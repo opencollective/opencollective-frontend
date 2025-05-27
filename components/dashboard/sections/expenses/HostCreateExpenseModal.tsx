@@ -22,6 +22,7 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { isValidUrl } from '../../../../lib/utils';
 import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
+import { formatCurrency } from '@/lib/currency-utils';
 import type { AccountingCategory } from '@/lib/graphql/types/v2/graphql';
 import type { PossiblyArray } from '@/lib/types';
 
@@ -280,200 +281,244 @@ export const HostCreateExpenseModal = ({
             }
           }}
         >
-          {({ isSubmitting, setFieldValue, setFieldTouched, values }) => (
-            <Form>
-              <div className="grid gap-6">
-                <div className="flex flex-col gap-4">
-                  <StyledInputFormikField
-                    name="description"
-                    label={<FormattedMessage defaultMessage="Description" id="Fields.description" />}
-                    autoFocus
-                  />
-                  <StyledInputFormikField
-                    inputType="date"
-                    name="incurredAt"
-                    label={<FormattedMessage defaultMessage="Date" id="expense.incurredAt" />}
-                    formatValue={value => value?.split('T')[0]}
-                  />
-                  <StyledInputFormikField
-                    name="amount"
-                    label={<FormattedMessage defaultMessage="Amount" id="Fields.amount" />}
-                  >
-                    {({ field }) => (
-                      <div>
-                        <div className="flex justify-between gap-2 [&>div]:w-full">
-                          <StyledInputAmountWithDynamicFxRate
-                            onChange={valueInCents => setFieldValue('amount', { ...values.amount, valueInCents })}
-                            onCurrencyChange={currency => setFieldValue('amount', { ...values.amount, currency })}
-                            onExchangeRateChange={exchangeRate =>
-                              setFieldValue('amount', { ...values.amount, exchangeRate })
-                            }
-                            exchangeRate={field.value.exchangeRate}
-                            fromCurrency={field.value.currency}
-                            toCurrency={host.currency}
-                            value={field.value.valueInCents}
-                            disabled={isAmountLocked || field.disabled}
-                            date={values.incurredAt}
-                          />
-                          {Boolean(transactionsImportRow?.amount?.valueInCents) && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="h-[38px]"
-                              onClick={() => setIsAmountLocked(locked => !locked)}
-                              aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
-                            >
-                              {isAmountLocked ? <Lock size={18} /> : <Unlock size={18} />}
-                            </Button>
-                          )}
-                        </div>
-                        {isAmountLocked && Boolean(transactionsImportRow?.amount?.valueInCents) && (
-                          <span className="mt-1 text-xs text-gray-500">
-                            <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </StyledInputFormikField>
-                  <StyledInputFormikField
-                    name="type"
-                    label={<FormattedMessage defaultMessage="Type" id="Expense.type" />}
-                  >
-                    {({ field }) => (
-                      <StyledSelect
-                        inputId={field.id}
-                        error={field.error}
-                        onChange={option => {
-                          setFieldValue('attachedFile', null);
-                          setFieldValue('type', option?.['value']);
-                        }}
-                        fontSize="14px"
-                        isDisabled={field.disabled}
-                        placeholder="Select a type"
-                        value={!values.type ? null : getExpenseTypeOption(intl, values.type)}
-                        options={expenseTypeOptions}
-                        menuPortalTarget={null}
-                      />
-                    )}
-                  </StyledInputFormikField>
-                  <StyledInputFormikField
-                    name="account"
-                    label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
-                  >
-                    {({ field }) =>
-                      Array.isArray(account) && account.length > 0 ? (
-                        <CollectivePicker
-                          inputId={field.id}
-                          collective={field.value}
-                          disabled={field.disabled || account.length === 1}
-                          error={field.error}
-                          collectives={account}
-                          onChange={({ value }) => setFieldValue(field.name, value)}
-                          onBlur={() => setFieldTouched(field.name, true)}
-                        />
-                      ) : (
-                        <CollectivePickerAsync
-                          inputId={field.id}
-                          collective={field.value}
-                          disabled={field.disabled || Boolean(account)}
-                          error={field.error}
-                          onBlur={() => setFieldTouched(field.name, true)}
-                          onChange={({ value }) => setFieldValue(field.name, value)}
-                          hostCollectiveIds={[host.legacyId]}
-                          preload
-                        />
-                      )
-                    }
-                  </StyledInputFormikField>
-                  <StyledInputFormikField
-                    name="payee"
-                    label={<FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />}
-                  >
-                    {({ field }) => (
-                      <PayeeSelect
-                        inputId={field.id}
-                        error={field.error}
-                        onBlur={() => setFieldTouched(field.name, true)}
-                        onChange={({ value }) => setFieldValue(field.name, value)}
-                        host={host}
-                        forAccount={values.account as Account}
-                        disabled={field.disabled}
-                        collective={field.value}
-                      />
-                    )}
-                  </StyledInputFormikField>
-                  {host?.accountingCategories?.totalCount > 0 && (
+          {({ isSubmitting, setFieldValue, setFieldTouched, values }) => {
+            const hasChangedAmount = Boolean(
+              transactionsImportRow?.amount?.valueInCents &&
+                (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
+                  transactionsImportRow.amount.currency !== values.amount.currency),
+            );
+
+            return (
+              <Form>
+                <div className="grid gap-6">
+                  <div className="flex flex-col gap-4">
                     <StyledInputFormikField
-                      name="accountingCategory"
-                      label={
-                        <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />
-                      }
+                      name="description"
+                      label={<FormattedMessage defaultMessage="Description" id="Fields.description" />}
+                      autoFocus
+                    />
+                    <StyledInputFormikField
+                      inputType="date"
+                      name="incurredAt"
+                      label={<FormattedMessage defaultMessage="Date" id="expense.incurredAt" />}
+                      formatValue={value => value?.split('T')[0]}
+                    />
+                    <StyledInputFormikField
+                      name="amount"
+                      label={<FormattedMessage defaultMessage="Amount" id="Fields.amount" />}
                     >
                       {({ field }) => (
-                        <AccountingCategorySelect
-                          id={field.id}
-                          kind="EXPENSE"
-                          host={host}
-                          disabled={!values.account}
-                          account={values.account as null | Account}
-                          expenseType={values.type}
-                          expenseValues={values}
-                          selectedCategory={field.value}
-                          onChange={category => setFieldValue(field.name, category)}
-                          buttonClassName="max-w-full"
-                          predictionStyle="inline-preload"
-                          showCode
-                          allowNone
+                        <div>
+                          <div className="flex justify-between gap-2 [&>div]:w-full">
+                            <StyledInputAmountWithDynamicFxRate
+                              onChange={valueInCents => setFieldValue('amount', { ...values.amount, valueInCents })}
+                              onCurrencyChange={currency => setFieldValue('amount', { ...values.amount, currency })}
+                              onExchangeRateChange={exchangeRate =>
+                                setFieldValue('amount', { ...values.amount, exchangeRate })
+                              }
+                              exchangeRate={field.value.exchangeRate}
+                              fromCurrency={field.value.currency}
+                              toCurrency={host.currency}
+                              value={field.value.valueInCents}
+                              disabled={isAmountLocked || field.disabled}
+                              date={values.incurredAt}
+                            />
+                            {Boolean(transactionsImportRow?.amount?.valueInCents) && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-[38px]"
+                                onClick={() => setIsAmountLocked(locked => !locked)}
+                                aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
+                                disabled={hasChangedAmount}
+                              >
+                                {isAmountLocked ? <Unlock size={18} /> : <Lock size={18} />}
+                              </Button>
+                            )}
+                          </div>
+                          {Boolean(transactionsImportRow?.amount?.valueInCents) &&
+                            (isAmountLocked ? (
+                              <span className="mt-1 text-xs text-gray-500">
+                                <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
+                              </span>
+                            ) : (
+                              hasChangedAmount && (
+                                <span className="mt-1 text-xs text-gray-500">
+                                  <FormattedMessage
+                                    defaultMessage="The initial amount was {amount}"
+                                    id="+EJXC5"
+                                    values={{
+                                      amount: formatCurrency(
+                                        Math.abs(transactionsImportRow.amount.valueInCents),
+                                        transactionsImportRow.amount.currency,
+                                        { locale: intl.locale },
+                                      ),
+                                    }}
+                                  />
+                                  {' - '}
+                                  <Button
+                                    variant="link"
+                                    size="xs"
+                                    className="p-0 text-xs"
+                                    onClick={() => {
+                                      setFieldValue('amount', {
+                                        valueInCents: Math.abs(transactionsImportRow.amount.valueInCents),
+                                        currency: transactionsImportRow.amount.currency,
+                                      });
+                                      setIsAmountLocked(true);
+                                    }}
+                                  >
+                                    <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
+                                  </Button>
+                                </span>
+                              )
+                            ))}
+                        </div>
+                      )}
+                    </StyledInputFormikField>
+                    <StyledInputFormikField
+                      name="type"
+                      label={<FormattedMessage defaultMessage="Type" id="Expense.type" />}
+                    >
+                      {({ field }) => (
+                        <StyledSelect
+                          inputId={field.id}
+                          error={field.error}
+                          onChange={option => {
+                            setFieldValue('attachedFile', null);
+                            setFieldValue('type', option?.['value']);
+                          }}
+                          fontSize="14px"
+                          isDisabled={field.disabled}
+                          placeholder="Select a type"
+                          value={!values.type ? null : getExpenseTypeOption(intl, values.type)}
+                          options={expenseTypeOptions}
+                          menuPortalTarget={null}
                         />
                       )}
                     </StyledInputFormikField>
-                  )}
-                  <StyledInputFormikField
-                    required={values.type === ExpenseType.RECEIPT}
-                    name="attachedFile"
-                    label={
-                      values.type === ExpenseType.RECEIPT ? (
-                        <FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />
-                      ) : (
-                        <FormattedMessage defaultMessage="Attachment" id="Expense.Attachment" />
-                      )
-                    }
-                  >
-                    {({ form, field, meta }) => (
-                      <Dropzone
-                        {...attachmentDropzoneParams}
-                        kind="EXPENSE_ITEM"
-                        data-cy={`${field.name}-dropzone`}
-                        name={field.name}
-                        isMulti={false}
-                        error={(meta.touched || form.submitCount) && meta.error}
-                        mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
-                        value={field.value && isValidUrl(field.value?.url) && field.value.url}
-                        useGraphQL={true}
-                        parseDocument={false}
-                        onGraphQLSuccess={uploadResults => {
-                          const uploadedFile = uploadResults[0].file;
-                          setFieldValue(field.name, uploadedFile);
-                        }}
-                        onReject={msg => {
-                          toast({ variant: 'error', message: msg });
-                        }}
-                      />
+                    <StyledInputFormikField
+                      name="account"
+                      label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
+                    >
+                      {({ field }) =>
+                        Array.isArray(account) && account.length > 0 ? (
+                          <CollectivePicker
+                            inputId={field.id}
+                            collective={field.value}
+                            disabled={field.disabled || account.length === 1}
+                            error={field.error}
+                            collectives={account}
+                            onChange={({ value }) => setFieldValue(field.name, value)}
+                            onBlur={() => setFieldTouched(field.name, true)}
+                          />
+                        ) : (
+                          <CollectivePickerAsync
+                            inputId={field.id}
+                            collective={field.value}
+                            disabled={field.disabled || Boolean(account)}
+                            error={field.error}
+                            onBlur={() => setFieldTouched(field.name, true)}
+                            onChange={({ value }) => setFieldValue(field.name, value)}
+                            hostCollectiveIds={[host.legacyId]}
+                            preload
+                          />
+                        )
+                      }
+                    </StyledInputFormikField>
+                    <StyledInputFormikField
+                      name="payee"
+                      label={<FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />}
+                    >
+                      {({ field }) => (
+                        <PayeeSelect
+                          inputId={field.id}
+                          error={field.error}
+                          onBlur={() => setFieldTouched(field.name, true)}
+                          onChange={({ value }) => setFieldValue(field.name, value)}
+                          host={host}
+                          forAccount={values.account as Account}
+                          disabled={field.disabled}
+                          collective={field.value}
+                        />
+                      )}
+                    </StyledInputFormikField>
+                    {host?.accountingCategories?.totalCount > 0 && (
+                      <StyledInputFormikField
+                        name="accountingCategory"
+                        label={
+                          <FormattedMessage
+                            defaultMessage="Accounting category"
+                            id="AddFundsModal.accountingCategory"
+                          />
+                        }
+                      >
+                        {({ field }) => (
+                          <AccountingCategorySelect
+                            id={field.id}
+                            kind="EXPENSE"
+                            host={host}
+                            disabled={!values.account}
+                            account={values.account as null | Account}
+                            expenseType={values.type}
+                            expenseValues={values}
+                            selectedCategory={field.value}
+                            onChange={category => setFieldValue(field.name, category)}
+                            buttonClassName="max-w-full"
+                            predictionStyle="inline-preload"
+                            showCode
+                            allowNone
+                          />
+                        )}
+                      </StyledInputFormikField>
                     )}
-                  </StyledInputFormikField>
+                    <StyledInputFormikField
+                      required={values.type === ExpenseType.RECEIPT}
+                      name="attachedFile"
+                      label={
+                        values.type === ExpenseType.RECEIPT ? (
+                          <FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />
+                        ) : (
+                          <FormattedMessage defaultMessage="Attachment" id="Expense.Attachment" />
+                        )
+                      }
+                    >
+                      {({ form, field, meta }) => (
+                        <Dropzone
+                          {...attachmentDropzoneParams}
+                          kind="EXPENSE_ITEM"
+                          data-cy={`${field.name}-dropzone`}
+                          name={field.name}
+                          isMulti={false}
+                          error={(meta.touched || form.submitCount) && meta.error}
+                          mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
+                          value={field.value && isValidUrl(field.value?.url) && field.value.url}
+                          useGraphQL={true}
+                          parseDocument={false}
+                          onGraphQLSuccess={uploadResults => {
+                            const uploadedFile = uploadResults[0].file;
+                            setFieldValue(field.name, uploadedFile);
+                          }}
+                          onReject={msg => {
+                            toast({ variant: 'error', message: msg });
+                          }}
+                        />
+                      )}
+                    </StyledInputFormikField>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-8 flex justify-end gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
-                <Button onClick={() => setOpen(false)} type="button" variant="outline" disabled={isSubmitting}>
-                  <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                </Button>
-                <Button data-cy="add-funds-submit-btn" type="submit" loading={isSubmitting}>
-                  <FormattedMessage defaultMessage="Create expense" id="YUK+rq" />
-                </Button>
-              </div>
-            </Form>
-          )}
+                <div className="mt-8 flex justify-end gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
+                  <Button onClick={() => setOpen(false)} type="button" variant="outline" disabled={isSubmitting}>
+                    <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                  </Button>
+                  <Button data-cy="add-funds-submit-btn" type="submit" loading={isSubmitting}>
+                    <FormattedMessage defaultMessage="Create expense" id="YUK+rq" />
+                  </Button>
+                </div>
+              </Form>
+            );
+          }}
         </FormikZod>
       </DialogContent>
     </Dialog>

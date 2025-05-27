@@ -788,17 +788,43 @@ const AddFundsModalContentWithCollective = ({
                               size="sm"
                               className="h-[38px]"
                               onClick={() => setIsAmountLocked(locked => !locked)}
+                              disabled={initialValues.amount !== values.amount}
                               aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
                             >
-                              {isAmountLocked ? <Lock size={18} /> : <Unlock size={18} />}
+                              {isAmountLocked ? <Unlock size={18} /> : <Lock size={18} />}
                             </Button>
                           )}
                         </div>
-                        {isAmountLocked && Boolean(initialValues?.amount) && (
-                          <span className="mt-1 text-xs text-gray-500">
-                            <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
-                          </span>
-                        )}
+                        {Boolean(initialValues?.amount) &&
+                          (isAmountLocked ? (
+                            <span className="mt-1 text-xs text-gray-500">
+                              <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
+                            </span>
+                          ) : (
+                            initialValues.amount !== values.amount && (
+                              <span className="mt-1 text-xs text-gray-500">
+                                <FormattedMessage
+                                  defaultMessage="The initial amount was {amount}."
+                                  id="6hEUR9"
+                                  values={{
+                                    amount: formatCurrency(initialValues.amount, currency, { locale: intl.locale }),
+                                  }}
+                                />
+                                {' - '}
+                                <Button
+                                  variant="link"
+                                  size="xs"
+                                  className="p-0 text-xs"
+                                  onClick={() => {
+                                    formik.setFieldValue('amount', initialValues.amount);
+                                    setIsAmountLocked(true);
+                                  }}
+                                >
+                                  <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
+                                </Button>
+                              </span>
+                            )
+                          ))}
                       </div>
                     )}
                   </Field>
