@@ -232,9 +232,10 @@ const getDefaultFilterValues = (
   row: TransactionsImportRow,
   accounts: Pick<Account, 'slug'>[],
   activeViewId: TabType,
+  host: Pick<Host, 'id' | 'slug' | 'currency'>,
 ) => {
   const filters = {
-    amount: getAmountRangeFilter(row.amount.valueInCents),
+    amount: { ...getAmountRangeFilter(row.amount.valueInCents), currency: host.currency },
     account: accounts?.map(account => account.slug),
   };
 
@@ -252,7 +253,7 @@ const getDefaultFilterValues = (
 const useMatchDebitDialogQueryFilter = (
   activeViewId: TabType,
   row: TransactionsImportRow,
-  host: Pick<Host, 'id' | 'slug'>,
+  host: Pick<Host, 'id' | 'slug' | 'currency'>,
   accounts: Pick<Account, 'slug'>[],
 ) => {
   const intl = useIntl();
@@ -282,7 +283,7 @@ const useMatchDebitDialogQueryFilter = (
   );
 
   const defaultFilterValues = React.useMemo(
-    () => getDefaultFilterValues(row, accounts, activeViewId),
+    () => getDefaultFilterValues(row, accounts, activeViewId, host),
     [row, accounts, activeViewId],
   );
 
@@ -352,7 +353,7 @@ const useMatchDebitDialogQueryFilter = (
   // Re-apply default filters after changing view
   React.useEffect(() => {
     queryFilter.resetFilters({
-      ...getDefaultFilterValues(row, accounts, activeViewId),
+      ...getDefaultFilterValues(row, accounts, activeViewId, host),
       ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
     });
   }, [activeViewId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -423,7 +424,7 @@ export const MatchDebitDialog = ({
   // When opening the modal, make sure we reset the filters to their default values
   React.useEffect(() => {
     if (props.open) {
-      queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
+      queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId, host));
     }
   }, [props.open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -439,7 +440,7 @@ export const MatchDebitDialog = ({
           setIsSubmitting(false);
           setOpen(false);
           setActiveViewId(TabType.EXPENSES_UNPAID);
-          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
+          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId, host));
         }
       }}
     >
@@ -465,7 +466,7 @@ export const MatchDebitDialog = ({
             activeViewId={activeViewId}
             resetFilters={filter => {
               queryFilter.resetFilters({
-                ...getDefaultFilterValues(row, accounts, activeViewId),
+                ...getDefaultFilterValues(row, accounts, activeViewId, host),
                 ...filter,
                 ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
               });
