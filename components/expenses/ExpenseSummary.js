@@ -401,7 +401,7 @@ const ExpenseSummary = ({
           {canEditItems && (
             <EditExpenseDialog
               expense={expense}
-              dialogContentClassName="sm:max-w-xl"
+              dialogContentClassName="sm:max-w-2xl"
               field="expenseDetails"
               title={intl.formatMessage({ defaultMessage: 'Edit expense details', id: 'expense.editDetails' })}
             />

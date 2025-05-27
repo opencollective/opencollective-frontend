@@ -1539,8 +1539,9 @@ async function buildFormOptions(
       options.canSetupRecurrence = false;
     }
 
-    options.allowExpenseItemAttachment =
-      values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE;
+    options.allowExpenseItemAttachment = values.expenseTypeOption
+      ? values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE
+      : options.expense?.type === ExpenseType.RECEIPT || options.expense?.type === ExpenseType.CHARGE;
 
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 

@@ -510,6 +510,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
       newPayoutMethod: {
         data: {},
       },
+      expenseTypeOption: ExpenseType.CHARGE,
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
@@ -518,17 +519,21 @@ const AttachReceipts = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <div className="space-y-4">
-          {expenseForm.values.expenseItems.map((item, i) => (
-            <ExpenseItemWrapper
-              key={item.id}
-              index={i}
-              isAmountLocked={true}
-              isDateLocked={true}
-              isSubjectToTax={Boolean(expenseForm.options.taxType)}
-            />
-          ))}
-        </div>
+        {expenseForm.initialLoading ? (
+          <Skeleton className="h-42 w-full" />
+        ) : (
+          <div className="space-y-4">
+            {expenseForm.values.expenseItems.map((item, i) => (
+              <ExpenseItemWrapper
+                key={item.id}
+                index={i}
+                isAmountLocked={true}
+                isDateLocked={true}
+                isSubjectToTax={Boolean(expenseForm.options.taxType)}
+              />
+            ))}
+          </div>
+        )}
 
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
