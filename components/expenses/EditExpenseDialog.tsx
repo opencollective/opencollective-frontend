@@ -658,7 +658,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
   return (
     <React.Fragment>
       <RadioGroup
-        disabled={expenseForm.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE) || expenseForm.isSubmitting} // TODO: should type be locked here? Perhaps prevent it before in this case
+        disabled={expenseForm.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE) || expenseForm.isSubmitting}
         value={expenseForm.values.expenseTypeOption}
         onValueChange={newValue => expenseForm.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
         className="flex"
