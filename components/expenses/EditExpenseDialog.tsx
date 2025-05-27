@@ -675,7 +675,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
               </div>
               {expenseForm.options.expense?.type === ExpenseType.INVOICE && (
                 <Badge type="info" size="sm">
-                  Current
+                  <FormattedMessage id="Expense.Type.current" defaultMessage="Current" />
                 </Badge>
               )}
             </div>
