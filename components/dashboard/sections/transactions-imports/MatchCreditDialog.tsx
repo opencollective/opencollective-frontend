@@ -79,8 +79,7 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
     $offset: Int
     $limit: Int
     $status: [ExpenseStatusFilter!]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $payoutMethodType: PayoutMethodType
@@ -92,8 +91,7 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
       status: $status
       dateFrom: $dateFrom
       dateTo: $dateTo
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
       searchTerm: $searchTerm
       offset: $offset
       limit: $limit
@@ -158,8 +156,7 @@ const findOrderMatchForOffPlatformCreditQuery = gql`
     $offset: Int
     $limit: Int
     $status: [OrderStatus!]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $account: [AccountReferenceInput!]
@@ -171,8 +168,7 @@ const findOrderMatchForOffPlatformCreditQuery = gql`
         status: $status
         dateFrom: $dateFrom
         dateTo: $dateTo
-        minAmount: $minAmount
-        maxAmount: $maxAmount
+        amount: $amount
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
