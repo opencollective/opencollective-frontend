@@ -32,6 +32,7 @@ export const accountExpensesQuery = gql`
     $fetchHostForExpenses: Boolean!
     $hasAmountInCreatedByAccountCurrency: Boolean!
     $accountingCategory: [String]
+    $hasGrantHistory: Boolean!
   ) {
     expenses(
       account: $account
@@ -79,6 +80,16 @@ export const accountExpensesQuery = gql`
         host @include(if: $fetchHostForExpenses) {
           id
           ...ExpenseHostFields
+        }
+
+        grantHistory: payeeExpenseHistory(status: PAID, type: GRANT, limit: 1) @include(if: $hasGrantHistory) {
+          totalAmount {
+            amount {
+              currency
+              valueInCents
+            }
+          }
+          totalCount
         }
       }
     }
@@ -158,6 +169,7 @@ export const hostDashboardExpensesQuery = gql`
     $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
+    $hasGrantHistory: Boolean!
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -187,6 +199,17 @@ export const hostDashboardExpensesQuery = gql`
         id
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
+
+        grantHistory: payeeExpenseHistory(status: PAID, type: GRANT, limit: 1, fromExpenseAccount: HOST)
+          @include(if: $hasGrantHistory) {
+          totalAmount {
+            amount {
+              currency
+              valueInCents
+            }
+          }
+          totalCount
+        }
       }
     }
     host(slug: $hostSlug) {

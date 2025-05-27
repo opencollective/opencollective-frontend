@@ -6,8 +6,9 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
 import useProcessExpense from '@/lib/expenses/useProcessExpense';
-import type { Expense } from '@/lib/graphql/types/v2/schema';
+import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
@@ -20,6 +21,7 @@ import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpe
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
+import StyledLink from '@/components/StyledLink';
 import StyledSpinner from '@/components/StyledSpinner';
 import {
   DropdownMenu,
@@ -43,9 +45,9 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
   beneficiary: {
     accessorKey: 'payee',
     header: () => <FormattedMessage defaultMessage="Beneficiary" id="VfJsl4" />,
-    cell: ({ cell, row }) => {
-      const createdByAccount = row.original.createdByAccount;
-      return <BeneficiaryCell account={cell.getValue()} createdByAccount={createdByAccount} />;
+    cell: ({ row }) => {
+      const grant = row.original;
+      return <BeneficiaryCell grant={grant} />;
     },
   },
   createdAt: {
@@ -166,7 +168,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
                   router.push(
                     getDashboardRoute(
                       account,
-                      `${isHost ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}`,
+                      `${isHost ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${isHost ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
                     ),
                   )
                 }
@@ -205,22 +207,33 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
   );
 }
 
-function BeneficiaryCell({ account, createdByAccount }) {
+function BeneficiaryCell({ grant }) {
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
+  const isHostDashboardAccount = isHostAccount(dashboardAccount);
+
   const intl = useIntl();
 
-  const hasPreviousGrants = false;
+  const grantHistory = grant.grantHistory;
+  const hasPreviousGrants = grantHistory?.totalCount > 0;
+  const beneficiary = grant.payee;
+  const createdByAccount = grant.createdByAccount;
+
+  const previousGrantsLink = getDashboardRoute(
+    dashboardAccount,
+    `${isHostDashboardAccount ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${isHostDashboardAccount ? `&status=ALL` : ''}`,
+  );
 
   return (
     <div className="flex">
       <div className="pr-4">
         <AccountHoverCard
-          account={account}
+          account={beneficiary}
           trigger={
             <span className="inline-flex">
               <AvatarWithLink
                 size={32}
-                account={account}
-                secondaryAccount={account.id === createdByAccount.id ? null : createdByAccount}
+                account={beneficiary}
+                secondaryAccount={beneficiary.id === createdByAccount.id ? null : createdByAccount}
               />
             </span>
           }
@@ -229,29 +242,63 @@ function BeneficiaryCell({ account, createdByAccount }) {
       <div>
         <div className="font-semibold">
           <AccountHoverCard
-            account={account}
+            account={beneficiary}
             trigger={
               <span className="inline-flex">
-                <LinkCollective noTitle className="inline-flex hover:underline" collective={account}>
-                  {account.name}
+                <LinkCollective noTitle className="inline-flex hover:underline" collective={beneficiary}>
+                  {beneficiary.name}
                 </LinkCollective>
               </span>
             }
           />
         </div>
         <div>
-          <span>{formatCollectiveType(intl, account.type)}</span>
-          {hasPreviousGrants && (
+          <span>
+            {beneficiary?.type === CollectiveType.VENDOR ? (
+              <FormattedMessage defaultMessage="Beneficiary" id="VfJsl4" />
+            ) : (
+              formatCollectiveType(intl, beneficiary.type)
+            )}
+          </span>
+          {hasPreviousGrants && grant.status !== ExpenseStatus.PAID && (
             <span>
               &nbsp;•&nbsp;
-              <FormattedMessage
-                defaultMessage="Granted {amount} in {countGrants, plural, one {# grant} other {# grants}}"
-                id="zV1NPO"
-                values={{
-                  amount: <FormattedMoneyAmount currency="USD" amount={10000} />,
-                  countGrants: 10,
+              <StyledLink
+                href={previousGrantsLink}
+                onClick={e => {
+                  e.stopPropagation();
                 }}
-              />
+              >
+                {isHostDashboardAccount ? (
+                  <FormattedMessage
+                    defaultMessage="Received {countGrants, plural, one {# grant} other {# grants}} totalling {amount} from hosted funds"
+                    id="8LMAoG"
+                    values={{
+                      amount: (
+                        <FormattedMoneyAmount
+                          currency={grantHistory?.totalAmount?.amount?.currency}
+                          amount={grantHistory?.totalAmount?.amount?.valueInCents}
+                        />
+                      ),
+                      countGrants: grantHistory?.totalCount,
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Received {countGrants, plural, one {# grant} other {# grants}} totalling {amount}"
+                    id="HpMrEk"
+                    values={{
+                      amount: (
+                        <FormattedMoneyAmount
+                          currency={grantHistory?.totalAmount?.amount?.currency}
+                          amount={grantHistory?.totalAmount?.amount?.valueInCents}
+                        />
+                      ),
+                      countGrants: grantHistory?.totalCount,
+                    }}
+                  />
+                )}
+              </StyledLink>
             </span>
           )}
         </div>

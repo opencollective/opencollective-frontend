@@ -183,6 +183,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     hostSlug,
     ...queryFilter.variables,
     type: ExpenseType.GRANT,
+    hasGrantHistory: true,
   };
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
@@ -246,6 +247,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
             innerClassName="text-muted-foreground"
             meta={
               {
+                enableViewGrantsByBeneficiary: true,
                 onViewDetailsClick,
               } as GrantsTableMeta
             }

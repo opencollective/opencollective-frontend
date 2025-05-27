@@ -74,6 +74,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     fromAccount,
     fetchHostForExpenses: true,
     hasAmountInCreatedByAccountCurrency: true, // To generate the `amountInCreatedByAccountCurrency` field below
+    hasGrantHistory: false,
     ...queryFilter.variables,
     ...(!queryFilter.variables.type
       ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
