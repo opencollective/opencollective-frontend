@@ -558,7 +558,7 @@ const ExpenseSummary = ({
             </div>
           )}
         </Flex>
-        {expenseTypeSupportsAttachments(expense?.type) && invoiceFile && (
+        {expense?.type === expenseTypes.INVOICE && (
           <React.Fragment>
             <Flex my={4} alignItems="center" gridGap={2}>
               {!expense && isLoading ? (
