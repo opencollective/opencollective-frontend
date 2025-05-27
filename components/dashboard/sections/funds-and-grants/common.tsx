@@ -254,7 +254,7 @@ function BeneficiaryCell({ grant }) {
         </div>
         <div>
           <span>
-            {beneficiary?.type === CollectiveType.VENDOR ? (
+            {beneficiary.type === CollectiveType.VENDOR ? (
               <FormattedMessage defaultMessage="Beneficiary" id="VfJsl4" />
             ) : (
               formatCollectiveType(intl, beneficiary.type)
