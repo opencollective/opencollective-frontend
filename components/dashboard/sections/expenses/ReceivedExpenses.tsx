@@ -8,8 +8,17 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { type Account, ExpenseStatusFilter, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
+import {
+  type Account,
+  ExpenseStatusFilter,
+  ExpenseType,
+  PayoutMethodType,
+} from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { i18nExpenseType } from '@/lib/i18n/expense';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import StyledButton from '../../../StyledButton';
@@ -41,6 +50,7 @@ type FilterMeta = CommonFilterMeta & {
   expenseTags?: string[];
   hostSlug?: string;
   includeUncategorized: boolean;
+  omitExpenseTypesInFilter?: ExpenseType[];
 };
 const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
@@ -73,6 +83,18 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
+  type: {
+    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
+    Component: ({ meta, valueRenderer, intl, ...props }) => (
+      <ComboSelectFilter
+        options={Object.values(omit(ExpenseType, [ExpenseType.FUNDING_REQUEST, ...meta.omitExpenseTypesInFilter]))
+          .map(value => ({ label: valueRenderer({ value, intl }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
+  },
 };
 
 const filtersWithoutHost = omit(filters, 'accountingCategory');
@@ -94,6 +116,13 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
+  const { LoggedInUser } = useLoggedInUser();
+  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const omitExpenseTypesInFilter = hasGrantAndFundsReorgEnabled ? [ExpenseType.GRANT] : [];
+
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     childrenAccounts: metadata?.account?.childrenAccounts?.nodes.length
@@ -103,9 +132,10 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     expenseTags: metadata?.expenseTagStats?.nodes?.map(({ tag }) => tag),
     hostSlug: hostSlug,
     includeUncategorized: true,
+    omitExpenseTypesInFilter,
   };
 
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, { type: ExpenseType }>({
     schema: hostSlug ? schema : schemaWithoutHost,
     toVariables,
     meta: filterMeta,
@@ -118,6 +148,9 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       fetchHostForExpenses: false, // Already fetched at the root level
       hasAmountInCreatedByAccountCurrency: false,
       ...queryFilter.variables,
+      ...(!queryFilter.variables.type
+        ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
+        : {}),
     },
     context: API_V2_CONTEXT,
   });

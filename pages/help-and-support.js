@@ -4,6 +4,7 @@ import { Mail } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { getEnvVar } from '@/lib/env-utils';
+import { parseToBoolean } from '@/lib/utils';
 
 import { Flex } from '../components/Grid';
 import BrowseTopics from '../components/help-and-support/BrowseTopicSection';
@@ -38,7 +39,7 @@ const renderFormContent = formConfirmation => {
   return (
     <React.Fragment>
       <HowCanWeHelp />
-      {!getEnvVar('DISABLE_CONTACT_FORM') ? (
+      {!parseToBoolean(getEnvVar('DISABLE_CONTACT_FORM')) ? (
         <ContactForm />
       ) : (
         <div className="mx-auto mt-12 flex max-w-3xl flex-col items-center gap-3 rounded-xl border p-8 text-center shadow">

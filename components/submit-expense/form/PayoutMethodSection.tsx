@@ -15,7 +15,7 @@ import {
   type SavePayoutMethodMutation,
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
-import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
 import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
@@ -46,7 +46,7 @@ type PayoutMethodSectionProps = {
 function getFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
-    ...pick(form.values, ['payeeSlug', 'payoutMethodId']),
+    ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.options, [
       'payee',
       'payoutMethods',
@@ -163,10 +163,17 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       !props.isAdminOfPayee &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
         <MessageBox type="info">
-          <FormattedMessage
-            defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
-            id="LHdznY"
-          />
+          {props.expenseTypeOption === ExpenseType.GRANT ? (
+            <FormattedMessage
+              defaultMessage="The person you are inviting to submit this grant request will be asked to provide payout method details."
+              id="lsGVcb"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+              id="LHdznY"
+            />
+          )}
         </MessageBox>
       ) : (
         <RadioGroup

@@ -113,6 +113,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
 
+  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const hasPendingGrants = account.pendingGrants?.totalCount > 0;
+  const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
+
   const items: MenuItem[] = [
     {
       if: isIndividual || !isHost,
@@ -161,6 +168,44 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
             },
             { accountName: account.name },
           ),
+        },
+      ],
+    },
+    {
+      if: isIndividual && hasGrantAndFundsReorgEnabled,
+      Icon: Receipt,
+      label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+      section: ALL_SECTIONS.SUBMITTED_GRANTS,
+    },
+    {
+      if: !isIndividual && hasGrantAndFundsReorgEnabled,
+      type: 'group',
+      Icon: Receipt,
+      label:
+        isHost || isSelfHosted
+          ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
+          : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      subMenu: [
+        {
+          if: isHost,
+          section: ALL_SECTIONS.HOSTED_FUNDS,
+        },
+        {
+          if: isHost || isSelfHosted,
+          section: ALL_SECTIONS.HOSTED_GRANTS,
+          label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+        },
+        {
+          if: !isIndividual && !(isHost || isSelfHosted),
+          section: ALL_SECTIONS.GRANTS,
+        },
+        {
+          if: isHost || isSelfHosted ? hasPendingGrants : !isIndividual,
+          section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
+        },
+        {
+          if: isHost || isSelfHosted ? hasIssuedGrantRequests : true,
+          section: ALL_SECTIONS.SUBMITTED_GRANTS,
         },
       ],
     },

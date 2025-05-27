@@ -24,6 +24,12 @@ import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/typ
 import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { CollectiveType } from '@/lib/constants/collectives';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+
+import { useModal } from '@/components/ModalContext';
+import { SubmitGrantFlowModal } from '@/components/submit-grant/SubmitGrantFlow';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import AddAgreementModal from '../../../agreements/AddAgreementModal';
@@ -206,6 +212,20 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
     },
   },
+  unhostedAt: {
+    accessorKey: 'unhostedAt',
+    header: () => <FormattedMessage defaultMessage="Unhosted since" id="UnhostedSince" />,
+    cell: ({ row }) => {
+      const unhostedAt = row.original.unhostedAt;
+      return isNil(unhostedAt) ? (
+        ''
+      ) : (
+        <div suppressHydrationWarning className="whitespace-nowrap">
+          <FormattedDate value={unhostedAt} day="numeric" month="long" year="numeric" />
+        </div>
+      );
+    },
+  },
   balance: {
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
@@ -221,7 +241,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   },
   consolidatedBalance: {
     accessorKey: 'consolidatedBalence',
-    header: () => <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
+    header: () => <FormattedMessage defaultMessage="Current balance" id="kuYpoI" />,
     cell: ({ row }) => {
       const collective = row.original;
       const isChild = !!collective.parent?.id;
@@ -249,6 +269,40 @@ export const cols: Record<string, ColumnDef<any, any>> = {
               </TooltipContent>
             </Tooltip>
           )}
+        </div>
+      );
+    },
+  },
+  totalAmountRaised: {
+    accessorKey: 'totalAmountRaised',
+    header: () => <FormattedMessage id="budgetSection-raised" defaultMessage="Total raised" />,
+    cell: ({ row }) => {
+      const collective = row.original;
+      const stats = collective.stats;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={stats.totalAmountRaised?.valueInCents}
+            currency={stats.totalAmountRaised?.currency}
+            showCurrencyCode={true}
+          />
+        </div>
+      );
+    },
+  },
+  totalAmountSpent: {
+    accessorKey: 'totalAmountSpent',
+    header: () => <FormattedMessage defaultMessage="Total disbursed" id="dIoEln" />,
+    cell: ({ row }) => {
+      const collective = row.original;
+      const stats = collective.stats;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={Math.abs(stats.totalAmountSpent?.valueInCents)}
+            currency={stats.totalAmountSpent?.currency}
+            showCurrencyCode={true}
+          />
         </div>
       );
     },
@@ -288,10 +342,18 @@ export const MoreActionsMenu = ({
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
   const router = useRouter();
+  const { showModal } = useModal();
   const { account } = React.useContext(DashboardContext);
   const [openModal, setOpenModal] = React.useState<
     null | 'ADD_FUNDS' | 'ADD_EXPENSE' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
   >(null);
+
+  const { LoggedInUser } = useLoggedInUser();
+  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const isCollectiveAdmin = LoggedInUser.isAdminOfCollective(collective);
 
   return (
     <React.Fragment>
@@ -302,10 +364,18 @@ export const MoreActionsMenu = ({
             <React.Fragment>
               <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>
                 <Eye className="mr-2" size="16" />
-                <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </React.Fragment>
+          )}
+          {isCollectiveAdmin && (
+            <a href={getDashboardRoute(collective)}>
+              <DropdownMenuItem className="cursor-pointer" data-cy="actions-visit-dashboard">
+                <Eye className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Visit dashboard" id="I7Vl8J" />
+              </DropdownMenuItem>
+            </a>
           )}
           <DropdownMenuItem
             className="cursor-pointer"
@@ -313,8 +383,32 @@ export const MoreActionsMenu = ({
             onClick={() => router.push(getDashboardRoute(account, `host-transactions?account=${collective.slug}`))}
           >
             <ReceiptText className="mr-2" size="16" />
-            <FormattedMessage id="viewTransactions" defaultMessage="View Transactions" />
+            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
           </DropdownMenuItem>
+          {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="actions-view-disbursed-grants"
+              onClick={() =>
+                router.push(getDashboardRoute(account, `hosted-grants?account=${collective.slug}&status=PAID`))
+              }
+            >
+              <ReceiptText className="mr-2" size="16" />
+              <FormattedMessage defaultMessage="View disbursed grants" id="P/PQ+i" />
+            </DropdownMenuItem>
+          )}
+          {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="actions-view-grants-requests"
+              onClick={() =>
+                router.push(getDashboardRoute(account, `hosted-grants?account=${collective.slug}&status=ALL`))
+              }
+            >
+              <ReceiptText className="mr-2" size="16" />
+              <FormattedMessage defaultMessage="View grant requests" id="HABa5r" />
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
@@ -322,9 +416,21 @@ export const MoreActionsMenu = ({
             onClick={() => setOpenModal('ADD_FUNDS')}
           >
             <Banknote className="mr-2" size="16" />
-            <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+            <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+          {collective.type === CollectiveType.FUND && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="actions-create-grant-request"
+              onClick={() => {
+                showModal(SubmitGrantFlowModal, { account: collective });
+              }}
+            >
+              <ReceiptText className="mr-2" size="16" />
+              <FormattedMessage defaultMessage="Create grant request" id="TnG9DJ" />
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="cursor-pointer"
             data-cy="actions-add-expense"
@@ -340,7 +446,7 @@ export const MoreActionsMenu = ({
             onClick={() => setOpenModal('ADD_AGREEMENT')}
           >
             <FilePlus2 className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Add Agreement" id="apnXKF" />
+            <FormattedMessage defaultMessage="Add agreement" id="aHYj2r" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -356,12 +462,20 @@ export const MoreActionsMenu = ({
             {collective.isFrozen ? (
               <React.Fragment>
                 <Play className="mr-2" size="16" />
-                <FormattedMessage defaultMessage="Unfreeze Collective" id="gX79wf" />
+                <FormattedMessage
+                  defaultMessage="Unfreeze {collectiveType, select, FUND {fund} other {collective}}"
+                  id="62ZM+e"
+                  values={{ collectiveType: collective.type }}
+                />
               </React.Fragment>
             ) : (
               <React.Fragment>
                 <Pause className="mr-2" size="16" />
-                <FormattedMessage defaultMessage="Freeze Collective" id="ILjcbM" />
+                <FormattedMessage
+                  defaultMessage="Freeze {collectiveType, select, FUND {fund} other {collective}}"
+                  id="pq79Xh"
+                  values={{ collectiveType: collective.type }}
+                />
               </React.Fragment>
             )}
           </DropdownMenuItem>

@@ -168,7 +168,7 @@ const MessagesPerType: Record<
   },
 };
 
-type ConfirmProcessExpenseModalType =
+export type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
   | 'MARK_AS_SPAM'

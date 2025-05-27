@@ -3,11 +3,9 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { checkIfOCF } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
 
-import Link from '../Link';
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
@@ -211,20 +209,6 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
           currency={collective.currency}
           customButton={props => <NotificationBarButton {...props} />}
         />
-      ),
-    };
-  } else if (checkIfOCF(collective) || checkIfOCF(collective.parentCollective)) {
-    return {
-      type: 'warning',
-      title: 'Open Collective Official Statement: OCF Dissolution',
-      description: (
-        <React.Fragment>
-          Find more information here:{' '}
-          <Link href="https://blog.opencollective.com/open-collective-official-statement-ocf-dissolution/" openInNewTab>
-            Open Collective official Statement
-          </Link>
-          .
-        </React.Fragment>
       ),
     };
   }

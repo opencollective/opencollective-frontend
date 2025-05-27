@@ -115,6 +115,7 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
             payoutMethod={props.form.options.payoutMethod}
             expense={props.form.options.expense}
             loggedInAccount={props.form.options.loggedInAccount}
+            expenseTypeOption={props.form.values.expenseTypeOption}
           />
         </div>
       </div>
@@ -537,6 +538,7 @@ const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySectio
   payoutMethod: ExpenseForm['options']['payoutMethod'];
   loggedInAccount: ExpenseForm['options']['loggedInAccount'];
   expense: ExpenseForm['options']['expense'];
+  expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
   return (
     <React.Fragment>
@@ -548,10 +550,17 @@ const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySectio
       props.payee?.type !== CollectiveType.VENDOR ? (
         <React.Fragment>
           <div className="mt-2 text-sm text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
-              id="LHdznY"
-            />
+            {props.expenseTypeOption === ExpenseType.GRANT ? (
+              <FormattedMessage
+                defaultMessage="The person you are inviting to submit this grant request will be asked to provide payout method details."
+                id="lsGVcb"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+                id="LHdznY"
+              />
+            )}
           </div>
         </React.Fragment>
       ) : (

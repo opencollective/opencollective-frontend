@@ -222,6 +222,7 @@ export type AccountExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -1634,6 +1635,7 @@ export type BotExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -2165,6 +2167,7 @@ export type CollectiveExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -4184,6 +4187,7 @@ export type EventExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -4545,6 +4549,8 @@ export type Expense = {
   /** The account from where the expense was paid */
   host?: Maybe<Host>;
   id: Scalars['String']['output'];
+  /** Date of the expense */
+  incurredAt: Scalars['DateTime']['output'];
   /** (Optional - applicable to invoice expense only) The invoice file for this expense */
   invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
@@ -5422,6 +5428,7 @@ export type FundExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -6057,6 +6064,7 @@ export type HostExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -6994,6 +7002,7 @@ export type IndividualExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -9006,7 +9015,9 @@ export enum OrderByFieldType {
   RANK = 'RANK',
   /** Order by start date */
   STARTS_AT = 'STARTS_AT',
-  TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED'
+  TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED',
+  /** Order by the date the collective was unhosted */
+  UNHOSTED_AT = 'UNHOSTED_AT'
 }
 
 /** Input to order collection */
@@ -9422,6 +9433,7 @@ export type OrganizationExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -10527,6 +10539,7 @@ export type ProjectExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -10999,6 +11012,7 @@ export type QueryExpensesArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -12782,6 +12796,7 @@ export type VendorExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;

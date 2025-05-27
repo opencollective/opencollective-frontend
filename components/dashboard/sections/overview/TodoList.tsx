@@ -3,20 +3,36 @@ import { Coins, Receipt } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import Link from '../../../Link';
 import { DashboardContext } from '../../DashboardContext';
 
 export const TodoList = () => {
+  const { LoggedInUser } = useLoggedInUser();
   const { account } = React.useContext(DashboardContext);
 
-  const pendingExpenseCount = account?.pendingExpenses.totalCount;
+  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const pendingExpenseCount = hasGrantAndFundsReorgEnabled
+    ? account?.pendingExpenses.totalCount
+    : account?.pendingExpenses.totalCount + account?.pendingGrants.totalCount;
+  const pendingGrantCount = hasGrantAndFundsReorgEnabled ? account?.pendingGrants.totalCount : 0;
   const pausedIncomingContributionsCount = account?.pausedIncomingContributions.totalCount;
   const pausedOutgoingContributions = account?.pausedOutgoingContributions.totalCount;
   const canStartResumeContributionsProcess = account?.canStartResumeContributionsProcess;
   const canActOnPausedIncomingContributions =
     pausedIncomingContributionsCount > 0 && canStartResumeContributionsProcess;
-  if (!pendingExpenseCount && !pausedOutgoingContributions && !canActOnPausedIncomingContributions) {
+
+  if (
+    !pendingExpenseCount &&
+    !pendingGrantCount &&
+    !pausedOutgoingContributions &&
+    !canActOnPausedIncomingContributions
+  ) {
     return null;
   }
 
@@ -44,6 +60,31 @@ export const TodoList = () => {
                     </Link>
                   ),
                   pendingExpenseCount: pendingExpenseCount,
+                }}
+              />
+            </span>
+          </div>
+        </div>
+      )}
+
+      {pendingGrantCount > 0 && (
+        <div className="rounded-xl border bg-slate-50 p-3 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Receipt size={16} />
+            <span>
+              <FormattedMessage
+                defaultMessage="{pendingGrantCount, plural, one {<Link>{pendingGrantCount} grant</Link> has} other {<Link>{pendingGrantCount} grants</Link> have}} not been reviewed"
+                id="jLe6JL"
+                values={{
+                  Link: chunks => (
+                    <Link
+                      className="font-medium text-primary hover:underline"
+                      href={getDashboardRoute(account, 'grants?status=PENDING')}
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                  pendingGrantCount: pendingGrantCount,
                 }}
               />
             </span>
