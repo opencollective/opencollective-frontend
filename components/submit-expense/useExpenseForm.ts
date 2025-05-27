@@ -2076,14 +2076,13 @@ export function useExpenseForm(opts: {
     }
   }, [formOptions.taxType, setFieldValue]);
 
+  // Move attachments when switching expense type
   React.useEffect(() => {
     // if expenseTypeOption.touched?
     if (expenseForm.values.expenseTypeOption === ExpenseType.INVOICE) {
-      if (expenseForm.values.expenseItems.length === 1) {
-        if (expenseForm.values.expenseItems[0].attachment) {
-          setFieldValue('invoiceFile', expenseForm.values.expenseItems[0].attachment);
-          setFieldValue('expenseItems.0.attachment', undefined);
-        }
+      if (expenseForm.values.expenseItems.length === 1 && expenseForm.values.expenseItems[0].attachment) {
+        setFieldValue('invoiceFile', expenseForm.values.expenseItems[0].attachment);
+        setFieldValue('expenseItems.0.attachment', undefined);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
       } else {
         const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
