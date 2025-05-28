@@ -2698,37 +2698,6 @@ type Expense {
   [Host admins only] If the expense associated with a transactions import row, this field will reference it
   """
   transactionImportRow: TransactionsImportRow
-
-  """
-  Payee history with this expense account or host
-  """
-  payeeExpenseHistory(
-    """
-    Return expenses by payee with the expense account or host
-    """
-    fromExpenseAccount: PayeeExpenseHistoryFromAccount = ACCOUNT
-
-    """
-    Use this field to filter expenses on their statuses
-    """
-    status: [ExpenseStatusFilter]
-
-    """
-    Use this field to filter expenses on their type (RECEIPT/INVOICE)
-    """
-    type: ExpenseType
-    types: [ExpenseType]
-
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-  ): ExpenseCollection!
 }
 
 """
@@ -4121,6 +4090,11 @@ type Host implements Account & AccountWithContributions {
     Rank vendors based on their relationship with this account
     """
     forAccount: AccountReferenceInput
+
+    """
+    Only returns vendors that are visible to the given accounts
+    """
+    visibleToAccounts: [AccountReferenceInput]
 
     """
     Filter on archived vendors
@@ -8233,18 +8207,6 @@ enum ExpenseLockableFields {
   Locks the type field.
   """
   TYPE
-}
-
-enum PayeeExpenseHistoryFromAccount {
-  """
-  Expense host
-  """
-  HOST
-
-  """
-  Expense account
-  """
-  ACCOUNT
 }
 
 """
@@ -15300,6 +15262,11 @@ type Vendor implements Account & AccountWithContributions {
   The account who created this order
   """
   createdByAccount: Account
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [Account]!
 }
 
 """
@@ -24762,6 +24729,7 @@ input VendorCreateInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  visibleToAccounts: [AccountReferenceInput]
 
   """
   The profile avatar image
@@ -24816,6 +24784,7 @@ input VendorEditInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  visibleToAccounts: [AccountReferenceInput]
 
   """
   The profile avatar image

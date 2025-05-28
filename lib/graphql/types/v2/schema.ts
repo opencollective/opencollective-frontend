@@ -4584,8 +4584,6 @@ export type Expense = {
   paidBy?: Maybe<Account>;
   /** The account being paid by this expense */
   payee: Account;
-  /** Payee history with this expense account or host */
-  payeeExpenseHistory: ExpenseCollection;
   /** The address of the payee */
   payeeLocation?: Maybe<Location>;
   paymentMethod?: Maybe<PaymentMethod>;
@@ -4645,17 +4643,6 @@ export type ExpenseLegalDocumentsArgs = {
   orderBy?: ChronologicalOrderInput;
   status?: InputMaybe<Array<InputMaybe<LegalDocumentRequestStatus>>>;
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
-};
-
-
-/** This represents an Expense */
-export type ExpensePayeeExpenseHistoryArgs = {
-  fromExpenseAccount?: InputMaybe<PayeeExpenseHistoryFromAccount>;
-  limit?: Scalars['Int']['input'];
-  orderBy?: ChronologicalOrderInput;
-  status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
-  type?: InputMaybe<ExpenseType>;
-  types?: InputMaybe<Array<InputMaybe<ExpenseType>>>;
 };
 
 
@@ -6505,6 +6492,7 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 
@@ -9768,13 +9756,6 @@ export type ParseUploadedFileResult = {
   success: Scalars['Boolean']['output'];
 };
 
-export enum PayeeExpenseHistoryFromAccount {
-  /** Expense account */
-  ACCOUNT = 'ACCOUNT',
-  /** Expense host */
-  HOST = 'HOST'
-}
-
 /** A Stripe payment intent */
 export type PaymentIntent = {
   __typename?: 'PaymentIntent';
@@ -12764,6 +12745,8 @@ export type Vendor = Account & AccountWithContributions & {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host */
+  visibleToAccounts: Array<Maybe<Account>>;
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
@@ -13159,6 +13142,7 @@ export type VendorCreateInput = {
   payoutMethod?: InputMaybe<PayoutMethodInput>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 export type VendorEditInput = {
@@ -13183,6 +13167,7 @@ export type VendorEditInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 /** Some context about the vendor */
