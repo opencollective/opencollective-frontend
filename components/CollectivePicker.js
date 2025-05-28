@@ -307,6 +307,7 @@ class CollectivePicker extends React.PureComponent {
       renderNewCollectiveOption,
       isSearchable,
       expenseType,
+      useBeneficiaryForVendor,
       ...props
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
@@ -347,6 +348,7 @@ class CollectivePicker extends React.PureComponent {
                       <CollectiveTypePicker
                         onChange={this.setCreateFormCollectiveType}
                         types={option.types || (typeof creatable === 'object' ? creatable : types)}
+                        useBeneficiaryForVendor={useBeneficiaryForVendor}
                       />
                     );
                   } else if (option[FLAG_INVITE_NEW]) {

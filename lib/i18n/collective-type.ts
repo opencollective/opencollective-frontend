@@ -35,6 +35,10 @@ const TypesI18n = defineMessages({
     id: 'CollectiveType.Vendor',
     defaultMessage: '{count, plural, one {Vendor} other {Vendors}}',
   },
+  BENEFICIARY: {
+    defaultMessage: '{count, plural, one {Beneficiary} other {Beneficiaries}}',
+    id: 'thDZ5f',
+  },
 });
 
 /**
@@ -43,8 +47,8 @@ const TypesI18n = defineMessages({
  * @param {object} `intl` - see `injectIntl`
  * @param {string} `type`
  */
-const formatCollectiveType = (intl, type, count = 1): string => {
-  const i18nMsg = TypesI18n[type];
+const formatCollectiveType = (intl, type, count = 1, { useBeneficiaryForVendor = false } = {}): string => {
+  const i18nMsg = TypesI18n[type === CollectiveType.VENDOR && useBeneficiaryForVendor ? 'BENEFICIARY' : type];
   return i18nMsg ? intl.formatMessage(i18nMsg, { count }) : type;
 };
 

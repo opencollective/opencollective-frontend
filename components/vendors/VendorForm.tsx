@@ -25,6 +25,7 @@ import { useDrawerActionsContainer } from '../Drawer';
 import { DROPZONE_ACCEPT_IMAGES } from '../Dropzone';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
+import MessageBox from '../MessageBox';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
@@ -33,6 +34,8 @@ import StyledSelect from '../StyledSelect';
 import StyledSpinner from '../StyledSpinner';
 import StyledTextarea from '../StyledTextarea';
 import { Button } from '../ui/Button';
+import { Label } from '../ui/Label';
+import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
 
@@ -86,6 +89,7 @@ type VendorFormProps = {
   supportsTaxForm: boolean;
   hidePayoutMethod?: boolean;
   limitVisibilityOptionToAccount?: AccountHoverCardFieldsFragment;
+  isBeneficiary?: boolean;
 };
 
 const AvatarContainer = elementFromClass(
@@ -218,7 +222,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
       ['__typename'],
     );
 
-    if (props.limitVisibilityOptionToAccount && values.visibleAccountOnly) {
+    if (props.limitVisibilityOptionToAccount && values.accountVisibility === 'limit-visibility') {
       data.visibleToAccounts = [
         {
           slug: props.limitVisibilityOptionToAccount.slug,
@@ -237,14 +241,22 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
         vendorResult = result.data.editVendor;
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Vendor Updated" id="XqtbM9" />,
+          message: props.isBeneficiary ? (
+            <FormattedMessage defaultMessage="Beneficiary Updated" id="IsIW4B" />
+          ) : (
+            <FormattedMessage defaultMessage="Vendor Updated" id="XqtbM9" />
+          ),
         });
       } else {
         const result = await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
         vendorResult = result.data.createVendor;
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Vendor Created" id="4O9yQ3" />,
+          message: props.isBeneficiary ? (
+            <FormattedMessage defaultMessage="Beneficiary Created" id="m9s72m" />
+          ) : (
+            <FormattedMessage defaultMessage="Vendor Created" id="4O9yQ3" />
+          ),
         });
       }
       onSuccess?.(vendorResult);
@@ -273,7 +285,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
   }
 
   if (props.limitVisibilityOptionToAccount) {
-    initialValues['visibleAccountOnly'] = true;
+    initialValues['accountVisibility'] = 'limit-visibility';
   }
 
   const loading = isCreating || isEditing;
@@ -282,7 +294,13 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     <div>
       <div className="flex justify-between text-xl font-bold">
         {vendor ? (
-          <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
+          props.isBeneficiary ? (
+            <FormattedMessage defaultMessage="Edit Beneficiary" id="Wdzpxp" />
+          ) : (
+            <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
+          )
+        ) : props.isBeneficiary ? (
+          <FormattedMessage defaultMessage="Create Beneficiary" id="AzRKUx" />
         ) : (
           <FormattedMessage defaultMessage="Create Vendor" id="I5p2+k" />
         )}
@@ -304,7 +322,13 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               </Button>
               <Button onClick={formik.submitForm} loading={loading} className="rounded-full">
                 {vendor ? (
-                  <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
+                  props.isBeneficiary ? (
+                    <FormattedMessage defaultMessage="Update beneficiary" id="tvIIrH" />
+                  ) : (
+                    <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
+                  )
+                ) : props.isBeneficiary ? (
+                  <FormattedMessage defaultMessage="Create beneficiary" id="rwEWZ6" />
                 ) : (
                   <FormattedMessage defaultMessage="Create vendor" id="jrCJwo" />
                 )}
@@ -331,7 +355,11 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 <div className="grow">
                   <StyledInputFormikField
                     name="name"
-                    label={intl.formatMessage({ defaultMessage: "Vendor's name", id: 'iDPmhB' })}
+                    label={
+                      props.isBeneficiary
+                        ? intl.formatMessage({ defaultMessage: "Beneficiary's name", id: '9voqSP' })
+                        : intl.formatMessage({ defaultMessage: "Vendor's name", id: 'iDPmhB' })
+                    }
                     labelProps={FIELD_LABEL_PROPS}
                     mt={3}
                     required
@@ -342,7 +370,11 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               </div>
               <StyledInputFormikField
                 name="legalName"
-                label={intl.formatMessage({ defaultMessage: "Vendor's legal name", id: '+5Vgek' })}
+                label={
+                  props.isBeneficiary
+                    ? intl.formatMessage({ defaultMessage: "Beneficiary's legal name", id: 'GFYFG/' })
+                    : intl.formatMessage({ defaultMessage: "Vendor's legal name", id: '+5Vgek' })
+                }
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
@@ -352,56 +384,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 )}
               </StyledInputFormikField>
 
-              {props.limitVisibilityOptionToAccount ? (
-                <StyledInputFormikField
-                  name="visibleAccountOnly"
-                  label={intl.formatMessage({ defaultMessage: 'Limit visibility', id: 'G+YYVv' })}
-                  labelProps={FIELD_LABEL_PROPS}
-                  required={false}
-                  mt={3}
-                >
-                  {({ field, form }) => (
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        {...field}
-                        checked={field.value}
-                        onCheckedChange={checked => {
-                          form.setFieldValue(field.name, checked);
-                          if (!checked) {
-                            form.setFieldValue(field.name, null);
-                          }
-                        }}
-                      />
-                      <label htmlFor="visibleAccountOnly" className="flex items-center font-normal">
-                        {field.value ? (
-                          <FormattedMessage
-                            defaultMessage="Visible to {account} only"
-                            id="q02wF4"
-                            values={{
-                              account: (
-                                <AccountHoverCard
-                                  account={props.limitVisibilityOptionToAccount}
-                                  trigger={
-                                    <span>
-                                      &nbsp;
-                                      <span className="rounded border">
-                                        {props.limitVisibilityOptionToAccount.name}
-                                      </span>
-                                      &nbsp;
-                                    </span>
-                                  }
-                                />
-                              ),
-                            }}
-                          />
-                        ) : (
-                          <FormattedMessage defaultMessage="Visible to all hosted accounts" id="jPCIv9" />
-                        )}
-                      </label>
-                    </div>
-                  )}
-                </StyledInputFormikField>
-              ) : (
+              {!props.limitVisibilityOptionToAccount && (
                 <StyledInputFormikField
                   name="visibleToAccounts"
                   label={intl.formatMessage({ defaultMessage: 'Visible to accounts', id: 'z3aZR5' })}
@@ -594,6 +577,72 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                     </Field>
                   )}
                 </React.Fragment>
+              )}
+
+              {props.limitVisibilityOptionToAccount && !props.isBeneficiary && (
+                <StyledInputFormikField
+                  name="accountVisibility"
+                  label={intl.formatMessage({ defaultMessage: 'Visibility', id: 'JAkIqb' })}
+                  labelProps={FIELD_LABEL_PROPS}
+                  required={true}
+                  mt={3}
+                >
+                  {({ field, form }) => (
+                    <div className="flex items-center gap-2">
+                      <RadioGroup
+                        id={field.name}
+                        value={field.value}
+                        onValueChange={value => form.setFieldValue('accountVisibility', value)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="limit-visibility" id="limit-visibility" />
+                          <Label htmlFor="limit-visibility">
+                            <FormattedMessage
+                              defaultMessage="Visible to {account} only"
+                              id="q02wF4"
+                              values={{
+                                account: (
+                                  <AccountHoverCard
+                                    account={props.limitVisibilityOptionToAccount}
+                                    trigger={
+                                      <span>
+                                        <span className="rounded border">
+                                          {props.limitVisibilityOptionToAccount.name}
+                                        </span>
+                                      </span>
+                                    }
+                                  />
+                                ),
+                              }}
+                            />
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="visible-to-all" id="visible-to-all" />
+                          <Label htmlFor="visible-to-all">
+                            <FormattedMessage defaultMessage="Visible to all collectives and funds" id="DN5I4w" />
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  )}
+                </StyledInputFormikField>
+              )}
+
+              {props.limitVisibilityOptionToAccount && formik.values.accountVisibility === 'limit-visibility' && (
+                <MessageBox type="info" className="mt-3">
+                  {props.isBeneficiary ? (
+                    <FormattedMessage
+                      defaultMessage="This beneficiary will be visible only within this fund. To change the visibility, you can edit the beneficiary."
+                      id="R2OJwE"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="This vendor will be visible only within this collective. To change the visibility, you can edit the vendor."
+                      id="MU6Fhb"
+                    />
+                  )}
+                </MessageBox>
               )}
 
               <StyledInputFormikField

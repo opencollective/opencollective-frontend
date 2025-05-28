@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
-import { AccountType } from '../../../lib/graphql/types/v2/schema';
+import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
@@ -310,6 +310,7 @@ function VendorOptionWrapper() {
         account={form.options.account}
         host={form.options.host}
         refresh={form.refresh}
+        expenseTypeOption={form.values.expenseTypeOption}
       />
     );
   }
@@ -325,6 +326,7 @@ const VendorOption = React.memo(function VendorOption(props: {
   account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
   refresh: ExpenseForm['refresh'];
+  expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser.isAdminOfCollective(props.host);
@@ -335,6 +337,9 @@ const VendorOption = React.memo(function VendorOption(props: {
     props.payeeSlug === '__newVendor' ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendorSlug === props.payeeSlug;
+
+  const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
+
   return (
     <RadioGroupCard
       value="__vendor"
@@ -345,6 +350,7 @@ const VendorOption = React.memo(function VendorOption(props: {
         <div>
           <CollectivePickerAsync
             inputId="__vendor"
+            useBeneficiaryForVendor={isBeneficiary}
             isSearchable
             types={['VENDOR']}
             creatable={isHostAdmin ? ['VENDOR'] : false}
@@ -369,6 +375,7 @@ const VendorOption = React.memo(function VendorOption(props: {
               <Separator className="mt-3" />
               <div className="mt-3">
                 <VendorForm
+                  isBeneficiary={isBeneficiary}
                   limitVisibilityOptionToAccount={props.account}
                   onSuccess={async ({ slug }) => {
                     await props.refresh();
@@ -389,7 +396,11 @@ const VendorOption = React.memo(function VendorOption(props: {
         </div>
       }
     >
-      <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
+      {isBeneficiary ? (
+        <FormattedMessage defaultMessage="A beneficiary" id="9/Di6r" />
+      ) : (
+        <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
+      )}
     </RadioGroupCard>
   );
 });
