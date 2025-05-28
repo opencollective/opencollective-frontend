@@ -78,14 +78,17 @@ export const accountExpensesQuery = gql`
           ...ExpenseHostFields
         }
 
-        grantHistory: payeeExpenseHistory(status: PAID, type: GRANT, limit: 1) @include(if: $hasGrantHistory) {
-          totalAmount {
-            amount {
-              currency
-              valueInCents
+        payee {
+          grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, account: $account)
+            @include(if: $hasGrantHistory) {
+            totalAmount {
+              amount {
+                currency
+                valueInCents
+              }
             }
+            totalCount
           }
-          totalCount
         }
       }
     }
@@ -194,15 +197,17 @@ export const hostDashboardExpensesQuery = gql`
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
 
-        grantHistory: payeeExpenseHistory(status: PAID, type: GRANT, limit: 1, fromExpenseAccount: HOST)
-          @include(if: $hasGrantHistory) {
-          totalAmount {
-            amount {
-              currency
-              valueInCents
+        payee {
+          grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })
+            @include(if: $hasGrantHistory) {
+            totalAmount {
+              amount {
+                currency
+                valueInCents
+              }
             }
+            totalCount
           }
-          totalCount
         }
       }
     }

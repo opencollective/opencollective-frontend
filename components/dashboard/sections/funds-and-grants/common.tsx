@@ -213,7 +213,7 @@ function BeneficiaryCell({ grant }) {
 
   const intl = useIntl();
 
-  const grantHistory = grant.grantHistory;
+  const grantHistory = grant.payee.grantHistory;
   const hasPreviousGrants = grantHistory?.totalCount > 0;
   const beneficiary = grant.payee;
   const createdByAccount = grant.createdByAccount;
