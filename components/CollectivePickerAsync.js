@@ -20,6 +20,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
     $skipGuests: Boolean
     $includeArchived: Boolean
     $includeVendorsForHostId: Int
+    $vendorVisibleToAccountIds: [Int]
   ) {
     search(
       term: $term
@@ -30,6 +31,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
       skipGuests: $skipGuests
       includeArchived: $includeArchived
       includeVendorsForHostId: $includeVendorsForHostId
+      vendorVisibleToAccountIds: $vendorVisibleToAccountIds
     ) {
       id
       collectives {
@@ -50,6 +52,11 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isHost
         ... on Vendor {
           hasPayoutMethod
+          visibleToAccounts {
+            id
+            slug
+            name
+          }
         }
         ... on User {
           isTwoFactorAuthEnabled
@@ -96,7 +103,7 @@ const Messages = defineMessages({
  * If a single type is selected, will return a label like: `Search for users`
  * Otherwise it just returns `Search`
  */
-const getPlaceholder = (intl, types) => {
+const getPlaceholder = (intl, types, { useBeneficiaryForVendor } = {}) => {
   const nbTypes = types ? types.length : 0;
   if (nbTypes === 0 || nbTypes > 3) {
     return intl.formatMessage(Messages.search);
@@ -104,14 +111,16 @@ const getPlaceholder = (intl, types) => {
     if (types[0] === CollectiveType.USER) {
       return intl.formatMessage(Messages.searchForUsers);
     } else {
-      return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
+      return intl.formatMessage(Messages.searchForType, {
+        entity: formatCollectiveType(intl, types[0], 100, { useBeneficiaryForVendor }),
+      });
     }
   } else {
     // Format by passing a map of entities like { entity1: 'Collectives' }
     return intl.formatMessage(
       Messages[`searchForType_${nbTypes}`],
       types.reduce((i18nParams, type, index) => {
-        i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100);
+        i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100, { useBeneficiaryForVendor });
         return i18nParams;
       }, {}),
     );
@@ -138,6 +147,8 @@ const CollectivePickerAsync = ({
   includeArchived = false,
   includeVendorsForHostId = undefined,
   defaultCollectives = undefined,
+  vendorVisibleToAccountIds = undefined,
+  useBeneficiaryForVendor = false,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -186,7 +197,7 @@ const CollectivePickerAsync = ({
   }, [term, preload, data, loading, filteredDefaultCollectives]);
 
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
-  const placeholder = getPlaceholder(intl, types);
+  const placeholder = getPlaceholder(intl, types, { useBeneficiaryForVendor });
 
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
@@ -200,9 +211,10 @@ const CollectivePickerAsync = ({
         skipGuests,
         includeArchived,
         includeVendorsForHostId,
+        vendorVisibleToAccountIds,
       });
     }
-  }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, term]);
 
   return (
     <CollectivePicker
@@ -222,6 +234,7 @@ const CollectivePickerAsync = ({
         setTerm(newTerm.trim());
       }}
       customOptions={!term ? emptyCustomOptions : []}
+      useBeneficiaryForVendor={useBeneficiaryForVendor}
       {...props}
     />
   );
@@ -261,6 +274,7 @@ CollectivePickerAsync.propTypes = {
   includeArchived: PropTypes.bool,
   /** Include vendors for the given host id**/
   includeVendorsForHostId: PropTypes.number,
+  vendorVisibleToAccountIds: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default CollectivePickerAsync;

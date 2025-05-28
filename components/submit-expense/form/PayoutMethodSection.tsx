@@ -48,6 +48,8 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.options, [
+      'host',
+      'isHostAdmin',
       'payee',
       'payoutMethods',
       'newPayoutMethodTypes',
@@ -134,7 +136,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
 
-  const isVendor = props.payee?.type === CollectiveType.VENDOR;
+  const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
 
   const onPaymentMethodDeleted = React.useCallback(
     async deletedPayoutMethodId => {
@@ -154,12 +156,35 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     [refresh, setFieldValue],
   );
 
+  if (isVendor && !props.isHostAdmin) {
+    if (!props.payee || props.payee?.['hasPayoutMethod']) {
+      return (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="The vendor payout method is managed by the host." id="KnF5xM" />
+        </MessageBox>
+      );
+    } else {
+      return (
+        <MessageBox type="error">
+          <FormattedMessage
+            defaultMessage="This vendor is missing payout method information, please contact {hostName} before submitting to this vendor."
+            id="H4wPrV"
+            values={{
+              hostName: props.host?.name,
+            }}
+          />
+        </MessageBox>
+      );
+    }
+  }
+
   return (
     <div>
       {!isLoading &&
       !isLoadingPayee &&
       !isPickingProfileAdministered &&
       !isVendor &&
+      props.payeeSlug !== '__newVendor' &&
       !props.isAdminOfPayee &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
         <MessageBox type="info">
@@ -174,6 +199,10 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
               id="LHdznY"
             />
           )}
+        </MessageBox>
+      ) : props.payeeSlug === '__newVendor' ? (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="Save the vendor information to create a payout method" id="E8oTcs" />
         </MessageBox>
       ) : (
         <RadioGroup
@@ -206,18 +235,20 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             </RadioGroupCard>
           )}
 
-          {!(isLoading || isLoadingPayee) && !isVendor && props.newPayoutMethodTypes?.length > 0 && (
-            <RadioGroupCard
-              value="__newPayoutMethod"
-              data-cy="add-new-payout-method"
-              checked={isNewPayoutMethodSelected}
-              disabled={isLoading || props.initialLoading || props.isSubmitting}
-              showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
-              subContent={<NewPayoutMethodOptionWrapper />}
-            >
-              <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
-            </RadioGroupCard>
-          )}
+          {!(isLoading || isLoadingPayee) &&
+            props.newPayoutMethodTypes?.length > 0 &&
+            !(isVendor && payoutMethods.length > 0) && (
+              <RadioGroupCard
+                value="__newPayoutMethod"
+                data-cy="add-new-payout-method"
+                checked={isNewPayoutMethodSelected}
+                disabled={isLoading || props.initialLoading || props.isSubmitting}
+                showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
+                subContent={<NewPayoutMethodOptionWrapper />}
+              >
+                <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+              </RadioGroupCard>
+            )}
         </RadioGroup>
       )}
     </div>
@@ -332,7 +363,10 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   );
 
   const onPayoutMethodTypeChange = React.useCallback(
-    value => setFieldValue('newPayoutMethod.type', value as PayoutMethodType),
+    value => {
+      setFieldValue('newPayoutMethod.data', {});
+      setFieldValue('newPayoutMethod.type', value as PayoutMethodType);
+    },
     [setFieldValue],
   );
 

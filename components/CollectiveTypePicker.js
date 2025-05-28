@@ -9,7 +9,7 @@ import { Box, Flex, Grid } from './Grid';
 import StyledButton from './StyledButton';
 
 /** Return the caption associated to a given collective type */
-const getTypeCaption = type => {
+const getTypeCaption = (type, { useBeneficiaryForVendor = false }) => {
   if (type === CollectiveType.USER) {
     return <FormattedMessage id="User.InviteNew" defaultMessage="Invite new User" />;
   } else if (type === CollectiveType.ORGANIZATION) {
@@ -17,7 +17,11 @@ const getTypeCaption = type => {
   } else if (type === CollectiveType.COLLECTIVE) {
     return <FormattedMessage id="collective.create" defaultMessage="Create Collective" />;
   } else if (type === CollectiveType.VENDOR) {
-    return <FormattedMessage defaultMessage="Create Vendor" id="I5p2+k" />;
+    return useBeneficiaryForVendor ? (
+      <FormattedMessage defaultMessage="Create Beneficiary" id="AzRKUx" />
+    ) : (
+      <FormattedMessage defaultMessage="Create Vendor" id="I5p2+k" />
+    );
   } else {
     return null;
   }
@@ -29,6 +33,7 @@ const getTypeCaption = type => {
 const CollectiveTypePicker = ({
   types = [CollectiveType.USER, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION],
   onChange,
+  useBeneficiaryForVendor,
 }) => {
   const isSingleType = types.length === 1;
   return (
@@ -43,7 +48,7 @@ const CollectiveTypePicker = ({
           <Flex alignItems="center" flexDirection={isSingleType ? 'row' : 'column'}>
             <PlusCircle size={24} />
             <Box ml={isSingleType ? '16px' : 0} fontSize="11px">
-              {getTypeCaption(type)}
+              {getTypeCaption(type, { useBeneficiaryForVendor })}
             </Box>
           </Flex>
         </StyledButton>
@@ -57,6 +62,7 @@ CollectiveTypePicker.propTypes = {
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))).isRequired,
   /** Called when user pick a button */
   onChange: PropTypes.func.isRequired,
+  useBeneficiaryForVendor: PropTypes.bool,
 };
 
 export default CollectiveTypePicker;
