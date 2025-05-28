@@ -988,7 +988,7 @@ const AddFundsModalContentWithCollective = ({
                   {isEdit ? (
                     <FormattedMessage
                       id="AddFundsModal.editDisclaimer"
-                      defaultMessage="For funds added in the previous 24 hours, you'll be editing the original transactions, and no trace of this operation will be left. If this transaction was already consolidated somewhere outside the platform, make sure those records are also updated. Otherwise, by clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
+                      defaultMessage="By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
                     />
                   ) : (
                     <FormattedMessage
