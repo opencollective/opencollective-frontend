@@ -33,9 +33,11 @@ import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Span } from '../../Text';
 import { Switch } from '../../ui/Switch';
+import { Tabs, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { useToast } from '../../ui/useToast';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
+import FormBuilder from './FormBuilder';
 
 const { FUND, PROJECT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
@@ -86,7 +88,7 @@ function getReceiptTemplates(intl, host) {
   return receiptTemplateTitles;
 }
 
-function FormFields({ collective, values, hideTypeSelect }) {
+function FormFields({ collective, values, hideTypeSelect, activeTab }) {
   const intl = useIntl();
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
@@ -129,413 +131,430 @@ function FormFields({ collective, values, hideTypeSelect }) {
   React.useEffect(() => {}, [values.type]);
 
   return (
-    <React.Fragment>
-      {collective.type !== FUND && !hideTypeSelect && (
+    <div className="h-full max-h-[500px] overflow-y-auto pr-2 pb-2">
+      {activeTab === 'general' && (
         <React.Fragment>
+          {collective.type !== FUND && !hideTypeSelect && (
+            <React.Fragment>
+              <StyledInputFormikField
+                name="type"
+                label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
+                labelFontWeight="bold"
+                mt="3"
+              >
+                {({ field, form, loading }) => (
+                  <StyledSelect
+                    inputId={field.name}
+                    data-cy={`select-${field.name}`}
+                    error={field.error}
+                    onBlur={() => form.setFieldTouched(field.name, true)}
+                    onChange={({ value }) => form.setFieldValue(field.name, value)}
+                    isLoading={loading}
+                    options={tierTypeOptions}
+                    value={tierTypeOptions.find(option => option.value === field.value)}
+                  />
+                )}
+              </StyledInputFormikField>
+              {taxes.map(({ type, percentage }) => (
+                <Flex key={`${type}-${percentage}`} mt={3}>
+                  <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+                    <Span fontWeight="bold">
+                      <FormattedMessage
+                        id="withColon"
+                        defaultMessage="{item}:"
+                        values={{ item: i18nTaxType(intl, type) }}
+                      />{' '}
+                      {percentage}%
+                    </Span>
+                    <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+                  </MessageBox>
+                </Flex>
+              ))}
+            </React.Fragment>
+          )}
           <StyledInputFormikField
-            name="type"
-            label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
+            name="name"
+            label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
             labelFontWeight="bold"
             mt="3"
+            required
           >
-            {({ field, form, loading }) => (
-              <StyledSelect
-                inputId={field.name}
-                data-cy={`select-${field.name}`}
-                error={field.error}
-                onBlur={() => form.setFieldTouched(field.name, true)}
-                onChange={({ value }) => form.setFieldValue(field.name, value)}
-                isLoading={loading}
-                options={tierTypeOptions}
-                value={tierTypeOptions.find(option => option.value === field.value)}
-              />
-            )}
+            {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
           </StyledInputFormikField>
-          {taxes.map(({ type, percentage }) => (
-            <Flex key={`${type}-${percentage}`} mt={3}>
-              <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
-                <Span fontWeight="bold">
-                  <FormattedMessage
-                    id="withColon"
-                    defaultMessage="{item}:"
-                    values={{ item: i18nTaxType(intl, type) }}
-                  />{' '}
-                  {percentage}%
-                </Span>
-                <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
-              </MessageBox>
-            </Flex>
-          ))}
-        </React.Fragment>
-      )}
-      <StyledInputFormikField
-        name="name"
-        label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
-        labelFontWeight="bold"
-        mt="3"
-        required
-      >
-        {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
-      </StyledInputFormikField>
-      <StyledInputFormikField
-        name="description"
-        label={intl.formatMessage({
-          id: 'Fields.description',
-          defaultMessage: 'Description',
-        })}
-        labelFontWeight="bold"
-        mt="3"
-        required={false}
-      >
-        {({ field }) => <StyledTextarea data-cy={field.name} maxLength={510} width="100%" showCount {...field} />}
-      </StyledInputFormikField>
-      {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
-        <StyledInputFormikField
-          name="interval"
-          label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
-          labelFontWeight="bold"
-          mt="3"
-          required
-        >
-          {({ field, form, loading }) => (
-            <StyledSelect
-              inputId={field.name}
-              data-cy={`select-${field.name}`}
-              error={field.error}
-              onBlur={() => form.setFieldTouched(field.name, true)}
-              onChange={({ value }) => form.setFieldValue(field.name, value)}
-              isLoading={loading}
-              options={intervalOptions}
-              value={intervalOptions.find(option => option.value === field.value)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.interval !== 'flexible' && (
-        <StyledInputFormikField
-          name="amountType"
-          label={intl.formatMessage({
-            id: 'tier.amountType.label',
-            defaultMessage: 'Amount type',
-          })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form, loading }) => (
-            <StyledSelect
-              inputId={field.name}
-              data-cy={field.name}
-              error={field.error}
-              onBlur={() => form.setFieldTouched(field.name, true)}
-              onChange={({ value }) => form.setFieldValue(field.name, value)}
-              isLoading={loading}
-              options={amountTypeOptions}
-              value={amountTypeOptions.find(option => option.value === field.value)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.amountType === FIXED && (
-        <StyledInputFormikField
-          name="amount"
-          label={intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form }) => (
-            <StyledInputAmount
-              id={field.id}
-              data-cy={field.name}
-              currency={field.value?.currency ?? collective.currency}
-              currencyDisplay="CODE"
-              placeholder="0.00"
-              error={field.error}
-              value={field.value?.valueInCents}
-              maxWidth="100%"
-              onChange={value =>
-                form.setFieldValue(
-                  field.name,
-                  !isNil(value) && !isNaN(value)
-                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
-                    : null,
-                )
-              }
-              onBlur={() => form.setFieldTouched(field.name, true)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.amountType === FLEXIBLE && (
-        <StyledInputFormikField
-          name="presets"
-          label={intl.formatMessage({
-            id: 'tier.presets.label',
-            defaultMessage: 'Suggested amounts',
-          })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form }) => (
-            <InputFieldPresets
-              {...field}
-              min={values.minimumAmount?.valueInCents || 0}
-              defaultValue={field.value}
-              onChange={value => form.setFieldValue(field.name, value)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.amountType === FLEXIBLE && (
-        <StyledInputFormikField
-          name="amount"
-          label={intl.formatMessage({ id: 'tier.defaultAmount.label', defaultMessage: 'Default amount' })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form }) => (
-            <StyledInputAmount
-              id={field.id}
-              data-cy={field.name}
-              currency={field.value?.currency ?? collective.currency}
-              currencyDisplay="CODE"
-              placeholder="0.00"
-              error={field.error}
-              value={field.value?.valueInCents}
-              maxWidth="100%"
-              onChange={value =>
-                form.setFieldValue(
-                  field.name,
-                  !isNil(value) && !isNaN(value)
-                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
-                    : null,
-                )
-              }
-              onBlur={() => form.setFieldTouched(field.name, true)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {values.amountType === FLEXIBLE && (
-        <StyledInputFormikField
-          name="minimumAmount"
-          label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
-          labelFontWeight="bold"
-          mt="3"
-          required
-        >
-          {({ field, form }) => (
-            <StyledInputAmount
-              id={field.id}
-              data-cy={field.name}
-              currency={field.value?.currency ?? collective.currency}
-              currencyDisplay="CODE"
-              placeholder="0.00"
-              error={field.error}
-              value={field.value?.valueInCents}
-              maxWidth="100%"
-              onChange={value =>
-                form.setFieldValue(
-                  field.name,
-                  !isNil(value) && !isNaN(value)
-                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
-                    : null,
-                )
-              }
-              onBlur={() => form.setFieldTouched(field.name, true)}
-            />
-          )}
-        </StyledInputFormikField>
-      )}
-      {([TICKET, PRODUCT, MEMBERSHIP].includes(values.type) ||
-        (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
-        <React.Fragment>
           <StyledInputFormikField
-            name="maxQuantity"
+            name="description"
             label={intl.formatMessage({
-              id: 'tier.maxQuantity.label',
-              defaultMessage: 'Available quantity',
+              id: 'Fields.description',
+              defaultMessage: 'Description',
             })}
             labelFontWeight="bold"
             mt="3"
             required={false}
           >
-            {({ field }) => <StyledInput data-cy={field.name} {...field} />}
+            {({ field }) => <StyledTextarea data-cy={field.name} maxLength={510} width="100%" showCount {...field} />}
           </StyledInputFormikField>
-          <FieldDescription>
-            {intl.formatMessage({
-              id: 'tier.maxQuantity.description',
-              defaultMessage: 'Leave empty for unlimited',
-            })}
-          </FieldDescription>
-        </React.Fragment>
-      )}
-      {![FUND].includes(collective.type) && (
-        <StyledInputFormikField
-          name="button"
-          label={intl.formatMessage({
-            id: 'tier.button.label',
-            defaultMessage: 'Button text',
-          })}
-          labelFontWeight="bold"
-          mt="3"
-          required={false}
-        >
-          {({ field }) => <StyledInput data-cy={field.name} {...field} maxLength={20} />}
-        </StyledInputFormikField>
-      )}
-      <StyledInputFormikField
-        name="goal"
-        label={intl.formatMessage({
-          id: 'ContributionType.Goal',
-          defaultMessage: 'Goal',
-        })}
-        labelFontWeight="bold"
-        mt="3"
-        required={false}
-      >
-        {({ field, form }) => (
-          <StyledInputAmount
-            id={field.id}
-            data-cy={field.name}
-            currency={field.value?.currency ?? collective.currency}
-            currencyDisplay="CODE"
-            placeholder="0.00"
-            error={field.error}
-            value={field.value?.valueInCents}
-            maxWidth="100%"
-            onChange={value =>
-              form.setFieldValue(
-                field.name,
-                !isNil(value) && !isNaN(value)
-                  ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
-                  : null,
-              )
-            }
-            onBlur={() => form.setFieldTouched(field.name, true)}
-          />
-        )}
-      </StyledInputFormikField>
-      <FieldDescription>
-        {intl.formatMessage({
-          id: 'tier.goal.description',
-          defaultMessage: 'Amount you aim to raise',
-        })}
-      </FieldDescription>
-      {values.type === TICKET && (
-        <React.Fragment>
-          <StyledInputFormikField
-            name="singleTicket"
-            label={<FormattedMessage defaultMessage="Single Ticket" id="WHXII/" />}
-            labelFontWeight="bold"
-            mt="3"
-            flexDirection={'row'}
-            justifyContent={'space-between'}
-            alignItems={'center'}
-          >
-            {({ field, form }) => (
-              <Switch
-                name={field.name}
-                checked={field.value}
-                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
-              />
-            )}
-          </StyledInputFormikField>
-          <FieldDescription>
-            <FormattedMessage
-              id="tier.singleTicketDescription"
-              defaultMessage="Only allow people to buy a single ticket per order"
-            />
-          </FieldDescription>
-        </React.Fragment>
-      )}
-      {![FUND, PROJECT].includes(collective.type) && (
-        <React.Fragment>
-          <StyledInputFormikField
-            name="useStandalonePage"
-            label={intl.formatMessage({
-              id: 'tier.standalonePage',
-              defaultMessage: 'Standalone page',
-            })}
-            labelFontWeight="bold"
-            mt="3"
-            flexDirection={'row'}
-            justifyContent={'space-between'}
-            alignItems={'center'}
-          >
-            {({ field, form }) => (
-              <Switch
-                name={field.name}
-                checked={field.value}
-                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
-              />
-            )}
-          </StyledInputFormikField>
-          <FieldDescription>
-            {intl.formatMessage(
-              {
-                id: 'tier.standalonePageDescription',
-                defaultMessage:
-                  "Create a <link>standalone</link> page for this tier? It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly",
-              },
-              {
-                link: function StandaloneTierPageLink(...msg) {
-                  if (!values.id) {
-                    return <span>{msg}</span>;
-                  } else {
-                    return (
-                      <StyledLink
-                        as={Link}
-                        openInNewTab
-                        href={{
-                          pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${
-                            values.legacyId
-                          }`,
-                        }}
-                      >
-                        <span>{msg}</span>
-                      </StyledLink>
-                    );
+          {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
+            <StyledInputFormikField
+              name="interval"
+              label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
+              labelFontWeight="bold"
+              mt="3"
+              required
+            >
+              {({ field, form, loading }) => (
+                <StyledSelect
+                  inputId={field.name}
+                  data-cy={`select-${field.name}`}
+                  error={field.error}
+                  onBlur={() => form.setFieldTouched(field.name, true)}
+                  onChange={({ value }) => form.setFieldValue(field.name, value)}
+                  isLoading={loading}
+                  options={intervalOptions}
+                  value={intervalOptions.find(option => option.value === field.value)}
+                />
+              )}
+            </StyledInputFormikField>
+          )}
+          {values.interval !== 'flexible' && (
+            <StyledInputFormikField
+              name="amountType"
+              label={intl.formatMessage({
+                id: 'tier.amountType.label',
+                defaultMessage: 'Amount type',
+              })}
+              labelFontWeight="bold"
+              mt="3"
+            >
+              {({ field, form, loading }) => (
+                <StyledSelect
+                  inputId={field.name}
+                  data-cy={field.name}
+                  error={field.error}
+                  onBlur={() => form.setFieldTouched(field.name, true)}
+                  onChange={({ value }) => form.setFieldValue(field.name, value)}
+                  isLoading={loading}
+                  options={amountTypeOptions}
+                  value={amountTypeOptions.find(option => option.value === field.value)}
+                />
+              )}
+            </StyledInputFormikField>
+          )}
+          {values.amountType === FIXED && (
+            <StyledInputFormikField
+              name="amount"
+              label={intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' })}
+              labelFontWeight="bold"
+              mt="3"
+            >
+              {({ field, form }) => (
+                <StyledInputAmount
+                  id={field.id}
+                  data-cy={field.name}
+                  currency={field.value?.currency ?? collective.currency}
+                  currencyDisplay="CODE"
+                  placeholder="0.00"
+                  error={field.error}
+                  value={field.value?.valueInCents}
+                  maxWidth="100%"
+                  onChange={value =>
+                    form.setFieldValue(
+                      field.name,
+                      !isNil(value) && !isNaN(value)
+                        ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                        : null,
+                    )
                   }
-                },
-              },
-            )}
-          </FieldDescription>
-        </React.Fragment>
-      )}
-      {receiptTemplateOptions.length > 1 && (
-        <React.Fragment>
+                  onBlur={() => form.setFieldTouched(field.name, true)}
+                />
+              )}
+            </StyledInputFormikField>
+          )}
+          {values.amountType === FLEXIBLE && (
+            <StyledInputFormikField
+              name="presets"
+              label={intl.formatMessage({
+                id: 'tier.presets.label',
+                defaultMessage: 'Suggested amounts',
+              })}
+              labelFontWeight="bold"
+              mt="3"
+            >
+              {({ field, form }) => (
+                <InputFieldPresets
+                  {...field}
+                  min={values.minimumAmount?.valueInCents || 0}
+                  defaultValue={field.value}
+                  onChange={value => form.setFieldValue(field.name, value)}
+                />
+              )}
+            </StyledInputFormikField>
+          )}
+          {values.amountType === FLEXIBLE && (
+            <StyledInputFormikField
+              name="amount"
+              label={intl.formatMessage({ id: 'tier.defaultAmount.label', defaultMessage: 'Default amount' })}
+              labelFontWeight="bold"
+              mt="3"
+            >
+              {({ field, form }) => (
+                <StyledInputAmount
+                  id={field.id}
+                  data-cy={field.name}
+                  currency={field.value?.currency ?? collective.currency}
+                  currencyDisplay="CODE"
+                  placeholder="0.00"
+                  error={field.error}
+                  value={field.value?.valueInCents}
+                  maxWidth="100%"
+                  onChange={value =>
+                    form.setFieldValue(
+                      field.name,
+                      !isNil(value) && !isNaN(value)
+                        ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                        : null,
+                    )
+                  }
+                  onBlur={() => form.setFieldTouched(field.name, true)}
+                />
+              )}
+            </StyledInputFormikField>
+          )}
+          {values.amountType === FLEXIBLE && (
+            <StyledInputFormikField
+              name="minimumAmount"
+              label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
+              labelFontWeight="bold"
+              mt="3"
+              required
+            >
+              {({ field, form }) => (
+                <StyledInputAmount
+                  id={field.id}
+                  data-cy={field.name}
+                  currency={field.value?.currency ?? collective.currency}
+                  currencyDisplay="CODE"
+                  placeholder="0.00"
+                  error={field.error}
+                  value={field.value?.valueInCents}
+                  maxWidth="100%"
+                  onChange={value =>
+                    form.setFieldValue(
+                      field.name,
+                      !isNil(value) && !isNaN(value)
+                        ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                        : null,
+                    )
+                  }
+                  onBlur={() => form.setFieldTouched(field.name, true)}
+                />
+              )}
+            </StyledInputFormikField>
+          )}
+          {([TICKET, PRODUCT, MEMBERSHIP].includes(values.type) ||
+            (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
+            <React.Fragment>
+              <StyledInputFormikField
+                name="maxQuantity"
+                label={intl.formatMessage({
+                  id: 'tier.maxQuantity.label',
+                  defaultMessage: 'Available quantity',
+                })}
+                labelFontWeight="bold"
+                mt="3"
+                required={false}
+              >
+                {({ field }) => <StyledInput data-cy={field.name} {...field} />}
+              </StyledInputFormikField>
+              <FieldDescription>
+                {intl.formatMessage({
+                  id: 'tier.maxQuantity.description',
+                  defaultMessage: 'Leave empty for unlimited',
+                })}
+              </FieldDescription>
+            </React.Fragment>
+          )}
+          {![FUND].includes(collective.type) && (
+            <StyledInputFormikField
+              name="button"
+              label={intl.formatMessage({
+                id: 'tier.button.label',
+                defaultMessage: 'Button text',
+              })}
+              labelFontWeight="bold"
+              mt="3"
+              required={false}
+            >
+              {({ field }) => <StyledInput data-cy={field.name} {...field} maxLength={20} />}
+            </StyledInputFormikField>
+          )}
           <StyledInputFormikField
-            name="invoiceTemplate"
+            name="goal"
             label={intl.formatMessage({
-              defaultMessage: 'Choose receipt',
-              id: 'cyMx/0',
+              id: 'ContributionType.Goal',
+              defaultMessage: 'Goal',
             })}
             labelFontWeight="bold"
             mt="3"
             required={false}
           >
-            {({ field, form, loading }) => (
-              <StyledSelect
-                inputId={field.name}
+            {({ field, form }) => (
+              <StyledInputAmount
+                id={field.id}
                 data-cy={field.name}
+                currency={field.value?.currency ?? collective.currency}
+                currencyDisplay="CODE"
+                placeholder="0.00"
                 error={field.error}
+                value={field.value?.valueInCents}
+                maxWidth="100%"
+                onChange={value =>
+                  form.setFieldValue(
+                    field.name,
+                    !isNil(value) && !isNaN(value)
+                      ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                      : null,
+                  )
+                }
                 onBlur={() => form.setFieldTouched(field.name, true)}
-                onChange={({ value }) => form.setFieldValue(field.name, value)}
-                isLoading={loading}
-                options={receiptTemplateOptions}
-                value={receiptTemplateOptions.find(option => option.value === (field.value ?? 'default'))}
               />
             )}
           </StyledInputFormikField>
           <FieldDescription>
             {intl.formatMessage({
-              defaultMessage: 'Choose between the receipts templates available.',
-              id: 'sn4ULW',
+              id: 'tier.goal.description',
+              defaultMessage: 'Amount you aim to raise',
             })}
           </FieldDescription>
+          {values.type === TICKET && (
+            <React.Fragment>
+              <StyledInputFormikField
+                name="singleTicket"
+                label={<FormattedMessage defaultMessage="Single Ticket" id="WHXII/" />}
+                labelFontWeight="bold"
+                mt="3"
+                flexDirection={'row'}
+                justifyContent={'space-between'}
+                alignItems={'center'}
+              >
+                {({ field, form }) => (
+                  <Switch
+                    name={field.name}
+                    checked={field.value}
+                    onCheckedChange={checked => form.setFieldValue(field.name, checked)}
+                  />
+                )}
+              </StyledInputFormikField>
+              <FieldDescription>
+                <FormattedMessage
+                  id="tier.singleTicketDescription"
+                  defaultMessage="Only allow people to buy a single ticket per order"
+                />
+              </FieldDescription>
+            </React.Fragment>
+          )}
         </React.Fragment>
       )}
-    </React.Fragment>
+
+      {activeTab === 'custom-fields' && (
+        <FormBuilder
+          fields={values.customFields || []}
+          onChange={fields => formik.setFieldValue('customFields', fields)}
+        />
+      )}
+
+      {activeTab === 'advanced' && (
+        <React.Fragment>
+          {![FUND, PROJECT].includes(collective.type) && (
+            <React.Fragment>
+              <StyledInputFormikField
+                name="useStandalonePage"
+                label={intl.formatMessage({
+                  id: 'tier.standalonePage',
+                  defaultMessage: 'Deprecated: Standalone page',
+                })}
+                labelFontWeight="bold"
+                mt="3"
+                flexDirection={'row'}
+                justifyContent={'space-between'}
+                alignItems={'center'}
+              >
+                {({ field, form }) => (
+                  <Switch
+                    name={field.name}
+                    checked={field.value}
+                    onCheckedChange={checked => form.setFieldValue(field.name, checked)}
+                  />
+                )}
+              </StyledInputFormikField>
+              <FieldDescription className="mt-2">
+                {intl.formatMessage(
+                  {
+                    id: 'tier.standalonePageDescription',
+                    defaultMessage:
+                      "Create a <link>standalone</link> page for this tier? It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly",
+                  },
+                  {
+                    link: function StandaloneTierPageLink(...msg) {
+                      if (!values.id) {
+                        return <span>{msg}</span>;
+                      } else {
+                        return (
+                          <StyledLink
+                            as={Link}
+                            openInNewTab
+                            href={{
+                              pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${
+                                values.legacyId
+                              }`,
+                            }}
+                          >
+                            <span>{msg}</span>
+                          </StyledLink>
+                        );
+                      }
+                    },
+                  },
+                )}
+                .
+              </FieldDescription>
+            </React.Fragment>
+          )}
+          {receiptTemplateOptions.length > 1 && (
+            <React.Fragment>
+              <StyledInputFormikField
+                name="invoiceTemplate"
+                label={intl.formatMessage({
+                  defaultMessage: 'Choose receipt',
+                  id: 'cyMx/0',
+                })}
+                labelFontWeight="bold"
+                mt="4"
+                required={false}
+              >
+                {({ field, form, loading }) => (
+                  <StyledSelect
+                    inputId={field.name}
+                    data-cy={field.name}
+                    error={field.error}
+                    onBlur={() => form.setFieldTouched(field.name, true)}
+                    onChange={({ value }) => form.setFieldValue(field.name, value)}
+                    isLoading={loading}
+                    options={receiptTemplateOptions}
+                    value={receiptTemplateOptions.find(option => option.value === (field.value ?? 'default'))}
+                  />
+                )}
+              </StyledInputFormikField>
+              <FieldDescription>
+                {intl.formatMessage({
+                  defaultMessage: 'Choose between the receipts templates available.',
+                  id: 'sn4ULW',
+                })}
+              </FieldDescription>
+            </React.Fragment>
+          )}
+        </React.Fragment>
+      )}
+    </div>
   );
 }
 
@@ -553,16 +572,25 @@ FormFields.propTypes = {
     amountType: PropTypes.string,
     interval: PropTypes.string,
     minimumAmount: PropTypes.shape({ valueInCents: PropTypes.number, currency: PropTypes.string }),
+    customFields: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        required: PropTypes.bool,
+        options: PropTypes.arrayOf(PropTypes.string),
+      }),
+    ),
   }),
   hideTypeSelect: PropTypes.bool,
   tier: PropTypes.shape({
     type: PropTypes.string,
     singleTicket: PropTypes.bool,
   }),
+  activeTab: PropTypes.string,
 };
 
 const EditSectionContainer = styled(Flex)`
-  overflow-y: scroll;
   flex-grow: 1;
   flex-direction: column;
   padding-right: 0.65rem;
@@ -788,6 +816,7 @@ const getRequiredFields = values => {
 function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
+  const [activeTab, setActiveTab] = React.useState('general');
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
@@ -929,19 +958,35 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
                 )}
               </ModalHeader>
               <ModalBody>
-                <ModalSectionContainer>
-                  <EditSectionContainer>
-                    <FormFields
-                      collective={collective}
-                      values={values}
-                      tier={tier}
-                      hideTypeSelect={Boolean(forcedType)}
-                    />
-                  </EditSectionContainer>
-                  <PreviewSectionContainer>
-                    <ContributeCardPreview collective={collective} tier={values} />
-                  </PreviewSectionContainer>
-                </ModalSectionContainer>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="my-3">
+                    <TabsTrigger value="general">
+                      <FormattedMessage id="tier.tabs.general" defaultMessage="General" />
+                    </TabsTrigger>
+                    <TabsTrigger value="custom-fields">
+                      <FormattedMessage id="tier.tabs.customFields" defaultMessage="Custom Fields" />
+                    </TabsTrigger>
+                    <TabsTrigger value="advanced">
+                      <FormattedMessage id="tier.tabs.advanced" defaultMessage="Advanced" />
+                    </TabsTrigger>
+                  </TabsList>
+                  <ModalSectionContainer>
+                    <EditSectionContainer>
+                      <FormFields
+                        collective={collective}
+                        values={values}
+                        tier={tier}
+                        hideTypeSelect={Boolean(forcedType)}
+                        activeTab={activeTab}
+                      />
+                    </EditSectionContainer>
+                    {activeTab === 'general' && (
+                      <PreviewSectionContainer>
+                        <ContributeCardPreview collective={collective} tier={values} />
+                      </PreviewSectionContainer>
+                    )}
+                  </ModalSectionContainer>
+                </Tabs>
               </ModalBody>
               <ModalFooter isFullWidth dividerMargin="0.65rem 0">
                 <EditModalActionsContainer>
