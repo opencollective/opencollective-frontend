@@ -567,7 +567,10 @@ function Expense(props) {
           <ExpenseInviteNotificationBanner expense={expense} createdUser={state.createdUser} />
         )}
       {isMissingReceipt && (
-        <ExpenseMissingReceiptNotificationBanner onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick} />
+        <ExpenseMissingReceiptNotificationBanner
+          onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick}
+          expense={expense}
+        />
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
