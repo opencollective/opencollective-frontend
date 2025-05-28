@@ -21,6 +21,7 @@ import {
   isTaxRateValid,
 } from '../../expenses/lib/utils';
 import { DISABLE_ANIMATIONS } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 
 import { FormField } from '@/components/FormField';
 import InputAmount from '@/components/InputAmount';
@@ -94,7 +95,6 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
             {expenseItems?.map((ei, i) => {
               return (
-                // eslint-disable-next-line react/no-array-index-key
                 <div key={ei.key} id={ei.key} role="listitem" className="flex gap-4">
                   <div className="grow">
                     <ExpenseItemWrapper
@@ -103,7 +103,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
                       isSubjectToTax={Boolean(props.taxType)}
                     />
                   </div>
-                  <div className="flex flex-col gap-1">
+                  <div className={cn('flex flex-col gap-1', { hidden: expenseItems.length < 2 })}>
                     <Button
                       onClick={() => {
                         setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);

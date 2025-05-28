@@ -235,8 +235,7 @@ const dashboardContributionsQuery = gql`
     $frequency: [ContributionFrequency]
     $status: [OrderStatus!]
     $includeIncognito: Boolean
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $paymentMethod: [PaymentMethodReferenceInput]
     $includeHostedAccounts: Boolean!
     $includeChildrenAccounts: Boolean
@@ -261,8 +260,7 @@ const dashboardContributionsQuery = gql`
         frequency: $frequency
         status: $status
         includeIncognito: $includeIncognito
-        minAmount: $minAmount
-        maxAmount: $maxAmount
+        amount: $amount
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit

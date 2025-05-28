@@ -14,11 +14,9 @@ export const accountExpensesQuery = gql`
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
-    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $payoutMethod: PayoutMethodReferenceInput
     $payoutMethodType: PayoutMethodType
     $dateFrom: DateTime
@@ -40,11 +38,9 @@ export const accountExpensesQuery = gql`
       limit: $limit
       offset: $offset
       type: $type
-      types: $types
       tag: $tags
       status: $status
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
       payoutMethod: $payoutMethod
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
@@ -156,8 +152,7 @@ export const hostDashboardExpensesQuery = gql`
     $type: ExpenseType
     $tags: [String]
     $status: [ExpenseStatusFilter]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $payoutMethodType: PayoutMethodType
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -166,7 +161,6 @@ export const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
-    $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
     $hasGrantHistory: Boolean!
@@ -179,8 +173,7 @@ export const hostDashboardExpensesQuery = gql`
       type: $type
       tag: $tags
       status: $status
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
       dateTo: $dateTo
@@ -190,7 +183,6 @@ export const hostDashboardExpensesQuery = gql`
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
-      fromAccount: $fromAccount
     ) {
       totalCount
       offset

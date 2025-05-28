@@ -79,8 +79,7 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
     $offset: Int
     $limit: Int
     $status: [ExpenseStatusFilter!]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $payoutMethodType: PayoutMethodType
@@ -92,8 +91,7 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
       status: $status
       dateFrom: $dateFrom
       dateTo: $dateTo
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
       searchTerm: $searchTerm
       offset: $offset
       limit: $limit
@@ -158,8 +156,7 @@ const findOrderMatchForOffPlatformCreditQuery = gql`
     $offset: Int
     $limit: Int
     $status: [OrderStatus!]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $account: [AccountReferenceInput!]
@@ -171,8 +168,7 @@ const findOrderMatchForOffPlatformCreditQuery = gql`
         status: $status
         dateFrom: $dateFrom
         dateTo: $dateTo
-        minAmount: $minAmount
-        maxAmount: $maxAmount
+        amount: $amount
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
@@ -229,9 +225,10 @@ const getDefaultFilterValues = (
   row: TransactionsImportRow,
   accounts: Pick<Account, 'slug'>[],
   activeViewId: TabType,
+  host: Pick<Host, 'currency'>,
 ) => {
   const filters = {
-    amount: getAmountRangeFilter(row.amount.valueInCents),
+    amount: { ...getAmountRangeFilter(row.amount.valueInCents), currency: host.currency },
     account: accounts?.map(account => account.slug),
   };
 
@@ -257,7 +254,7 @@ const getDefaultFilterValues = (
 const useMatchCreditDialogQueryFilter = (
   activeViewId: TabType,
   row: TransactionsImportRow,
-  host: Pick<Host, 'id' | 'slug'>,
+  host: Pick<Host, 'id' | 'slug' | 'currency'>,
   accounts: Pick<Account, 'slug'>[],
 ) => {
   const intl = useIntl();
@@ -289,7 +286,7 @@ const useMatchCreditDialogQueryFilter = (
   );
 
   const defaultFilterValues = React.useMemo(
-    () => getDefaultFilterValues(row, accounts, activeViewId),
+    () => getDefaultFilterValues(row, accounts, activeViewId, host),
     [row, accounts, activeViewId],
   );
 
@@ -355,7 +352,7 @@ const useMatchCreditDialogQueryFilter = (
   // Re-apply default filters after changing view
   React.useEffect(() => {
     queryFilter.resetFilters({
-      ...getDefaultFilterValues(row, accounts, activeViewId),
+      ...getDefaultFilterValues(row, accounts, activeViewId, host),
       ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
     });
   }, [activeViewId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -427,7 +424,7 @@ export const MatchCreditDialog = ({
 
   React.useEffect(() => {
     if (props.open) {
-      queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
+      queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId, host));
     }
   }, [props.open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -443,7 +440,7 @@ export const MatchCreditDialog = ({
           setIsSubmitting(false);
           setOpen(false);
           setActiveViewId(TabType.EXPECTED_FUNDS);
-          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
+          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId, host));
         }
       }}
     >
@@ -469,7 +466,7 @@ export const MatchCreditDialog = ({
             activeViewId={activeViewId}
             resetFilters={filter => {
               queryFilter.resetFilters({
-                ...getDefaultFilterValues(row, accounts, activeViewId),
+                ...getDefaultFilterValues(row, accounts, activeViewId, host),
                 ...filter,
                 ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
               });

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { themeGet } from '@styled-system/theme-get';
 import clsx from 'clsx';
+import { unescape } from 'lodash';
 import { ChevronLeft, ChevronRight, Download, ExternalLink, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -240,7 +241,8 @@ export default function FilesViewerModal({
                 </Span>
               ) : null}
 
-              <Span>{selectedItem?.name}</Span>
+              {/* Items descriptions can contain HTML entities from the rich text editor, we need to decode them */}
+              <Span>{selectedItem?.name ? unescape(selectedItem.name) : ''}</Span>
             </Span>
           </Box>
           <Flex alignItems="center" gridGap={2}>

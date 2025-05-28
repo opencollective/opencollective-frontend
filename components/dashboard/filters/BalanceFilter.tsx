@@ -19,12 +19,14 @@ const BalanceFilterType = pick(AmountFilterType, ['IS_GREATER_THAN', 'IS_LESS_TH
 const BalanceFilter = React.memo(function BalanceFilter({
   value,
   onChange,
+  meta,
 }: {
   value: AmountFilterValueType;
   onChange: (value: AmountFilterValueType) => void;
+  meta?: { currency?: string };
 }) {
   const intl = useIntl();
-  value = value ?? { type: AmountFilterType.IS_GREATER_THAN };
+  value = value ?? { type: AmountFilterType.IS_GREATER_THAN, currency: meta?.currency };
 
   return (
     <div className="flex flex-col gap-2 p-3">
@@ -45,7 +47,7 @@ const BalanceFilter = React.memo(function BalanceFilter({
         </SelectContent>
       </Select>
 
-      {renderOptions(value, onChange)}
+      {renderOptions(value, onChange, meta)}
     </div>
   );
 });
@@ -54,8 +56,8 @@ export const consolidatedBalanceFilter: FilterConfig<z.infer<typeof amountFilter
   schema: amountFilterSchema,
   toVariables: (value: z.infer<typeof amountFilterSchema>) => ({
     consolidatedBalance: {
-      gte: 'gte' in value ? { valueInCents: value.gte } : undefined,
-      lte: 'lte' in value ? { valueInCents: value.lte } : undefined,
+      gte: 'gte' in value ? { valueInCents: value.gte, currency: value.currency || undefined } : undefined,
+      lte: 'lte' in value ? { valueInCents: value.lte, currency: value.currency || undefined } : undefined,
     },
   }),
   filter: {

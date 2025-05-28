@@ -7358,7 +7358,10 @@ export type LegalDocument = {
   documentLink?: Maybe<Scalars['URL']['output']>;
   /** Unique identifier for this legal document */
   id: Scalars['String']['output'];
-  /** Whether this legal document is expired */
+  /**
+   * Whether this legal document is expired
+   * @deprecated 2025-05-27: Use "status" = "EXPIRED" instead
+   */
   isExpired: Scalars['Boolean']['output'];
   /** The date and time the request for this legal document was created */
   requestedAt: Scalars['DateTime']['output'];
@@ -7386,6 +7389,7 @@ export type LegalDocumentCollection = Collection & {
 /** Status for a legal document */
 export enum LegalDocumentRequestStatus {
   ERROR = 'ERROR',
+  EXPIRED = 'EXPIRED',
   INVALID = 'INVALID',
   NOT_REQUESTED = 'NOT_REQUESTED',
   RECEIVED = 'RECEIVED',
