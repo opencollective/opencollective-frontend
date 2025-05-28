@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "此{type}已被归档且不再活跃。",
   "collective.pending": "Collective 正在等待批准。",
   "collective.pending.description": "等待 {host} 的批准。",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, other {个组织正在}}支持 {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, other {位个人正在}}支持 {collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

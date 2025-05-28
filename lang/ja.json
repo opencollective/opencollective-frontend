@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "This {type} has been archived and is no longer active.",
   "collective.pending": "コレクティブは承認待ちです。",
   "collective.pending.description": "{host} からの承認を待ちです。",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {つの組織が} other {つの組織が}} {collective} をサポートしています",
   "collective.section.backers.users.title": "{n}名の方が {collective} を支援しています",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

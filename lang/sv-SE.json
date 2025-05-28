@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "Denna {type} har arkiverats och är inte längre aktiv.",
   "collective.pending": "Godkännande för detta kollektiv pågår.",
   "collective.pending.description": "Väntar på godkännande från {host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organisation} other {organisationer}} stödjer {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {person} other {personer}} stödjer {collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",
