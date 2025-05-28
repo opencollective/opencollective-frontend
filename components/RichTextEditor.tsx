@@ -302,6 +302,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
       this.editorRef.current.removeEventListener('trix-action-invoke', this.trixActionInvoke);
       this.editorRef.current.removeEventListener('trix-initialize', this.trixInitialize);
+      this.isReady = false;
     }
   }
 
