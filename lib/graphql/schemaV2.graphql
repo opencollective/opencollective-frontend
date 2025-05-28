@@ -4584,6 +4584,7 @@ enum LegalDocumentRequestStatus {
   RECEIVED
   ERROR
   INVALID
+  EXPIRED
 }
 
 """
