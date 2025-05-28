@@ -161,6 +161,7 @@ export const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
     $hasGrantHistory: Boolean!
@@ -168,6 +169,7 @@ export const hostDashboardExpensesQuery = gql`
     expenses(
       host: { slug: $hostSlug }
       account: $account
+      fromAccount: $fromAccount
       limit: $limit
       offset: $offset
       type: $type

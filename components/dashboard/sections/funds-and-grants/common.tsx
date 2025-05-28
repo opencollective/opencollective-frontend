@@ -269,35 +269,19 @@ function BeneficiaryCell({ grant }) {
                   e.stopPropagation();
                 }}
               >
-                {isHostDashboardAccount ? (
-                  <FormattedMessage
-                    defaultMessage="Received {countGrants, plural, one {# grant} other {# grants}} totalling {amount} from hosted funds"
-                    id="8LMAoG"
-                    values={{
-                      amount: (
-                        <FormattedMoneyAmount
-                          currency={grantHistory?.totalAmount?.amount?.currency}
-                          amount={grantHistory?.totalAmount?.amount?.valueInCents}
-                        />
-                      ),
-                      countGrants: grantHistory?.totalCount,
-                    }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="Received {countGrants, plural, one {# grant} other {# grants}} totalling {amount}"
-                    id="HpMrEk"
-                    values={{
-                      amount: (
-                        <FormattedMoneyAmount
-                          currency={grantHistory?.totalAmount?.amount?.currency}
-                          amount={grantHistory?.totalAmount?.amount?.valueInCents}
-                        />
-                      ),
-                      countGrants: grantHistory?.totalCount,
-                    }}
-                  />
-                )}
+                <FormattedMessage
+                  defaultMessage="Received {countGrants, plural, one {# grant} other {# grants}} totalling {amount}"
+                  id="HpMrEk"
+                  values={{
+                    amount: (
+                      <FormattedMoneyAmount
+                        currency={grantHistory?.totalAmount?.amount?.currency}
+                        amount={grantHistory?.totalAmount?.amount?.valueInCents}
+                      />
+                    ),
+                    countGrants: grantHistory?.totalCount,
+                  }}
+                />
               </StyledLink>
             </span>
           )}
