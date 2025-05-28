@@ -94,18 +94,18 @@ describe('Grant Submission Flow', () => {
     cy.contains('View All Expenses').should('be.visible');
   });
 
-  it('should allow host admin to create vendor', function () {
+  it('should allow host admin to create beneficiary', function () {
     cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
-      cy.contains('A vendor').click();
-      cy.contains('A vendor').parent().get('[role="combobox"]').click();
-      cy.root().closest('html').contains('Create Vendor').click();
+      cy.contains('A beneficiary').click();
+      cy.contains('A beneficiary').parent().get('[role="combobox"]').click();
+      cy.root().closest('html').contains('Create Beneficiary').click();
 
-      cy.contains('label', "Vendor's name").click();
-      cy.focused().type('A vendor name');
+      cy.contains('label', "Beneficiary's name").click();
+      cy.focused().type('A beneficiary name');
 
-      cy.contains('button', 'Create vendor').click();
+      cy.contains('button', 'Create beneficiary').click();
     });
 
     cy.get('#PAYOUT_METHOD').within(() => {
@@ -148,11 +148,11 @@ describe('Grant Submission Flow', () => {
     cy.contains('View All Expenses').should('be.visible');
   });
 
-  it('should allow host admin submit grant existing vendor while adding payout method', function () {
+  it('should allow host admin submit grant existing beneficiary while adding payout method', function () {
     cy.createVendor(
       this.host.slug,
       {
-        name: 'existing vendor',
+        name: 'existing beneficiary',
       },
       this.hostAdmin.email,
     );
@@ -160,9 +160,9 @@ describe('Grant Submission Flow', () => {
     cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
-      cy.contains('A vendor').click();
-      cy.contains('A vendor').parent().get('[role="combobox"]').click();
-      cy.root().closest('html').contains('existing vendor').click();
+      cy.contains('A beneficiary').click();
+      cy.contains('A beneficiary').parent().get('[role="combobox"]').click();
+      cy.root().closest('html').contains('existing beneficiary').click();
     });
 
     cy.get('#PAYOUT_METHOD').within(() => {
@@ -205,11 +205,11 @@ describe('Grant Submission Flow', () => {
     cy.contains('View All Expenses').should('be.visible');
   });
 
-  it('should allow host admin submit grant to existing vendor', function () {
+  it('should allow host admin submit grant to existing beneficiary', function () {
     cy.createVendor(
       this.host.slug,
       {
-        name: 'existing vendor',
+        name: 'existing beneficiary',
         payoutMethod: {
           type: 'OTHER',
           name: '12345',
@@ -225,9 +225,9 @@ describe('Grant Submission Flow', () => {
     cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
     cy.contains('button', 'Proceed').click();
     cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
-      cy.contains('A vendor').click();
-      cy.contains('A vendor').parent().get('[role="combobox"]').click();
-      cy.root().closest('html').contains('existing vendor').click();
+      cy.contains('A beneficiary').click();
+      cy.contains('A beneficiary').parent().get('[role="combobox"]').click();
+      cy.root().closest('html').contains('existing beneficiary').click();
     });
 
     cy.contains('Application Content').scrollIntoView();
