@@ -1566,7 +1566,9 @@ async function buildFormOptions(
       options.canSetupRecurrence = false;
     }
 
-    options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
+    options.allowExpenseItemAttachment = values.expenseTypeOption
+      ? values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE
+      : options.expense?.type === ExpenseType.RECEIPT || options.expense?.type === ExpenseType.CHARGE;
 
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
@@ -2101,6 +2103,35 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [formOptions.taxType, setFieldValue]);
+
+  // Move attachments when switching expense type
+  React.useEffect(() => {
+    if (expenseForm.values.expenseTypeOption === ExpenseType.INVOICE) {
+      if (expenseForm.values.expenseItems.length === 1 && expenseForm.values.expenseItems[0].attachment) {
+        setFieldValue('invoiceFile', expenseForm.values.expenseItems[0].attachment);
+        setFieldValue('expenseItems.0.attachment', null);
+        setFieldValue('hasInvoiceOption', YesNoOption.YES);
+      } else {
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        let count = 0;
+
+        expenseForm.values.expenseItems.forEach((item, i) => {
+          if (item.attachment) {
+            setFieldValue(`additionalAttachments.${numberOfAdditionalAttachments + count}`, item.attachment);
+            setFieldValue(`expenseItems.${i}.attachment`, null);
+            count++;
+          }
+        });
+      }
+    } else if (expenseForm.values.expenseTypeOption === ExpenseType.RECEIPT) {
+      if (expenseForm.values.invoiceFile) {
+        for (let i = 0; i < expenseForm.values.expenseItems.length; i++) {
+          setFieldValue(`expenseItems.${i}.attachment`, expenseForm.values.invoiceFile);
+        }
+        setFieldValue('invoiceFile', null);
+      }
+    }
+  }, [expenseForm.values.expenseTypeOption]);
 
   React.useEffect(() => {
     setFieldValue('payoutMethodNameDiscrepancyReason', '');

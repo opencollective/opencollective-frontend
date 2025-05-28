@@ -4547,7 +4547,7 @@ type LegalDocument {
   """
   Whether this legal document is expired
   """
-  isExpired: Boolean!
+  isExpired: Boolean! @deprecated(reason: "2025-05-27: Use \"status\" = \"EXPIRED\" instead")
 
   """
   The date and time the request for this legal document was created
@@ -4589,6 +4589,7 @@ enum LegalDocumentRequestStatus {
   RECEIVED
   ERROR
   INVALID
+  EXPIRED
 }
 
 """

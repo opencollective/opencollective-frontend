@@ -16,6 +16,7 @@ import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/grap
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
+import { Separator } from '@/components/ui/Separator';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
@@ -219,7 +220,7 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
 
   return (
     <React.Fragment>
-      <Label className="mb-4 font-bold">
+      <Label className="mb-4 block font-bold">
         <FormattedMessage defaultMessage="Items" id="Fields.items" />
       </Label>
       <div role="list">
@@ -281,8 +282,10 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
         ))}
       </div>
 
+      <Separator className="mb-2 w-full" />
+
       <div className="flex justify-end">
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-right">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
           <SummaryItemsTotal
             {...pick(props, ['hasTax', 'tax', 'expenseCurrency', 'totalInvoicedInExpenseCurrency', 'taxType'])}
           />
@@ -396,18 +399,23 @@ const SummaryItemsTotal = React.memo(function SummaryItemsTotal(
         </React.Fragment>
       )}
 
-      <div className="col-span-2 text-right">
-        <FormattedMoneyAmount
-          amount={
-            props.hasTax && props.tax && isTaxRateValid(props.tax.rate)
-              ? getTaxAmount(props.totalInvoicedInExpenseCurrency, props.tax) + props.totalInvoicedInExpenseCurrency
-              : props.totalInvoicedInExpenseCurrency
-          }
-          precision={2}
-          currency={props.expenseCurrency}
-          showCurrencyCode
-          amountClassName="font-bold"
-        />
+      <div className="col-span-2 my-2 flex gap-3 text-right">
+        <div className="font-semibold capitalize">
+          <FormattedMessage defaultMessage="Total amount" id="TotalAmount" />
+        </div>
+        <div>
+          <FormattedMoneyAmount
+            amount={
+              props.hasTax && props.tax && isTaxRateValid(props.tax.rate)
+                ? getTaxAmount(props.totalInvoicedInExpenseCurrency, props.tax) + props.totalInvoicedInExpenseCurrency
+                : props.totalInvoicedInExpenseCurrency
+            }
+            precision={2}
+            currency={props.expenseCurrency}
+            showCurrencyCode
+            amountClassName="font-bold"
+          />
+        </div>
       </div>
     </React.Fragment>
   );

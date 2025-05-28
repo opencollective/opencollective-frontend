@@ -133,7 +133,7 @@ const messages = defineMessages({
   },
   'receiptExpensePolicy.label': {
     id: 'collective.receiptExpensePolicy.label',
-    defaultMessage: 'Receipt Expenses Policy',
+    defaultMessage: 'Reimbursement Expenses Policy',
   },
   'receiptExpensePolicy.placeholder': {
     id: 'collective.expensePolicy.placeholder',
