@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "{type} עבר לארכיון ואינו פעיל יותר.",
   "collective.pending": "הקבוצה טרם אושרה.",
   "collective.pending.description": "ממתין לאישור מ{host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n, plural,one {ארגון {n} תומך} other {{n} ארגונים תומכים}} ב־{collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {יחיד/ה} two {יחידים} many {יחידים} other {יחידים}} תומכים ב־{collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

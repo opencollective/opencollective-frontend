@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "Цей {type} заархівовано й він більше не активний.",
   "collective.pending": "Колективне очікує затвердження.",
   "collective.pending.description": "Очікується підтвердження від {host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {організація} few {організації} other {організацій}} {n, plural, one {підтримує} other {підтримують}} {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {людина} few {людини} many {людей} other {людей}} {n, plural, one {підтримує} many {підтримують} other {підтримують}} {collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

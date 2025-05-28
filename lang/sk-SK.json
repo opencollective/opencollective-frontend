@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "Tento {type} bol archivovaný a už nie je aktívny.",
   "collective.pending": "Kolektív čaká na schválenie.",
   "collective.pending.description": "Čakáme na schválenie od hostiteľa {host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organizácia podporuje} few {organizácie podporujú} other {organizácií podporuje}} {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {jedntlivec podporuje} few {jednotlivci podporujú} other {jednotlivcov podporuje}} {collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

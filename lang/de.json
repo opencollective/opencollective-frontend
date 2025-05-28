@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "Dieser {type} wurde archiviert und ist nicht mehr aktiv.",
   "collective.pending": "Collective-Genehmigung ausstehend.",
   "collective.pending.description": "Warte auf Genehmigung von {host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {Organisation unterstützt} other {Organisationen unterstützen}} {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {Person unterstützt} other {Personen unterstützen}} {collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

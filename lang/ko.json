@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "This {type} has been archived and is no longer active.",
   "collective.pending": "Collective 승인 대기 중.",
   "collective.pending.description": "Awaiting approval from {host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}",
   "collective.section.backers.users.title": "{n}명의 {n, plural, one {개인이} other {개인이}} {collective}를 지원함",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",

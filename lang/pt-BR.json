@@ -791,7 +791,7 @@
   "collective.isArchived.edit.description": "Este {type} foi arquivado e não está mais ativo.",
   "collective.pending": "Aprovação do Coletivo pendente.",
   "collective.pending.description": "Aguardando aprovação de {host}.",
-  "collective.receiptExpensePolicy.label": "Receipt Expenses Policy",
+  "collective.receiptExpensePolicy.label": "Reimbursement Expenses Policy",
   "collective.section.backers.organizations.title": "{n} {n, plural, one {organização está} other {organizações estão}} apoiando {collective}",
   "collective.section.backers.users.title": "{n} {n, plural, one {indivíduo está} other {indivíduos estão}} apoiando {collective}",
   "collective.sendMoney.PayPalPayouts.description": "Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal.",
