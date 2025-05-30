@@ -225,8 +225,8 @@ const ApplicationForm = ({
                 defaultMessage="Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
-                    <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
-                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Read our FAQs" />
+                    <StyledLink href="https://docs.oscollective.org/how-to-apply" openInNewTab color="purple.500">
+                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Visit our docs" />
                     </StyledLink>
                   ),
                 }}

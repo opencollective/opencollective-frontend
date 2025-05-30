@@ -95,7 +95,7 @@ class ConnectGithub extends React.Component {
                   values={{
                     helplink: (
                       <StyledLink
-                        href="https://docs.opencollective.com/help/collectives/osc-verification"
+                        href="https://docs.oscollective.org/how-to-apply/github-verification#github-verification-troubleshooting"
                         openInNewTab
                         color="purple.500"
                       >
@@ -117,7 +117,7 @@ class ConnectGithub extends React.Component {
                     }),
                     AltVerificationLink: getI18nLink({
                       openInNewTab: true,
-                      href: 'https://www.oscollective.org/#criteria',
+                      href: 'https://docs.oscollective.org/how-to-apply/manual-verification',
                       color: 'purple.500',
                     }),
                   }}
