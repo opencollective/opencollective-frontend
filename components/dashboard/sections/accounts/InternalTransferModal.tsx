@@ -290,10 +290,10 @@ export default function InternalTransferModal({
                             type="number"
                             inputMode="numeric"
                             onChange={e =>
-                              setFieldValue(
-                                'amount.valueInCents',
-                                e.target.value ? parseFloat(e.target.value) * 100 : '',
-                              )
+                              setFieldValue('amount', {
+                                valueInCents: e.target.value ? parseFloat(e.target.value) * 100 : '',
+                                currency: data.account.currency,
+                              })
                             }
                             className="flex-1"
                           />
