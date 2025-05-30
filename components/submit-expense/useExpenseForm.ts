@@ -1524,7 +1524,7 @@ async function buildFormOptions(
     } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
-      options.expenseCurrency = options.account?.currency;
+      options.expenseCurrency = options.expense?.currency ?? options.account?.currency;
     }
 
     options.isLongFormItemDescription = false;
