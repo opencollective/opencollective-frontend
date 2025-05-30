@@ -318,8 +318,15 @@ export const ApplicationApproveScreen = ({
             minWidth={175}
             disabled={loading}
             onClick={() => {
-              // If we're on the first page of the history, close the window. Otherwise, go back.
-              if (window.history.length === 0) {
+              if (redirectUri) {
+                const accessDenied = new URL(redirectUri);
+                accessDenied.searchParams.set('error', 'access_denied');
+                if (state) {
+                  accessDenied.searchParams.set('state', state);
+                }
+                router.push(accessDenied.toString());
+              } else if (window.history.length === 0) {
+                // If we're on the first page of the history, close the window. Otherwise, go back.
                 window.close();
               } else {
                 window.history.back();
