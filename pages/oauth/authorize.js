@@ -85,12 +85,22 @@ const OAuthAuthorizePage = () => {
               values={{ field: 'response_type', value: query['response_type'], expected: 'code' }}
             />
           </MessageBox>
+        ) : query['code_challenge'] && query['code_challenge_method'] !== 'S256' ? (
+          <MessageBox withIcon type="error">
+            <FormattedMessage
+              defaultMessage='{field} has invalid value "{value}". Expected: "{expected}"'
+              id="mGSAXe"
+              values={{ field: 'code_challenge_method', value: query['code_challenge_method'], expected: 'S256' }}
+            />
+          </MessageBox>
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
         ) : (
           <ApplicationApproveScreen
             application={data.application}
             redirectUri={query['redirect_uri']}
+            codeChallenge={query['code_challenge']}
+            codeChallengeMethod={query['code_challenge_method']}
             autoApprove={hasExistingAuthorization}
             state={query['state']}
             scope={query['scope']}
