@@ -4403,6 +4403,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this account has any payout methods saved
   """
   hasPayoutMethod: Boolean
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [CollectiveInterface]
 }
 
 """
@@ -4519,6 +4524,11 @@ type Query {
     Included vendors for specific host ID
     """
     includeVendorsForHostId: Int
+
+    """
+    Only return vendors visible to given account ids
+    """
+    vendorVisibleToAccountIds: [Int]
 
     """
     Whether to skip recent accounts (48h)

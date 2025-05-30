@@ -122,6 +122,7 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
       hasAmountInCreatedByAccountCurrency: false,
+      hasGrantHistory: true,
       ...queryFilter.variables,
       type: ExpenseType.GRANT,
       status: [ExpenseStatusFilter.PENDING],
