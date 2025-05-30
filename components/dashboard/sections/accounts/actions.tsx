@@ -34,7 +34,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
             showModal(
               InternalTransferModal,
               {
-                accountSlug: 'parent' in account ? account.parent.slug : account.slug,
+                parentAccount: 'parent' in account ? account.parent : account,
                 defaultFromAccount: account,
                 onCloseFocusRef,
               },
