@@ -456,6 +456,7 @@ function Expense(props) {
   useEffect(() => {
     const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
     setState(state => ({ ...state, showFilesViewerModal }));
+    setOpenUrl(files?.[0]?.url || null);
   }, [files, isDesktop, isDrawer]);
 
   const confirmSaveButtons = (
@@ -601,6 +602,7 @@ function Expense(props) {
             drawerActionsContainer={drawerActionsContainer}
             openFileViewer={openFileViewer}
             enableKeyboardShortcuts={enableKeyboardShortcuts}
+            openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
@@ -822,6 +824,7 @@ function Expense(props) {
               { expenseId: expense.legacyId },
             )}
             openFileUrl={openUrl}
+            setOpenFileUrl={setOpenUrl}
             onClose={
               isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
             }
