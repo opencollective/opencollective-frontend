@@ -91,6 +91,8 @@ const OAuthAuthorizePage = () => {
           <ApplicationApproveScreen
             application={data.application}
             redirectUri={query['redirect_uri']}
+            codeChallenge={query['code_challenge']}
+            codeChallengeMethod={query['code_challenge_method']}
             autoApprove={hasExistingAuthorization}
             state={query['state']}
             scope={query['scope']}
