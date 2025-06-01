@@ -633,13 +633,13 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 <MessageBox type="info" className="mt-3">
                   {props.isBeneficiary ? (
                     <FormattedMessage
-                      defaultMessage="This beneficiary will be visible only within this fund. To change the visibility, you can edit the beneficiary."
-                      id="R2OJwE"
+                      defaultMessage="This beneficiary will only be visible within this fund. To change the visibility, you can edit this beneficiary at vendors settings in your dashboard."
+                      id="lk4zhJ"
                     />
                   ) : (
                     <FormattedMessage
-                      defaultMessage="This vendor will be visible only within this collective. To change the visibility, you can edit the vendor."
-                      id="MU6Fhb"
+                      defaultMessage="The above specified visibility settings will be applied to this vendor. To customise the visibility, you can edit this vendor's settings from your dashboard."
+                      id="Mr88Jf"
                     />
                   )}
                 </MessageBox>
