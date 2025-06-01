@@ -32,6 +32,9 @@ const dashboardAccountsQueryFields = gql`
     ... on AccountWithParent {
       parent {
         id
+        legacyId
+        imageUrl(height: 96)
+        name
         slug
         settings
         isHost
