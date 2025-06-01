@@ -30,7 +30,7 @@ export const accountExpensesQuery = gql`
     $fetchHostForExpenses: Boolean!
     $hasAmountInCreatedByAccountCurrency: Boolean!
     $accountingCategory: [String]
-    $hasGrantHistory: Boolean!
+    $fetchGrantHistory: Boolean!
   ) {
     expenses(
       account: $account
@@ -80,7 +80,7 @@ export const accountExpensesQuery = gql`
 
         payee {
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, account: $account)
-            @include(if: $hasGrantHistory) {
+            @include(if: $fetchGrantHistory) {
             totalAmount {
               amount {
                 currency
@@ -167,7 +167,7 @@ export const hostDashboardExpensesQuery = gql`
     $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
-    $hasGrantHistory: Boolean!
+    $fetchGrantHistory: Boolean!
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -199,7 +199,7 @@ export const hostDashboardExpensesQuery = gql`
 
         payee {
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })
-            @include(if: $hasGrantHistory) {
+            @include(if: $fetchGrantHistory) {
             totalAmount {
               amount {
                 currency

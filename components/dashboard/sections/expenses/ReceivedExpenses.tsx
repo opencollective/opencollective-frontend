@@ -147,7 +147,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
       hasAmountInCreatedByAccountCurrency: false,
-      hasGrantHistory: false,
+      fetchGrantHistory: false,
       ...queryFilter.variables,
       ...(!queryFilter.variables.type
         ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }

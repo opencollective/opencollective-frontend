@@ -134,7 +134,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
       hasAmountInCreatedByAccountCurrency: false,
-      hasGrantHistory: true,
+      fetchGrantHistory: true,
       ...queryFilter.variables,
       type: ExpenseType.GRANT,
     },

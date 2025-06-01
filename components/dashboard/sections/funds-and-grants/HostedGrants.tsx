@@ -183,7 +183,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     hostSlug,
     ...queryFilter.variables,
     type: ExpenseType.GRANT,
-    hasGrantHistory: true,
+    fetchGrantHistory: true,
   };
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
