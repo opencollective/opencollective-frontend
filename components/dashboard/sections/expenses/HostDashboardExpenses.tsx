@@ -204,6 +204,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const variables = {
     hostSlug,
     ...queryFilter.variables,
+    fetchGrantHistory: false,
   };
 
   const expenses = useQuery(hostDashboardExpensesQuery, {

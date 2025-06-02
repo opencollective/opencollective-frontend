@@ -6492,6 +6492,7 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 
@@ -12744,6 +12745,8 @@ export type Vendor = Account & AccountWithContributions & {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host */
+  visibleToAccounts: Array<Maybe<Account>>;
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
@@ -13139,6 +13142,7 @@ export type VendorCreateInput = {
   payoutMethod?: InputMaybe<PayoutMethodInput>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 export type VendorEditInput = {
@@ -13163,6 +13167,7 @@ export type VendorEditInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 /** Some context about the vendor */
