@@ -162,18 +162,24 @@ export default function FilesViewerModal({
 
   const onArrowLeft = React.useCallback(
     () =>
-      setOpenFileUrl
-        ? setOpenFileUrl(files?.[Math.max(selectedIndex - 1, 0)].url)
-        : setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)),
-    [],
+      setSelectedIndex(selectedIndex => {
+        const newIndex = Math.max(selectedIndex - 1, 0);
+        setOpenFileUrl?.(files?.[newIndex]?.url || '');
+        return newIndex;
+      }),
+    [files, setOpenFileUrl],
   );
+
   const onArrowRight = React.useCallback(
     () =>
-      setOpenFileUrl
-        ? setOpenFileUrl(files?.[Math.min(selectedIndex + 1, (files?.length || 1) - 1)].url)
-        : setSelectedIndex(selectedIndex => Math.min(selectedIndex + 1, (files?.length || 1) - 1)),
-    [files],
+      setSelectedIndex(selectedIndex => {
+        const newIndex = Math.min(selectedIndex + 1, (files?.length || 1) - 1);
+        setOpenFileUrl?.(files?.[newIndex]?.url || '');
+        return newIndex;
+      }),
+    [files, setOpenFileUrl],
   );
+
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
