@@ -125,11 +125,7 @@ const hostCreateExpenseMutation = gql`
   }
 `;
 
-const SUPPORTED_EXPENSE_TYPES = omit(ExpenseType, [
-  ExpenseType.UNCLASSIFIED,
-  ExpenseType.SETTLEMENT,
-  ExpenseType.FUNDING_REQUEST,
-]);
+const SUPPORTED_EXPENSE_TYPES = [ExpenseType.CHARGE, ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.RECEIPT];
 
 const hostExpenseFormValuesSchema = z
   .object({
@@ -149,7 +145,7 @@ const hostExpenseFormValuesSchema = z
         attachedFile: z.object({ url: z.string() }),
       }),
       z.object({
-        type: z.enum(Object.values(omit(SUPPORTED_EXPENSE_TYPES, [ExpenseType.RECEIPT])) as [string, ...string[]]),
+        type: z.enum(SUPPORTED_EXPENSE_TYPES.filter(type => type !== ExpenseType.RECEIPT) as [string, ...string[]]),
         attachedFile: z.object({ url: z.string() }).optional().nullable(),
       }),
     ]),
@@ -197,7 +193,7 @@ export const HostCreateExpenseModal = ({
   const [createExpense, { client }] = useMutation(hostCreateExpenseMutation, { context: API_V2_CONTEXT });
   const { toast } = useToast();
   const expenseTypeOptions = React.useMemo(
-    () => Object.values(SUPPORTED_EXPENSE_TYPES).map(value => getExpenseTypeOption(intl, value)),
+    () => SUPPORTED_EXPENSE_TYPES.map(value => getExpenseTypeOption(intl, value)),
     [intl],
   );
 
@@ -475,9 +471,7 @@ export const HostCreateExpenseModal = ({
                       required={values.type === ExpenseType.RECEIPT}
                       name="attachedFile"
                       label={
-                        values.type === ExpenseType.RECEIPT ? (
-                          <FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />
-                        ) : values.type === ExpenseType.CHARGE ? (
+                        values.type === ExpenseType.RECEIPT || values.type === ExpenseType.CHARGE ? (
                           <FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />
                         ) : (
                           <FormattedMessage defaultMessage="Attachment" id="Expense.Attachment" />
