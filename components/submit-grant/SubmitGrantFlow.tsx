@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
   CreateExpenseFromDashboardMutation,
@@ -543,7 +544,13 @@ function FormContainer(props: FormContainerProps) {
             id={Step.PAYOUT_METHOD}
             inViewChange={onInViewChange}
             title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
-            subtitle={<FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />}
+            subtitle={
+              form.options.payee?.type === CollectiveType.VENDOR || !form.options.isAdminOfPayee ? (
+                <FormattedMessage defaultMessage="Where the money will be sent to" id="IQIlkE" />
+              ) : (
+                <FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />
+              )
+            }
           >
             <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(form)} />
           </FormSectionContainer>
