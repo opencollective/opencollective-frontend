@@ -278,14 +278,82 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage id="budgetSection-raised" defaultMessage="Total raised" />,
     cell: ({ row }) => {
       const collective = row.original;
+      const isChild = !!collective.parent?.id;
       const stats = collective.stats;
+
+      const netAmountDifference =
+        stats.consolidatedTotalAmountRaised.valueInCents - stats.consolidatedTotalNetAmountRaised.valueInCents;
+
+      const hasChildActivity =
+        stats.consolidatedTotalAmountRaised.valueInCents !== stats.totalAmountRaised.valueInCents;
+
       return (
-        <div className="flex items-center font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={stats.totalAmountRaised?.valueInCents}
-            currency={stats.totalAmountRaised?.currency}
-            showCurrencyCode={true}
-          />
+        <div className="flex items-center font-medium whitespace-nowrap text-foreground">
+          {netAmountDifference === 0 ? (
+            <span className="inline-flex items-center">
+              <FormattedMoneyAmount
+                amount={stats.consolidatedTotalNetAmountRaised.valueInCents}
+                currency={stats.consolidatedTotalNetAmountRaised.currency}
+                showCurrencyCode={true}
+              />
+              {!isChild && hasChildActivity && (
+                <Tooltip>
+                  <TooltipTrigger className="cursor-help align-middle">
+                    <SquareSigma className="ml-1" size="16" />
+                  </TooltipTrigger>
+                  <TooltipContent className="font-normal">
+                    <FormattedMessage
+                      defaultMessage="Includes the contribution to all events and projects"
+                      id="bcvJEF"
+                    />
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </span>
+          ) : (
+            <Tooltip>
+              <span className="inline-flex items-center">
+                <TooltipTrigger asChild>
+                  <span className="border-b-2 border-dotted">
+                    <FormattedMoneyAmount
+                      amount={stats.consolidatedTotalNetAmountRaised.valueInCents}
+                      currency={stats.consolidatedTotalNetAmountRaised.currency}
+                      showCurrencyCode={true}
+                    />
+                  </span>
+                </TooltipTrigger>
+
+                {!isChild && hasChildActivity && (
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-help align-middle">
+                      <SquareSigma className="ml-1" size="16" />
+                    </TooltipTrigger>
+                    <TooltipContent className="font-normal">
+                      <FormattedMessage
+                        defaultMessage="Includes the contribution to all events and projects"
+                        id="bcvJEF"
+                      />
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </span>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="Total raised before fees: {amount}"
+                  id="hRpDEz"
+                  values={{
+                    amount: (
+                      <FormattedMoneyAmount
+                        amount={stats.consolidatedTotalAmountRaised.valueInCents}
+                        currency={stats.consolidatedTotalAmountRaised.currency}
+                        showCurrencyCode={true}
+                      />
+                    ),
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },
@@ -295,14 +363,31 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage defaultMessage="Total disbursed" id="dIoEln" />,
     cell: ({ row }) => {
       const collective = row.original;
+      const isChild = !!collective.parent?.id;
       const stats = collective.stats;
+
+      const hasChildActivity = stats.consolidatedTotalAmountSpent.valueInCents !== stats.totalAmountSpent.valueInCents;
+
       return (
         <div className="flex items-center font-medium text-foreground">
           <FormattedMoneyAmount
-            amount={Math.abs(stats.totalAmountSpent?.valueInCents)}
-            currency={stats.totalAmountSpent?.currency}
+            amount={Math.abs(stats.consolidatedTotalAmountSpent?.valueInCents)}
+            currency={stats.consolidatedTotalAmountSpent?.currency}
             showCurrencyCode={true}
           />
+          {!isChild && hasChildActivity && (
+            <Tooltip>
+              <TooltipTrigger className="cursor-help align-middle">
+                <SquareSigma className="ml-1" size="16" />
+              </TooltipTrigger>
+              <TooltipContent className="font-normal">
+                <FormattedMessage
+                  defaultMessage="Includes the disbursements from all events and projects"
+                  id="7yv7k/"
+                />
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },
