@@ -125,12 +125,7 @@ const hostCreateExpenseMutation = gql`
   }
 `;
 
-const SUPPORTED_EXPENSE_TYPES = omit(ExpenseType, [
-  ExpenseType.UNCLASSIFIED,
-  ExpenseType.CHARGE,
-  ExpenseType.SETTLEMENT,
-  ExpenseType.FUNDING_REQUEST,
-]);
+const SUPPORTED_EXPENSE_TYPES = [ExpenseType.CHARGE, ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.RECEIPT];
 
 const hostExpenseFormValuesSchema = z
   .object({
@@ -150,7 +145,7 @@ const hostExpenseFormValuesSchema = z
         attachedFile: z.object({ url: z.string() }),
       }),
       z.object({
-        type: z.enum(Object.values(omit(SUPPORTED_EXPENSE_TYPES, ExpenseType.RECEIPT)) as [string, ...string[]]),
+        type: z.enum(SUPPORTED_EXPENSE_TYPES.filter(type => type !== ExpenseType.RECEIPT) as [string, ...string[]]),
         attachedFile: z.object({ url: z.string() }).optional().nullable(),
       }),
     ]),
@@ -198,7 +193,7 @@ export const HostCreateExpenseModal = ({
   const [createExpense, { client }] = useMutation(hostCreateExpenseMutation, { context: API_V2_CONTEXT });
   const { toast } = useToast();
   const expenseTypeOptions = React.useMemo(
-    () => Object.values(SUPPORTED_EXPENSE_TYPES).map(value => getExpenseTypeOption(intl, value)),
+    () => SUPPORTED_EXPENSE_TYPES.map(value => getExpenseTypeOption(intl, value)),
     [intl],
   );
 
@@ -218,6 +213,7 @@ export const HostCreateExpenseModal = ({
           initialValues={getInitialValues(transactionsImportRow, account)}
           onSubmit={async values => {
             try {
+              const embedFileInItems = [ExpenseType.RECEIPT, ExpenseType.CHARGE].includes(values.type);
               const result = await createExpense({
                 variables: {
                   account: getAccountReferenceInput(values.account),
@@ -239,13 +235,11 @@ export const HostCreateExpenseModal = ({
                         amountV2: omit(values.amount, ['exchangeRate.__typename', 'exchangeRate.isApproximate']),
                         description: values.description,
                         incurredAt: standardizeExpenseItemIncurredAt(values.incurredAt),
-                        url: values.type === ExpenseType.RECEIPT ? values['attachedFile']?.url : null,
+                        url: embedFileInItems ? values['attachedFile']?.url : null,
                       },
                     ],
                     attachedFiles:
-                      values.type === ExpenseType.RECEIPT || !values['attachedFile']
-                        ? []
-                        : [pick(values['attachedFile'], ['url'])],
+                      embedFileInItems || !values['attachedFile'] ? [] : [pick(values['attachedFile'], ['url'])],
                   },
                 },
               });
@@ -477,7 +471,7 @@ export const HostCreateExpenseModal = ({
                       required={values.type === ExpenseType.RECEIPT}
                       name="attachedFile"
                       label={
-                        values.type === ExpenseType.RECEIPT ? (
+                        values.type === ExpenseType.RECEIPT || values.type === ExpenseType.CHARGE ? (
                           <FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />
                         ) : (
                           <FormattedMessage defaultMessage="Attachment" id="Expense.Attachment" />
@@ -485,25 +479,35 @@ export const HostCreateExpenseModal = ({
                       }
                     >
                       {({ form, field, meta }) => (
-                        <Dropzone
-                          {...attachmentDropzoneParams}
-                          kind="EXPENSE_ITEM"
-                          data-cy={`${field.name}-dropzone`}
-                          name={field.name}
-                          isMulti={false}
-                          error={(meta.touched || form.submitCount) && meta.error}
-                          mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
-                          value={field.value && isValidUrl(field.value?.url) && field.value.url}
-                          useGraphQL={true}
-                          parseDocument={false}
-                          onGraphQLSuccess={uploadResults => {
-                            const uploadedFile = uploadResults[0].file;
-                            setFieldValue(field.name, uploadedFile);
-                          }}
-                          onReject={msg => {
-                            toast({ variant: 'error', message: msg });
-                          }}
-                        />
+                        <div>
+                          <Dropzone
+                            {...attachmentDropzoneParams}
+                            kind="EXPENSE_ITEM"
+                            data-cy={`${field.name}-dropzone`}
+                            name={field.name}
+                            isMulti={false}
+                            error={(meta.touched || form.submitCount) && meta.error}
+                            mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
+                            value={field.value && isValidUrl(field.value?.url) && field.value.url}
+                            useGraphQL={true}
+                            parseDocument={false}
+                            onGraphQLSuccess={uploadResults => {
+                              const uploadedFile = uploadResults[0].file;
+                              setFieldValue(field.name, uploadedFile);
+                            }}
+                            onReject={msg => {
+                              toast({ variant: 'error', message: msg });
+                            }}
+                          />
+                          {values.type === ExpenseType.CHARGE && !field.value && (
+                            <div className="mt-2 text-sm text-neutral-600">
+                              <FormattedMessage
+                                defaultMessage="If no receipt is provided, collective admins will have to provide one."
+                                id="WmyjIg"
+                              />
+                            </div>
+                          )}
+                        </div>
                       )}
                     </StyledInputFormikField>
                   </div>
