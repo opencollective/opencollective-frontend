@@ -371,8 +371,8 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return (
         <div className="flex items-center font-medium text-foreground">
           <FormattedMoneyAmount
-            amount={Math.abs(stats.consolidatedTotalAmountSpent?.valueInCents)}
-            currency={stats.consolidatedTotalAmountSpent?.currency}
+            amount={Math.abs(stats.consolidatedTotalAmountSpent.valueInCents)}
+            currency={stats.consolidatedTotalAmountSpent.currency}
             showCurrencyCode={true}
           />
           {!isChild && hasChildActivity && (
