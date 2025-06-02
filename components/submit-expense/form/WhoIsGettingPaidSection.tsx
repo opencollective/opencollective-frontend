@@ -331,12 +331,12 @@ const VendorOption = React.memo(function VendorOption(props: {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser.isAdminOfCollective(props.host);
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
-  const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
+  const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
     props.payeeSlug === '__vendor' ||
     props.payeeSlug === '__newVendor' ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
-    selectedVendorSlug === props.payeeSlug;
+    selectedVendor?.slug === props.payeeSlug;
 
   const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
 
@@ -357,15 +357,18 @@ const VendorOption = React.memo(function VendorOption(props: {
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={props.payeeSlug === '__vendor' || props.payeeSlug === '__newVendor' ? null : props.payee}
+            collective={
+              props.payeeSlug === '__vendor' || props.payeeSlug === '__newVendor' ? null : selectedVendor || props.payee
+            }
             handleCreateForm
             onCreateClick={() => {
               props.setFieldValue('payeeSlug', '__newVendor');
-              setSelectedVendorSlug(null);
+              setSelectedVendor(null);
             }}
             onChange={e => {
-              const slug = e.value?.slug;
-              setSelectedVendorSlug(slug);
+              const selected = e.value;
+              const slug = selected?.slug;
+              setSelectedVendor(selected);
               props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
             }}
             vendorVisibleToAccountIds={props.account.legacyId}
@@ -377,17 +380,16 @@ const VendorOption = React.memo(function VendorOption(props: {
                 <VendorForm
                   isBeneficiary={isBeneficiary}
                   limitVisibilityOptionToAccount={props.account}
-                  onSuccess={async ({ slug }) => {
-                    await props.refresh();
-                    props.setFieldValue('payeeSlug', slug);
-                    setSelectedVendorSlug(slug);
+                  onSuccess={selected => {
+                    props.setFieldValue('payeeSlug', selected?.slug);
+                    setSelectedVendor(selected);
                   }}
                   hidePayoutMethod
                   host={props.host}
                   supportsTaxForm={false}
                   onCancel={() => {
                     props.setFieldValue('payeeSlug', '__vendor');
-                    setSelectedVendorSlug(null);
+                    setSelectedVendor(null);
                   }}
                 />
               </div>

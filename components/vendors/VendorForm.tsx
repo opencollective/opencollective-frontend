@@ -406,7 +406,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                           form.setFieldValue('visibleToAccounts', [...(selection ?? []).map(sel => sel.value)]);
                         }}
                       />
-                      <div className="text-xs text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         <FormattedMessage
                           defaultMessage="By default, vendors are visible to all hosted accounts. To restrict visibility of this vendor, pick hosted accounts."
                           id="jEkeo9"
