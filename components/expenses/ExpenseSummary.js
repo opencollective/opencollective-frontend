@@ -14,6 +14,7 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
+import { cn } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
@@ -106,6 +107,7 @@ const ExpenseSummary = ({
   drawerActionsContainer,
   openFileViewer,
   enableKeyboardShortcuts,
+  openedItemId,
   ...props
 }) => {
   const intl = useIntl();
@@ -430,7 +432,14 @@ const ExpenseSummary = ({
           <div data-cy="expense-summary-items">
             {expenseItems.map((attachment, attachmentIdx) => (
               <React.Fragment key={attachment.id || attachmentIdx}>
-                <Flex my={24} flexWrap="wrap" data-cy="expense-summary-item">
+                <div
+                  data-cy="expense-summary-item"
+                  className={cn(
+                    'my-2 flex flex-wrap border-l-2 border-l-transparent py-4',
+                    openedItemId === attachment.id &&
+                      '-mr-2 -ml-6 rounded-r-lg border-l-blue-500 bg-blue-100 pr-2 pl-6',
+                  )}
+                >
                   {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
                     <Box mr={3} mb={3} width={['100%', 'auto']}>
                       <UploadedFilePreview
@@ -514,7 +523,7 @@ const ExpenseSummary = ({
                       )}
                     </Container>
                   </Flex>
-                </Flex>
+                </div>
                 <StyledHr borderStyle="dotted" />
               </React.Fragment>
             ))}
@@ -810,6 +819,7 @@ ExpenseSummary.propTypes = {
   /** Reference to the actions container element in the Expense Drawer */
   drawerActionsContainer: PropTypes.object,
   enableKeyboardShortcuts: PropTypes.bool,
+  openedItemId: PropTypes.string,
 };
 
 export default ExpenseSummary;

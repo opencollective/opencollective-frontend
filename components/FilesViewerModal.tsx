@@ -135,6 +135,7 @@ type FilesViewerModalProps = {
   canDownload?: boolean;
   canOpenInNewWindow?: boolean;
   hideCloseButton?: boolean;
+  setOpenFileUrl?: (url: string) => void;
 };
 
 export default function FilesViewerModal({
@@ -146,6 +147,7 @@ export default function FilesViewerModal({
   canDownload = true,
   canOpenInNewWindow = true,
   hideCloseButton = false,
+  setOpenFileUrl,
 }: FilesViewerModalProps) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
@@ -158,9 +160,18 @@ export default function FilesViewerModal({
     }
   }, [openFileUrl, files]);
 
-  const onArrowLeft = React.useCallback(() => setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)), []);
+  const onArrowLeft = React.useCallback(
+    () =>
+      setOpenFileUrl
+        ? setOpenFileUrl(files?.[Math.max(selectedIndex - 1, 0)].url)
+        : setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)),
+    [],
+  );
   const onArrowRight = React.useCallback(
-    () => setSelectedIndex(selectedIndex => Math.min(selectedIndex + 1, (files?.length || 1) - 1)),
+    () =>
+      setOpenFileUrl
+        ? setOpenFileUrl(files?.[Math.min(selectedIndex + 1, (files?.length || 1) - 1)].url)
+        : setSelectedIndex(selectedIndex => Math.min(selectedIndex + 1, (files?.length || 1) - 1)),
     [files],
   );
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
