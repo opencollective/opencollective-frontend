@@ -2152,7 +2152,7 @@
   "HostApplication.form.linksToPreviousEventsPlaceholder": "Informe a URL dos eventos anteriores.",
   "HostApplication.form.mainInfo": "Informações principais",
   "HostApplication.form.publicInformation": "Esta informação é pública. Não adicione informações pessoais, como nomes ou endereços neste campo.",
-  "HostApplication.form.readFaqs": "Leia as perguntas frequentes",
+  "HostApplication.form.readFaqs": "Visit our docs",
   "HostApplication.form.subheading": "Apresente o seu coletivo. Inclua o máximo de contexto possível para que possamos oferecer o melhor serviço que pudermos! Alguma dúvida? {faqLink}",
   "HostApplication.form.team": "Sua equipe",
   "HostApplication.form.tellUsMoreHelpText": "Queremos saber mais sobre você e como podemos ajudá-lo.",
