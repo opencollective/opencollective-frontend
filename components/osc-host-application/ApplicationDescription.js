@@ -23,7 +23,11 @@ const ApplicationDescription = () => (
             </StyledLink>
           ),
           criterialink: (
-            <StyledLink href="https://docs.oscollective.org/interested-in-joining-osc/acceptance-criteria" openInNewTab color="purple.500">
+            <StyledLink
+              href="https://docs.oscollective.org/interested-in-joining-osc/acceptance-criteria"
+              openInNewTab
+              color="purple.500"
+            >
               <FormattedMessage id="verificationCriteria" defaultMessage="verification criteria" />
             </StyledLink>
           ),
