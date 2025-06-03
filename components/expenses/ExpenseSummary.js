@@ -568,7 +568,7 @@ const ExpenseSummary = ({
             </div>
           )}
         </Flex>
-        {expense?.type === expenseTypes.INVOICE && (
+        {expense?.type === expenseTypes.INVOICE && expense.permissions?.canSeeInvoiceInfo && (
           <React.Fragment>
             <Flex my={4} alignItems="center" gridGap={2}>
               {!expense && isLoading ? (
