@@ -80,6 +80,13 @@ export const managedOrderFragment = gql`
       }
       ...AccountHoverCardFields
     }
+    createdByAccount {
+      id
+      name
+      slug
+      type
+      ...AccountHoverCardFields
+    }
     toAccount {
       id
       slug
