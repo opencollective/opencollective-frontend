@@ -127,7 +127,7 @@
     "react-swipeable": "7.0.2",
     "react-text-mask": "5.5.0",
     "react-turnstile": "1.1.4",
-    "react-verification-input": "4.1.2",
+    "react-verification-input": "4.2.2",
     "react-window": "1.8.11",
     "redis": "4.7.0",
     "sanitize-html": "2.17.0",
