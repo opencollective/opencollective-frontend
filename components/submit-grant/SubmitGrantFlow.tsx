@@ -351,7 +351,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
         items: [
           {
             name: Step.WHO_WILL_RECEIVE_FUNDS,
-            title: <FormattedMessage defaultMessage="Who will receive the fund?" id="q5ZkgW" />,
+            title: <FormattedMessage defaultMessage="Who will receive the funds?" id="CAYwc2" />,
             formValues: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
           },
           {

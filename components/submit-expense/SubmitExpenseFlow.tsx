@@ -148,7 +148,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 </div>
               </div>
             </main>
-            <DialogFooter className="z-30 flex justify-center border-t p-4 sm:justify-center sm:px-0">
+            <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
               <Button onClick={handleOnClose}>
                 {props.endFlowButtonLabel || (
                   <FormattedMessage
