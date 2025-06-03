@@ -28,8 +28,10 @@ interface PageProps {
   title?: string;
   metaTitle?: string;
   twitterHandle?: string;
+  identity?: string;
   collective?: object;
   menuItems?: object;
+  showHeader?: boolean;
   showFooter?: boolean;
   showProfileAndChangelogMenu?: boolean;
   loading?: boolean;
@@ -47,11 +49,13 @@ const Page = ({
   metaTitle,
   noRobots,
   twitterHandle,
+  identity,
   showSearch = true,
   canonicalURL,
   collective,
   menuItems,
   withTopBar = true,
+  showHeader = true,
   showFooter = true,
   showProfileAndChangelogMenu = true,
   loading,
@@ -63,22 +67,25 @@ const Page = ({
   const childProps = { LoggedInUser, loadingLoggedInUser };
   return (
     <div>
-      <Header
-        showSearch={showSearch}
-        title={title}
-        noRobots={noRobots}
-        twitterHandle={twitterHandle}
-        description={description}
-        image={image}
-        metaTitle={metaTitle}
-        canonicalURL={canonicalURL}
-        collective={collective}
-        menuItems={menuItems}
-        LoggedInUser={LoggedInUser}
-        showProfileAndChangelogMenu={showProfileAndChangelogMenu}
-        loading={loading}
-        withTopBar={withTopBar}
-      />
+      {showHeader && (
+        <Header
+          showSearch={showSearch}
+          title={title}
+          noRobots={noRobots}
+          twitterHandle={twitterHandle}
+          description={description}
+          image={image}
+          metaTitle={metaTitle}
+          canonicalURL={canonicalURL}
+          collective={collective}
+          menuItems={menuItems}
+          LoggedInUser={LoggedInUser}
+          showProfileAndChangelogMenu={showProfileAndChangelogMenu}
+          loading={loading}
+          withTopBar={withTopBar}
+          identity={identity}
+        />
+      )}
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
     </div>
