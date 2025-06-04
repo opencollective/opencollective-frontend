@@ -27,7 +27,6 @@ import StyledSpinner from '../StyledSpinner';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
-import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
 
@@ -231,7 +230,6 @@ const Transactions = ({
               </StyledButton>
             </Link>
           )}
-          <TransactionsDownloadCSV collective={account} query={router.query} width="100%" />
         </div>
       </div>
 
