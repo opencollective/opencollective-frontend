@@ -126,7 +126,6 @@ class UserProvider extends React.Component {
       }
 
       if (error.message.includes('Two-factor authentication is enabled')) {
-        // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
             const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);

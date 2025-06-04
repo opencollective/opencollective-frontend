@@ -66,7 +66,13 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign = true, host }) => {
+const OrderBudgetItem = ({
+  isLoading = false,
+  order,
+  showPlatformTip = false,
+  showAmountSign = true,
+  host = undefined,
+}) => {
   const intl = useIntl();
   return (
     <OrderContainer>

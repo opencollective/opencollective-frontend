@@ -24,7 +24,7 @@ const sendMessageMutation = gql`
   }
 `;
 
-const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange }) => {
+const CollectiveContactForm = ({ collective, isModal = false, onClose = undefined, onChange = undefined }) => {
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
@@ -137,7 +137,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
                   variant: 'success',
                   message: <FormattedMessage id="MessageSent" defaultMessage="Message sent" />,
                 });
-                onClose();
+                onClose?.();
               }
             } catch (e) {
               setError(e);

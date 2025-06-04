@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';

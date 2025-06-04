@@ -122,7 +122,7 @@ const FreezeAccountModal = ({
   onClose,
   ...props
 }: {
-  collective: Pick<Account, 'id' | 'isFrozen'>;
+  collective: Pick<Account, 'id' | 'isFrozen' | 'name'>;
   onSuccess?: () => void;
   onClose: () => void;
 } & Omit<React.ComponentProps<typeof StyledModal>, 'children'>) => {
@@ -150,7 +150,7 @@ const FreezeAccountModal = ({
   const isUnfreezing = modalState === 'UNFREEZE';
   const contributionsSummary = getRecurringContributionsCountSummary(data?.account);
   return (
-    <StyledModal maxWidth={600} trapFocus onClose={onClose} {...props}>
+    <StyledModal maxWidth={600} onClose={onClose} {...props}>
       <CollectiveModalHeader
         mb={3}
         collective={collective}

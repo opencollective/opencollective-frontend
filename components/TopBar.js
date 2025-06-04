@@ -113,7 +113,7 @@ const TopBar = ({
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const ref = useRef();
+  const ref = useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.

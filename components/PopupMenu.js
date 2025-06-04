@@ -17,9 +17,17 @@ const Popup = styled(Box)`
   z-index: ${props => props.zIndex ?? 1000};
 `;
 
-const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex, popupMarginTop }) => {
+const PopupMenu = ({
+  Button,
+  children,
+  placement = 'bottom',
+  onClose = undefined,
+  closingEvents = undefined,
+  zIndex = undefined,
+  popupMarginTop = undefined,
+}) => {
   const [isOpen, setOpen] = React.useState(false);
-  const ref = React.useRef();
+  const ref = React.useRef(undefined);
   useGlobalBlur(
     ref,
     outside => {

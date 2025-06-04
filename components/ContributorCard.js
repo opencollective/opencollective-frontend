@@ -110,7 +110,7 @@ const ContributorCard = ({
   const truncatedPublicMessage = publicMessage && truncate(publicMessage, { length: 50 });
   const truncatedDescription = description && truncate(description, { length: 30 });
   const [showEditMessagePopup, setShowEditMessagePopup] = useState(false);
-  const mainContainerRef = useRef();
+  const mainContainerRef = useRef(undefined);
   return (
     <MainContainer ref={mainContainerRef} width={width} height={height} {...props}>
       <CollectiveLogoContainer>

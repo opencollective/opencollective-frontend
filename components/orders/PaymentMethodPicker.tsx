@@ -210,8 +210,8 @@ type StripeSetupPaymentMethodOptionProps = {
 };
 
 function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionProps) {
-  const elementContainer = React.useRef<HTMLDivElement>();
-  const inputRef = React.useRef<HTMLInputElement>();
+  const elementContainer = React.useRef<HTMLDivElement>(undefined);
+  const inputRef = React.useRef<HTMLInputElement>(undefined);
   const intl = useIntl();
   const [paymentMethodType, setPaymentMethodType] = React.useState<string>();
   const { LoggedInUser } = useLoggedInUser();

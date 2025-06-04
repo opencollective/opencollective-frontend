@@ -12,9 +12,9 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal'
  * A image preview modal that can be used to display a preview image for a
  * an Email Template or an Invoice Receipt.
  */
-const PreviewModal = ({ previewImage, heading, subheading, imgHeight, imgWidth, onClose }) => {
+const PreviewModal = ({ previewImage, heading, subheading = null, imgHeight, imgWidth, onClose }) => {
   return (
-    <StyledModal onClose={onClose} trapFocus>
+    <StyledModal onClose={onClose}>
       <ModalHeader>{heading}</ModalHeader>
       <ModalBody mb={0}>
         {subheading && (

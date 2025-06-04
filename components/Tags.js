@@ -90,7 +90,16 @@ const Tag = styled(StyledTag).attrs({
   variant: 'rounded',
 })``;
 
-const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+const Tags = ({
+  expense = null,
+  order = null,
+  limit = 4,
+  getTagProps = undefined,
+  children = undefined,
+  canEdit = false,
+  suggestedTags = undefined,
+  showUntagged = false,
+}) => {
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 

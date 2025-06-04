@@ -15,13 +15,13 @@ import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
 
 const AcceptRejectButtons = ({
   collective,
-  isLoading,
+  isLoading = false,
   onApprove,
   onReject,
-  disabled,
-  disabledMessage,
-  customButton,
-  editCollectiveMutation,
+  disabled = false,
+  disabledMessage = undefined,
+  customButton = undefined,
+  editCollectiveMutation = undefined,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);

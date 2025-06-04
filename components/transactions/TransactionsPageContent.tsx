@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
+import type { NextRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isIndividualAccount } from '../../lib/collective';
@@ -11,6 +11,8 @@ import { parseDateInterval } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../lib/url-helpers';
+import type { Account, AccountWithHost, AccountWithParent, Transaction } from '@/lib/graphql/types/v2/schema';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import Container from '../Container';
@@ -73,6 +75,58 @@ const convertProcessingOrderIntoTransactionItem = order => ({
   ...pick(order, ['id', 'amount', 'toAccount', 'fromAccount', 'description', 'createdAt', 'paymentMethod']),
 });
 
+interface TransactionsProps {
+  account?: Pick<Account, 'id' | 'slug' | 'type'> & {
+    processingOrders?: {
+      nodes?: unknown[];
+      totalCount?: number;
+    };
+  } & Pick<AccountWithParent, 'parent'> &
+    Pick<AccountWithHost, 'host'>;
+  transactions?: {
+    totalCount?: number;
+    paymentMethodTypes?: string[];
+    kinds?: string[];
+    nodes?: Array<
+      Pick<
+        Transaction,
+        | 'id'
+        | 'fromAccount'
+        | 'toAccount'
+        | 'giftCardEmitterAccount'
+        | 'account'
+        | 'createdAt'
+        | 'amount'
+        | 'kind'
+        | 'type'
+        | 'paymentMethod'
+      > & {
+        fromAccount?: Pick<AccountWithParent, 'parent'> & Pick<AccountWithHost, 'host'>;
+        toAccount?: Pick<AccountWithParent, 'parent'> & Pick<AccountWithHost, 'host'>;
+      }
+    >;
+  };
+  variables?: {
+    offset: number;
+    limit: number;
+    displayPendingContributions: boolean;
+  };
+  loading?: boolean;
+  refetch?(...args: unknown[]): unknown;
+  error?: any;
+  LoggedInUser?: LoggedInUser;
+  query?: {
+    searchTerm?: string;
+    offset?: string;
+    ignoreIncognitoTransactions?: string;
+    ignoreGiftCardsTransactions?: string;
+    ignoreChildrenTransactions?: string;
+    displayPendingContributions?: string;
+  };
+  router?: NextRouter;
+  isDashboard?: boolean;
+}
+
 const Transactions = ({
   LoggedInUser,
   transactions,
@@ -83,7 +137,7 @@ const Transactions = ({
   variables,
   router,
   isDashboard,
-}) => {
+}: TransactionsProps) => {
   const intl = useIntl();
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const [state, setState] = useState({
@@ -336,31 +390,6 @@ const Transactions = ({
       </Box>
     </Container>
   );
-};
-
-Transactions.propTypes = {
-  account: PropTypes.object,
-  transactions: PropTypes.shape({
-    nodes: PropTypes.array,
-    totalCount: PropTypes.number,
-    paymentMethodTypes: PropTypes.array,
-    kinds: PropTypes.array,
-  }),
-  variables: PropTypes.object,
-  loading: PropTypes.bool,
-  refetch: PropTypes.func,
-  error: PropTypes.any,
-  LoggedInUser: PropTypes.object,
-  query: PropTypes.shape({
-    searchTerm: PropTypes.string,
-    offset: PropTypes.string,
-    ignoreIncognitoTransactions: PropTypes.string,
-    ignoreGiftCardsTransactions: PropTypes.string,
-    ignoreChildrenTransactions: PropTypes.string,
-    displayPendingContributions: PropTypes.string,
-  }),
-  router: PropTypes.object,
-  isDashboard: PropTypes.bool,
 };
 
 export default Transactions;

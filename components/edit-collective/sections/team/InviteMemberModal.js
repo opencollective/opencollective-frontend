@@ -115,7 +115,7 @@ const InviteMemberModal = props => {
 
   return (
     <Container>
-      <StyledModal onClose={cancelHandler} trapFocus>
+      <StyledModal onClose={cancelHandler}>
         <ModalHeader mb={2}>
           <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
         </ModalHeader>

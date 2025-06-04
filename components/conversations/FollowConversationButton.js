@@ -55,7 +55,6 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
             id="mustBeLoggedInWithLink"
             defaultMessage="You must be <login-link>logged in</login-link>"
             values={{
-              // eslint-disable-next-line react/display-name
               'login-link': msg => <Link href={{ pathname: '/signin', query: { next: Router.asPath } }}>{msg}</Link>,
             }}
           />

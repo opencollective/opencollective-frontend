@@ -70,7 +70,7 @@ const HTMLContent = styled(
   }) => {
     const [isOpen, setOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
-    const contentRef = useRef();
+    const contentRef = useRef(undefined);
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 

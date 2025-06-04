@@ -66,7 +66,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
   };
 
   return (
-    <StyledModal onClose={handleClose} maxWidth={450} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} maxWidth={450} {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage defaultMessage="Delete virtual card" id="7nrRJ/" />

@@ -19,7 +19,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
   const [showRecoveryCodesConfirmationModal, setShowRecoveryCodesConfirmationModal] = React.useState(false);
 
   return (
-    <StyledModal ignoreEscapeKey trapFocus preventClose onClose={props.onClose}>
+    <StyledModal ignoreEscapeKey preventClose onClose={props.onClose}>
       <React.Fragment>
         <Box width="500px">
           <Flex alignItems="center">

@@ -77,7 +77,7 @@ const ChevronDownIcon = styled(ChevronDown)`
 
 const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const intl = useIntl();
-  const wrapperRef = React.useRef();
+  const wrapperRef = React.useRef(undefined);
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
   const [processModal, setProcessModal] = React.useState(false);

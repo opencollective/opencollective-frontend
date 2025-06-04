@@ -25,15 +25,15 @@ const DEFAULT_LOCATION = {
 const StyledInputLocation = ({
   name,
   location,
-  autoDetectCountry,
-  labelFontSize,
-  labelFontWeight,
+  autoDetectCountry = false,
+  labelFontSize = undefined,
+  labelFontWeight = undefined,
   onChange,
-  errors,
+  errors = undefined,
   prefix = '',
   required = true,
-  onLoadSuccess,
-  useStructuredForFallback,
+  onLoadSuccess = undefined,
+  useStructuredForFallback = false,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
   const intl = useIntl();

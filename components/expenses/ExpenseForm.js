@@ -314,7 +314,7 @@ const ExpenseFormBody = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const router = useRouter();
-  const formRef = React.useRef();
+  const formRef = React.useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
@@ -1092,14 +1092,14 @@ const ExpenseForm = ({
   expense,
   originalExpense,
   payoutProfiles,
-  autoFocusTitle,
+  autoFocusTitle = false,
   onCancel,
   validateOnChange = false,
-  formPersister,
+  formPersister = null,
   loggedInAccount,
   loading,
-  shouldLoadValuesFromPersister,
-  defaultStep,
+  shouldLoadValuesFromPersister = false,
+  defaultStep = undefined,
   drawerActionsContainer,
   canEditPayoutMethod,
 }) => {

@@ -30,7 +30,7 @@ const PrivateNoteLabel = () => {
   );
 };
 
-const ExpenseNotesForm = ({ onChange, disabled, defaultValue, hideLabel }) => {
+const ExpenseNotesForm = ({ onChange, disabled = false, defaultValue = '', hideLabel = false }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledInputField

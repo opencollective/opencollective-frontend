@@ -18,7 +18,7 @@ import ExpandableExpensePolicies from './ExpandableExpensePolicies';
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, children }) => {
+const ExpenseInfoSidebar = ({ isLoading = false, host = null, expenseHost = null, collective, children = null }) => {
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
   return (
     <Box width="100%">

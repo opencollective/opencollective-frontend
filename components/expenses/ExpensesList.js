@@ -70,20 +70,20 @@ ExpensesTotal.propTypes = {
 };
 
 const ExpensesList = ({
-  collective,
-  host,
+  collective = null,
+  host = null,
   expenses,
-  isLoading,
+  isLoading = false,
   nbPlaceholders = 10,
-  isInverted,
+  isInverted = false,
   view = 'public',
-  onDelete,
-  onProcess,
+  onDelete = undefined,
+  onProcess = undefined,
   expenseFieldForTotalAmount = 'amountInAccountCurrency',
-  useDrawer,
-  setOpenExpenseLegacyId,
-  openExpenseLegacyId,
-  onDuplicateClick,
+  useDrawer = false,
+  setOpenExpenseLegacyId = undefined,
+  openExpenseLegacyId = undefined,
+  onDuplicateClick = undefined,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
   // Initial values for expense in drawer

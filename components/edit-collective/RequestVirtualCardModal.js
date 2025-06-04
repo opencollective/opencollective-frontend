@@ -115,7 +115,7 @@ const RequestVirtualCardModal = props => {
   const currency = props.host?.currency || props.collective?.currency;
 
   return (
-    <StyledModal onClose={handleClose} trapFocus {...props}>
+    <StyledModal onClose={handleClose} {...props}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={props.onClose}>
           <FormattedMessage id="Collective.VirtualCards.RequestCard" defaultMessage="Request a Card" />

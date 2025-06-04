@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { differenceBy } from 'lodash';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -56,11 +55,6 @@ export const TruncatedValueContainer = props => {
       </Flex>
     </ReactSelectComponents.SelectContainer>
   );
-};
-
-TruncatedValueContainer.propTypes = {
-  selectProps: PropTypes.object,
-  children: PropTypes.node,
 };
 
 export const getSelectFilterStyles = stylesFromProps => ({

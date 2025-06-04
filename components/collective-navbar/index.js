@@ -441,17 +441,17 @@ export const NAVBAR_HEIGHT = [56, 64];
  */
 const CollectiveNavbar = ({
   collective,
-  isAdmin,
-  isLoading,
-  sections: sectionsFromParent,
+  isAdmin = undefined,
+  isLoading = false,
+  sections: sectionsFromParent = undefined,
   selectedCategory,
   callsToAction = {},
-  onCollectiveClick,
+  onCollectiveClick = undefined,
   isInHero = false,
   onlyInfos = false,
   showBackButton = true,
-  useAnchorsForCategories,
-  showSelectedCategoryOnMobile,
+  useAnchorsForCategories = false,
+  showSelectedCategoryOnMobile = false,
 }) => {
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -502,8 +502,8 @@ const CollectiveNavbar = ({
       isNewGrantFlowEnabled,
       () => setIsSubmitExpenseModalOpen(true),
     );
-  const navbarRef = useRef();
-  const mainContainerRef = useRef();
+  const navbarRef = useRef(undefined);
+  const mainContainerRef = useRef(undefined);
 
   /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
    * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */

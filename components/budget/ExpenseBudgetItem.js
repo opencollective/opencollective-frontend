@@ -103,17 +103,17 @@ const ExpenseContainer = styled.div`
 `;
 
 const ExpenseBudgetItem = ({
-  isLoading,
-  host,
-  isInverted,
-  showAmountSign,
+  isLoading = false,
+  host = undefined,
+  isInverted = false,
+  showAmountSign = false,
   expense,
-  showProcessActions,
+  showProcessActions = false,
   view = 'public',
-  onProcess,
-  selected,
-  expandExpense,
-  useDrawer,
+  onProcess = undefined,
+  selected = undefined,
+  expandExpense = undefined,
+  useDrawer = false,
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();

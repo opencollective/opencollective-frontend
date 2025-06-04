@@ -9,7 +9,7 @@ import LocalFilePreview from '../LocalFilePreview';
 import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
+const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer = undefined }) => {
   const intl = useIntl();
 
   return (

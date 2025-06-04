@@ -28,7 +28,7 @@ const translatedTypes = defineMessages({
   },
 });
 
-const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
+const UpdateAudienceBreakdown = ({ audienceStats, isLoading = false }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={50} />;

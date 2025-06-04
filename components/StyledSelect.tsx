@@ -112,7 +112,7 @@ const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
     </ReactSelectComponents.ValueContainer>
   );
 };
-/* eslint-enable react/prop-types */
+ 
 
 const STYLES_DISPLAY_NONE = { display: 'none' };
 

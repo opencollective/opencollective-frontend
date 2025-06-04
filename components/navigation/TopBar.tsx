@@ -157,7 +157,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef(undefined);
   const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;

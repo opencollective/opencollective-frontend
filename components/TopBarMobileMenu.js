@@ -45,7 +45,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
     viewProductsMenu: false,
     viewCompanyMenu: false,
   });
-  const innerRef = React.useRef();
+  const innerRef = React.useRef(undefined);
 
   useGlobalBlur(innerRef, isOutside => {
     if (isOutside) {

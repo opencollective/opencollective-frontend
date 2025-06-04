@@ -3,7 +3,6 @@
  * See https://github.com/opencollective/opencollective/issues/2929 for more info.
  */
 
-import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import type { ColorProps, FlexboxProps, GridProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { border, color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
@@ -32,14 +31,6 @@ export const Box = styled.div.withConfig({
 );
 
 Box.displayName = 'Box';
-
-Box.propTypes = {
-  ...propTypes.space,
-  ...propTypes.color,
-  ...propTypes.layout,
-  ...propTypes.typography,
-  ...propTypes.flexbox,
-};
 
 export type FlexProps = BoxProps;
 

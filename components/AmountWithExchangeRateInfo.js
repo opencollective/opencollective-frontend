@@ -78,13 +78,13 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
 
 const AmountWithExchangeRateInfo = ({
   amount: { exchangeRate, currency, value, valueInCents },
-  amountClassName,
-  showCurrencyCode,
-  invertIconPosition,
-  warning,
-  error,
-  amountWrapperClassName,
-  currencyCodeClassName,
+  amountClassName = null,
+  showCurrencyCode = false,
+  invertIconPosition = false,
+  warning = null,
+  error = null,
+  amountWrapperClassName = null,
+  currencyCodeClassName = null,
 }) => {
   const intl = useIntl();
   return (

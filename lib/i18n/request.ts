@@ -81,10 +81,10 @@ export function getPreloadedLocaleMessages(locale: string) {
   }
   // checks if the module is loaded using a weak require (does not include the dependency in this bundle)
   const moduleId = require.resolveWeak(`../../lang/${locale}.json`);
-  // eslint-disable-next-line no-undef, camelcase
+  // eslint-disable-next-line camelcase
   if (moduleId && __webpack_modules__[moduleId]) {
     // if the module is loaded, require it using the webpack raw require to avoid adding it to this bundle as a dependency.
-    // eslint-disable-next-line no-undef
+     
     return __webpack_require__(moduleId);
   }
 

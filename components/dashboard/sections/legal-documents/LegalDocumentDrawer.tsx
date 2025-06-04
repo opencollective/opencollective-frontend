@@ -70,7 +70,7 @@ export default function LegalDocumentDrawer({
   getActions,
 }: Readonly<LegalDocumentDrawerProps>) {
   const intl = useIntl();
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     context: API_V2_CONTEXT,
     variables: { hostId: host.id, accountId: get(document, 'account.id') },

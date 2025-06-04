@@ -68,7 +68,15 @@ const getBackgroundColor = type => {
   }
 };
 
-const NotificationBar = ({ title, description, type, actions, inline, dismiss, isSticky }) => {
+const NotificationBar = ({
+  title,
+  description,
+  type,
+  actions = undefined,
+  inline = false,
+  dismiss = undefined,
+  isSticky = false,
+}) => {
   return (
     <NotificationBarContainer
       data-cy="notification-bar"

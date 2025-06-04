@@ -136,7 +136,7 @@ const ProcessExpenseButtons = ({
   host,
   permissions,
   buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
-  onSuccess,
+  onSuccess = undefined,
   onModalToggle,
   onDelete,
   isMoreActions,

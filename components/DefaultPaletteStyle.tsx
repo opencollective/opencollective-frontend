@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function DefaultPaletteStyle({ palette }: { palette: Record<string, string> }) {
   return (
-    // eslint-disable-next-line react/no-unknown-property
+     
     <style jsx global>
       {`
         :root {

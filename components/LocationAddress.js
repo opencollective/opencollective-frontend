@@ -8,7 +8,7 @@ import { Span } from './Text';
 /**
  * Displays a location object
  */
-const LocationAddress = ({ location, isLoading, showMessageIfEmpty, singleLine }) => {
+const LocationAddress = ({ location, isLoading = false, showMessageIfEmpty = false, singleLine = false }) => {
   if (isLoading) {
     return (
       <div>

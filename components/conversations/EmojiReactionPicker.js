@@ -122,11 +122,11 @@ const mutationOptions = { context: API_V2_CONTEXT };
 /**
  * A component to render the reaction picker on comments.
  */
-const EmojiReactionPicker = ({ comment, update }) => {
+const EmojiReactionPicker = ({ comment = null, update = null }) => {
   const emojiFirstRow = ['👍️', '👎', '😀', '🎉'];
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
-  const wrapperRef = React.useRef();
+  const wrapperRef = React.useRef(undefined);
   const [addReaction] = useMutation(addReactionMutation, mutationOptions);
   const [removeReaction] = useMutation(removeReactionMutation, mutationOptions);
 

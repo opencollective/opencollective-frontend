@@ -94,7 +94,7 @@ const StepperProvider = ({ value, children }: StepperContextProviderProps) => {
 // <---------- HOOKS ---------->
 
 function usePrevious<T>(value: T): T | undefined {
-  const ref = React.useRef<T>();
+  const ref = React.useRef<T>(undefined);
 
   React.useEffect(() => {
     ref.current = value;
@@ -353,6 +353,8 @@ const HorizontalContent = ({ children }: { children: React.ReactNode }) => {
         if (!React.isValidElement(node)) {
           return null;
         }
+
+        // @ts-expect-error children is not typed
         return React.Children.map(node.props.children, childNode => childNode);
       })}
     </React.Fragment>
