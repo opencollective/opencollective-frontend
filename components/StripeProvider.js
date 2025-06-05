@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Elements } from '@stripe/react-stripe-js';
 
 import { getStripe } from '../lib/stripe';
@@ -10,16 +9,10 @@ const StripeLoaderContext = React.createContext({
 });
 
 /**
- * A wrapPropTypesper around StriperProvider context that loads the external script
+ * A wrapper around StriperProvider context that loads the external script
  * on the client.
  */
 class StripeProvider extends React.Component {
-  static propTypes = {
-    /** If we should automatically load stripe JS on mount (useful for styledguidest) */
-    loadOnMount: PropTypes.bool,
-    token: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
     this.state = { loading: false, stripe: null };

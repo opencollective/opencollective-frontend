@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -32,16 +31,6 @@ const LocationAddress = ({ location, isLoading = false, showMessageIfEmpty = fal
       {location.country}
     </React.Fragment>
   );
-};
-
-LocationAddress.propTypes = {
-  location: PropTypes.shape({
-    address: PropTypes.string,
-    country: PropTypes.string,
-  }),
-  isLoading: PropTypes.bool,
-  showMessageIfEmpty: PropTypes.bool,
-  singleLine: PropTypes.bool,
 };
 
 export default LocationAddress;

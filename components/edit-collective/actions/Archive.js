@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -244,12 +243,6 @@ const ArchiveCollective = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-ArchiveCollective.propTypes = {
-  collective: PropTypes.object.isRequired,
-  archiveCollective: PropTypes.func,
-  unarchiveCollective: PropTypes.func,
 };
 
 export default ArchiveCollective;

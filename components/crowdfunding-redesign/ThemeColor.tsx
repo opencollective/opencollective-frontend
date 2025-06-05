@@ -9,7 +9,6 @@ export function ThemeColor({ color = undefined }) {
   const hsl = parseToHsl(color);
 
   return (
-     
     <style jsx global>
       {`
         :root {

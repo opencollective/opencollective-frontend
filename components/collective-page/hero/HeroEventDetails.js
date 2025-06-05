@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
 import { MapPin } from '@styled-icons/feather/MapPin';
 import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
@@ -52,29 +51,7 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
   );
 };
 
-Timerange.propTypes = {
-  startsAt: PropTypes.string,
-  endsAt: PropTypes.string,
-  timezone: PropTypes.string.isRequired,
-  isSameDay: PropTypes.bool,
-};
-
 class HeroEventDetails extends React.Component {
-  static propTypes = {
-    host: PropTypes.object,
-    displayedConnectedAccount: PropTypes.object,
-    collective: PropTypes.shape({
-      id: PropTypes.number,
-      startsAt: PropTypes.string,
-      endsAt: PropTypes.string,
-      timezone: PropTypes.string.isRequired,
-      location: PropTypes.object,
-      parentCollective: PropTypes.object,
-      isApproved: PropTypes.bool,
-      isHost: PropTypes.bool,
-    }).isRequired,
-  };
-
   isNotLocalTimeZone() {
     if (this.props.collective.timezone) {
       const eventTimezone = dayjs().tz(this.props.collective.timezone).format('Z');

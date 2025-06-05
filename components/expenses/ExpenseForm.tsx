@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick, trimStart } from 'lodash';
@@ -19,7 +18,6 @@ import { ExpenseLockableFields, ExpenseStatus } from '../../lib/graphql/types/v2
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { require2FAForAdmins } from '../../lib/policies';
-import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
 import { userMustSetAccountingCategory } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
@@ -31,6 +29,7 @@ import {
   getSupportedCurrencies,
   validateExpenseTaxes,
 } from './lib/utils';
+import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
 import { FIRST_PARTY_HOSTS } from '@/lib/preview-features';
 
 import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';
@@ -216,7 +215,7 @@ const validateExpense = (intl, expense, collective, host, LoggedInUser, canEditP
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  const errors = isCardCharge
+  const errors: Record<string, unknown> = isCardCharge
     ? {}
     : expense.payee?.type === CollectiveType.VENDOR
       ? requireFields(expense, ['description', 'payee', 'currency'])
@@ -266,7 +265,9 @@ const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.structured', payee.location.structured);
 };
 
-const HiddenFragment = styled.div`
+const HiddenFragment = styled.div<{
+  show: boolean;
+}>`
   display: ${({ show }) => (show ? 'block' : 'none')};
 `;
 
@@ -422,7 +423,7 @@ const ExpenseFormBody = ({
     }
 
     // Reset the accounting category (if not supported by the new expense type)
-    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory)) {
+    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory, isHostAdmin)) {
       formik.setFieldValue('accountingCategory', undefined);
     }
 
@@ -537,7 +538,6 @@ const ExpenseFormBody = ({
             setStep(EXPENSE_FORM_STEPS.EXPENSE);
           }
         }}
-        payoutProfiles={payoutProfiles}
       />
     );
   } else {
@@ -567,8 +567,6 @@ const ExpenseFormBody = ({
           }
         }}
         editingExpense={editingExpense}
-        resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
-        formPersister={formPersister}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
@@ -584,6 +582,7 @@ const ExpenseFormBody = ({
     <Flex flex={1} gridGap={[2, 3]} flexWrap="wrap">
       <StyledButton
         type="button"
+        // @ts-expect-error Bug on StyledButton's width prop
         width={['100%', 'auto']}
         whiteSpace="nowrap"
         data-cy="expense-back"
@@ -600,6 +599,7 @@ const ExpenseFormBody = ({
       </StyledButton>
       <StyledButton
         type="submit"
+        // @ts-expect-error Bug on StyledButton's width prop
         width={['100%', 'auto']}
         whiteSpace="nowrap"
         data-cy="expense-summary-btn"
@@ -631,6 +631,7 @@ const ExpenseFormBody = ({
       <StyledButton
         type="button"
         buttonStyle="borderless"
+        // @ts-expect-error Bug on StyledButton's width prop
         width={['100%', 'auto']}
         color="red.500"
         marginLeft="auto"
@@ -647,7 +648,7 @@ const ExpenseFormBody = ({
     <Form ref={formRef}>
       {(expense?.permissions?.canDeclineExpenseInvite ||
         (expense?.status === ExpenseStatus.DRAFT && expense?.draft?.recipientNote)) && (
-        <ExpenseInviteWelcome className="mb-8" expense={expense} draftKey={router.query.key} />
+        <ExpenseInviteWelcome className="mb-8" expense={expense} draftKey={router.query.key as string} />
       )}
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
@@ -895,7 +896,7 @@ const ExpenseFormBody = ({
                     </div>
                     <div className="mt-5">
                       <ExpenseAttachedFilesForm
-                        kind="EXPENSE_INVOICE"
+                        kind={UploadedFileKind.EXPENSE_INVOICE}
                         title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
                         description={
                           <FormattedMessage
@@ -906,7 +907,6 @@ const ExpenseFormBody = ({
                         onChange={invoiceFile =>
                           formik.setFieldValue('invoiceFile', invoiceFile?.length ? invoiceFile[0] : null)
                         }
-                        form={formik}
                         isSingle
                         fieldName="invoiceFile"
                         defaultValue={values.invoiceFile ? [values.invoiceFile] : []}
@@ -922,7 +922,6 @@ const ExpenseFormBody = ({
                           />
                         }
                         onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
-                        form={formik}
                         defaultValue={values.attachedFiles}
                       />
                     </div>
@@ -1023,65 +1022,6 @@ const ExpenseFormBody = ({
   );
 };
 
-ExpenseFormBody.propTypes = {
-  formik: PropTypes.object,
-  payoutProfiles: PropTypes.array, // Can be null when loading
-  autoFocusTitle: PropTypes.bool,
-  canEditPayoutMethod: PropTypes.bool,
-  shouldLoadValuesFromPersister: PropTypes.bool,
-  onCancel: PropTypes.func,
-  formPersister: PropTypes.object,
-  /** Defines the default selected step, if accessible (previous steps need to be completed) */
-  defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
-  loggedInAccount: PropTypes.object,
-  loading: PropTypes.bool,
-  isDraft: PropTypes.bool,
-  host: PropTypes.shape({
-    transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-    }),
-    settings: PropTypes.shape({
-      expenseTypes: PropTypes.shape({
-        GRANT: PropTypes.bool,
-        RECEIPT: PropTypes.bool,
-        INVOICE: PropTypes.bool,
-      }),
-    }),
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    settings: PropTypes.object,
-    isApproved: PropTypes.bool,
-  }).isRequired,
-  expense: PropTypes.shape({
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    currency: PropTypes.string,
-    description: PropTypes.string,
-    status: PropTypes.string,
-    payee: PropTypes.object,
-    draft: PropTypes.object,
-    payoutMethod: PropTypes.object,
-    lockedFields: PropTypes.arrayOf(PropTypes.string),
-    recurringExpense: PropTypes.shape({
-      interval: PropTypes.string,
-      endsAt: PropTypes.string,
-    }),
-    amountInAccountCurrency: AmountPropTypeShape,
-    items: PropTypes.arrayOf(
-      PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    ),
-    permissions: PropTypes.shape({
-      canDeclineExpenseInvite: PropTypes.bool,
-    }),
-  }),
-  drawerActionsContainer: PropTypes.object,
-  supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string),
-};
-
 /**
  * Main create expense form
  */
@@ -1161,87 +1101,6 @@ const ExpenseForm = ({
       )}
     </Formik>
   );
-};
-
-ExpenseForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  autoFocusTitle: PropTypes.bool,
-  validateOnChange: PropTypes.bool,
-  canEditPayoutMethod: PropTypes.bool,
-  shouldLoadValuesFromPersister: PropTypes.bool,
-  onCancel: PropTypes.func,
-  /** To save draft of form values */
-  formPersister: PropTypes.object,
-  loggedInAccount: PropTypes.object,
-  loading: PropTypes.bool,
-  /** Defines the default selected step, if accessible (previous steps need to be completed) */
-  defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-    }),
-  }),
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    settings: PropTypes.object,
-    isApproved: PropTypes.bool,
-  }).isRequired,
-  /** If editing */
-  expense: PropTypes.shape({
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    description: PropTypes.string,
-    status: PropTypes.string,
-    payee: PropTypes.object,
-    draft: PropTypes.object,
-    payoutMethod: PropTypes.object,
-    recurringExpense: PropTypes.object,
-    items: PropTypes.arrayOf(
-      PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    ),
-    permissions: PropTypes.shape({
-      canDeclineExpenseInvite: PropTypes.bool,
-    }),
-  }),
-  /** To reset form */
-  originalExpense: PropTypes.shape({
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    description: PropTypes.string,
-    status: PropTypes.string,
-    payee: PropTypes.object,
-    draft: PropTypes.object,
-    payoutMethod: PropTypes.object,
-    items: PropTypes.arrayOf(
-      PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    ),
-  }),
-  /** Payout profiles that user has access to */
-  payoutProfiles: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      location: PropTypes.shape({
-        address: PropTypes.string,
-        country: PropTypes.string,
-        structured: PropTypes.object,
-      }),
-      payoutMethods: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-          name: PropTypes.string,
-          data: PropTypes.object,
-        }),
-      ),
-    }),
-  ),
-  drawerActionsContainer: PropTypes.object,
 };
 
 export default React.memo(ExpenseForm);

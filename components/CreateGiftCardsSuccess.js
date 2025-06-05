@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/feather/CheckCircle';
 import { Clipboard } from '@styled-icons/feather/Clipboard';
 import { Printer } from '@styled-icons/feather/Printer';
@@ -29,19 +28,6 @@ const RedeemLinksTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
  * Displays created gift cards, with an option to print them.
  */
 export default class CreateGiftCardsSuccess extends React.Component {
-  static propTypes = {
-    cards: PropTypes.arrayOf(
-      PropTypes.shape({
-        uuid: PropTypes.string.isRequired,
-        currency: PropTypes.string.isRequired,
-        initialBalance: PropTypes.number.isRequired,
-        expiryDate: PropTypes.string,
-      }),
-    ).isRequired,
-    deliverType: PropTypes.oneOf(['manual', 'email']).isRequired,
-    collectiveSlug: PropTypes.string.isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.redeemLinkTextareaRef = React.createRef();

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -38,14 +37,6 @@ const MemberContainer = styled.div`
 `;
 
 class Member extends React.Component {
-  static propTypes = {
-    member: PropTypes.object.isRequired,
-    collective: PropTypes.object.isRequired,
-    viewMode: PropTypes.string,
-    intl: PropTypes.object.isRequired,
-    className: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
 

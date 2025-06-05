@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
 import { get, isEmpty, omit } from 'lodash';
@@ -460,28 +459,6 @@ const ExpenseFormPayeeInviteNewStep = ({
       )}
     </Fragment>
   );
-};
-
-ExpenseFormPayeeInviteNewStep.propTypes = {
-  formik: PropTypes.object,
-  payeeFieldName: PropTypes.string,
-  recipientNoteFieldName: PropTypes.string,
-  payoutMethodFieldName: PropTypes.string,
-  payoutProfiles: PropTypes.array,
-  onBack: PropTypes.func,
-  onNext: PropTypes.func,
-  hidePayoutDetails: PropTypes.bool,
-  optionalPayoutMethod: PropTypes.bool,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    host: PropTypes.shape({
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-    }),
-    settings: PropTypes.object,
-  }),
 };
 
 export default ExpenseFormPayeeInviteNewStep;

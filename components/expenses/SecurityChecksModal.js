@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
@@ -170,19 +169,6 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   );
 };
 
-SecurityChecksModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  expense: PropTypes.shape({
-    securityChecks: PropTypes.arrayOf(
-      PropTypes.shape({
-        scope: PropTypes.string,
-        level: PropTypes.string,
-        message: PropTypes.string,
-      }),
-    ),
-  }),
-};
-
 const Indicator = styled.div`
   position: absolute;
   display: flex;
@@ -241,13 +227,6 @@ export const SecurityChecksButton = ({ expense, enableKeyboardShortcuts, ...butt
       {displayModal && <SecurityChecksModal expense={expense} onClose={() => setDisplayModal(false)} />}
     </React.Fragment>
   );
-};
-
-SecurityChecksButton.propTypes = {
-  ...SecurityChecksModal.propTypes,
-  isOpen: PropTypes.bool,
-  onConfirm: PropTypes.func,
-  onClose: PropTypes.func,
 };
 
 export default SecurityChecksModal;

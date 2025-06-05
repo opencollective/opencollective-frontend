@@ -3,7 +3,6 @@ import { lighten } from 'polished';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
- 
 const GiftCard = ({ color = '#145ECC', size, ...props }: { color?: string; size?: number | string }) => {
   const gradientID = `gradient-${color.replace('#', '')}`;
   return (

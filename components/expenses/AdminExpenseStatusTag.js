@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import ReactDOM from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -189,12 +188,6 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
       )}
     </React.Fragment>
   );
-};
-
-AdminExpenseStatusTag.propTypes = {
-  collective: PropTypes.object.isRequired,
-  expense: PropTypes.object.isRequired,
-  host: PropTypes.object,
 };
 
 export default AdminExpenseStatusTag;

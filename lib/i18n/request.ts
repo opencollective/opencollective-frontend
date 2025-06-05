@@ -84,7 +84,7 @@ export function getPreloadedLocaleMessages(locale: string) {
   // eslint-disable-next-line camelcase
   if (moduleId && __webpack_modules__[moduleId]) {
     // if the module is loaded, require it using the webpack raw require to avoid adding it to this bundle as a dependency.
-     
+
     return __webpack_require__(moduleId);
   }
 

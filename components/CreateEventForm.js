@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { set } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -12,13 +11,6 @@ import StyledButton from './StyledButton';
 import TimezonePicker from './TimezonePicker';
 
 class CreateEventForm extends React.Component {
-  static propTypes = {
-    event: PropTypes.object,
-    loading: PropTypes.bool,
-    onSubmit: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);

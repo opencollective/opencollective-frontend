@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -12,16 +11,6 @@ import CreateOrganizationForm from './CreateOrganizationForm';
 import EditConnectedAccount from './EditConnectedAccount';
 
 class CreateHostForm extends React.Component {
-  static propTypes = {
-    organizations: PropTypes.arrayOf(PropTypes.object).isRequired,
-    collective: PropTypes.object.isRequired,
-    userCollective: PropTypes.object.isRequired,
-    createOrganization: PropTypes.func.isRequired,
-    onSubmit: PropTypes.func.isRequired, // when selecting the host to use
-    intl: PropTypes.object.isRequired,
-    router: PropTypes.object, // from withRouter
-  };
-
   constructor(props) {
     super(props);
 

@@ -25,11 +25,7 @@ const resendDraftExpenseInviteMutation = gql`
   }
 `;
 
-interface ResendDraftInviteButtonProps {
-  expense: object;
-}
-
-const ResendDraftInviteButton = ({ expense }: ResendDraftInviteButtonProps) => {
+const ResendDraftInviteButton = ({ expense }) => {
   const { toast } = useToast();
   const intl = useIntl();
   const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {
@@ -68,13 +64,7 @@ const ResendDraftInviteButton = ({ expense }: ResendDraftInviteButtonProps) => {
   );
 };
 
-interface ResendSignInEmailButtonProps {
-  createdUser: {
-    email: string;
-  };
-}
-
-const ResendSignInEmailButton = ({ createdUser }: ResendSignInEmailButtonProps) => {
+const ResendSignInEmailButton = ({ createdUser }) => {
   const { loading, call, error, data } = useAsyncCall(async () => {
     const userExists = await checkUserExistence(createdUser.email);
     if (userExists) {
@@ -107,22 +97,7 @@ const ResendSignInEmailButton = ({ createdUser }: ResendSignInEmailButtonProps) 
   );
 };
 
-interface ExpenseInviteNotificationBannerProps {
-  createdUser?: React.ComponentProps<typeof ResendSignInEmailButton>['createdUser'];
-  expense: {
-    draft: {
-      payee: {
-        email: string;
-        name: string;
-      };
-    };
-    permissions: {
-      canVerifyDraftExpense: boolean;
-    };
-  };
-}
-
-const ExpenseInviteNotificationBanner = (props: ExpenseInviteNotificationBannerProps) => {
+const ExpenseInviteNotificationBanner = props => {
   const canResendEmail = Boolean(props.expense.permissions?.canVerifyDraftExpense);
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">

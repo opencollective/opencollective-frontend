@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -123,24 +122,6 @@ const StyledInputLocation = ({
       )}
     </div>
   );
-};
-
-StyledInputLocation.propTypes = {
-  name: PropTypes.string,
-  prefix: PropTypes.string,
-  onChange: PropTypes.func,
-  onLoadSuccess: PropTypes.func,
-  autoDetectCountry: PropTypes.bool,
-  required: PropTypes.bool,
-  labelFontWeight: PropTypes.any,
-  labelFontSize: PropTypes.any,
-  useStructuredForFallback: PropTypes.bool,
-  location: PropTypes.shape({
-    structured: PropTypes.object,
-    address: PropTypes.string,
-    country: PropTypes.string,
-  }),
-  errors: PropTypes.object,
 };
 
 export default StyledInputLocation;

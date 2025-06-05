@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -46,16 +45,6 @@ class SectionRecurringContributions extends React.Component {
   static getInitialProps({ query: { slug } }) {
     return { slug };
   }
-
-  static propTypes = {
-    slug: PropTypes.string.isRequired,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      account: PropTypes.object,
-    }),
-    intl: PropTypes.object,
-  };
 
   constructor(props) {
     super(props);

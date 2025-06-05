@@ -112,7 +112,6 @@ const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
     </ReactSelectComponents.ValueContainer>
   );
 };
- 
 
 const STYLES_DISPLAY_NONE = { display: 'none' };
 

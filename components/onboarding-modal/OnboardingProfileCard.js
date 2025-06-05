@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -12,12 +11,6 @@ import StyledTooltip from '../StyledTooltip';
 const Admin = styled(StyledTag).attrs({ variant: 'rounded-right' })``;
 
 class OnboardingProfileCard extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    removeAdmin: PropTypes.func,
-    isPending: PropTypes.bool,
-  };
-
   render() {
     const { collective, removeAdmin, isPending } = this.props;
     const { name } = collective;

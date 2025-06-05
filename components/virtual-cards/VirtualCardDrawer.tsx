@@ -212,7 +212,6 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               canDeleteVirtualCard={props.canDeleteVirtualCard}
               onDeleteRefetchQuery={props.onDeleteRefetchQuery}
               hideViewTransactions
-               
               as={React.forwardRef((props, ref: React.ForwardedRef<HTMLButtonElement>) => {
                 return (
                   <StyledButton {...props} ref={ref}>

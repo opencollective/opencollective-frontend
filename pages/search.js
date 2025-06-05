@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
@@ -160,21 +159,6 @@ class SearchPage extends React.Component {
       offset: Number(query.offset) || 0,
     };
   }
-
-  static propTypes = {
-    term: PropTypes.string, // for addSearchQueryData
-    country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
-    sortBy: PropTypes.string, // for addSearchQueryData
-    tag: PropTypes.array, // for addSearchQueryData
-    limit: PropTypes.number, // for addSearchQueryData
-    offset: PropTypes.number, // for addSearchQueryData
-    router: PropTypes.object, // from next.js
-    data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object,
-    isHost: PropTypes.bool,
-    type: PropTypes.array,
-    onlyOpenToApplications: PropTypes.bool,
-  };
 
   constructor(props) {
     super(props);

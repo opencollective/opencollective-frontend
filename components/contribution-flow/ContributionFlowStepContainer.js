@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
@@ -16,34 +15,6 @@ import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
 
 class ContributionFlowStepContainer extends React.Component {
-  static propTypes = {
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    collective: PropTypes.object,
-    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
-    tier: PropTypes.object,
-    onChange: PropTypes.func,
-    showPlatformTip: PropTypes.bool,
-    onNewCardFormReady: PropTypes.func,
-    onSignInClick: PropTypes.func,
-    isEmbed: PropTypes.bool,
-    disabledPaymentMethodTypes: PropTypes.array,
-    isSubmitting: PropTypes.bool,
-    hideCreditCardPostalCode: PropTypes.bool,
-    taxes: PropTypes.array,
-    step: PropTypes.shape({
-      name: PropTypes.string,
-    }),
-    mainState: PropTypes.shape({
-      stepDetails: PropTypes.object,
-      stepProfile: PropTypes.shape({
-        contributorRejectedCategories: PropTypes.array,
-      }),
-      stepSummary: PropTypes.object,
-      stepPayment: PropTypes.object,
-    }),
-  };
-
   constructor(props) {
     super(props);
     this.headerMessages = defineMessages({

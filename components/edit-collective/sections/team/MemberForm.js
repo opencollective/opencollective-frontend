@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get, omit } from 'lodash';
@@ -155,14 +154,6 @@ const MemberForm = props => {
       </Formik>
     </Flex>
   );
-};
-
-MemberForm.propTypes = {
-  bindSubmitForm: PropTypes.func,
-  collectiveImg: PropTypes.string,
-  intl: PropTypes.object.isRequired,
-  member: PropTypes.object,
-  triggerSubmit: PropTypes.func,
 };
 
 export default injectIntl(MemberForm);

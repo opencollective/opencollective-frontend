@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import { PropTypes } from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
@@ -44,54 +43,6 @@ export const SignInOverlayBackground = styled(Container)`
  * also has the API methods binded, so you can use it directly.
  */
 class SignInOrJoinFree extends React.Component {
-  static propTypes = {
-    /** Redirect URL */
-    redirect: PropTypes.string,
-    /** To pre-fill the "email" field */
-    defaultEmail: PropTypes.string,
-    /** Provide this to automatically sign in the given email */
-    email: PropTypes.string,
-    /** createUserQuery binding */
-    createUser: PropTypes.func,
-    /** Whether user can signup from there */
-    disableSignup: PropTypes.bool,
-    /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signin', 'create-account']),
-    /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
-    /** If provided, component will use links instead of buttons to make the switch */
-    routes: PropTypes.shape({
-      signin: PropTypes.string,
-      join: PropTypes.string,
-    }),
-    /** Label for signIn, defaults to "Continue with your email" */
-    signInLabel: PropTypes.node,
-    intl: PropTypes.object,
-    router: PropTypes.object,
-    hideFooter: PropTypes.bool,
-    isOAuth: PropTypes.bool,
-    showSubHeading: PropTypes.bool,
-    showOCLogo: PropTypes.bool,
-    oAuthApplication: PropTypes.shape({
-      name: PropTypes.string,
-      account: PropTypes.shape({
-        imageUrl: PropTypes.string,
-      }),
-    }),
-    /* From UserProvider / withUser */
-    login: PropTypes.func,
-    /** whether the input needs to be auto-focused */
-    autoFocus: PropTypes.bool,
-    /** whether to update the page title when the sign in form is active */
-    noSignInTitle: PropTypes.bool,
-    whitelabelProvider: PropTypes.shape({
-      name: PropTypes.string,
-      squareLogo: PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    }),
-  };
-
   constructor(props) {
     super(props);
     this.state = {

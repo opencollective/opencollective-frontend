@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import omit from 'lodash/omit';
@@ -49,20 +48,6 @@ const TransactionsDownloadCSV = ({ collective, query, ...props }) => {
       )}
     </React.Fragment>
   );
-};
-
-TransactionsDownloadCSV.propTypes = {
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    legacyId: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-  }).isRequired,
-  client: PropTypes.object,
-  query: PropTypes.shape({
-    period: PropTypes.string,
-  }),
 };
 
 export default withApollo(TransactionsDownloadCSV);

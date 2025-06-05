@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 
 import RequestVirtualCardModal from './edit-collective/RequestVirtualCardModal';
 
@@ -11,12 +10,6 @@ const RequestVirtualCardBtn = ({ children, collective, host }) => {
       {showModal && <RequestVirtualCardModal host={host} collective={collective} onClose={() => setShowModal(false)} />}
     </Fragment>
   );
-};
-
-RequestVirtualCardBtn.propTypes = {
-  children: PropTypes.func.isRequired,
-  collective: PropTypes.object.isRequired,
-  host: PropTypes.object.isRequired,
 };
 
 export default RequestVirtualCardBtn;

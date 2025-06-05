@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
@@ -67,13 +66,6 @@ const InlineField = ({ name, children, label, isLabelClickable }) => (
   </Flex>
 );
 
-InlineField.propTypes = {
-  name: PropTypes.string,
-  children: PropTypes.node,
-  label: PropTypes.node,
-  isLabelClickable: PropTypes.bool,
-};
-
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
   align-items: center;
@@ -126,43 +118,12 @@ const RadioButtonWithLabel = ({ checked, onClick, name, children }) => {
   );
 };
 
-RadioButtonWithLabel.propTypes = {
-  checked: PropTypes.bool,
-  onClick: PropTypes.func,
-  name: PropTypes.string,
-  children: PropTypes.node,
-};
-
 const FieldLabelDetails = styled.span`
   color: ${themeGet('colors.black.600')};
   font-weight: normal;
 `;
 
 class CreateGiftCardsForm extends Component {
-  static propTypes = {
-    collectiveId: PropTypes.number.isRequired,
-    collectiveSlug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    createGiftCards: PropTypes.func.isRequired,
-    collectiveSettings: PropTypes.object.isRequired,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.object,
-      Collective: PropTypes.shape({
-        paymentMethods: PropTypes.array,
-      }),
-      allHosts: PropTypes.shape({
-        collectives: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.number,
-          }),
-        ),
-      }),
-    }),
-    /** @ignore from injectIntl */
-    intl: PropTypes.object,
-  };
-
   constructor(props) {
     super(props);
     this.form = React.createRef();

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import expenseTypes from '../../../lib/constants/expenseTypes';
@@ -25,11 +24,6 @@ const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-ExpenseTypeFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 };
 
 export default ExpenseTypeFilter;

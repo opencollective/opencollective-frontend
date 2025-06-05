@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import clsx from 'clsx';
 import { uniqBy } from 'lodash';
@@ -26,19 +25,6 @@ const MembersContainer = styled.div`
 `;
 
 class MembersWithData extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    tier: PropTypes.object,
-    limit: PropTypes.number,
-    onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object,
-    fetchMore: PropTypes.func.isRequired,
-    className: PropTypes.string,
-    data: PropTypes.object,
-    memberRole: PropTypes.string,
-    type: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
     this.state = {

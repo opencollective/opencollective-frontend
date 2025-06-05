@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Close } from '@styled-icons/material/Close';
 import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
@@ -133,16 +132,6 @@ const NotificationBar = ({
       )}
     </NotificationBarContainer>
   );
-};
-
-NotificationBar.propTypes = {
-  title: PropTypes.node,
-  description: PropTypes.node,
-  type: PropTypes.oneOf(['info', 'success', 'error', 'warning']),
-  inline: PropTypes.bool,
-  isSticky: PropTypes.bool,
-  actions: PropTypes.oneOf([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
-  dismiss: PropTypes.func,
 };
 
 export default NotificationBar;

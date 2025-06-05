@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
@@ -239,17 +238,6 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
       </P>
     </Flex>
   );
-};
-
-ContributionsBudget.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-  }),
-  defaultTimeInterval: PropTypes.shape({
-    from: PropTypes.object,
-    to: PropTypes.object,
-  }),
 };
 
 export default ContributionsBudget;

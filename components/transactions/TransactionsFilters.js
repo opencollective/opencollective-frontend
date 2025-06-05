@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -70,17 +69,6 @@ const TransactionsFilters = ({ collective, filters, kinds, paymentMethodTypes, o
       )}
     </React.Fragment>
   );
-};
-
-TransactionsFilters.propTypes = {
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  kinds: PropTypes.array,
-  paymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-    createdAt: PropTypes.string,
-  }).isRequired,
 };
 
 export default React.memo(TransactionsFilters);

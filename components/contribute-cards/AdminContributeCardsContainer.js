@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { isEqual } from 'lodash';
@@ -141,30 +140,6 @@ const AdminContributeCardsContainer = ({
       </SortableContext>
     </DndContext>
   );
-};
-
-AdminContributeCardsContainer.propTypes = {
-  cards: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    }),
-  ).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    parentCollective: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }).isRequired,
-  /** Whether to use the new modals to edit/create tiers */ useTierModals: PropTypes.bool,
-  onReorder: PropTypes.func,
-  setDraggingId: PropTypes.func,
-  draggingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onMount: PropTypes.func,
-  CardsContainer: PropTypes.elementType,
-  createNewType: PropTypes.string,
-  enableReordering: PropTypes.bool,
-  onTierUpdate: PropTypes.func,
 };
 
 export default AdminContributeCardsContainer;

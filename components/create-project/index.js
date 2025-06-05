@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -19,14 +18,6 @@ import { withUser } from '../UserProvider';
 import Form from './Form';
 
 class CreateProject extends Component {
-  static propTypes = {
-    parent: PropTypes.object,
-    LoggedInUser: PropTypes.object, // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    createProject: PropTypes.func.isRequired, // addCreateProjectMutation
-    router: PropTypes.object,
-  };
-
   constructor(props) {
     super(props);
 

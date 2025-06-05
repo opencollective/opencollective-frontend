@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 
 import AcceptContributionsOurselvesOrOrg from './AcceptContributionsOurselvesOrOrg';
@@ -8,13 +7,6 @@ import StartAcceptingFinancialContributionsPage from './StartAcceptingFinancialC
 import SuccessPage from './SuccessPage';
 
 class AcceptFinancialContributions extends Component {
-  static propTypes = {
-    router: PropTypes.object,
-    data: PropTypes.object,
-    host: PropTypes.object,
-    collective: PropTypes.object,
-  };
-
   constructor(props) {
     super(props);
 

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Editor, EditorState } from 'draft-js';
 import { debounce, omit, uniq } from 'lodash';
@@ -38,19 +37,6 @@ const InputContainer = styled(Container)`
 `;
 
 export default class StyledMultiEmailInput extends Component {
-  static propTypes = {
-    /** Editor initial state */
-    initialState: PropTypes.instanceOf(EditorState),
-    /** Callback for state update like `({emails, invalids}) => void` */
-    onChange: PropTypes.func,
-    /** Callback for when component is unmount. Useful to save editor state. */
-    onClose: PropTypes.func,
-    /** On array of invalid emails */
-    invalids: PropTypes.arrayOf(PropTypes.string),
-    /** disabled */
-    disabled: PropTypes.bool,
-  };
-
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);

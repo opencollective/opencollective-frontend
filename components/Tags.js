@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -63,27 +62,6 @@ const TagsForAdmins = ({ expense, order, suggestedTags }) => {
   return <EditTags disabled={loading} value={tagList} suggestedTags={suggestedTags} onChange={onChange} />;
 };
 
-TagsForAdmins.propTypes = {
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-    account: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-};
-
 const Tag = styled(StyledTag).attrs({
   mb: '4px',
   mr: '4px',
@@ -142,35 +120,6 @@ const Tags = ({
       )}
     </Flex>
   );
-};
-
-Tags.propTypes = {
-  /** Max number of tags to display */
-  limit: PropTypes.number,
-  /** A render func that gets passed the tag */
-  children: PropTypes.func,
-  /** A function to build the tag props dynamically */
-  getTagProps: PropTypes.func,
-  /** Whether current user can edit the tags */
-  canEdit: PropTypes.bool,
-  /** If canEdit is true, this array is used to display suggested tags */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  /** Whether to show an "Untagged" tag (when used for filtering) */
-  showUntagged: PropTypes.bool,
 };
 
 export default Tags;

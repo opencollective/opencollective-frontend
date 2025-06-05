@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -33,15 +32,6 @@ const PreviewModal = ({ previewImage, heading, subheading = null, imgHeight, img
       </ModalFooter>
     </StyledModal>
   );
-};
-
-PreviewModal.propTypes = {
-  previewImage: PropTypes.string.isRequired,
-  heading: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-  subheading: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  imgHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  imgWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  onClose: PropTypes.func,
 };
 
 export default PreviewModal;

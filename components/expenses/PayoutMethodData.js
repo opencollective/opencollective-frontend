@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { get, startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -112,17 +111,6 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
     default:
       return null;
   }
-};
-
-PayoutMethodData.propTypes = {
-  /** If false, only the raw data will be displayed */
-  showLabel: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  payoutMethod: PropTypes.shape({
-    id: PropTypes.string,
-    type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-    data: PropTypes.object,
-  }),
 };
 
 // @component

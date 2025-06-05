@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -100,9 +99,6 @@ export const StateLabel = styled(Box)`
   letter-spacing: 0.06em;
   text-transform: uppercase;
 `;
-StateLabel.propTypes = {
-  isActive: PropTypes.bool,
-};
 
 const pauseCardMutation = gql`
   mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
@@ -297,30 +293,6 @@ export const ActionsButton = props => {
   );
 };
 
-ActionsButton.propTypes = {
-  virtualCard: PropTypes.shape({
-    id: PropTypes.string,
-    data: PropTypes.object,
-    provider: PropTypes.string,
-    account: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-    assignee: PropTypes.shape({
-      email: PropTypes.string,
-    }),
-  }),
-  host: PropTypes.object,
-  onSuccess: PropTypes.func,
-  onError: PropTypes.func,
-  confirmOnPauseCard: PropTypes.bool,
-  canEditVirtualCard: PropTypes.bool,
-  canDeleteVirtualCard: PropTypes.bool,
-  onDeleteRefetchQuery: PropTypes.string,
-  openVirtualCardDrawer: PropTypes.func,
-  hideViewTransactions: PropTypes.bool,
-  as: PropTypes.any,
-};
-
 const getLimitString = ({
   spendingLimitAmount,
   spendingLimitInterval,
@@ -434,10 +406,6 @@ export function CardDetails({ virtualCard }) {
   );
 }
 
-CardDetails.propTypes = {
-  virtualCard: PropTypes.object,
-};
-
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
   const intl = useIntl();
@@ -545,39 +513,6 @@ const VirtualCard = props => {
       </Flex>
     </CardContainer>
   );
-};
-
-VirtualCard.propTypes = {
-  canEditVirtualCard: PropTypes.bool,
-  canPauseOrResumeVirtualCard: PropTypes.bool,
-  canDeleteVirtualCard: PropTypes.bool,
-  host: PropTypes.object,
-  virtualCard: PropTypes.shape({
-    id: PropTypes.string,
-    last4: PropTypes.string,
-    name: PropTypes.string,
-    data: PropTypes.object,
-    privateData: PropTypes.object,
-    provider: PropTypes.string,
-    spendingLimitAmount: PropTypes.number,
-    spendingLimitInterval: PropTypes.string,
-    spendingLimitRenewsOn: PropTypes.string,
-    remainingLimit: PropTypes.number,
-    currency: PropTypes.string,
-    createdAt: PropTypes.string,
-    assignee: PropTypes.shape({
-      name: PropTypes.string,
-      slug: PropTypes.string,
-    }),
-    account: PropTypes.shape({
-      id: PropTypes.string,
-      imageUrl: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-    }),
-  }),
-  confirmOnPauseCard: PropTypes.bool,
-  onDeleteRefetchQuery: PropTypes.string,
 };
 
 export default VirtualCard;

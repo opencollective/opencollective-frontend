@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Info } from '@styled-icons/feather/Info';
 import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
@@ -7,7 +6,6 @@ import styled from 'styled-components';
 
 import { getSectionsCategoryDetails } from '../../lib/collective-sections';
 
-import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import StyledHr from '../StyledHr';
@@ -89,10 +87,5 @@ const CategoryHeader = React.forwardRef(({ collective, category, ...props }, ref
 });
 
 CategoryHeader.displayName = 'CategoryHeader';
-
-CategoryHeader.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
-  collective: PropTypes.object,
-};
 
 export default CategoryHeader;

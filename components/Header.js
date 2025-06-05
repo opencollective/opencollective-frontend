@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import Head from 'next/head';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -18,28 +17,6 @@ const messages = defineMessages({
 });
 
 class Header extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    canonicalURL: PropTypes.string,
-    description: PropTypes.string,
-    image: PropTypes.string,
-    twitterHandle: PropTypes.string,
-    css: PropTypes.string,
-    className: PropTypes.string,
-    title: PropTypes.string,
-    metaTitle: PropTypes.string,
-    showSearch: PropTypes.bool,
-    showProfileAndChangelogMenu: PropTypes.bool,
-    withTopBar: PropTypes.bool,
-    menuItems: PropTypes.object,
-    /** If true, a no-robots meta will be added to the page */
-    noRobots: PropTypes.bool,
-    /** @ignore from injectIntl */
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    loading: PropTypes.bool,
-  };
-
   static defaultProps = {
     withTopBar: true,
   };

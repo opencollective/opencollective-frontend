@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Container from './Container';
@@ -18,14 +17,6 @@ const InputFieldPresetsContainer = styled.div`
 `;
 
 class InputFieldPresets extends React.Component {
-  static propTypes = {
-    defaultValue: PropTypes.arrayOf(PropTypes.number),
-    pre: PropTypes.string,
-    options: PropTypes.object,
-    onChange: PropTypes.func,
-    min: PropTypes.number,
-  };
-
   constructor(props) {
     super(props);
     this.maxLength = 5;

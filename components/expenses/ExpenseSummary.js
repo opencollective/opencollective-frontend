@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { Download, MessageSquare } from 'lucide-react';
@@ -8,12 +7,10 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { i18nGraphqlException } from '../../lib/errors';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { AmountPropTypeShape } from '../../lib/prop-types';
 import { cn } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
@@ -68,10 +65,6 @@ const CreatedByUserLink = ({ account }) => {
       </span>
     </LinkCollective>
   );
-};
-
-CreatedByUserLink.propTypes = {
-  account: PropTypes.object,
 };
 
 const Spacer = () => <Span mx="6px">{'•'}</Span>;
@@ -650,176 +643,6 @@ const ExpenseSummary = ({
         ) : null)}
     </StyledCard>
   );
-};
-
-ExpenseSummary.propTypes = {
-  /** Set this to true if the expense is not loaded yet */
-  isLoading: PropTypes.bool,
-  /** Set this to true if the logged in user is currenltly loading */
-  isLoadingLoggedInUser: PropTypes.bool,
-  host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    website: PropTypes.string,
-    location: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-  }),
-  /** Must be provided if isLoading is false */
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    accountingCategory: PropTypes.object,
-    description: PropTypes.string.isRequired,
-    reference: PropTypes.string,
-    longDescription: PropTypes.string,
-    amount: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-    invoiceInfo: PropTypes.string,
-    merchantId: PropTypes.string,
-    createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
-    onHold: PropTypes.bool,
-    type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
-    amountInAccountCurrency: AmountPropTypeShape,
-    amountInHostCurrency: AmountPropTypeShape,
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      host: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      }),
-      parent: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      }),
-    }).isRequired,
-    items: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        incurredAt: PropTypes.string,
-        description: PropTypes.string,
-        amount: PropTypes.number.isRequired,
-        url: PropTypes.string,
-      }).isRequired,
-    ),
-    attachedFiles: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        url: PropTypes.string.isRequired,
-      }).isRequired,
-    ),
-    invoiceFile: PropTypes.shape({
-      id: PropTypes.string,
-      url: PropTypes.string.isRequired,
-    }),
-    taxes: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.string,
-        rate: PropTypes.number,
-      }).isRequired,
-    ),
-    payee: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      isAdmin: PropTypes.bool,
-    }).isRequired,
-    approvedBy: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        isAdmin: PropTypes.bool,
-      }),
-    ),
-    payeeLocation: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-    createdByAccount: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }),
-    requestedByAccount: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }),
-    payoutMethod: PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-      data: PropTypes.object,
-    }),
-    draft: PropTypes.shape({
-      items: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          incurredAt: PropTypes.string,
-          description: PropTypes.string,
-          amount: PropTypes.number,
-          amountV2: PropTypes.object,
-          url: PropTypes.string,
-        }),
-      ),
-      attachedFiles: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          url: PropTypes.string.isRequired,
-        }).isRequired,
-      ),
-      invoiceFile: PropTypes.shape({
-        id: PropTypes.string,
-        url: PropTypes.string.isRequired,
-      }),
-      taxes: PropTypes.arrayOf(
-        PropTypes.shape({
-          type: PropTypes.string,
-          rate: PropTypes.number,
-        }).isRequired,
-      ),
-    }),
-    permissions: PropTypes.shape({
-      canSeeInvoiceInfo: PropTypes.bool,
-      canDelete: PropTypes.bool,
-      canEditAccountingCategory: PropTypes.bool,
-      canEdit: PropTypes.bool,
-    }),
-    comments: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
-  /** Whether current user can edit the tags */
-  canEditTags: PropTypes.bool,
-  /** Whether or not this is being displayed for an edited Expense */
-  isEditing: PropTypes.bool,
-  /** Whether to show the process buttons (Approve, Pay, etc) */
-  showProcessButtons: PropTypes.bool,
-  /** The account where the expense has been submitted, required to display the process actions */
-  collective: PropTypes.object,
-  /** Disable border and paiding in styled card, usefull for modals */
-  borderless: PropTypes.bool,
-  /** Passed down from ExpenseModal */
-  onClose: PropTypes.func,
-  /** Passed down from Expense */
-  onEdit: PropTypes.func,
-  /** Passed down from either ExpenseModal or Expense */
-  onDelete: PropTypes.func,
-  /** Passwed down from Expense */
-  openFileViewer: PropTypes.func,
-  /** Reference to the actions container element in the Expense Drawer */
-  drawerActionsContainer: PropTypes.object,
-  enableKeyboardShortcuts: PropTypes.bool,
-  openedItemId: PropTypes.string,
 };
 
 export default ExpenseSummary;

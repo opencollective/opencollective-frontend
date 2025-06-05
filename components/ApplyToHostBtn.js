@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -8,16 +7,6 @@ import ApplyToHostModal from './ApplyToHostModal';
 import StyledButton from './StyledButton';
 
 class ApplyToHostBtn extends React.Component {
-  static propTypes = {
-    hostSlug: PropTypes.string.isRequired,
-    minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    withoutIcon: PropTypes.bool,
-    buttonProps: PropTypes.object,
-    buttonRenderer: PropTypes.func,
-    router: PropTypes.object,
-    isHidden: PropTypes.bool,
-  };
-
   constructor(props) {
     super(props);
     this.state = { showModal: false };

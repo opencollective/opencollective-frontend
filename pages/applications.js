@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { getDashboardRoute } from '../lib/url-helpers';
@@ -11,11 +10,6 @@ import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 
 class Apps extends React.Component {
-  static propTypes = {
-    LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-  };
-
   render() {
     return (
       <AuthenticatedPage title="Applications">

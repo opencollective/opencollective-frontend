@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 
 /**
@@ -46,12 +45,6 @@ class ButtonPage extends React.Component {
     }
     return { color, collectiveSlug, verb };
   }
-
-  static propTypes = {
-    color: PropTypes.string,
-    collectiveSlug: PropTypes.string,
-    verb: PropTypes.string,
-  };
 
   render() {
     const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;

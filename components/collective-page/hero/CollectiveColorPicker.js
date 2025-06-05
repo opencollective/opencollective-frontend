@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { cloneDeep, set } from 'lodash';
@@ -184,21 +183,6 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
       )}
     </Mutation>
   );
-};
-
-CollectiveColorPicker.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    settings: PropTypes.shape({
-      collectivePage: PropTypes.shape({
-        primaryColor: PropTypes.string,
-      }),
-    }),
-  }).isRequired,
-  onChange: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-  /** @ignore from withTheme */
-  theme: PropTypes.object,
 };
 
 export default withTheme(CollectiveColorPicker);

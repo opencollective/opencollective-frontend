@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { groupBy, sortBy, truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -143,13 +142,6 @@ const ContributeProfilePicker = ({ profiles, tier, selectedProfile, onChange }) 
       }}
     />
   );
-};
-
-ContributeProfilePicker.propTypes = {
-  profiles: PropTypes.array,
-  onChange: PropTypes.func,
-  selectedProfile: PropTypes.object,
-  tier: PropTypes.object,
 };
 
 export default ContributeProfilePicker;

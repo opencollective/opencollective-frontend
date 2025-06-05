@@ -12,7 +12,6 @@ const breakpoints = {
   lg: '@media screen and (min-width: 64em)',
 };
 
- 
 const hidden = key => props =>
   props[key]
     ? {

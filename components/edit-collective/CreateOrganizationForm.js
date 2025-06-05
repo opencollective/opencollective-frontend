@@ -1,16 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
 
 class CreateOrganizationForm extends React.Component {
-  static propTypes = {
-    onChange: PropTypes.func.isRequired,
-    intl: PropTypes.object.isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);

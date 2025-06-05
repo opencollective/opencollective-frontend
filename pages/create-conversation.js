@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -34,31 +33,6 @@ class CreateConversationPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, tag } }) {
     return { collectiveSlug, tag };
   }
-
-  static propTypes = {
-    /** @ignore from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @ignore from withUser */
-    loadingLoggedInUser: PropTypes.bool,
-    /** @ignore from withRouter */
-    router: PropTypes.object,
-    /** @ignore from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      account: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        twitterHandle: PropTypes.string,
-        imageUrl: PropTypes.string,
-        conversationsTags: PropTypes.arrayOf(PropTypes.shape({ tag: PropTypes.string })),
-      }),
-    }).isRequired, // from withData
-  };
 
   getPageMetaData(collective) {
     const baseMetadata = getCollectivePageMetadata(collective);

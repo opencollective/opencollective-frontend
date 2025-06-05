@@ -3,7 +3,6 @@
  */
 
 import React, { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
@@ -94,14 +93,6 @@ const TopBarIcon = ({ provider }) => {
       </Flex>
     </Link>
   );
-};
-
-TopBarIcon.propTypes = {
-  provider: PropTypes.shape({
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    logo: PropTypes.string,
-  }),
 };
 
 const TopBar = ({
@@ -336,13 +327,6 @@ const TopBar = ({
       </Hide>
     </Flex>
   );
-};
-
-TopBar.propTypes = {
-  showSearch: PropTypes.bool,
-  showProfileAndChangelogMenu: PropTypes.bool,
-  menuItems: PropTypes.object,
-  account: PropTypes.object,
 };
 
 export default TopBar;

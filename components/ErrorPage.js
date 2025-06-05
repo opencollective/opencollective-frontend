@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
 import copy from 'copy-to-clipboard';
@@ -29,25 +28,6 @@ import { withUser } from './UserProvider';
  * A flexible error page
  */
 class ErrorPage extends React.Component {
-  static propTypes = {
-    /** Customize the error type. Check `createError.*` functions for more info */
-    error: PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(ERROR)),
-      payload: PropTypes.object,
-    }),
-    /** If true, a loading indicator will be displayed instead of an error */
-    loading: PropTypes.bool,
-    /** Define if error should be logged to console. Default: true */
-    log: PropTypes.bool,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @deprecated please generate errors with the `createError` helper  */
-    message: PropTypes.string,
-    /** @deprecated please generate errors with the `createError` helper */
-    data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
-    router: PropTypes.object,
-  };
-
   state = { copied: false };
 
   getErrorComponent() {

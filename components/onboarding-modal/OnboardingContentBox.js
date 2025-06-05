@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
@@ -14,21 +13,6 @@ import OnboardingProfileCard from './OnboardingProfileCard';
 import OnboardingSkipButton from './OnboardingSkipButton';
 
 class OnboardingContentBox extends React.Component {
-  static propTypes = {
-    slug: PropTypes.string,
-    step: PropTypes.number,
-    collective: PropTypes.object,
-    memberInvitations: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    updateAdmins: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    values: PropTypes.object,
-    errors: PropTypes.object,
-    touched: PropTypes.object,
-    setFieldValue: PropTypes.func,
-    setFieldTouched: PropTypes.func,
-  };
-
   constructor(props) {
     super(props);
 

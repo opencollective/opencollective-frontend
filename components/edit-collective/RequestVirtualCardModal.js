@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
@@ -303,35 +302,6 @@ const RequestVirtualCardModal = props => {
       </form>
     </StyledModal>
   );
-};
-
-RequestVirtualCardModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  host: PropTypes.shape({
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    currency: PropTypes.string,
-    imageUrl: PropTypes.string,
-    settings: PropTypes.shape({
-      virtualcards: PropTypes.shape({
-        autopause: PropTypes.bool,
-        requestcard: PropTypes.bool,
-        policy: PropTypes.string,
-      }),
-    }),
-  }).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    currency: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }),
 };
 
 /** @component */

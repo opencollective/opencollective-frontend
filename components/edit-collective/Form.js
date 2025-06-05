@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
@@ -57,18 +56,6 @@ import EditUserEmailForm from './EditUserEmailForm';
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
 class EditCollectiveForm extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    host: PropTypes.object,
-    status: PropTypes.string, // loading, saved
-    section: PropTypes.string,
-    onSubmit: PropTypes.func,
-    LoggedInUser: PropTypes.object.isRequired,
-    router: PropTypes.object, // from withRouter
-    intl: PropTypes.object.isRequired, // from injectIntl
-    query: PropTypes.object, // passed from Page/Router through index/EditCollective
-  };
-
   constructor(props) {
     super(props);
 

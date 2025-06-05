@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
@@ -465,25 +464,6 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expe
       )}
     </Fragment>
   );
-};
-
-ExpenseFormPayeeSignUpStep.propTypes = {
-  formik: PropTypes.object,
-  onCancel: PropTypes.func,
-  onNext: PropTypes.func,
-  expense: PropTypes.shape({
-    lockedFields: PropTypes.arrayOf(PropTypes.string),
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-    }),
-    settings: PropTypes.object,
-  }).isRequired,
 };
 
 export default ExpenseFormPayeeSignUpStep;

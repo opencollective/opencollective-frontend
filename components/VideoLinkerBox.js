@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { VideoPlus } from '@styled-icons/boxicons-regular/VideoPlus';
 import { ArrowDownCircle } from '@styled-icons/feather/ArrowDownCircle';
 import { themeGet } from '@styled-system/theme-get';
@@ -102,13 +101,6 @@ const VideoLinkerBox = ({ url, onChange, isEditing, setEditing }) => {
       />
     </MainFormContainer>
   );
-};
-
-VideoLinkerBox.propTypes = {
-  url: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool,
-  setEditing: PropTypes.func.isRequired,
 };
 
 export default VideoLinkerBox;

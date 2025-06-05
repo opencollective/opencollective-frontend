@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
@@ -233,16 +232,5 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
     document.body,
   );
 }
-
-EditPublicMessagePopup.propTypes = {
-  fromCollectiveId: PropTypes.number.isRequired,
-  collectiveId: PropTypes.number.isRequired,
-  cardRef: PropTypes.shape({ current: PropTypes.object }).isRequired,
-  onClose: PropTypes.func.isRequired,
-  message: PropTypes.string,
-  intl: PropTypes.object,
-  /** @ignore from withViewport */
-  width: PropTypes.number,
-};
 
 export default withViewport(EditPublicMessagePopup, { withWidth: true });

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
 
@@ -20,51 +19,6 @@ import { Span } from './Text';
  * Component for handing user sign-in or redirecting to sign-up.
  */
 export default class SignIn extends React.Component {
-  static propTypes = {
-    /** handles the email input submission, a.k.a Sign In */
-    onSubmit: PropTypes.func.isRequired,
-    /** handles the redirect from sign-in, a.k.a Join Free. Accepts URLs (string) or custom action func */
-    onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
-    /** When set to true, will show a spinner in Sign In button and will disable all actions */
-    loading: PropTypes.bool,
-    /** Whether user can click on "Join Free" */
-    showSecondaryAction: PropTypes.bool,
-    /** Set this to true to display the unknown email message */
-    unknownEmail: PropTypes.bool,
-    /** Set this to true to display the password field */
-    passwordRequired: PropTypes.bool,
-    /** Label, defaults to "Continue with your email" */
-    label: PropTypes.node,
-    /** Set the value of email input */
-    email: PropTypes.string.isRequired,
-    /** Set the value of password input */
-    password: PropTypes.string,
-    /** handles changes in the email input */
-    onEmailChange: PropTypes.func.isRequired,
-    /** handles changes in the password input */
-    onPasswordChange: PropTypes.func.isRequired,
-    /** Oauth Sign In **/
-    isOAuth: PropTypes.bool,
-    /** Oauth App Name **/
-    oAuthAppName: PropTypes.string,
-    /** Oauth App Image **/
-    oAuthAppImage: PropTypes.string,
-    /** Show/hide subheading **/
-    showSubHeading: PropTypes.bool,
-    /** Show/hide Open Collective Logo **/
-    showOCLogo: PropTypes.bool,
-    /** whether the input needs to be auto-focused */
-    autoFocus: PropTypes.bool,
-    /** whether to show the title or not */
-    noSignInTitle: PropTypes.bool,
-    whitelabelProvider: PropTypes.shape({
-      name: PropTypes.string,
-      squareLogo: PropTypes.shape({
-        url: PropTypes.string,
-      }),
-    }),
-  };
-
   static defaultProps = {
     showSubHeading: true,
     showOCLogo: true,

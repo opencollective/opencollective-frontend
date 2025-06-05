@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
 import Link from '../components/Link';
@@ -28,16 +27,6 @@ class StaticPage extends React.Component {
 
     return { title, content, path, pageSlug };
   }
-
-  static propTypes = {
-    path: PropTypes.string,
-    pageSlug: PropTypes.string,
-    title: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
-    data: PropTypes.object,
-    query: PropTypes.object,
-  };
 
   render() {
     const { path, pageSlug, title } = this.props;

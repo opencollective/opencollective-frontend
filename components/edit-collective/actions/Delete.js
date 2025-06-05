@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -168,12 +167,6 @@ const DeleteCollective = ({ collective, ...props }) => {
       )}
     </Container>
   );
-};
-
-DeleteCollective.propTypes = {
-  collective: PropTypes.object.isRequired,
-  refetchLoggedInUser: PropTypes.func,
-  router: PropTypes.object,
 };
 
 export default withUser(withRouter(DeleteCollective));

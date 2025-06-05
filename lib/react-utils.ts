@@ -26,9 +26,9 @@ export function elementFromClass<K extends keyof React.JSX.IntrinsicElements>(
   type: K,
   className: string,
 ): React.ForwardRefExoticComponent<React.JSX.IntrinsicElements[K]>;
- 
+
 export function elementFromClass<T>(type: T, className: string): T;
- 
+
 export function elementFromClass(type, className) {
   const render = (
     {

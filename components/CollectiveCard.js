@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -96,14 +95,6 @@ const CommaList = styled.ul`
 `;
 
 class CollectiveCard extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    membership: PropTypes.object,
-    memberships: PropTypes.array,
-    intl: PropTypes.object.isRequired,
-    hideRoles: PropTypes.bool,
-  };
-
   constructor(props) {
     super(props);
 

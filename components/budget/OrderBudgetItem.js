@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../lib/constants/payment-methods';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 import { i18nPaymentMethodType } from '../../lib/i18n/payment-method-type';
@@ -264,43 +262,6 @@ const OrderBudgetItem = ({
       </Flex>
     </OrderContainer>
   );
-};
-
-OrderBudgetItem.propTypes = {
-  isLoading: PropTypes.bool,
-  showAmountSign: PropTypes.bool,
-  host: PropTypes.object,
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    description: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(Object.values(ORDER_STATUS)).isRequired,
-    createdAt: PropTypes.string.isRequired,
-    amount: PropTypes.object.isRequired,
-    platformTipAmount: PropTypes.object.isRequired,
-    permissions: PropTypes.shape({
-      canReject: PropTypes.bool,
-      canMarkAsPaid: PropTypes.bool,
-      canUpdateAccountingCategory: PropTypes.bool,
-    }),
-    pendingContributionData: PropTypes.shape({
-      ponumber: PropTypes.number,
-      expectedAt: PropTypes.string,
-      paymentMethod: PropTypes.string,
-    }),
-    paymentMethod: PropTypes.shape({
-      providerType: PropTypes.string,
-      type: PropTypes.string,
-    }),
-    /** If available, this `account` will be used in place of the `collective` */
-    toAccount: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-    fromAccount: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
-  showPlatformTip: PropTypes.bool,
 };
 
 export default OrderBudgetItem;

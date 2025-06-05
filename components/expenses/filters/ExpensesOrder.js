@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
@@ -26,11 +25,6 @@ const ExpensesOrder = ({ onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-ExpensesOrder.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 };
 
 export const parseChronologicalOrderInput = str => {

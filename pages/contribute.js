@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -56,13 +55,6 @@ class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
     return { slug: collectiveSlug, verb };
   }
-
-  static propTypes = {
-    slug: PropTypes.string, // from getInitialProps, for addContributePageData
-    verb: PropTypes.string, // from getInitialProps
-    data: PropTypes.object.isRequired, // from withData
-    LoggedInUser: PropTypes.object,
-  };
 
   getFinancialContributorsWithoutTier = memoizeOne(contributors => {
     return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Mail } from '@styled-icons/feather/Mail';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -57,22 +56,6 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
       </Container>
     </ContainerSectionContent>
   );
-};
-
-SectionOurTeam.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    slug: PropTypes.string,
-    currency: PropTypes.string,
-    parentCollective: PropTypes.shape({
-      coreContributors: PropTypes.array.isRequired,
-    }),
-    canContact: PropTypes.bool,
-  }).isRequired,
-
-  coreContributors: PropTypes.array.isRequired,
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(SectionOurTeam);

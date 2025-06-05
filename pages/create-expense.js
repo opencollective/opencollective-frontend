@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
@@ -61,67 +60,6 @@ class CreateExpensePage extends React.Component {
   static getInitialProps({ query: query }) {
     return CreateExpensePageUrlQueryHelper.decode(query);
   }
-
-  static propTypes = {
-    /** from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    parentCollectiveSlug: PropTypes.string,
-    customData: PropTypes.object,
-    /** from withUser */
-    LoggedInUser: PropTypes.object,
-    /** from withUser */
-    loadingLoggedInUser: PropTypes.bool,
-    /** from withRouter */
-    router: PropTypes.object,
-    /** from injectIntl */
-    intl: PropTypes.object,
-    /** from apollo */
-    createExpense: PropTypes.func.isRequired,
-    /** from apollo */
-    draftExpenseAndInviteUser: PropTypes.func.isRequired,
-    /** from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      refetch: PropTypes.func,
-      account: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        parent: PropTypes.object,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        twitterHandle: PropTypes.string,
-        imageUrl: PropTypes.string,
-        isArchived: PropTypes.bool,
-        supportedExpenseTypes: PropTypes.array,
-        expensesTags: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            tag: PropTypes.string.isRequired,
-          }),
-        ),
-        host: PropTypes.shape({
-          id: PropTypes.string.isRequired,
-        }),
-      }),
-      loggedInAccount: PropTypes.shape({
-        adminMemberships: PropTypes.shape({
-          nodes: PropTypes.arrayOf(
-            PropTypes.shape({
-              id: PropTypes.string.isRequired,
-              account: PropTypes.shape({
-                id: PropTypes.string.isRequired,
-                slug: PropTypes.string.isRequired,
-                name: PropTypes.string,
-                imageUrl: PropTypes.string,
-              }),
-            }),
-          ),
-        }),
-      }),
-    }).isRequired, // from withData
-  };
 
   constructor(props) {
     super(props);

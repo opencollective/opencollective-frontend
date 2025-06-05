@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -28,35 +27,10 @@ const MainContainer = styled(Container)`
     center -900px repeat-y url(${ContributorsGridBackgroundSVG});
 `;
 
-const ExpectedContributorsPropTypes = PropTypes.shape({
-  id: PropTypes.string.isRequired,
-  since: PropTypes.string.isRequired,
-  roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-  isCore: PropTypes.bool.isRequired,
-  isBacker: PropTypes.bool.isRequired,
-  totalAmountDonated: PropTypes.number.isRequired,
-});
-
 /**
  * Section that displays all the contributors to the collective (financial, admins...etc)
  */
 export default class SectionContributors extends React.PureComponent {
-  static propTypes = {
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-    }),
-    stats: PropTypes.shape({
-      backers: PropTypes.shape({
-        all: PropTypes.number,
-      }),
-    }).isRequired,
-    coreContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
-    financialContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
-  };
-
   constructor(props) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };

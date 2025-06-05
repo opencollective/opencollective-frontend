@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
@@ -438,26 +437,6 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
       </form>
     </StyledModal>
   );
-};
-
-AssignVirtualCardModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  host: PropTypes.shape({
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }),
 };
 
 /** @component */

@@ -354,7 +354,7 @@ const HorizontalContent = ({ children }: { children: React.ReactNode }) => {
           return null;
         }
 
-        // @ts-expect-error children is not typed
+        // @ts-expect-error - TODO: fix this
         return React.Children.map(node.props.children, childNode => childNode);
       })}
     </React.Fragment>

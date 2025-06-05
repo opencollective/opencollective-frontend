@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
@@ -294,14 +293,6 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
       )}
     </PopUpMenu>
   );
-};
-
-RecurringContributionsPopUp.propTypes = {
-  contribution: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
-  status: PropTypes.string.isRequired,
-  onCloseEdit: PropTypes.func,
-  account: PropTypes.object.isRequired,
 };
 
 export default withUser(RecurringContributionsPopUp);

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -16,14 +15,6 @@ import SignInOrJoinFree from './SignInOrJoinFree';
 import { H1, P } from './Text';
 
 class CreateOrganization extends React.Component {
-  static propTypes = {
-    createOrganization: PropTypes.func,
-    editCollectiveMembers: PropTypes.func,
-    LoggedInUser: PropTypes.object,
-    refetchLoggedInUser: PropTypes.func.isRequired,
-    router: PropTypes.object,
-  };
-
   constructor(props) {
     super(props);
     this.state = { collective: { type: 'ORGANIZATION' }, result: {}, admins: [] };

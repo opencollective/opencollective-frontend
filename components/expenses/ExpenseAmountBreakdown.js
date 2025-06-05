@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -81,30 +80,6 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
       </TotalAmountLine>
     </Container>
   );
-};
-
-ExpenseAmountBreakdown.propTypes = {
-  /** The currency of the collective */
-  currency: PropTypes.string.isRequired,
-  /** Expense items */
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      amountV2: PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-    }),
-  ).isRequired,
-  /** Taxes applied to the expense */
-  taxes: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.string,
-      rate: PropTypes.number,
-    }),
-  ),
-  /** Total amount coming from the expense */
-  expenseTotalAmount: PropTypes.number,
 };
 
 export default React.memo(ExpenseAmountBreakdown);

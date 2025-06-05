@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
@@ -17,15 +16,6 @@ import CategoryPicker from './CategoryPicker';
 import Form from './Form';
 
 class CreateFund extends Component {
-  static propTypes = {
-    host: PropTypes.object,
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object, // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    router: PropTypes.object.isRequired, // from withRouter
-    createFund: PropTypes.func.isRequired, // addCreateFundMutation
-  };
-
   constructor(props) {
     super(props);
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
 import { themeGet } from '@styled-system/theme-get';
@@ -46,15 +45,6 @@ const GreenCheckbox = styled(CheckboxChecked)`
 `;
 
 class StripeOrBankAccountPicker extends React.Component {
-  static propTypes = {
-    data: PropTypes.object.isRequired,
-    intl: PropTypes.object.isRequired,
-    router: PropTypes.object,
-    collective: PropTypes.object.isRequired,
-    host: PropTypes.object.isRequired,
-    addHost: PropTypes.func.isRequired,
-  };
-
   constructor(props) {
     super(props);
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Box } from '../Grid';
@@ -30,7 +29,7 @@ const PrivateNoteLabel = () => {
   );
 };
 
-const ExpenseNotesForm = ({ onChange, disabled = false, defaultValue = '', hideLabel = false }) => {
+const ExpenseNotesForm = ({ onChange, disabled = false, defaultValue, hideLabel = false }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledInputField
@@ -59,13 +58,6 @@ const ExpenseNotesForm = ({ onChange, disabled = false, defaultValue = '', hideL
       )}
     </StyledInputField>
   );
-};
-
-ExpenseNotesForm.propTypes = {
-  defaultValue: PropTypes.string,
-  disabled: PropTypes.bool,
-  hideLabel: PropTypes.bool,
-  onChange: PropTypes.func,
 };
 
 export default ExpenseNotesForm;

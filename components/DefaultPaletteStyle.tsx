@@ -2,7 +2,6 @@ import React from 'react';
 
 export default function DefaultPaletteStyle({ palette }: { palette: Record<string, string> }) {
   return (
-     
     <style jsx global>
       {`
         :root {

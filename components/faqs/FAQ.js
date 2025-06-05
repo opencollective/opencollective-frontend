@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
@@ -160,20 +159,6 @@ const EntryContainer = styled.div`
  * A small FAQ with expendable contents.
  */
 export default class FAQ extends Component {
-  static propTypes = {
-    children: PropTypes.node,
-    /** The title to display above entries. Set to null to disable it. */
-    title: PropTypes.string,
-    /** Props for styling the title */
-    titleProps: PropTypes.object,
-    /** If true, a border will be displayed on the left  */
-    withBorderLeft: PropTypes.bool,
-    /** If true, will display a button with a chevron instead of the `+` sign  */
-    withNewButtons: PropTypes.bool,
-    /** All properties from `Box` */
-    ...Box.propTypes,
-  };
-
   render() {
     const { title, children, withBorderLeft, withNewButtons, titleProps, ...props } = this.props;
     return (

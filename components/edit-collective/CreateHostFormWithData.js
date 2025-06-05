@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get } from 'lodash';
 
@@ -13,14 +12,6 @@ import LoadingGrid from '../LoadingGrid';
 import CreateHostForm from './CreateHostForm';
 
 class CreateHostFormWithData extends React.Component {
-  static propTypes = {
-    LoggedInUser: PropTypes.object.isRequired,
-    collective: PropTypes.object.isRequired,
-    data: PropTypes.object.isRequired,
-    onSubmit: PropTypes.func.isRequired,
-    createCollective: PropTypes.func,
-  };
-
   constructor(props) {
     super(props);
     this.createOrganization = this.createOrganization.bind(this);

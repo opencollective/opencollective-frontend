@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
@@ -65,12 +64,6 @@ export const BudgetTable = ({ headers, rows, truncate, ...props }) => {
       </tbody>
     </Table>
   );
-};
-
-BudgetTable.propTypes = {
-  headers: PropTypes.arrayOf(PropTypes.node).isRequired,
-  rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.node)),
-  truncate: PropTypes.number,
 };
 
 export const COLORS = ['#A3F89C', '#FFBF5F', '#8FC7FF', '#F89CE4', '#F89C9C'];

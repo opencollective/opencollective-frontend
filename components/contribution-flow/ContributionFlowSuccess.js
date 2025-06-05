@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { themeGet } from '@styled-system/theme-get';
 import { get, uniqBy } from 'lodash';
@@ -185,15 +184,6 @@ const getMainTag = collective => {
 };
 
 class ContributionFlowSuccess extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    intl: PropTypes.object,
-    router: PropTypes.object,
-    isEmbed: PropTypes.bool,
-    data: PropTypes.object,
-  };
-
   async componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
     if (this.props.LoggedInUser) {

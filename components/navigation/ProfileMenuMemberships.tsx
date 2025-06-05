@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
-import type { ReverseCompatibleMemberRole } from '@/lib/constants/roles';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import Avatar from '../Avatar';
@@ -74,10 +73,7 @@ interface MembershipLineProps {
   user?: LoggedInUser;
   closeDrawer?(...args: unknown[]): unknown;
   membership?: {
-    collective: {
-      slug: string;
-      name: string;
-    };
+    collective: GraphQLV1Collective;
   };
 }
 
@@ -151,12 +147,8 @@ const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
 
 interface MembershipsListProps {
   user?: LoggedInUser;
+  memberships?: LoggedInUser['memberOf'];
   closeDrawer?(...args: unknown[]): unknown;
-  memberships?: {
-    id: number;
-    role: ReverseCompatibleMemberRole;
-    collective: GraphQLV1Collective;
-  }[];
 }
 
 const MembershipsList = ({ user, memberships, closeDrawer }: MembershipsListProps) => {

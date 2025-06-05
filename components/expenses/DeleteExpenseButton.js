@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { FormattedMessage } from 'react-intl';
 
@@ -38,18 +37,6 @@ const DeleteExpenseButton = ({ expense, onDelete, buttonProps, isDisabled, onMod
       )}
     </React.Fragment>
   );
-};
-
-DeleteExpenseButton.propTypes = {
-  isDisabled: PropTypes.bool,
-  expense: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    legacyId: PropTypes.number.isRequired,
-  }),
-  onDelete: PropTypes.func,
-  buttonProps: PropTypes.object,
-  /** Called when a modal is opened/closed with a boolean like (isOpen) */
-  onModalToggle: PropTypes.func,
 };
 
 export default DeleteExpenseButton;

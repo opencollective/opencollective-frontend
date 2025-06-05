@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -55,11 +54,6 @@ const TruncatedValueContainer = props => {
   );
 };
 
-TruncatedValueContainer.propTypes = {
-  selectProps: PropTypes.object,
-  children: PropTypes.node,
-};
-
 const REACT_SELECT_COMPONENT_OVERRIDE = {
   ValueContainer: TruncatedValueContainer,
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
@@ -90,12 +84,6 @@ const TransactionsPaymentMethodTypeFilter = ({ onChange, value, types, ...props 
       {...props}
     />
   );
-};
-
-TransactionsPaymentMethodTypeFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-  types: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default TransactionsPaymentMethodTypeFilter;

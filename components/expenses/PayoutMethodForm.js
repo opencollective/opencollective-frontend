@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
 import { compact, get, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
@@ -193,23 +192,6 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
       )}
     </div>
   );
-};
-
-PayoutMethodForm.propTypes = {
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  /** Set this to nil to create a new one */
-  payoutMethod: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.oneOf(Object.values(PayoutMethodType)).isRequired,
-    data: PropTypes.object,
-  }).isRequired,
-  /** Base name of the field in the form */
-  fieldsPrefix: PropTypes.string,
-  required: PropTypes.bool,
-  disabled: PropTypes.bool,
-  alwaysSave: PropTypes.bool,
 };
 
 export default React.memo(PayoutMethodForm);

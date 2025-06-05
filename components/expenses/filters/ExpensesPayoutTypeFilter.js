@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
@@ -22,11 +21,6 @@ const ExpensesPayoutTypeFilter = ({ onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-ExpensesPayoutTypeFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf(Object.values(PayoutMethodType)),
 };
 
 export default ExpensesPayoutTypeFilter;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -149,20 +148,6 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose = undefine
       </Box>
     </Box>
   );
-};
-
-CollectiveContactForm.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string,
-  }),
-  /* Defines whether this form is displayed as a modal */
-  isModal: PropTypes.bool,
-  /* Specifies close behaviour is this form is part of a modal */
-  onClose: PropTypes.func,
-  onChange: PropTypes.func,
 };
 
 export default CollectiveContactForm;

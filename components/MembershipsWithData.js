@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
@@ -13,17 +12,6 @@ import StyledButton from './StyledButton';
 const MEMBERSHIPS_PER_PAGE = 10;
 
 class MembershipsWithData extends React.Component {
-  static propTypes = {
-    memberCollectiveSlug: PropTypes.string,
-    orderBy: PropTypes.string,
-    limit: PropTypes.number,
-    onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object,
-    fetchMore: PropTypes.func,
-    refetch: PropTypes.func,
-    data: PropTypes.object,
-  };
-
   constructor(props) {
     super(props);
     this.fetchMore = this.fetchMore.bind(this);

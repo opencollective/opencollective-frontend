@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { FormattedMessage } from 'react-intl';
 
@@ -42,9 +41,3 @@ export const InviteCollectiveDropdownOption = ({ onClick, isSearching, expenseTy
     </StyledButton>
   </Flex>
 );
-
-InviteCollectiveDropdownOption.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  isSearching: PropTypes.bool,
-  expenseType: PropTypes.string,
-};

@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { compact, concat, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
@@ -41,35 +40,6 @@ import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
  * See design: https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/09.-Collectives?node-id=2338%3A36062
  */
 class CollectivePage extends Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    host: PropTypes.object,
-    financialContributors: PropTypes.arrayOf(PropTypes.object),
-    coreContributors: PropTypes.arrayOf(PropTypes.object),
-    topOrganizations: PropTypes.arrayOf(PropTypes.object),
-    topIndividuals: PropTypes.arrayOf(PropTypes.object),
-    tiers: PropTypes.arrayOf(PropTypes.object),
-    transactions: PropTypes.arrayOf(PropTypes.object),
-    conversations: PropTypes.object,
-    expenses: PropTypes.arrayOf(PropTypes.object),
-    updates: PropTypes.arrayOf(PropTypes.object),
-    events: PropTypes.arrayOf(PropTypes.object),
-    projects: PropTypes.arrayOf(PropTypes.object),
-    connectedCollectives: PropTypes.arrayOf(PropTypes.object),
-    LoggedInUser: PropTypes.object,
-    isAdmin: PropTypes.bool.isRequired,
-    isHostAdmin: PropTypes.bool.isRequired,
-    isRoot: PropTypes.bool.isRequired,
-    onPrimaryColorChange: PropTypes.func.isRequired,
-    stats: PropTypes.shape({
-      backers: PropTypes.shape({
-        all: PropTypes.number,
-      }),
-    }).isRequired,
-    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
-    refetch: PropTypes.func,
-  };
-
   constructor(props) {
     super(props);
     this.sectionCategoriesRefs = {}; // This will store a map of category => ref

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -132,14 +131,6 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
       </Container>
     </Container>
   );
-};
-
-CaseStudy.propTypes = {
-  bgImage: PropTypes.string,
-  name: PropTypes.string,
-  id: PropTypes.string,
-  logo: PropTypes.string,
-  learnMorePath: PropTypes.string,
 };
 
 const CaseStudies = () => {

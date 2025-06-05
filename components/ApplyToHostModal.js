@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
@@ -231,15 +230,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
       )}
     </Flex>
   );
-};
-
-ConfirmButtons.propTypes = {
-  onClose: PropTypes.func,
-  onBack: PropTypes.func,
-  onSubmit: PropTypes.func,
-  isSubmitting: PropTypes.bool,
-  canSubmit: PropTypes.bool,
-  isOSCHost: PropTypes.bool,
 };
 
 /**
@@ -663,16 +653,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
       )}
     </StyledModal>
   );
-};
-
-ApplyToHostModal.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  /** If not provided, the default is to ad a success toast and to call onClose */
-  onSuccess: PropTypes.func,
-  /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
-  collective: PropTypes.object,
-  router: PropTypes.object,
 };
 
 export default withRouter(ApplyToHostModal);

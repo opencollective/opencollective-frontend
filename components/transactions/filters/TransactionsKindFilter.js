@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { intersection, size } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -73,12 +72,6 @@ const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
       {...props}
     />
   );
-};
-
-TransactionsKindFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-  kinds: PropTypes.array,
 };
 
 export default TransactionsKindFilter;

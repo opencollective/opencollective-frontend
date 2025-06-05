@@ -1,12 +1,11 @@
+// Open Collective Frontend imports
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-// Open Collective Frontend imports
 import INTERVALS from '../../lib/constants/intervals';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { isTierExpired } from '../../lib/tier-utils';
@@ -107,59 +106,6 @@ const editTierMutation = gql`
  * See design: https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/OC.COM-07-%2F-Collectives?node-id=2587%3A39809
  */
 class TierPage extends Component {
-  static propTypes = {
-    /** The collective the tier belongs to */
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      currency: PropTypes.string,
-      type: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      backgroundImage: PropTypes.string,
-    }).isRequired,
-
-    /** The actual tier */
-    tier: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      idV2: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      interval: PropTypes.string,
-      currency: PropTypes.string,
-      endsAt: PropTypes.string,
-      button: PropTypes.string,
-      goal: PropTypes.number,
-      description: PropTypes.string,
-      longDescription: PropTypes.string,
-      videoUrl: PropTypes.string,
-      stats: PropTypes.shape({
-        totalRecurringDonations: PropTypes.number,
-        totalDonated: PropTypes.number,
-      }),
-    }).isRequired,
-
-    /** The contributors for this tier */
-    contributors: PropTypes.arrayOf(PropTypes.object),
-
-    /** Some statistics about this tier */
-    contributorsStats: PropTypes.shape({
-      all: PropTypes.number.isRequired,
-      collectives: PropTypes.number.isRequired,
-      organizations: PropTypes.number.isRequired,
-      users: PropTypes.number.isRequired,
-    }).isRequired,
-
-    redirect: PropTypes.string,
-
-    /** The logged in user */
-    LoggedInUser: PropTypes.object,
-
-    /** @ignore from `withRouter` */
-    router: PropTypes.object,
-  };
-
   renderShareBlock() {
     const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
     return (

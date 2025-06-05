@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
@@ -106,20 +105,6 @@ const params = {
 };
 
 class OnboardingModal extends React.Component {
-  static propTypes = {
-    step: PropTypes.string,
-    mode: PropTypes.string,
-    collective: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    editCollectiveMembers: PropTypes.func,
-    editCollectiveContact: PropTypes.func,
-    showOnboardingModal: PropTypes.bool,
-    data: PropTypes.object,
-    setShowOnboardingModal: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    router: PropTypes.object,
-  };
-
   constructor(props) {
     super(props);
 

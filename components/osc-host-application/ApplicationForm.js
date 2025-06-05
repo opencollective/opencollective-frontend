@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
@@ -804,31 +803,6 @@ const ApplicationForm = ({
       </Flex>
     </React.Fragment>
   );
-};
-
-ApplicationForm.propTypes = {
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  refetchLoggedInUser: PropTypes.func,
-  initialValues: PropTypes.object,
-  setInitialValues: PropTypes.func,
-  collective: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isAdmin: PropTypes.bool,
-    description: PropTypes.description,
-  }),
-  host: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string,
-    policies: PropTypes.object,
-  }),
-  popularTags: PropTypes.arrayOf(PropTypes.string),
-  loadingCollective: PropTypes.bool,
-  canApplyWithCollective: PropTypes.bool,
-  router: PropTypes.object,
 };
 
 export default withRouter(ApplicationForm);

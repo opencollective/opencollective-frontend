@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -176,13 +175,6 @@ const InviteMemberModal = props => {
       </StyledModal>
     </Container>
   );
-};
-
-InviteMemberModal.propTypes = {
-  collective: PropTypes.object,
-  cancelHandler: PropTypes.func,
-  intl: PropTypes.object.isRequired,
-  membersIds: PropTypes.array,
 };
 
 export default InviteMemberModal;

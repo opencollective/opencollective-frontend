@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
@@ -66,20 +65,6 @@ class ManageContributionsPage extends React.Component {
   static getInitialProps({ query: { slug } }) {
     return { slug };
   }
-
-  static propTypes = {
-    slug: PropTypes.string,
-    tab: PropTypes.string,
-    loadingLoggedInUser: PropTypes.bool,
-    LoggedInUser: PropTypes.object,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      account: PropTypes.object,
-    }), // from withData
-    intl: PropTypes.object,
-    router: PropTypes.object,
-  };
 
   constructor(props) {
     super(props);

@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
-import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Container from '../Container';
 import ScheduledExpensesBanner from '../dashboard/sections/expenses/ScheduledExpensesBanner';
@@ -26,51 +24,7 @@ import ExpensesList from './ExpensesList';
 
 const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
-interface ExpensesProps {
-  LoggedInUser?: LoggedInUser;
-  query?: {
-    type?: string;
-    tag?: string;
-    searchTerm?: string;
-    direction?: 'SUBMITTED' | 'RECEIVED';
-    orderBy?: string;
-  };
-  loading?: boolean;
-  error?: any;
-  refetch?(...args: unknown[]): unknown;
-  variables?: {
-    offset: number;
-    limit: number;
-    account?: object;
-    collectiveSlug?: string;
-  };
-  data?: {
-    account?: ComponentProps<typeof ExpenseInfoSidebar>['collective'] & {
-      id: string;
-      currency: string;
-      slug: string;
-      name?: string;
-      isArchived?: boolean;
-      isHost?: boolean;
-      host?: object;
-      expensesTags?: unknown[];
-      type?: unknown[];
-    };
-    expenses?: {
-      nodes?: unknown[];
-      totalCount?: number;
-      offset?: number;
-      limit?: number;
-    };
-    scheduledExpenses?: {
-      totalCount?: number;
-    };
-  };
-  isDashboard?: boolean;
-  onlySubmittedExpenses?: boolean;
-}
-
-const Expenses = (props: ExpensesProps) => {
+const Expenses = props => {
   const router = useRouter();
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 

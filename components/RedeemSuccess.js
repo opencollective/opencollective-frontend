@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -22,10 +21,6 @@ const CheckCircleIcon = styled(Check)`
 `;
 
 class RedeemSuccess extends React.Component {
-  static propTypes = {
-    email: PropTypes.string.isRequired,
-  };
-
   render() {
     const { email } = this.props;
 

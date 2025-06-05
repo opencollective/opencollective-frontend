@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -31,19 +30,6 @@ import { withUser } from './UserProvider';
  * ```
  */
 class AuthenticatedPage extends React.Component {
-  static propTypes = {
-    /** A child renderer to call when user is properly authenticated */
-    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-    /** Whether user can signup on this page */
-    disableSignup: PropTypes.bool,
-    /** Whether this page is limited to root users */
-    rootOnly: PropTypes.bool,
-    /** @ignore from withUser */
-    loadingLoggedInUser: PropTypes.bool,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-  };
-
   renderContent(loadingLoggedInUser, LoggedInUser) {
     if (!LoggedInUser) {
       return (

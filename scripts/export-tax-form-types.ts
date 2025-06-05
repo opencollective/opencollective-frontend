@@ -6,7 +6,7 @@
 
 import path from 'path';
 
-import ts from 'typescript';  
+import ts from 'typescript';
 
 const basePath = 'components/dashboard/sections/tax-information';
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -20,12 +19,6 @@ import { H1, P } from '../Text';
 import GithubRepositories from './GithubRepositories';
 
 class ConnectGithub extends React.Component {
-  static propTypes = {
-    router: PropTypes.object.isRequired,
-    setGithubInfo: PropTypes.func.isRequired,
-    nextDisabled: PropTypes.bool,
-  };
-
   constructor(props) {
     super(props);
 
