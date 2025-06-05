@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { saveAs } from 'file-saver';
 
 /**
@@ -6,6 +7,13 @@ import { saveAs } from 'file-saver';
  * saving...etc).
  */
 export default class FileDownloader extends React.Component {
+  static propTypes = {
+    filename: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    buildFetchParams: PropTypes.func,
+    children: PropTypes.func,
+  };
+
   static defaultProps = {
     buildFetchParams: () => {},
   };

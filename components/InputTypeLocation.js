@@ -1,4 +1,5 @@
 import React, { createRef, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
 import Geosuggest from '@ubilabs/react-geosuggest';
@@ -112,6 +113,15 @@ const GeoSuggestItem = styled(Geosuggest)`
 `;
 
 class InputTypeLocation extends React.Component {
+  static propTypes = {
+    value: PropTypes.object,
+    intl: PropTypes.object,
+    className: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    options: PropTypes.object,
+    placeholder: PropTypes.string,
+  };
+
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);

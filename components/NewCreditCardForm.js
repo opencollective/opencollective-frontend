@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
 import { isUndefined } from 'lodash';
 import { HelpCircle } from 'lucide-react';
@@ -27,6 +28,18 @@ const StyledCardElement = styled(CardElement)`
 `;
 
 class NewCreditCardFormWithoutStripe extends React.Component {
+  static propTypes = {
+    error: PropTypes.string,
+    hasSaveCheckBox: PropTypes.bool,
+    hidePostalCode: PropTypes.bool,
+    onChange: PropTypes.func,
+    onReady: PropTypes.func,
+    stripe: PropTypes.object,
+    stripeElements: PropTypes.object,
+    useLegacyCallback: PropTypes.bool,
+    defaultIsSaved: PropTypes.bool,
+  };
+
   static defaultProps = {
     hasSaveCheckBox: true,
     hidePostalCode: false,
@@ -159,5 +172,9 @@ const NewCreditCardForm = ({ useLegacyCallback = true, ...props }) => (
     )}
   </ElementsConsumer>
 );
+
+NewCreditCardForm.propTypes = {
+  useLegacyCallback: PropTypes.bool,
+};
 
 export default NewCreditCardForm;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
@@ -47,6 +48,28 @@ class UpdatePaymentPage extends React.Component {
   static getInitialProps({ query: { paymentMethodId } }) {
     return { paymentMethodId: parseInt(paymentMethodId) };
   }
+
+  static propTypes = {
+    paymentMethodId: PropTypes.number,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    intl: PropTypes.object.isRequired,
+    replaceCreditCard: PropTypes.func.isRequired,
+    loadStripe: PropTypes.func.isRequired,
+    data: PropTypes.shape({
+      refetch: PropTypes.func,
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      PaymentMethod: PropTypes.shape({
+        id: PropTypes.number,
+        orders: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.number,
+          }),
+        ),
+      }),
+    }),
+  };
 
   state = {
     showCreditCardForm: true,

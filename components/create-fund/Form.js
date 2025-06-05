@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -62,6 +63,17 @@ const messages = defineMessages({
 });
 
 class CreateFundForm extends React.Component {
+  static propTypes = {
+    error: PropTypes.string,
+    host: PropTypes.object,
+    loading: PropTypes.bool,
+    onSubmit: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    onChange: PropTypes.func,
+    github: PropTypes.object,
+    router: PropTypes.object.isRequired,
+  };
+
   render() {
     const { intl, error, host, loading } = this.props;
 

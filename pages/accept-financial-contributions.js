@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 
 import AcceptFinancialContributions from '../components/accept-financial-contributions/index.js';
@@ -15,6 +16,13 @@ class AcceptFinancialContributionsPage extends React.Component {
       slug: query.slug,
     };
   }
+
+  static propTypes = {
+    slug: PropTypes.string,
+    data: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    LoggedInUser: PropTypes.object,
+  };
 
   render() {
     const { data } = this.props;

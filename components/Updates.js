@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -8,6 +9,13 @@ import StyledUpdate from './StyledUpdate';
 import { P } from './Text';
 
 class Updates extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object,
+    updates: PropTypes.object,
+    loading: PropTypes.bool,
+    nbLoadingPlaceholders: PropTypes.number,
+  };
+
   render() {
     const { collective, updates, loading, nbLoadingPlaceholders } = this.props;
     return (

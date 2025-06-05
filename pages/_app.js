@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
 import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
@@ -61,6 +62,14 @@ if (typeof window === 'undefined') {
 }
 
 class OpenCollectiveFrontendApp extends App {
+  static propTypes = {
+    twoFactorAuthContext: PropTypes.object,
+    pageProps: PropTypes.object.isRequired,
+    scripts: PropTypes.object.isRequired,
+    locale: PropTypes.string,
+    messages: PropTypes.object,
+  };
+
   constructor() {
     super(...arguments);
     this.state = { hasError: false, errorEventId: undefined };

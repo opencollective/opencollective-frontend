@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -22,6 +23,26 @@ import { toast } from '../../ui/useToast';
 import { withUser } from '../../UserProvider';
 
 class UserSecurity extends React.Component {
+  static propTypes = {
+    /** From graphql query */
+    setPassword: PropTypes.func.isRequired,
+    /** From withUser */
+    LoggedInUser: PropTypes.shape({
+      isRoot: PropTypes.bool.isRequired,
+      hasPassword: PropTypes.bool.isRequired,
+      hasRole: PropTypes.func.isRequired,
+      email: PropTypes.string.isRequired,
+    }),
+    login: PropTypes.func.isRequired,
+    refetchLoggedInUser: PropTypes.func.isRequired,
+    data: PropTypes.shape({
+      individual: PropTypes.object,
+      loading: PropTypes.bool,
+    }),
+    /** From parent component */
+    slug: PropTypes.string,
+  };
+
   constructor(props) {
     super(props);
     this.state = {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
@@ -47,6 +48,28 @@ class RedeemPage extends React.Component {
       name: name?.trim(),
     };
   }
+
+  static propTypes = {
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
+    intl: PropTypes.object.isRequired, // from injectIntl
+    redeemPaymentMethod: PropTypes.func.isRequired, // from addRedeemPaymentMethodMutation
+    LoggedInUser: PropTypes.object, // from withUser
+    loadingLoggedInUser: PropTypes.bool, // from withUser
+    code: PropTypes.string,
+    name: PropTypes.string,
+    collectiveSlug: PropTypes.string,
+    email: PropTypes.string,
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      Collective: PropTypes.shape({
+        slug: PropTypes.string,
+        backgroundImageUrl: PropTypes.string,
+        imageUrl: PropTypes.string,
+        name: PropTypes.string,
+      }),
+    }),
+    router: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);

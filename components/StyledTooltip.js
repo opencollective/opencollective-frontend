@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
@@ -152,6 +153,31 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
  * @deprecated Use `ui/Tooltip` instead
  */
 class StyledTooltip extends React.Component {
+  static propTypes = {
+    /** Tooltip place */
+    place: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+    /** The popup content */
+    content: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    /** If using a node children, this defines the parent display type */
+    display: PropTypes.string,
+    /** Vertical alignment of the container */
+    containerVerticalAlign: PropTypes.string,
+    containerLineHeight: PropTypes.string,
+    containerCursor: PropTypes.string,
+    delayHide: PropTypes.number,
+    /** If true, children will be rendered directly, without any tooltip. Useful to build conditional tooltips */
+    noTooltip: PropTypes.bool,
+    /** If true, the arrow will be hidden */
+    noArrow: PropTypes.bool,
+    /** The component that will be used as a container for the children */
+    childrenContainer: PropTypes.any,
+    /** The trigger. Either:
+     *  - A render func, that gets passed props to set on the trigger
+     *  - A React node, rendered inside an div
+     */
+    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+  };
+
   static defaultProps = {
     type: 'dark',
     place: 'top',

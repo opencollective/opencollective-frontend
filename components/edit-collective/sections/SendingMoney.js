@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -12,6 +13,11 @@ import EditTransferWiseAccount from '../EditTransferWiseAccount';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 class SendingMoney extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object.isRequired,
+    editCollectiveSettings: PropTypes.func.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.state = {

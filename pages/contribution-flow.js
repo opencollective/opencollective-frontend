@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit } from 'lodash';
 import { withRouter } from 'next/router';
@@ -34,6 +35,25 @@ class NewContributionFlowPage extends React.Component {
       error: query.error,
     };
   }
+
+  static propTypes = {
+    collectiveSlug: PropTypes.string.isRequired,
+    tierId: PropTypes.number,
+    error: PropTypes.string,
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      account: PropTypes.object,
+      me: PropTypes.object,
+      tier: PropTypes.object,
+      refetch: PropTypes.func,
+    }), // from withData
+    intl: PropTypes.object,
+    loadStripe: PropTypes.func,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    router: PropTypes.object,
+  };
 
   componentDidMount() {
     this.loadExternalScripts();

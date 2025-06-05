@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -16,6 +17,23 @@ import { Button } from '../ui/Button';
 import SettingsSectionTitle from './sections/SettingsSectionTitle';
 
 class EditUserEmailForm extends React.Component {
+  static propTypes = {
+    // From withData: A function to call to update user
+    updateUserEmail: PropTypes.func.isRequired,
+
+    // from withUser
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      LoggedInUser: PropTypes.shape({
+        email: PropTypes.string.isRequired,
+        emailWaitingForValidation: PropTypes.string,
+      }),
+      updateUserEmail: PropTypes.shape({
+        emailWaitingForValidation: PropTypes.string,
+      }),
+    }).isRequired,
+  };
+
   state = {
     step: 'initial',
     newEmail: null,

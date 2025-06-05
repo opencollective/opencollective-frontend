@@ -1,10 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
 import Container from './Container';
 import Response from './Response';
 
 class Responses extends React.Component {
+  static propTypes = {
+    responses: PropTypes.arrayOf(PropTypes.object).isRequired,
+  };
+
   render() {
     const { responses } = this.props;
     if (!responses || responses.length === 0) {

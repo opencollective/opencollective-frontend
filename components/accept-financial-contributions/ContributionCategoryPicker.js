@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -40,6 +41,12 @@ const independentCollectiveMoreInfo =
 const applyFiscalHostMoreInfo = 'https://opencollective.com/fiscal-hosting';
 
 class ContributionCategoryPicker extends React.Component {
+  static propTypes = {
+    router: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    collective: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
 

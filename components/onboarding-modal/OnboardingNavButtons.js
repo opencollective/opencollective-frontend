@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -26,6 +27,16 @@ const params = {
 };
 
 class OnboardingNavButtons extends React.Component {
+  static propTypes = {
+    step: PropTypes.number,
+    slug: PropTypes.string,
+    mode: PropTypes.string,
+    loading: PropTypes.bool,
+    viewport: PropTypes.object,
+    handleSubmit: PropTypes.func,
+    router: PropTypes.object,
+  };
+
   getStepParams = (step, param) => {
     return params[step][param];
   };

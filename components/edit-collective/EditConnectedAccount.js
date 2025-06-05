@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import * as Sentry from '@sentry/browser';
 import { capitalize, pick } from 'lodash';
@@ -18,6 +19,16 @@ import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
 class EditConnectedAccount extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object.isRequired,
+    options: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+    service: PropTypes.string,
+    connectedAccount: PropTypes.object,
+    router: PropTypes.object,
+    client: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.state = { isConnecting: false, isDisconnecting: false };

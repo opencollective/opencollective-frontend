@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { Plus, Trash } from 'lucide-react';
@@ -26,6 +27,18 @@ const BORDER = '1px solid #efefef';
 const getInterpolationOption = value => ({ label: startCase(value), value });
 const INTERPOLATION_OPTIONS = ['auto', 'logarithm', 'linear'].map(getInterpolationOption);
 class CollectiveGoals extends React.Component {
+  static propTypes = {
+    collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      slug: PropTypes.string.isRequired,
+      settings: PropTypes.object,
+    }).isRequired,
+    currency: PropTypes.string.isRequired,
+    intl: PropTypes.object.isRequired,
+    editCollectiveSettings: PropTypes.func.isRequired,
+    title: PropTypes.string,
+  };
+
   constructor(props) {
     super(props);
     const { intl, collective } = props;

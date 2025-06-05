@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Router from 'next/router';
 import { defineMessages, injectIntl } from 'react-intl';
 
@@ -12,6 +13,12 @@ import { IgnorableError } from '../lib/errors';
  * See `lib/hooks/warnIfUnsavedChanges.ts` for the hook version of this component.
  */
 class WarnIfUnsavedChanges extends React.Component {
+  static propTypes = {
+    hasUnsavedChanges: PropTypes.bool,
+    children: PropTypes.node,
+    intl: PropTypes.object,
+  };
+
   componentDidMount() {
     window.addEventListener('beforeunload', this.beforeunload);
     Router.router.events.on('routeChangeStart', this.routeChangeStart);

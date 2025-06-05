@@ -1,9 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Container from './Container';
 import EventSponsorCard from './EventSponsorCard';
 
 class Sponsors extends React.Component {
+  static propTypes = {
+    sponsors: PropTypes.arrayOf(PropTypes.object).isRequired,
+  };
+
   constructor(props) {
     super(props);
   }

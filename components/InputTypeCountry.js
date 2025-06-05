@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -13,6 +14,34 @@ import StyledSelect from './StyledSelect';
 import { Span } from './Text';
 
 class InputTypeCountry extends Component {
+  static propTypes = {
+    /** The id of the search input */
+    inputId: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    name: PropTypes.string,
+    /** To force a specific locale */
+    locale: PropTypes.string,
+    fontSize: PropTypes.string,
+    defaultValue: PropTypes.string,
+    /** Use this to control the component state */
+    value: PropTypes.string,
+    /** Switch between display modes */
+    mode: PropTypes.oneOf(['select', 'underlined']),
+    /** If true, we'll try to autodetect country form the IP */
+    autoDetect: PropTypes.bool,
+    /** From injectIntl */
+    intl: PropTypes.object.isRequired,
+    /** Is this input required? */
+    required: PropTypes.bool,
+    /** Custom options **/
+    customOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.node,
+        value: PropTypes.any,
+      }),
+    ),
+  };
+
   static defaultProps = { name: 'country', customOptions: [], fontSize: '14px' };
 
   constructor(props) {

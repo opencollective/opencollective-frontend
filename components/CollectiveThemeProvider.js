@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { clamp, get, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { darken, getContrast, getLuminance, setLightness } from 'polished';
@@ -15,6 +16,17 @@ import DefaultPaletteStyle from './DefaultPaletteStyle';
  * from `collective.settings.collectivePage.primaryColor`.
  */
 export default class CollectiveThemeProvider extends React.PureComponent {
+  static propTypes = {
+    children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+    collective: PropTypes.shape({
+      settings: PropTypes.shape({
+        collectivePage: PropTypes.shape({
+          primaryColor: PropTypes.string,
+        }),
+      }),
+    }),
+  };
+
   state = { newPrimaryColor: null };
 
   /**

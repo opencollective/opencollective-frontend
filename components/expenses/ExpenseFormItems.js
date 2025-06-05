@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { filter, isEmpty, range, some } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -29,6 +30,28 @@ import ExpenseItemForm from './ExpenseItemForm';
 const filesListToItems = (files, expenseCurrency) => files.map(({ url }) => newExpenseItem({ url }, expenseCurrency));
 
 class ExpenseFormItems extends React.PureComponent {
+  static propTypes = {
+    collective: PropTypes.object,
+    /** @ignore from injectIntl */
+    intl: PropTypes.object,
+    /** Array helper as provided by formik */
+    push: PropTypes.func.isRequired,
+    /** Array helper as provided by formik */
+    remove: PropTypes.func.isRequired,
+    hasOCRFeature: PropTypes.bool,
+    /** Formik */
+    form: PropTypes.shape({
+      values: PropTypes.object.isRequired,
+      touched: PropTypes.object,
+      errors: PropTypes.object,
+      setFieldValue: PropTypes.func,
+      setFieldTouched: PropTypes.func,
+    }).isRequired,
+    expense: PropTypes.shape({
+      lockedFields: PropTypes.arrayOf(PropTypes.string),
+    }),
+  };
+
   componentDidMount() {
     const { values } = this.props.form;
     if ([expenseTypes.INVOICE, expenseTypes.GRANT].includes(values.type)) {

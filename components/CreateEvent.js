@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -22,6 +23,14 @@ import StyledButton from './StyledButton';
 import { withUser } from './UserProvider';
 
 class CreateEvent extends React.Component {
+  static propTypes = {
+    parentCollective: PropTypes.object,
+    createCollective: PropTypes.func,
+    LoggedInUser: PropTypes.object, // from withUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
+    router: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
     const timezone = dayjs.tz.guess();

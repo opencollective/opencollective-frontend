@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
@@ -18,6 +19,19 @@ class ConfirmOrderPage extends React.Component {
   static getInitialProps({ query }) {
     return { id: parseInt(query.id) };
   }
+
+  static propTypes = {
+    /** OrderId */
+    id: PropTypes.number.isRequired,
+    /** @ignore from graphql */
+    confirmOrder: PropTypes.func.isRequired,
+    /** @ignore from withUser */
+    loadingLoggedInUser: PropTypes.bool.isRequired,
+    /** @ignore from withUser */
+    LoggedInUser: PropTypes.object,
+    /** @ignore from withRouter */
+    router: PropTypes.object,
+  };
 
   state = {
     status: ConfirmOrderPage.SUBMITTING,

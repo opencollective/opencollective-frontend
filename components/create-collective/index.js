@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -17,6 +18,25 @@ import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 import CreateCollectiveForm from './CreateCollectiveForm';
 
 class CreateCollective extends Component {
+  static propTypes = {
+    host: PropTypes.object,
+    intl: PropTypes.object,
+    LoggedInUser: PropTypes.object, // from withUser
+    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
+    router: PropTypes.object.isRequired, // from withRouter
+    createCollective: PropTypes.func.isRequired, // addCreateCollectiveMutation
+    data: PropTypes.shape({
+      // from addTagStatsQuery
+      tagStats: PropTypes.shape({
+        nodes: PropTypes.arrayOf(
+          PropTypes.shape({
+            tag: PropTypes.string,
+          }),
+        ),
+      }),
+    }),
+  };
+
   constructor(props) {
     super(props);
 

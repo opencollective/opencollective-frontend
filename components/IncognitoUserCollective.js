@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import Footer from './navigation/Footer';
@@ -9,6 +10,11 @@ import Header from './Header';
 import { H1 } from './Text';
 
 class IncognitoUserCollective extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object,
+    intl: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.messages = defineMessages({

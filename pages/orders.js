@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
 
@@ -13,6 +14,17 @@ class OrdersPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
     return { slug: collectiveSlug, filter, value };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addCollectiveNavbarData
+    filter: PropTypes.string,
+    value: PropTypes.string,
+    data: PropTypes.shape({
+      account: PropTypes.object,
+      loading: PropTypes.bool,
+    }).isRequired, // from withData
+    LoggedInUser: PropTypes.object,
+  };
 
   render() {
     const { slug, data, LoggedInUser } = this.props;

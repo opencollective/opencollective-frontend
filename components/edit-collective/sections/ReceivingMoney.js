@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { has } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -14,6 +15,10 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const { USER } = CollectiveType;
 
 class ReceivingMoney extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object.isRequired,
+  };
+
   state = {
     hideTopsection: false,
   };

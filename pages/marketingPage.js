@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
 
 import languages from '../lib/constants/locales';
@@ -36,6 +37,12 @@ class MarketingPage extends React.Component {
   static getInitialProps({ query: { pageSlug } }) {
     return { pageSlug };
   }
+
+  static propTypes = {
+    LoggedInUser: PropTypes.object,
+    pageSlug: PropTypes.string.isRequired,
+    intl: PropTypes.object.isRequired,
+  };
 
   async componentDidMount() {
     this.loadScripts();

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
@@ -124,6 +125,62 @@ class ConversationPage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id } }) {
     return { collectiveSlug, id };
   }
+
+  static propTypes = {
+    /** @ignore from getInitialProps */
+    collectiveSlug: PropTypes.string.isRequired,
+    /** @ignore from getInitialProps */
+    id: PropTypes.string.isRequired,
+    /** @ignore from withApollo */
+    client: PropTypes.object.isRequired,
+    /** @ignore from withUser */
+    LoggedInUser: PropTypes.object,
+    /** @ignore from apollo */
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      refetch: PropTypes.func,
+      fetchMore: PropTypes.func,
+      account: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        description: PropTypes.string,
+        type: PropTypes.string.isRequired,
+        twitterHandle: PropTypes.string,
+        imageUrl: PropTypes.string,
+        conversationsTags: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+            tag: PropTypes.string,
+          }),
+        ),
+      }),
+      conversation: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        tags: PropTypes.arrayOf(PropTypes.string),
+        body: PropTypes.shape({
+          id: PropTypes.string,
+        }),
+        comments: PropTypes.shape({
+          nodes: PropTypes.arrayOf(
+            PropTypes.shape({
+              id: PropTypes.string,
+            }),
+          ),
+        }),
+        followers: PropTypes.shape({
+          totalCount: PropTypes.number,
+          nodes: PropTypes.arrayOf(
+            PropTypes.shape({
+              id: PropTypes.string,
+            }),
+          ),
+        }),
+      }),
+    }).isRequired, // from withData
+    router: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);

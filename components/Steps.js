@@ -1,10 +1,35 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { findLastIndex } from 'lodash';
 
 /**
  * A stepper component to manage state and validations for multi-steps processes.
  */
 export default class Steps extends React.Component {
+  static propTypes = {
+    /** The steps list */
+    steps: PropTypes.arrayOf(
+      PropTypes.shape({
+        /** The step name, **must be unique**. */
+        name: PropTypes.string.isRequired,
+        /** A function triggered when leaving the step. Return false to abort. */
+        validate: PropTypes.func,
+        /** A boolean indicating if the step has been completed */
+        isCompleted: PropTypes.bool,
+      }),
+    ).isRequired,
+    /** The current step name. The step must be present in `steps` */
+    currentStepName: PropTypes.string.isRequired,
+    /** Called to change step */
+    onStepChange: PropTypes.func.isRequired,
+    /** Called when the last step is submitted */
+    onComplete: PropTypes.func.isRequired,
+    /** A function that gets passed everything needed to show the current step */
+    children: PropTypes.func.isRequired,
+    /** If false on initial mount, the check for steps completion (and thus the redirect) will be delayed until the flag becomes true */
+    delayCompletionCheck: PropTypes.bool.isRequired,
+  };
+
   state = {
     /** A set of visited steps */
     visited: new Set([]),

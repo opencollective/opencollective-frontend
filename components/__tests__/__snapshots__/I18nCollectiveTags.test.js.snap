@@ -1,37 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`I18nCollectiveTags can ignore untranslated 1`] = `
-[
-  "Open source, ",
-  "Meetup",
-]
+<div>
+  Open source, 
+  Meetup
+</div>
 `;
 
 exports[`I18nCollectiveTags can provide a custom renderer 1`] = `
-[
+<div>
   <div>
     HelloWorld
      is 
     untranslated
-  </div>,
+  </div>
   <div>
     Meetup
      is 
     translated
-  </div>,
-]
+  </div>
+</div>
 `;
 
-exports[`I18nCollectiveTags renders a list of tag 1`] = `"Open source"`;
+exports[`I18nCollectiveTags renders a list of tag 1`] = `
+<div>
+  Open source
+</div>
+`;
 
 exports[`I18nCollectiveTags renders a list of tag 2`] = `
-[
-  "not translated, ",
-  "Open source, ",
-  "Meetup",
-]
+<div>
+  not translated, 
+  Open source, 
+  Meetup
+</div>
 `;
 
-exports[`I18nCollectiveTags renders a single tag 1`] = `"Open source"`;
+exports[`I18nCollectiveTags renders a single tag 1`] = `
+<div>
+  Open source
+</div>
+`;
 
-exports[`I18nCollectiveTags renders a single tag 2`] = `"not translated"`;
+exports[`I18nCollectiveTags renders a single tag 2`] = `
+<div>
+  not translated
+</div>
+`;

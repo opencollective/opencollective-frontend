@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Head from 'next/head';
 import styled from 'styled-components';
 
@@ -79,6 +80,14 @@ class CollectivesIframe extends React.Component {
     }
     return { collectiveSlug, id, role, orderBy, limit: Number(limit) };
   }
+
+  static propTypes = {
+    collectiveSlug: PropTypes.string,
+    id: PropTypes.number,
+    role: PropTypes.string,
+    limit: PropTypes.number,
+    orderBy: PropTypes.string,
+  };
 
   onChange = change => {
     if (!change) {

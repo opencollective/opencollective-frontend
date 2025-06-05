@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
@@ -48,12 +49,34 @@ const GiftCardStatus = ({ isConfirmed, collective, data }) => {
   }
 };
 
+GiftCardStatus.propTypes = {
+  isConfirmed: PropTypes.bool,
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+    name: PropTypes.string,
+  }),
+  data: PropTypes.shape({
+    email: PropTypes.string,
+  }),
+};
+
 /**
  * Render GiftCard details like its status (claimed or not), who claimed it,
  * when was it created... It is not meant to be show to all users, but just to
  * the organizations that create the gift cards.
  */
 class GiftCardDetails extends React.Component {
+  static propTypes = {
+    /** The gift card, which is actually a PaymentMethod */
+    giftCard: PropTypes.object.isRequired,
+    /** Collective slug */
+    collectiveSlug: PropTypes.string.isRequired,
+    /** @ignore Provided by styled-component withTheme(...) */
+    theme: PropTypes.object,
+    /** @ignore Provided by injectIntl */
+    intl: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
     this.state = { expended: false };

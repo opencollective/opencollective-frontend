@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../lib/utils';
@@ -12,6 +13,17 @@ import { withUser } from './UserProvider';
  * If user is currently loggin in, button will be disabled and will show a spinner.
  */
 class LoginBtn extends React.Component {
+  static propTypes = {
+    /**
+     * Login button label. Default: "Sign In"
+     */
+    children: PropTypes.node,
+    loadingLoggedInUser: PropTypes.bool,
+    asLink: PropTypes.bool,
+    className: PropTypes.string,
+    whitelabel: PropTypes.object,
+  };
+
   static defaultProps = {
     children: null,
   };

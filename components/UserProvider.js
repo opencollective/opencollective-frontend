@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash';
@@ -25,6 +26,16 @@ export const UserContext = React.createContext({
 });
 
 class UserProvider extends React.Component {
+  static propTypes = {
+    getLoggedInUser: PropTypes.func.isRequired,
+    twoFactorAuthPrompt: PropTypes.object,
+    router: PropTypes.object,
+    client: PropTypes.object,
+    children: PropTypes.node,
+    intl: PropTypes.object,
+    initialLoggedInUser: PropTypes.object,
+  };
+
   state = {
     loadingLoggedInUser: this.props.initialLoggedInUser ? false : true,
     LoggedInUser: this.props.initialLoggedInUser,

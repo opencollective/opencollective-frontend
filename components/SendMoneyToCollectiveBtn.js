@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -13,6 +14,21 @@ import { toast } from './ui/useToast';
 import { Flex } from './Grid';
 
 class SendMoneyToCollectiveBtn extends React.Component {
+  static propTypes = {
+    amount: PropTypes.number.isRequired,
+    currency: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    fromCollective: PropTypes.object.isRequired,
+    toCollective: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
+    data: PropTypes.object,
+    sendMoneyToCollective: PropTypes.func,
+    confirmTransfer: PropTypes.func,
+    isTransferApproved: PropTypes.bool,
+    customButton: PropTypes.function,
+  };
+
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);

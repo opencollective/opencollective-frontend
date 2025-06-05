@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -31,6 +32,24 @@ export const conversationsSectionQuery = gql`
  * Conversations section.
  */
 class SectionConversations extends React.PureComponent {
+  static propTypes = {
+    /** Collective */
+    collective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }).isRequired,
+
+    /** Conversations */
+    data: PropTypes.shape({
+      account: PropTypes.shape({
+        conversations: PropTypes.shape({
+          totalCount: PropTypes.number,
+          nodes: PropTypes.arrayOf(PropTypes.object),
+        }),
+      }),
+    }),
+  };
+
   render() {
     const { collective, data } = this.props;
     const conversations = get(data, 'account.conversations', {});

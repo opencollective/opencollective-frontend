@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { ArrowForward } from '@styled-icons/material/ArrowForward';
 import styled, { css } from 'styled-components';
@@ -53,6 +54,21 @@ const ArrowContainer = styled(StyledRoundButton)`
  * carets to navigate easily.
  */
 class HorizontalScroller extends React.PureComponent {
+  static propTypes = {
+    /* Children component */
+    children: PropTypes.node.isRequired,
+    /** Container component where the list (children) will be inserted */
+    container: PropTypes.elementType,
+    /** Passed to `container` */
+    containerProps: PropTypes.object,
+    /** Callback to get the scrolled distance when we click on prev/next controllers */
+    getScrollDistance: PropTypes.func,
+    /** @ignore from withViewport */
+    width: PropTypes.number,
+    /** Set the top position of the arrows. Defaults 50% */
+    controlsTopPosition: PropTypes.number,
+  };
+
   constructor(props) {
     super(props);
     this.ref = React.createRef();

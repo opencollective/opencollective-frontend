@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -14,6 +15,12 @@ import { H1, H2, P } from '../Text';
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
 class SuccessPage extends React.Component {
+  static propTypes = {
+    chosenHost: PropTypes.object,
+    collective: PropTypes.object.isRequired,
+    router: PropTypes.object.isRequired,
+  };
+
   render() {
     const { collective, chosenHost, router } = this.props;
     const { path } = router.query;

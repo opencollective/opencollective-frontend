@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
@@ -65,6 +66,30 @@ const TextArea = styled.textarea`
  * @deprecated Use `ui/Textarea` instead
  */
 export default class StyledTextarea extends React.PureComponent {
+  static propTypes = {
+    onChange: PropTypes.func,
+    /** If true, the component will update its size based on its content */
+    autoSize: PropTypes.bool,
+    /** styled-system prop: accepts any css 'border' value */
+    border: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** styled-system prop: accepts any css 'border-color' value */
+    borderColor: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** styled-system prop: accepts any css 'border-radius' value */
+    borderRadius: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** If not provided, the value will be set to `none` if `autoSize` is true, `vertical` otherwise */
+    resize: PropTypes.oneOf(['vertical', 'horizontal', 'both', 'none']),
+    /** If true, max text length will be displayed at the bottom right */
+    showCount: PropTypes.bool,
+    /** if true, a default outline will be displayed when focused */
+    withOutline: PropTypes.bool,
+    /** If truthy, the outline will be red */
+    error: PropTypes.any,
+    /** @ignore */
+    px: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    /** @ignore */
+    py: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  };
+
   static defaultProps = {
     border: '1px solid',
     borderColor: 'black.300',

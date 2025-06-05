@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
@@ -105,6 +106,20 @@ const params = {
 };
 
 class OnboardingModal extends React.Component {
+  static propTypes = {
+    step: PropTypes.string,
+    mode: PropTypes.string,
+    collective: PropTypes.object,
+    LoggedInUser: PropTypes.object,
+    editCollectiveMembers: PropTypes.func,
+    editCollectiveContact: PropTypes.func,
+    showOnboardingModal: PropTypes.bool,
+    data: PropTypes.object,
+    setShowOnboardingModal: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    router: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
 
@@ -269,7 +284,7 @@ class OnboardingModal extends React.Component {
         ) : (
           <React.Fragment>
             {showOnboardingModal && (
-              <ResponsiveModal usePortal={false} width="576px" minHeight="456px" onClose={this.onClose}>
+              <ResponsiveModal usePortal={false} width="576px" minHeight="456px" onClose={this.onClose} trapFocus>
                 <ResponsiveModalHeader onClose={this.onClose}>
                   <Flex flexDirection="column" alignItems="center" width="100%">
                     <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>

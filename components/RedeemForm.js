@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -15,6 +16,16 @@ const Description = styled(P)`
 `;
 
 class RedeemForm extends React.Component {
+  static propTypes = {
+    intl: PropTypes.object.isRequired,
+    code: PropTypes.string,
+    email: PropTypes.string,
+    name: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    onChange: PropTypes.func.isRequired,
+  };
+
   static getDerivedStateFromProps(nextProps, nextState) {
     const { LoggedInUser } = nextProps;
     const code = nextState.form.code || nextProps.code;

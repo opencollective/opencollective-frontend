@@ -2,21 +2,21 @@
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        maxLength={100}
-        minLength={10}
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={true}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div>
+        <input
+          font-size="14px"
+          id="input-myAttribute"
+          maxlength="100"
+          minlength="10"
+          name="myAttribute"
+          required=""
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -24,21 +24,21 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on nested field 1`] = `
 <div>
-  <div
-    data-cy="InputField-my.nested.attribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-my.nested.attribute"
-        maxLength={100}
-        minLength={10}
-        name="my.nested.attribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={true}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-my.nested.attribute"
+    >
+      <div>
+        <input
+          font-size="14px"
+          id="input-my.nested.attribute"
+          maxlength="100"
+          minlength="10"
+          name="my.nested.attribute"
+          required=""
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -46,19 +46,18 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on nullable field 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={false}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div>
+        <input
+          font-size="14px"
+          id="input-myAttribute"
+          name="myAttribute"
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -66,21 +65,21 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on number field 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        max={100}
-        min={10}
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={true}
-        type="number"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div>
+        <input
+          font-size="14px"
+          id="input-myAttribute"
+          max="100"
+          min="10"
+          name="myAttribute"
+          required=""
+          type="number"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -88,19 +87,18 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on optional field 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={false}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div>
+        <input
+          font-size="14px"
+          id="input-myAttribute"
+          name="myAttribute"
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -108,17 +106,17 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField renders default options 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div>
+        <input
+          font-size="14px"
+          id="input-myAttribute"
+          name="myAttribute"
+        />
+      </div>
     </div>
   </div>
 </div>

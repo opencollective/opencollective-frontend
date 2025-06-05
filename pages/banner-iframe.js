@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash';
@@ -219,6 +220,14 @@ class BannerIframe extends React.Component {
 
     return { collectiveSlug, id, style, useNewFormat: parseToBoolean(useNewFormat) };
   }
+
+  static propTypes = {
+    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveBannerIframeData
+    id: PropTypes.string, // from getInitialProps
+    style: PropTypes.string, // from getInitialProps
+    data: PropTypes.object.isRequired, // from withData
+    useNewFormat: PropTypes.bool,
+  };
 
   componentDidMount() {
     this.onSizeUpdate();

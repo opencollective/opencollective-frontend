@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
@@ -77,6 +78,16 @@ const messages = defineMessages({
 const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
 
 class CreateCollectiveForm extends React.Component {
+  static propTypes = {
+    error: PropTypes.string,
+    host: PropTypes.object,
+    loading: PropTypes.bool,
+    onSubmit: PropTypes.func,
+    intl: PropTypes.object.isRequired,
+    loggedInUser: PropTypes.object,
+    popularTags: PropTypes.arrayOf(PropTypes.string),
+  };
+
   hasHostTerms() {
     if (!this.props.host) {
       return false;

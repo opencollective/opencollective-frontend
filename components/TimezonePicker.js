@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import timezones from '../lib/constants/timezones';
 
@@ -7,6 +8,12 @@ import StyledSelect from './StyledSelect';
 import { P } from './Text';
 
 class TimezonePicker extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.func,
+    label: PropTypes.string,
+    selectedTimezone: PropTypes.string,
+  };
+
   constructor(props) {
     super(props);
     this.handleTimezoneChange = this.handleTimezoneChange.bind(this);

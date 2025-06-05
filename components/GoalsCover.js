@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { debounce, get, maxBy, sortBy, truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -141,6 +142,12 @@ const BarContainer = styled.div`
 `;
 
 class GoalsCover extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object.isRequired,
+    interpolation: PropTypes.oneOf(['linear', 'logarithm', 'auto']),
+    intl: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.renderGoal = this.renderGoal.bind(this);

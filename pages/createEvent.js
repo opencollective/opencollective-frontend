@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 
 import { legacyCollectiveQuery } from '../lib/graphql/v1/queries';
@@ -13,6 +14,12 @@ class CreateEventPage extends React.Component {
 
     return { slug: parentCollectiveSlug, scripts };
   }
+
+  static propTypes = {
+    slug: PropTypes.string, // for addLegacyCollectiveData
+    data: PropTypes.object.isRequired, // from withData
+    loadingLoggedInUser: PropTypes.bool,
+  };
 
   constructor(props) {
     super(props);

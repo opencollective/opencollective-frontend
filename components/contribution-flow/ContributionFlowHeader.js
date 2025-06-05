@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -11,6 +12,26 @@ import { withUser } from '../UserProvider';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
 
 class NewContributionFlowHeader extends React.Component {
+  static propTypes = {
+    collective: PropTypes.shape({
+      slug: PropTypes.string,
+      currency: PropTypes.string,
+      name: PropTypes.string,
+      contributors: PropTypes.shape({
+        totalCount: PropTypes.number,
+        nodes: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+            name: PropTypes.string,
+          }),
+        ),
+      }),
+    }).isRequired,
+    LoggedInUser: PropTypes.object,
+    intl: PropTypes.object,
+    isEmbed: PropTypes.bool,
+  };
+
   render() {
     const { collective, isEmbed } = this.props;
     const contributors = collective.contributors?.nodes;

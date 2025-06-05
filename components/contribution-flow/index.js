@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
@@ -124,6 +125,36 @@ const validateNewOrg = values => {
 };
 
 class ContributionFlow extends React.Component {
+  static propTypes = {
+    collective: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      currency: PropTypes.string.isRequired,
+      platformContributionAvailable: PropTypes.bool,
+      parent: PropTypes.shape({
+        slug: PropTypes.string,
+      }),
+    }).isRequired,
+    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
+    host: PropTypes.object.isRequired,
+    tier: PropTypes.object,
+    intl: PropTypes.object,
+    createOrder: PropTypes.func.isRequired,
+    confirmOrder: PropTypes.func.isRequired,
+    loadingLoggedInUser: PropTypes.bool,
+    isEmbed: PropTypes.bool,
+    error: PropTypes.string,
+    /** @ignore from withUser */
+    refetchLoggedInUser: PropTypes.func,
+    /** @ignore from withUser */
+    LoggedInUser: PropTypes.object,
+    createCollective: PropTypes.func.isRequired, // from mutation
+    router: PropTypes.object,
+    onStepChange: PropTypes.func,
+    onSuccess: PropTypes.func,
+  };
+
   constructor(props) {
     super(props);
     this.mainContainerRef = React.createRef();

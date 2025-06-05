@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -42,6 +43,48 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
  * re-renders when scrolling.
  */
 class SectionContribute extends React.PureComponent {
+  static propTypes = {
+    tiers: PropTypes.arrayOf(PropTypes.object),
+    events: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        contributors: PropTypes.arrayOf(PropTypes.object),
+      }),
+    ),
+    connectedCollectives: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        collective: PropTypes.shape({
+          id: PropTypes.number.isRequired,
+        }),
+      }),
+    ),
+    collective: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      isActive: PropTypes.bool,
+      isHost: PropTypes.bool,
+      host: PropTypes.object,
+      currency: PropTypes.string,
+      settings: PropTypes.object,
+      parentCollective: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
+      name: PropTypes.string,
+    }),
+    contributorsStats: PropTypes.object,
+    contributors: PropTypes.arrayOf(
+      PropTypes.shape({
+        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
+        isBacker: PropTypes.bool,
+        tiersIds: PropTypes.arrayOf(PropTypes.number),
+      }),
+    ),
+    isAdmin: PropTypes.bool,
+    editAccountSettings: PropTypes.func.isRequired,
+  };
+
   state = {
     showTiersAdmin: false,
     isSaving: false,

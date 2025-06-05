@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -48,6 +49,15 @@ const validateInstructions = instructions => {
 };
 
 class UpdateBankDetailsForm extends React.Component {
+  static propTypes = {
+    intl: PropTypes.object.isRequired,
+    profileType: PropTypes.string, // USER or ORGANIZATION
+    value: PropTypes.string,
+    onChange: PropTypes.func,
+    useStructuredForm: PropTypes.bool,
+    bankAccount: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
     this.state = { instructions: props.value || '', errors: [] };

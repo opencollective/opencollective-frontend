@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -40,6 +41,14 @@ const EditCollectiveHostSection = styled.div`
 `;
 
 class Host extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object.isRequired,
+    LoggedInUser: PropTypes.object.isRequired,
+    editCollectiveMutation: PropTypes.func.isRequired,
+    router: PropTypes.object.isRequired, // from withRouter
+    intl: PropTypes.object.isRequired, // from injectIntl
+  };
+
   constructor(props) {
     super(props);
     this.changeHost = this.changeHost.bind(this);

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import Avatar from './Avatar';
@@ -6,6 +7,11 @@ import Container from './Container';
 import LinkCollective from './LinkCollective';
 
 class Response extends React.Component {
+  static propTypes = {
+    response: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.messages = defineMessages({

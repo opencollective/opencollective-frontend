@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import { Form, Formik } from 'formik';
@@ -63,6 +64,17 @@ const ImageSizingContainer = styled(Container)`
 `;
 
 class AcceptContributionsOurselvesOrOrg extends React.Component {
+  static propTypes = {
+    collective: PropTypes.object,
+    router: PropTypes.object,
+    LoggedInUser: PropTypes.object.isRequired,
+    editBankAccount: PropTypes.func,
+    refetchLoggedInUser: PropTypes.func,
+    createPayoutMethod: PropTypes.func,
+    applyToHost: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
+  };
+
   constructor(props) {
     super(props);
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { get, isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -25,6 +26,11 @@ const Label = ({ label, isPrivate }) => (
     {label}&nbsp;{isPrivate && <PrivateInfoIcon />}
   </label>
 );
+
+Label.propTypes = {
+  label: PropTypes.node,
+  isPrivate: PropTypes.bool,
+};
 
 function FieldGroup({ label, help, pre, post, after, button, className, isPrivate, ...props }) {
   const validationState = props.validationState === 'error' ? 'error' : null;
@@ -85,6 +91,20 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
   }
 }
 
+FieldGroup.propTypes = {
+  key: PropTypes.string,
+  name: PropTypes.string,
+  label: PropTypes.string,
+  help: PropTypes.string,
+  pre: PropTypes.string,
+  post: PropTypes.string,
+  after: PropTypes.string,
+  button: PropTypes.node,
+  className: PropTypes.string,
+  isPrivate: PropTypes.bool,
+  validationState: PropTypes.string,
+};
+
 const InputFieldContainer = styled.div`
   label {
     margin-top: 5px;
@@ -107,6 +127,47 @@ const HelpBlock = styled(Box)`
  * Please use the `Styled*` equivalents: `StyledInput`, `StyledInputAmount`, etc.
  */
 class InputField extends React.Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    description: PropTypes.string,
+    isPrivate: PropTypes.bool,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object, PropTypes.array]),
+    defaultValue: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.object,
+      PropTypes.bool,
+      PropTypes.array,
+    ]),
+    validate: PropTypes.func,
+    options: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]),
+    context: PropTypes.object,
+    placeholder: PropTypes.string,
+    pre: PropTypes.string,
+    post: PropTypes.string,
+    button: PropTypes.node,
+    className: PropTypes.string,
+    type: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    onKeyDown: PropTypes.func,
+    overflow: PropTypes.string,
+    required: PropTypes.bool,
+    style: PropTypes.object,
+    multiple: PropTypes.bool,
+    closeOnSelect: PropTypes.bool,
+    charCount: PropTypes.number,
+    maxLength: PropTypes.number,
+    step: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    disabled: PropTypes.bool,
+    min: PropTypes.number,
+    max: PropTypes.number,
+    focus: PropTypes.bool,
+    help: PropTypes.string,
+    error: PropTypes.string,
+    formModified: PropTypes.bool,
+  };
+
   constructor(props) {
     super(props);
     this.state = { value: props.value, validationState: null };
