@@ -250,5 +250,4 @@ function ThumbnailAwareImagePreview({ url, alt }) {
 ThumbnailAwareImagePreview.propTypes = {
   url: PropTypes.string,
   alt: PropTypes.string,
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
