@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -17,6 +16,7 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -91,7 +91,11 @@ export const getSettingsQuery = gql`
   }
 `;
 
-const ItemContainer = styled.div`
+const ItemContainer = styled.div<{
+  isDragging: boolean;
+  isDragOverlay: boolean;
+  isSubSection: boolean;
+  }>`
   ${props =>
     props.isDragging &&
     css`
@@ -118,6 +122,25 @@ const ItemContainer = styled.div`
     `}
 `;
 
+interface CollectiveSectionEntryProps {
+  isEnabled?: boolean;
+  restrictedTo?: unknown[];
+  section?: string;
+  index?: number;
+  version?: number;
+  onMove?(...args: unknown[]): unknown;
+  onDrop?(...args: unknown[]): unknown;
+  onSectionToggle?(...args: unknown[]): unknown;
+  collectiveType?: string;
+  fontWeight?: string;
+  hasData?: boolean;
+  showMissingDataWarning?: boolean;
+  showDragIcon?: boolean;
+  parentItem?: object;
+  dragHandleProps?: object;
+  isSubSection?: boolean;
+}
+
 const CollectiveSectionEntry = ({
   isEnabled,
   version,
@@ -129,8 +152,8 @@ const CollectiveSectionEntry = ({
   hasData,
   showMissingDataWarning,
   showDragIcon,
-  dragHandleProps,
-}) => {
+  dragHandleProps
+}: CollectiveSectionEntryProps) => {
   const intl = useIntl();
 
   let options = [
@@ -237,26 +260,41 @@ const CollectiveSectionEntry = ({
   );
 };
 
-CollectiveSectionEntry.propTypes = {
-  isEnabled: PropTypes.bool,
-  restrictedTo: PropTypes.array,
-  section: PropTypes.oneOf(Object.values(Sections)),
-  index: PropTypes.number,
-  version: PropTypes.number,
-  onMove: PropTypes.func,
-  onDrop: PropTypes.func,
-  onSectionToggle: PropTypes.func,
-  collectiveType: PropTypes.string,
-  fontWeight: PropTypes.string,
-  hasData: PropTypes.bool,
-  showMissingDataWarning: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-  parentItem: PropTypes.object,
-  dragHandleProps: PropTypes.object,
-  isSubSection: PropTypes.bool,
-};
+type MenuCategoryItem = {
+  name: string;
+  type: 'CATEGORY' | 'SECTION';
+  isEnabled: boolean;
+  version: number;
+  restrictedTo: string[];
+  sections: MenuCategoryItem[]
+}
 
-const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragHandleProps }) => {
+interface MenuCategoryProps {
+  index?: number;
+  collective?: GraphQLV1Collective;
+  onMove?(...args: unknown[]): unknown;
+  onDrop?(...args: unknown[]): unknown;
+  onSectionToggle?(...args: unknown[]): unknown;
+  setSubSections?(...args: unknown[]): unknown;
+  isDragOverlay?: boolean;
+  dragHandleProps?: object;
+  item?: {
+    name: string;
+    type: string;
+    isEnabled: boolean;
+    version: number;
+    restrictedTo: string[];
+    sections: MenuCategoryItem[]
+  };
+}
+
+const MenuCategory = ({
+  item,
+  collective,
+  onSectionToggle,
+  setSubSections,
+  dragHandleProps
+}: MenuCategoryProps) => {
   const intl = useIntl();
 
   const [draggingId, setDraggingId] = React.useState(null);
@@ -321,19 +359,20 @@ const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragH
   );
 };
 
-MenuCategory.propTypes = {
-  item: PropTypes.object,
-  index: PropTypes.number,
-  collective: PropTypes.object,
-  onMove: PropTypes.func,
-  onDrop: PropTypes.func,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isDragOverlay: PropTypes.bool,
-  dragHandleProps: PropTypes.object,
-};
+interface ItemProps extends React.ComponentProps<typeof ItemContainer> {
+  dragHandleProps?: object;
+  isDragging?: boolean;
+  isDragOverlay?: boolean;
+  style?: object;
+  item?: MenuCategoryItem;
+  collective?: GraphQLV1Collective;
+  onSectionToggle?(...args: unknown[]): unknown;
+  setSubSections?(...args: unknown[]): unknown;
+  isSubSection?: boolean;
+  showDragIcon?: boolean;
+}
 
-const Item = React.forwardRef(
+const Item = React.forwardRef<HTMLElement, ItemProps>(
   (
     {
       dragHandleProps,
@@ -351,7 +390,7 @@ const Item = React.forwardRef(
   ) => {
     return (
       <ItemContainer
-        ref={ref}
+        ref={ref as React.Ref<HTMLDivElement>}
         style={style}
         isDragging={isDragging}
         isDragOverlay={isDragOverlay}
@@ -383,24 +422,21 @@ const Item = React.forwardRef(
   },
 );
 
-Item.propTypes = {
-  dragHandleProps: PropTypes.object,
-  isDragging: PropTypes.bool,
-  isDragOverlay: PropTypes.bool,
-  style: PropTypes.object,
-  item: PropTypes.object,
-  collective: PropTypes.object,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isSubSection: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-};
-
 Item.displayName = 'Item';
 
 const MemoizedItem = memo(Item);
 
-const DraggableItem = props => {
+interface DraggableItemProps {
+  item?: MenuCategoryItem;
+  collective?: GraphQLV1Collective;
+  onSectionToggle?(...args: unknown[]): unknown;
+  setSubSections?(...args: unknown[]): unknown;
+  isSubSection?: boolean;
+  showDragIcon?: boolean;
+  id?: string;
+}
+
+const DraggableItem = (props: DraggableItemProps) => {
   const { attributes, listeners, isDragging, setNodeRef, transform, transition } = useSortable({ id: props.id });
 
   const style = {
@@ -419,17 +455,13 @@ const DraggableItem = props => {
   );
 };
 
-DraggableItem.propTypes = {
-  item: PropTypes.object,
-  collective: PropTypes.object,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isSubSection: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-  id: PropTypes.string,
-};
+interface EditCollectivePageProps {
+  collective?: GraphQLV1Collective;
+}
 
-const EditCollectivePage = ({ collective }) => {
+const EditCollectivePage = ({
+  collective
+}: EditCollectivePageProps) => {
   const intl = useIntl();
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState([]);
@@ -506,7 +538,6 @@ const EditCollectivePage = ({ collective }) => {
                           item={item}
                           collective={collective}
                           onSectionToggle={onSectionToggle}
-                          fontWeight="bold"
                           showDragIcon
                           setSubSections={subSections => {
                             const newSections = cloneDeep(sections);
@@ -553,7 +584,7 @@ const EditCollectivePage = ({ collective }) => {
                 value: {
                   ...data?.account?.settings.collectivePage,
                   sections,
-                  showGoals: flatten(sections, item => item.sections || item).some(
+                  showGoals: flatten(sections.map(item => item.sections || item)).some(
                     ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
                   ),
                 },
@@ -573,13 +604,6 @@ const EditCollectivePage = ({ collective }) => {
       </div>
     </DndContext>
   );
-};
-
-EditCollectivePage.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-  }),
 };
 
 export default EditCollectivePage;

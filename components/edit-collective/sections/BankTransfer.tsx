@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { findLast, get, omit } from 'lodash';
 import { Edit, X } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
@@ -96,7 +96,13 @@ const renderBankInstructions = (instructions, bankAccountInfo) => {
   return formatManualInstructions(instructions, formattedValues);
 };
 
-const BankTransfer = props => {
+interface BankTransferProps {
+  collectiveSlug: string;
+  hideTopsection(...args: unknown[]): unknown;
+  intl: IntlShape;
+}
+
+const BankTransfer = (props: BankTransferProps) => {
   const { toast } = useToast();
   const { loading, data } = useQuery(hostQuery, {
     context: API_V2_CONTEXT,
@@ -290,9 +296,8 @@ const BankTransfer = props => {
               </Box>
               <div className="mt-3 flex flex-row gap-2">
                 <Button
-                  mr={2}
                   variant="outline"
-                  className="min-w-32"
+                  className="min-w-32 mr-2"
                   onClick={() => {
                     setShowForm(false);
                     props.hideTopsection(false);
@@ -348,11 +353,6 @@ const BankTransfer = props => {
       )}
     </Flex>
   );
-};
-
-BankTransfer.propTypes = {
-  collectiveSlug: PropTypes.string.isRequired,
-  hideTopsection: PropTypes.func.isRequired,
 };
 
 export default injectIntl(BankTransfer);

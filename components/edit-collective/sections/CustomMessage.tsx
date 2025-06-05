@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -27,7 +26,25 @@ const updateCustomMessageMutation = gql`
   }
 `;
 
-const CustomMessage = ({ collective }) => {
+interface CustomMessageProps {
+  collective?: {
+    id?: number;
+    type?: string;
+    settings?: {
+      customEmailMessage?: string;
+    };
+    parentCollective?: {
+      settings?: {
+        customEmailMessage?: string;
+      };
+    };
+  };
+  isInheritSettings?: boolean;
+}
+
+const CustomMessage = ({
+  collective
+}: CustomMessageProps) => {
   const thankYouMessage =
     collective.settings?.customEmailMessage || collective.parentCollective?.settings?.customEmailMessage;
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
@@ -104,7 +121,7 @@ const CustomMessage = ({ collective }) => {
           showCount
         />
       </Container>
-      {[CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type) ? (
+      {([CollectiveType.EVENT, CollectiveType.PROJECT] as string[]).includes(collective.type) ? (
         <MessageBox type="info" mt="24px">
           <P fontSize="13px" fontWeight={400} lineHeight="20px">
             <FormattedMessage
@@ -127,7 +144,6 @@ const CustomMessage = ({ collective }) => {
         <Button
           className="w-full"
           disabled={loading || !isModified}
-          width="157px"
           onClick={() => handleSubmit(customMessage)}
         >
           <FormattedMessage id="save" defaultMessage="Save" />
@@ -150,22 +166,6 @@ const CustomMessage = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-CustomMessage.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    type: PropTypes.string,
-    settings: PropTypes.shape({
-      customEmailMessage: PropTypes.string,
-    }),
-    parentCollective: PropTypes.shape({
-      settings: PropTypes.shape({
-        customEmailMessage: PropTypes.string,
-      }),
-    }),
-  }),
-  isInheritSettings: PropTypes.bool,
 };
 
 export default CustomMessage;

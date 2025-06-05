@@ -1,15 +1,24 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Container from '../../Container';
 import { P } from '../../Text';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 import SendFundsToCollectiveSection from '../SendFundsToCollectiveSection';
 
-const EmptyBalance = ({ collective, LoggedInUser }) => {
+interface EmptyBalanceProps {
+  collective: GraphQLV1Collective;
+  LoggedInUser: LoggedInUser;
+}
+
+const EmptyBalance = ({
+  collective,
+  LoggedInUser
+}: EmptyBalanceProps) => {
   if (!collective.host || collective.host.id === collective.id) {
     return null;
   }
@@ -30,7 +39,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
           values={{ type: collective.type }}
         />
       </P>
-      {[CollectiveType.FUND, CollectiveType.COLLECTIVE].includes(collective.type) &&
+      {([CollectiveType.FUND, CollectiveType.COLLECTIVE] as string[]).includes(collective.type) &&
         !collective.host.hostCollective && (
           <P color="rgb(224, 183, 0)" my={2}>
             <FormattedMessage
@@ -39,14 +48,14 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
             />
           </P>
         )}
-      {[CollectiveType.FUND, CollectiveType.COLLECTIVE].includes(collective.type) && collective.host.hostCollective && (
+      {([CollectiveType.FUND, CollectiveType.COLLECTIVE] as string[]).includes(collective.type) && collective.host.hostCollective && (
         <SendFundsToCollectiveSection
           LoggedInUser={LoggedInUser}
           collective={collective}
           toCollective={collective.host.hostCollective}
         />
       )}
-      {[CollectiveType.PROJECT, CollectiveType.EVENT].includes(collective.type) && collective.parentCollective && (
+      {([CollectiveType.PROJECT, CollectiveType.EVENT] as string[]).includes(collective.type) && collective.parentCollective && (
         <SendFundsToCollectiveSection
           LoggedInUser={LoggedInUser}
           collective={collective}
@@ -55,11 +64,6 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
       )}
     </Container>
   );
-};
-
-EmptyBalance.propTypes = {
-  collective: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
 };
 
 export default EmptyBalance;

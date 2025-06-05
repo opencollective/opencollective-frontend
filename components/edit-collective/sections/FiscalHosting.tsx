@@ -1,11 +1,11 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import Container from '../../Container';
 import { adminPanelQuery } from '../../dashboard/queries';
@@ -76,7 +76,13 @@ const getCollectiveType = type => {
   }
 };
 
-const FiscalHosting = ({ collective }) => {
+interface FiscalHostingProps {
+  collective: GraphQLV1Collective;
+}
+
+const FiscalHosting = ({
+  collective
+}: FiscalHostingProps) => {
   const isHostAccount = collective.isHost;
   const isBudgetActive = collective.isActive;
 
@@ -282,7 +288,6 @@ const FiscalHosting = ({ collective }) => {
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
               <Button
-                buttonStyle="primary"
                 data-cy="action"
                 onClick={() => {
                   if (activateAsHostModal.type === 'Deactivate') {
@@ -389,10 +394,6 @@ const FiscalHosting = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-FiscalHosting.propTypes = {
-  collective: PropTypes.object.isRequired,
 };
 
 export default FiscalHosting;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { isOneOfTypes } from '../../../lib/collective-sections';
@@ -16,7 +15,18 @@ import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const Export = ({ collective }) => {
+interface ExportProps {
+  collective: {
+    slug: string;
+    tiers?: {
+      id: number;
+    }[];
+  };
+}
+
+const Export = ({
+  collective
+}: ExportProps) => {
   const [isDownloadingCsv, setDownloadingCsv] = React.useState(false);
   const websiteUrl = getWebsiteUrl();
   const widgetCode = `<script src="${websiteUrl}/${collective.slug}/banner.js"></script>`;
@@ -174,17 +184,6 @@ const Export = ({ collective }) => {
       )}
     </div>
   );
-};
-
-Export.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    tiers: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-      }),
-    ),
-  }).isRequired,
 };
 
 export default Export;

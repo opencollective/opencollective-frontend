@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { capitalize } from '../../../lib/utils';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { Box } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
@@ -16,7 +16,15 @@ const TITLE_OVERRIDE = {
   transferwise: 'Wise',
 };
 
-const ConnectedAccounts = props => {
+interface ConnectedAccountsProps {
+  collective: GraphQLV1Collective;
+  connectedAccounts?: object[];
+  editMode?: boolean;
+  services?: string[];
+  variation?: "SENDING" | "RECEIVING";
+}
+
+const ConnectedAccounts = (props: ConnectedAccountsProps) => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
   const services = [];
@@ -55,14 +63,6 @@ const ConnectedAccounts = props => {
       ))}
     </div>
   );
-};
-
-ConnectedAccounts.propTypes = {
-  collective: PropTypes.object.isRequired,
-  connectedAccounts: PropTypes.arrayOf(PropTypes.object),
-  editMode: PropTypes.bool,
-  services: PropTypes.arrayOf(PropTypes.string),
-  variation: PropTypes.oneOf(['SENDING', 'RECEIVING']),
 };
 
 export default ConnectedAccounts;

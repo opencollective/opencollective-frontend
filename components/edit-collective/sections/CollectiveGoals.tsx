@@ -1,12 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { Plus, Trash } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -26,24 +27,45 @@ import SettingsSubtitle from '../SettingsSubtitle';
 const BORDER = '1px solid #efefef';
 const getInterpolationOption = value => ({ label: startCase(value), value });
 const INTERPOLATION_OPTIONS = ['auto', 'logarithm', 'linear'].map(getInterpolationOption);
-class CollectiveGoals extends React.Component {
-  static propTypes = {
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      slug: PropTypes.string.isRequired,
-      settings: PropTypes.object,
-    }).isRequired,
-    currency: PropTypes.string.isRequired,
-    intl: PropTypes.object.isRequired,
-    editCollectiveSettings: PropTypes.func.isRequired,
-    title: PropTypes.string,
+
+interface CollectiveGoalsProps {
+  collective: GraphQLV1Collective
+  currency: string;
+  intl: IntlShape;
+  editCollectiveSettings(...args: unknown[]): unknown;
+  title?: string;
+}
+
+class CollectiveGoals extends React.Component<CollectiveGoalsProps, {
+  isTouched: boolean;
+  error: string | null;
+  submitting: boolean;
+  submitted: boolean;
+  goalsInterpolation: string;
+  isSubmitting: boolean;
+  collectivePage: {
+    showGoals: boolean;
+    sections: Array<{
+      type: string;
+      name: string;
+      isEnabled: boolean;
+    }>;
   };
+  goals: Array<{
+    type: string;
+    key: string;
+    amount?: number;
+    description?: string;
+  }>;
+}> {
+
 
   constructor(props) {
     super(props);
     const { intl, collective } = props;
 
     this.state = {
+      isSubmitting: false,
       collectivePage: get(collective.settings, 'collectivePage', {}),
       isTouched: false,
       error: null,
@@ -68,6 +90,7 @@ class CollectiveGoals extends React.Component {
       amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
       showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Profile page' },
     });
+    
 
     const getOptions = arr => {
       return arr.map(key => {
@@ -103,6 +126,18 @@ class CollectiveGoals extends React.Component {
       },
     ];
   }
+
+  defaultType: string;
+  messages: Record<string, { id: string; defaultMessage: string }>;
+  fields: Array<{
+    name: string;
+    label: string;
+    placeholder?: string;
+    maxLength?: number;
+    type?: string;
+    pre?: string;
+    options?: Array<{ value: string; label: string }>;
+  }>;
 
   editGoal = (index, fieldName, value) => {
     if (value === 'onetime') {
@@ -297,7 +332,7 @@ class CollectiveGoals extends React.Component {
         )}
 
         <div className="flex flex-col gap-2 sm:justify-stretch">
-          <Button onClick={this.handleSubmit} loading={isSubmitting} disabled={submitted || !isTouched} minWidth={200}>
+          <Button onClick={this.handleSubmit} loading={isSubmitting} disabled={submitted || !isTouched} className="min-w-52">
             {submitted ? (
               <FormattedMessage id="saved" defaultMessage="Saved" />
             ) : (
@@ -319,4 +354,4 @@ const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation
   name: 'editCollectiveSettings',
 });
 
-export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));
+export default addEditCollectiveSettingsMutation(injectIntl((CollectiveGoals)))
