@@ -3,7 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import type { ManagedOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import { AccountType } from '@/lib/graphql/types/v2/schema';
+import { type Account, AccountType } from '@/lib/graphql/types/v2/schema';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { i18nFrequency } from '@/lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '@/lib/i18n/payment-method-provider-type';
@@ -70,18 +70,30 @@ export const beneficiary: ColumnDef<ManagedOrderFieldsFragment> = {
   header: () => <FormattedMessage id="VfJsl4" defaultMessage="Beneficiary" />,
   meta: { className: 'max-w-[250px] overflow-hidden' },
   cell: ({ row }) => {
-    const toAccount = row.original.toAccount;
+    let beneficiary = row.original.toAccount;
+    let account: string | React.ReactElement = (
+      <FormattedMessage id="AccountType.MainAccount" defaultMessage="Main account" />
+    );
+    if ('parent' in row.original.toAccount) {
+      beneficiary = row.original.toAccount.parent as Account;
+      account = row.original.toAccount.name || row.original.toAccount.slug;
+    }
     return (
       <AccountHoverCard
-        account={toAccount}
+        account={beneficiary}
         trigger={
-          <div className="flex items-center gap-2">
-            <div>
-              <Avatar size={32} collective={toAccount} displayTitle={false} />
-            </div>
-            <div className="overflow-hidden">
-              <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
-                {toAccount.name || toAccount.slug}
+          <div>
+            <div className="flex items-center gap-2">
+              <div>
+                <Avatar size={32} collective={beneficiary} displayTitle={false} />
+              </div>
+              <div className="overflow-hidden">
+                <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
+                  {beneficiary.name || beneficiary.slug}
+                </div>
+                <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
+                  {account}
+                </div>
               </div>
             </div>
           </div>
@@ -93,14 +105,7 @@ export const beneficiary: ColumnDef<ManagedOrderFieldsFragment> = {
 
 export const amount: ColumnDef<ManagedOrderFieldsFragment> = {
   accessorKey: 'totalAmount',
-  header: () => (
-    <div className="flex flex-col">
-      <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
-      <div className="text-xs font-normal">
-        <FormattedMessage id="Frequency" defaultMessage="Frequency" />
-      </div>
-    </div>
-  ),
+  header: () => <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
   cell: ({ row, table }) => {
     const { intl } = table.options.meta;
     const amount = row.original.totalAmount;
@@ -139,14 +144,7 @@ export const paymentMethod: ColumnDef<ManagedOrderFieldsFragment> = {
 
 export const date: ColumnDef<ManagedOrderFieldsFragment> = {
   accessorKey: 'lastChargedAt',
-  header: () => (
-    <div className="flex flex-col whitespace-nowrap">
-      <FormattedMessage id="Contribution.ChargeDate" defaultMessage="Charge Date" />
-      <div className="text-xs font-normal">
-        <FormattedMessage id="Contribution.SinceDate" defaultMessage="Since Date" />
-      </div>
-    </div>
-  ),
+  header: () => <FormattedMessage id="Contribution.ChargeDate" defaultMessage="Charge Date" />,
   cell: ({ row }) => {
     const order = row.original;
     const lastChargedAt = order.lastChargedAt || order.createdAt;
