@@ -5171,6 +5171,8 @@ export type ExpenseValuesByRole = {
   /** The values provided by the host admin(s) */
   hostAdmin?: Maybe<ExpenseValuesRoleDetails>;
   id: Scalars['NonEmptyString']['output'];
+  /** The values provided by the prediction service */
+  prediction?: Maybe<ExpenseValuesRoleDetails>;
   /** The values provided by the expense submitter(s) */
   submitter?: Maybe<ExpenseValuesRoleDetails>;
 };

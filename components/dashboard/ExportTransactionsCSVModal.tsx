@@ -234,6 +234,7 @@ type ExportTransactionsCSVModalProps = {
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
+  canCreatePreset?: boolean;
 };
 
 const ExportTransactionsCSVModal = ({
@@ -243,6 +244,7 @@ const ExportTransactionsCSVModal = ({
   trigger,
   queryFilter,
   isHostReport,
+  canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
@@ -262,10 +264,12 @@ const ExportTransactionsCSVModal = ({
 
   const customFields = React.useMemo(
     () =>
-      updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
-      account?.settings?.exportedTransactionsFieldSets ||
-      {},
-    [updateSettingsData, account],
+      canCreatePreset
+        ? []
+        : updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
+          account?.settings?.exportedTransactionsFieldSets ||
+          {},
+    [updateSettingsData, account, canCreatePreset],
   );
 
   const {
@@ -302,15 +306,20 @@ const ExportTransactionsCSVModal = ({
     useFieldNames?: boolean;
   }> = React.useMemo(() => {
     return [
-      ...Object.keys(customFields).map(key => ({
-        value: key,
-        label: customFields[key].name,
-        fields: customFields[key].fields,
-        flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
+      ...(canCreatePreset
+        ? Object.keys(customFields).map(key => ({
+            value: key,
+            label: customFields[key].name,
+            fields: customFields[key].fields,
+            flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
+          }))
+        : []),
+      ...Object.keys(canCreatePreset ? FIELD_OPTIONS : omit(FIELD_OPTIONS, [FIELD_OPTIONS.NEW_PRESET])).map(value => ({
+        value,
+        label: FieldOptionsLabels[value],
       })),
-      ...Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] })),
     ];
-  }, [customFields]);
+  }, [customFields, canCreatePreset]);
 
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);

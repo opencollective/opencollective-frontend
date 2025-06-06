@@ -7741,6 +7741,11 @@ type ExpenseValuesByRole {
   The values provided by the host admin(s)
   """
   hostAdmin: ExpenseValuesRoleDetails
+
+  """
+  The values provided by the prediction service
+  """
+  prediction: ExpenseValuesRoleDetails
 }
 
 type ExpenseValuesRoleDetails {
