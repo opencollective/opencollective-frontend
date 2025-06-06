@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Minimum bedrag: {minAmount} {currency}",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Aantal",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Terug naar {accountName} pagina",
   "ContributionFlow.CreateOrganizationLabel": "Bijdragen als een organisatie",
   "ContributionFlow.CreateUserLabel": "Bijdragen als individu",

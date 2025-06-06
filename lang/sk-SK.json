@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Minimálna suma: {minAmount} {currency}",
   "contribution.paymentFee": "Poplatok za spracovanie platby",
   "contribution.quantity": "Množstvo",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Späť na stránku používateľa {accountName}",
   "ContributionFlow.CreateOrganizationLabel": "Prispieť ako organizácia",
   "ContributionFlow.CreateUserLabel": "Prispieť ako jednotlivec",

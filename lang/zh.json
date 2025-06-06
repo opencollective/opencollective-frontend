@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "最小金额：{minAmount} {currency}",
   "contribution.paymentFee": "支付手续费",
   "contribution.quantity": "数量",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "返回 {accountName} 页",
   "ContributionFlow.CreateOrganizationLabel": "作为一个组织进行捐款",
   "ContributionFlow.CreateUserLabel": "作为个人贡献",

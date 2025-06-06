@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "最少金額: {minAmount} {currency}",
   "contribution.paymentFee": "決済代行手数料",
   "contribution.quantity": "数量",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "{accountName} のメインページへ移動",
   "ContributionFlow.CreateOrganizationLabel": "組織として貢献する",
   "ContributionFlow.CreateUserLabel": "Contribute as an individual",

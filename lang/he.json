@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "סכום מינימלי: {minAmount}{currency}",
   "contribution.paymentFee": "עמלות טיפול בתשלום",
   "contribution.quantity": "כמות",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.CreateOrganizationLabel": "תרומה כארגון",
   "ContributionFlow.CreateUserLabel": "תרומה כיחיד/ה",
