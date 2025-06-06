@@ -2,7 +2,7 @@ import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { Calendar, TestTube2, UserCog } from 'lucide-react';
 import styled from 'styled-components';
-import type { BorderProps } from 'styled-system';
+import type { BorderProps, ColorProps, LayoutProps, SpaceProps } from 'styled-system';
 import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
@@ -19,8 +19,11 @@ const COLLECTIVE_TYPE_ICON = {
   ROOT: UserCog,
 };
 
-type StyledAvatarProps = FlexProps &
-  BorderProps & {
+type StyledAvatarProps = SpaceProps &
+  ColorProps &
+  BorderProps &
+  FlexProps &
+  LayoutProps & {
     src?: string;
     type?: string;
     size?: string | number | (string | number)[];
@@ -28,13 +31,19 @@ type StyledAvatarProps = FlexProps &
     backgroundSize?: string;
   };
 
-const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
-  style: {
-    backgroundImage: props.src ? `url(${props.src})` : null,
-    backgroundSize: props.backgroundSize || 'cover',
-    backgroundColor: props.backgroundColor,
-  },
-}))<StyledAvatarProps>`
+const BaseAvatar = props => (
+  <Flex
+    style={{
+      ...props.style,
+      backgroundImage: props.src ? `url(${props.src})` : null,
+      backgroundSize: props.backgroundSize || 'cover',
+      backgroundColor: props.backgroundColor,
+    }}
+    {...props}
+  />
+);
+
+const StyledAvatar = styled(BaseAvatar)<StyledAvatarProps>`
   align-items: center;
   background-color: ${({ theme, type }) =>
     type === 'USER' || type === 'INDIVIDUAL' ? themeGet('colors.black.100')({ theme }) : 'none'};

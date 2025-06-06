@@ -1,5 +1,5 @@
+// Open Collective Frontend imports
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Clipboard } from '@styled-icons/feather/Clipboard';
 import { Linkedin } from '@styled-icons/feather/Linkedin';
 // Styled-icons
@@ -8,7 +8,6 @@ import { Twitter } from '@styled-icons/feather/Twitter';
 import copy from 'copy-to-clipboard';
 import { defineMessages, injectIntl } from 'react-intl';
 
-// Open Collective Frontend imports
 import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../Container';
@@ -89,15 +88,6 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
       </StyledTooltip>
     </Flex>
   );
-};
-
-ShareButtons.propTypes = {
-  pageUrl: PropTypes.string.isRequired,
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    twitterHandle: PropTypes.string,
-  }).isRequired,
-  intl: PropTypes.object.isRequired,
 };
 
 export default injectIntl(ShareButtons);

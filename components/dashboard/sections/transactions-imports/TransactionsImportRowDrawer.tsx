@@ -31,7 +31,7 @@ export const TransactionsImportRowDrawer = ({
   rowIndex: number;
   autoFocusNoteForm: boolean;
 } & ComponentProps<typeof Sheet>) => {
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const [hasRawValuesExpanded, setHasRawValuesExpanded] = React.useState(false);
   return (
     <Sheet {...props}>

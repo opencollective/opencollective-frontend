@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { isOneOfTypes } from '../../../lib/collective-sections';
@@ -174,17 +173,6 @@ const Export = ({ collective }) => {
       )}
     </div>
   );
-};
-
-Export.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    tiers: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-      }),
-    ),
-  }).isRequired,
 };
 
 export default Export;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
@@ -287,16 +286,6 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
       )}
     </Box>
   );
-};
-
-OrdersWithData.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
-  /** If provided, only orders matching this status will be fetched */
-  status: PropTypes.string,
-  /** An optional title to be used instead of "Financial contributions" */
-  title: PropTypes.node,
-  showPlatformTip: PropTypes.bool,
-  canCreatePendingOrder: PropTypes.bool,
 };
 
 export default OrdersWithData;

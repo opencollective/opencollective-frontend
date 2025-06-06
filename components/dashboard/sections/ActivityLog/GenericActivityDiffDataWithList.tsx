@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { diffArrays, diffChars, diffJson } from 'diff';
 import { has, isEmpty, pickBy, startCase } from 'lodash';
 import { Pencil } from 'lucide-react';
@@ -93,7 +92,32 @@ const shouldUseInlineDiff = changes => {
 const DEFAULT_IGNORED_FIELDS = ['id', 'createdAt', 'updatedAt', 'deletedAt', 'CollectiveId'];
 const ALWAYS_DISPLAYED = ['code'];
 
-export const GenericActivityDiffDataWithList = ({ activity }) => {
+interface GenericActivityDiffDataWithListProps {
+  activity: {
+    type: string;
+    data?: {
+      added?: Array<{
+        id: string;
+        [key: string]: string;
+      }>;
+      removed?: Array<{
+        id: string;
+        [key: string]: string;
+      }>;
+      edited?: Array<{
+        id: string;
+        previousData: {
+          [key: string]: string;
+        };
+        newData: {
+          [key: string]: string;
+        };
+      }>;
+    };
+  };
+}
+
+export const GenericActivityDiffDataWithList = ({ activity }: GenericActivityDiffDataWithListProps) => {
   const { added, removed, edited } = activity.data ?? {};
   if (!added?.length && !removed?.length && !edited?.length) {
     return (
@@ -221,8 +245,4 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
       )}
     </div>
   );
-};
-
-GenericActivityDiffDataWithList.propTypes = {
-  activity: PropTypes.shape({ type: PropTypes.string.isRequired, data: PropTypes.object }).isRequired,
 };

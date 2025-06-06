@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
@@ -238,43 +237,6 @@ const CollectivePickerAsync = ({
       {...props}
     />
   );
-};
-
-CollectivePickerAsync.propTypes = {
-  ...CollectivePicker.propTypes,
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** The types of collectives to retrieve */
-  types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
-  /** Whether we should group collectives by type. By default, this is true when there's more than one type */
-  groupByType: PropTypes.bool,
-  /** Max number of collectives displayed at the same time */
-  limit: PropTypes.number,
-  /** If set, only the collectives under this host will be retrieved */
-  hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
-  /** If set, only the collectives under this parent collective will be retrieved */
-  parentCollectiveIds: PropTypes.arrayOf(PropTypes.number),
-  /** If true, a query will be triggered even if search is empty */
-  preload: PropTypes.bool,
-  /** If true, results won't be cached (Apollo "network-only" mode) */
-  noCache: PropTypes.bool,
-  /** Query to use for the search. Override to add custom fields */
-  searchQuery: PropTypes.any,
-  /** Custom options that are displayed when the field is empty */
-  emptyCustomOptions: PropTypes.any,
-  /** Function to filter results returned by the API */
-  filterResults: PropTypes.func,
-  /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
-  /** If true, a permanent option to invite a new user will be displayed in the select */
-  invitable: PropTypes.bool,
-  skipGuests: PropTypes.bool,
-  onInvite: PropTypes.func,
-  /** Include archived collectives **/
-  includeArchived: PropTypes.bool,
-  /** Include vendors for the given host id**/
-  includeVendorsForHostId: PropTypes.number,
-  vendorVisibleToAccountIds: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default CollectivePickerAsync;

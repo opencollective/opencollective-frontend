@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import CollectiveContactForm from './CollectiveContactForm';
@@ -27,13 +26,6 @@ const ContactCollectiveModal = ({ collective, onClose }) => {
       />
     </StyledModal>
   );
-};
-
-ContactCollectiveModal.propTypes = {
-  /** the collective that is contacted */
-  collective: PropTypes.object,
-  /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
 };
 
 export default ContactCollectiveModal;

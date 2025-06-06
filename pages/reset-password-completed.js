@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { LayoutDashboard } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -62,11 +61,6 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
       </div>
     </Page>
   );
-};
-
-ResetPasswordCompleted.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
 };
 
 // next.js export

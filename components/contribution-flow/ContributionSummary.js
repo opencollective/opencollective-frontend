@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { get } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -264,16 +263,6 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
       )}
     </Container>
   );
-};
-
-ContributionSummary.propTypes = {
-  collective: PropTypes.object,
-  tier: PropTypes.object,
-  stepDetails: PropTypes.object,
-  stepSummary: PropTypes.object,
-  stepPayment: PropTypes.object,
-  currency: PropTypes.string,
-  renderTax: PropTypes.func,
 };
 
 export default ContributionSummary;

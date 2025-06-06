@@ -258,7 +258,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
 
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,

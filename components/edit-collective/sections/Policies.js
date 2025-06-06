@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, isNil, set, size } from 'lodash';
@@ -1082,20 +1081,6 @@ const Policies = ({ collective }) => {
       </form>
     </Flex>
   );
-};
-
-Policies.propTypes = {
-  collective: PropTypes.shape({
-    settings: PropTypes.object,
-    id: PropTypes.number,
-    slug: PropTypes.string,
-    isHost: PropTypes.bool,
-    members: PropTypes.arrayOf(
-      PropTypes.shape({
-        role: PropTypes.string,
-      }),
-    ),
-  }),
 };
 
 export default Policies;

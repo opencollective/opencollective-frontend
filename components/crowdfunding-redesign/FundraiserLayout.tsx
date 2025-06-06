@@ -27,7 +27,7 @@ export function FundraiserLayout({ children, activeTab }) {
   });
   const account = data?.account;
   const fundraiser = getDefaultFundraiserValues(account);
-  const tabRef = React.useRef();
+  const tabRef = React.useRef(undefined);
 
   if (loading || !account) {
     return null;

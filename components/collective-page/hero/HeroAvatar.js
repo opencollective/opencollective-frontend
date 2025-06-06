@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
@@ -313,17 +312,6 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
       <Avatar collective={collective} radius={AVATAR_SIZE} />
     );
   }
-};
-
-HeroAvatar.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    type: PropTypes.string,
-    image: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  isAdmin: PropTypes.bool,
-  intl: PropTypes.object,
 };
 
 export default injectIntl(HeroAvatar);

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -49,16 +48,6 @@ const ProjectTypeOption = ({ name, value, label, description, isChecked, onChang
       </Box>
     </ProjectTypeOptionContainer>
   );
-};
-
-ProjectTypeOption.propTypes = {
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  value: PropTypes.oneOf(['CODE', 'COMMUNITY']).isRequired,
-  isChecked: PropTypes.bool,
-  onChange: PropTypes.func,
-  iconSrc: PropTypes.string.isRequired,
 };
 
 const Fieldset = styled.fieldset`
@@ -117,13 +106,6 @@ const ProjectTypeSelect = ({ name, value, onChange, error }) => {
       {error}
     </React.Fragment>
   );
-};
-
-ProjectTypeSelect.propTypes = {
-  name: PropTypes.string.isRequired,
-  value: PropTypes.oneOf(['CODE', 'COMMUNITY']),
-  onChange: PropTypes.func,
-  error: PropTypes.node,
 };
 
 export default React.memo(ProjectTypeSelect);

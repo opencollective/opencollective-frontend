@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -327,49 +326,6 @@ const ContributeCard = ({
       </Flex>
     </StyledContributeCard>
   );
-};
-
-ContributeCard.propTypes = {
-  /** Contribution title */
-  title: PropTypes.node.isRequired,
-  /** Type of the contribution */
-  type: PropTypes.oneOf(Object.values(ContributionTypes)).isRequired,
-  /** Route for the contribute button */
-  route: PropTypes.string.isRequired,
-  /** A custom button text to override the default one */
-  buttonText: PropTypes.string,
-  /** An image to display on the card hero */
-  image: PropTypes.string,
-  /** The card body */
-  children: PropTypes.node,
-  /** If true, the call to action will not be displayed */
-  disableCTA: PropTypes.bool,
-  hideCTA: PropTypes.bool,
-  /** Contributors */
-  contributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      collectiveSlug: PropTypes.string,
-    }),
-  ),
-  /** Contributors stats */
-  stats: PropTypes.shape({
-    all: PropTypes.number,
-    users: PropTypes.number,
-    organizations: PropTypes.number,
-  }),
-  /** If true, contributors will not be displayed */
-  hideContributors: PropTypes.bool,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object.isRequired,
-  router: PropTypes.object,
-  tier: PropTypes.object,
-  collective: PropTypes.object,
-  isPreview: PropTypes.bool,
-  onClickEdit: PropTypes.func,
-  missingCTAMsg: PropTypes.string,
 };
 
 export default injectIntl(ContributeCard);

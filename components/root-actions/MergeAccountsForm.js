@@ -153,6 +153,4 @@ const getMergeCTA = (fromAccount, toAccount) => {
   }
 };
 
-MergeAccountsForm.propTypes = {};
-
 export default MergeAccountsForm;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
@@ -12,7 +11,12 @@ import { Flex } from '../Grid';
 import { NotificationBarButton } from '../NotificationBar';
 import { useToast } from '../ui/useToast';
 
-export default function PendingApplicationActions({ collective, refetch }) {
+interface PendingApplicationActionsProps {
+  refetch?(...args: unknown[]): unknown;
+  collective?: React.ComponentProps<typeof AcceptRejectButtons>['collective'];
+}
+
+export default function PendingApplicationActions({ collective, refetch }: PendingApplicationActionsProps) {
   const intl = useIntl();
   const { toast } = useToast();
   const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
@@ -50,14 +54,3 @@ export default function PendingApplicationActions({ collective, refetch }) {
     </Flex>
   );
 }
-
-PendingApplicationActions.propTypes = {
-  refetch: PropTypes.func,
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    slug: PropTypes.string,
-    host: PropTypes.shape({
-      id: PropTypes.number,
-    }),
-  }),
-};

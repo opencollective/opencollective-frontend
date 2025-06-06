@@ -27,7 +27,7 @@ const PlatformTip = ({ ...props }) => (
             openInNewTab: true,
           }),
           strong: I18nBold,
-          // eslint-disable-next-line react/display-name
+
           br: () => <br />,
         }}
       />

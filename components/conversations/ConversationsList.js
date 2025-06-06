@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Markup } from 'interweave';
 import { size } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -86,33 +85,6 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
   );
 };
 
-ConversationListItem.propTypes = {
-  collectiveSlug: PropTypes.string.isRequired,
-  conversation: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    summary: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    fromAccount: PropTypes.shape({
-      type: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-    }).isRequired,
-    followers: PropTypes.shape({
-      totalCount: PropTypes.number,
-      nodes: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-        }),
-      ),
-    }),
-    stats: PropTypes.shape({
-      commentsCount: PropTypes.number,
-    }),
-  }),
-};
-
 /**
  * Displays a list of conversations
  */
@@ -130,11 +102,6 @@ const ConversationsList = ({ collectiveSlug, conversations }) => {
       ))}
     </StyledCard>
   );
-};
-
-ConversationsList.propTypes = {
-  collectiveSlug: PropTypes.string.isRequired,
-  conversations: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default ConversationsList;

@@ -31,8 +31,8 @@ const ListItem = styled.li`
       : "url('/static/images/pricing/checkMark.svg') no-repeat left center"};
   padding-left: 26px;
 
-  :first-of-type,
-  :last-of-type {
+  &:first-of-type,
+  &:last-of-type {
     margin-top: 0;
     margin-bottom: 0;
   }
@@ -54,8 +54,8 @@ const FeeDescription = styled(P)`
 `;
 
 const AccessToWrapper = styled(Container)`
-  :nth-child(1),
-  :nth-child(2) {
+  &:nth-child(1),
+  &:nth-child(2) {
     margin-bottom: 46px;
   }
 `;

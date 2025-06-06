@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
@@ -82,10 +81,6 @@ const ObfuscatedClientSecret = ({ secret }) => {
       </StyledLink>
     </P>
   );
-};
-
-ObfuscatedClientSecret.propTypes = {
-  secret: PropTypes.string,
 };
 
 const LABEL_STYLES = { fontWeight: 700, fontSize: '16px', lineHeight: '24px' };
@@ -267,11 +262,6 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
       )}
     </div>
   );
-};
-
-OAuthApplicationSettings.propTypes = {
-  id: PropTypes.string.isRequired,
-  backPath: PropTypes.string.isRequired,
 };
 
 export default OAuthApplicationSettings;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { AlertTriangle } from 'lucide-react';
@@ -211,12 +210,6 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
       </Formik>
     </StyledModal>
   );
-};
-
-CreatePersonalTokenModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-  account: PropTypes.object.isRequired,
 };
 
 export default CreatePersonalTokenModal;

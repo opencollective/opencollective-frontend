@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { isArray, omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
@@ -158,11 +157,6 @@ const AccountSettings = ({ account, section }) => {
       section={section}
     />
   );
-};
-
-AccountSettings.propTypes = {
-  account: PropTypes.object,
-  section: PropTypes.string,
 };
 
 export default AccountSettings;

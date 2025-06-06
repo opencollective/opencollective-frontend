@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
@@ -148,12 +147,6 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
       </Formik>
     </PublicMessageContainer>
   );
-};
-
-ContributionFlowPublicMessage.propTypes = {
-  order: PropTypes.object.isRequired,
-  publicMessage: PropTypes.string,
-  intl: PropTypes.object,
 };
 
 export default injectIntl(ContributionFlowPublicMessage);

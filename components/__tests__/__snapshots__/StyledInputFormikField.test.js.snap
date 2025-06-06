@@ -2,21 +2,30 @@
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        maxLength={100}
-        minLength={10}
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={true}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div
+        flexdirection="column"
+        justifycontent="flex-end"
+      >
+        <input
+          border="1px solid"
+          bordercolor="black.300"
+          borderradius="4px"
+          font-size="14px"
+          id="input-myAttribute"
+          lineheight="1.5"
+          maxlength="100"
+          minlength="10"
+          name="myAttribute"
+          px="3"
+          py="2"
+          required=""
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -24,21 +33,30 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on nested field 1`] = `
 <div>
-  <div
-    data-cy="InputField-my.nested.attribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-my.nested.attribute"
-        maxLength={100}
-        minLength={10}
-        name="my.nested.attribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={true}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-my.nested.attribute"
+    >
+      <div
+        flexdirection="column"
+        justifycontent="flex-end"
+      >
+        <input
+          border="1px solid"
+          bordercolor="black.300"
+          borderradius="4px"
+          font-size="14px"
+          id="input-my.nested.attribute"
+          lineheight="1.5"
+          maxlength="100"
+          minlength="10"
+          name="my.nested.attribute"
+          px="3"
+          py="2"
+          required=""
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -46,19 +64,27 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on nullable field 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={false}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div
+        flexdirection="column"
+        justifycontent="flex-end"
+      >
+        <input
+          border="1px solid"
+          bordercolor="black.300"
+          borderradius="4px"
+          font-size="14px"
+          id="input-myAttribute"
+          lineheight="1.5"
+          name="myAttribute"
+          px="3"
+          py="2"
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -66,21 +92,30 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on number field 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        max={100}
-        min={10}
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={true}
-        type="number"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div
+        flexdirection="column"
+        justifycontent="flex-end"
+      >
+        <input
+          border="1px solid"
+          bordercolor="black.300"
+          borderradius="4px"
+          font-size="14px"
+          id="input-myAttribute"
+          lineheight="1.5"
+          max="100"
+          min="10"
+          name="myAttribute"
+          px="3"
+          py="2"
+          required=""
+          type="number"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -88,19 +123,27 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema on optional field 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-        required={false}
-        type="text"
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div
+        flexdirection="column"
+        justifycontent="flex-end"
+      >
+        <input
+          border="1px solid"
+          bordercolor="black.300"
+          borderradius="4px"
+          font-size="14px"
+          id="input-myAttribute"
+          lineheight="1.5"
+          name="myAttribute"
+          px="3"
+          py="2"
+          type="text"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -108,17 +151,26 @@ exports[`StyledInputFormikField With Zod schema automatically adds attributes fr
 
 exports[`StyledInputFormikField renders default options 1`] = `
 <div>
-  <div
-    data-cy="InputField-myAttribute"
-  >
-    <div>
-      <input
-        fontSize="14px"
-        id="input-myAttribute"
-        name="myAttribute"
-        onBlur={[Function]}
-        onChange={[Function]}
-      />
+  <div>
+    <div
+      data-cy="InputField-myAttribute"
+    >
+      <div
+        flexdirection="column"
+        justifycontent="flex-end"
+      >
+        <input
+          border="1px solid"
+          bordercolor="black.300"
+          borderradius="4px"
+          font-size="14px"
+          id="input-myAttribute"
+          lineheight="1.5"
+          name="myAttribute"
+          px="3"
+          py="2"
+        />
+      </div>
     </div>
   </div>
 </div>

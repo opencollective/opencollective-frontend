@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -152,23 +151,6 @@ const DefinedTerm = ({ intl, term, textTransform, fontSize, children, color = 'b
       )}
     </StyledTooltip>
   );
-};
-
-DefinedTerm.propTypes = {
-  /** The term to be defined */
-  term: PropTypes.oneOf(Object.values(Terms)),
-  /** Applies to the underlined term */
-  textTransform: PropTypes.string,
-  /** Color for the text and the underline */
-  color: PropTypes.string,
-  /** Font size */
-  fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** If provided, will be rendered in place of the term */
-  children: PropTypes.node,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object.isRequired,
-  /** Extra content to include with term definition */
-  extraTooltipContent: PropTypes.node,
 };
 
 export default injectIntl(DefinedTerm);

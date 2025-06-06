@@ -301,6 +301,4 @@ const BanAccountsWithSearch = () => {
   );
 };
 
-BanAccountsWithSearch.propTypes = {};
-
 export default BanAccountsWithSearch;

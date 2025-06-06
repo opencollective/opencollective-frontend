@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep } from 'lodash';
@@ -52,11 +51,6 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
       </TooltipContent>
     </Tooltip>
   );
-};
-
-ChangelogTrigger.propTypes = {
-  setShowNewsAndUpdates: PropTypes.func,
-  setChangelogViewDate: PropTypes.func,
 };
 
 const setChangelogViewDateMutation = gql`

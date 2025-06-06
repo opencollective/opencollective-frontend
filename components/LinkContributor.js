@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -24,19 +23,6 @@ const LinkContributor = ({ contributor, children }) => {
   } else {
     return children || <span>{contributor.name}</span>;
   }
-};
-
-LinkContributor.propTypes = {
-  /** The contributor to link to */
-  contributor: PropTypes.shape({
-    collectiveSlug: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    isGuest: PropTypes.bool,
-  }).isRequired,
-  /** By default we show the name in the link. Use this prop to override this */
-  children: PropTypes.node,
 };
 
 export default LinkContributor;

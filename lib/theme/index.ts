@@ -1,3 +1,6 @@
+// A global namespace on StyledComponents's theme// import original module declarations
+import 'styled-components';
+
 import { transparentize } from 'polished';
 
 import { getButtonSizes, getButtonStyles } from './variants/button';
@@ -51,3 +54,15 @@ export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } 
 // Generate and export main theme
 const theme = generateTheme();
 export default theme;
+
+declare module 'styled-components' {
+  export interface DefaultTheme {
+    colors: typeof theme.colors;
+    space: typeof theme.space;
+    breakpoints: typeof theme.breakpoints;
+    buttons: typeof theme.buttons;
+    buttonSizes: typeof theme.buttonSizes;
+    messageTypes: typeof theme.messageTypes;
+    sizes: typeof theme.sizes;
+  }
+}

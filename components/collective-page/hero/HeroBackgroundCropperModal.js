@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Image as ImageIcon } from '@styled-icons/boxicons-regular/Image';
 import { AngleDoubleDown } from '@styled-icons/fa-solid/AngleDoubleDown';
@@ -289,16 +288,6 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
       </ReactDropzone>
     </StyledModal>
   );
-};
-
-HeroBackgroundCropperModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    backgroundImage: PropTypes.string.isRequired,
-    backgroundImageUrl: PropTypes.string.isRequired,
-    settings: PropTypes.object,
-  }).isRequired,
 };
 
 export default HeroBackgroundCropperModal;

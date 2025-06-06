@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -135,12 +134,6 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
   }
 };
 
-CollectiveContainer.propTypes = {
-  useLink: PropTypes.bool,
-  collective: PropTypes.object.isRequired,
-  children: PropTypes.node.isRequired,
-};
-
 /**
  * A card to show a collective that supports including a custom body.
  *
@@ -229,44 +222,6 @@ const StyledCollectiveCard = ({
       </Container>
     </StyledCard>
   );
-};
-
-StyledCollectiveCard.propTypes = {
-  /** Displayed below the top header of the card */
-  children: PropTypes.node,
-  /** To replace the default tag. Set to `null` to hide tag */
-  tag: PropTypes.node,
-  /** A fixed height for the content */
-  bodyHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  /** The collective to display */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    backgroundImageUrl: PropTypes.string,
-    website: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    location: PropTypes.shape({ country: PropTypes.string }),
-    isVerified: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.shape({
-      // TODO: getCollectiveMainTag should be based on slug
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      location: PropTypes.shape({ country: PropTypes.string }),
-      isTrustedHost: PropTypes.bool,
-      isFirstPartyHost: PropTypes.bool,
-    }),
-    parentCollective: PropTypes.shape({
-      backgroundImageUrl: PropTypes.string,
-    }),
-    parent: PropTypes.shape({
-      backgroundImageUrl: PropTypes.string,
-      location: PropTypes.shape({ country: PropTypes.string }),
-    }),
-  }).isRequired,
-  borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  showWebsite: PropTypes.bool,
-  useLink: PropTypes.bool,
 };
 
 export default StyledCollectiveCard;

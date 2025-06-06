@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Star } from '@styled-icons/fa-solid/Star';
 
@@ -61,18 +60,6 @@ const RepositoryEntry = ({ radio, value }) => {
       )}
     </Fragment>
   );
-};
-
-RepositoryEntry.propTypes = {
-  radio: PropTypes.object,
-  value: PropTypes.shape({
-    description: PropTypes.string,
-    owner: PropTypes.object,
-    stargazers_count: PropTypes.number, // eslint-disable-line camelcase
-    full_name: PropTypes.string, // eslint-disable-line camelcase
-    name: PropTypes.string,
-  }),
-  checked: PropTypes.bool,
 };
 
 export default RepositoryEntry;

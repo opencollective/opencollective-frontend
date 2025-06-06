@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { fadeIn } from '../StyledKeyframes';
@@ -43,8 +42,6 @@ export const DebitItem = ({ children, ...props }) => {
   );
 };
 
-DebitItem.propTypes = { children: PropTypes.node };
-
 /** Displays a credit entry in the list */
 export const CreditItem = ({ children, ...props }) => {
   return (
@@ -54,5 +51,3 @@ export const CreditItem = ({ children, ...props }) => {
     </DebitCreditItem>
   );
 };
-
-CreditItem.propTypes = { children: PropTypes.node };

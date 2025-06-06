@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, last, startCase } from 'lodash';
@@ -284,21 +283,6 @@ export const ContributionInterval = ({ tier, contribution }) => {
   }
 };
 
-ContributionInterval.propTypes = {
-  tier: PropTypes.shape({
-    id: PropTypes.string,
-    interval: PropTypes.string,
-  }),
-  contribution: PropTypes.shape({
-    tier: PropTypes.shape({
-      id: PropTypes.string,
-      interval: PropTypes.string,
-    }),
-    frequency: PropTypes.string,
-  }),
-  onCloseEdit: PropTypes.func,
-};
-
 const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // GraphQL mutations and queries
   const queryVariables = { slug: contribution.toAccount.slug };
@@ -478,11 +462,6 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
       </Flex>
     </Fragment>
   );
-};
-
-UpdateOrderPopUp.propTypes = {
-  contribution: PropTypes.object.isRequired,
-  onCloseEdit: PropTypes.func,
 };
 
 export default UpdateOrderPopUp;

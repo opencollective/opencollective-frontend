@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -45,16 +44,6 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
   }
 };
 
-PrettyAmountFromStepDetails.propTypes = {
-  currency: PropTypes.string,
-  stepDetails: PropTypes.shape({
-    interval: PropTypes.string,
-    amount: PropTypes.number,
-    platformTip: PropTypes.number,
-  }),
-  isFreeTier: PropTypes.bool,
-};
-
 const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
     if (stepProfile) {
@@ -88,16 +77,6 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
   }
 
   return null;
-};
-
-StepInfo.propTypes = {
-  step: PropTypes.object,
-  stepProfile: PropTypes.object,
-  stepDetails: PropTypes.object,
-  stepPayment: PropTypes.object,
-  stepSummary: PropTypes.object,
-  isFreeTier: PropTypes.bool,
-  currency: PropTypes.string,
 };
 
 const ContributionFlowStepsProgress = ({
@@ -145,21 +124,6 @@ const ContributionFlowStepsProgress = ({
       )}
     </StepsProgress>
   );
-};
-
-ContributionFlowStepsProgress.propTypes = {
-  steps: PropTypes.arrayOf(PropTypes.object).isRequired,
-  currentStep: PropTypes.object.isRequired,
-  goToStep: PropTypes.func.isRequired,
-  stepProfile: PropTypes.object,
-  stepDetails: PropTypes.object,
-  stepPayment: PropTypes.object,
-  stepSummary: PropTypes.object,
-  isSubmitted: PropTypes.bool,
-  loading: PropTypes.bool,
-  lastVisitedStep: PropTypes.object,
-  currency: PropTypes.string,
-  isFreeTier: PropTypes.bool,
 };
 
 export default ContributionFlowStepsProgress;

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -171,11 +170,6 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
       </Box>
     </Flex>
   );
-};
-
-TermsOfFiscalSponsorship.propTypes = {
-  checked: PropTypes.bool,
-  onChecked: PropTypes.func,
 };
 
 export default TermsOfFiscalSponsorship;

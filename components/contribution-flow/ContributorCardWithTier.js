@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -132,10 +131,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
       </Flex>
     </StyledCollectiveCard>
   );
-};
-
-ContributorCardWithTier.propTypes = {
-  contribution: PropTypes.object.isRequired,
 };
 
 export default withUser(ContributorCardWithTier);

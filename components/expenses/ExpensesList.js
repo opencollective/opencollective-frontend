@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -62,28 +61,21 @@ const ExpensesTotal = ({ collective, host, expenses, expenseFieldForTotalAmount 
   );
 };
 
-ExpensesTotal.propTypes = {
-  collective: PropTypes.object,
-  host: PropTypes.object,
-  expenses: PropTypes.array,
-  expenseFieldForTotalAmount: PropTypes.string,
-};
-
 const ExpensesList = ({
-  collective,
-  host,
+  collective = undefined,
+  host = undefined,
   expenses,
-  isLoading,
+  isLoading = false,
   nbPlaceholders = 10,
-  isInverted,
+  isInverted = false,
   view = 'public',
-  onDelete,
-  onProcess,
+  onDelete = undefined,
+  onProcess = undefined,
   expenseFieldForTotalAmount = 'amountInAccountCurrency',
-  useDrawer,
-  setOpenExpenseLegacyId,
-  openExpenseLegacyId,
-  onDuplicateClick,
+  useDrawer = false,
+  setOpenExpenseLegacyId = undefined,
+  openExpenseLegacyId = undefined,
+  onDuplicateClick = undefined,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
   // Initial values for expense in drawer
@@ -226,35 +218,6 @@ const ExpensesList = ({
       )}
     </StyledCard>
   );
-};
-
-ExpensesList.propTypes = {
-  isLoading: PropTypes.bool,
-  /** Set this to true to invert who's displayed (payee or collective) */
-  isInverted: PropTypes.bool,
-  /** When `isLoading` is true, this sets the number of "loadin" items displayed */
-  nbPlaceholders: PropTypes.number,
-  host: PropTypes.object,
-  view: PropTypes.oneOf(['public', 'admin', 'submitter']),
-  onDelete: PropTypes.func,
-  onProcess: PropTypes.func,
-  /** Defines the field in `expense` that holds the amount. Useful to display the right one based on the context for multi-currency expenses. */
-  expenseFieldForTotalAmount: PropTypes.string,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    parent: PropTypes.shape({ slug: PropTypes.string }),
-    currency: PropTypes.string,
-  }),
-  expenses: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      legacyId: PropTypes.number.isRequired,
-    }),
-  ),
-  useDrawer: PropTypes.bool,
-  setOpenExpenseLegacyId: PropTypes.func,
-  openExpenseLegacyId: PropTypes.number,
-  onDuplicateClick: PropTypes.func,
 };
 
 export default ExpensesList;

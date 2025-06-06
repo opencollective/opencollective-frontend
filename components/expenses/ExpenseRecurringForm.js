@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { getDateFromValue, toIsoDateStr } from '../../lib/date-utils';
@@ -99,14 +98,6 @@ const ExpenseRecurringForm = ({ recurring, onChange }) => {
       )}
     </Box>
   );
-};
-
-ExpenseRecurringForm.propTypes = {
-  onChange: PropTypes.func,
-  recurring: PropTypes.shape({
-    interval: PropTypes.string,
-    endsAt: PropTypes.Date,
-  }),
 };
 
 export default ExpenseRecurringForm;

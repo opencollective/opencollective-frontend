@@ -83,7 +83,7 @@ export default function FindAHostSearch(props: {
   collective: Account;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
-  const scrollRef = React.useRef<HTMLDivElement>();
+  const scrollRef = React.useRef<HTMLDivElement>(undefined);
   const [queryPage, setQueryPage] = React.useState(1);
 
   // Return to first page when filters change.

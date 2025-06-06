@@ -3,7 +3,6 @@
  */
 
 import React, { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
@@ -51,15 +50,15 @@ const NavButton = styled(StyledButton)`
   padding: 10px;
   cursor: pointer;
   @media (hover: hover) {
-    :hover {
+    &:hover {
       background-color: white !important;
     }
   }
-  :focus {
+  &:focus {
     background-color: white;
     border-radius: 1px;
   }
-  :active {
+  &:active {
     color: black;
   }
 `;
@@ -69,7 +68,7 @@ const NavItem = styled(StyledLink)`
   font-weight: 500;
   font-size: 14px;
   @media (hover: hover) {
-    :hover {
+    &:hover {
       text-decoration: underline;
     }
   }
@@ -96,14 +95,6 @@ const TopBarIcon = ({ provider }) => {
   );
 };
 
-TopBarIcon.propTypes = {
-  provider: PropTypes.shape({
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    logo: PropTypes.string,
-  }),
-};
-
 const TopBar = ({
   showSearch = true,
   menuItems = { solutions: true, product: true, company: true, docs: true },
@@ -113,7 +104,7 @@ const TopBar = ({
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const ref = useRef();
+  const ref = useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
@@ -336,13 +327,6 @@ const TopBar = ({
       </Hide>
     </Flex>
   );
-};
-
-TopBar.propTypes = {
-  showSearch: PropTypes.bool,
-  showProfileAndChangelogMenu: PropTypes.bool,
-  menuItems: PropTypes.object,
-  account: PropTypes.object,
 };
 
 export default TopBar;

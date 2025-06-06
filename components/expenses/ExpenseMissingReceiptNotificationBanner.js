@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
@@ -60,11 +59,6 @@ const ExpenseMissingReceiptNotificationBanner = props => {
       </Flex>
     </MessageBox>
   );
-};
-
-ExpenseMissingReceiptNotificationBanner.propTypes = {
-  onEdit: PropTypes.func,
-  expense: PropTypes.any,
 };
 
 export default ExpenseMissingReceiptNotificationBanner;

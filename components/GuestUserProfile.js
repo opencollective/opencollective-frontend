@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { GuestAvatar } from './Avatar';
@@ -30,10 +29,6 @@ const GuestUserProfile = ({ account }) => {
       </Flex>
     </Page>
   );
-};
-
-GuestUserProfile.propTypes = {
-  account: PropTypes.object,
 };
 
 export default GuestUserProfile;

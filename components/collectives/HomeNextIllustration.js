@@ -1,5 +1,4 @@
 import React from 'react';
-import { PropTypes } from 'prop-types';
 
 import { Box } from '../Grid';
 import Image from '../Image';
@@ -15,12 +14,5 @@ function NextIllustration({ display, ...props }) {
     </Box>
   );
 }
-
-NextIllustration.propTypes = {
-  display: PropTypes.array,
-  src: PropTypes.string,
-  width: PropTypes.number,
-  height: PropTypes.number,
-};
 
 export default NextIllustration;

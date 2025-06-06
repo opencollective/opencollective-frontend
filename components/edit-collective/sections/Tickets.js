@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, sortBy } from 'lodash';
 import styled from 'styled-components';
@@ -71,13 +70,6 @@ const Tickets = ({ collective }) => {
       )}
     </Box>
   );
-};
-
-Tickets.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
-  }).isRequired,
 };
 
 export default Tickets;

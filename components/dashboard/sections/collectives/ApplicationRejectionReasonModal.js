@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/feather/Lock';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -129,12 +128,6 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
       </ModalFooter>
     </StyledModal>
   );
-};
-
-ApplicationRejectionReasonModal.propTypes = {
-  collective: PropTypes.object.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default ApplicationRejectionReasonModal;

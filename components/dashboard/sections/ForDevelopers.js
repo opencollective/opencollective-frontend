@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
 import { isIndividualAccount } from '../../../lib/collective';
-import { CollectiveType } from '../../../lib/constants/collectives';
 import { getOauthAppSettingsRoute, getPersonalTokenSettingsRoute } from '../../../lib/url-helpers';
 
 import OAuthApplicationSettings from '../../oauth/OAuthApplicationSettings';
@@ -37,13 +35,6 @@ const ForDevelopers = ({ account }) => {
       </React.Fragment>
     );
   }
-};
-
-ForDevelopers.propTypes = {
-  account: PropTypes.shape({
-    type: PropTypes.oneOf(Object.keys(CollectiveType)).isRequired,
-    slug: PropTypes.string.isRequired,
-  }),
 };
 
 export default ForDevelopers;

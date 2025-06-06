@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -125,15 +124,6 @@ const User = ({ id, name, picture, type, collectivePath }) => {
       </Container>
     </Container>
   );
-};
-
-User.propTypes = {
-  id: PropTypes.string,
-  name: PropTypes.string,
-  picture: PropTypes.string,
-  type: PropTypes.string,
-  collectivePath: PropTypes.string,
-  learnMorePath: PropTypes.string,
 };
 
 const OCUsers = () => {

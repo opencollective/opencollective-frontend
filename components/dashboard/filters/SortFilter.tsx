@@ -143,20 +143,18 @@ export function buildSortFilter({
 }
 const getIcon = (direction, field) => Icons[FieldIconTypes[field]][direction] ?? Icons.DEFAULT[direction];
 
-function buildSortFilterComponent(
-  fieldSchema: z.ZodEnum<any>,
-  i18nCustomLabels?: Record<string, MessageDescriptor>,
-): React.FunctionComponent<
-  FilterComponentProps<
+function buildSortFilterComponent(fieldSchema: z.ZodEnum<any>, i18nCustomLabels?: Record<string, MessageDescriptor>) {
+  return function SortFilter({
+    onChange,
+    value,
+  }: FilterComponentProps<
     z.infer<
       z.ZodObject<{
         field: typeof fieldSchema;
         direction: typeof sortDirectionSchema;
       }>
     >
-  >
-> {
-  return function SortFilter({ onChange, value }) {
+  >) {
     const intl = useIntl();
     const Icon = getIcon(value.direction, value.field);
     const simpleList = true;

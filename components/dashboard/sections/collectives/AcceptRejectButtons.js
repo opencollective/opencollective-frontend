@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Ban, Check, Info } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -15,13 +14,13 @@ import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
 
 const AcceptRejectButtons = ({
   collective,
-  isLoading,
+  isLoading = false,
   onApprove,
   onReject,
-  disabled,
-  disabledMessage,
-  customButton,
-  editCollectiveMutation,
+  disabled = false,
+  disabledMessage = undefined,
+  customButton = undefined,
+  editCollectiveMutation = undefined,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
@@ -171,22 +170,6 @@ const AcceptRejectButtons = ({
       )}
     </Flex>
   );
-};
-
-AcceptRejectButtons.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-  }),
-  isLoading: PropTypes.bool,
-  disabled: PropTypes.bool,
-  disabledMessage: PropTypes.string,
-  onApprove: PropTypes.func,
-  onReject: PropTypes.func,
-  customButton: PropTypes.func,
-  editCollectiveMutation: PropTypes.func,
 };
 
 export default AcceptRejectButtons;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
@@ -66,7 +65,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
   };
 
   return (
-    <StyledModal onClose={handleClose} maxWidth={450} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} maxWidth={450} {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage defaultMessage="Delete virtual card" id="7nrRJ/" />
@@ -98,16 +97,6 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
       </form>
     </StyledModal>
   );
-};
-
-DeleteVirtualCardModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  onDeleteRefetchQuery: PropTypes.string,
-  virtualCard: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-  }),
 };
 
 /** @component */

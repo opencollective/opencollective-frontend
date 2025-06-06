@@ -172,7 +172,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
 };
 
 const EditPayee = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -276,7 +276,7 @@ const EditPayee = ({ expense, onSubmit }) => {
 };
 
 const EditPayoutMethod = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -366,7 +366,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
 };
 
 const EditExpenseDetails = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -455,7 +455,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
 };
 
 const AttachReceipts = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -557,7 +557,7 @@ const getEditExpenseTypeSteps = (intl: IntlShape): StepItem[] => {
 const EditExpenseType = ({ expense, onSubmit }) => {
   const intl = useIntl();
 
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,

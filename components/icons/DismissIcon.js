@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
@@ -11,9 +10,5 @@ const DismissIcon = props => (
     />
   </CustomStyledIcon>
 );
-
-DismissIcon.propTypes = {
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
 
 export default DismissIcon;

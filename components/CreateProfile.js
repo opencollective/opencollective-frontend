@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Captcha, { isCaptchaEnabled } from './Captcha';
-import Container from './Container';
 import { Box, Flex } from './Grid';
 import { getI18nLink, WebsiteName } from './I18nFormatters';
 import Image from './Image';
@@ -17,7 +15,7 @@ import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledLinkButton from './StyledLinkButton';
-import { P, Span } from './Text';
+import { Span } from './Text';
 
 const messages = defineMessages({
   newsletter: {
@@ -34,31 +32,6 @@ const messages = defineMessages({
   },
 });
 
-const Tab = ({ active, children, setActive, 'data-cy': dataCy }) => (
-  <Container
-    bg={active ? 'white.full' : 'black.50'}
-    color="black.700"
-    cursor="pointer"
-    px={3}
-    py={20}
-    textAlign="center"
-    width={0.5}
-    tabIndex={0}
-    onClick={setActive}
-    onKeyDown={event => event.key === 'Enter' && setActive(event)}
-    data-cy={dataCy}
-  >
-    <P fontWeight={active ? '600' : 'normal'}>{children}</P>
-  </Container>
-);
-
-Tab.propTypes = {
-  active: PropTypes.bool,
-  children: PropTypes.node,
-  setActive: PropTypes.func,
-  'data-cy': PropTypes.string,
-};
-
 const SecondaryAction = ({ children, loading, onSecondaryAction, asLink }) => {
   const Button = asLink ? StyledLinkButton : StyledButton;
   return typeof onSecondaryAction === 'string' ? (
@@ -72,13 +45,6 @@ const SecondaryAction = ({ children, loading, onSecondaryAction, asLink }) => {
   );
 };
 
-SecondaryAction.propTypes = {
-  children: PropTypes.node,
-  loading: PropTypes.bool,
-  onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-  asLink: PropTypes.bool,
-};
-
 const NewsletterCheckBox = ({ onChange, checked }) => {
   const intl = useIntl();
   return (
@@ -89,11 +55,6 @@ const NewsletterCheckBox = ({ onChange, checked }) => {
       label={intl.formatMessage(messages.newsletter)}
     />
   );
-};
-
-NewsletterCheckBox.propTypes = {
-  onChange: PropTypes.func,
-  checked: PropTypes.bool,
 };
 
 const TOSCheckBox = ({ onChange, checked }) => {
@@ -117,11 +78,6 @@ const TOSCheckBox = ({ onChange, checked }) => {
       }
     />
   );
-};
-
-TOSCheckBox.propTypes = {
-  onChange: PropTypes.func,
-  checked: PropTypes.bool,
 };
 
 const useForm = ({ onEmailChange, onFieldChange, name, newsletterOptIn, tosOptIn, errors }) => {
@@ -386,38 +342,6 @@ const CreateProfile = ({
       </Box>
     </React.Fragment>
   );
-};
-
-CreateProfile.propTypes = {
-  /** a map of errors to the matching field name, e.g., `{ email: 'Invalid email' }` will display that message until the email field */
-  errors: PropTypes.objectOf(PropTypes.string),
-  /** handles submissions of personal profile form */
-  onSubmit: PropTypes.func.isRequired,
-  /** Disable submit and show a spinner on button when set to true */
-  submitting: PropTypes.bool,
-  /** Set the value of email input */
-  email: PropTypes.string.isRequired,
-  /** Set the value of name input */
-  name: PropTypes.string.isRequired,
-  /** Set the value of newsLetterOptIn input */
-  newsletterOptIn: PropTypes.bool.isRequired,
-  /** Set the value of tosOptIn input */
-  tosOptIn: PropTypes.bool.isRequired,
-  /** handles changes in the email input */
-  onEmailChange: PropTypes.func.isRequired,
-  /** handles changes in input fields */
-  onFieldChange: PropTypes.func.isRequired,
-  /** specifies whether the email is already registered **/
-  emailAlreadyExists: PropTypes.bool,
-  /** All props from `StyledCard` */
-  ...StyledCard.propTypes,
-  /** Oauth Sign In **/
-  isOAuth: PropTypes.bool,
-  /** Oauth App Name **/
-  oAuthAppName: PropTypes.string,
-  /** Oauth App Image URL **/
-  oAuthAppImage: PropTypes.string,
-  data: PropTypes.object,
 };
 
 export default CreateProfile;

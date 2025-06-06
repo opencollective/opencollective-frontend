@@ -65,13 +65,13 @@ const ContributeButton = styled.div`
   cursor: pointer;
   background-image: url(/static/images/buttons/contribute-button-blue.svg);
 
-  :hover {
+  &:hover {
     background-position: 0 -50px;
   }
-  :active {
+  &:active {
     background-position: 0 -100px;
   }
-  :focus {
+  &:focus {
     outline: 0;
   }
 `;

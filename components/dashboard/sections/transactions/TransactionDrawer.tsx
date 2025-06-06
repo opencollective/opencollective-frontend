@@ -251,7 +251,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   });
   const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
 

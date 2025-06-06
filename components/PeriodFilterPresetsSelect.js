@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { stripTime } from '../lib/date-utils';
@@ -104,19 +103,6 @@ const PeriodFilterPresetsSelect = ({
       }}
     />
   );
-};
-
-PeriodFilterPresetsSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  inputId: PropTypes.string.isRequired,
-  interval: PropTypes.shape({
-    from: PropTypes.string,
-    to: PropTypes.string,
-  }).isRequired,
-  formatDateFn: PropTypes.func,
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  SelectComponent: PropTypes.elementType,
-  styles: PropTypes.object,
 };
 
 export default PeriodFilterPresetsSelect;

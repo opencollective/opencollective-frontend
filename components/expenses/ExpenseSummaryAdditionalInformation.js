@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -7,7 +6,7 @@ import styled from 'styled-components';
 import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import { INVITE, VIRTUAL_CARD } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
@@ -31,20 +30,6 @@ import { H4, P, Span } from '../Text';
 import EditExpenseDialog from './EditExpenseDialog';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
-
-const CreatedByUserLink = ({ account }) => {
-  return (
-    <LinkCollective collective={account}>
-      <Span color="black.800" fontWeight={500} textDecoration="none">
-        {account ? account.name : <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
-      </Span>
-    </LinkCollective>
-  );
-};
-
-CreatedByUserLink.propTypes = {
-  account: PropTypes.object,
-};
 
 const PrivateInfoColumn = styled(Box).attrs({ flexBasis: [0, '185px'] })`
   background: #f9fafb;
@@ -107,9 +92,9 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
 const ExpenseSummaryAdditionalInformation = ({
   expense,
   host,
-  isLoading,
-  isLoadingLoggedInUser,
-  isDraft,
+  isLoading = false,
+  isLoadingLoggedInUser = false,
+  isDraft = false,
   collective,
 }) => {
   const intl = useIntl();
@@ -342,113 +327,6 @@ const ExpenseSummaryAdditionalInformation = ({
       </PrivateInfoColumn>
     </Flex>
   );
-};
-
-PayeeTotalPayoutSumTooltip.propTypes = {
-  stats: PropTypes.shape({
-    totalPaidInvoices: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }).isRequired,
-    totalPaidReceipts: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }).isRequired,
-    totalPaidGrants: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }).isRequired,
-  }),
-};
-
-ExpenseSummaryAdditionalInformation.propTypes = {
-  /** Set this to true if the expense is not loaded yet */
-  isLoading: PropTypes.bool,
-  /** Set this to true if this shoud use information from expense.draft property */
-  isDraft: PropTypes.bool,
-  /** Set this to true if the logged in user is currenltly loading */
-  isLoadingLoggedInUser: PropTypes.bool,
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  /** Must be provided if isLoading is false */
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    description: PropTypes.string,
-    longDescription: PropTypes.string,
-    currency: PropTypes.string,
-    invoiceInfo: PropTypes.string,
-    createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    tags: PropTypes.arrayOf(PropTypes.string),
-    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
-    draft: PropTypes.shape({
-      payee: PropTypes.object,
-      payeeLocation: PropTypes.object,
-      payoutMethod: PropTypes.object,
-    }),
-    payee: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-      isAdmin: PropTypes.bool,
-      isInvite: PropTypes.bool,
-      stats: PropTypes.shape({
-        totalPaidInvoices: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }).isRequired,
-        totalPaidReceipts: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }).isRequired,
-        totalPaidGrants: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }).isRequired,
-      }),
-    }),
-    payeeLocation: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-    createdByAccount: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-    }),
-    payoutMethod: PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-      data: PropTypes.object,
-    }),
-    virtualCard: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      last4: PropTypes.string,
-    }),
-    permissions: PropTypes.shape({
-      canEditPaidBy: PropTypes.boolean,
-    }),
-  }),
-  collective: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    isActive: PropTypes.bool,
-    type: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    legalName: PropTypes.string,
-    stats: PropTypes.shape({
-      balanceWithBlockedFunds: PropTypes.object,
-    }),
-    hostAgreements: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
 };
 
 export default ExpenseSummaryAdditionalInformation;

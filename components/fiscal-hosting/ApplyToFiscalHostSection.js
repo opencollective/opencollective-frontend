@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -133,17 +132,6 @@ const Host = ({ id, name, logo, bgImage, location, color, collectivePath }) => {
   );
 };
 
-Host.propTypes = {
-  id: PropTypes.string,
-  name: PropTypes.string,
-  picture: PropTypes.string,
-  location: PropTypes.string,
-  collectivePath: PropTypes.string,
-  logo: PropTypes.string,
-  bgImage: PropTypes.string,
-  color: PropTypes.string,
-};
-
 const ApplyToHostDesktopCarousel = ({ display, controllerPosition }) => (
   <StyledCarousel controllerPosition={controllerPosition} width={1} display={display}>
     {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
@@ -159,11 +147,6 @@ const ApplyToHostDesktopCarousel = ({ display, controllerPosition }) => (
   </StyledCarousel>
 );
 
-ApplyToHostDesktopCarousel.propTypes = {
-  display: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-  controllerPosition: PropTypes.string,
-};
-
 export const ApplyToHostMobileCarousel = ({ color }) => (
   <StyledCarousel display={[null, 'none']} width={1}>
     {HOSTS.map(host => (
@@ -172,10 +155,6 @@ export const ApplyToHostMobileCarousel = ({ color }) => (
   </StyledCarousel>
 );
 
-ApplyToHostMobileCarousel.propTypes = {
-  color: PropTypes.string,
-};
-
 export const ApplyToHostGrid = ({ color }) => (
   <Grid gridGap={[1, null, null, null, '48px']} gridTemplateColumns={'repeat(3, 1fr)'}>
     {HOSTS.map(host => (
@@ -183,10 +162,6 @@ export const ApplyToHostGrid = ({ color }) => (
     ))}
   </Grid>
 );
-
-ApplyToHostGrid.propTypes = {
-  color: PropTypes.string,
-};
 
 const ApplyToFiscalHosts = () => (
   <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">

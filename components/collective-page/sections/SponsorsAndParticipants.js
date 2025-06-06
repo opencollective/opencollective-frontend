@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get, groupBy, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -122,14 +121,6 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
       )}
     </Box>
   );
-};
-
-Participants.propTypes = {
-  collective: PropTypes.shape({
-    orders: PropTypes.array,
-  }).isRequired,
-  LoggedInUser: PropTypes.object,
-  refetch: PropTypes.func,
 };
 
 export default Participants;

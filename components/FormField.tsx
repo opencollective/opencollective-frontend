@@ -31,7 +31,7 @@ export function FormField({
   name: string;
   hint?: string | React.ReactNode;
   placeholder?: string;
-  children?: (props: { form: FormikProps<any>; meta: any; field: any; hasError?: boolean }) => JSX.Element;
+  children?: (props: { form: FormikProps<any>; meta: any; field: any; hasError?: boolean }) => React.ReactNode;
   required?: boolean;
   min?: number;
   max?: number;

@@ -60,7 +60,6 @@ const CommandInput = React.forwardRef<
 >(({ className, loading, customIcon, hideIcon, ...props }, ref) => {
   const Icon = loading ? Loader2 : (customIcon ?? Search);
   return (
-    // eslint-disable-next-line react/no-unknown-property
     <div className="flex items-center px-3" cmdk-input-wrapper="">
       {!hideIcon && <Icon className={clsx('mr-2 h-4 w-4 shrink-0 opacity-50', loading && 'animate-spin')} />}
       <CommandPrimitive.Input

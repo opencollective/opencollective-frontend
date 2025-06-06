@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { CheckCircle as CheckIcon } from '@styled-icons/boxicons-regular/CheckCircle';
 import { Ban as RejectedIcon } from '@styled-icons/fa-solid/Ban';
 import { Cogs as CogsIcon } from '@styled-icons/fa-solid/Cogs';
@@ -16,6 +15,7 @@ import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
+import type { Transaction } from '@/lib/graphql/types/v2/schema';
 
 import { Box as Container } from '../Grid';
 /**
@@ -202,7 +202,13 @@ export const isSupportedActivity = activity => {
   return Object.prototype.hasOwnProperty.call(ACTIVITIES_INFO, activity.type);
 };
 
-function ExpenseTransactionRenderer({ activity }) {
+interface ExpenseTransactionRendererProps {
+  activity?: {
+    transaction: Pick<Transaction, 'type'> & Parameters<typeof renderDetailsString>[0];
+  };
+}
+
+function ExpenseTransactionRenderer({ activity }: ExpenseTransactionRendererProps) {
   const intl = useIntl();
   if (!activity.transaction) {
     return null;
@@ -218,7 +224,3 @@ function ExpenseTransactionRenderer({ activity }) {
     </Container>
   );
 }
-
-ExpenseTransactionRenderer.propTypes = {
-  activity: PropTypes.object,
-};

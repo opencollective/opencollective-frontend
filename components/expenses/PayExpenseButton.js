@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
 import { get, includes } from 'lodash';
@@ -70,14 +69,6 @@ const PayoutMethodTypeIcon = ({ type, host, ...props }) => {
   } else {
     return <OtherIcon {...props} />;
   }
-};
-
-PayoutMethodTypeIcon.propTypes = {
-  type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  host: PropTypes.shape({
-    transferwise: PropTypes.object,
-  }),
 };
 
 const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
@@ -153,48 +144,6 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
   } else {
     return button;
   }
-};
-
-PayExpenseButton.propTypes = {
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    amount: PropTypes.number,
-    payoutMethod: PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-    }),
-    payee: PropTypes.shape({
-      host: PropTypes.shape({
-        id: PropTypes.string,
-      }),
-    }),
-  }).isRequired,
-  collective: PropTypes.shape({
-    host: PropTypes.shape({
-      plan: PropTypes.object,
-    }),
-    stats: PropTypes.shape({
-      // Collective / Balance can be v1 or v2 there ...
-      balanceWithBlockedFunds: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.shape({
-          valueInCents: PropTypes.number.isRequired,
-          currency: PropTypes.string.isRequired,
-        }),
-      ]),
-    }),
-  }).isRequired,
-  host: PropTypes.shape({
-    id: PropTypes.string,
-    plan: PropTypes.object,
-  }),
-  /** To disable the button */
-  disabled: PropTypes.bool,
-  /** Function called when users click on one of the "Pay" buttons */
-  onSubmit: PropTypes.func.isRequired,
-  /** If set, will be displayed in the pay modal */
-  error: PropTypes.string,
-  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default PayExpenseButton;

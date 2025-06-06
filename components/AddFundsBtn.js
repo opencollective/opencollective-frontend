@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
@@ -19,11 +18,6 @@ const AddFundsBtn = ({ children = DefaultAddFundsButton, collective }) => {
       {showModal && <AddFundsModal collective={collective} host={collective.host} onClose={() => setShowModal(null)} />}
     </Fragment>
   );
-};
-
-AddFundsBtn.propTypes = {
-  children: PropTypes.func.isRequired,
-  collective: PropTypes.object.isRequired,
 };
 
 export default AddFundsBtn;

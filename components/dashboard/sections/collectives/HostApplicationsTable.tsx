@@ -20,7 +20,7 @@ interface ApplicationMeta extends TableMeta<HostApplicationFieldsFragment> {
 }
 
 const StatusTag = ({ status }: { status: HostApplicationStatus }) => {
-  const tagProps = { textTransform: 'uppercase', fontWeight: 700, fontSize: '12px' };
+  const tagProps = { textTransform: 'uppercase', fontWeight: 700, fontSize: '12px' } as const;
 
   switch (status) {
     case 'PENDING':

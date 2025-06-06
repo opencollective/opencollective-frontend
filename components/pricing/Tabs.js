@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -62,9 +61,5 @@ const Tabs = ({ activeTab }) => (
     </Link>
   </Container>
 );
-
-Tabs.propTypes = {
-  activeTab: PropTypes.string,
-};
 
 export default Tabs;

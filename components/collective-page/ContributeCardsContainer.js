@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { display } from 'styled-system';
 
@@ -59,10 +58,6 @@ const ContributeCardsContainer = styled.div.attrs(props => ({
     }
   }
 `;
-
-ContributeCardsContainer.propTypes = {
-  disableScrollSnapping: PropTypes.bool,
-};
 
 /** @component */
 export default ContributeCardsContainer;

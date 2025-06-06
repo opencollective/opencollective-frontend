@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -40,9 +39,4 @@ const OpenEmailProviderButton = ({ email, children }) => {
       );
 };
 
-OpenEmailProviderButton.propTypes = {
-  email: PropTypes.string,
-  /** Called with the button component if email is recognized */
-  children: PropTypes.func.isRequired,
-};
 export default OpenEmailProviderButton;

@@ -33,6 +33,7 @@ import {
   whiteSpace,
   wordBreak,
 } from '../lib/styled-system-custom-properties';
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
 export type ContainerProps = FlexboxProps &
   BackgroundProps &
@@ -59,7 +60,7 @@ export type ContainerProps = FlexboxProps &
 const FILTERED_PROPS = new Set(['display', 'width', 'height', 'overflow']);
 
 const Container = styled.div.withConfig({
-  shouldForwardProp: (prop, validate) => validate(prop) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: prop => defaultShouldForwardProp(prop) && !FILTERED_PROPS.has(prop),
 })<ContainerProps>`
   box-sizing: border-box;
 
@@ -83,7 +84,7 @@ const Container = styled.div.withConfig({
   ${props =>
     props.clearfix &&
     `
-      ::after {
+      &::after {
         content: "";
         display: table;
         clear: both;

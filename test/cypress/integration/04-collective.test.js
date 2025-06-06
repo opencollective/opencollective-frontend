@@ -227,7 +227,7 @@ describe('Edit public message after contribution', () => {
       cy.signup({ redirect: `/${slug}/donate`, visitParams: { onBeforeLoad: mockRecaptcha } }).then(() => {
         // SECTION: Make a donation to the collective
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.wait(50);
+        cy.contains('Contribute as').should('be.visible');
         cy.get('button[data-cy="cf-next-step"]').click();
         cy.wait(2000); // Wait for stripe to be loaded
         cy.fillStripeInput();

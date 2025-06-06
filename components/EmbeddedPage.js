@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 import { color } from 'styled-system';
 
@@ -43,16 +42,6 @@ const EmbeddedPage = ({ children, description, title, canonicalURL, collective, 
       <Main backgroundColor={backgroundColor}>{children}</Main>
     </Fragment>
   );
-};
-
-EmbeddedPage.propTypes = {
-  children: PropTypes.node,
-  description: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  canonicalURL: PropTypes.string,
-  loadingLoggedInUser: PropTypes.bool,
-  title: PropTypes.string,
-  collective: PropTypes.object,
 };
 
 export default withUser(EmbeddedPage);

@@ -221,7 +221,6 @@ class CreateEventForm extends React.Component {
                   defaultValue={this.getFieldDefaultValue(field)}
                   value={field.value}
                   validate={field.validate}
-                  ref={field.name}
                   name={field.name}
                   label={field.label}
                   description={field.description}

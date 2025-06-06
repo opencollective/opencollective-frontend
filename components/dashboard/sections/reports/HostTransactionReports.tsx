@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import type { DashboardSectionProps } from '../../types';
 
@@ -12,10 +11,6 @@ const HostDashboardReports = ({ accountSlug: hostSlug, subpath }: DashboardSecti
   }
 
   return <HostTransactionReportList accountSlug={hostSlug} />;
-};
-
-HostDashboardReports.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardReports;

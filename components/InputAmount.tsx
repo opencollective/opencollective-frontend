@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 
 import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
+import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import StyledSpinner from '@/components/StyledSpinner';
@@ -67,7 +67,26 @@ const useAmountInputMinWidth = (value, max = 1000000000) => {
   return result;
 };
 
-const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, minFxRate, maxFxRate }) => {
+interface ConvertedAmountInputProps {
+  exchangeRate?: {
+    toCurrency: CurrencyEnum;
+    value: number;
+  };
+  onChange?(...args: unknown[]): unknown;
+  baseAmount?: number;
+  minFxRate?: number;
+  maxFxRate?: number;
+  inputId: string;
+}
+
+const ConvertedAmountInput = ({
+  inputId,
+  exchangeRate,
+  onChange,
+  baseAmount,
+  minFxRate,
+  maxFxRate,
+}: ConvertedAmountInputProps) => {
   const precision = getDefaultCurrencyPrecision(exchangeRate.toCurrency);
   const targetAmount = round((baseAmount || 0) * exchangeRate.value, precision);
   const [isEditing, setEditing] = React.useState(false);
@@ -122,14 +141,6 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
       <span className="ml-1">{getEmojiByCurrencyCode(exchangeRate.toCurrency)}</span>
     </div>
   );
-};
-
-ConvertedAmountInput.propTypes = {
-  exchangeRate: PropTypes.object,
-  onChange: PropTypes.func,
-  baseAmount: PropTypes.number,
-  minFxRate: PropTypes.number,
-  maxFxRate: PropTypes.number,
 };
 
 /**

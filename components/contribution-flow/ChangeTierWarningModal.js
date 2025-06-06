@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -23,13 +22,6 @@ const ChangeTierWarningModal = ({ onClose, tierName, onConfirm }) => {
       </P>
     </ConfirmationModal>
   );
-};
-
-ChangeTierWarningModal.propTypes = {
-  /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  tierName: PropTypes.string.isRequired,
 };
 
 export default ChangeTierWarningModal;

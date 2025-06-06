@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -63,15 +62,6 @@ const ActivityFilters = ({ filters, onChange, account }) => {
       </Flex>
     </Container>
   );
-};
-
-ActivityFilters.propTypes = {
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  account: PropTypes.shape({
-    isHost: PropTypes.bool,
-    childrenAccounts: PropTypes.object,
-  }),
 };
 
 export default React.memo(ActivityFilters);

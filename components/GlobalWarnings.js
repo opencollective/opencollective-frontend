@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -71,13 +70,6 @@ const GlobalWarnings = ({ collective }) => {
   }
 
   return null;
-};
-
-GlobalWarnings.propTypes = {
-  collective: PropTypes.shape({
-    host: PropTypes.object,
-    isFrozen: PropTypes.bool,
-  }),
 };
 
 export default GlobalWarnings;

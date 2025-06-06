@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -191,31 +190,6 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
       </div>
     </Fragment>
   );
-};
-
-StepProfileLoggedInForm.propTypes = {
-  data: PropTypes.object,
-  stepDetails: PropTypes.object,
-  tier: PropTypes.object,
-  onChange: PropTypes.func,
-  profiles: PropTypes.arrayOf(PropTypes.object),
-  collective: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    currency: PropTypes.string,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      legacyId: PropTypes.number,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-    }),
-    policies: PropTypes.shape({
-      CONTRIBUTOR_INFO_THRESHOLDS: PropTypes.shape({
-        legalName: PropTypes.number,
-        address: PropTypes.number,
-      }),
-    }),
-  }),
 };
 
 export default StepProfileLoggedInForm;

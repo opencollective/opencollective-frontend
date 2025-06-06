@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { FormattedDate } from 'react-intl';
@@ -106,17 +105,6 @@ const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) =>
       {...props}
     />
   );
-};
-
-ExpensesPickerAsync.propTypes = {
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** Max number of collectives displayed at the same time */
-  limit: PropTypes.number,
-  /** If true, results won't be cached (Apollo "network-only" mode) */
-  noCache: PropTypes.bool,
-  account: PropTypes.object,
-  status: PropTypes.string,
 };
 
 export default ExpensesPickerAsync;

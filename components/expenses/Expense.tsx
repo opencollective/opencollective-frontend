@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
+import type { ApolloClient } from '@apollo/client';
 import { useMutation } from '@apollo/client';
+import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
@@ -16,12 +17,14 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import type { Account } from '../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 
@@ -89,7 +92,7 @@ const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }
@@ -107,7 +110,53 @@ const PrivateNoteLabel = () => {
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
-function Expense(props) {
+interface ExpenseProps {
+  collectiveSlug?: string;
+  parentCollectiveSlug?: string;
+  legacyExpenseId?: number;
+  draftKey?: string;
+  edit?: string;
+  client?: ApolloClient<object>;
+  loading?: boolean;
+  error?: any;
+  refetch?: () => void;
+  fetchMore?: FetchMoreFunction<unknown, unknown>;
+  startPolling?: (number) => void;
+  stopPolling?: () => void;
+  onClose?: () => void;
+  isRefetchingDataForUser?: boolean;
+  drawerActionsContainer?: object;
+  isDrawer?: boolean;
+  enableKeyboardShortcuts?: boolean;
+  data?: {
+    loggedInAccount: Pick<Account, 'id' | 'slug' | 'type'>;
+    expense: React.ComponentProps<typeof ExpenseInviteWelcome> &
+      React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
+      React.ComponentProps<typeof ExpenseInviteWelcome> &
+      React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
+      Pick<
+        ExpenseType,
+        | 'id'
+        | 'legacyId'
+        | 'type'
+        | 'account'
+        | 'status'
+        | 'permissions'
+        | 'items'
+        | 'comments'
+        | 'activities'
+        | 'privateMessage'
+        | 'onHold'
+        | 'recurringExpense'
+        | 'requiredLegalDocuments'
+        | 'draft'
+      > & {
+        account: Pick<AccountWithHost, 'host'>;
+      };
+  };
+}
+
+function Expense(props: ExpenseProps) {
   const {
     data,
     loading,
@@ -127,17 +176,17 @@ function Expense(props) {
   const router = useRouter();
 
   const isNewExpenseSubmissionFlow =
-    ([expenseTypes.INVOICE, expenseTypes.RECEIPT].includes(data?.expense?.type) &&
+    (([expenseTypes.INVOICE, expenseTypes.RECEIPT] as string[]).includes(data?.expense?.type) &&
       ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
         router.query.newExpenseFlowEnabled)) ||
-    ([expenseTypes.GRANT].includes(data?.expense?.type) &&
+    (([expenseTypes.GRANT] as string[]).includes(data?.expense?.type) &&
       ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
         router.query.newGrantFlowEnabled));
 
   const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
 
   const onContinueSubmissionClick = React.useCallback(() => {
-    if ([expenseTypes.GRANT].includes(data?.expense?.type)) {
+    if (([expenseTypes.GRANT] as string[]).includes(data?.expense?.type)) {
       router.push({
         pathname: `${getCollectivePageRoute(data?.expense?.account)}/grants/new`,
         query: {
@@ -432,12 +481,14 @@ function Expense(props) {
         if (!fetchMoreResult) {
           return prev;
         }
+
+        const resultExpense = fetchMoreResult['expense'] as { comments: { nodes: Comment[] } };
         const newValues = {
           expense: {
             ...prev.expense,
             comments: {
-              ...fetchMoreResult.expense.comments,
-              nodes: [...prev.expense.comments.nodes, ...fetchMoreResult.expense.comments.nodes],
+              ...resultExpense.comments,
+              nodes: [...prev.expense.comments.nodes, ...resultExpense.comments.nodes],
             },
           },
         };
@@ -835,26 +886,5 @@ function Expense(props) {
     </Box>
   );
 }
-
-Expense.propTypes = {
-  collectiveSlug: PropTypes.string,
-  parentCollectiveSlug: PropTypes.string,
-  legacyExpenseId: PropTypes.number,
-  draftKey: PropTypes.string,
-  edit: PropTypes.string,
-  client: PropTypes.object,
-  data: PropTypes.object,
-  loading: PropTypes.bool,
-  error: PropTypes.any,
-  refetch: PropTypes.func,
-  fetchMore: PropTypes.func,
-  startPolling: PropTypes.func,
-  stopPolling: PropTypes.func,
-  onClose: PropTypes.func,
-  isRefetchingDataForUser: PropTypes.bool,
-  drawerActionsContainer: PropTypes.object,
-  isDrawer: PropTypes.bool,
-  enableKeyboardShortcuts: PropTypes.bool,
-};
 
 export default Expense;

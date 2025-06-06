@@ -88,6 +88,4 @@ const UnhostAccountForm = () => {
   );
 };
 
-UnhostAccountForm.propTypes = {};
-
 export default UnhostAccountForm;

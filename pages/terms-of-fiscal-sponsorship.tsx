@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
@@ -52,10 +51,6 @@ const TermsOfFiscalSponsorship = (props: InferGetServerSidePropsType<typeof getS
       <Loading />
     </div>
   );
-};
-
-TermsOfFiscalSponsorship.propTypes = {
-  hostCollectiveSlug: PropTypes.string,
 };
 
 // next.js export

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
@@ -539,28 +538,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
   );
 }
 
-FormFields.propTypes = {
-  collective: PropTypes.shape({
-    host: PropTypes.object,
-    currency: PropTypes.string,
-    type: PropTypes.string,
-  }),
-  values: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    amountType: PropTypes.string,
-    interval: PropTypes.string,
-    minimumAmount: PropTypes.shape({ valueInCents: PropTypes.number, currency: PropTypes.string }),
-  }),
-  hideTypeSelect: PropTypes.bool,
-  tier: PropTypes.shape({
-    type: PropTypes.string,
-    singleTicket: PropTypes.bool,
-  }),
-};
-
 const EditSectionContainer = styled(Flex)`
   overflow-y: scroll;
   flex-grow: 1;
@@ -645,14 +622,6 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
   );
 }
 
-EditTierModal.propTypes = {
-  tier: PropTypes.object,
-  collective: PropTypes.object,
-  onClose: PropTypes.func,
-  onUpdate: PropTypes.func,
-  forcedType: PropTypes.string,
-};
-
 function ContributeCardPreview({ tier, collective }) {
   const intl = useIntl();
 
@@ -672,14 +641,6 @@ function ContributeCardPreview({ tier, collective }) {
     </ContributeCardPreviewContainer>
   );
 }
-
-ContributeCardPreview.propTypes = {
-  tier: PropTypes.shape({
-    legacyId: PropTypes.number,
-    maxQuantity: PropTypes.number,
-  }),
-  collective: PropTypes.object,
-};
 
 const editTiersFieldsFragment = gql`
   fragment EditTiersFields on Tier {
@@ -999,11 +960,3 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
     </React.Fragment>
   );
 }
-
-EditTierForm.propTypes = {
-  collective: PropTypes.object,
-  tier: PropTypes.object,
-  onClose: PropTypes.func,
-  onUpdate: PropTypes.func,
-  forcedType: PropTypes.string,
-};

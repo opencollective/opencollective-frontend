@@ -320,6 +320,4 @@ const MoveAuthoredContributions = () => {
   );
 };
 
-MoveAuthoredContributions.propTypes = {};
-
 export default MoveAuthoredContributions;

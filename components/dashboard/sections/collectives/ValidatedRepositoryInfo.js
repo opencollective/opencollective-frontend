@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Ban, Check } from 'lucide-react';
@@ -15,16 +14,6 @@ const FieldWithValidationBadge = ({ field, children }) => {
       <p className="text-sm text-slate-700">{children({ field })}</p>
     </div>
   );
-};
-
-const ValidatedFieldPropType = PropTypes.shape({
-  isValid: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
-});
-
-FieldWithValidationBadge.propTypes = {
-  field: ValidatedFieldPropType.isRequired,
-  children: PropTypes.func.isRequired,
 };
 
 const msg = defineMessages({
@@ -119,23 +108,5 @@ function ValidatedRepositoryInfo({ customData }) {
     </div>
   );
 }
-
-ValidatedRepositoryInfo.propTypes = {
-  customData: PropTypes.shape({
-    repositoryUrl: PropTypes.string.isRequired,
-    licenseSpdxId: PropTypes.string,
-    validatedRepositoryInfo: PropTypes.shape({
-      fields: PropTypes.shape({
-        licenseSpdxId: ValidatedFieldPropType,
-        lastCommitDate: ValidatedFieldPropType,
-        isOwnedByOrg: ValidatedFieldPropType,
-        isFork: ValidatedFieldPropType,
-        collaboratorsCount: ValidatedFieldPropType,
-        starsCount: ValidatedFieldPropType,
-        isAdmin: ValidatedFieldPropType,
-      }).isRequired,
-    }).isRequired,
-  }),
-};
 
 export default ValidatedRepositoryInfo;

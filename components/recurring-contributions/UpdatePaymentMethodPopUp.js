@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
@@ -484,14 +483,6 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
       </Flex>
     </Fragment>
   );
-};
-
-UpdatePaymentMethodPopUp.propTypes = {
-  data: PropTypes.object,
-  contribution: PropTypes.object.isRequired,
-  onCloseEdit: PropTypes.func,
-  loadStripe: PropTypes.func.isRequired,
-  account: PropTypes.object.isRequired,
 };
 
 export default withStripeLoader(UpdatePaymentMethodPopUp);

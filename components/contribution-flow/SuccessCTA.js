@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -135,13 +134,6 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
   }
 };
 
-SuccessCTAWrapper.propTypes = {
-  type: PropTypes.string,
-  orderId: PropTypes.string,
-  email: PropTypes.string,
-  account: PropTypes.object,
-};
-
 const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
@@ -180,17 +172,6 @@ const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
       </SuccessCTAWrapper>
     </Container>
   );
-};
-
-SuccessCTA.propTypes = {
-  type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)).isRequired,
-  orderId: PropTypes.string,
-  email: PropTypes.string,
-  isPrimary: PropTypes.bool,
-  account: PropTypes.shape({
-    name: PropTypes.string,
-    slug: PropTypes.string,
-  }).isRequired,
 };
 
 export default SuccessCTA;

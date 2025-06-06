@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import DateTime from '../../../DateTime';
@@ -45,16 +44,6 @@ const ActivityListItem = ({ activity }) => {
       </Flex>
     </Box>
   );
-};
-
-ActivityListItem.propTypes = {
-  activity: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    individual: PropTypes.shape({ name: PropTypes.string }),
-    isSystem: PropTypes.bool,
-  }).isRequired,
 };
 
 export default ActivityListItem;

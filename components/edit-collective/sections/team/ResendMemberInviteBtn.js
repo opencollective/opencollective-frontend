@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -50,14 +49,6 @@ const ResendMemberInviteBtn = ({ member, collective }) => {
       )}
     </StyledButton>
   );
-};
-
-ResendMemberInviteBtn.propTypes = {
-  collective: PropTypes.object.isRequired,
-  member: PropTypes.shape({
-    role: PropTypes.string,
-    account: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired,
-  }),
 };
 
 export default ResendMemberInviteBtn;

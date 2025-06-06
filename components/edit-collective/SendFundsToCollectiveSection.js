@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -80,12 +79,6 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
       )}
     </Fragment>
   );
-};
-
-SendFundsToCollectiveSection.propTypes = {
-  collective: PropTypes.object.isRequired,
-  toCollective: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
 };
 
 export default SendFundsToCollectiveSection;

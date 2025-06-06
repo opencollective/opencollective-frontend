@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Illustration from '../collectives/HomeIllustration';
@@ -97,10 +96,6 @@ const Consideration = ({ consideration }) => {
       </Box>
     </Container>
   );
-};
-
-Consideration.propTypes = {
-  consideration: PropTypes.string,
 };
 
 const FindTheRightFiscalHost = () => {

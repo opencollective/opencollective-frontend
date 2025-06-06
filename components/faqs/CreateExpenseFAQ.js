@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
@@ -78,9 +77,5 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     </Box>
   </FAQ>
 );
-
-CreateExpenseFAQ.propTypes = {
-  defaultOpen: PropTypes.bool,
-};
 
 export default CreateExpenseFAQ;

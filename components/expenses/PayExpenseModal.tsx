@@ -456,7 +456,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     amountInBalance.valueInCents >= amountBatched.valueInCents + amounts.totalAmount?.valueInCents;
 
   return (
-    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal" trapFocus>
+    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal">
       <ModalHeader>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />

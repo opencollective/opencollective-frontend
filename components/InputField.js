@@ -57,6 +57,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
               e.target.blur();
             }}
             {...inputProps}
+            key={inputProps.key}
           />
           {after && <div className="after">{after}</div>}
           {button && <StyledButton>{button}</StyledButton>}
@@ -82,6 +83,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
               e.target.blur();
             }}
             {...inputProps}
+            key={inputProps.key}
           />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>

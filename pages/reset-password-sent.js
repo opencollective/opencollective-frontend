@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
@@ -63,10 +62,6 @@ class ResetPasswordSent extends Component {
     );
   }
 }
-
-ResetPasswordSent.propTypes = {
-  email: PropTypes.string.isRequired,
-};
 
 // next.js export
 // ts-unused-exports:disable-next-line

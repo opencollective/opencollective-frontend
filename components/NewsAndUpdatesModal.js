@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
@@ -145,11 +144,6 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
       </DialogContent>
     </Dialog>
   );
-};
-
-NewsAndUpdatesModal.propTypes = {
-  setOpen: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
 };
 
 export default NewsAndUpdatesModal;

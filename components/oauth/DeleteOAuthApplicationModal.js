@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -70,15 +69,6 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
       </P>
     </ConfirmationModal>
   );
-};
-
-DeleteOAuthApplicationModal.propTypes = {
-  application: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default DeleteOAuthApplicationModal;

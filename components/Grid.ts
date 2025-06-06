@@ -3,10 +3,11 @@
  * See https://github.com/opencollective/opencollective/issues/2929 for more info.
  */
 
-import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import type { ColorProps, FlexboxProps, GridProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { border, color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
+
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
 export const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
 
@@ -23,7 +24,7 @@ type BoxProps = SpaceProps &
 const FILTERED_PROPS = new Set(['display', 'width', 'height']);
 
 export const Box = styled.div.withConfig({
-  shouldForwardProp: (prop, validate) => validate(prop) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: prop => defaultShouldForwardProp(prop) && !FILTERED_PROPS.has(prop),
 })<BoxProps>(
   {
     boxSizing: 'border-box',
@@ -32,14 +33,6 @@ export const Box = styled.div.withConfig({
 );
 
 Box.displayName = 'Box';
-
-Box.propTypes = {
-  ...propTypes.space,
-  ...propTypes.color,
-  ...propTypes.layout,
-  ...propTypes.typography,
-  ...propTypes.flexbox,
-};
 
 export type FlexProps = BoxProps;
 

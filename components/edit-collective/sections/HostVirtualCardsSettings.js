@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { get } from 'lodash';
@@ -292,21 +291,6 @@ const HostVirtualCards = props => {
       </Box>
     </Fragment>
   );
-};
-
-HostVirtualCards.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    slug: PropTypes.string,
-    settings: PropTypes.shape({
-      virtualcards: PropTypes.shape({
-        autopause: PropTypes.bool,
-        requestcard: PropTypes.bool,
-        policy: PropTypes.string,
-      }),
-    }),
-  }),
-  hideTopsection: PropTypes.func,
 };
 
 export default HostVirtualCards;

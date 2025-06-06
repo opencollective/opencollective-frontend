@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Label } from '../ui/Label';
@@ -36,11 +35,6 @@ const TransactionRejectMessageForm = ({ message, onChange }) => {
       />
     </div>
   );
-};
-
-TransactionRejectMessageForm.propTypes = {
-  message: PropTypes.string,
-  onChange: PropTypes.func,
 };
 
 export default TransactionRejectMessageForm;

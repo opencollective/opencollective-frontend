@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
@@ -51,12 +50,6 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
       </Flex>
     </MessageBox>
   );
-};
-
-PrivateCommentsMessage.propTypes = {
-  isLoading: PropTypes.bool,
-  isAllowed: PropTypes.bool,
-  expenseType: PropTypes.string,
 };
 
 export default PrivateCommentsMessage;

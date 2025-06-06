@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage } from 'react-intl';
@@ -69,17 +68,6 @@ const PaypalPreApprovalDetailsIcon = ({ paymentMethod }) => {
 
   const { message, icon } = getPaypalExpiryInfo(paymentMethod);
   return <StyledTooltip content={message}>{icon}</StyledTooltip>;
-};
-
-PaypalPreApprovalDetailsIcon.propTypes = {
-  paymentMethod: PropTypes.shape({
-    name: PropTypes.string,
-    expiryDate: PropTypes.string,
-    balance: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string.isRequired,
-    }).isRequired,
-  }),
 };
 
 // keep for future use?

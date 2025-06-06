@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import AddressFormatter from '@shopify/address';
 import { Field } from 'formik';
 import { cloneDeep, get, isEmpty, isNil, orderBy, pick, set, truncate } from 'lodash';
@@ -116,17 +115,6 @@ const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, .
   );
 };
 
-ZoneSelect.propTypes = {
-  info: PropTypes.array,
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  error: PropTypes.any,
-  required: PropTypes.bool,
-  id: PropTypes.string,
-  value: PropTypes.string,
-  onChange: PropTypes.func,
-};
-
 const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
   const validate = required ? value => (value ? undefined : `${label} is required`) : undefined;
   return (
@@ -218,21 +206,6 @@ export const SimpleLocationFieldRenderer = ({
     </StyledInputField>
   );
 };
-
-const fieldRenderPropTypes = {
-  info: PropTypes.array,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  label: PropTypes.string.isRequired,
-  value: PropTypes.string,
-  prefix: PropTypes.string,
-  required: PropTypes.bool,
-  fieldProps: PropTypes.object,
-  error: PropTypes.any,
-};
-
-FormikLocationFieldRenderer.propTypes = fieldRenderPropTypes;
-SimpleLocationFieldRenderer.propTypes = fieldRenderPropTypes;
 
 /**
  * This component aims to create a responsive address form based on the user's country that they select.
@@ -328,25 +301,6 @@ const I18nAddressFields = ({
       ))}
     </React.Fragment>
   );
-};
-
-I18nAddressFields.propTypes = {
-  /** ISO country code passed down from ExpenseFormPayeeStep. */
-  selectedCountry: PropTypes.string,
-  name: PropTypes.string,
-  prefix: PropTypes.string,
-  required: PropTypes.bool,
-  /** String if using old address textarea; object if using new address fields. */
-  value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-  onCountryChange: PropTypes.func.isRequired, // TODO Rename this prop, it's not doing what the name implies
-  /** Called when the call to the Shopify API fails */
-  onLoadError: PropTypes.func,
-  onLoadSuccess: PropTypes.func,
-  /** A function used to render the field */
-  Component: PropTypes.func,
-  /** Additional props to be passed to `Component` */
-  fieldProps: PropTypes.object,
-  errors: PropTypes.object,
 };
 
 export default I18nAddressFields;

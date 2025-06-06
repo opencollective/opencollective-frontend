@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
@@ -47,10 +46,6 @@ const ExtendedTag = ({ children, ...props }) => (
   </StyledTag>
 );
 
-ExtendedTag.propTypes = {
-  children: PropTypes.any,
-};
-
 const BaseTag = ({ status, ...props }) => {
   const intl = useIntl();
   return (
@@ -58,10 +53,6 @@ const BaseTag = ({ status, ...props }) => {
       {i18nExpenseStatus(intl, status)}
     </StyledTag>
   );
-};
-
-BaseTag.propTypes = {
-  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
 };
 
 /**
@@ -121,12 +112,6 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...pro
       </Flex>
     );
   }
-};
-
-ExpenseStatusTag.propTypes = {
-  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
-  payee: PropTypes.shape({ isAdmin: PropTypes.bool }),
-  showTaxFormTag: PropTypes.bool,
 };
 
 export default ExpenseStatusTag;

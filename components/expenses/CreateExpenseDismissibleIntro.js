@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../lib/constants/dismissable-help-message';
@@ -37,10 +36,6 @@ const CreateExpenseDismissibleIntro = ({ collectiveName }) => {
       )}
     </DismissibleMessage>
   );
-};
-
-CreateExpenseDismissibleIntro.propTypes = {
-  collectiveName: PropTypes.string.isRequired,
 };
 
 export default CreateExpenseDismissibleIntro;

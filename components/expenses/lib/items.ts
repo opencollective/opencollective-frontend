@@ -51,7 +51,7 @@ export const newExpenseItem = (attrs = {}, expenseCurrency: string): ExpenseItem
 /** Helper to add a new item to the form */
 export const addNewExpenseItem = (
   formik: FormikProps<ExpenseFormValues>,
-  defaultValues: ExpenseItemFormValues,
+  defaultValues: Partial<ExpenseItemFormValues> = {},
 ): void => {
   formik.setFieldValue('items', [
     ...(formik.values.items || []),

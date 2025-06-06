@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { TransactionTypes } from '../../../lib/constants/transactions';
@@ -21,11 +20,6 @@ const TransactionTypeFilter = ({ onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-TransactionTypeFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 };
 
 export default TransactionTypeFilter;

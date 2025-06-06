@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -165,15 +164,6 @@ const RecurringContributionsContainer = ({
       )}
     </Container>
   );
-};
-
-RecurringContributionsContainer.propTypes = {
-  recurringContributions: PropTypes.object.isRequired,
-  account: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object,
-  displayFilters: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  filter: PropTypes.oneOf(Object.values(FILTERS)),
 };
 
 export default withUser(RecurringContributionsContainer);

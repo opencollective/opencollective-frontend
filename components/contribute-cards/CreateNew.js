@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Flex } from '../Grid';
@@ -47,13 +46,6 @@ const CreateNew = ({ route, children, ...props }) => {
       </Flex>
     </CreateNewCard>
   );
-};
-
-CreateNew.propTypes = {
-  /** The link to redirect to when users click */
-  route: PropTypes.string.isRequired,
-  /** The label/description */
-  children: PropTypes.node.isRequired,
 };
 
 export default CreateNew;

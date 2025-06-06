@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -49,12 +48,6 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
       <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountClassName="font-bold text-xl" />
     </Box>
   );
-};
-
-HeroTotalCollectiveContributionsWithData.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
 };
 
 export default HeroTotalCollectiveContributionsWithData;

@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
@@ -283,10 +282,6 @@ const ActivityLog = ({ accountSlug }) => {
       <ActivityDetailsDrawer activity={selectedActivity} onClose={() => setSelectedActivity(null)} />
     </Box>
   );
-};
-
-ActivityLog.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
 };
 
 export default ActivityLog;

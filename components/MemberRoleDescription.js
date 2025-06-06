@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
@@ -35,10 +34,6 @@ export const hasRoleDescription = role => {
 const MemberRoleDescription = ({ role }) => {
   const intl = useIntl();
   return hasRoleDescription(role) ? intl.formatMessage(ROLES_DETAILS[role], I18nFormatters) : null;
-};
-
-MemberRoleDescription.propTypes = {
-  role: PropTypes.oneOf(Object.values(roles)),
 };
 
 export default MemberRoleDescription;

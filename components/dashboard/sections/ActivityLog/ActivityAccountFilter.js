@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
@@ -100,18 +99,6 @@ const ActivityAccountFilter = ({ account, value, onChange }) => {
       }}
     />
   );
-};
-
-ActivityAccountFilter.propTypes = {
-  account: PropTypes.shape({
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    imageUrl: PropTypes.string,
-    legacyId: PropTypes.number,
-    isHost: PropTypes.bool,
-  }),
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 };
 
 export default ActivityAccountFilter;

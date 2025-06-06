@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 
 import Container from './Container';
@@ -29,12 +28,6 @@ const ContainerOverlay = ({ backgroundType = 'white', backgroundOpacity = undefi
       {...props}
     />
   );
-};
-
-ContainerOverlay.propTypes = {
-  backgroundType: PropTypes.oneOf(['dark', 'white']),
-  /** If omitted, will use 0.5 for dark and 0.75 for black */
-  backgroundOpacity: PropTypes.number,
 };
 
 export default ContainerOverlay;

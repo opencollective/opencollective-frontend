@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
@@ -61,11 +60,6 @@ CreateCollectivePage.getInitialProps = () => {
   return {
     scripts: { googleMaps: true }, // To enable location autocomplete
   };
-};
-
-CreateCollectivePage.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
 };
 
 // next.js export

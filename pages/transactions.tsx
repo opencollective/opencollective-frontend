@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { loggedInUserCanAccessFinancialData } from '../lib/collective';
-import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -14,7 +13,6 @@ import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
-import { Sections } from '../components/collective-page/_constants';
 import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';
 import Header from '../components/Header';
@@ -264,7 +262,6 @@ export default function TransactionsPage(props) {
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(account)}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-          selectedSection={accountType === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
         />
         <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} my={[4, 5]} data-cy="transactions-page-content">
           <Transactions

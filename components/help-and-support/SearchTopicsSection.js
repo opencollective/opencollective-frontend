@@ -74,7 +74,7 @@ const LoadingSearchResults = () => {
 
 const SearchTopics = () => {
   const intl = useIntl();
-  const innerRef = React.useRef();
+  const innerRef = React.useRef(undefined);
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
   const [showSearchResults, setShowSearchResults] = React.useState(false);

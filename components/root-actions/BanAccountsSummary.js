@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import Container from '../Container';
 import LinkCollective from '../LinkCollective';
@@ -24,10 +23,6 @@ const BanAccountsSummary = ({ dryRunData }) => {
       )}
     </React.Fragment>
   );
-};
-
-BanAccountsSummary.propTypes = {
-  dryRunData: PropTypes.object,
 };
 
 export default BanAccountsSummary;

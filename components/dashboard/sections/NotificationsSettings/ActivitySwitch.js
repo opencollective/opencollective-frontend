@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -111,23 +110,6 @@ const ActivitySwitch = ({ account, activityType }) => {
       />
     </Flex>
   );
-};
-
-ActivitySwitch.propTypes = {
-  account: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    imageUrl: PropTypes.string,
-    activitySubscriptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.string,
-        active: PropTypes.bool,
-      }),
-    ),
-  }),
-  activityType: PropTypes.string,
 };
 
 export default ActivitySwitch;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { FormattedDate } from 'react-intl';
@@ -135,22 +134,6 @@ const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito
       {...props}
     />
   );
-};
-
-OrdersPickerAsync.propTypes = {
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** Max number of collectives displayed at the same time */
-  limit: PropTypes.number,
-  /** If set, only the collectives under this host will be retrieved */
-  hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
-  /** If true, a query will be triggered even if search is empty */
-  preload: PropTypes.bool,
-  /** If true, results won't be cached (Apollo "network-only" mode) */
-  noCache: PropTypes.bool,
-  includeIncognito: PropTypes.bool,
-  filter: PropTypes.oneOf(['OUTGOING', 'INCOMING']),
-  account: PropTypes.object,
 };
 
 export default OrdersPickerAsync;

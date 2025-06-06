@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -237,25 +236,6 @@ const CollectiveSectionEntry = ({
   );
 };
 
-CollectiveSectionEntry.propTypes = {
-  isEnabled: PropTypes.bool,
-  restrictedTo: PropTypes.array,
-  section: PropTypes.oneOf(Object.values(Sections)),
-  index: PropTypes.number,
-  version: PropTypes.number,
-  onMove: PropTypes.func,
-  onDrop: PropTypes.func,
-  onSectionToggle: PropTypes.func,
-  collectiveType: PropTypes.string,
-  fontWeight: PropTypes.string,
-  hasData: PropTypes.bool,
-  showMissingDataWarning: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-  parentItem: PropTypes.object,
-  dragHandleProps: PropTypes.object,
-  isSubSection: PropTypes.bool,
-};
-
 const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragHandleProps }) => {
   const intl = useIntl();
 
@@ -321,18 +301,6 @@ const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragH
   );
 };
 
-MenuCategory.propTypes = {
-  item: PropTypes.object,
-  index: PropTypes.number,
-  collective: PropTypes.object,
-  onMove: PropTypes.func,
-  onDrop: PropTypes.func,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isDragOverlay: PropTypes.bool,
-  dragHandleProps: PropTypes.object,
-};
-
 const Item = React.forwardRef(
   (
     {
@@ -383,19 +351,6 @@ const Item = React.forwardRef(
   },
 );
 
-Item.propTypes = {
-  dragHandleProps: PropTypes.object,
-  isDragging: PropTypes.bool,
-  isDragOverlay: PropTypes.bool,
-  style: PropTypes.object,
-  item: PropTypes.object,
-  collective: PropTypes.object,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isSubSection: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-};
-
 Item.displayName = 'Item';
 
 const MemoizedItem = memo(Item);
@@ -417,16 +372,6 @@ const DraggableItem = props => {
       {...props}
     />
   );
-};
-
-DraggableItem.propTypes = {
-  item: PropTypes.object,
-  collective: PropTypes.object,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isSubSection: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-  id: PropTypes.string,
 };
 
 const EditCollectivePage = ({ collective }) => {
@@ -573,13 +518,6 @@ const EditCollectivePage = ({ collective }) => {
       </div>
     </DndContext>
   );
-};
-
-EditCollectivePage.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-  }),
 };
 
 export default EditCollectivePage;

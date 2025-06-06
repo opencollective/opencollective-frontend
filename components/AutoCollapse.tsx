@@ -39,7 +39,7 @@ type AutoCollapseProps = {
 export const AutoCollapse = ({ children, maxCollapsedHeight }: AutoCollapseProps) => {
   const [isOpen, setOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const contentRef = React.useRef<HTMLDivElement>();
+  const contentRef = React.useRef<HTMLDivElement>(undefined);
   const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
   const toggleIsOpen = () => setOpen(!isOpen);

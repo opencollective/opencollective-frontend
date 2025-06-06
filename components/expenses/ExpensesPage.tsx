@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
@@ -235,50 +233,6 @@ const Expenses = props => {
       </Flex>
     </Container>
   );
-};
-
-Expenses.propTypes = {
-  LoggedInUser: PropTypes.object,
-  query: PropTypes.shape({
-    type: PropTypes.string,
-    tag: PropTypes.string,
-    searchTerm: PropTypes.string,
-    direction: PropTypes.string,
-    orderBy: PropTypes.string,
-  }),
-  loading: PropTypes.bool,
-  error: PropTypes.any,
-  refetch: PropTypes.func,
-  variables: PropTypes.shape({
-    offset: PropTypes.number.isRequired,
-    limit: PropTypes.number.isRequired,
-    account: PropTypes.object,
-    collectiveSlug: PropTypes.string,
-  }),
-  data: PropTypes.shape({
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string,
-      isArchived: PropTypes.bool,
-      isHost: PropTypes.bool,
-      host: PropTypes.object,
-      expensesTags: PropTypes.array,
-      type: PropTypes.oneOf(Object.keys(CollectiveType)),
-    }),
-    expenses: PropTypes.shape({
-      nodes: PropTypes.array,
-      totalCount: PropTypes.number,
-      offset: PropTypes.number,
-      limit: PropTypes.number,
-    }),
-    scheduledExpenses: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
-  isDashboard: PropTypes.bool,
-  onlySubmittedExpenses: PropTypes.bool,
 };
 
 export default Expenses;

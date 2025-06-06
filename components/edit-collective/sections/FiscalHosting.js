@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -389,10 +388,6 @@ const FiscalHosting = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-FiscalHosting.propTypes = {
-  collective: PropTypes.object.isRequired,
 };
 
 export default FiscalHosting;

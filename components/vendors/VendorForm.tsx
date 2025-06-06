@@ -504,6 +504,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 <FormattedMessage defaultMessage="Mailing address" id="yrKCq7" />
               </p>
               <StyledInputLocation
+                name="vendorInfo.location"
                 onChange={values => {
                   formik.setFieldValue('location', values);
                 }}

@@ -32,7 +32,7 @@ const StyledLinkButton = styled.button.attrs<StyledLinkButtonProps>(props => ({
   ${typography}
   ${textDecoration}
 
-  :hover {
+  &:hover {
     color: ${props => props.$hoverColor};
     text-decoration: ${props => (props.$underlineOnHover ? 'underline' : undefined)};
   }

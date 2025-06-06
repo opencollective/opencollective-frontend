@@ -29,7 +29,7 @@ const ListItem = styled.li`
   padding-left: 26px;
 
   @media screen and (min-width: 64em) {
-    :first-of-type {
+    &:first-of-type {
       margin-top: 0;
     }
   }
@@ -53,8 +53,8 @@ const FeeDescription = styled(FeeData)`
 `;
 
 const AccessToWrapper = styled(Container)`
-  :nth-child(1),
-  :nth-child(2) {
+  &:nth-child(1),
+  &:nth-child(2) {
     margin-bottom: 46px;
   }
 `;

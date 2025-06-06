@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
@@ -235,37 +234,6 @@ const CommentForm = ({
       </form>
     </Container>
   );
-};
-
-CommentForm.propTypes = {
-  /** An optional id for the container, useful for the redirection link */
-  id: PropTypes.string,
-  /** If commenting on a conversation */
-  ConversationId: PropTypes.string,
-  /** If commenting on an expense */
-  ExpenseId: PropTypes.string,
-  /** If commenting on an update */
-  UpdateId: PropTypes.string,
-  /** If commenting on a host application */
-  HostApplicationId: PropTypes.string,
-  /** Called when the comment is created successfully */
-  onSuccess: PropTypes.func,
-  /** disable the inputs */
-  isDisabled: PropTypes.bool,
-  /** Default type of comment */
-  defaultType: PropTypes.oneOf(Object.values(commentTypes)),
-  /** Can post comment as private note */
-  canUsePrivateNote: PropTypes.bool,
-  /** @ignore from withUser */
-  loadingLoggedInUser: PropTypes.bool,
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.object,
-  replyingToComment: PropTypes.object,
-  /** @ignore from withRouter */
-  router: PropTypes.object,
-  minHeight: PropTypes.number,
-  submitButtonJustify: PropTypes.string,
-  submitButtonVariant: PropTypes.string,
 };
 
 export default withUser(withRouter(CommentForm));

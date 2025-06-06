@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -123,30 +122,6 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
       </Container>
     </StyledCollectiveCard>
   );
-};
-
-SearchCollectiveCard.propTypes = {
-  collective: PropTypes.shape({
-    type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-    currency: PropTypes.string,
-    description: PropTypes.string,
-    isHost: PropTypes.bool,
-    stats: PropTypes.shape({
-      contributorsCount: PropTypes.number,
-      totalAmountReceived: PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-      totalAmountSpent: PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-    }),
-    host: PropTypes.shape({
-      totalHostedCollectives: PropTypes.number,
-      hostFeePercent: PropTypes.number,
-    }),
-  }).isRequired,
 };
 
 export default injectIntl(SearchCollectiveCard);

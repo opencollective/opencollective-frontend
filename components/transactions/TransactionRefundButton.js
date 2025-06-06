@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Undo } from '@styled-icons/boxicons-regular/Undo';
 import { FormattedMessage } from 'react-intl';
@@ -85,11 +84,6 @@ const TransactionRefundButton = props => {
       </Box>
     </Flex>
   );
-};
-
-TransactionRefundButton.propTypes = {
-  id: PropTypes.string.isRequired,
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionRefundButton;

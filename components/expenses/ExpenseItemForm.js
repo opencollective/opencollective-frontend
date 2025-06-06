@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { Field, useFormikContext } from 'formik';
@@ -172,18 +171,6 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
     )}
   </div>
 );
-
-WithOCRComparisonWarning.propTypes = {
-  children: PropTypes.node,
-  mrClass: PropTypes.string,
-  formatValue: PropTypes.func,
-  comparison: PropTypes.shape({
-    hasMismatch: PropTypes.bool,
-    ocrValue: PropTypes.any,
-    hasCurrencyMismatch: PropTypes.bool,
-    hasAmountMismatch: PropTypes.bool,
-  }),
-};
 
 const currencyExchangeRateQuery = gql`
   query ExpenseFormCurrencyExchangeRate($requests: [CurrencyExchangeRateRequest!]!) {
@@ -599,45 +586,6 @@ const ExpenseItemForm = ({
       </Flex>
     </Box>
   );
-};
-
-ExpenseItemForm.propTypes = {
-  collective: PropTypes.object,
-  /** Called when clicking on remove */
-  onRemove: PropTypes.func,
-  /** A map of errors for this object */
-  errors: PropTypes.object,
-  /** Whether a file is required for this attachment type */
-  requireFile: PropTypes.bool,
-  /** Whether a date is required for this expense type */
-  requireDate: PropTypes.bool,
-  /** Whether this whole item is optional */
-  isOptional: PropTypes.bool,
-  /** Whether the OCR feature is enabled */
-  hasOCRFeature: PropTypes.bool,
-  /** True if description is HTML */
-  isRichText: PropTypes.bool,
-  /** Called when an attachment upload fails */
-  onUploadError: PropTypes.func.isRequired,
-  /** Is it an invoice */
-  isInvoice: PropTypes.bool,
-  /** Whether the item is subject to tax */
-  isSubjectToTax: PropTypes.bool,
-  /** the item data. TODO: Rename to "item" */
-  attachment: PropTypes.shape({
-    id: PropTypes.string,
-    url: PropTypes.string,
-    description: PropTypes.string,
-    incurredAt: PropTypes.string,
-    amount: PropTypes.number,
-    __parsingResult: PropTypes.object,
-    __isUploading: PropTypes.bool,
-  }).isRequired,
-  editOnlyDescriptiveInfo: PropTypes.bool,
-  itemIdx: PropTypes.number.isRequired,
-  ocrComparison: PropTypes.object,
-  hasCurrencyPicker: PropTypes.bool,
-  amountIsLocked: PropTypes.bool,
 };
 
 export default React.memo(ExpenseItemForm);
