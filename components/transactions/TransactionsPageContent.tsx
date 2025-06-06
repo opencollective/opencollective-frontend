@@ -341,6 +341,7 @@ const Transactions = ({ LoggedInUser, account, ...props }) => {
                 variant="outline"
                 className="rounded-full whitespace-nowrap"
                 onClick={() => setDisplayExportCSVModal(true)}
+                data-cy="download-csv"
               >
                 <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
               </Button>
