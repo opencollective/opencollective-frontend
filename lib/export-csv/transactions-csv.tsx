@@ -848,7 +848,7 @@ export const GROUP_FIELDS = Object.keys(GROUPS).reduce((dict, groupId) => {
   return { ...dict, [groupId]: FIELDS.filter(f => f.group === groupId).map(f => f.id) };
 }, {});
 
-export const DEFAULT_FIELDS_2023: Array<CSVField> = [
+const DEFAULT_FIELDS_2023: Array<CSVField> = [
   'datetime',
   'shortId',
   'shortGroup',
