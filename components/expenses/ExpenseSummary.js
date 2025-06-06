@@ -51,7 +51,7 @@ export const SummaryHeader = styled(H1)`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }

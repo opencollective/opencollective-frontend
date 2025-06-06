@@ -76,7 +76,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
 
   if (typeof children === 'function' && trigger === 'click') {
     return (
-      <div ref={dropdownRef} {...props} data-expanded={isDisplayed}>
+      <div {...props} ref={dropdownRef} data-expanded={isDisplayed}>
         {children({
           isDisplayed,
           triggerProps: {

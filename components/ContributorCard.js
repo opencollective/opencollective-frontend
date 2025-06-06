@@ -110,7 +110,7 @@ const ContributorCard = ({
   const [showEditMessagePopup, setShowEditMessagePopup] = useState(false);
   const mainContainerRef = useRef(undefined);
   return (
-    <MainContainer ref={mainContainerRef} width={width} height={height} {...props}>
+    <MainContainer width={width} height={height} {...props} ref={mainContainerRef}>
       <CollectiveLogoContainer>
         <Box mt={-32}>
           <LinkContributor contributor={contributor}>

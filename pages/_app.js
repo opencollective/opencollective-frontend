@@ -5,7 +5,7 @@ import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
-import { ThemeProvider } from 'styled-components';
+import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
@@ -49,6 +49,7 @@ import { WhitelabelProviderContext } from '../lib/hooks/useWhitelabel';
 import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getWhitelabelProps } from '../lib/whitelabel';
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 import sentryLib, { Sentry } from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
@@ -195,28 +196,30 @@ class OpenCollectiveFrontendApp extends App {
             )
           }
         >
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <IntlProvider locale={locale}>
-                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                  <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                    <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
-                      <WorkspaceProvider>
-                        <ModalProvider>
-                          <NewsAndUpdatesProvider>
-                            <Component {...pageProps} />
-                            <Toaster />
-                            <GlobalNewsAndUpdates />
-                            <TwoFactorAuthenticationModal />
-                          </NewsAndUpdatesProvider>
-                        </ModalProvider>
-                      </WorkspaceProvider>
-                    </WhitelabelProviderContext.Provider>
-                  </UserProvider>
-                </TooltipProvider>
-              </IntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
+          <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
+            <ThemeProvider theme={theme}>
+              <StripeProviderSSR>
+                <IntlProvider locale={locale}>
+                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                    <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
+                      <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
+                        <WorkspaceProvider>
+                          <ModalProvider>
+                            <NewsAndUpdatesProvider>
+                              <Component {...pageProps} />
+                              <Toaster />
+                              <GlobalNewsAndUpdates />
+                              <TwoFactorAuthenticationModal />
+                            </NewsAndUpdatesProvider>
+                          </ModalProvider>
+                        </WorkspaceProvider>
+                      </WhitelabelProviderContext.Provider>
+                    </UserProvider>
+                  </TooltipProvider>
+                </IntlProvider>
+              </StripeProviderSSR>
+            </ThemeProvider>
+          </StyleSheetManager>
         </ApolloProvider>
         <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (

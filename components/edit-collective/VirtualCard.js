@@ -46,7 +46,7 @@ export const CardContainer = styled(Flex)`
     transform 500ms ease;
   box-shadow: 0px 0px 4px rgba(20, 20, 20, 0);
 
-  :hover {
+  &:hover {
     box-shadow: 0px 8px 12px rgba(20, 20, 20, 0.16);
     transform: translate(0, -4px);
   }
@@ -78,7 +78,7 @@ const Action = styled.button`
 
   color: ${props => props.theme.colors[props.color]?.[500] || props.color || props.theme.colors.black[900]};
 
-  :hover {
+  &:hover {
     color: ${props => props.theme.colors[props.color]?.[300] || props.color || props.theme.colors.black[700]};
   }
 

@@ -92,7 +92,7 @@ const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }

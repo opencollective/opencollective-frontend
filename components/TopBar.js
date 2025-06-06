@@ -50,15 +50,15 @@ const NavButton = styled(StyledButton)`
   padding: 10px;
   cursor: pointer;
   @media (hover: hover) {
-    :hover {
+    &:hover {
       background-color: white !important;
     }
   }
-  :focus {
+  &:focus {
     background-color: white;
     border-radius: 1px;
   }
-  :active {
+  &:active {
     color: black;
   }
 `;
@@ -68,7 +68,7 @@ const NavItem = styled(StyledLink)`
   font-weight: 500;
   font-size: 14px;
   @media (hover: hover) {
-    :hover {
+    &:hover {
       text-decoration: underline;
     }
   }

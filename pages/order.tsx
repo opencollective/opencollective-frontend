@@ -212,7 +212,9 @@ const messages = defineMessages({
   },
 });
 
-const ButtonsContainer = styled(Flex).attrs({ 'data-cy': 'order-actions' })`
+const ButtonsContainer = styled(Flex).attrs<{
+  'data-cy'?: string;
+}>({ 'data-cy': 'order-actions' })`
   flex-wrap: wrap;
   transition: opacity 0.05s;
   justify-content: flex-end;
@@ -246,7 +248,7 @@ const OrderDetails = ({ children: [field, value] }: { children: [React.ReactNode
 
 const TransactionDetailsWrapper = styled(Flex)`
   padding-bottom: 16px;
-  :not(:last-child) {
+  &:not(:last-child) {
     border-bottom: 1px dotted #e6e8eb;
     margin-bottom: 24px;
   }
@@ -291,7 +293,7 @@ const SummaryHeader = styled(H1)`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }

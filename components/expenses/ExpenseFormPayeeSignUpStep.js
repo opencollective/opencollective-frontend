@@ -113,7 +113,7 @@ const RadioOptionContainer = styled.label`
   padding: 6px 16px;
   cursor: pointer;
 
-  :not(:last-child) {
+  &:not(:last-child) {
     @media (max-width: ${themeGet('breakpoints.0')}) {
       border-bottom: 1px solid #dcdee0;
     }

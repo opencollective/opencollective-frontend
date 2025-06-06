@@ -342,6 +342,7 @@ export type StyledSelectProps = LayoutProps &
 
 export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
+// @ts-expect-error theme is not properly typed. No time to spend on this as StyledSelect & styled-components are being deprecated.
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
 /**

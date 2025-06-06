@@ -95,7 +95,7 @@ type CollapseProps = {
   children?: React.ReactNode;
   defaultIsOpen?: boolean;
   buttonSize?: React.ComponentProps<typeof CollapseBtn>['size'];
-} & React.ComponentProps<typeof Details>;
+} & Omit<React.ComponentProps<typeof Details>, 'title'>;
 
 /**
  * A stylized version of the `details` HTML element to hide & show content when clicked.

@@ -35,7 +35,7 @@ const SearchInput = styled(Box)`
     border: none;
     margin-right: 1.5rem;
     ${typography}
-    ::placeholder {
+    &::placeholder {
       color: #9d9fa3;
     }
   }

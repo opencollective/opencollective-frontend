@@ -60,7 +60,7 @@ const StatusTag = ({ status }: StatusTagProps) => {
     textTransform: 'uppercase',
     fontWeight: 700,
     fontSize: '12px',
-  };
+  } as const;
 
   switch (status) {
     case 'PENDING':

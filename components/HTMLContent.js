@@ -85,7 +85,7 @@ const HTMLContent = styled(
 
     return (
       <div>
-        <DisplayBox ref={contentRef} maxHeight={maxHeight} maxCollapsedHeight={maxCollapsedHeight} {...props}>
+        <DisplayBox maxHeight={maxHeight} maxCollapsedHeight={maxCollapsedHeight} {...props} ref={contentRef}>
           {/* See api/server/lib/sanitize-html.ts */}
           <Markup
             noWrap

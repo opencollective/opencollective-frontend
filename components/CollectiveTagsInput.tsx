@@ -54,13 +54,14 @@ const MultiValue = (props: MultiValueProps<TagOption>) => {
   };
 
   return (
-    <div style={style} ref={setNodeRef} {...attributes} {...listeners}>
+    <div style={style} {...attributes} {...listeners} ref={setNodeRef}>
       <StyledTag
         m="4px"
         variant="rounded-right"
         maxHeight="none"
         style={{ cursor: 'grab' }}
         onMouseDown={onMouseDown}
+        // @ts-expect-error closeButtonProps not correctly typed
         closeButtonProps={{ ...props.removeProps, isFocused: props.isFocused, onPointerDown: e => e.stopPropagation() }}
       >
         {props.children}

@@ -24,7 +24,7 @@ const Table = styled.table`
     line-height: 24px;
     color: #141415;
 
-    :not(:first-child) {
+    &:not(:first-child) {
       border-left: 1px solid #eaeaec;
       text-align: center;
     }
@@ -83,7 +83,7 @@ export const StatsCardContent = styled(Flex)`
     margin: 12px 0;
     padding: 0px 36px;
 
-    :not(:first-child) {
+    &:not(:first-child) {
       border-left: 1px solid #d9d9d9;
     }
   }
@@ -105,7 +105,7 @@ export const GraphTypeButton = styled.button`
   background-color: #f9fafb;
   cursor: pointer;
 
-  :hover {
+  &:hover {
     border-color: #c4c7cc;
   }
 

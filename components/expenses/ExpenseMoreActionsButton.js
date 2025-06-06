@@ -47,11 +47,11 @@ const Action = styled.button`
 
   color: ${props => props.theme.colors.black[900]};
 
-  :hover {
+  &:hover {
     color: ${props => props.theme.colors.black[700]};
   }
 
-  :focus {
+  &:focus {
     color: ${props => props.theme.colors.black[700]};
     text-decoration: underline;
   }

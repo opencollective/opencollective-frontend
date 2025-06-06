@@ -23,7 +23,7 @@ const SecurityCheckItem = styled(Flex)`
   justify-content: space-between;
   min-height: 72px;
   padding: 12px 16px;
-  :not(:last-child) {
+  &:not(:last-child) {
     border-bottom: 1px solid ${themeGet('colors.black.300')};
   }
 `;

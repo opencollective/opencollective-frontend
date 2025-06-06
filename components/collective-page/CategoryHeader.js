@@ -58,7 +58,7 @@ const CategoryHeader = React.forwardRef(({ collective, category, ...props }, ref
   const intl = useIntl();
   const data = getSectionsCategoryDetails(intl, collective, category);
   return (
-    <ContainerWithMaxWidth ref={ref} {...props}>
+    <ContainerWithMaxWidth {...props} ref={ref}>
       <Flex alignItems="center" justifyContent="center">
         <TypeIllustrationCircle alignItems="center" mr={2}>
           <TypeIllustration src={data.img} />
