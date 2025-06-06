@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Minsta belopp: {minAmount} {currency}",
   "contribution.paymentFee": "Betalningshanteringsavgift",
   "contribution.quantity": "Antal",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.CreateOrganizationLabel": "Bidra som organisation",
   "ContributionFlow.CreateUserLabel": "Bidra som individ",

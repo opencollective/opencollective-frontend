@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Mindestbetrag: {minAmount} {currency}",
   "contribution.paymentFee": "Gebühr für Zahlungsabwicklung",
   "contribution.quantity": "Quantity",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Zurück zur Seite von {accountName}",
   "ContributionFlow.CreateOrganizationLabel": "Als Organisation beitragen",
   "ContributionFlow.CreateUserLabel": "Als Einzelperson spenden",

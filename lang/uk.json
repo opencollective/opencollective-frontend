@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Найменша сума: {minAmount} {currency}",
   "contribution.paymentFee": "Комісія обробника платежу",
   "contribution.quantity": "Кількість",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Повернутися на сторінку {accountName}",
   "ContributionFlow.CreateOrganizationLabel": "Зробити внесок як організація",
   "ContributionFlow.CreateUserLabel": "Зробити внесок як окрема особа",

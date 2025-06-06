@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Importo minimo: {minAmount} {currency}",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Quantità",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.CreateOrganizationLabel": "Contribuisci come organizzazione",
   "ContributionFlow.CreateUserLabel": "Contribute as an individual",

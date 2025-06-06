@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Quantity",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
   "ContributionFlow.CreateUserLabel": "Contribute as an individual",

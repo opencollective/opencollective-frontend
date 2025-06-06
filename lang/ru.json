@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Минимальная сумма: {minAmount} {currency}",
   "contribution.paymentFee": "Комиссия обработки платежа",
   "contribution.quantity": "Количество",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.CreateOrganizationLabel": "Внести вклад как организация",
   "ContributionFlow.CreateUserLabel": "Внести вклад как физическое лицо",

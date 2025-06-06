@@ -965,7 +965,6 @@
   "contribution.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "contribution.paymentFee": "Poplatek zpracovatele platby",
   "contribution.quantity": "Množství",
-  "Contribution.SinceDate": "Since Date",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.CreateOrganizationLabel": "Přispět jako organizace",
   "ContributionFlow.CreateUserLabel": "Přispět jako jednotlivec",
