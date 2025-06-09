@@ -7,11 +7,16 @@ import { z } from 'zod';
 
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gqlV1 } from '../../../../lib/graphql/helpers';
+import type {
+  AccountsDashboardQuery,
+  DashboardAccountsQueryFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import { Currency } from '../../../../lib/graphql/types/v2/schema';
 
-import CollectivePicker from '../../../CollectivePicker';
+import CollectivePickerAsync from '@/components/CollectivePickerAsync';
+
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { FormField } from '../../../FormField';
 import { FormikZod } from '../../../FormikZod';
@@ -24,8 +29,8 @@ import { toast } from '../../../ui/useToast';
 import { accountsQuery } from './queries';
 
 const transferFundsFormValuesSchema = z.object({
-  fromAccount: z.object({ id: z.string().optional(), name: z.string().optional() }), // accountReferenceInput
-  toAccount: z.object({ id: z.string().optional(), name: z.string().optional() }), // / accountReferenceInput
+  fromAccount: z.object({ id: z.union([z.string(), z.number()]).optional(), name: z.string().optional() }), // accountReferenceInput
+  toAccount: z.object({ id: z.union([z.string(), z.number()]).optional(), name: z.string().optional() }), // accountReferenceInput
   amount: z.object({ valueInCents: z.number().min(1), currency: z.nativeEnum(Currency) }),
 });
 
@@ -48,25 +53,74 @@ const internalTransferMutation = gql`
   }
 `;
 
+const fromCollectiveSearchQuery = gqlV1/* GraphQL */ `
+  query CollectivePickerSearch(
+    $term: String!
+    $types: [TypeOfCollective]
+    $limit: Int
+    $hostCollectiveIds: [Int]
+    $parentCollectiveIds: [Int]
+    $skipGuests: Boolean
+    $includeArchived: Boolean
+    $includeVendorsForHostId: Int
+  ) {
+    search(
+      term: $term
+      types: $types
+      limit: $limit
+      hostCollectiveIds: $hostCollectiveIds
+      parentCollectiveIds: $parentCollectiveIds
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+      includeVendorsForHostId: $includeVendorsForHostId
+    ) {
+      id
+      collectives {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          id
+          address
+          country
+        }
+        imageUrl(height: 64)
+        hostFeePercent
+        isActive
+        isArchived
+        isHost
+        stats {
+          balanceWithBlockedFunds
+        }
+        ... on Organization {
+          isTrustedHost
+        }
+      }
+    }
+  }
+`;
+
 interface InternalTransferModalProps extends BaseModalProps {
   defaultFromAccount?: DashboardAccountsQueryFieldsFragment;
-  accountSlug: string;
+  parentAccount: Pick<Account, 'legacyId' | 'id' | 'slug' | 'name'>;
 }
 
 export default function InternalTransferModal({
   open,
   setOpen,
-  accountSlug,
   defaultFromAccount,
   onCloseFocusRef,
+  parentAccount,
 }: InternalTransferModalProps) {
   const intl = useIntl();
   const formikRef = React.useRef<FormikProps<z.infer<typeof transferFundsFormValuesSchema>>>(null);
 
   const { data, loading } = useQuery(accountsQuery, {
     variables: {
-      accountSlug,
-      limit: 100, // TODO: This is the max limit of childrenAccounts, when refactoring the Collective Picker Async to work with GQL v2, this limitation can be worked around
+      accountSlug: parentAccount.slug,
+      limit: 10,
     },
     context: API_V2_CONTEXT,
   });
@@ -79,10 +133,10 @@ export default function InternalTransferModal({
 
   // Update currency when activeAccounts load
   React.useEffect(() => {
-    if (activeAccounts.length > 0 && activeAccounts[0]?.currency && formikRef.current) {
-      formikRef.current.setFieldValue('amount.currency', activeAccounts[0].currency);
+    if (data?.account?.currency && formikRef.current) {
+      formikRef.current.setFieldValue('amount.currency', data.account.currency);
     }
-  }, [activeAccounts]);
+  }, [data?.accout]);
 
   const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation, {
     context: API_V2_CONTEXT,
@@ -119,27 +173,10 @@ export default function InternalTransferModal({
             },
           }}
           onSubmit={async values => {
-            const paymentMethods = values.fromAccount?.id
-              ? activeAccounts.find(a => a.id === values.fromAccount.id)?.paymentMethods
-              : null;
-            if (!paymentMethods || paymentMethods.length === 0) {
-              toast({
-                variant: 'error',
-                message: (
-                  <FormattedMessage
-                    defaultMessage="We couldn't find a payment method to make this transaction"
-                    id="+H8kCF"
-                  />
-                ),
-              });
-              return;
-            }
-
             const order = {
               fromAccount: getAccountReferenceInput(values.fromAccount),
               toAccount: getAccountReferenceInput(values.toAccount),
               amount: { valueInCents: values.amount.valueInCents, currency: values.amount.currency },
-              paymentMethod: { id: paymentMethods[0].id },
               frequency: 'ONETIME',
               isBalanceTransfer: true,
             };
@@ -178,9 +215,17 @@ export default function InternalTransferModal({
           innerRef={formikRef}
         >
           {({ setFieldValue, values }) => {
-            const availableBalance = values.fromAccount?.id
-              ? activeAccounts.find(a => a.id === values.fromAccount.id)?.stats.balance
-              : null;
+            const fromAccount = values.fromAccount as AccountsDashboardQuery['account'] & {
+              stats?: { balanceWithBlockedFunds?: number };
+            };
+            const availableBalance = fromAccount?.stats?.balance
+              ? fromAccount?.stats?.balance
+              : fromAccount?.stats?.balanceWithBlockedFunds
+                ? {
+                    currency: fromAccount.currency,
+                    valueInCents: fromAccount.stats.balanceWithBlockedFunds,
+                  }
+                : null;
 
             return (
               <Form>
@@ -189,13 +234,19 @@ export default function InternalTransferModal({
                     name="fromAccount"
                     label={intl.formatMessage({ defaultMessage: 'From account', id: 'F4xg6X' })}
                   >
-                    {({ field }) => (
-                      <CollectivePicker
+                    {({ field, form }) => (
+                      <CollectivePickerAsync
                         inputId={field.id}
                         collective={field.value}
-                        collectives={activeAccounts}
+                        defaultCollectives={activeAccounts}
+                        includeArchived={true}
+                        parentCollectiveIds={[parentAccount?.legacyId]}
+                        searchQuery={fromCollectiveSearchQuery}
                         onChange={({ value }) => {
                           setFieldValue('fromAccount', value);
+                          if (form.values?.toAccount?.id === value?.id) {
+                            setFieldValue('toAccount', null);
+                          }
                         }}
                       />
                     )}
@@ -205,12 +256,19 @@ export default function InternalTransferModal({
                     name="toAccount"
                     label={intl.formatMessage({ defaultMessage: 'To account', id: 'gCOFay' })}
                   >
-                    {({ field }) => (
-                      <CollectivePicker
+                    {({ field, form }) => (
+                      <CollectivePickerAsync
                         inputId={field.id}
                         collective={field.value}
-                        collectives={activeAccounts}
-                        onChange={({ value }) => setFieldValue('toAccount', value)}
+                        defaultCollectives={activeAccounts.filter(
+                          a =>
+                            (a.legacyId || a.id) !== (form.values.fromAccount?.legacyId || form.values.fromAccount?.id),
+                        )}
+                        includeArchived={true}
+                        parentCollectiveIds={[parentAccount?.legacyId]}
+                        onChange={({ value }) => {
+                          setFieldValue('toAccount', value);
+                        }}
                       />
                     )}
                   </FormField>
@@ -227,15 +285,15 @@ export default function InternalTransferModal({
                       return (
                         <div className="flex items-center gap-2">
                           <InputGroup
-                            prepend={values.amount.currency}
+                            prepend={values.amount?.currency}
                             value={field.value ? field.value / 100 : ''}
                             type="number"
                             inputMode="numeric"
                             onChange={e =>
-                              setFieldValue(
-                                'amount.valueInCents',
-                                e.target.value ? parseFloat(e.target.value) * 100 : '',
-                              )
+                              setFieldValue('amount', {
+                                valueInCents: e.target.value ? parseFloat(e.target.value) * 100 : '',
+                                currency: data.account.currency,
+                              })
                             }
                             className="flex-1"
                           />

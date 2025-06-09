@@ -1002,7 +1002,14 @@ class ContributionFlow extends React.Component {
                     collective={collective}
                     tier={tier}
                     mainState={this.state}
-                    onChange={data => this.setState(data, this.updateRouteFromState)}
+                    onChange={data => {
+                      // Clear error when payment method changes
+                      if (data.stepPayment && data.stepPayment.key !== this.state.stepPayment?.key) {
+                        this.setState({ ...data, error: null }, this.updateRouteFromState);
+                      } else {
+                        this.setState(data, this.updateRouteFromState);
+                      }
+                    }}
                     step={currentStep}
                     showPlatformTip={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}

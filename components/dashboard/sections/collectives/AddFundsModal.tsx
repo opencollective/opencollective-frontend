@@ -4,7 +4,7 @@ import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { compact, get, groupBy, isEmpty, map } from 'lodash';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -49,7 +49,7 @@ import { TaxesFormikFields, validateTaxInput } from '../../../taxes/TaxesFormikF
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
 import { Button } from '../../../ui/Button';
-import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
+import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const AddFundsModalContainer = styled(StyledModal)`
   width: 100%;
@@ -454,6 +454,7 @@ const AddFundsModalContentWithCollective = ({
   editOrderId?: string;
 }) => {
   const intl = useIntl();
+  const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(initialValues?.amount));
   const {
     data,
     loading,
@@ -757,7 +758,7 @@ const AddFundsModalContentWithCollective = ({
                 >
                   {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
                 </Field>
-                <Flex mt={3} flexWrap="wrap">
+                <Flex mt={3} flexWrap="wrap" alignItems="flex-end">
                   <Field
                     name="amount"
                     htmlFor="addFunds-amount"
@@ -766,19 +767,68 @@ const AddFundsModalContentWithCollective = ({
                     flex="1 1"
                   >
                     {({ form, field }) => (
-                      <StyledInputAmount
-                        id={field.id}
-                        data-cy="add-funds-amount"
-                        currency={currency}
-                        placeholder="0.00"
-                        error={field.error}
-                        value={field.value}
-                        maxWidth="100%"
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
-                      />
+                      <div>
+                        <div className="flex justify-between gap-2 [&>div]:w-full">
+                          <StyledInputAmount
+                            id={field.id}
+                            data-cy="add-funds-amount"
+                            currency={currency}
+                            placeholder="0.00"
+                            error={field.error}
+                            value={field.value}
+                            maxWidth="100%"
+                            onChange={value => form.setFieldValue(field.name, value)}
+                            onBlur={() => form.setFieldTouched(field.name, true)}
+                            disabled={isAmountLocked}
+                          />
+                          {Boolean(initialValues?.amount) && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-[38px]"
+                              onClick={() => setIsAmountLocked(locked => !locked)}
+                              disabled={initialValues.amount !== values.amount}
+                              aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
+                            >
+                              {isAmountLocked ? <Unlock size={18} /> : <Lock size={18} />}
+                            </Button>
+                          )}
+                        </div>
+                        {Boolean(initialValues?.amount) &&
+                          (isAmountLocked ? (
+                            <span className="mt-1 text-xs text-gray-500">
+                              <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
+                            </span>
+                          ) : (
+                            initialValues.amount !== values.amount && (
+                              <span className="mt-1 text-xs text-gray-500">
+                                <FormattedMessage
+                                  defaultMessage="The initial amount was {amount}."
+                                  id="6hEUR9"
+                                  values={{
+                                    amount: formatCurrency(initialValues.amount, currency, { locale: intl.locale }),
+                                  }}
+                                />
+                                {' - '}
+                                <Button
+                                  variant="link"
+                                  size="xs"
+                                  className="p-0 text-xs"
+                                  onClick={() => {
+                                    formik.setFieldValue('amount', initialValues.amount);
+                                    setIsAmountLocked(true);
+                                  }}
+                                >
+                                  <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
+                                </Button>
+                              </span>
+                            )
+                          ))}
+                      </div>
                     )}
                   </Field>
+
                   {canAddHostFee && (
                     <Field
                       name="hostFeePercent"
@@ -938,7 +988,7 @@ const AddFundsModalContentWithCollective = ({
                   {isEdit ? (
                     <FormattedMessage
                       id="AddFundsModal.editDisclaimer"
-                      defaultMessage="For funds added in the previous 24 hours, you'll be editing the original transactions, and no trace of this operation will be left. If this transaction was already consolidated somewhere outside the platform, make sure those records are also updated. Otherwise, by clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
+                      defaultMessage="By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
                     />
                   ) : (
                     <FormattedMessage
@@ -1136,7 +1186,7 @@ const AddFundsModal = ({
   initialValues?: Partial<AddFundsFormValues>;
   onSuccess?: (order: Order) => void;
   transactionsImportRow?: TransactionReferenceInput &
-    React.ComponentProps<typeof TransactionsImportRowDetailsAccordion>['transactionsImportRow'];
+    React.ComponentProps<typeof TransactionsImportRowDetails>['transactionsImportRow'];
   editOrderId?: string;
   onClose: () => void;
 }) => {
@@ -1182,7 +1232,7 @@ const AddFundsModal = ({
       )}
 
       {transactionsImportRow && (
-        <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
+        <TransactionsImportRowDetails transactionsImportRow={transactionsImportRow} className="mb-4" />
       )}
 
       {!LoggedInUser ? (

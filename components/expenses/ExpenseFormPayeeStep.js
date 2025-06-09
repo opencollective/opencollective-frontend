@@ -394,6 +394,7 @@ const ExpenseFormPayeeStep = ({
                     onInvite={onInvite}
                     LoggedInUser={loggedInAccount}
                     includeVendorsForHostId={collective.host?.legacyId || undefined}
+                    vendorVisibleToAccountIds={[collective.legacyId]}
                     addLoggedInUserAsAdmin
                     excludeAdminFields
                     searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
@@ -605,6 +606,7 @@ ExpenseFormPayeeStep.propTypes = {
   disablePayee: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({
+    legacyId: PropTypes.number,
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     host: PropTypes.shape({

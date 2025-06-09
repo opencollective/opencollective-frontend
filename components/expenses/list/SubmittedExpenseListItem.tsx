@@ -90,7 +90,14 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
                 : I18nMessages.DESCRIPTION_LINE_NO_PAYOUT_METHOD)}
               values={{
                 submittedAt: <DateTime value={props.expense.createdAt} />,
-                payoutMethod: <PayoutMethodLabel showIcon payoutMethod={props.expense.payoutMethod} />,
+                payoutMethod: (
+                  <PayoutMethodLabel
+                    iconSize={14}
+                    className="inline-flex min-h-0 items-baseline"
+                    showIcon
+                    payoutMethod={props.expense.payoutMethod}
+                  />
+                ),
                 submitter: (
                   <AccountHoverCard
                     account={props.expense.payee}

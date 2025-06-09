@@ -115,7 +115,7 @@ function getErrorsObjectFromZodSchema<Values>(
     const errorResult = result as z.SafeParseError<typeof values>;
     for (const error of errorResult.error.issues) {
       if (!get(errors, error.path)) {
-        set(errors, error.path, error.message);
+        set(errors, error.path.join('.'), error.message);
       }
     }
   }
