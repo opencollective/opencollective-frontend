@@ -208,9 +208,7 @@
     "@cypress/code-coverage": "^3.12.39",
     "@eslint/compat": "^1.2.8",
     "@formatjs/cli": "^6.2.12",
-    "@graphql-codegen/add": "^5.0.2",
-    "@graphql-codegen/cli": "5.0.5",
-    "@graphql-codegen/client-preset": "^4.2.6",
+    "@graphql-codegen/cli": "5.0.7",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@next/bundle-analyzer": "^14.2.3",
     "@rollup/plugin-commonjs": "^26.0.0",
@@ -304,8 +302,6 @@
   },
   "@opencollective/depcheck": {
     "ignores": [
-      "@graphql-codegen/add",
-      "@graphql-codegen/client-preset",
       "@types/webpack-env",
       "@tailwindcss/postcss",
       "@tailwindcss/typography",
