@@ -116,7 +116,6 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     fillOpacity: 1,
     discrete: [],
     shape: 'circle',
-    radius: expanded ? 2 : 0,
     offsetX: 0,
     offsetY: 0,
     showNullDataPoints: true,
