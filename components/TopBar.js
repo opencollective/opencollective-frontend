@@ -75,19 +75,34 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBarIcon = ({ provider }) => {
+const TopBarIcon = ({ provider, identity }) => {
+  let href = '/home';
+  if (provider?.slug) {
+    href = provider?.slug;
+  } else if (identity === 'opencollective') {
+    href = '/';
+  }
   return (
-    <Link href={`/${provider?.slug || ''}`}>
+    <Link href={href}>
       <Flex alignItems="center">
         {provider?.logo ? (
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
         ) : (
-          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
+          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="" />
         )}
         {!provider && (
           <Hide xs sm md>
             <Box mx={2}>
-              <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+              {identity === 'opencollective' ? (
+                <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+              ) : (
+                <Image
+                  height={21}
+                  width={170}
+                  src="/static/images/logotype-ofi-opencollective.svg"
+                  alt="OFi Open Collective"
+                />
+              )}
             </Box>
           </Hide>
         )}
@@ -102,6 +117,7 @@ TopBarIcon.propTypes = {
     slug: PropTypes.string,
     logo: PropTypes.string,
   }),
+  identity: PropTypes.string,
 };
 
 const TopBar = ({
@@ -109,6 +125,7 @@ const TopBar = ({
   menuItems = { solutions: true, product: true, company: true, docs: true },
   showProfileAndChangelogMenu = true,
   account,
+  identity,
 }) => {
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -162,7 +179,7 @@ const TopBar = ({
       }}
       ref={ref}
     >
-      <TopBarIcon provider={whitelabel} />
+      <TopBarIcon provider={whitelabel} identity={identity} />
       <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
         <Hide xs sm>
           {' '}
@@ -343,6 +360,7 @@ TopBar.propTypes = {
   showProfileAndChangelogMenu: PropTypes.bool,
   menuItems: PropTypes.object,
   account: PropTypes.object,
+  identity: PropTypes.string,
 };
 
 export default TopBar;

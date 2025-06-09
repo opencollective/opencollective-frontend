@@ -1,4 +1,4 @@
-import { getServerSideProps, HomePage } from './home';
+import { getServerSideProps, HomePage } from './prehome';
 
 // ts-unused-exports:disable-next-line
 export { getServerSideProps };
