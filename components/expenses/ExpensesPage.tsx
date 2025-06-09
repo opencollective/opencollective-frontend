@@ -186,7 +186,7 @@ export const toVariables: FiltersToVariables<FilterValues, HostDashboardExpenses
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
 };
 
-export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
+const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...pick(commonFilters, ['searchTerm']),
   direction: expenseDirectionFilter.filter,
   ...omit(commonFilters, ['searchTerm', 'status']),
@@ -256,7 +256,7 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
       {isSelfHosted && LoggedInUser?.isHostAdmin(account) && data?.scheduledExpenses?.totalCount > 0 && (
         <ScheduledExpensesBanner hostSlug={account.slug} />
       )}
-      <div className="mx-5 flex flex-col justify-between gap-0 gap-16 lg:mx-0 lg:flex-row">
+      <div className="mx-5 flex flex-col justify-between gap-16 lg:mx-0 lg:flex-row">
         <div className="w-full">
           <Filterbar hideSeparator className="mb-4" {...queryFilter} />
           {!loading && !data?.expenses?.nodes.length ? (

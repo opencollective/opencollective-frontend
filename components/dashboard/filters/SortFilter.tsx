@@ -16,7 +16,8 @@ import { z } from 'zod';
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/schema';
 
-import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
+import { parseChronologicalOrderInput } from '@/components/dashboard/filters/OrderFilter';
+
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';

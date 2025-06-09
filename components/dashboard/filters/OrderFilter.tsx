@@ -9,7 +9,7 @@ import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/fi
 import { Button } from '../../ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../../ui/Select';
 
-const parseChronologicalOrderInput = str => {
+export const parseChronologicalOrderInput = str => {
   const [field, direction] = str.split(',');
   return { field, direction };
 };

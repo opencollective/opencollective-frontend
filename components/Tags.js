@@ -85,9 +85,7 @@ TagsForAdmins.propTypes = {
 };
 
 const Tag = styled(StyledTag).attrs({
-  mb: '4px',
-  mr: '4px',
-  variant: 'rounded',
+  variant: 'rounded-right',
 })``;
 
 const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
@@ -106,7 +104,7 @@ const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, sugge
     return children ? children({ key: tag, tag, renderedTag, props: extraTagProps }) : renderedTag;
   };
   return (
-    <Flex flexWrap="wrap" alignItems="flex-start">
+    <Flex flexWrap="wrap" alignItems="flex-start" gap={2}>
       {canEdit ? (
         <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />
       ) : (

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { FormattedMessage } from 'react-intl';
 
-import StyledButton from '../StyledButton';
 import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 
@@ -17,8 +17,8 @@ const DeleteExpenseButton = ({ expense, onDelete, buttonProps, isDisabled, onMod
 
   return (
     <React.Fragment>
-      <StyledButton
-        buttonStyle="dangerSecondary"
+      <Button
+        variant="outlineDestructive"
         data-cy="delete-expense-button"
         disabled={isDisabled}
         {...buttonProps}
@@ -28,7 +28,7 @@ const DeleteExpenseButton = ({ expense, onDelete, buttonProps, isDisabled, onMod
         <Span ml="6px">
           <FormattedMessage id="actions.delete" defaultMessage="Delete" />
         </Span>
-      </StyledButton>
+      </Button>
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion
           onDelete={onDelete}
