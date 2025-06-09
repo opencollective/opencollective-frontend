@@ -106,6 +106,7 @@ const nextConfig = {
             // eslint-disable-next-line n/no-extraneous-require
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'build/pdf.worker.min.mjs'),
             to: path.join(__dirname, 'public/static/scripts/pdf.worker.min.mjs'),
+            info: { minimized: true },
           },
         ],
       }),
