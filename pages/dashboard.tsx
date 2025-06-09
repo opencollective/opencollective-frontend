@@ -8,7 +8,6 @@ import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import type { Context } from '@/lib/apollo-client';
 import { loadGoogleMaps } from '@/lib/google-maps';
 import { getWhitelabelProps } from '@/lib/whitelabel';
@@ -19,6 +18,7 @@ import {
   ROOT_PROFILE_KEY,
   ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
+  SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS,
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
@@ -58,10 +58,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (
-    isIndividualAccount(account) ||
-    (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
-  ) {
+  } else if (isIndividualAccount(account) || !isHostAccount(account)) {
     return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
@@ -111,6 +108,15 @@ function getBlocker(LoggedInUser, account, section) {
         <FormattedMessage
           defaultMessage="You need to be logged in as an admin or accountant to view this page"
           id="9FWGOh"
+        />
+      );
+    }
+  } else if (SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS.includes(section)) {
+    if (!isAdmin && !LoggedInUser.hasRole(roles.COMMUNITY_MANAGER, account)) {
+      return (
+        <FormattedMessage
+          defaultMessage="You need to be logged in as a community manager to view this page"
+          id="dnkxQ8"
         />
       );
     }

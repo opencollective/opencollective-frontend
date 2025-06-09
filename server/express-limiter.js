@@ -26,7 +26,7 @@ function expressLimiter(redisClient) {
       let limit;
       try {
         limit = await redisClient.get(key);
-      } catch (err) {
+      } catch {
         // Nothing
       }
       const now = Date.now();
@@ -47,7 +47,7 @@ function expressLimiter(redisClient) {
       limit.remaining = Math.max(Number(limit.remaining) - 1, -1);
       try {
         await redisClient.set(key, JSON.stringify(limit), { PX: opts.expire });
-      } catch (err) {
+      } catch {
         // Nothing
       }
       if (!opts.skipHeaders) {

@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isEmpty, isObject, omit } from 'lodash';
+import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
 import * as whitelabel from './constants/whitelabel-providers';
@@ -33,7 +33,7 @@ export const isValidUrl = url => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -61,7 +61,7 @@ export const isValidRelativeUrl = url => {
     // If we're able to construct a URL, it means it's an absolute URL.
     new URL(url);
     return false;
-  } catch (e) {
+  } catch {
     // Prevent URLs like //example.com or /\n/example.com or /\/example.com/
     if (url.match(/^[\s\\/]{2,}.+/)) {
       return false;
@@ -112,7 +112,6 @@ export function getQueryParams() {
     },
     query = window.location.search.substring(1);
 
-  // eslint-disable-next-line no-cond-assign
   while ((match = search.exec(query))) {
     urlParams[decode(match[1])] = decode(match[2]);
   }
@@ -273,7 +272,18 @@ export const flattenObjectDeep = obj =>
 
 export const omitDeep = (obj, keys) =>
   Object.keys(omit(obj, keys)).reduce(
-    (acc, next) => ({ ...acc, [next]: isObject(obj[next]) ? omitDeep(obj[next], keys) : obj[next] }),
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeep(obj[next], keys) : obj[next],
+    }),
+    {},
+  );
+export const omitDeepBy = (obj, predicate) =>
+  Object.keys(omitBy(obj, predicate)).reduce(
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeepBy(obj[next], predicate) : obj[next],
+    }),
     {},
   );
 

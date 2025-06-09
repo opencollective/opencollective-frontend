@@ -27,6 +27,8 @@ export function EmptyResults({
     | 'UPDATES'
     | 'PROJECTS'
     | 'TRANSACTIONS'
+    | 'FUNDS'
+    | 'GRANTS'
     | 'PAYMENT_METHODS';
   imageSize?: number;
 }) {

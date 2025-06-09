@@ -319,18 +319,20 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     if (values.fromAccount?.type === 'VENDOR') {
       const vendorInfo = host?.vendors?.nodes?.find(vendor => vendor.id === formik.values?.fromAccount?.id)?.vendorInfo;
       if (vendorInfo?.contact) {
-        formik.touched.fromAccountInfo?.['name'] !== true &&
+        if (formik.touched.fromAccountInfo?.['name'] !== true) {
           setFieldValue('fromAccountInfo.name', vendorInfo.contact.name);
-        formik.touched.fromAccountInfo?.['email'] !== true &&
+        }
+        if (formik.touched.fromAccountInfo?.['email'] !== true) {
           setFieldValue('fromAccountInfo.email', vendorInfo.contact.email);
+        }
       }
     } else {
-      formik.touched.fromAccountInfo?.['name'] !== true &&
-        formik.values?.fromAccountInfo?.name &&
+      if (formik.touched.fromAccountInfo?.['name'] !== true && formik.values?.fromAccountInfo?.name) {
         setFieldValue('fromAccountInfo.name', '');
-      formik.touched.fromAccountInfo?.['email'] !== true &&
-        formik.values?.fromAccountInfo?.email &&
+      }
+      if (formik.touched.fromAccountInfo?.['email'] !== true && formik.values?.fromAccountInfo?.email) {
         setFieldValue('fromAccountInfo.email', '');
+      }
     }
   }, [values.fromAccount]);
 

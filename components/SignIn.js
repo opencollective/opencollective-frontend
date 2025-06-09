@@ -57,6 +57,12 @@ export default class SignIn extends React.Component {
     autoFocus: PropTypes.bool,
     /** whether to show the title or not */
     noSignInTitle: PropTypes.bool,
+    whitelabelProvider: PropTypes.shape({
+      name: PropTypes.string,
+      squareLogo: PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    }),
   };
 
   static defaultProps = {
@@ -105,7 +111,7 @@ export default class SignIn extends React.Component {
   getSignInPageHeading(unknownEmail) {
     if (this.props.isOAuth && unknownEmail) {
       return <FormattedMessage defaultMessage="Sign in to your Open Collective account" id="sAWx+H" />;
-    } else if (this.props.isOAuth) {
+    } else if (this.props.isOAuth || this.props.whitelabelProvider) {
       return <FormattedMessage defaultMessage="Continue with your Open Collective account" id="07Y/8I" />;
     } else {
       return this.props.label || <FormattedMessage defaultMessage="Continue with your email" id="6zdt+y" />;
@@ -117,13 +123,31 @@ export default class SignIn extends React.Component {
       return (
         <FormattedMessage defaultMessage="and connect with {oAuthAppName}" id="boQlk1" values={{ oAuthAppName }} />
       );
+    } else if (this.props.whitelabelProvider) {
+      return (
+        <FormattedMessage
+          defaultMessage="Sign in to {whitelabelProviderName} with your Open Collective account."
+          id="QeM97p"
+          values={{ whitelabelProviderName: this.props.whitelabelProvider.name }}
+        />
+      );
     } else {
       return <FormattedMessage defaultMessage="Sign in or create a personal account to continue" id="qxlyPu" />;
     }
   }
 
   render() {
-    const { onSubmit, loading, email, password, onEmailChange, onPasswordChange, label, noSignInTitle } = this.props;
+    const {
+      onSubmit,
+      loading,
+      email,
+      password,
+      onEmailChange,
+      onPasswordChange,
+      label,
+      noSignInTitle,
+      whitelabelProvider,
+    } = this.props;
     const { error, showError } = this.state;
     return (
       <React.Fragment>
@@ -136,7 +160,7 @@ export default class SignIn extends React.Component {
         <Box maxWidth={390} px={['20px', 0]}>
           {this.props.isOAuth ? (
             <React.Fragment>
-              <Flex justifyContent="center" mb={40}>
+              <div className="mb-10 flex justify-center">
                 <Box minWidth={104}>
                   <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
                 </Box>
@@ -146,13 +170,24 @@ export default class SignIn extends React.Component {
                 <Box minWidth={104}>
                   <img src={this.props.oAuthAppImage} alt="" height={104} width={104} style={{ borderRadius: 10 }} />
                 </Box>
-              </Flex>
+              </div>
             </React.Fragment>
           ) : (
             this.props.showOCLogo && (
-              <Flex justifyContent="center">
+              <div className="flex items-center justify-center gap-4">
                 <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} />
-              </Flex>
+                {whitelabelProvider?.squareLogo && (
+                  <React.Fragment>
+                    <Image
+                      src="/static/images/illustrations/arrow-to.png"
+                      height={64}
+                      width={64}
+                      className="mt-5 -rotate-[20deg]"
+                    />
+                    <img src={whitelabelProvider.squareLogo.url} alt="" height={128} width={128} />
+                  </React.Fragment>
+                )}
+              </div>
             )
           )}
           <Flex

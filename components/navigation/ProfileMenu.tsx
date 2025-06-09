@@ -128,7 +128,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   }, []);
 
   if (!LoggedInUser) {
-    return <LoginBtn isWhitelabelDomain={!!whitelabel} />;
+    return <LoginBtn whitelabel={whitelabel} />;
   }
 
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
@@ -210,7 +210,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 />
                 <MenuItem
                   Icon={BookOpen}
-                  href="https://docs.opencollective.com"
+                  href="https://documentation.opencollective.com"
                   external={true}
                   label={intl.formatMessage({ id: 'menu.documentation', defaultMessage: 'Documentation' })}
                 />

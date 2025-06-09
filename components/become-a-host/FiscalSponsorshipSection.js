@@ -48,7 +48,7 @@ const FiscalSponsorship = () => {
               defaultMessage="Open Collective is purpose-built to streamline your processes, reduce overhead, increase transparency, and enable your organization to hold and manage funds for more projects in less time. <learnMoreLink>Learn more</learnMoreLink>."
               values={{
                 learnMoreLink: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host',
+                  href: 'https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host',
                   openInNewTab: true,
                 }),
               }}

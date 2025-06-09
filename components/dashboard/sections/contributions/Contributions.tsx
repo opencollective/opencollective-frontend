@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
 import { ArrowLeftRightIcon, LinkIcon, Pencil, PlusIcon } from 'lucide-react';
@@ -44,6 +44,7 @@ import { managedOrderFragment } from '../../../recurring-contributions/graphql/q
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
@@ -234,8 +235,7 @@ const dashboardContributionsQuery = gql`
     $frequency: [ContributionFrequency]
     $status: [OrderStatus!]
     $includeIncognito: Boolean
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $paymentMethod: [PaymentMethodReferenceInput]
     $includeHostedAccounts: Boolean!
     $includeChildrenAccounts: Boolean
@@ -260,8 +260,7 @@ const dashboardContributionsQuery = gql`
         frequency: $frequency
         status: $status
         includeIncognito: $includeIncognito
-        minAmount: $minAmount
-        maxAmount: $maxAmount
+        amount: $amount
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
@@ -734,9 +733,13 @@ const Contributions = ({
     }
   }, [metadata?.account]);
 
+  const { account } = useContext(DashboardContext);
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
+    childrenAccounts: account.childrenAccounts?.nodes ?? [],
+    accountSlug: account.slug,
+    showChildAccountFilter: direction === 'INCOMING' && !includeHostedAccounts && includeChildrenAccounts,
   };
 
   const queryFilter = useQueryFilter({

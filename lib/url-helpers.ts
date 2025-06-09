@@ -9,8 +9,7 @@ import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
 
-export const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL;
-const NEXT_PDF_SERVICE_URL = process.env.NEXT_PDF_SERVICE_URL;
+export const PDF_SERVICE_V2_URL = process.env.PDF_SERVICE_V2_URL;
 
 // ---- Utils ----
 
@@ -44,16 +43,16 @@ const objectToQueryString = options => {
 
 // ---- Routes to other Open Collective services ----
 
-export const collectiveInvoiceURL = (collectiveSlug, hostSlug, startDate, endDate, format) => {
-  return `${PDF_SERVICE_URL}/receipts/collectives/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
+export const collectiveInvoiceURL = (collectiveSlug, hostSlug, startDate, endDate, format = 'pdf') => {
+  return `${PDF_SERVICE_V2_URL}/receipts/period/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
 };
 
 export const transactionInvoiceURL = transactionUUID => {
-  return `${PDF_SERVICE_URL}/receipts/transactions/${transactionUUID}/receipt.pdf`;
+  return `${PDF_SERVICE_V2_URL}/receipts/transaction/${transactionUUID}/receipt.pdf`;
 };
 
 export const expenseInvoiceUrl = expenseId => {
-  return `${PDF_SERVICE_URL}/expense/${expenseId}/invoice.pdf`;
+  return `${PDF_SERVICE_V2_URL}/expenses/${expenseId}/invoice.pdf`;
 };
 
 /**
@@ -62,7 +61,7 @@ export const expenseInvoiceUrl = expenseId => {
  * @param {string} filename - filename **with** extension
  */
 export const giftCardsDownloadUrl = filename => {
-  return `${PDF_SERVICE_URL}/giftcards/from-data/${filename}`;
+  return `${PDF_SERVICE_V2_URL}/gift-cards/${filename}`;
 };
 
 // ---- Routes to external services ----
@@ -146,6 +145,26 @@ export const getPersonalTokenSettingsRoute = (account, token) => {
   return getDashboardRoute(account, `for-developers/personal-tokens/${token.id}`);
 };
 
+export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
+  const base = `/dashboard/${hostSlug}/off-platform-transactions`;
+  if (importId) {
+    const params = new URLSearchParams();
+    params.set('importIds', importId);
+    return `${base}?${params.toString()}`;
+  } else {
+    return base;
+  }
+};
+
+export const getCSVTransactionsImportRoute = (hostSlug: string, importId = null) => {
+  const base = `/dashboard/${hostSlug}/ledger-csv-imports`;
+  if (importId) {
+    return `${base}/${importId}`;
+  } else {
+    return base;
+  }
+};
+
 export const getCollectivePageCanonicalURL = account => {
   return getWebsiteUrl() + getCollectivePageRoute(account);
 };
@@ -178,7 +197,7 @@ const TRUSTED_DOMAINS = [
   'gatherfor.org',
   'funds.ecosyste.ms',
 ];
-const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'opencollective.foundation', 'oscollective.org'];
+const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'oscollective.org'];
 
 export const isTrustedRedirectURL = (url: URL) => {
   if (url.protocol !== 'https:') {
@@ -231,7 +250,7 @@ export const isRelativeHref = href => {
     try {
       const parsedUrl = new URL(href, windowLocation.origin);
       return parsedUrl.origin === windowLocation.origin;
-    } catch (e) {
+    } catch {
       return false; // Invalid URL
     }
   }
@@ -289,9 +308,8 @@ export const getFileExtensionFromUrl = url => {
   }
 };
 
-export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = false, useNext = false }): string => {
-  const serviceUrl = (useNext && NEXT_PDF_SERVICE_URL) || PDF_SERVICE_URL;
-  const url = new URL(`${serviceUrl}/tax-form/${type}.pdf`);
+export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = false } = {}): string => {
+  const url = new URL(`${PDF_SERVICE_V2_URL}/tax-forms/${type}.pdf`);
   const base64Values = Buffer.from(JSON.stringify(values)).toString('base64');
   url.searchParams.set('formType', type);
   url.searchParams.set('values', base64Values);

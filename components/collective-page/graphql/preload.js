@@ -24,14 +24,6 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
     const queries = [];
     const isIndividual = isIndividualAccount(collective) && !collective.isHost;
     if (sectionsNames.includes('budget')) {
-      queries.push(
-        client.query({
-          query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
-          variables: getBudgetSectionQueryVariables(slug, isIndividual),
-          context: API_V2_CONTEXT,
-        }),
-      );
-      // V2
       const budget = sections.find(el => el.name === 'BUDGET')?.sections.find(el => el.name === 'budget');
       if (budget?.version === 2) {
         queries.push(
@@ -45,6 +37,14 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
           client.query({
             query: budgetSectionContributionsQuery,
             variables: { slug, from: null, to: null },
+            context: API_V2_CONTEXT,
+          }),
+        );
+      } else {
+        queries.push(
+          client.query({
+            query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
+            variables: getBudgetSectionQueryVariables(slug, isIndividual, collective.host),
             context: API_V2_CONTEXT,
           }),
         );

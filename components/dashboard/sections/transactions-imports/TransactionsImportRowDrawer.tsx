@@ -1,5 +1,4 @@
 import React from 'react';
-import { isEmpty } from 'lodash';
 import { Eye, EyeOff } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -7,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import type { GetActions } from '../../../../lib/actions/types';
 import type { TransactionsImportQuery } from '../../../../lib/graphql/types/v2/graphql';
 
-import { Card } from '@/components/ui/Card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
 
 import DateTime from '../../../DateTime';
@@ -17,7 +15,7 @@ import StyledLink from '../../../StyledLink';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
-import { TransactionsImportRowDataLine } from './TransactionsImportRowDataLine';
+import { ImportedTransactionDataList } from './ImportedTransactionDataList';
 import { TransactionsImportRowNoteForm } from './TransactionsImportRowNoteForm';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 
@@ -25,14 +23,12 @@ export const TransactionsImportRowDrawer = ({
   getActions,
   row,
   rowIndex,
-  transactionsImportId,
   autoFocusNoteForm,
   ...props
 }: {
   row: TransactionsImportQuery['transactionsImport']['rows']['nodes'][number];
   getActions: GetActions<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number]>;
   rowIndex: number;
-  transactionsImportId: string;
   autoFocusNoteForm: boolean;
 } & ComponentProps<typeof Sheet>) => {
   const dropdownTriggerRef = React.useRef();
@@ -97,6 +93,18 @@ export const TransactionsImportRowDrawer = ({
                   </DataListItemLabel>
                   <DataListItemValue>{row.description}</DataListItemValue>
                 </DataListItem>
+                <DataListItem>
+                  <DataListItemLabel>
+                    <FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />
+                  </DataListItemLabel>
+                  <DataListItemValue>{row.transactionsImport.source}</DataListItemValue>
+                </DataListItem>
+                <DataListItem>
+                  <DataListItemLabel>
+                    <FormattedMessage defaultMessage="Transaction ID" id="oK0S4l" />
+                  </DataListItemLabel>
+                  <DataListItemValue>{row.sourceId}</DataListItemValue>
+                </DataListItem>
                 <Collapsible open={hasRawValuesExpanded}>
                   <DataListItem>
                     <DataListItemLabel>
@@ -122,29 +130,8 @@ export const TransactionsImportRowDrawer = ({
                     </DataListItemValue>
                   </DataListItem>
                   <DataListItem>
-                    <CollapsibleContent>
-                      <Card className="mt-2 max-h-80 overflow-y-auto px-2 py-4 text-xs text-neutral-800">
-                        <ul className="list-inside list-disc pl-2">
-                          <li>
-                            <strong>
-                              <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
-                            </strong>
-                            : <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
-                          </li>
-                          <li>
-                            <strong>
-                              <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
-                            </strong>
-                            : <DateTime value={row.date} />
-                          </li>
-                          {Object.entries(row.rawValue as Record<string, string>)
-                            .filter(entry => !isEmpty(entry[1]))
-                            .map(([key, value], index) => (
-                              // eslint-disable-next-line react/no-array-index-key
-                              <TransactionsImportRowDataLine key={`${key}-${index}`} labelKey={key} value={value} />
-                            ))}
-                        </ul>
-                      </Card>
+                    <CollapsibleContent className="mt-2 text-sm">
+                      <ImportedTransactionDataList row={row} transactionsImport={row.transactionsImport} hideBasics />
                     </CollapsibleContent>
                   </DataListItem>
                 </Collapsible>
@@ -182,11 +169,7 @@ export const TransactionsImportRowDrawer = ({
                 )}
               </DataList>
               <hr className="my-4 border-gray-200" />
-              <TransactionsImportRowNoteForm
-                transactionsImportId={transactionsImportId}
-                row={row}
-                autoFocus={autoFocusNoteForm}
-              />
+              <TransactionsImportRowNoteForm row={row} autoFocus={autoFocusNoteForm} />
             </SheetBody>
           </React.Fragment>
         )}

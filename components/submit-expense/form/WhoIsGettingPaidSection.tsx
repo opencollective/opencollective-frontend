@@ -8,13 +8,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
-import { AccountType } from '../../../lib/graphql/types/v2/schema';
+import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import LoginBtn from '@/components/LoginBtn';
 import StyledInputFormikField from '@/components/StyledInputFormikField';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
+import VendorForm from '@/components/vendors/VendorForm';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -49,7 +51,7 @@ function getFormProps(form: ExpenseForm) {
       'expense',
       'loggedInAccount',
     ]),
-    ...pick(form.values, ['payeeSlug', 'inviteeAccountType']),
+    ...pick(form.values, ['payeeSlug', 'inviteeAccountType', 'expenseTypeOption']),
   };
 }
 
@@ -134,6 +136,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   return (
     <RadioGroup
       id="payeeSlug"
+      data-cy="payee-selector"
       disabled={props.isSubmitting}
       value={props.payeeSlug}
       onValueChange={payeeSlug => {
@@ -154,6 +157,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
       {(personalProfile || isLoading) && (
         <RadioGroupCard
+          data-cy="payee-myself-option"
           value={!isLoading ? personalProfile.slug : ''}
           disabled={isLoading || props.isSubmitting}
           checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
@@ -201,6 +205,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 disabled={props.isSubmitting}
                 onFocus={() => props.setFieldValue('payeeSlug', '__inviteSomeone')}
                 invitable
+                expenseType={props.expenseTypeOption}
                 collective={props.payeeSlug === '__inviteExistingUser' ? props.payee : null}
                 types={[
                   CollectiveType.COLLECTIVE,
@@ -302,7 +307,10 @@ function VendorOptionWrapper() {
         payeeSlug={form.values.payeeSlug}
         payee={form.options.payee}
         vendorsForAccount={form.options.vendorsForAccount || []}
+        account={form.options.account}
         host={form.options.host}
+        refresh={form.refresh}
+        expenseTypeOption={form.values.expenseTypeOption}
       />
     );
   }
@@ -315,14 +323,23 @@ const VendorOption = React.memo(function VendorOption(props: {
   payeeSlug: ExpenseForm['values']['payeeSlug'];
   payee: ExpenseForm['options']['payee'];
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
+  account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
+  refresh: ExpenseForm['refresh'];
+  expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = LoggedInUser.isAdminOfCollective(props.host);
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
-  const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
+  const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
     props.payeeSlug === '__vendor' ||
+    props.payeeSlug === '__newVendor' ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
-    selectedVendorSlug === props.payeeSlug;
+    selectedVendor?.slug === props.payeeSlug;
+
+  const isBeneficiary = props.expenseTypeOption === ExpenseType.GRANT;
+
   return (
     <RadioGroupCard
       value="__vendor"
@@ -333,22 +350,59 @@ const VendorOption = React.memo(function VendorOption(props: {
         <div>
           <CollectivePickerAsync
             inputId="__vendor"
+            useBeneficiaryForVendor={isBeneficiary}
             isSearchable
             types={['VENDOR']}
+            creatable={isHostAdmin ? ['VENDOR'] : false}
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={props.payeeSlug === '__vendor' ? null : props.payee}
+            collective={
+              props.payeeSlug === '__vendor' || props.payeeSlug === '__newVendor' ? null : selectedVendor || props.payee
+            }
+            handleCreateForm
+            onCreateClick={() => {
+              props.setFieldValue('payeeSlug', '__newVendor');
+              setSelectedVendor(null);
+            }}
             onChange={e => {
-              const slug = e.value.slug;
-              setSelectedVendorSlug(slug);
+              const selected = e.value;
+              const slug = selected?.slug;
+              setSelectedVendor(selected);
               props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
             }}
+            vendorVisibleToAccountIds={props.account.legacyId}
           />
+          {props.payeeSlug === '__newVendor' && (
+            <React.Fragment>
+              <Separator className="mt-3" />
+              <div className="mt-3">
+                <VendorForm
+                  isBeneficiary={isBeneficiary}
+                  limitVisibilityOptionToAccount={props.account}
+                  onSuccess={selected => {
+                    props.setFieldValue('payeeSlug', selected?.slug);
+                    setSelectedVendor(selected);
+                  }}
+                  hidePayoutMethod
+                  host={props.host}
+                  supportsTaxForm={false}
+                  onCancel={() => {
+                    props.setFieldValue('payeeSlug', '__vendor');
+                    setSelectedVendor(null);
+                  }}
+                />
+              </div>
+            </React.Fragment>
+          )}
         </div>
       }
     >
-      <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
+      {isBeneficiary ? (
+        <FormattedMessage defaultMessage="A beneficiary" id="9/Di6r" />
+      ) : (
+        <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
+      )}
     </RadioGroupCard>
   );
 });

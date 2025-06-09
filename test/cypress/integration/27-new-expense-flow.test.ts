@@ -504,8 +504,8 @@ function submitExpense(options: {
 
   cy.get('#EXPENSE_TITLE').within(() => {
     cy.root().scrollIntoView();
-    cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`),
-      cy.contains('Add tag').click();
+    cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`);
+    cy.contains('Add tag').click();
     cy.focused().should('have.attr', 'placeholder', 'Add tag').type('A tag');
     cy.wait(100);
     cy.focused().type('{enter}');
@@ -644,7 +644,7 @@ function fillTypeOfExpense(opts: { expenseType: 'invoice' | 'reimbursement'; has
         cy.contains('Yes, I have an invoice').click();
         cy.contains('Attach your invoice file').selectFile(getReceiptFixture({ fileName: 'invoice0.jpg' }));
         cy.contains('Clear').should('exist');
-        cy.contains('Invoice number').click().type('INV0001');
+        cy.contains('Invoice reference').click().type('INV0001');
       } else {
         cy.contains('No, generate an invoice for me').click();
       }

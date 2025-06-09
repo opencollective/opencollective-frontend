@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Mail } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { getEnvVar } from '@/lib/env-utils';
+import { parseToBoolean } from '@/lib/utils';
 
 import { Flex } from '../components/Grid';
 import BrowseTopics from '../components/help-and-support/BrowseTopicSection';
@@ -35,7 +39,21 @@ const renderFormContent = formConfirmation => {
   return (
     <React.Fragment>
       <HowCanWeHelp />
-      <ContactForm />
+      {!parseToBoolean(getEnvVar('DISABLE_CONTACT_FORM')) ? (
+        <ContactForm />
+      ) : (
+        <div className="mx-auto mt-12 flex max-w-3xl flex-col items-center gap-3 rounded-xl border p-8 text-center shadow">
+          <Mail size={64} className="text-neutral-700" />
+          <FormattedMessage
+            defaultMessage="Contact us at {email}"
+            tagName="div"
+            id="64TD/d"
+            values={{
+              email: <StyledLink href="mailto:support@opencollective.com">support@opencollective.com</StyledLink>,
+            }}
+          />
+        </div>
+      )}
       <WeAreHereIfYouWantToTalk />
       <NeedHelp
         title={
@@ -55,7 +73,7 @@ const renderFormContent = formConfirmation => {
               </StyledButton>
             </Link>
             <StyledLink
-              href="https://docs.opencollective.com/"
+              href="https://documentation.opencollective.com"
               buttonSize="medium"
               minWidth={208}
               buttonStyle="marketing"

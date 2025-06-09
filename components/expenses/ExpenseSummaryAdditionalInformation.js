@@ -11,6 +11,8 @@ import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payo
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -109,7 +111,6 @@ const ExpenseSummaryAdditionalInformation = ({
   isLoadingLoggedInUser,
   isDraft,
   collective,
-  useInlineExpenseEdit,
 }) => {
   const intl = useIntl();
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
@@ -118,6 +119,12 @@ const ExpenseSummaryAdditionalInformation = ({
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === ExpenseStatus.PAID;
+  const { LoggedInUser } = useLoggedInUser();
+  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
+  )
+    ? expense?.permissions || {}
+    : {};
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -136,7 +143,22 @@ const ExpenseSummaryAdditionalInformation = ({
     >
       {collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
-          <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+          <div className="flex justify-between gap-2">
+            <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+
+            {canEditPaidBy && (
+              <EditExpenseDialog
+                field={'paidBy'}
+                expense={expense}
+                title={intl.formatMessage({ defaultMessage: 'Edit paid by', id: 'expense.editPaidBy' })}
+                description={intl.formatMessage({
+                  defaultMessage: 'You can move the expense within the Collective',
+                  id: 'expense.editPaidBy.description',
+                })}
+                dialogContentClassName="sm:max-w-xl"
+              />
+            )}
+          </div>
           <AccountHoverCard
             account={collective}
             trigger={
@@ -207,7 +229,7 @@ const ExpenseSummaryAdditionalInformation = ({
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
             )}
           </PrivateInfoColumnHeader>
-          {useInlineExpenseEdit && (
+          {canEditPayee && (
             <EditExpenseDialog
               field={'payee'}
               expense={expense}
@@ -275,7 +297,7 @@ const ExpenseSummaryAdditionalInformation = ({
           <PrivateInfoColumnHeader>
             <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
           </PrivateInfoColumnHeader>
-          {useInlineExpenseEdit && (
+          {canEditPayoutMethod && (
             <EditExpenseDialog
               field={'payoutMethod'}
               expense={expense}
@@ -346,7 +368,6 @@ ExpenseSummaryAdditionalInformation.propTypes = {
   isDraft: PropTypes.bool,
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
-  useInlineExpenseEdit: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
   }),
@@ -409,6 +430,9 @@ ExpenseSummaryAdditionalInformation.propTypes = {
       id: PropTypes.string,
       name: PropTypes.string,
       last4: PropTypes.string,
+    }),
+    permissions: PropTypes.shape({
+      canEditPaidBy: PropTypes.boolean,
     }),
   }),
   collective: PropTypes.shape({

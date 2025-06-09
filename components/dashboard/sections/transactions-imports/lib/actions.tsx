@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import type { Account, TransactionsImport, TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
+import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
 
@@ -16,59 +16,60 @@ import StyledSpinner from '../../../../StyledSpinner';
 import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
-import { MatchContributionDialog } from '../MatchContributionDialog';
-import { MatchExpenseDialog } from '../MatchExpenseDialog';
+import { MatchCreditDialog } from '../MatchCreditDialog';
+import { MatchDebitDialog } from '../MatchDebitDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
 const getOptimisticResponse = (
-  transactionsImport,
+  host,
   rowIds,
   status: TransactionsImportRowStatus,
 ): UpdateTransactionsImportRowMutation => {
-  type ReturnedTransactionsImport = UpdateTransactionsImportRowMutation['updateTransactionsImportRows']['import'];
+  type ReturnedHost = UpdateTransactionsImportRowMutation['updateTransactionsImportRows']['host'];
   const optimisticResult = {
-    import: cloneDeep(pick<ReturnedTransactionsImport, 'id' | 'stats'>(transactionsImport, ['id', 'stats'])),
-    rows: [],
-  };
-
-  // Update nodes
-  update(optimisticResult, 'rows', nodes =>
-    nodes.map(node => (!rowIds.includes(node.id) ? node : { ...node, status })),
-  );
+    __typename: 'TransactionsImportEditResponse',
+    rows: rowIds.map(id => ({ id, status, __typename: 'TransactionsImportRow' })),
+    host: cloneDeep(
+      pick<ReturnedHost, 'id' | 'offPlatformTransactionsStats' | '__typename'>(host, [
+        'id',
+        'offPlatformTransactionsStats',
+        '__typename',
+      ]),
+    ),
+  } as const;
 
   // Update stats
   if (status === TransactionsImportRowStatus.IGNORED) {
-    update(optimisticResult, 'import.stats.ignored', ignored => ignored + rowIds.length);
-    update(optimisticResult, 'import.stats.processed', processed => processed + rowIds.length);
+    update(optimisticResult, 'host.offPlatformTransactionsStats.ignored', ignored => ignored + rowIds.length);
+    update(optimisticResult, 'host.offPlatformTransactionsStats.processed', processed => processed + rowIds.length);
   } else if (status === TransactionsImportRowStatus.PENDING) {
-    update(optimisticResult, 'import.stats.ignored', ignored => ignored - rowIds.length);
-    update(optimisticResult, 'import.stats.processed', processed => processed - rowIds.length);
+    update(optimisticResult, 'host.offPlatformTransactionsStats.ignored', ignored => ignored - rowIds.length);
+    update(optimisticResult, 'host.offPlatformTransactionsStats.processed', processed => processed - rowIds.length);
   }
 
-  return { updateTransactionsImportRows: optimisticResult };
+  return {
+    updateTransactionsImportRows: optimisticResult,
+  };
 };
 
-export function useTransactionsImportActions({
+export const useTransactionsImportActions = ({
   host,
-  transactionsImport,
-  assignments,
+  getAllRowsIds,
 }: {
-  host: React.ComponentProps<typeof MatchContributionDialog>['host'] &
-    React.ComponentProps<typeof MatchExpenseDialog>['host'];
-  transactionsImport: Pick<TransactionsImport, 'id'> &
-    React.ComponentProps<typeof AddFundsModalFromImportRow>['transactionsImport'] &
-    React.ComponentProps<typeof MatchContributionDialog>['transactionsImport'] &
-    React.ComponentProps<typeof MatchExpenseDialog>['transactionsImport'];
-  assignments: Record<string, Pick<Account, 'id' | 'slug' | 'type'>[]>;
+  host: React.ComponentProps<typeof MatchCreditDialog>['host'] &
+    React.ComponentProps<typeof MatchDebitDialog>['host'] &
+    React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
+  /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
+  getAllRowsIds: () => Promise<string[]>;
 }): {
   getActions: GetActions<TransactionsImportRow>;
   setRowsStatus: (
     rowIds: string[],
     newStatus: TransactionsImportRowStatus,
     options?: { includeAllPages?: boolean },
-  ) => Promise<void>;
-} {
+  ) => Promise<boolean>;
+} => {
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
@@ -79,11 +80,13 @@ export function useTransactionsImportActions({
     rowIds: string[],
     newStatus: TransactionsImportRowStatus,
     { includeAllPages = false } = {},
-  ) => {
+  ): Promise<boolean> => {
     setUpdatingRows(uniq([...updatingRows, ...rowIds]));
     try {
       let action: string;
+      let allRowsIds = rowIds;
       if (includeAllPages) {
+        allRowsIds = await getAllRowsIds();
         if (newStatus === TransactionsImportRowStatus.IGNORED) {
           action = 'DISMISS_ALL';
         } else if (newStatus === TransactionsImportRowStatus.PENDING) {
@@ -99,16 +102,16 @@ export function useTransactionsImportActions({
 
       await updateRows({
         variables: {
-          importId: transactionsImport.id,
           action,
-          ...(!includeAllPages && {
-            rows: rowIds.map(id => ({ id, status: newStatus })),
-          }),
+          rows: allRowsIds.map(id => ({ id, status: newStatus })),
         },
-        optimisticResponse: getOptimisticResponse(transactionsImport, rowIds, newStatus),
+        optimisticResponse: getOptimisticResponse(host, rowIds, newStatus),
       });
+
+      return true;
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+      return false;
     } finally {
       setUpdatingRows(updatingRows.filter(rowId => !rowIds.includes(rowId)));
     }
@@ -121,11 +124,12 @@ export function useTransactionsImportActions({
     const actions: ReturnType<GetActions<TransactionsImportRow>> = { primary: [], secondary: [] };
     const isImported = Boolean(row.expense || row.order);
     const isUpdatingRow = updatingRows.includes(row.id);
-    const assignedAccounts = assignments[row.accountId];
+    const assignedAccounts = row.assignedAccounts?.length ? row.assignedAccounts : null;
+    const transactionsImport = row.transactionsImport;
     const showAddFundsModal = () => {
       showModal(
         AddFundsModalFromImportRow,
-        { collective: assignedAccounts, transactionsImport, row, onCloseFocusRef },
+        { host, collective: assignedAccounts, transactionsImport, row, onCloseFocusRef },
         'add-funds-modal',
       );
     };
@@ -137,17 +141,17 @@ export function useTransactionsImportActions({
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />,
+          label: <FormattedMessage defaultMessage="Match" id="Qr9R5O" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
-              MatchContributionDialog,
+              MatchCreditDialog,
               {
-                accounts: assignedAccounts,
-                transactionsImport,
-                row,
                 host,
+                row,
+                transactionsImport,
                 onCloseFocusRef,
+                accounts: assignedAccounts,
                 onAddFundsClick: () => {
                   hideModal('match-contribution-modal');
                   showAddFundsModal();
@@ -159,19 +163,19 @@ export function useTransactionsImportActions({
         actions.primary.push({
           key: 'add-funds',
           Icon: Banknote,
-          label: <FormattedMessage defaultMessage="Add funds" id="h9vJHn" />,
+          label: <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />,
           disabled: isUpdatingRow,
           onClick: showAddFundsModal,
         });
       } else if (row.amount.valueInCents < 0) {
         actions.primary.push({
-          key: 'match-expense',
+          key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match expense" id="BGB+3j" />,
+          label: <FormattedMessage defaultMessage="Match" id="Qr9R5O" />,
           disabled: isUpdatingRow,
           onClick: () => {
             showModal(
-              MatchExpenseDialog,
+              MatchDebitDialog,
               { host, row, transactionsImport, onCloseFocusRef, accounts: assignedAccounts },
               'host-match-expense-modal',
             );
@@ -180,7 +184,7 @@ export function useTransactionsImportActions({
         actions.primary.push({
           key: 'create-expense',
           Icon: Receipt,
-          label: <FormattedMessage defaultMessage="Add expense" id="6/UjBO" />,
+          label: <FormattedMessage defaultMessage="Create expense" id="YUK+rq" />,
           disabled: isUpdatingRow,
           onClick: () => {
             showModal(
@@ -206,33 +210,39 @@ export function useTransactionsImportActions({
           </div>
         ),
       });
+    } else {
+      actions.primary.push({
+        key: 'restore',
+        Icon: ArchiveRestore,
+        onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.PENDING),
+        disabled: isUpdatingRow,
+        label: (
+          <div>
+            <FormattedMessage defaultMessage="Restore" id="zz6ObK" />
+            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+          </div>
+        ),
+      });
     }
 
-    actions.primary.push({
-      key: 'ignore',
-      Icon: row.status === TransactionsImportRowStatus.IGNORED ? ArchiveRestore : SquareSlashIcon,
-      onClick: () =>
-        setRowsStatus(
-          [row.id],
-          row.status === TransactionsImportRowStatus.IGNORED
-            ? TransactionsImportRowStatus.PENDING
-            : TransactionsImportRowStatus.IGNORED,
-        ),
-      disabled: isUpdatingRow,
-      label: (
-        <div>
-          {row.status === TransactionsImportRowStatus.IGNORED ? (
-            <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
-          ) : (
+    if (row.status !== TransactionsImportRowStatus.IGNORED) {
+      actions.primary.push({
+        key: 'ignore',
+        Icon: SquareSlashIcon,
+        onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.IGNORED),
+        disabled: isUpdatingRow,
+        label: (
+          <div>
             <FormattedMessage defaultMessage="No action" id="zue9QR" />
-          )}
-          {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
-        </div>
-      ),
-    });
+
+            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+          </div>
+        ),
+      });
+    }
 
     return actions;
   };
 
   return { getActions, setRowsStatus };
-}
+};

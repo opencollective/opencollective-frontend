@@ -58,6 +58,7 @@ export enum InviteeAccountType {
 }
 
 type ExpenseItem = {
+  id?: string;
   key?: string; // used to enable FlipMove animations (will either be a generated uuid on "Add item", or using the expense item id)
   description?: string;
   incurredAt?: string;
@@ -195,12 +196,12 @@ const formSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(limit: 1) {
+          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -208,12 +209,12 @@ const formSchemaQuery = gql`
 
       ... on Organization {
         host {
-          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(limit: 1) {
+          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -222,6 +223,10 @@ const formSchemaQuery = gql`
 
     payee: account(slug: $payeeSlug) @include(if: $hasPayeeSlug) {
       ...ExpenseFormPayeeFields
+
+      ... on Vendor {
+        hasPayoutMethod
+      }
     }
 
     loggedInAccount {
@@ -381,7 +386,8 @@ const formSchemaQuery = gql`
     name
     data
     isSaved
-    canBeEditedOrDeleted
+    canBeEdited
+    canBeDeleted
   }
 
   fragment ExpenseFormSchemaHostFields on Host {
@@ -393,6 +399,8 @@ const formSchemaQuery = gql`
     type
     currency
     settings
+    isFirstPartyHost
+    isTrustedHost
 
     location {
       id
@@ -441,12 +449,22 @@ const formSchemaQuery = gql`
     description
     imageUrl(height: 64)
     hasPayoutMethod
+    vendorInfo {
+      taxId
+      taxType
+    }
     payoutMethods {
       id
       type
       name
       data
       isSaved
+    }
+    visibleToAccounts {
+      id
+      legacyId
+      slug
+      name
     }
   }
 
@@ -459,6 +477,7 @@ const formSchemaQuery = gql`
     currency
     settings
     supportedExpenseTypes
+    isVerified
 
     stats {
       balance {
@@ -519,8 +538,12 @@ const formSchemaQuery = gql`
   fragment ExpenseFormSubmitterFields on Account {
     id
     slug
+    type
+    isVerified
     name
     imageUrl
+    isHost
+    isArchived
   }
 
   fragment ExpenseFormPayeeFields on Account {
@@ -584,6 +607,7 @@ type ExpenseFormOptions = {
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
+  isHostAdmin?: boolean;
   submitter?: ExpenseFormSchemaQuery['submitter'];
   loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
   expense?: ExpenseFormSchemaQuery['expense'];
@@ -599,7 +623,6 @@ type ExpenseFormOptions = {
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (apolloClient: ApolloClient<any>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
@@ -663,6 +686,10 @@ function buildFormSchema(
     expenseId: z.number().nullish(),
     expenseTypeOption: z.nativeEnum(ExpenseType).refine(
       v => {
+        if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
+          return true;
+        }
+
         if (options.account?.supportedExpenseTypes?.length > 0) {
           return options.account.supportedExpenseTypes.includes(v);
         }
@@ -686,6 +713,10 @@ function buildFormSchema(
             options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
           ) {
             return true;
+          }
+
+          if (options.payee?.type === CollectiveType.VENDOR && !options.payee?.['hasPayoutMethod']) {
+            return false;
           }
 
           // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
@@ -717,7 +748,8 @@ function buildFormSchema(
             options.isAccountingCategoryRequired &&
             options.accountingCategories?.length > 0 &&
             !options.accountingCategories.some(ac => ac.id === v) &&
-            !isNull(v) // null represents "I don't know" and is a valid option
+            !isNull(v) && // null represents "I don't know" and is a valid option
+            values.expenseTypeOption !== ExpenseType.GRANT
           ) {
             return false;
           }
@@ -1071,6 +1103,10 @@ function buildFormSchema(
               return true;
             }
 
+            if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
+              return true;
+            }
+
             if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
               return !!type;
             }
@@ -1094,6 +1130,10 @@ function buildFormSchema(
             .refine(
               currency => {
                 if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+                  return true;
+                }
+
+                if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
                   return true;
                 }
 
@@ -1305,6 +1345,7 @@ function getPayeeSlug(values: ExpenseFormValues): string {
     case '__invite':
     case '__inviteSomeone':
     case '__vendor':
+    case '__newVendor':
       return null;
     case '__inviteExistingUser':
       return values.inviteeExistingAccount;
@@ -1402,14 +1443,14 @@ async function buildFormOptions(
     }
 
     if (host) {
+      options.isHostAdmin = loggedInUser?.isAdminOfCollective(host) ?? false;
       options.host = host;
       options.vendorsForAccount =
         'vendorsForAccount' in host
-          ? (((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(
-              v => v.hasPayoutMethod,
-            )
+          ? ((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []
           : [];
-      options.showVendorsOption = 'vendors' in host ? (host.vendors as any)?.totalCount > 0 : false;
+      options.showVendorsOption =
+        options.isHostAdmin || ('vendors' in host ? (host.vendors as any)?.totalCount > 0 : false);
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1480,13 +1521,14 @@ async function buildFormOptions(
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
-      } else if (values.payoutMethodId === '__newPayoutMethod') {
+      } else if (
+        values.payoutMethodId === '__newPayoutMethod' &&
+        ((options.payee && options.payee.type !== CollectiveType.VENDOR) || options.isHostAdmin)
+      ) {
         options.payoutMethod = values.newPayoutMethod;
       }
 
-      // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
       options.isAdminOfPayee =
-        startOptions.isInlineEdit ||
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
         values.payeeSlug === '__findAccountIAdminister';
     } else {
@@ -1509,7 +1551,7 @@ async function buildFormOptions(
     } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
-      options.expenseCurrency = options.account?.currency;
+      options.expenseCurrency = options.expense?.currency ?? options.account?.currency;
     }
 
     options.isLongFormItemDescription = false;
@@ -1524,7 +1566,9 @@ async function buildFormOptions(
       options.canSetupRecurrence = false;
     }
 
-    options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
+    options.allowExpenseItemAttachment = values.expenseTypeOption
+      ? values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE
+      : options.expense?.type === ExpenseType.RECEIPT || options.expense?.type === ExpenseType.CHARGE;
 
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
@@ -1744,6 +1788,7 @@ export function useExpenseForm(opts: {
                   ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
                   : undefined,
             items: values.expenseItems.map(ei => ({
+              id: ei.id,
               description: ei.description,
               amountV2: {
                 valueInCents: ei.amount.valueInCents,
@@ -1897,7 +1942,7 @@ export function useExpenseForm(opts: {
 
         if (!isEmpty(errs)) {
           // eslint-disable-next-line no-console
-          console.warn('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
+          console.log('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
         }
 
         return errs;
@@ -2001,6 +2046,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.draft?.items?.map(ei => ({
+          id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: ei.url,
           description: ei.description ?? '',
@@ -2015,6 +2061,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
+          id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
@@ -2057,6 +2104,35 @@ export function useExpenseForm(opts: {
     }
   }, [formOptions.taxType, setFieldValue]);
 
+  // Move attachments when switching expense type
+  React.useEffect(() => {
+    if (expenseForm.values.expenseTypeOption === ExpenseType.INVOICE) {
+      if (expenseForm.values.expenseItems.length === 1 && expenseForm.values.expenseItems[0].attachment) {
+        setFieldValue('invoiceFile', expenseForm.values.expenseItems[0].attachment);
+        setFieldValue('expenseItems.0.attachment', null);
+        setFieldValue('hasInvoiceOption', YesNoOption.YES);
+      } else {
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        let count = 0;
+
+        expenseForm.values.expenseItems.forEach((item, i) => {
+          if (item.attachment) {
+            setFieldValue(`additionalAttachments.${numberOfAdditionalAttachments + count}`, item.attachment);
+            setFieldValue(`expenseItems.${i}.attachment`, null);
+            count++;
+          }
+        });
+      }
+    } else if (expenseForm.values.expenseTypeOption === ExpenseType.RECEIPT) {
+      if (expenseForm.values.invoiceFile) {
+        for (let i = 0; i < expenseForm.values.expenseItems.length; i++) {
+          setFieldValue(`expenseItems.${i}.attachment`, expenseForm.values.invoiceFile);
+        }
+        setFieldValue('invoiceFile', null);
+      }
+    }
+  }, [expenseForm.values.expenseTypeOption]);
+
   React.useEffect(() => {
     setFieldValue('payoutMethodNameDiscrepancyReason', '');
     setFieldTouched('payoutMethodNameDiscrepancyReason', false);
@@ -2083,8 +2159,21 @@ export function useExpenseForm(opts: {
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
+    } else if (!expenseForm.values.tax) {
+      const selectedVendor = formOptions.vendorsForAccount?.find(
+        v => v.slug === expenseForm.values.payeeSlug && formOptions?.taxType === v.vendorInfo?.taxType,
+      );
+      if (selectedVendor && !expenseForm.values.tax) {
+        setFieldValue('tax', { idNumber: selectedVendor.vendorInfo?.taxId, rate: 0 });
+      }
     }
-  }, [expenseForm.values.hasTax, setFieldValue]);
+  }, [
+    expenseForm.values.hasTax,
+    expenseForm.values.tax,
+    expenseForm.values.payeeSlug,
+    formOptions.vendorsForAccount,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
@@ -2169,7 +2258,7 @@ export function useExpenseForm(opts: {
             }
           });
         }
-      } catch (err) {
+      } catch {
         return;
       }
     }
@@ -2246,7 +2335,36 @@ export function useExpenseForm(opts: {
     ) {
       setFieldValue('payoutMethodId', null);
     }
-  }, [formOptions.payoutMethods, expenseForm.values.payoutMethodId, setFieldValue]);
+
+    const selectedPayoutMethod = formOptions.payoutMethods?.find(p => p.id === expenseForm.values.payoutMethodId);
+    if (
+      selectedPayoutMethod &&
+      selectedPayoutMethod.data?.currency &&
+      formOptions.allowDifferentItemCurrency &&
+      !expenseForm.touched.expenseItems &&
+      expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
+      !startOptions.current.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
+    ) {
+      setFieldValue(
+        'expenseItems',
+        expenseForm.values.expenseItems.map(ei => ({
+          ...ei,
+          amount: {
+            ...ei.amount,
+            currency: selectedPayoutMethod.data?.currency,
+          },
+        })),
+      );
+    }
+  }, [
+    formOptions.allowDifferentItemCurrency,
+    formOptions.payoutMethods,
+    expenseForm.values.payoutMethodId,
+    setFieldValue,
+    setFormOptions,
+    expenseForm.touched.expenseItems,
+    expenseForm.values.expenseItems,
+  ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
 

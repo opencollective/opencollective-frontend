@@ -240,7 +240,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         const cleanCategories = newCategories.map(categoryToEditableFields);
         await editAccountingCategories({ variables: { categories: cleanCategories } });
         toast({ variant: 'success', message: intl.formatMessage({ id: 'saved', defaultMessage: 'Saved' }) });
-        onSuccess && onSuccess();
+        onSuccess?.();
       } catch (e) {
         toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         throw e;

@@ -208,6 +208,26 @@ const hostedCollectiveFields = gql`
         valueInCents
         currency
       }
+      totalAmountRaised: totalAmountReceived {
+        valueInCents
+        currency
+      }
+      consolidatedTotalAmountRaised: totalAmountReceived(includeChildren: true) {
+        valueInCents
+        currency
+      }
+      consolidatedTotalNetAmountRaised: totalAmountReceived(net: true, includeChildren: true) {
+        valueInCents
+        currency
+      }
+      totalAmountSpent: totalAmountSpent {
+        valueInCents
+        currency
+      }
+      consolidatedTotalAmountSpent: totalAmountSpent(includeChildren: true) {
+        valueInCents
+        currency
+      }
     }
     policies {
       id
@@ -294,21 +314,21 @@ const hostedCollectiveFields = gql`
 `;
 
 export const hostedCollectivesMetadataQuery = gql`
-  query HostedCollectivesMetadata($hostSlug: String!) {
+  query HostedCollectivesMetadata($hostSlug: String!, $accountTypes: [AccountType]!) {
     host(slug: $hostSlug) {
       id
       currency
-      all: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND]) {
+      all: hostedAccounts(limit: 1, accountType: $accountTypes) {
         totalCount
         currencies
       }
-      active: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND], isFrozen: false) {
+      active: hostedAccounts(limit: 1, accountType: $accountTypes, isFrozen: false) {
         totalCount
       }
       frozen: hostedAccounts(limit: 1, isFrozen: true) {
         totalCount
       }
-      unhosted: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND], isUnhosted: true) {
+      unhosted: hostedAccounts(limit: 1, accountType: $accountTypes, isUnhosted: true) {
         totalCount
       }
     }
@@ -367,6 +387,7 @@ export const hostedCollectivesQuery = gql`
         totalCount
         nodes {
           id
+          unhostedAt(host: { slug: $hostSlug })
           ...HostedCollectiveFields
         }
       }

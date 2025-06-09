@@ -41,7 +41,7 @@ describe('Gift cards admin', () => {
     // Mock date to make sure we have the same filename
     cy.getByDataCy('download-gift-cards-btn').click();
     const filename = `${collectiveSlug}-giftcards.pdf`;
-    cy.getDownloadedPDFContent(filename).should('contain', '$542.00	Gift	Card	from	TestOrg');
+    cy.getDownloadedPDFContent(filename).should('contain', '$542.00 Gift Card from TestOrg');
 
     // Links should also be added to gift cards list
     cy.getByDataCy('back-to-giftcards-list').click();

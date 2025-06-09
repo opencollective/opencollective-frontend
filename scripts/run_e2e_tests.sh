@@ -44,7 +44,7 @@ if [ -z "$PDF_FOLDER" ]; then
 else
   cd $PDF_FOLDER
 fi
-PORT=3002 OPENSSL_CONF=/dev/null npm start &
+PORT=3002 API_URL=http://localhost:3060 npm start &
 PDF_PID=$!
 cd -
 
@@ -61,12 +61,20 @@ fi
 # Wait for a service to be up
 function wait_for_service() {
   echo "> Waiting for $1 to be ready... "
+  local start_time=$(date +%s)
+  local timeout=300  # 5 minutes in seconds
   while true; do
     nc -z "$2" "$3"
     EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then
       echo "> Application $1 is up!"
       break
+    fi
+    local current_time=$(date +%s)
+    local elapsed_time=$((current_time - start_time))
+    if [ $elapsed_time -ge $timeout ]; then
+      echo "> Timeout waiting for $1 after 5 minutes"
+      exit 1
     fi
     sleep 1
   done

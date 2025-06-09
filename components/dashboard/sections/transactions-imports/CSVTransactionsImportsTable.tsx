@@ -1,6 +1,6 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
-import { FileUp, Landmark } from 'lucide-react';
+import { gql, useQuery } from '@apollo/client';
+import { FileUp } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -8,24 +8,21 @@ import { z } from 'zod';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
 import { capitalize } from '../../../../lib/utils';
-import { transactionsImportsQuery } from './lib/graphql';
+import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
-import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
 
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { NewCSVTransactionsImportDialog } from './NewCSVTransactionsImportDialog';
-import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 
 const NB_IMPORTS_DISPLAYED = 20;
 
@@ -34,55 +31,42 @@ const schema = z.object({
   offset: integer.default(0),
 });
 
-export const TransactionsImportsTable = ({ accountSlug }) => {
+const ledgerCSVImportsQuery = gql`
+  query LedgerCSVImportsQuery($accountSlug: String!, $limit: Int, $offset: Int) {
+    host(slug: $accountSlug) {
+      id
+      transactionsImports(limit: $limit, offset: $offset, type: [CSV, MANUAL]) {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          ...TransactionImportListFields
+        }
+      }
+    }
+  }
+  ${TransactionImportListFieldsFragment}
+`;
+
+export const CSVTransactionsImportsTable = ({ accountSlug }) => {
   const intl = useIntl();
-  const { toast } = useToast();
-  const { LoggedInUser } = useLoggedInUser();
   const [hasNewImportDialog, setHasNewImportDialog] = React.useState(false);
   const router = useRouter();
   const queryFilter = useQueryFilter({ schema, filters: {} });
-  const { data, loading, refetch, error } = useQuery(transactionsImportsQuery, {
+  const { data, loading, refetch, error } = useQuery(ledgerCSVImportsQuery, {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
   });
-  const onPlaidConnectSuccess = React.useCallback(
-    async ({ transactionsImport }) => {
-      refetch();
-      toast({
-        variant: 'success',
-        title: intl.formatMessage({ defaultMessage: 'Bank account connected', id: 'fGNAg9' }),
-        message: intl.formatMessage({
-          defaultMessage: 'It might take a few minutes to import your transactions.',
-          id: 'YZGI7N',
-        }),
-      });
-      router.push(`/dashboard/${accountSlug}/host-transactions/import/${transactionsImport.id}?step=last`);
-    },
-    [intl, toast, accountSlug, refetch, router],
-  );
-  const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onConnectSuccess: onPlaidConnectSuccess });
 
   return (
     <div>
       <DashboardHeader
-        title="Transactions"
-        titleRoute={`/dashboard/${accountSlug}/host-transactions`}
-        subpathTitle="Imports"
+        title="CSV Imports"
+        titleRoute={`/dashboard/${accountSlug}/ledger-csv-imports`}
         className="mb-5"
         actions={
           <React.Fragment>
-            {LoggedInUser.hasPreviewFeatureEnabled('PLAID_INTEGRATION') && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => plaidConnectDialog.show()}
-                disabled={plaidConnectDialog.status !== 'idle'}
-                loading={plaidConnectDialog.status === 'loading'}
-              >
-                <Landmark size={16} />
-                <FormattedMessage defaultMessage="Connect Bank Account" id="2Le983" />
-              </Button>
-            )}
             <Button size="sm" variant="outline" onClick={() => setHasNewImportDialog(true)}>
               <FileUp size={16} />
               <FormattedMessage defaultMessage="Import CSV" id="2uzHxT" />
@@ -97,7 +81,8 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
           <DataTable<TransactionsImport, unknown>
             loading={loading}
             data={data?.host?.transactionsImports?.nodes}
-            onClickRow={({ id }) => router.push(`/dashboard/${accountSlug}/host-transactions/import/${id}?step=last`)}
+            emptyMessage={() => <FormattedMessage defaultMessage="No CSV imported yet" id="5Tw/Vx" />}
+            onClickRow={({ id }) => router.push(getCSVTransactionsImportRoute(accountSlug, id))}
             columns={[
               {
                 header: intl.formatMessage({ defaultMessage: 'Source', id: 'AddFundsModal.source' }),
@@ -126,14 +111,6 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 cell: ({ cell }) => {
                   const stats = cell.getValue() as TransactionsImport['stats'];
                   return <ImportProgressBadge progress={!stats.total ? null : stats.processed / stats.total} />;
-                },
-              },
-              {
-                header: intl.formatMessage({ defaultMessage: 'Last sync', id: 'transactions.import.lastSync' }),
-                accessorKey: 'lastSyncAt',
-                cell: ({ row }) => {
-                  const transactionsImport = row.original;
-                  return <TransactionImportLastSyncAtBadge transactionsImport={transactionsImport} />;
                 },
               },
               {

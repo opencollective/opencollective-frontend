@@ -137,12 +137,13 @@ export default class IntlDocument extends Document {
       'RECAPTCHA_ENABLED',
       'WISE_ENVIRONMENT',
       'HCAPTCHA_SITEKEY',
-      'OCF_DUPLICATE_FLOW',
       'TURNSTILE_SITEKEY',
+      'DISABLE_CONTACT_FORM',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',
       'LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES',
+      'OC_ENV',
     ]);
   }
 

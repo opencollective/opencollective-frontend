@@ -97,7 +97,7 @@ export default class UrlQueryHelper {
     json: str => {
       try {
         return JSON.parse(str);
-      } catch (err) {
+      } catch {
         return null;
       }
     },

@@ -4,9 +4,7 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
-  NEW_GRANT_FLOW = 'NEW_GRANT_FLOW',
   INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
@@ -15,6 +13,7 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   PLAID_INTEGRATION = 'PLAID_INTEGRATION',
+  GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
 }
 
 export type PreviewFeature = {
@@ -33,7 +32,7 @@ export type PreviewFeature = {
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
-const FIRST_PARTY_HOSTS = [
+export const FIRST_PARTY_HOSTS = [
   'opencollective',
   'opensource',
   'europe',
@@ -48,28 +47,11 @@ const FIRST_PARTY_HOSTS = [
  */
 export const previewFeatures: PreviewFeature[] = [
   {
-    key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
-    title: 'Collective Overview',
-    description: 'Overview page for Collectives in Dashboard',
-    publicBeta: true,
-    alwaysEnableInDev: true,
-    enabledByDefaultFor: ['*'],
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
     title: 'New expense submission flow',
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
     publicBeta: true,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.NEW_GRANT_FLOW,
-    title: 'New grant submission flow',
-    description: 'Improved grant submission flow in Dashboard',
-    alwaysEnableInDev: true,
-    publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {
@@ -148,5 +130,13 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+    title: 'Reorganize Grands and Funds tools in Dashboard',
+    description: 'Grands and Funds are organized into their own Dashboard sections',
+    alwaysEnableInDev: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    publicBeta: false,
   },
 ];

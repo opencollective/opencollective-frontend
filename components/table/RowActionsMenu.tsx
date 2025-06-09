@@ -65,7 +65,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => openDetails()} className="gap-2.5">
           <PanelRightOpen className="text-muted-foreground" size={16} />
-          <FormattedMessage defaultMessage="Open details" id="iIXH4W" />
+          <FormattedMessage defaultMessage="View details" id="MnpUD7" />
         </DropdownMenuItem>
         {primary?.length > 0 && (
           <React.Fragment>

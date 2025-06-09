@@ -456,6 +456,7 @@ function Expense(props) {
   useEffect(() => {
     const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
     setState(state => ({ ...state, showFilesViewerModal }));
+    setOpenUrl(files?.[0]?.url || null);
   }, [files, isDesktop, isDrawer]);
 
   const confirmSaveButtons = (
@@ -567,7 +568,10 @@ function Expense(props) {
           <ExpenseInviteNotificationBanner expense={expense} createdUser={state.createdUser} />
         )}
       {isMissingReceipt && (
-        <ExpenseMissingReceiptNotificationBanner onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick} />
+        <ExpenseMissingReceiptNotificationBanner
+          onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick}
+          expense={expense}
+        />
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
@@ -598,6 +602,7 @@ function Expense(props) {
             drawerActionsContainer={drawerActionsContainer}
             openFileViewer={openFileViewer}
             enableKeyboardShortcuts={enableKeyboardShortcuts}
+            openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
@@ -727,6 +732,7 @@ function Expense(props) {
         <Fragment>
           <Box my={4}>
             <PrivateCommentsMessage
+              expenseType={expense?.type}
               isAllowed={expense?.permissions.canComment}
               isLoading={loadingLoggedInUser || isRefetchingDataForUser}
             />
@@ -818,6 +824,7 @@ function Expense(props) {
               { expenseId: expense.legacyId },
             )}
             openFileUrl={openUrl}
+            setOpenFileUrl={setOpenUrl}
             onClose={
               isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
             }

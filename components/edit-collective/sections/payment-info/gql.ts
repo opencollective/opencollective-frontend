@@ -7,7 +7,8 @@ export const PayoutMethodFragment = gql`
     name
     isSaved
     data
-    canBeEditedOrDeleted
+    canBeEdited
+    canBeDeleted
   }
 `;
 

@@ -42,6 +42,9 @@ interface CollectiveInterface {
   slug: String
   path: String
   isHost: Boolean
+  isTrustedHost: Boolean!
+  isFirstPartyHost: Boolean!
+  isVerified: Boolean!
   isIncognito: Boolean
 
   """
@@ -587,6 +590,7 @@ enum ContributorRole {
   HOST
   ADMIN
   MEMBER
+  COMMUNITY_MANAGER
   CONTRIBUTOR
   BACKER
   ATTENDEE
@@ -1050,9 +1054,15 @@ type ConnectedAccountType {
   id: Int
   service: String
   username: String
+  hash: String
   settings: JSON
   createdAt: DateString
   updatedAt: DateString
+
+  """
+  The account who connected this account
+  """
+  createdByUser: UserDetails
 }
 
 """
@@ -2188,6 +2198,16 @@ type Collective implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -2456,6 +2476,16 @@ type Event implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
 
   """
   Returns whether this user has two factor authentication enabled
@@ -2728,6 +2758,16 @@ type Fund implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -2998,6 +3038,16 @@ type Organization implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -3266,6 +3316,16 @@ type Project implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
 
   """
   Returns whether this user has two factor authentication enabled
@@ -3833,6 +3893,16 @@ type User implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -4105,6 +4175,16 @@ type Vendor implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -4323,6 +4403,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this account has any payout methods saved
   """
   hasPayoutMethod: Boolean
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [CollectiveInterface]
 }
 
 """
@@ -4439,6 +4524,11 @@ type Query {
     Included vendors for specific host ID
     """
     includeVendorsForHostId: Int
+
+    """
+    Only return vendors visible to given account ids
+    """
+    vendorVisibleToAccountIds: [Int]
 
     """
     Whether to skip recent accounts (48h)
@@ -4578,6 +4668,11 @@ type Mutation {
     If true, a signIn link will be sent to the user
     """
     sendSignInLink: Boolean = true
+
+    """
+    Captcha verification data
+    """
+    captcha: CaptchaInputType
   ): CreateUserResult
 
   """
@@ -4927,6 +5022,21 @@ input UserInputType {
 }
 
 scalar Email
+
+"""
+Input type for captcha verification
+"""
+input CaptchaInputType {
+  """
+  The captcha token to verify
+  """
+  token: String!
+
+  """
+  The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
+  """
+  provider: String!
+}
 
 """
 Input type for ConnectedAccountInputType

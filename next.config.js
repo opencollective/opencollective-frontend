@@ -52,8 +52,7 @@ const nextConfig = {
         OC_ENV: null,
         API_KEY: null,
         API_URL: null,
-        PDF_SERVICE_URL: null,
-        NEXT_PDF_SERVICE_URL: null,
+        PDF_SERVICE_V2_URL: null,
         ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
@@ -64,7 +63,6 @@ const nextConfig = {
         WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
-        OCF_DUPLICATE_FLOW: false,
         TURNSTILE_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
@@ -72,11 +70,11 @@ const nextConfig = {
         OC_APPLICATION: null,
         HEROKU_SLUG_COMMIT: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+        DISABLE_CONTACT_FORM: false,
       }),
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      // eslint-disable-next-line n/no-unpublished-require
       const CircularDependencyPlugin = require('circular-dependency-plugin');
       config.plugins.push(
         new CircularDependencyPlugin({
@@ -320,7 +318,6 @@ let exportedConfig = withSentryConfig(
 );
 
 if (process.env.ANALYZE) {
-  // eslint-disable-next-line n/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });

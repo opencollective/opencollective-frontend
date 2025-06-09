@@ -118,26 +118,24 @@ class EditUserEmailForm extends React.Component {
             >
               <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
             </Button>
-
-            {isDone ||
-              (true && (
-                <Button
-                  minWidth={180}
-                  disabled={step === 'already-sent'}
-                  loading={isResendingConfirmation}
-                  onClick={async () => {
-                    this.setState({ isResendingConfirmation: true });
-                    try {
-                      await updateUserEmail({ variables: { email: newEmail } });
-                      this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
-                    } catch (e) {
-                      this.setState({ error: e.message, isResendingConfirmation: false });
-                    }
-                  }}
-                >
-                  <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
-                </Button>
-              ))}
+            {!isDone && (
+              <Button
+                minWidth={180}
+                disabled={step === 'already-sent'}
+                loading={isResendingConfirmation}
+                onClick={async () => {
+                  this.setState({ isResendingConfirmation: true });
+                  try {
+                    await updateUserEmail({ variables: { email: newEmail } });
+                    this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
+                  } catch (e) {
+                    this.setState({ error: e.message, isResendingConfirmation: false });
+                  }
+                }}
+              >
+                <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
+              </Button>
+            )}
           </div>
         ) : (
           <LoadingPlaceholder height={63} />

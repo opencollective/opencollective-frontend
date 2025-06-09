@@ -255,7 +255,7 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
               : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
         });
         props.onExitEdit();
-      } catch (e) {
+      } catch {
         // toast handled by onEdit
       }
     },

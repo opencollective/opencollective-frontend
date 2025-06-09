@@ -7,8 +7,9 @@ import { isEmail } from 'validator';
 
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils';
+import { getEnvVar } from '@/lib/env-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
-import type { WhitelabelProps } from '@/lib/whitelabel';
+import { getWhitelabelProviderFromRedirectionUrl, type WhitelabelProps } from '@/lib/whitelabel';
 
 import Body from '../components/Body';
 import { Flex } from '../components/Grid';
@@ -33,6 +34,7 @@ type SigninPageProps = {
   router: any;
   whitelabel: WhitelabelProps;
   untrustedDomainRedirection: boolean;
+  requestedByWhitelabelProvider: WhitelabelProps['provider'];
 };
 
 type SigninPageState = {
@@ -51,6 +53,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
     const isTrustedRedirection = isTrustedSigninRedirectionUrl(next as string);
     const isValidRelative = isValidRelativeUrl(next);
+    const requestedByWhitelabelProvider = getWhitelabelProviderFromRedirectionUrl(next as string);
     email = typeof email === 'string' && decodeURIComponent(email);
     return {
       token,
@@ -59,6 +62,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       isSuspiciousUserAgent: isSuspiciousUserAgent((req as any)?.get('User-Agent')),
       email: email && isEmail(email) ? email : null,
       untrustedDomainRedirection: !isValidRelative && !isTrustedRedirection ? next : null,
+      requestedByWhitelabelProvider,
     };
   }
 
@@ -161,8 +165,9 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
   renderContent() {
     const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel } = this.props;
+    const env = getEnvVar('OC_ENV');
 
-    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain) {
+    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain && env !== 'staging') {
       return (
         <MessageBox type="error" withIcon>
           <FormattedMessage id="domain.notAuthorized" defaultMessage="This page is not available on this domain." />
@@ -235,7 +240,13 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
             )}
           </MessageBox>
         )}
-        <SignInOrJoinFree email={this.props.email} redirect={next || '/'} form={form} routes={this.getRoutes()} />
+        <SignInOrJoinFree
+          email={this.props.email}
+          redirect={next || '/'}
+          form={form}
+          routes={this.getRoutes()}
+          whitelabelProvider={this.props.requestedByWhitelabelProvider}
+        />
       </React.Fragment>
     );
   }
@@ -249,6 +260,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
           menuItems={{ solutions: false, product: false, company: false, docs: false }}
           showSearch={false}
           showProfileAndChangelogMenu={false}
+          withTopBar={!this.props.requestedByWhitelabelProvider}
         />
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>

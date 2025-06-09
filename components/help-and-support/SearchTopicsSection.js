@@ -51,7 +51,7 @@ function getAllSections(items) {
   }, []);
 }
 
-const DOCS_BASE_URL = 'https://docs.opencollective.com';
+const DOCS_BASE_URL = 'https://documentation.opencollective.com';
 
 const REACT_POPPER_MODIFIERS = [
   {
@@ -104,7 +104,7 @@ const SearchTopics = () => {
     try {
       const results = await searchDocs(query);
       setSearchResults(results.items);
-    } catch (error) {
+    } catch {
       toast({
         variant: 'error',
         title: intl.formatMessage({ defaultMessage: 'Error in fetching results', id: 'HqFOSM' }),

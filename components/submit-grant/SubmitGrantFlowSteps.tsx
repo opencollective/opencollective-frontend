@@ -1,8 +1,9 @@
 import React from 'react';
-import { isEmpty, pick } from 'lodash';
+import type { Path } from 'dot-path-value';
+import { get, isEmpty, pick } from 'lodash';
 
-import { StepHeader, StepItem } from '../submit-expense/SubmitExpenseFlowSteps';
-import type { ExpenseForm } from '../submit-expense/useExpenseForm';
+import { StepHeader, StepItem, StepValues as ExpenseFormStepValues } from '../submit-expense/SubmitExpenseFlowSteps';
+import type { ExpenseForm, ExpenseFormValues } from '../submit-expense/useExpenseForm';
 
 export enum Step {
   INFORMATION = 'INFORMATION',
@@ -15,6 +16,30 @@ export enum Step {
   PAYOUT_METHOD = 'PAYOUT_METHOD',
   DESCRIPTION = 'DESCRIPTION',
   SUMMARY = 'SUMMARY',
+}
+
+const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
+  [Step.GRANT_PROVIDER]: ExpenseFormStepValues.WHO_IS_PAYING,
+  [Step.INSTRUCTIONS]: ['acknowledgedHostGrantExpensePolicy', 'acknowledgedCollectiveGrantExpensePolicy'],
+  [Step.WHO_WILL_RECEIVE_FUNDS]: ExpenseFormStepValues.WHO_IS_GETTING_PAID,
+  [Step.PAYOUT_METHOD]: ExpenseFormStepValues.PAYOUT_METHOD,
+  [Step.INFORMATION]: [],
+  [Step.DESCRIPTION]: [],
+  [Step.SUMMARY]: [],
+  [Step.INVITATION_NOTE]: [],
+  [Step.APPLICATION_FORM]: [],
+};
+
+export function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
+  if (form.initialLoading) {
+    return false;
+  }
+
+  const valueKeys = StepValues[step];
+  if (isEmpty(valueKeys)) {
+    return true;
+  }
+  return valueKeys.map(valueKey => isEmpty(get(form.errors, valueKey))).every(Boolean);
 }
 
 type SubmitGrantFlowStepsProps = {

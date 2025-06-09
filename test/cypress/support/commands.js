@@ -151,7 +151,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  */
 Cypress.Commands.add(
   'createHostedCollectiveV2',
-  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, ...attributes } = {}) => {
+  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, collective, ...attributes } = {}) => {
     return cy.createCollectiveV2({
       ...attributes,
       email,
@@ -159,6 +159,7 @@ Cypress.Commands.add(
       host: { slug: hostSlug },
       collective: {
         repositoryUrl: 'https://github.com/opencollective',
+        ...collective,
       },
       applicationData: {
         useGithubValidation: true,
@@ -695,7 +696,7 @@ function getTokenFromRedirectUrl(url) {
 /**
  * @param {object} user - should have `email` and `id` set
  */
-function signinRequestAndReturnToken(user, redirect) {
+export function signinRequestAndReturnToken(user, redirect) {
   return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
@@ -712,7 +713,7 @@ function graphqlQuery(token, body) {
   });
 }
 
-function graphqlQueryV2(token, body) {
+export function graphqlQueryV2(token, body) {
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',

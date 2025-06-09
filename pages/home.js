@@ -16,7 +16,7 @@ import Page from '../components/Page';
 
 const messages = defineMessages({
   defaultTitle: {
-    defaultMessage: 'Raise and spend money with full transparency.',
+    defaultMessage: 'Raise, manage and disburse money with full transparency.',
     id: 'TZ9FXt',
   },
   defaultDescription: {
