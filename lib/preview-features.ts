@@ -13,6 +13,7 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   PLAID_INTEGRATION = 'PLAID_INTEGRATION',
+  GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
 }
 
 export type PreviewFeature = {
@@ -31,7 +32,7 @@ export type PreviewFeature = {
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
-const FIRST_PARTY_HOSTS = [
+export const FIRST_PARTY_HOSTS = [
   'opencollective',
   'opensource',
   'europe',
@@ -129,5 +130,13 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+    title: 'Reorganize Grands and Funds tools in Dashboard',
+    description: 'Grands and Funds are organized into their own Dashboard sections',
+    alwaysEnableInDev: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    publicBeta: false,
   },
 ];

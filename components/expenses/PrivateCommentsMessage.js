@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -27,14 +29,21 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
           </P>
           <P fontSize="12px" lineHeight="18px">
             {isAllowed ? (
-              <FormattedMessage
-                id="PrivateCommentsMessage.AllowedDetails"
-                defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter and the admins can see them."
-              />
+              props.expenseType === ExpenseType.GRANT ? (
+                <FormattedMessage
+                  defaultMessage="Grant request comments are private, because they sometimes contain confidential information such as payment details. Only the grant request submitter, the admins and the accountants can see them."
+                  id="OysmzD"
+                />
+              ) : (
+                <FormattedMessage
+                  id="PrivateCommentsMessage.AllowedDetails"
+                  defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter, the admins and the accountants can see them."
+                />
+              )
             ) : (
               <FormattedMessage
                 id="PrivateCommentsMessage.NotAllowedDetails"
-                defaultMessage="You must be signed in as an admin or the expense submitter to read comments on an expense."
+                defaultMessage="You must be signed in as an admin, an accountant or the expense submitter to read comments on an expense."
               />
             )}
           </P>
@@ -47,6 +56,7 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
 PrivateCommentsMessage.propTypes = {
   isLoading: PropTypes.bool,
   isAllowed: PropTypes.bool,
+  expenseType: PropTypes.string,
 };
 
 export default PrivateCommentsMessage;

@@ -62,7 +62,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:15.12
+        image: postgres:16.6
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -282,6 +282,6 @@ jobs:
         if: ${{ failure() }}
 
       - name: Report coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

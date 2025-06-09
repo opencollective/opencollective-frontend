@@ -16,6 +16,7 @@ import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/grap
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
+import { Separator } from '@/components/ui/Separator';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
@@ -115,6 +116,8 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
             payoutMethod={props.form.options.payoutMethod}
             expense={props.form.options.expense}
             loggedInAccount={props.form.options.loggedInAccount}
+            expenseTypeOption={props.form.values.expenseTypeOption}
+            isHostAdmin={props.form.options.isHostAdmin}
           />
         </div>
       </div>
@@ -217,7 +220,7 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
 
   return (
     <React.Fragment>
-      <Label className="mb-4 font-bold">
+      <Label className="mb-4 block font-bold">
         <FormattedMessage defaultMessage="Items" id="Fields.items" />
       </Label>
       <div role="list">
@@ -279,8 +282,10 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
         ))}
       </div>
 
+      <Separator className="mb-2 w-full" />
+
       <div className="flex justify-end">
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-right">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
           <SummaryItemsTotal
             {...pick(props, ['hasTax', 'tax', 'expenseCurrency', 'totalInvoicedInExpenseCurrency', 'taxType'])}
           />
@@ -394,18 +399,23 @@ const SummaryItemsTotal = React.memo(function SummaryItemsTotal(
         </React.Fragment>
       )}
 
-      <div className="col-span-2 text-right">
-        <FormattedMoneyAmount
-          amount={
-            props.hasTax && props.tax && isTaxRateValid(props.tax.rate)
-              ? getTaxAmount(props.totalInvoicedInExpenseCurrency, props.tax) + props.totalInvoicedInExpenseCurrency
-              : props.totalInvoicedInExpenseCurrency
-          }
-          precision={2}
-          currency={props.expenseCurrency}
-          showCurrencyCode
-          amountClassName="font-bold"
-        />
+      <div className="col-span-2 my-2 flex gap-3 text-right">
+        <div className="font-semibold capitalize">
+          <FormattedMessage defaultMessage="Total amount" id="TotalAmount" />
+        </div>
+        <div>
+          <FormattedMoneyAmount
+            amount={
+              props.hasTax && props.tax && isTaxRateValid(props.tax.rate)
+                ? getTaxAmount(props.totalInvoicedInExpenseCurrency, props.tax) + props.totalInvoicedInExpenseCurrency
+                : props.totalInvoicedInExpenseCurrency
+            }
+            precision={2}
+            currency={props.expenseCurrency}
+            showCurrencyCode
+            amountClassName="font-bold"
+          />
+        </div>
       </div>
     </React.Fragment>
   );
@@ -533,25 +543,39 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
 
 const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySection(props: {
   isAdminOfPayee: ExpenseForm['options']['isAdminOfPayee'];
+  isHostAdmin: ExpenseForm['options']['isHostAdmin'];
   payee: ExpenseForm['options']['payee'];
   payoutMethod: ExpenseForm['options']['payoutMethod'];
   loggedInAccount: ExpenseForm['options']['loggedInAccount'];
   expense: ExpenseForm['options']['expense'];
+  expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
   return (
     <React.Fragment>
       <div className="font-bold">
         <FormattedMessage defaultMessage="Payout Method" id="PayoutMethod" />
       </div>
-      {!props.isAdminOfPayee &&
-      !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) &&
-      props.payee?.type !== CollectiveType.VENDOR ? (
+
+      {props.payee?.type === CollectiveType.VENDOR && !props.isHostAdmin ? (
+        <MessageBox className="mt-2 text-sm text-muted-foreground" type="info">
+          <FormattedMessage defaultMessage="The vendor payout method is managed by the host." id="KnF5xM" />
+        </MessageBox>
+      ) : !props.isAdminOfPayee &&
+        !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) &&
+        props.payee?.type !== CollectiveType.VENDOR ? (
         <React.Fragment>
           <div className="mt-2 text-sm text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
-              id="LHdznY"
-            />
+            {props.expenseTypeOption === ExpenseType.GRANT ? (
+              <FormattedMessage
+                defaultMessage="The person you are inviting to submit this grant request will be asked to provide payout method details."
+                id="lsGVcb"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+                id="LHdznY"
+              />
+            )}
           </div>
         </React.Fragment>
       ) : (

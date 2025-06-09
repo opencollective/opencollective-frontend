@@ -60,6 +60,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
             host={expense?.host}
             isLoading={!expense}
             collective={expense?.account}
+            openedItemId={undefined}
           />
         </div>
         {expense?.type !== ExpenseType.GRANT && (

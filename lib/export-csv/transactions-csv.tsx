@@ -80,163 +80,76 @@ export type CSVField =
   | 'orderContributorAddress'
   | 'orderContributorCountry'
   | 'expensePayeeAddress'
-  | 'expensePayeeCountry';
-
-const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
-  transaction: [
-    'date',
-    'datetime',
-    'effectiveDate',
-    'id',
-    'legacyId',
-    'shortId',
-    'shortGroup',
-    'group',
-    'description',
-    'type',
-    'kind',
-    'isRefund',
-    'isRefunded',
-    'refundId',
-    'shortRefundId',
-    'refundKind',
-    'displayAmount',
-    'amount',
-    'paymentProcessorFee',
-    'netAmount',
-    'balance',
-    'currency',
-    'accountingCategoryCode',
-    'accountingCategoryName',
-    'debitAndCreditAmounts',
-  ],
-  accounts: [
-    'accountSlug',
-    'accountName',
-    'accountType',
-    'accountEmail',
-    'oppositeAccountSlug',
-    'oppositeAccountName',
-    'oppositeAccountType',
-    'oppositeAccountEmail',
-    'hostSlug',
-    'hostName',
-    'hostType',
-  ],
-  order: [
-    'orderId',
-    'orderLegacyId',
-    'orderMemo',
-    'orderFrequency',
-    'orderProcessedDate',
-    'orderCustomData',
-    'paymentMethodService',
-    'paymentMethodType',
-    'orderContributorAddress',
-    'orderContributorCountry',
-  ],
-  expense: [
-    'expenseId',
-    'expenseLegacyId',
-    'expenseType',
-    'expenseTags',
-    'payoutMethodType',
-    'merchantId',
-    'expenseReference',
-    'expenseTransferReference',
-    'expensePayeeAddress',
-    'expensePayeeCountry',
-  ],
-  tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
-  legacy: ['platformFee', 'hostFee'],
-};
-
-export const FIELD_GROUPS_2024: Record<string, readonly CSVField[]> = {
-  transaction: FIELD_GROUPS.transaction.filter(field => field !== 'paymentProcessorFee'),
-  accounts: FIELD_GROUPS.accounts,
-  order: FIELD_GROUPS.order,
-  expense: FIELD_GROUPS.expense,
-  tax: FIELD_GROUPS.tax.filter(field => field !== 'taxAmount'),
-  legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee', 'taxAmount'],
-};
-
-export const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
-  transaction: <FormattedMessage defaultMessage="Transaction" id="1+ROfp" />,
-  accounts: <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-  order: <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />,
-  expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
-  tax: <FormattedMessage defaultMessage="Tax" id="AwzkSM" />,
-  legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
-};
+  | 'expensePayeeCountry'
+  | 'isReverse'
+  | 'isReversed'
+  | 'reverseId'
+  | 'reverseLegacyId'
+  | 'reverseKind';
 
 export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
-  accountingCategoryCode: <FormattedMessage defaultMessage="Accounting Category Code" id="likV1W" />,
-  accountingCategoryName: <FormattedMessage defaultMessage="Accounting Category Name" id="ulLbhk" />,
-  date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-  datetime: <FormattedMessage defaultMessage="Date & Time" id="io/Qlk" />,
-  effectiveDate: <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />,
-  id: <FormattedMessage defaultMessage="Transaction ID" id="oK0S4l" />,
-  legacyId: <FormattedMessage defaultMessage="Legacy Transaction ID" id="/J1LvF" />,
-  shortId: <FormattedMessage defaultMessage="Short Transaction ID" id="bWYUU+" />,
-  shortGroup: <FormattedMessage defaultMessage="Short Group ID" id="4uWBOI" />,
-  group: <FormattedMessage defaultMessage="Group ID" id="nBKj/i" />,
-  description: <FormattedMessage id="Fields.description" defaultMessage="Description" />,
-  type: <FormattedMessage id="transactions.type" defaultMessage="Type" />,
-  kind: <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
-  isRefund: <FormattedMessage defaultMessage="Is Refund" id="o+jEZR" />,
-  isRefunded: <FormattedMessage defaultMessage="Is Refunded" id="3/XmM5" />,
-  refundId: <FormattedMessage defaultMessage="Refund ID" id="INO/bh" />,
-  shortRefundId: <FormattedMessage defaultMessage="Short Refund ID" id="OW15R5" />,
-  refundKind: <FormattedMessage defaultMessage="Refund Kind" id="vsKSo6" />,
-  displayAmount: <FormattedMessage defaultMessage="Display Amount" id="gKqXcg" />,
-  amount: <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
-  paymentProcessorFee: <FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />,
-  platformFee: <FormattedMessage defaultMessage="Platform Fee" id="SjFhQ9" />,
-  hostFee: <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />,
-  netAmount: <FormattedMessage defaultMessage="Net Amount" id="FxUka3" />,
-  balance: <FormattedMessage id="Balance" defaultMessage="Balance" />,
-  currency: <FormattedMessage id="Currency" defaultMessage="Currency" />,
-  accountSlug: <FormattedMessage defaultMessage="Account Handle" id="C9DEAp" />,
-  accountName: <FormattedMessage defaultMessage="Account Name" id="3WkdVP" />,
-  accountType: <FormattedMessage defaultMessage="Account Type" id="K1uUiB" />,
-  accountEmail: <FormattedMessage defaultMessage="Account Email" id="uGu5Jg" />,
-  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Handle" id="LdJJpQ" />,
-  oppositeAccountName: <FormattedMessage defaultMessage="Opposite Account Name" id="P5vKkd" />,
-  oppositeAccountType: <FormattedMessage defaultMessage="Opposite Account Type" id="HQ/XDa" />,
-  oppositeAccountEmail: <FormattedMessage defaultMessage="Opposite Account Email" id="E98WbS" />,
-  hostSlug: <FormattedMessage defaultMessage="Host Handle" id="xv/T06" />,
-  hostName: <FormattedMessage defaultMessage="Host Name" id="x92ME7" />,
-  hostType: <FormattedMessage defaultMessage="Host Type" id="3qzqTo" />,
-  orderId: <FormattedMessage defaultMessage="Contribution ID" id="cVkF3C" />,
-  orderLegacyId: <FormattedMessage defaultMessage="Legacy Contribution ID" id="6o/l5L" />,
-  orderFrequency: <FormattedMessage defaultMessage="Contribution Frequency" id="aAvgj8" />,
-  orderMemo: <FormattedMessage defaultMessage="Contribution Memo" id="WbO05M" />,
-  orderProcessedDate: <FormattedMessage defaultMessage="Contribution Processed Date" id="zeNNi6" />,
-  orderCustomData: <FormattedMessage defaultMessage="Contribution Custom Data" id="OV4x2C" />,
-  paymentMethodService: <FormattedMessage defaultMessage="Payment Method Service" id="QMkpv4" />,
-  paymentMethodType: <FormattedMessage defaultMessage="Payment Method Type" id="N7as4F" />,
-  expenseId: <FormattedMessage defaultMessage="Expense ID" id="aJWAKv" />,
-  expenseLegacyId: <FormattedMessage defaultMessage="Legacy Expense ID" id="9IikCp" />,
-  expenseType: <FormattedMessage defaultMessage="Expense Type" id="wbd643" />,
-  expenseTags: <FormattedMessage defaultMessage="Expense Tags" id="pe+mUc" />,
-  payoutMethodType: <FormattedMessage defaultMessage="Payout Method Type" id="Ko3cDv" />,
-  merchantId: <FormattedMessage defaultMessage="Merchant ID" id="EvIfQD" />,
-  taxAmount: <FormattedMessage defaultMessage="Tax Amount" id="i+M7sg" />,
-  taxType: <FormattedMessage defaultMessage="Tax Type" id="VLk78/" />,
-  taxRate: <FormattedMessage defaultMessage="Tax Rate" id="la9cZ4" />,
-  taxIdNumber: <FormattedMessage defaultMessage="Tax ID Number" id="YnfjEo" />,
-  debitAndCreditAmounts: <FormattedMessage defaultMessage="Debit and Credit Amounts" id="VXKn0i" />,
+  accountingCategoryCode: 'Accounting Category Code',
+  accountingCategoryName: 'Accounting Category Name',
+  date: 'Date',
+  datetime: 'Date & Time',
+  effectiveDate: 'Effective Date',
+  id: 'Transaction ID',
+  legacyId: 'Legacy Transaction ID',
+  shortId: 'Short Transaction ID',
+  shortGroup: 'Short Group ID',
+  group: 'Group ID',
+  description: 'Description',
+  type: 'Type',
+  kind: 'Kind',
+  isRefund: 'Is Refund',
+  isRefunded: 'Is Refunded',
+  refundId: 'Refund ID',
+  shortRefundId: 'Short Refund ID',
+  refundKind: 'Refund Kind',
+  displayAmount: 'Display Amount',
+  amount: 'Amount',
+  paymentProcessorFee: 'Payment Processor Fee',
+  platformFee: 'Platform Fee',
+  hostFee: 'Host Fee',
+  netAmount: 'Net Amount',
+  balance: 'Balance',
+  currency: 'Currency',
+  accountSlug: 'Account Handle',
+  accountName: 'Account Name',
+  accountType: 'Account Type',
+  accountEmail: 'Account Email',
+  oppositeAccountSlug: 'Opposite Account Handle',
+  oppositeAccountName: 'Opposite Account Name',
+  oppositeAccountType: 'Opposite Account Type',
+  oppositeAccountEmail: 'Opposite Account Email',
+  hostSlug: 'Host Handle',
+  hostName: 'Host Name',
+  hostType: 'Host Type',
+  orderId: 'Contribution ID',
+  orderLegacyId: 'Legacy Contribution ID',
+  orderFrequency: 'Contribution Frequency',
+  orderMemo: 'Contribution Memo',
+  orderProcessedDate: 'Contribution Processed Date',
+  orderCustomData: 'Contribution Custom Data',
+  paymentMethodService: 'Payment Method Service',
+  paymentMethodType: 'Payment Method Type',
+  expenseId: 'Expense ID',
+  expenseLegacyId: 'Legacy Expense ID',
+  expenseType: 'Expense Type',
+  expenseTags: 'Expense Tags',
+  payoutMethodType: 'Payout Method Type',
+  merchantId: 'Merchant ID',
+  taxAmount: 'Tax Amount',
+  taxType: 'Tax Type',
+  taxRate: 'Tax Rate',
+  taxIdNumber: 'Tax ID Number',
+  debitAndCreditAmounts: 'Debit and Credit Amounts',
 };
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
   DEFAULT_2023 = 'DEFAULT_2023',
   NEW_PRESET = 'NEW_PRESET',
-}
-
-export enum LEGACY_FIELD_OPTIONS {
-  DEFAULT = 'DEFAULT',
-  CUSTOM = 'CUSTOM',
 }
 
 export const FieldOptionsLabels = {
@@ -247,7 +160,6 @@ export const FieldOptionsLabels = {
       <FormattedMessage defaultMessage="New Preset" id="99ZtbG" />
     </span>
   ),
-  [LEGACY_FIELD_OPTIONS.CUSTOM]: <FormattedMessage defaultMessage="Custom" id="Sjo1P4" />,
 };
 
 export const GROUPS = {
@@ -272,7 +184,7 @@ export const FIELDS: Array<{
     tooltip: (
       <FormattedMessage defaultMessage="UTC date and time yyyy-mm-ddThh:mm:ss (eg: 2024-05-20T14:37:51)" id="KySDZj" />
     ),
-    label: <FormattedMessage defaultMessage="Date & Time" id="io/Qlk" />,
+    label: 'Date & Time',
   },
   {
     id: 'effectiveDate',
@@ -283,13 +195,13 @@ export const FIELDS: Array<{
         id="qszRlM"
       />
     ),
-    label: <FormattedMessage defaultMessage="Effective Date & Time" id="Hy4duK" />,
+    label: 'Effective Date & Time',
   },
   {
     id: 'legacyId',
     group: 'transaction',
     tooltip: <FormattedMessage defaultMessage="A unique serial transaction identifier." id="ufJYd0" />,
-    label: <FormattedMessage defaultMessage="Transaction ID" id="oK0S4l" />,
+    label: 'Transaction ID',
   },
   {
     id: 'group',
@@ -300,13 +212,13 @@ export const FIELDS: Array<{
         id="pq5Ikr"
       />
     ),
-    label: <FormattedMessage defaultMessage="Group ID" id="nBKj/i" />,
+    label: 'Group ID',
   },
   {
     id: 'description',
     group: 'transaction',
     tooltip: <FormattedMessage defaultMessage="A textual descriptor of the transaction." id="Pdh+ep" />,
-    label: <FormattedMessage id="Fields.description" defaultMessage="Description" />,
+    label: 'Description',
   },
   {
     id: 'type',
@@ -317,13 +229,13 @@ export const FIELDS: Array<{
         id="sxMk1S"
       />
     ),
-    label: <FormattedMessage defaultMessage="Credit/Debit" id="cSigj5" />,
+    label: 'Credit/Debit',
   },
   {
     id: 'kind',
     group: 'transaction',
     tooltip: <FormattedMessage defaultMessage="See documentation for reference to transaction kinds." id="8duKGM" />,
-    label: <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
+    label: 'Kind',
   },
   {
     id: 'netAmount',
@@ -334,7 +246,7 @@ export const FIELDS: Array<{
         id="i4IfVR"
       />
     ),
-    label: <FormattedMessage defaultMessage="Amount Single Column" id="MUCUmd" />,
+    label: 'Amount Single Column',
   },
   {
     id: 'debitAndCreditAmounts',
@@ -345,13 +257,13 @@ export const FIELDS: Array<{
         id="VhwOce"
       />
     ),
-    label: <FormattedMessage defaultMessage="Amount Debit/Credit Columns" id="rbN4St" />,
+    label: 'Amount Debit/Credit Columns',
   },
   {
     id: 'currency',
     group: 'transaction',
     tooltip: <FormattedMessage defaultMessage="A 3 letter identifier of the host currency." id="J/Pgyh" />,
-    label: <FormattedMessage id="Currency" defaultMessage="Currency" />,
+    label: 'Currency',
   },
   {
     id: 'displayAmount',
@@ -362,29 +274,30 @@ export const FIELDS: Array<{
         id="uNrhIZ"
       />
     ),
-    label: <FormattedMessage defaultMessage="Original Currency Amount" id="J1iOIC" />,
+    label: 'Original Currency Amount',
   },
+
   {
-    id: 'isRefund',
+    id: 'isReverse',
     group: 'transaction',
     tooltip: (
       <FormattedMessage
-        defaultMessage="Indicates “REFUND” if this transaction represents a refund (otherwise empty)."
-        id="haTMSR"
+        defaultMessage="Indicates “REVERSE” if this transaction represents a reverse (otherwise empty)."
+        id="A8J/np"
       />
     ),
-    label: <FormattedMessage defaultMessage="Is Refund" id="o+jEZR" />,
+    label: 'Is Reverse',
   },
   {
-    id: 'isRefunded',
+    id: 'isReversed',
     group: 'transaction',
     tooltip: (
       <FormattedMessage
-        defaultMessage="Indicates “REFUNDED” if this transaction was refunded (otherwise empty)."
-        id="0Eavm2"
+        defaultMessage="Indicates “REVERSED” if this transaction was reversed (otherwise empty)."
+        id="pYbc8f"
       />
     ),
-    label: <FormattedMessage defaultMessage="Is Refunded" id="3/XmM5" />,
+    label: 'Is Reversed',
   },
   {
     id: 'accountingCategoryCode',
@@ -395,7 +308,7 @@ export const FIELDS: Array<{
         id="f5A9ME"
       />
     ),
-    label: <FormattedMessage defaultMessage="Accounting Category Code" id="likV1W" />,
+    label: 'Accounting Category Code',
   },
   {
     id: 'accountingCategoryName',
@@ -406,7 +319,7 @@ export const FIELDS: Array<{
         id="XK8i/f"
       />
     ),
-    label: <FormattedMessage defaultMessage="Accounting Category Name" id="ulLbhk" />,
+    label: 'Accounting Category Name',
   },
   {
     id: 'merchantId',
@@ -417,7 +330,7 @@ export const FIELDS: Array<{
         id="p4M9u0"
       />
     ),
-    label: <FormattedMessage defaultMessage="Merchant ID" id="EvIfQD" />,
+    label: 'Merchant ID',
   },
   {
     id: 'paymentMethodService',
@@ -428,7 +341,7 @@ export const FIELDS: Array<{
         id="ssBTh2"
       />
     ),
-    label: <FormattedMessage defaultMessage="Payment Processor" id="WM5yCZ" />,
+    label: 'Payment Processor',
   },
   {
     id: 'paymentMethodType',
@@ -439,7 +352,7 @@ export const FIELDS: Array<{
         id="TA1v9N"
       />
     ),
-    label: <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />,
+    label: 'Payment Method',
   },
   {
     id: 'accountSlug',
@@ -450,13 +363,13 @@ export const FIELDS: Array<{
         id="QGJ3Z6"
       />
     ),
-    label: <FormattedMessage defaultMessage="Account Handle" id="C9DEAp" />,
+    label: 'Account Handle',
   },
   {
     id: 'accountName',
     group: 'account',
     tooltip: <FormattedMessage defaultMessage="The full name of the transaction account." id="a3eXJv" />,
-    label: <FormattedMessage defaultMessage="Account Name" id="3WkdVP" />,
+    label: 'Account Name',
   },
   {
     id: 'accountType',
@@ -467,13 +380,13 @@ export const FIELDS: Array<{
         id="Yv8Wbt"
       />
     ),
-    label: <FormattedMessage defaultMessage="Account Type" id="K1uUiB" />,
+    label: 'Account Type',
   },
   {
     id: 'accountEmail',
     group: 'account',
     tooltip: <FormattedMessage defaultMessage="A contact email for the account (for individuals only)." id="nbe++n" />,
-    label: <FormattedMessage defaultMessage="Account Email" id="uGu5Jg" />,
+    label: 'Account Email',
   },
   {
     id: 'oppositeAccountSlug',
@@ -484,13 +397,13 @@ export const FIELDS: Array<{
         id="l/JVrq"
       />
     ),
-    label: <FormattedMessage defaultMessage="Opposite Account Handle" id="LdJJpQ" />,
+    label: 'Opposite Account Handle',
   },
   {
     id: 'oppositeAccountName',
     group: 'account',
     tooltip: <FormattedMessage defaultMessage="The full name of the transaction opposite account." id="7zWixh" />,
-    label: <FormattedMessage defaultMessage="Opposite Account Name" id="P5vKkd" />,
+    label: 'Opposite Account Name',
   },
   {
     id: 'oppositeAccountType',
@@ -501,7 +414,7 @@ export const FIELDS: Array<{
         id="sgVok2"
       />
     ),
-    label: <FormattedMessage defaultMessage="Opposite Account Type" id="HQ/XDa" />,
+    label: 'Opposite Account Type',
   },
   {
     id: 'oppositeAccountEmail',
@@ -509,7 +422,7 @@ export const FIELDS: Array<{
     tooltip: (
       <FormattedMessage defaultMessage="A contact email for the opposite account (for individuals only)." id="fG5bjt" />
     ),
-    label: <FormattedMessage defaultMessage="Opposite Account Email" id="E98WbS" />,
+    label: 'Opposite Account Email',
   },
   {
     id: 'orderLegacyId',
@@ -520,7 +433,7 @@ export const FIELDS: Array<{
         id="YRbKvY"
       />
     ),
-    label: <FormattedMessage defaultMessage="Contribution ID" id="cVkF3C" />,
+    label: 'Contribution ID',
   },
   {
     id: 'orderMemo',
@@ -531,7 +444,7 @@ export const FIELDS: Array<{
         id="IpHuhY"
       />
     ),
-    label: <FormattedMessage defaultMessage="Contribution Memo" id="WbO05M" />,
+    label: 'Contribution Memo',
   },
   {
     id: 'orderFrequency',
@@ -542,47 +455,47 @@ export const FIELDS: Array<{
         id="Wazs0c"
       />
     ),
-    label: <FormattedMessage defaultMessage="Contribution Frequency" id="aAvgj8" />,
+    label: 'Contribution Frequency',
   },
   {
     id: 'orderCustomData',
     group: 'order',
     tooltip: <FormattedMessage defaultMessage="Additional contribution metadata." id="WbW/6b" />,
-    label: <FormattedMessage defaultMessage="Contribution Custom Data" id="OV4x2C" />,
+    label: 'Contribution Custom Data',
   },
   {
     id: 'orderContributorAddress',
     group: 'order',
-    label: <FormattedMessage defaultMessage="Contributor Address" id="Mle9tk" />,
+    label: 'Contributor Address',
   },
   {
     id: 'orderContributorCountry',
     group: 'order',
-    label: <FormattedMessage defaultMessage="Contributor Country" id="Ib+hA6" />,
+    label: 'Contributor Country',
   },
   {
     id: 'expenseLegacyId',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="A unique platform identifier for an expense." id="ndQbVX" />,
-    label: <FormattedMessage defaultMessage="Expense ID" id="aJWAKv" />,
+    label: 'Expense ID',
   },
   {
     id: 'expenseType',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="Invoice/Receipt/Grant/Platform Settlement" id="nKqSHB" />,
-    label: <FormattedMessage defaultMessage="Expense Type" id="wbd643" />,
+    label: 'Expense Type',
   },
   {
     id: 'expenseTags',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="Tags that are applied to the expense." id="RKpJ1S" />,
-    label: <FormattedMessage defaultMessage="Expense Tags" id="pe+mUc" />,
+    label: 'Expense Tags',
   },
   {
     id: 'taxType',
     group: 'tax',
     tooltip: <FormattedMessage defaultMessage="eg: VAT, GST, etc." id="rg47YZ" />,
-    label: <FormattedMessage defaultMessage="Tax Type" id="VLk78/" />,
+    label: 'Tax Type',
   },
   {
     id: 'taxRate',
@@ -593,19 +506,19 @@ export const FIELDS: Array<{
         id="6hAx2q"
       />
     ),
-    label: <FormattedMessage defaultMessage="Tax Rate" id="la9cZ4" />,
+    label: 'Tax Rate',
   },
   {
     id: 'taxIdNumber',
     group: 'tax',
     tooltip: <FormattedMessage defaultMessage="For contributions: the contributor tax ID." id="sPZVmW" />,
-    label: <FormattedMessage defaultMessage="Tax ID Number" id="YnfjEo" />,
+    label: 'Tax ID Number',
   },
   {
     id: 'date',
     group: 'legacy',
     tooltip: <FormattedMessage defaultMessage="date only yyyy-mm-dd (eg: 2024-05-20)" id="xqzsep" />,
-    label: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+    label: 'Date',
   },
   {
     id: 'id',
@@ -616,7 +529,7 @@ export const FIELDS: Array<{
         id="PtUfDA"
       />
     ),
-    label: <FormattedMessage defaultMessage="Transaction GraphQL ID" id="gPmHZC" />,
+    label: 'Transaction GraphQL ID',
   },
   {
     id: 'shortId',
@@ -624,7 +537,7 @@ export const FIELDS: Array<{
     tooltip: (
       <FormattedMessage defaultMessage="An 8 character alpha-numeric unique transaction identifier." id="dxKB8J" />
     ),
-    label: <FormattedMessage defaultMessage="Short Transaction ID" id="bWYUU+" />,
+    label: 'Short Transaction ID',
   },
   {
     id: 'shortGroup',
@@ -635,19 +548,9 @@ export const FIELDS: Array<{
         id="yjJINH"
       />
     ),
-    label: <FormattedMessage defaultMessage="Short Group ID" id="4uWBOI" />,
+    label: 'Short Group ID',
   },
-  {
-    id: 'shortRefundId',
-    group: 'legacy',
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="If “IsRefunded” indicates “true” then this ID will reference the 8 character alpha-numeric unique transaction ID of the refund transaction (which will indicate “IsRefund” as “true”)."
-        id="5cIM9E"
-      />
-    ),
-    label: <FormattedMessage defaultMessage="Short Refund Transaction ID" id="z9PsQI" />,
-  },
+
   {
     id: 'amount',
     group: 'legacy',
@@ -657,7 +560,7 @@ export const FIELDS: Array<{
         id="8wmqUO"
       />
     ),
-    label: <FormattedMessage defaultMessage="Gross Amount" id="bwZInO" />,
+    label: 'Gross Amount',
   },
   {
     id: 'paymentProcessorFee',
@@ -668,7 +571,7 @@ export const FIELDS: Array<{
         id="l7fiJ5"
       />
     ),
-    label: <FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />,
+    label: 'Payment Processor Fee',
   },
   {
     id: 'expenseId',
@@ -679,7 +582,7 @@ export const FIELDS: Array<{
         id="PtUfDA"
       />
     ),
-    label: <FormattedMessage defaultMessage="Expense GraphQL ID" id="VQNNKj" />,
+    label: 'Expense GraphQL ID',
   },
   {
     id: 'payoutMethodType',
@@ -690,7 +593,7 @@ export const FIELDS: Array<{
         id="cQYwAf"
       />
     ),
-    label: <FormattedMessage defaultMessage="Expense Payout Method Type" id="06CHAp" />,
+    label: 'Expense Payout Method Type',
   },
   {
     id: 'platformFee',
@@ -701,7 +604,7 @@ export const FIELDS: Array<{
         id="pQB5Gx"
       />
     ),
-    label: <FormattedMessage defaultMessage="Platform Fee" id="SjFhQ9" />,
+    label: 'Platform Fee',
   },
   {
     id: 'hostFee',
@@ -712,7 +615,7 @@ export const FIELDS: Array<{
         id="rlWQ/t"
       />
     ),
-    label: <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />,
+    label: 'Host Fee',
   },
   {
     id: 'orderId',
@@ -723,22 +626,22 @@ export const FIELDS: Array<{
         id="PtUfDA"
       />
     ),
-    label: <FormattedMessage defaultMessage="Contribution GraphQL ID" id="19sed6" />,
+    label: 'Contribution GraphQL ID',
   },
 
   // New Fields
   {
-    id: 'refundLegacyId',
+    id: 'reverseLegacyId',
     group: 'transaction',
-    label: <FormattedMessage defaultMessage="Refund Transaction ID" id="Rxym6C" />,
+    label: 'Reverse Transaction ID',
   },
   {
-    id: 'refundKind',
+    id: 'reverseKind',
     group: 'transaction',
-    label: <FormattedMessage defaultMessage="Refund Kind" id="vsKSo6" />,
+    label: 'Reverse Kind',
     tooltip: (
       <FormattedMessage
-        defaultMessage="The kind of refund issued tracks the reason why the transaction was returned."
+        defaultMessage="The kind of reverse issued tracks the reason why the transaction was returned."
         id="eHIFuv"
       />
     ),
@@ -747,13 +650,13 @@ export const FIELDS: Array<{
     id: 'expenseTotalAmount',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="A sum of the expense line items." id="DbeRk+" />,
-    label: <FormattedMessage defaultMessage="Expense Total Amount" id="SMZxQE" />,
+    label: 'Expense Total Amount',
   },
   {
     id: 'expenseCurrency',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="The currency in which the expense was submitted" id="JmgISf" />,
-    label: <FormattedMessage defaultMessage="Expense Currency" id="3135/i" />,
+    label: 'Expense Currency',
   },
   {
     id: 'expenseSubmittedByHandle',
@@ -764,7 +667,7 @@ export const FIELDS: Array<{
         id="vA2baN"
       />
     ),
-    label: <FormattedMessage defaultMessage="Expense Submitted By Handle" id="oaI4cl" />,
+    label: 'Expense Submitted By Handle',
   },
   {
     id: 'expenseApprovedByHandle',
@@ -775,7 +678,7 @@ export const FIELDS: Array<{
         id="wMmL7u"
       />
     ),
-    label: <FormattedMessage defaultMessage="Expense Approved By Handle" id="M6G/Sk" />,
+    label: 'Expense Approved By Handle',
   },
   {
     id: 'expensePaidByHandle',
@@ -786,12 +689,12 @@ export const FIELDS: Array<{
         id="ZP0mkD"
       />
     ),
-    label: <FormattedMessage defaultMessage="Expense Paid By Handle" id="NaeCZ+" />,
+    label: 'Expense Paid By Handle',
   },
   {
     id: 'expenseReference',
     group: 'expense',
-    label: <FormattedMessage defaultMessage="Expense Reference Number" id="fnGteD" />,
+    label: 'Expense Reference Number',
     tooltip: (
       <FormattedMessage defaultMessage="The Reference Number submitted by the user with the expense." id="5Zh4DV" />
     ),
@@ -799,7 +702,7 @@ export const FIELDS: Array<{
   {
     id: 'expenseTransferReference',
     group: 'expense',
-    label: <FormattedMessage defaultMessage="Expense Transfer Reference" id="7wB9iF" />,
+    label: 'Expense Transfer Reference',
     tooltip: (
       <FormattedMessage
         defaultMessage="The Reference Number used when setting up the payment transfer and the actual reference the user will receive on their side."
@@ -810,24 +713,24 @@ export const FIELDS: Array<{
   {
     id: 'expensePayeeAddress',
     group: 'expense',
-    label: <FormattedMessage defaultMessage="Payee Address" id="R4eFnz" />,
+    label: 'Payee Address',
   },
   {
     id: 'expensePayeeCountry',
     group: 'expense',
-    label: <FormattedMessage defaultMessage="Payee Country" id="ZRVrsh" />,
+    label: 'Payee Country',
   },
   // Imported data
   {
     id: 'importSourceName',
     group: 'imports',
-    label: <FormattedMessage defaultMessage="Import Source Name" id="Y71SPR" />,
+    label: 'Import Source Name',
     tooltip: <FormattedMessage defaultMessage="The name of the import source" id="/0q47+" />,
   },
   {
     id: 'importSourceId',
     group: 'imports',
-    label: <FormattedMessage defaultMessage="Import Source ID" id="ovrmdQ" />,
+    label: 'Import Source ID',
     tooltip: (
       <FormattedMessage
         defaultMessage="The ID provided by the import source (e.g., bank statement transaction ID)."
@@ -838,7 +741,7 @@ export const FIELDS: Array<{
   {
     id: 'importSourceDescription',
     group: 'imports',
-    label: <FormattedMessage defaultMessage="Import Source Description" id="OOduTH" />,
+    label: 'Import Source Description',
     tooltip: (
       <FormattedMessage
         defaultMessage="The description extracted from the import source, usually corresponds to the bank statement description."
@@ -849,57 +752,95 @@ export const FIELDS: Array<{
   {
     id: 'importSourceAmount',
     group: 'imports',
-    label: <FormattedMessage defaultMessage="Import Source Amount" id="f97Ybo" />,
+    label: 'Import Source Amount',
     tooltip: <FormattedMessage defaultMessage="The amount extracted from the import source." id="GKRVxa" />,
   },
   {
     id: 'importSourceDate',
     group: 'imports',
-    label: <FormattedMessage defaultMessage="Import Source Date" id="cffITg" />,
+    label: 'Import Source Date',
     tooltip: <FormattedMessage defaultMessage="The date extracted from the import source." id="W9/Zp3" />,
   },
   {
     id: 'importSourceData',
     group: 'imports',
-    label: <FormattedMessage defaultMessage="Import Source Data" id="0vHY8L" />,
+    label: 'Import Source Data',
     tooltip: <FormattedMessage defaultMessage="The raw data from the import source as a JSON string." id="ydD0AS" />,
   },
 
   // Deprecated
   {
+    id: 'shortRefundId',
+    group: 'legacy',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="If “IsRefunded” indicates “true” then this ID will reference the 8 character alpha-numeric unique transaction ID of the refund transaction (which will indicate “IsRefund” as “true”)."
+        id="5cIM9E"
+      />
+    ),
+    label: 'Short Refund Transaction ID',
+  },
+  {
+    id: 'refundLegacyId',
+    group: 'legacy',
+    label: 'Refund Transaction ID',
+  },
+  {
     id: 'refundId',
     group: 'legacy',
-    label: <FormattedMessage defaultMessage="Refund ID" id="INO/bh" />,
+    label: 'Refund ID',
+  },
+  {
+    id: 'isRefund',
+    group: 'legacy',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Indicates “REFUND” if this transaction represents a refund (otherwise empty)."
+        id="haTMSR"
+      />
+    ),
+    label: 'Is Refund',
+  },
+  {
+    id: 'isRefunded',
+    group: 'legacy',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Indicates “REFUNDED” if this transaction was refunded (otherwise empty)."
+        id="0Eavm2"
+      />
+    ),
+    label: 'Is Refunded',
   },
   {
     id: 'balance',
     group: 'legacy',
-    label: <FormattedMessage id="Balance" defaultMessage="Balance" />,
+    label: 'Balance',
   },
   {
     id: 'hostSlug',
     group: 'legacy',
-    label: <FormattedMessage defaultMessage="Host Handle" id="xv/T06" />,
+    label: 'Host Handle',
   },
   {
     id: 'hostName',
     group: 'legacy',
-    label: <FormattedMessage defaultMessage="Host Name" id="x92ME7" />,
+    label: 'Host Name',
   },
   {
     id: 'hostType',
     group: 'legacy',
-    label: <FormattedMessage defaultMessage="Host Type" id="3qzqTo" />,
+    label: 'Host Type',
   },
   {
     id: 'orderProcessedDate',
     group: 'legacy',
-    label: <FormattedMessage defaultMessage="Contribution Processed Date" id="zeNNi6" />,
+    label: 'Contribution Processed Date',
   },
   {
     id: 'taxAmount',
     group: 'legacy',
-    label: <FormattedMessage defaultMessage="Tax Amount" id="i+M7sg" />,
+    label: 'Tax Amount',
   },
 ];
 
@@ -907,7 +848,7 @@ export const GROUP_FIELDS = Object.keys(GROUPS).reduce((dict, groupId) => {
   return { ...dict, [groupId]: FIELDS.filter(f => f.group === groupId).map(f => f.id) };
 }, {});
 
-export const DEFAULT_FIELDS_2023: Array<CSVField> = [
+const DEFAULT_FIELDS_2023: Array<CSVField> = [
   'datetime',
   'shortId',
   'shortGroup',
@@ -949,9 +890,9 @@ const DEFAULT_FIELDS: Array<CSVField> = [
   'group',
   'netAmount',
   'currency',
-  'isRefund',
-  'isRefunded',
-  'refundLegacyId',
+  'isReverse',
+  'isReversed',
+  'reverseLegacyId',
   'accountSlug',
   'accountName',
   'oppositeAccountSlug',
@@ -965,10 +906,10 @@ const DEFAULT_FIELDS: Array<CSVField> = [
   'accountingCategoryCode',
   'accountingCategoryName',
   'merchantId',
-  'refundKind',
+  'reverseKind',
 ];
 
 export const PLATFORM_PRESETS = {
-  DEFAULT: { fields: DEFAULT_FIELDS, flattenTaxesAndPaymentProcessorFees: false },
+  DEFAULT: { fields: DEFAULT_FIELDS, flattenTaxesAndPaymentProcessorFees: false, useFieldNames: true },
   DEFAULT_2023: { fields: DEFAULT_FIELDS_2023, flattenTaxesAndPaymentProcessorFees: true },
 };

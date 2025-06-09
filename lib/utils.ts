@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isEmpty, isObject, omit } from 'lodash';
+import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
 import * as whitelabel from './constants/whitelabel-providers';
@@ -272,7 +272,18 @@ export const flattenObjectDeep = obj =>
 
 export const omitDeep = (obj, keys) =>
   Object.keys(omit(obj, keys)).reduce(
-    (acc, next) => ({ ...acc, [next]: isObject(obj[next]) ? omitDeep(obj[next], keys) : obj[next] }),
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeep(obj[next], keys) : obj[next],
+    }),
+    {},
+  );
+export const omitDeepBy = (obj, predicate) =>
+  Object.keys(omitBy(obj, predicate)).reduce(
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeepBy(obj[next], predicate) : obj[next],
+    }),
     {},
   );
 
