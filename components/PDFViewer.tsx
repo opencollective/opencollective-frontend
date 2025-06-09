@@ -1,6 +1,6 @@
 'use client';
 
-import 'pdfjs-dist/build/pdf.worker.min.mjs'
+import 'pdfjs-dist/build/pdf.worker.min.mjs';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
