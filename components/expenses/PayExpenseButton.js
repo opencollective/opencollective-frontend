@@ -9,9 +9,9 @@ import { getAmountInCents } from '../../lib/currency-utils';
 import useKeyboardKey, { P } from '../../lib/hooks/useKeyboardKey';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
-import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 import PayExpenseModal from './PayExpenseModal';
 import SecurityChecksModal, { expenseRequiresSecurityConfirmation } from './SecurityChecksModal';
@@ -91,18 +91,12 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
   });
 
   const button = (
-    <StyledButton
-      buttonStyle="successSecondary"
-      data-cy="pay-button"
-      {...props}
-      disabled={isDisabled}
-      onClick={handleClick}
-    >
+    <Button data-cy="pay-button" {...props} disabled={isDisabled} onClick={handleClick}>
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} host={host} size={12} />
       <Span ml="6px">
         <FormattedMessage id="actions.goToPay" defaultMessage="Go to Pay" />
       </Span>
-    </StyledButton>
+    </Button>
   );
 
   if (disabledMessage) {

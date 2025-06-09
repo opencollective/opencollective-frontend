@@ -73,7 +73,6 @@ const expensePageQueryHelpers = getSSRQueryHelpers<z.infer<typeof schema>, Expen
   query: expensesPageQuery,
   context: API_V2_CONTEXT,
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
-  // getVariablesFromContext: (ctx, props) => getVariablesFromProps(props),
   getVariablesFromContext: ctx => ({
     account: { slug: ctx.query.collectiveSlug },
     ...getSSRVariablesFromQuery({

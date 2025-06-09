@@ -24,7 +24,7 @@ export const expenseDirectionFilter: FilterConfig<ExpenseDirectionFilterValue> =
   schema,
   filter: {
     static: true,
-    labelMsg: defineMessage({ id: 'Direction', defaultMessage: 'Direction' }),
+    labelMsg: defineMessage({ id: 'DZ2Koj', defaultMessage: 'Direction' }),
     Component: ({ intl, ...props }) => {
       const options = useMemo(
         () => [

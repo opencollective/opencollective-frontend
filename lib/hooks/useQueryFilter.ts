@@ -252,11 +252,13 @@ function addFilterValidationErrorToast(error, intl) {
     errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
   });
 
-  setImmediate(() => {
-    toast({
-      variant: 'error',
-      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
-      message: errorMessage,
+  if (typeof setImmediate !== 'undefined') {
+    setImmediate(() => {
+      toast({
+        variant: 'error',
+        title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
+        message: errorMessage,
+      });
     });
-  });
+  }
 }

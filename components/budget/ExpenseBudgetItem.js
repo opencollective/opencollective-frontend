@@ -536,7 +536,7 @@ const ExpenseBudgetItem = ({
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
           <div
             data-cy="expense-actions"
-            className="flex w-full flex-col items-stretch gap-2 self-end sm:float-right sm:w-auto sm:flex-row sm:items-end sm:justify-end"
+            className="flex w-full flex-col items-stretch gap-1 self-end sm:float-right sm:w-auto sm:flex-row sm:items-end sm:justify-end"
           >
             <ProcessExpenseButtons
               host={host}
