@@ -1,3 +1,4 @@
+// eslint-disable-next-line n/no-unpublished-require
 const { defineConfig } = require('cypress');
 const fs = require('fs');
 const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
@@ -29,6 +30,7 @@ module.exports = defineConfig({
   },
   e2e: {
     setupNodeEvents(on, config) {
+      // eslint-disable-next-line n/no-unpublished-require
       require('@cypress/code-coverage/task')(on, config);
       require('cypress-terminal-report/src/installLogsPrinter')(on, {
         printLogsToConsole: 'onFail',
