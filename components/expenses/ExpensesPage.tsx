@@ -3,11 +3,11 @@ import { gql, useQuery } from '@apollo/client';
 import { omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type { ExpensesPageQuery, HostDashboardExpensesQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type { ExpensesPageQuery, ExpensesPageQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
@@ -172,7 +172,10 @@ export const expensesPageQuery = gql`
   ${expenseHostFields}
 `;
 
-export const schema = commonSchema.extend({ direction: expenseDirectionFilter.schema });
+export const schema = commonSchema.extend({
+  direction: expenseDirectionFilter.schema,
+  collectiveSlug: z.string().optional(),
+});
 
 type FilterValues = z.infer<typeof schema>;
 
@@ -181,14 +184,20 @@ type FilterMeta = CommonFilterMeta & {
   includeUncategorized?: boolean;
 };
 
-export const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
+export const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
+  direction: (value, key, meta, filterValues) => ({
+    [value === EXPENSE_DIRECTION.RECEIVED ? 'account' : 'fromAccount']: {
+      slug: filterValues?.collectiveSlug,
+    },
+  }),
+  collectiveSlug: value => ({ accountSlug: value }),
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  ...pick(commonFilters, ['searchTerm']),
   direction: expenseDirectionFilter.filter,
+  ...pick(commonFilters, ['searchTerm']),
   ...omit(commonFilters, ['searchTerm', 'status']),
   status: { ...commonFilters.status, static: false } as typeof commonFilters.status,
   tag: expenseTagFilter.filter,
@@ -210,26 +219,15 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
   };
 
   const queryFilter = useQueryFilter({
-    schema,
+    schema: direction ? schema.extend({ direction: expenseDirectionFilter.schema.default(direction) }) : schema,
     toVariables,
     filters: isSubmitted ? omit(filters, ['direction']) : filters,
-    defaultFilterValues: { direction: direction || EXPENSE_DIRECTION.RECEIVED },
     meta,
     shallow: true,
   });
 
-  const variables = {
-    ...{
-      [queryFilter.values.direction === EXPENSE_DIRECTION.RECEIVED ? 'account' : 'fromAccount']: {
-        legacyId: account?.legacyId,
-      },
-    },
-    accountSlug: account?.slug,
-    ...queryFilter.variables,
-  };
-
   const { data, loading, refetch } = useQuery(expensesPageQuery, {
-    variables,
+    variables: queryFilter.variables,
     context: API_V2_CONTEXT,
   });
 
