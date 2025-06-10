@@ -42,21 +42,6 @@ export const makeTruncatedValueAllSelectedLabelContainer = (allSelectedNode: Rea
   return TruncatedValueAllSelectedLabelContainer;
 };
 
-export const TruncatedValueContainer = props => {
-  const { selectProps, children } = props;
-  const itemsList = (selectProps.value || []).map(({ label }) => label);
-  const itemsListStr = itemsList.join(', ');
-
-  return (
-    <ReactSelectComponents.SelectContainer height="1em" {...props}>
-      <Flex>
-        <TruncatedItemsList title={itemsListStr}>{itemsListStr}</TruncatedItemsList>
-        {children}
-      </Flex>
-    </ReactSelectComponents.SelectContainer>
-  );
-};
-
 export const getSelectFilterStyles = stylesFromProps => ({
   ...(stylesFromProps || null),
   control: (baseStyles, state) => {

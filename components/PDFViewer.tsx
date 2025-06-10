@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { throttle } from 'lodash';
 import type { ComponentProps } from 'react';
@@ -9,7 +11,7 @@ import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import Loading from './Loading';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = '/static/scripts/pdf.worker.min.mjs';
 
 const DocumentContainer = styled.div`
   .pdf-page {

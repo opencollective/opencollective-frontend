@@ -100,7 +100,7 @@ export const getDateFromValue = (value): Date | null => {
 /**
  * From a simple date as '2020-01-01', returns a string like '2020-01-01T00:00:00Z'.
  */
-export const simpleDateToISOString = (date, isEndOfDay, timezoneType) => {
+const simpleDateToISOString = (date, isEndOfDay, timezoneType) => {
   if (!date) {
     return null;
   } else {

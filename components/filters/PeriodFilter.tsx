@@ -26,7 +26,7 @@ const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
  * Get a date range as stored internally from a `value` prop, that can be either an object
  * like { from, to } or a stringified value (see `encodeDateInterval`).
  */
-export const getIntervalFromValue = value => {
+const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
   const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateInterval(value);
   if (intervalFromValue.timezoneType === 'UTC') {
@@ -92,7 +92,7 @@ type PeriodFilterFormProps = {
   disabled?: boolean;
 };
 
-export const PeriodFilterForm = ({
+const PeriodFilterForm = ({
   onChange,
   onValidate,
   value,

@@ -16,10 +16,10 @@ import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
-import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P, Span } from '../Text';
+import { P } from '../Text';
+import { Button } from '../ui/Button';
 
 import TransactionRefundButton from './TransactionRefundButton';
 import TransactionRejectButton from './TransactionRejectButton';
@@ -297,31 +297,22 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
       </Flex>
       {displayActions && ( // Let us override so we can hide buttons in the collective page
         <Flex flexDirection="column" width={[1, 0.3]}>
-          <Flex flexWrap="wrap" justifyContent={['flex-start', 'flex-end']} alignItems="center" mt={[2, 0]}>
+          <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
             {(showRefundButton || showRejectButton) && (
               <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)} mt={2}>
-                <Box mx={2}>
-                  <Info color="#1869F5" size={20} />
-                </Box>
+                <Info color="#1869F5" size={20} />
               </StyledTooltip>
             )}
-            {showRefundButton && (
-              <Span mb={2}>
-                <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />
-              </Span>
-            )}
+            {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
             {showRejectButton && (
-              <Span mb={2}>
-                <TransactionRejectButton
-                  id={id}
-                  canRefund={permissions?.canRefund && !isRefunded}
-                  onMutationSuccess={onMutationSuccess}
-                />
-              </Span>
+              <TransactionRejectButton
+                id={id}
+                canRefund={permissions?.canRefund && !isRefunded}
+                onMutationSuccess={onMutationSuccess}
+              />
             )}
             {showDownloadInvoiceButton && (
-              <StyledButton
-                buttonSize="small"
+              <Button
                 data-loading={loadingInvoice}
                 loading={loadingInvoice}
                 onClick={downloadInvoiceWith({
@@ -330,19 +321,14 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                   toCollectiveSlug: toAccount.slug,
                   createdAt: transaction.createdAt,
                 })}
-                minWidth={140}
-                background="transparent"
-                textTransform="capitalize"
-                ml={2}
-                mb={2}
-                px="unset"
+                variant="outline"
                 data-cy="download-transaction-receipt-btn"
               >
                 {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                 {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
-              </StyledButton>
+              </Button>
             )}
-          </Flex>
+          </div>
         </Flex>
       )}
     </DetailsContainer>
