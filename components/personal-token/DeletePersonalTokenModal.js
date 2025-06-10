@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -73,15 +72,6 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
       </P>
     </ConfirmationModal>
   );
-};
-
-DeletePersonalTokenModal.propTypes = {
-  personalToken: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default DeletePersonalTokenModal;

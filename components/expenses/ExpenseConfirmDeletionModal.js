@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
@@ -77,21 +75,6 @@ const ExpenseConfirmDeletion = ({ onDelete, showDeleteConfirmMoreActions, expens
       )}
     </Mutation>
   );
-};
-
-ExpenseConfirmDeletion.propTypes = {
-  onDelete: PropTypes.func,
-  showDeleteConfirmMoreActions: PropTypes.func,
-  expense: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    legacyId: PropTypes.number.isRequired,
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    permissions: PropTypes.shape({
-      canEdit: PropTypes.bool,
-      canSeeInvoiceInfo: PropTypes.bool,
-      canMarkAsIncomplete: PropTypes.bool,
-    }),
-  }),
 };
 
 export default ExpenseConfirmDeletion;

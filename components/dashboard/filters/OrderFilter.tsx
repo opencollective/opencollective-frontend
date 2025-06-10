@@ -42,8 +42,8 @@ export function buildOrderByFilter<T extends [OrderFilterKey, ...OrderFilterKey[
 function buildOrderByFilterComponent<T extends [string, ...string[]]>(
   schema: z.ZodDefault<z.ZodEnum<T>>,
   i18nLabels: Record<z.infer<z.ZodEnum<T>>, MessageDescriptor>,
-): React.FunctionComponent<FilterComponentProps<z.infer<z.ZodEnum<T>>>> {
-  return function OrderFilter({ onChange, value }) {
+) {
+  return function OrderFilter({ onChange, value }: FilterComponentProps<z.infer<z.ZodEnum<T>>>) {
     const intl = useIntl();
     const options = schema.removeDefault().options.map(value => ({
       value,

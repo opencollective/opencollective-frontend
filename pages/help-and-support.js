@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Mail } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -108,11 +107,6 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
       )}
     </Page>
   );
-};
-
-HelpAndSupport.propTypes = {
-  action: PropTypes.string,
-  formConfirmation: PropTypes.string,
 };
 
 HelpAndSupport.getInitialProps = async ctx => ({

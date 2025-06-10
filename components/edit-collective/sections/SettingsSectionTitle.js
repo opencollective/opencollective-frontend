@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Flex } from '../../Grid';
 import StyledHr from '../../StyledHr';
@@ -14,10 +13,6 @@ const SettingsSectionTitle = ({ children, ...props }) => {
       <StyledHr ml={2} flex="1 1" borderColor="black.400" />
     </Flex>
   );
-};
-
-SettingsSectionTitle.propTypes = {
-  children: PropTypes.node,
 };
 
 export default SettingsSectionTitle;

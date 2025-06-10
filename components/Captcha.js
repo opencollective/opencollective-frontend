@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import * as Sentry from '@sentry/browser';
 import { toUpper } from 'lodash';
@@ -64,11 +63,6 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
   );
 };
 
-ReCaptcha.propTypes = {
-  onVerify: PropTypes.func,
-  onError: PropTypes.func,
-};
-
 /**
  * @type {React.ForwardRefExoticComponent<{ onVerify: (result) => void;}>}
  */
@@ -120,10 +114,5 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
 });
 
 Captcha.displayName = 'Captcha';
-
-Captcha.propTypes = {
-  onVerify: PropTypes.func,
-  provider: PropTypes.string,
-};
 
 export default Captcha;

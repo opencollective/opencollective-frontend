@@ -60,7 +60,7 @@ describe('Gift cards admin', () => {
     checkSubmit(false, 'Create 0 gift cards');
 
     // Multi-email tests
-    const multiEmailSelector = '.gift-cards-recipients .public-DraftEditor-content';
+    const multiEmailSelector = '#gift-cards-recipients textarea';
     cy.get(multiEmailSelector).type('test1@opencollective.com');
     checkSubmit(true, 'Create 1 gift cards');
     // De-duplicate

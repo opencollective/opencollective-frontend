@@ -1,8 +1,19 @@
 import React from 'react';
 import { Times } from '@styled-icons/fa-solid/Times';
 import styled from 'styled-components';
+import type {
+  BackgroundProps,
+  BorderProps,
+  ColorProps,
+  FontSizeProps,
+  LayoutProps,
+  PositionProps,
+  SpaceProps,
+  TypographyProps,
+} from 'styled-system';
 import { background, border, color, layout, position, space, typography, variant } from 'styled-system';
 
+import type { TextTransformProps } from '../lib/styled-system-custom-properties';
 import { textTransform } from '../lib/styled-system-custom-properties';
 
 import { Span } from './Text';
@@ -54,9 +65,20 @@ const TAG_TYPE_VARIANTS = {
   },
 };
 
-const StyledTagBase = styled.div<{
-  variant: 'squared' | 'rounded-right' | 'rounded-left' | 'rounded';
-}>`
+const StyledTagBase = styled.div<
+  TypographyProps &
+    SpaceProps &
+    LayoutProps &
+    PositionProps &
+    BackgroundProps &
+    ColorProps &
+    BorderProps &
+    TypographyProps &
+    FontSizeProps &
+    TextTransformProps & {
+      variant?: 'squared' | 'rounded-right' | 'rounded-left' | 'rounded';
+    }
+>`
   text-align: center;
   white-space: nowrap;
   letter-spacing: 0.06em;
@@ -108,12 +130,13 @@ const StyledTagBase = styled.div<{
   ${textTransform}
 `;
 
-const CloseButton = styled.button.attrs({
+const CloseButton = styled.button.attrs<{
+  'data-cy'?: string;
+  isFocused?: boolean;
+}>({
   type: 'button',
   'data-cy': 'remove-btn',
-})<{
-  isFocused?: boolean;
-}>`
+})`
   cursor: pointer;
   text-align: center;
   padding: 0 2px 0 0;
@@ -142,7 +165,7 @@ const CloseButton = styled.button.attrs({
   }
 `;
 
-export interface StyledTagProps extends React.ComponentProps<typeof StyledTagBase> {
+export type StyledTagProps = React.ComponentProps<typeof StyledTagBase> & {
   closeButtonProps?: React.ComponentProps<typeof CloseButton> | boolean;
   /** If defined, a close button will be displayed on the tag */
   onClose?: (...args: unknown[]) => unknown;
@@ -151,7 +174,7 @@ export interface StyledTagProps extends React.ComponentProps<typeof StyledTagBas
   children?: React.ReactNode;
   type?: 'white' | 'dark' | 'grey' | 'info' | 'success' | 'warning' | 'error';
   htmlType?: 'button' | 'submit' | 'reset';
-}
+};
 
 /**
  * Simple tag to display a short string

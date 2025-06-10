@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { CommentType } from '../../lib/graphql/types/v2/schema';
 
@@ -100,40 +99,11 @@ const Comment = ({
   );
 };
 
-Comment.propTypes = {
-  comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-    type: PropTypes.string,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  }).isRequired,
-  /** Reactions associated with this comment? */
-  reactions: PropTypes.object,
-  /** Can current user edit this comment? */
-  canEdit: PropTypes.bool,
-  /** Can current user delete this comment? */
-  canDelete: PropTypes.bool,
-  canReply: PropTypes.bool,
-  /** Set this to true if the comment is the root comment of a conversation */
-  isConversationRoot: PropTypes.bool,
-  /** If set, comment will be scrollable over this height */
-  maxCommentHeight: PropTypes.number,
-  /** Called when comment gets deleted */
-  onDelete: PropTypes.func,
-  /** Called when comment gets selected*/
-  onReplyClick: PropTypes.func,
-};
-
 /**
  *
  * @param {import('./types').CommentPropsWithVariant} props
  */
 export default function CommentComponent(props) {
-  // eslint-disable-next-line react/prop-types
   if (props.variant === 'small') {
     return <SmallComment {...props} />;
   }

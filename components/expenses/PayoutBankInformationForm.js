@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useFormikContext } from 'formik';
 import { compact, get, kebabCase, partition } from 'lodash';
@@ -193,15 +192,6 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   }
 };
 
-Field.propTypes = {
-  disabled: PropTypes.bool,
-  loading: PropTypes.bool,
-  formik: PropTypes.object.isRequired,
-  getFieldName: PropTypes.func.isRequired,
-  refetch: PropTypes.func,
-  input: PropTypes.object.isRequired,
-};
-
 export const FieldGroup = ({ field, ...props }) => {
   return (
     <div className="flex-1">
@@ -210,19 +200,6 @@ export const FieldGroup = ({ field, ...props }) => {
       ))}
     </div>
   );
-};
-
-FieldGroup.propTypes = {
-  disabled: PropTypes.bool,
-  loading: PropTypes.bool,
-  host: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  currency: PropTypes.string,
-  formik: PropTypes.object.isRequired,
-  getFieldName: PropTypes.func.isRequired,
-  refetch: PropTypes.func,
-  field: PropTypes.object.isRequired,
 };
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSave }) => {
@@ -428,17 +405,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
   );
 };
 
-DetailsForm.propTypes = {
-  disabled: PropTypes.bool,
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  currency: PropTypes.string.isRequired,
-  formik: PropTypes.object.isRequired,
-  getFieldName: PropTypes.func.isRequired,
-  alwaysSave: PropTypes.bool,
-};
-
 const availableCurrenciesQuery = gql`
   query PayoutBankInformationAvailableCurrencies($slug: String, $ignoreBlockedCurrencies: Boolean) {
     host(slug: $slug) {
@@ -616,27 +582,6 @@ const PayoutBankInformationForm = ({
       )}
     </React.Fragment>
   );
-};
-
-PayoutBankInformationForm.propTypes = {
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string,
-    transferwise: PropTypes.shape({
-      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-    }),
-  }),
-  disabled: PropTypes.bool,
-  isNew: PropTypes.bool,
-  optional: PropTypes.bool,
-  alwaysSave: PropTypes.bool,
-  ignoreBlockedCurrencies: PropTypes.bool,
-  getFieldName: PropTypes.func.isRequired,
-  /** Enforces a fixedCurrency */
-  fixedCurrency: PropTypes.string,
-  /** A map of errors for this object */
-  errors: PropTypes.object,
-  formik: PropTypes.object,
 };
 
 export default PayoutBankInformationForm;

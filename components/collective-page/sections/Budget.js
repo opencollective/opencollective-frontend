@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -328,14 +327,6 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
   }
 };
 
-ViewAllLink.propTypes = {
-  collective: PropTypes.object,
-  hasExpenses: PropTypes.bool,
-  isIndividual: PropTypes.bool,
-  hasTransactions: PropTypes.bool,
-  filter: PropTypes.oneOf(FILTERS),
-};
-
 /**
  * The budget section. Shows the expenses, the latest transactions and some statistics
  * abut the global budget of the collective.
@@ -439,22 +430,6 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
       </Flex>
     </ContainerSectionContent>
   );
-};
-
-SectionBudget.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool,
-    isHost: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.object,
-  }),
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(withUser(SectionBudget));

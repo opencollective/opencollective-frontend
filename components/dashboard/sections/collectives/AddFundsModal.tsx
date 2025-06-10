@@ -51,7 +51,7 @@ import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMess
 import { Button } from '../../../ui/Button';
 import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
-const AddFundsModalContainer = styled(StyledModal)`
+const AddFundsModalContainer = styled(StyledModal)<{ $showSuccessModal: boolean }>`
   width: 100%;
   max-width: 576px;
   padding: 24px 24px 16px 32px;
@@ -1204,7 +1204,6 @@ const AddFundsModal = ({
     <AddFundsModalContainer
       key="add-funds-modal"
       {...props}
-      trapFocus
       onClose={handleClose}
       $showSuccessModal={fundDetails.showSuccessModal}
     >

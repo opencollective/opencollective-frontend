@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import { FixedSizeGrid } from 'react-window';
 import styled from 'styled-components';
@@ -39,7 +38,6 @@ const StyledGridContainer = styled.div`
  * let you pass custom props to outer container.
  */
 const getGridContainer = (paddingLeft, hasScroll) => {
-  // eslint-disable-next-line react/prop-types
   const GridContainer = ({ style, ...props }, ref) => {
     return (
       <StyledGridContainer
@@ -64,10 +62,6 @@ const getGridContainer = (paddingLeft, hasScroll) => {
  */
 const GridInnerContainer = ({ style, ...props }) => {
   return <div style={{ ...style, position: 'relative', width: style.width + COLLECTIVE_CARD_MARGIN_X }} {...props} />;
-};
-
-GridInnerContainer.propTypes = {
-  style: PropTypes.object,
 };
 
 /** Cards to show individual contributors */
@@ -192,48 +186,6 @@ const ContributorsGrid = ({
       }}
     </FixedSizeGrid>
   );
-};
-
-ContributorsGrid.propTypes = {
-  /** The contributors */
-  contributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      collectiveId: PropTypes.number,
-    }),
-  ),
-
-  /** Maximum number of rows for different viewports */
-  maxNbRowsForViewports: PropTypes.shape({
-    [VIEWPORTS.UNKNOWN]: PropTypes.number,
-    [VIEWPORTS.XSMALL]: PropTypes.number,
-    [VIEWPORTS.SMALL]: PropTypes.number,
-    [VIEWPORTS.MEDIUM]: PropTypes.number,
-    [VIEWPORTS.LARGE]: PropTypes.number,
-  }),
-
-  /** Currency used for contributions */
-  currency: PropTypes.string,
-
-  /** @ignore from withViewport */
-  viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
-
-  /** @ignore from withViewport */
-  width: PropTypes.number.isRequired,
-
-  /** To center the content when the grid is not full */
-  maxWidthWhenNotFull: PropTypes.number,
-
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.shape({
-    CollectiveId: PropTypes.number,
-  }),
-
-  /** Collective id */
-  collectiveId: PropTypes.number,
-
-  /* Reference to the FixedSizedGrid */
-  gridRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
 };
 
 export default withViewport(withUser(ContributorsGrid), { withWidth: true });

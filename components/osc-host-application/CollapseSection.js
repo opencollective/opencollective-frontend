@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import AnimateHeight from 'react-animate-height';
@@ -63,15 +62,6 @@ const CollapseSection = ({ title, isExpanded, toggleExpanded, subtitle, imageSrc
       </AnimateHeight>
     </Container>
   );
-};
-
-CollapseSection.propTypes = {
-  title: PropTypes.node.isRequired,
-  subtitle: PropTypes.node.isRequired,
-  imageSrc: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-  isExpanded: PropTypes.bool.isRequired,
-  toggleExpanded: PropTypes.func.isRequired,
 };
 
 export default CollapseSection;

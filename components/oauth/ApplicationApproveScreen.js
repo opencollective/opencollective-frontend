@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { difference, has } from 'lodash';
 import {
@@ -309,22 +308,4 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
       )}
     </Container>
   );
-};
-
-ApplicationApproveScreen.propTypes = {
-  application: PropTypes.shape({
-    name: PropTypes.string,
-    clientId: PropTypes.string.isRequired,
-    redirectUri: PropTypes.string.isRequired,
-    preAuthorize2FA: PropTypes.bool.isRequired,
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  redirectUri: PropTypes.string,
-  state: PropTypes.string,
-  scope: PropTypes.string,
-  autoApprove: PropTypes.bool,
 };

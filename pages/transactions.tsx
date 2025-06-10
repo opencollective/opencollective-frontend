@@ -6,7 +6,6 @@ import type { z } from 'zod';
 
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
 import { loggedInUserCanAccessFinancialData } from '../lib/collective';
-import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -17,7 +16,6 @@ import { getSSRVariablesFromQuery } from '@/lib/hooks/useQueryFilter';
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import ErrorPage from '../components/ErrorPage';
 import Header from '../components/Header';
 import Footer from '../components/navigation/Footer';
@@ -92,7 +90,6 @@ export default function TransactionsPage(props: InferGetServerSidePropsType<type
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(account)}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-          selectedSection={account?.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
         />
         <div className="mx-auto my-16 max-w-[1260px] px-2 md:px-3 lg:px-4" data-cy="transactions-page-content">
           <h1 className="mb-6 text-[32px] leading-10">

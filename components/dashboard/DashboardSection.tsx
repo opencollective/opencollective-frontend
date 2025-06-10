@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -134,7 +133,19 @@ const ROOT_COMPONENTS = {
   [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
 };
 
-const DashboardSection = ({ account, isLoading, section, subpath }) => {
+interface DashboardSectionProps {
+  isLoading?: boolean;
+  section?: string;
+  subpath?: string[];
+  /** The account. Can be null if isLoading is true */
+  account?: {
+    slug: string;
+    name?: string;
+    isHost?: boolean;
+  };
+}
+
+const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const { activeSlug } = useContext(DashboardContext);
 
@@ -209,18 +220,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
       <NotFound />
     </Container>
   );
-};
-
-DashboardSection.propTypes = {
-  isLoading: PropTypes.bool,
-  section: PropTypes.string,
-  subpath: PropTypes.arrayOf(PropTypes.string),
-  /** The account. Can be null if isLoading is true */
-  account: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
 };
 
 export default DashboardSection;

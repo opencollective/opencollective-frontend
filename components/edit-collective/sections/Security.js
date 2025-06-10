@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
@@ -231,12 +230,6 @@ const Security = ({ collective }) => {
       )}
     </Formik>
   );
-};
-
-Security.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
 };
 
 export default Security;

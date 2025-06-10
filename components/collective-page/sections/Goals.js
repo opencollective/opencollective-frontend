@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 
 import Container from '../../Container';
@@ -22,14 +21,6 @@ const SectionGoals = ({ collective }) => {
       </Container>
     </Container>
   );
-};
-
-SectionGoals.propTypes = {
-  /** The collective to display description for */
-  collective: PropTypes.shape({
-    settings: PropTypes.object,
-    name: PropTypes.string,
-  }).isRequired,
 };
 
 export default React.memo(SectionGoals);

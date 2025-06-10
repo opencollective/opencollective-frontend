@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -148,15 +147,6 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
       )}
     </Container>
   );
-};
-
-PlatformTipInput.propTypes = {
-  currency: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  amount: PropTypes.number,
-  quantity: PropTypes.number,
-  value: PropTypes.number,
-  isEmbed: PropTypes.bool,
 };
 
 export default PlatformTipInput;

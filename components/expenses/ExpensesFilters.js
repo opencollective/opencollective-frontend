@@ -1,11 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { encodeDateInterval } from '../../lib/date-utils';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
@@ -155,23 +153,6 @@ const ExpensesFilters = ({
       )}
     </Flex>
   );
-};
-
-ExpensesFilters.propTypes = {
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  showOrderFilter: PropTypes.bool,
-  explicitAllForStatus: PropTypes.bool,
-  collective: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-    createdAt: PropTypes.string,
-  }).isRequired,
-  wrap: PropTypes.bool,
-  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(ExpenseStatus))),
-  displayOnHoldPseudoStatus: PropTypes.bool,
-  showChargeHasReceiptFilter: PropTypes.bool,
-  chargeHasReceiptFilter: PropTypes.bool,
-  onChargeHasReceiptFilterChange: PropTypes.func,
 };
 
 export default React.memo(ExpensesFilters);

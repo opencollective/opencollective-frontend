@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes } from 'lodash';
@@ -12,7 +11,6 @@ import { getFilesFromExpense } from '../../lib/expenses';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
@@ -103,17 +101,17 @@ const ExpenseContainer = styled.div`
 `;
 
 const ExpenseBudgetItem = ({
-  isLoading,
-  host,
-  isInverted,
-  showAmountSign,
+  isLoading = false,
+  host = undefined,
+  isInverted = false,
+  showAmountSign = false,
   expense,
-  showProcessActions,
+  showProcessActions = false,
   view = 'public',
-  onProcess,
-  selected,
-  expandExpense,
-  useDrawer,
+  onProcess = undefined,
+  selected = undefined,
+  expandExpense = undefined,
+  useDrawer = false,
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -568,104 +566,6 @@ const ExpenseBudgetItem = ({
       )}
     </ExpenseContainer>
   );
-};
-
-ExpenseBudgetItem.propTypes = {
-  isLoading: PropTypes.bool,
-  /** Set this to true to invert who's displayed (payee or collective) */
-  isInverted: PropTypes.bool,
-  showAmountSign: PropTypes.bool,
-  onDelete: PropTypes.func,
-  onProcess: PropTypes.func,
-  showProcessActions: PropTypes.bool,
-  view: PropTypes.oneOf(['public', 'admin', 'submitter']),
-  host: PropTypes.object,
-  expense: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    legacyId: PropTypes.number,
-    comments: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-    type: PropTypes.string.isRequired,
-    reference: PropTypes.string,
-    description: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    amount: PropTypes.number.isRequired,
-    amountInAccountCurrency: AmountPropTypeShape,
-    currency: PropTypes.string.isRequired,
-    permissions: PropTypes.object,
-    onHold: PropTypes.bool,
-    accountingCategory: PropTypes.object,
-    items: PropTypes.arrayOf(PropTypes.object),
-    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
-    attachedFiles: PropTypes.arrayOf(PropTypes.object),
-    invoiceFile: PropTypes.object,
-    payee: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      type: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string.isRequired,
-      isAdmin: PropTypes.bool,
-    }),
-    payoutMethod: PropTypes.shape({
-      type: PropTypes.string,
-    }),
-    createdByAccount: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
-    /** If available, this `account` will be used to link expense in place of the `collective` */
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      currency: PropTypes.string,
-      hostAgreements: PropTypes.shape({
-        totalCount: PropTypes.number,
-      }),
-      stats: PropTypes.shape({
-        // Collective / Balance can be v1 or v2 there ...
-        balanceWithBlockedFunds: PropTypes.oneOfType([
-          PropTypes.number,
-          PropTypes.shape({
-            valueInCents: PropTypes.number,
-          }),
-        ]),
-      }),
-      parent: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      }),
-    }),
-    approvedBy: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-      }),
-    ),
-    lastComment: PropTypes.shape({
-      nodes: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          createdAt: PropTypes.string.isRequired,
-          fromAccount: PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            slug: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired,
-            imageUrl: PropTypes.string.isRequired,
-          }),
-        }),
-      ),
-    }),
-  }),
-  selected: PropTypes.bool,
-  expandExpense: PropTypes.func,
-  useDrawer: PropTypes.bool,
 };
 
 export default ExpenseBudgetItem;

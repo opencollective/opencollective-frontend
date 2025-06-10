@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { MinusCircle } from '@styled-icons/boxicons-regular/MinusCircle';
 import { FormattedMessage } from 'react-intl';
@@ -116,12 +115,6 @@ const TransactionRejectButton = props => {
       )}
     </div>
   );
-};
-
-TransactionRejectButton.propTypes = {
-  id: PropTypes.string.isRequired,
-  canRefund: PropTypes.bool,
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionRejectButton;

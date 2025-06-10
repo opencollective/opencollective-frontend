@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
@@ -25,7 +24,7 @@ const Table = styled.table`
     line-height: 24px;
     color: #141415;
 
-    :not(:first-child) {
+    &:not(:first-child) {
       border-left: 1px solid #eaeaec;
       text-align: center;
     }
@@ -67,12 +66,6 @@ export const BudgetTable = ({ headers, rows, truncate, ...props }) => {
   );
 };
 
-BudgetTable.propTypes = {
-  headers: PropTypes.arrayOf(PropTypes.node).isRequired,
-  rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.node)),
-  truncate: PropTypes.number,
-};
-
 export const COLORS = ['#A3F89C', '#FFBF5F', '#8FC7FF', '#F89CE4', '#F89C9C'];
 
 export const TagMarker = styled.div`
@@ -90,7 +83,7 @@ export const StatsCardContent = styled(Flex)`
     margin: 12px 0;
     padding: 0px 36px;
 
-    :not(:first-child) {
+    &:not(:first-child) {
       border-left: 1px solid #d9d9d9;
     }
   }
@@ -112,7 +105,7 @@ export const GraphTypeButton = styled.button`
   background-color: #f9fafb;
   cursor: pointer;
 
-  :hover {
+  &:hover {
     border-color: #c4c7cc;
   }
 

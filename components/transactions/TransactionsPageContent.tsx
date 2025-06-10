@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
 import { gql, useQuery } from '@apollo/client';
+import type { NextRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../../lib/collective';
 import roles from '../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { TransactionKind } from '@/lib/constants/transactions';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type { TransactionKind as TransactionKindType } from '@/lib/graphql/types/v2/schema';
+import type { Account, PaymentMethod, PaymentMethodType, Transaction } from '@/lib/graphql/types/v2/schema';
+import { TransactionKind } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import type LoggedInUser from '@/lib/LoggedInUser';
 import { cn } from '@/lib/utils';
 
 import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
@@ -241,6 +243,58 @@ export const schema = commonSchema.extend({
   account: childAccountFilter.schema,
 });
 
+interface TransactionsProps {
+  account?: Pick<Account, 'id' | 'slug' | 'type' | 'settings' | 'currency'> & {
+    childrenAccounts?: {
+      nodes?: unknown[];
+    };
+    processingOrders?: {
+      nodes?: unknown[];
+      totalCount?: number;
+    };
+    parent?: Pick<Account, 'id' | 'slug' | 'name'>;
+    host?: Pick<Account, 'id' | 'slug'>;
+  };
+  transactions?: {
+    totalCount?: number;
+    paymentMethodTypes?: string[];
+    kinds?: string[];
+    nodes?: Array<
+      Pick<Transaction, 'id' | 'createdAt' | 'amount' | 'kind' | 'type'> & {
+        giftCardEmitterAccount?: Pick<Account, 'id' | 'slug' | 'name'>;
+        fromAccount?: Pick<Account, 'id' | 'slug' | 'name'> & {
+          parent?: Pick<Account, 'id' | 'slug' | 'name'>;
+          host?: Pick<Account, 'id' | 'slug'>;
+        };
+        toAccount?: Pick<Account, 'id' | 'slug' | 'name'> & {
+          parent?: Pick<Account, 'id' | 'slug' | 'name'>;
+          host?: Pick<Account, 'id' | 'slug'>;
+        };
+        paymentMethod?: Pick<PaymentMethod, 'id' | 'service' | 'name' | 'type' | 'expiryDate' | 'data'>;
+      }
+    >;
+  };
+  variables?: {
+    offset: number;
+    limit: number;
+    displayPendingContributions: boolean;
+  };
+  loading?: boolean;
+  refetch?(...args: unknown[]): unknown;
+  error?: any;
+  LoggedInUser?: LoggedInUser;
+  query?: {
+    searchTerm?: string;
+    offset?: string;
+    ignoreIncognitoTransactions?: string;
+    ignoreGiftCardsTransactions?: string;
+    ignoreChildrenTransactions?: string;
+    displayPendingContributions?: string;
+  };
+  router?: NextRouter;
+  isDashboard?: boolean;
+}
+
 export const toVariables /* : FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta>*/ = {
   ...commonToVariables,
   account: (value, key, meta) => {
@@ -268,21 +322,21 @@ export const defaultFilterValues = {
     TransactionKind.CONTRIBUTION,
     TransactionKind.EXPENSE,
     TransactionKind.BALANCE_TRANSFER,
-  ] as TransactionKindType[],
+  ] as TransactionKind[],
 };
 
-const Transactions = ({ LoggedInUser, account, ...props }) => {
+const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) => {
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
 
   const queryFilter = useQueryFilter({
     schema,
     toVariables,
-    filters,
+    filters: filters as typeof filters & {},
     meta: {
       currency: account.currency,
-      paymentMethodTypes: props.transactions?.paymentMethodTypes,
-      kinds: props.transactions?.kinds,
+      paymentMethodTypes: props.transactions?.paymentMethodTypes as PaymentMethodType[],
+      kinds: props.transactions?.kinds as TransactionKind[],
       accountSlug: account.slug,
       childrenAccounts: account.childrenAccounts?.nodes ?? [],
     },

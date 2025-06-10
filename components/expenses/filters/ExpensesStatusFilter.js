@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { ExpenseStatus } from '../../../lib/graphql/types/v2/schema';
@@ -46,13 +45,6 @@ const ExpenseStatusFilter = ({
       {...props}
     />
   );
-};
-
-ExpenseStatusFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf([...Object.values(ExpenseStatus), 'ALL', 'READY_TO_PAY']),
-  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(ExpenseStatus))),
-  displayOnHoldPseudoStatus: PropTypes.bool,
 };
 
 export default ExpenseStatusFilter;

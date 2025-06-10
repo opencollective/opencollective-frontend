@@ -377,6 +377,7 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
             <React.Fragment>
               {paymentMethods.map(v => (
                 <div key={v.id}>
+                  {/* @ts-expect-error giftCard is not properly typed */}
                   <GiftCardDetails giftCard={v} collectiveSlug={collectiveSlug} />
                   {v !== lastGiftCard && <hr className="my-6" />}
                 </div>

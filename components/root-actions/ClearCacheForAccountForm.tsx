@@ -108,6 +108,4 @@ const ClearCacheForAccountForm = () => {
   );
 };
 
-ClearCacheForAccountForm.propTypes = {};
-
 export default ClearCacheForAccountForm;

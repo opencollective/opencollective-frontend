@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
@@ -122,11 +121,11 @@ const mutationOptions = { context: API_V2_CONTEXT };
 /**
  * A component to render the reaction picker on comments.
  */
-const EmojiReactionPicker = ({ comment, update }) => {
+const EmojiReactionPicker = ({ comment = null, update = null }) => {
   const emojiFirstRow = ['👍️', '👎', '😀', '🎉'];
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
-  const wrapperRef = React.useRef();
+  const wrapperRef = React.useRef(undefined);
   const [addReaction] = useMutation(addReactionMutation, mutationOptions);
   const [removeReaction] = useMutation(removeReactionMutation, mutationOptions);
 
@@ -210,25 +209,6 @@ const EmojiReactionPicker = ({ comment, update }) => {
       </div>
     </Manager>
   );
-};
-
-EmojiReactionPicker.propTypes = {
-  comment: PropTypes.shape({
-    id: PropTypes.string,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-    userReactions: PropTypes.array,
-  }),
-  update: PropTypes.shape({
-    id: PropTypes.string,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    userReactions: PropTypes.array,
-  }),
 };
 
 export default EmojiReactionPicker;

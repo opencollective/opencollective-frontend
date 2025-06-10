@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { FormattedMessage } from 'react-intl';
 
@@ -55,14 +54,6 @@ const CollectiveTypePicker = ({
       ))}
     </Grid>
   );
-};
-
-CollectiveTypePicker.propTypes = {
-  /** List of allowed types for this collective creator */
-  types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))).isRequired,
-  /** Called when user pick a button */
-  onChange: PropTypes.func.isRequired,
-  useBeneficiaryForVendor: PropTypes.bool,
 };
 
 export default CollectiveTypePicker;

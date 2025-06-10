@@ -85,7 +85,7 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
     props.href &&
     css`
       @media (hover: hover) {
-        :hover {
+        &:hover {
           color: #0f172a !important;
           background-color: #f1f5f9;
         }
@@ -157,7 +157,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef(undefined);
   const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
