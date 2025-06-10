@@ -350,7 +350,6 @@ class CreateGiftCardsForm extends Component {
           </label>
           <StyledMultiEmailInput
             id="gift-cards-recipients"
-            className="gift-cards-recipients"
             mt="0.25em"
             invalids={errors.emails}
             initialState={multiEmailsInitialState}
