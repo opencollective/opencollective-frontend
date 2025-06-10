@@ -239,7 +239,7 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
     }
   }, [LoggedInUser, refetch]);
 
-  const isSelfHosted = account && 'host' in account && account.id === account.host.id;
+  const isSelfHosted = account && 'host' in account && account.id === account.host?.id;
   const expenses = data?.expenses || _expenses;
 
   return (
