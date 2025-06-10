@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { ContributionDrawerQuery } from '../../lib/graphql/types/v2/graphql';
+import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
@@ -81,7 +81,10 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
   }));
 }
 
-export function getTransactionsUrl(LoggedInUser: LoggedInUser, order: ContributionDrawerQuery['order']): URL {
+export function getTransactionsUrl(
+  LoggedInUser: LoggedInUser,
+  order: ContributionDrawerQuery['order'] | ManagedOrderFieldsFragment,
+): URL {
   let route = `/${order.toAccount.slug}/transactions`;
   if (LoggedInUser.isSelf(order.fromAccount)) {
     route = getDashboardRoute(order.fromAccount, 'transactions');
