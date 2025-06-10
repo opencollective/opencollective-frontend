@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import type { FilterConfig } from '@/lib/filters/filter-types';
 
-import ComboSelectFilter from '@/components/dashboard/filters/ComboSelectFilter';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 export enum EXPENSE_DIRECTION {
   RECEIVED = 'RECEIVED',
@@ -16,7 +16,7 @@ const AccountStatusMessages = defineMessages({
   [EXPENSE_DIRECTION.SUBMITTED]: { id: 'Expense.Direction.Submitted', defaultMessage: 'Submitted' },
 });
 
-const schema = z.nativeEnum(EXPENSE_DIRECTION).optional();
+const schema = z.nativeEnum(EXPENSE_DIRECTION).default(EXPENSE_DIRECTION.RECEIVED);
 
 type ExpenseDirectionFilterValue = z.infer<typeof schema>;
 
@@ -25,7 +25,7 @@ export const expenseDirectionFilter: FilterConfig<ExpenseDirectionFilterValue> =
   filter: {
     static: true,
     labelMsg: defineMessage({ id: 'DZ2Koj', defaultMessage: 'Direction' }),
-    Component: ({ intl, ...props }) => {
+    StandaloneComponent: ({ intl, value, onChange }) => {
       const options = useMemo(
         () => [
           {
@@ -39,16 +39,18 @@ export const expenseDirectionFilter: FilterConfig<ExpenseDirectionFilterValue> =
         ],
         [intl],
       );
-      return <ComboSelectFilter options={options} {...props} />;
+      return (
+        <Tabs value={value} onValueChange={onChange}>
+          <TabsList className="h-9">
+            {options.map(option => (
+              <TabsTrigger className="h-7" key={option.value} value={option.value}>
+                {option.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      );
     },
     valueRenderer: ({ value, intl }) => intl.formatMessage(AccountStatusMessages[value]),
-  },
-  toVariables: value => {
-    switch (value) {
-      case EXPENSE_DIRECTION.RECEIVED:
-        return { direction: true };
-      case EXPENSE_DIRECTION.SUBMITTED:
-        return { isActive: false };
-    }
   },
 };

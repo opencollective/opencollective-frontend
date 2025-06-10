@@ -76,18 +76,12 @@ const expensePageQueryHelpers = getSSRQueryHelpers<z.infer<typeof schema>, Expen
   context: API_V2_CONTEXT,
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
   // getVariablesFromContext: (ctx, props) => getVariablesFromProps(props),
-  getVariablesFromContext: ctx => ({
-    account: { slug: ctx.query.collectiveSlug },
-    ...getSSRVariablesFromQuery({
+  getVariablesFromContext: ctx =>
+    getSSRVariablesFromQuery({
       query: ctx.query,
       schema,
       toVariables,
-      defaultFilterValues: {
-        direction: EXPENSE_DIRECTION.RECEIVED,
-      },
     }),
-    accountSlug: ctx.query.collectiveSlug,
-  }),
   skipClientIfSSRThrows404: true,
 });
 

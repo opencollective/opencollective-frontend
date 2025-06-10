@@ -81,7 +81,7 @@ export function getQueryValueFromFilterValue(filterValue, defaultFilterValue, de
 
     // If the filterValue is equal to the default value from the schema, then we can omit it from the query string
     // (if it's also not in the user configured default values)
-  } else if (filterValue === defaultSchemaValue && isUndefined(defaultFilterValue)) {
+  } else if (isEqual(filterValue, defaultSchemaValue) && isUndefined(defaultFilterValue)) {
     return undefined;
   } else {
     return filterValue;
