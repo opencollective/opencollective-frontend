@@ -308,7 +308,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
     return isIndividual ? (
       <Link
-        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS,CONTRIBUTION,PLATFORM_TIP`}
+        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION&kind=PLATFORM_TIP`}
         data-cy="view-all-transactions-link"
       >
         <FormattedMessage

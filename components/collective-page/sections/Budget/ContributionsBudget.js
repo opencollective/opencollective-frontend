@@ -226,7 +226,7 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
       )}
       <P mt={3} textAlign="right">
         <Link
-          href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS%2CCONTRIBUTION`}
+          href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION`}
           data-cy="view-all-contributions-link"
         >
           <FormattedMessage
