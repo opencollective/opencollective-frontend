@@ -91,7 +91,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
   });
 
   const button = (
-    <Button data-cy="pay-button" {...props} disabled={isDisabled} onClick={handleClick}>
+    <Button variant="outlineSuccess" data-cy="pay-button" {...props} disabled={isDisabled} onClick={handleClick}>
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} host={host} size={12} />
       <Span ml="6px">
         <FormattedMessage id="actions.goToPay" defaultMessage="Go to Pay" />
