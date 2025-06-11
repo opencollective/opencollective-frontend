@@ -183,7 +183,6 @@ type FilterMeta = CommonFilterMeta & {
 
 export const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
   ...commonToVariables,
-  limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
