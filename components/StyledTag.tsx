@@ -16,8 +16,6 @@ import { background, border, color, layout, position, space, typography, variant
 import type { TextTransformProps } from '../lib/styled-system-custom-properties';
 import { textTransform } from '../lib/styled-system-custom-properties';
 
-import { Span } from './Text';
-
 const defaultRoundedStyleProps = {
   backgroundColor: 'black.100',
   maxHeight: '24px',
@@ -188,9 +186,7 @@ const StyledTag = ({ closeButtonProps = null, children, variant = 'squared', htm
     </StyledTagBase>
   ) : (
     <StyledTagBase type={htmlType} variant={variant} {...props}>
-      <Span mr="12px" letterSpacing="inherit">
-        {children}
-      </Span>
+      <span className="mr-3">{children}</span>
       <CloseButton {...(closeButtonProps === true ? null : closeButtonProps)}>
         <Times size="12px" />
       </CloseButton>

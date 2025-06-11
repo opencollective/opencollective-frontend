@@ -14,6 +14,7 @@ const StyledRoundButton = styled(StyledButton).attrs(props => ({
   alignItems: 'center',
   justifyContent: 'center',
   size: props.size ?? 42,
+  m: 0,
 }))`
   line-height: 1;
 `;
