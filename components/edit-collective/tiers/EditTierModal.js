@@ -36,7 +36,7 @@ import { useToast } from '../../ui/useToast';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 
-const { FUND, PROJECT } = CollectiveType;
+const { FUND, PROJECT, EVENT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
@@ -87,22 +87,30 @@ function getReceiptTemplates(intl, host) {
 
 function FormFields({ collective, values, hideTypeSelect }) {
   const intl = useIntl();
+  const tierTypeOptions = React.useMemo(() => getTierTypeOptions(intl, collective.type), [intl, collective.type]);
+  const intervalOptions = React.useMemo(() => {
+    if (collective.type === EVENT) {
+      return [{ value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) }];
+    } else {
+      return [
+        { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
+        { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+        { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
+        { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
+      ];
+    }
+  }, [collective.type, intl]);
 
-  const tierTypeOptions = getTierTypeOptions(intl, collective.type);
-  const intervalOptions = [
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
-    { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
-    { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
-    { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
-  ];
-
-  const amountTypeOptions = [
-    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
-    {
-      value: FLEXIBLE,
-      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
-    },
-  ];
+  const amountTypeOptions = React.useMemo(
+    () => [
+      { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
+      {
+        value: FLEXIBLE,
+        label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
+      },
+    ],
+    [intl],
+  );
 
   const receiptTemplateOptions = getReceiptTemplates(intl, collective.host);
 
@@ -206,6 +214,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
               isLoading={loading}
               options={intervalOptions}
               value={intervalOptions.find(option => option.value === field.value)}
+              disabled={intervalOptions.length < 2}
             />
           )}
         </StyledInputFormikField>
