@@ -85,24 +85,36 @@ function getReceiptTemplates(intl, host) {
   return receiptTemplateTitles;
 }
 
+const collectiveSupportsInterval = collective => {
+  return collective.type !== CollectiveType.EVENT;
+};
+
 function FormFields({ collective, values, hideTypeSelect }) {
   const intl = useIntl();
+  const tierTypeOptions = React.useMemo(() => getTierTypeOptions(intl, collective.type), [intl, collective.type]);
+  const intervalOptions = React.useMemo(() => {
+    if (!collectiveSupportsInterval(collective)) {
+      return [{ value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) }];
+    } else {
+      return [
+        { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
+        { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+        { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
+        { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
+      ];
+    }
+  }, [collective.type, intl]);
 
-  const tierTypeOptions = getTierTypeOptions(intl, collective.type);
-  const intervalOptions = [
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
-    { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
-    { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
-    { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
-  ];
-
-  const amountTypeOptions = [
-    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
-    {
-      value: FLEXIBLE,
-      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
-    },
-  ];
+  const amountTypeOptions = React.useMemo(
+    () => [
+      { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
+      {
+        value: FLEXIBLE,
+        label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
+      },
+    ],
+    [intl],
+  );
 
   const receiptTemplateOptions = getReceiptTemplates(intl, collective.host);
 
@@ -188,7 +200,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
       >
         {({ field }) => <StyledTextarea data-cy={field.name} maxLength={510} width="100%" showCount {...field} />}
       </StyledInputFormikField>
-      {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
+      {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && intervalOptions.length > 1 && (
         <StyledInputFormikField
           name="interval"
           label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
@@ -754,7 +766,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
       return {
         ...omit(tier, ['__typename', 'endsAt', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
-        interval: getIntervalFromContributionFrequency(tier.frequency),
+        interval: collectiveSupportsInterval(collective) ? getIntervalFromContributionFrequency(tier.frequency) : null,
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
@@ -768,7 +780,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         amountType: AmountTypes.FIXED,
         amount: null,
         minimumAmount: null,
-        interval: INTERVALS.month,
+        interval: collectiveSupportsInterval(collective) ? INTERVALS.month : null,
         description: '',
         presets: [1000],
       };
