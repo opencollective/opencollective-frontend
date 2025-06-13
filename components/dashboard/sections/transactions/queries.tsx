@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
-const transactionsTableQueryCollectionFragment = gql`
+export const transactionsTableQueryCollectionFragment = gql`
   fragment TransactionsTableQueryCollectionFragment on TransactionCollection {
     totalCount
     offset

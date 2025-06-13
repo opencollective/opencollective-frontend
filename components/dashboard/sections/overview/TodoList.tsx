@@ -9,7 +9,7 @@ import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import Link from '../../../Link';
 import { DashboardContext } from '../../DashboardContext';
 
-export const TodoList = () => {
+export const AccountTodoList = () => {
   const { LoggedInUser } = useLoggedInUser();
   const { account } = React.useContext(DashboardContext);
 
@@ -41,106 +41,107 @@ export const TodoList = () => {
       <div className="text-lg font-bold">
         <FormattedMessage defaultMessage="To do" id="vwqEeH" />
       </div>
-
-      {pendingExpenseCount > 0 && (
-        <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Receipt size={16} />
-            <span>
-              <FormattedMessage
-                defaultMessage="{pendingExpenseCount, plural, one {<Link>{pendingExpenseCount} expense</Link> has} other {<Link>{pendingExpenseCount} expenses</Link> have}} not been reviewed"
-                id="PcyeDN"
-                values={{
-                  Link: chunks => (
-                    <Link
-                      className="font-medium text-primary hover:underline"
-                      href={getDashboardRoute(account, 'expenses?status=PENDING')}
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                  pendingExpenseCount: pendingExpenseCount,
-                }}
-              />
-            </span>
+      <div className="divide-y rounded-xl border bg-slate-50">
+        {pendingExpenseCount > 0 && (
+          <div className="p-3 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Receipt size={16} />
+              <span>
+                <FormattedMessage
+                  defaultMessage="{pendingExpenseCount, plural, one {<Link>{pendingExpenseCount} expense</Link> has} other {<Link>{pendingExpenseCount} expenses</Link> have}} not been reviewed"
+                  id="PcyeDN"
+                  values={{
+                    Link: chunks => (
+                      <Link
+                        className="font-medium text-primary hover:underline"
+                        href={getDashboardRoute(account, 'expenses?status=PENDING')}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    pendingExpenseCount: pendingExpenseCount,
+                  }}
+                />
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {pendingGrantCount > 0 && (
-        <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Receipt size={16} />
-            <span>
-              <FormattedMessage
-                defaultMessage="{pendingGrantCount, plural, one {<Link>{pendingGrantCount} grant</Link> has} other {<Link>{pendingGrantCount} grants</Link> have}} not been reviewed"
-                id="jLe6JL"
-                values={{
-                  Link: chunks => (
-                    <Link
-                      className="font-medium text-primary hover:underline"
-                      href={getDashboardRoute(account, 'grants?status=PENDING')}
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                  pendingGrantCount: pendingGrantCount,
-                }}
-              />
-            </span>
+        {pendingGrantCount > 0 && (
+          <div className="p-3 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Receipt size={16} />
+              <span>
+                <FormattedMessage
+                  defaultMessage="{pendingGrantCount, plural, one {<Link>{pendingGrantCount} grant</Link> has} other {<Link>{pendingGrantCount} grants</Link> have}} not been reviewed"
+                  id="jLe6JL"
+                  values={{
+                    Link: chunks => (
+                      <Link
+                        className="font-medium text-primary hover:underline"
+                        href={getDashboardRoute(account, 'grants?status=PENDING')}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    pendingGrantCount: pendingGrantCount,
+                  }}
+                />
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {canActOnPausedIncomingContributions && (
-        <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Coins size={16} />
-            <span>
-              <FormattedMessage
-                defaultMessage="{pausedIncomingContributionsCount, plural, one {A recurring contribution to your Collective is paused} other {# recurring contributions to your Collective are paused}} and <Link>can be resumed</Link>."
-                id="qck/cA"
-                values={{
-                  Link: chunks => (
-                    <Link
-                      className="font-medium text-primary hover:underline"
-                      href={getDashboardRoute(account, 'incoming-contributions?status=PAUSED')}
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                  pausedIncomingContributionsCount: pausedIncomingContributionsCount,
-                }}
-              />
-            </span>
+        {canActOnPausedIncomingContributions && (
+          <div className="p-3 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Coins size={16} />
+              <span>
+                <FormattedMessage
+                  defaultMessage="{pausedIncomingContributionsCount, plural, one {A recurring contribution to your Collective is paused} other {# recurring contributions to your Collective are paused}} and <Link>can be resumed</Link>."
+                  id="qck/cA"
+                  values={{
+                    Link: chunks => (
+                      <Link
+                        className="font-medium text-primary hover:underline"
+                        href={getDashboardRoute(account, 'incoming-contributions?status=PAUSED')}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    pausedIncomingContributionsCount: pausedIncomingContributionsCount,
+                  }}
+                />
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {pausedOutgoingContributions > 0 && (
-        <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Coins size={16} />
-            <span>
-              <FormattedMessage
-                defaultMessage="{pausedOutgoingContributions, plural, one {One of your recurring contributions is paused} other {# of your recurring contributions are paused}} and <Link>can be resumed</Link>."
-                id="4HaZeO"
-                values={{
-                  Link: chunks => (
-                    <Link
-                      className="font-medium text-primary hover:underline"
-                      href={getDashboardRoute(account, 'outgoing-contributions?status=PAUSED')}
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                  pausedOutgoingContributions: pausedOutgoingContributions,
-                }}
-              />
-            </span>
+        {pausedOutgoingContributions > 0 && (
+          <div className="p-3 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Coins size={16} />
+              <span>
+                <FormattedMessage
+                  defaultMessage="{pausedOutgoingContributions, plural, one {One of your recurring contributions is paused} other {# of your recurring contributions are paused}} and <Link>can be resumed</Link>."
+                  id="4HaZeO"
+                  values={{
+                    Link: chunks => (
+                      <Link
+                        className="font-medium text-primary hover:underline"
+                        href={getDashboardRoute(account, 'outgoing-contributions?status=PAUSED')}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                    pausedOutgoingContributions: pausedOutgoingContributions,
+                  }}
+                />
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

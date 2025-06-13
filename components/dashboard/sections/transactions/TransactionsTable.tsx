@@ -90,7 +90,7 @@ const RefundBadge = ({ transaction }) => {
   );
 };
 
-const columns: ColumnDef<TransactionsTableQueryNode>[] = [
+export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   columnHelper.accessor('createdAt', {
     id: 'date',
     meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },

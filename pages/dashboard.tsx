@@ -10,6 +10,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { loadGoogleMaps } from '@/lib/google-maps';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -58,7 +59,11 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (isIndividualAccount(account) || !isHostAccount(account)) {
+  } else if (
+    isIndividualAccount(account) ||
+    !isHostAccount(account) ||
+    (isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_OVERVIEW))
+  ) {
     return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;

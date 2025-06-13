@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { isIndividualAccount } from '../../../../lib/collective';
+import { isHostAccount, isIndividualAccount } from '../../../../lib/collective';
 
 import { DashboardContext } from '../../DashboardContext';
 import type { DashboardSectionProps } from '../../types';
 
 import { CollectiveOverview } from './CollectiveOverview';
+import { HostOverview } from './HostOverview';
 import IndividualOverview from './IndividualOverview';
 
 export default function Overview({ accountSlug, subpath }: DashboardSectionProps) {
@@ -13,6 +14,10 @@ export default function Overview({ accountSlug, subpath }: DashboardSectionProps
 
   if (isIndividualAccount(account)) {
     return <IndividualOverview accountSlug={accountSlug} subpath={subpath} />;
+  }
+
+  if (isHostAccount(account)) {
+    return <HostOverview accountSlug={accountSlug} subpath={subpath} />;
   }
 
   return <CollectiveOverview accountSlug={accountSlug} subpath={subpath} />;
