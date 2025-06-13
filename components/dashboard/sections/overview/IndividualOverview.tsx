@@ -14,7 +14,7 @@ import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
 import { Timeline } from './Timeline';
-import { TodoList } from './TodoList';
+import { AccountTodoList } from './TodoList';
 
 const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
@@ -34,7 +34,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
           }
         />
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
-          <TodoList />
+          <AccountTodoList />
           <Timeline accountSlug={slug} withFilter />
         </div>
       </div>
