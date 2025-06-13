@@ -13,7 +13,12 @@ import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { EmptyResults } from '../../EmptyResults';
 
-export const SuggestedExpensesTable = ({
+type ExpenseForRow = Pick<Expense, 'id' | 'legacyId' | 'incurredAt' | 'amountV2' | 'description' | 'status'> & {
+  account: Pick<Account, 'id' | 'slug' | 'name' | 'type' | 'imageUrl'>;
+  payee: Pick<Account, 'id' | 'slug' | 'name' | 'type' | 'imageUrl'>;
+};
+
+export const SuggestedExpensesTable = <ExpenseType extends ExpenseForRow>({
   loading,
   selectedExpense,
   setSelectedExpense,
@@ -23,16 +28,16 @@ export const SuggestedExpensesTable = ({
   onCreateExpenseClick,
 }: {
   loading: boolean;
-  selectedExpense: Expense;
-  setSelectedExpense: (expense: Expense) => void;
-  expenses: Expense[];
+  selectedExpense: ExpenseType;
+  setSelectedExpense: (expense: ExpenseType) => void;
+  expenses: ExpenseType[];
   totalExpenses: number;
   queryFilter: any;
   onCreateExpenseClick: () => void;
 }) => {
   return (
     <RadioGroup value={selectedExpense?.id}>
-      <DataTable<Expense, unknown>
+      <DataTable<ExpenseType, unknown>
         loading={loading}
         nbPlaceholders={3}
         onClickRow={({ original }) => setSelectedExpense(original)}
