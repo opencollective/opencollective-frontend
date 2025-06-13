@@ -10,7 +10,7 @@ interface ContributionConfirmationModalProps {
   /** the order that is being confirmed */
   order?: {
     toAccount: React.ComponentProps<typeof CollectiveModalHeader>['collective'];
-  };
+  } & React.ComponentProps<typeof ConfirmContributionForm>['order'];
   /** handles how the modal is closed */
   onClose(...args: unknown[]): unknown;
   /** Called if the action request is successful */
