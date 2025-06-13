@@ -1,6 +1,7 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { transactionsTableQueryCollectionFragment } from '../transactions/queries';
 
 export const timelineQuery = gql`
   query Timeline($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
@@ -397,4 +398,60 @@ export const overviewMetricsQuery = gql`
     }
   }
   ${accountHoverCardFields}
+`;
+
+export const hostOverviewMetricsQuery = gql`
+  query HostOverviewMetrics(
+    $slug: String!
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $includeOrgStats: Boolean!
+    $transactionsForAccount: [AccountReferenceInput!]
+    $excludeTransactionsForAccount: [AccountReferenceInput!]
+  ) {
+    host(slug: $slug) {
+      id
+      isActive
+      ...AccountHoverCardFields
+      allOpeningBalance: hostMetrics(dateTo: $dateFrom) {
+        totalMoneyManaged {
+          currency
+          valueInCents
+        }
+      }
+      allClosingBalance: hostMetrics(dateTo: $dateTo) {
+        totalMoneyManaged {
+          currency
+          valueInCents
+        }
+      }
+      orgStats: stats @include(if: $includeOrgStats) {
+        openingBalance: balance(includeChildren: true, dateTo: $dateFrom) {
+          currency
+          valueInCents
+        }
+        closingBalance: balance(includeChildren: true, dateTo: $dateTo) {
+          currency
+          valueInCents
+        }
+      }
+    }
+
+    transactions(
+      host: { slug: $slug }
+      limit: 5
+      includeDebts: true
+      account: $transactionsForAccount
+      excludeAccount: $excludeTransactionsForAccount
+      includeChildrenTransactions: true
+      includeIncognitoTransactions: true
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      orderBy: { direction: DESC, field: CREATED_AT }
+    ) {
+      ...TransactionsTableQueryCollectionFragment
+    }
+  }
+  ${accountHoverCardFields}
+  ${transactionsTableQueryCollectionFragment}
 `;

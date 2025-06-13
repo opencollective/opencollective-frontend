@@ -36,14 +36,21 @@ export function ColumnHeader<TData, TValue>({
   const { queryFilter } = table.options.meta;
   const { labelMsg, align } = column.columnDef.meta;
   filterKey = filterKey ?? column.id;
+  const [addingFilter, setAddingFilter] = React.useState(false);
+  const [tmpFilterValue, setTmpFilterValue] = React.useState(queryFilter?.values[filterKey]);
 
+  if (!queryFilter) {
+    return (
+      <div className={clsx('flex items-center', align === 'right' && 'justify-end')}>
+        <span className={clsx(align === 'right' && 'order-1')}>{labelMsg && intl.formatMessage(labelMsg)}</span>
+      </div>
+    );
+  }
   const canSort = Boolean(sortField);
   const canHide = column.getCanHide();
   const canFilter = Boolean(queryFilter.filters[filterKey]);
 
   const hasFilterValue = queryFilter.values[filterKey] !== undefined;
-  const [addingFilter, setAddingFilter] = React.useState(false);
-  const [tmpFilterValue, setTmpFilterValue] = React.useState(queryFilter.values[filterKey]);
 
   const isSorted = queryFilter.values.sort?.field === sortField;
   const isSortedDesc = isSorted && queryFilter.values.sort.direction === OrderDirection.DESC;
