@@ -225,6 +225,7 @@ export const HostCreateExpenseModal = ({
                     currency: host.currency,
                     payoutMethod: {
                       type: 'OTHER',
+                      isSaved: false,
                       data: {
                         content: `Transaction import${transactionsImport?.source ? ` from ${transactionsImport.source} (#${transactionsImport.id})` : ''}`,
                         currency: values.amount.currency,
