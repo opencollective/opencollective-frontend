@@ -139,10 +139,7 @@ export const TransactionsImportAssignmentsForm = ({
               <div className="mt-4">
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-sm font-medium">
-                    <FormattedMessage
-                      defaultMessage="Connected Plaid accounts"
-                      id="settings.accounts.connectedAccounts"
-                    />
+                    <FormattedMessage defaultMessage="Connected sub-accounts" id="jMHLZq" />
                   </p>
                   {transactionsImport.connectedAccount && (
                     <Button
