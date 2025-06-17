@@ -9,10 +9,10 @@ const CollapsableText = ({ text, maxLength }) => {
   if (!text) {
     return null;
   } else if (text.length <= maxLength) {
-    return <span>{text}</span>;
+    return <span className="whitespace-normal">{text}</span>;
   } else if (isCollapsed) {
     return (
-      <span>
+      <span className="whitespace-normal">
         {truncate(text, { length: maxLength })}{' '}
         <StyledLink
           href="#"
@@ -28,7 +28,7 @@ const CollapsableText = ({ text, maxLength }) => {
     );
   } else {
     return (
-      <span>
+      <span className="whitespace-normal">
         {text}{' '}
         <StyledLink
           href="#"
