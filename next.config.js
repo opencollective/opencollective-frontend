@@ -308,20 +308,27 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig(
-  {
-    ...nextConfig,
-    sentry: {
-      hideSourceMaps: true,
+let exportedConfig = nextConfig;
+
+if (process.env.SENTRY_AUTH_TOKEN) {
+  exportedConfig = withSentryConfig(
+    {
+      ...nextConfig,
+      sentry: {
+        hideSourceMaps: true,
+      },
     },
-  },
-  {
-    org: 'open-collective',
-    project: 'oc-frontend',
-    authToken: process.env.SENTRY_AUTH_TOKEN,
-    silent: true,
-  },
-);
+    {
+      org: 'open-collective',
+      project: 'oc-frontend',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: true,
+    },
+  );
+} else {
+  // eslint-disable-next-line no-console
+  console.warn('[!!! WARNING !!!] SENTRY_AUTH_TOKEN not found. Skipping Sentry configuration.');
+}
 
 if (process.env.ANALYZE) {
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
