@@ -85,16 +85,21 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
     $searchTerm: String
     $offset: Int
     $limit: Int
-    $status: [ExpenseStatusFilter!]
+    $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $payoutMethodType: PayoutMethodType
     $account: [AccountReferenceInput!]
     $sort: ChronologicalOrderInput
+    $type: ExpenseType
+    $chargeHasReceipts: Boolean
+    $virtualCards: [VirtualCardReferenceInput]
+    $lastCommentBy: [LastCommentBy]
+    $accountingCategory: [String]
   ) {
     expenses(
-      host: { id: $hostId }
+      fromAccount: { id: $hostId }
       status: $status
       dateFrom: $dateFrom
       dateTo: $dateTo
@@ -106,6 +111,11 @@ const findExpenseMatchForOffPlatformCreditQuery = gql`
       fromAccounts: $account
       includeChildrenExpenses: true
       orderBy: $sort
+      type: $type
+      chargeHasReceipts: $chargeHasReceipts
+      virtualCards: $virtualCards
+      lastCommentBy: $lastCommentBy
+      accountingCategory: $accountingCategory
     ) {
       totalCount
       offset
@@ -319,20 +329,19 @@ const useMatchCreditDialogQueryFilter = (
     > = {
       account: hostedAccountsFilter.toVariables,
     };
-    const filters: FilterComponentConfigs<z.infer<typeof schema>, FiltersMeta> = {
-      account: {
-        ...hostedAccountsFilter.filter,
-        getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
-      },
-    };
+    const filters: FilterComponentConfigs<z.infer<typeof schema>, FiltersMeta> = {};
 
     if (activeViewId === TabType.EXPENSES) {
       Object.assign(filters, omit(ExpenseFilters.filters, ['account']));
       Object.assign(toVariables, omit(ExpenseFilters.toVariables, ['account']));
-      schema = ExpenseFilters.schema.extend(commonSchemaOptions);
+      schema = ExpenseFilters.schema.extend(omit(commonSchemaOptions, ['account']));
     } else {
       Object.assign(filters, omit(contributionsFilters.filters, ['account']));
       Object.assign(toVariables, omit(contributionsFilters.toVariables, ['account']));
+      filters.account = {
+        ...hostedAccountsFilter.filter,
+        getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
+      };
       schema = contributionsFilters.schema.extend(commonSchemaOptions);
     }
 

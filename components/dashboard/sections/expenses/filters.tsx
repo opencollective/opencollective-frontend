@@ -1,5 +1,5 @@
 import React from 'react';
-import { omit } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -76,6 +76,7 @@ export const toVariables: FiltersToVariables<
   tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
+  status: value => (isEmpty(value) ? undefined : { status: value }),
 };
 
 // The filters config is used to populate the Filters component.
