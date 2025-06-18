@@ -7,6 +7,7 @@ import { isOCError } from '../lib/errors';
 import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../lib/form-utils';
 import { cn } from '../lib/utils';
 
+import { Input } from './ui/Input';
 import Container from './Container';
 import { FormikZodContext, getInputAttributesFromZodSchema } from './FormikZod';
 import StyledInput from './StyledInput';
@@ -31,6 +32,8 @@ const StyledInputFormikField = ({
   placeholder = undefined,
   showError = true,
   formatValue = null,
+  prepend = null,
+  useLegacyComponent = true,
   ...props
 }) => {
   const intl = useIntl();
@@ -50,7 +53,7 @@ const StyledInputFormikField = ({
               ...field,
               name: name || htmlFor,
               id: htmlFor,
-              type: props.inputType,
+              type: props.inputType || props.type,
               disabled: props.disabled,
               min: props.min,
               max: props.max,
@@ -58,6 +61,7 @@ const StyledInputFormikField = ({
               autoFocus: props.autoFocus,
               error: hasError,
               placeholder,
+              prepend,
             },
             value => value !== undefined,
           ),
@@ -92,7 +96,13 @@ const StyledInputFormikField = ({
               required={fieldAttributes.required}
             >
               <React.Fragment>
-                {children ? children({ form, meta, field: fieldAttributes }) : <StyledInput {...fieldAttributes} />}
+                {children ? (
+                  children({ form, meta, field: fieldAttributes })
+                ) : useLegacyComponent ? (
+                  <StyledInput {...fieldAttributes} />
+                ) : (
+                  <Input {...fieldAttributes} />
+                )}
                 {hasError && showError && (
                   <P display="block" color="red.500" pt={2} fontSize="11px">
                     {isOCError(meta.error)

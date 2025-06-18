@@ -177,31 +177,31 @@ const TopBar = ({ account }: TopBarProps) => {
       <div className="border-b bg-white px-4 xl:px-6" ref={ref}>
         <div className="flex h-16 items-center justify-between gap-4 py-4">
           <Flex alignItems="center" gridGap={[2, 3]}>
-            <Box flexShrink={0}>
+            <div className="shrink-0">
               <Link href={ocLogoRoute}>
                 <Flex alignItems="center" gridGap={2}>
                   <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
                 </Flex>
               </Link>
-            </Box>
+            </div>
           </Flex>
 
-          <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
+          <div className="flex grow items-center gap-3 overflow-hidden">
             <MainNavItem href="/dashboard" $isActive={onDashboardRoute}>
               <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
             </MainNavItem>
             <MainNavItem href="/search" $isActive={onSearchRoute}>
               <FormattedMessage id="Explore" defaultMessage="Explore" />
             </MainNavItem>
-          </Flex>
+          </div>
 
-          <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
+          <div className="flex shrink grow-0 items-center gap-2">
             <SearchTrigger setShowSearchModal={setShowSearchModal} />
             <div className="hidden sm:block">{!whitelabel && <ChangelogTrigger />}</div>
             <ProfileMenu
               logoutParameters={{ skipQueryRefetch: onDashboardRoute, redirect: onDashboardRoute ? '/' : undefined }}
             />
-          </Flex>
+          </div>
         </div>
       </div>
       {useSearchCommandMenu ? (

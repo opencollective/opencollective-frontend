@@ -35,6 +35,7 @@ type SigninPageProps = {
   whitelabel: WhitelabelProps;
   untrustedDomainRedirection: boolean;
   requestedByWhitelabelProvider: WhitelabelProps['provider'];
+  close?: boolean;
 };
 
 type SigninPageState = {
@@ -45,7 +46,7 @@ type SigninPageState = {
 };
 
 class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
-  static getInitialProps({ query: { token, next, form, email }, req }: NextPageContext) {
+  static getInitialProps({ query: { token, next, form, email, close }, req }: NextPageContext) {
     // Decode next URL if URI encoded
     if (typeof next === 'string' && next.includes('%2F')) {
       next = decodeURIComponent(next);
@@ -63,6 +64,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       email: email && isEmail(email) ? email : null,
       untrustedDomainRedirection: !isValidRelative && !isTrustedRedirection ? next : null,
       requestedByWhitelabelProvider,
+      close: !!close,
     };
   }
 
@@ -117,9 +119,11 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
         parsedUrl.pathname = '/signin';
         redirect = parsedUrl.toString();
       }
-      const defaultRedirect = '/dashboard';
-      await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
-      window.scroll(0, 0);
+      if (!this.props.close) {
+        const defaultRedirect = '/dashboard';
+        await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
+        window.scroll(0, 0);
+      }
     }
   }
 
@@ -164,7 +168,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   }
 
   renderContent() {
-    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel } = this.props;
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel, close } = this.props;
     const env = getEnvVar('OC_ENV');
 
     if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain && env !== 'staging') {
@@ -200,7 +204,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
           <Loading />
         </Flex>
       );
-    } else if ((loadingLoggedInUser || this.state.success) && token) {
+    } else if ((loadingLoggedInUser || this.state.success) && token && !close) {
       return <Loading />;
     } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
       return (
@@ -209,6 +213,16 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
             id="createAccount.alreadyLoggedIn"
             defaultMessage={`It seems like you're already signed in as "{email}". If you want to create a new account, please log out first.`}
             values={{ email: LoggedInUser.email }}
+          />
+        </MessageBox>
+      );
+    } else if (!loadingLoggedInUser && LoggedInUser && close) {
+      return (
+        <MessageBox type="info" withIcon>
+          <FormattedMessage
+            id="login.close"
+            defaultMessage={`You are already logged in as "{email}".{br} You can close this tab now.`}
+            values={{ email: LoggedInUser.email, br: <br /> }}
           />
         </MessageBox>
       );
