@@ -102,12 +102,6 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
   `}
   font-weight: 500;
   ${props => props.$isActive && `background-color: #f1f5f9;`}
-
-  span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 `;
 
 const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
