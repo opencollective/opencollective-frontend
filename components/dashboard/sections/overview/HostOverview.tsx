@@ -34,7 +34,7 @@ import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
 import { hostOverviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
-import { AccountTodoList } from './TodoList';
+import { HostTodoList } from './TodoList';
 
 const schema = z.object({
   context: hostContextFilter.schema,
@@ -252,7 +252,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
       <div className="grid grid-cols-1 gap-6">
         <div className="order-1 space-y-6 xl:order-none">
-          <AccountTodoList />
+          <HostTodoList />
           <Timeline accountSlug={router.query?.as ?? accountSlug} />
         </div>
       </div>

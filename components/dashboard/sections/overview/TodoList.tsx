@@ -1,13 +1,272 @@
 import React from 'react';
-import { Coins, Receipt } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { useQuery } from '@apollo/client';
+import { ArrowRight, Building, Coins, MailOpen, Receipt } from 'lucide-react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
+import { Badge } from '@/components/ui/Badge';
+
 import Link from '../../../Link';
 import { DashboardContext } from '../../DashboardContext';
+
+const hostTodoQuery = gql`
+  query HostTodo($hostSlug: String!) {
+    host(slug: $hostSlug) {
+      id
+
+      unrepliedApplications: hostApplications(limit: 0, offset: 0, lastCommentBy: COLLECTIVE_ADMIN) {
+        totalCount
+      }
+      pendingApplications: hostApplications(limit: 0, offset: 0, status: PENDING) {
+        totalCount
+      }
+
+      disputedOrders: orders(
+        filter: INCOMING
+        status: [DISPUTED]
+        includeIncognito: true
+        includeHostedAccounts: true
+      ) {
+        totalCount
+      }
+      inReviewOrders: orders(
+        filter: INCOMING
+        status: [IN_REVIEW]
+        includeIncognito: true
+        includeHostedAccounts: true
+      ) {
+        totalCount
+      }
+    }
+
+    unrepliedExpenses: expenses(
+      host: { slug: $hostSlug }
+      status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
+      lastCommentBy: [NON_HOST_ADMIN]
+    ) {
+      totalCount
+    }
+    toPayExpenses: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
+      totalCount
+    }
+    missingReceiptExpenses: expenses(host: { slug: $hostSlug }, chargeHasReceipts: false) {
+      totalCount
+    }
+    onHoldExpenses: expenses(host: { slug: $hostSlug }, status: [ON_HOLD]) {
+      totalCount
+    }
+    incompleteExpenses: expenses(host: { slug: $hostSlug }, status: [INCOMPLETE]) {
+      totalCount
+    }
+    errorExpenses: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
+      totalCount
+    }
+  }
+`;
+
+export const HostTodoList = () => {
+  const { account } = React.useContext(DashboardContext);
+  const intl = useIntl();
+
+  const { data } = useQuery(hostTodoQuery, {
+    variables: {
+      hostSlug: account.slug,
+    },
+    context: API_V2_CONTEXT,
+  });
+
+  const filteredTodoList = React.useMemo(
+    () =>
+      [
+        {
+          id: 'applications',
+          title: 'Applications',
+          href: getDashboardRoute(account, 'host-applications'),
+          icon: Building,
+          iconBgColor: 'bg-blue-50',
+          iconColor: 'text-blue-700',
+          badges: [
+            {
+              id: 'pending',
+              show: data?.host.pendingApplications.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} pending', id: 'TodoList.Pending' },
+                { count: data?.host.pendingApplications.totalCount },
+              ),
+              queryParams: '?status=PENDING&lastCommentBy=ALL',
+            },
+            {
+              id: 'unreplied',
+              show: data?.host.unrepliedApplications.totalCount > 0,
+              Icon: MailOpen,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} unreplied', id: 'TodoList.Unreplied' },
+                { count: data?.host.unrepliedApplications.totalCount },
+              ),
+              queryParams: '?lastCommentBy=COLLECTIVE_ADMIN',
+            },
+          ],
+        },
+        {
+          id: 'expenses',
+          title: 'Expenses',
+          href: getDashboardRoute(account, 'host-expenses'),
+          icon: Receipt,
+          iconBgColor: 'bg-green-50',
+          iconColor: 'text-green-700',
+          badges: [
+            {
+              id: 'to-pay',
+              show: data?.toPayExpenses.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} to pay', id: 'TodoList.Expenses.ToPay' },
+                { count: data?.toPayExpenses.totalCount },
+              ),
+              queryParams: '?status=READY_TO_PAY',
+            },
+            {
+              id: 'missing-receipts',
+              show: data?.missingReceiptExpenses.totalCount > 0,
+              label: intl.formatMessage(
+                {
+                  defaultMessage: '{count, plural, one {# missing receipt} other {# missing receipts}}',
+                  id: 'TodoList.Expenses.MissingReceipts',
+                },
+                { count: data?.missingReceiptExpenses.totalCount },
+              ),
+              queryParams: '?chargeHasReceipts=false&status=ALL',
+            },
+
+            {
+              id: 'on-hold',
+              show: data?.onHoldExpenses.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} on hold', id: 'TodoList.Expenses.OnHold' },
+                { count: data?.onHoldExpenses.totalCount },
+              ),
+              queryParams: '?status=ON_HOLD',
+            },
+            {
+              id: 'incomplete',
+              show: data?.incompleteExpenses.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} incomplete', id: 'TodoList.Expenses.Incomplete' },
+                { count: data?.incompleteExpenses.totalCount },
+              ),
+              queryParams: '?status=INCOMPLETE',
+            },
+            {
+              id: 'error',
+              show: data?.errorExpenses.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count, plural, one {# error} other {# errors}}', id: 'TodoList.Expenses.Errored' },
+                { count: data?.errorExpenses.totalCount },
+              ),
+              queryParams: '?status=ERROR',
+            },
+            {
+              id: 'unreplied',
+              show: data?.unrepliedExpenses.totalCount > 0,
+              Icon: MailOpen,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} unreplied', id: 'TodoList.Unreplied' },
+                { count: data?.unrepliedExpenses.totalCount },
+              ),
+              queryParams:
+                '?status=APPROVED&status=ERROR&status=INCOMPLETE&status=ON_HOLD&lastCommentBy=NON_HOST_ADMIN',
+            },
+          ],
+        },
+        {
+          id: 'contributions',
+          title: 'Contributions',
+          href: getDashboardRoute(account, 'orders'),
+          icon: Coins,
+          iconBgColor: 'bg-amber-50',
+          iconColor: 'text-amber-700',
+          badges: [
+            {
+              id: 'disputed',
+              show: data?.host.disputedOrders.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} disputed', id: 'TodoList.Contributions.Disputed' },
+                { count: data?.host.disputedOrders.totalCount },
+              ),
+              queryParams: '?status=DISPUTED',
+            },
+            {
+              id: 'in-review',
+              show: data?.host.inReviewOrders.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} in review', id: 'TodoList.Contributions.InReview' },
+                { count: data?.host.inReviewOrders.totalCount },
+              ),
+              queryParams: '?status=IN_REVIEW',
+            },
+          ],
+        },
+      ]
+        .map(item => ({
+          ...item,
+          badges: item.badges.filter(badge => badge.show),
+        }))
+        .filter(item => item.badges.length > 0),
+
+    [data, account, intl],
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="text-lg font-bold">
+        <FormattedMessage defaultMessage="To do" id="vwqEeH" />
+      </div>
+
+      <div className="divide-y rounded-xl border">
+        {filteredTodoList.map(item => {
+          const IconComponent = item.icon;
+
+          return (
+            <div
+              key={item.id}
+              className="group relative transition-colors hover:bg-primary/5 has-[.badge-hover:hover]:bg-background"
+            >
+              <Link href={item.href} className="absolute inset-0" aria-label={item.title}>
+                <span className="sr-only">{item.title}</span>
+              </Link>
+
+              <div className="pointer-events-none relative flex flex-col justify-between p-3 sm:flex-row sm:items-center">
+                <div className="mb-2 flex items-center gap-3 sm:mb-0">
+                  <div className={`rounded-md ${item.iconBgColor} p-2`}>
+                    <IconComponent className={`h-5 w-5 ${item.iconColor}`} />
+                  </div>
+                  <h3 className="font-medium">{item.title}</h3>
+                </div>
+                <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+                  {item.badges.map(badge => (
+                    <Link key={badge.id} href={`${item.href}${badge.queryParams ?? ''}`}>
+                      <Badge
+                        type="outline"
+                        className={'badge-hover gap-1 hover:relative hover:z-10 hover:bg-primary/5'}
+                      >
+                        {badge.Icon && <badge.Icon className="h-3 w-3" />}
+                        <span>{badge.label}</span>
+                      </Badge>
+                    </Link>
+                  ))}
+                  <ArrowRight className="ml-1 hidden h-4 w-4 sm:block" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const AccountTodoList = () => {
   const { LoggedInUser } = useLoggedInUser();
