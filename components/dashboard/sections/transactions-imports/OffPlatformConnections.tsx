@@ -71,7 +71,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
       refetch();
       toast({
         variant: 'success',
-        title: intl.formatMessage({ defaultMessage: 'Bank account connected', id: 'fGNAg9' }),
+        title: intl.formatMessage({ defaultMessage: 'Connection succeeded', id: 'qQo6HF' }),
         message: intl.formatMessage({
           defaultMessage: 'It might take a few minutes to import your transactions.',
           id: 'YZGI7N',
@@ -82,7 +82,28 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     },
     [intl, toast, accountSlug, refetch, router],
   );
-  const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onConnectSuccess: onPlaidConnectSuccess });
+  const onPlaidUpdateSuccess = React.useCallback(
+    ({ transactionsImport }) => {
+      toast({
+        variant: 'success',
+        title: intl.formatMessage(
+          { defaultMessage: 'Connection "{name}" updated', id: 'QYlfKp' },
+          { name: transactionsImport.source },
+        ),
+      });
+    },
+    [intl, toast],
+  );
+  const onPlaidDialogOpen = React.useCallback(() => {
+    setSelectedImport(null);
+  }, []);
+
+  const plaidConnectDialog = usePlaidConnectDialog({
+    host: data?.host,
+    onConnectSuccess: onPlaidConnectSuccess,
+    onUpdateSuccess: onPlaidUpdateSuccess,
+    onOpen: onPlaidDialogOpen,
+  });
 
   return (
     <div>
@@ -109,7 +130,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               size="sm"
               variant="outline"
               onClick={() => plaidConnectDialog.show()}
-              disabled={plaidConnectDialog.status !== 'idle'}
+              disabled={!['idle', 'success'].includes(plaidConnectDialog.status)}
               loading={plaidConnectDialog.status === 'loading'}
             >
               <Plus size={16} />
