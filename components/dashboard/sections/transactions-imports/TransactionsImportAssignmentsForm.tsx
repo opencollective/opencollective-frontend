@@ -95,7 +95,13 @@ export const TransactionsImportAssignmentsForm = ({
   };
   plaidStatus: PlaidDialogStatus;
   onOpenChange: (isOpen: boolean) => void;
-  showPlaidDialog: ({ accountsSelectionEnabled }: { accountsSelectionEnabled?: boolean }) => void;
+  showPlaidDialog: ({
+    accountsSelectionEnabled,
+    transactionImportId,
+  }: {
+    accountsSelectionEnabled?: boolean;
+    transactionImportId: string;
+  }) => void;
   isDeleting: boolean;
 }) => {
   const intl = useIntl();
@@ -148,7 +154,12 @@ export const TransactionsImportAssignmentsForm = ({
                       className="text-xs text-wrap"
                       loading={plaidStatus === 'loading' || plaidStatus === 'active'}
                       disabled={plaidStatus === 'disabled' || isDeleting || isSubmitting}
-                      onClick={() => showPlaidDialog({ accountsSelectionEnabled: true })}
+                      onClick={() =>
+                        showPlaidDialog({
+                          accountsSelectionEnabled: true,
+                          transactionImportId: transactionsImport.id,
+                        })
+                      }
                     >
                       <Landmark size={14} />
                       <FormattedMessage defaultMessage="Update selection" id="FyTcpa" />

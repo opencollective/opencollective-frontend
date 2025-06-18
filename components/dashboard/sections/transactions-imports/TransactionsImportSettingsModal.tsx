@@ -74,7 +74,7 @@ export default function TransactionsImportSettingsModal({
   onDelete: () => void;
   onArchived?: () => void;
   isOpen: boolean;
-  showPlaidDialog?: () => void;
+  showPlaidDialog?: (options?: { accountSelectionEnabled?: boolean; transactionImportId?: string }) => void;
   plaidStatus?: PlaidDialogStatus;
   hasRequestedSync: boolean;
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
@@ -235,7 +235,12 @@ export default function TransactionsImportSettingsModal({
                   <Button
                     loading={plaidStatus === 'loading' || plaidStatus === 'active'}
                     disabled={plaidStatus === 'disabled' || isDeleting}
-                    onClick={showPlaidDialog}
+                    onClick={() =>
+                      showPlaidDialog({
+                        accountSelectionEnabled: false,
+                        transactionImportId: transactionsImport.id,
+                      })
+                    }
                     variant="outline"
                     className="w-full"
                   >

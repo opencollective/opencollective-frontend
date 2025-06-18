@@ -325,7 +325,7 @@ if (process.env.SENTRY_AUTH_TOKEN) {
       silent: true,
     },
   );
-} else {
+} else if (process.env.OC_ENV === 'production') {
   // eslint-disable-next-line no-console
   console.warn('[!!! WARNING !!!] SENTRY_AUTH_TOKEN not found. Skipping Sentry configuration.');
 }
