@@ -189,6 +189,7 @@ const Indicator = styled.div`
 
 const RoundButton = styled(StyledRoundButton)`
   position: relative;
+  margin: 0;
 `;
 
 const LEVEL_BUTTON_STYLE = {
