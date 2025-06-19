@@ -9,6 +9,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Badge } from '@/components/ui/Badge';
+import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 
 import Link from '../../../Link';
 import { DashboardContext } from '../../DashboardContext';
@@ -84,21 +85,12 @@ export const HostTodoList = () => {
       [
         {
           id: 'applications',
-          title: 'Applications',
+          title: intl.formatMessage({ defaultMessage: 'Applications', id: 'HostApplications.Applications' }),
           href: getDashboardRoute(account, 'host-applications'),
           icon: Building,
           iconBgColor: 'bg-blue-50',
           iconColor: 'text-blue-700',
-          badges: [
-            {
-              id: 'pending',
-              show: data?.host.pendingApplications.totalCount > 0,
-              label: intl.formatMessage(
-                { defaultMessage: '{count} pending', id: 'TodoList.Pending' },
-                { count: data?.host.pendingApplications.totalCount },
-              ),
-              queryParams: '?status=PENDING&lastCommentBy=ALL',
-            },
+          subItems: [
             {
               id: 'unreplied',
               show: data?.host.unrepliedApplications.totalCount > 0,
@@ -109,16 +101,36 @@ export const HostTodoList = () => {
               ),
               queryParams: '?lastCommentBy=COLLECTIVE_ADMIN',
             },
+            {
+              id: 'pending',
+              show: data?.host.pendingApplications.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} pending', id: 'TodoList.Pending' },
+                { count: data?.host.pendingApplications.totalCount },
+              ),
+              queryParams: '?status=PENDING&lastCommentBy=ALL',
+            },
           ],
         },
         {
           id: 'expenses',
-          title: 'Expenses',
+          title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
           href: getDashboardRoute(account, 'host-expenses'),
           icon: Receipt,
           iconBgColor: 'bg-green-50',
           iconColor: 'text-green-700',
-          badges: [
+          subItems: [
+            {
+              id: 'unreplied',
+              show: data?.unrepliedExpenses.totalCount > 0,
+              Icon: MailOpen,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} unreplied', id: 'TodoList.Unreplied' },
+                { count: data?.unrepliedExpenses.totalCount },
+              ),
+              queryParams:
+                '?status=APPROVED&status=ERROR&status=INCOMPLETE&status=ON_HOLD&lastCommentBy=NON_HOST_ADMIN',
+            },
             {
               id: 'to-pay',
               show: data?.toPayExpenses.totalCount > 0,
@@ -168,27 +180,16 @@ export const HostTodoList = () => {
               ),
               queryParams: '?status=ERROR',
             },
-            {
-              id: 'unreplied',
-              show: data?.unrepliedExpenses.totalCount > 0,
-              Icon: MailOpen,
-              label: intl.formatMessage(
-                { defaultMessage: '{count} unreplied', id: 'TodoList.Unreplied' },
-                { count: data?.unrepliedExpenses.totalCount },
-              ),
-              queryParams:
-                '?status=APPROVED&status=ERROR&status=INCOMPLETE&status=ON_HOLD&lastCommentBy=NON_HOST_ADMIN',
-            },
           ],
         },
         {
           id: 'contributions',
-          title: 'Contributions',
+          title: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
           href: getDashboardRoute(account, 'orders'),
           icon: Coins,
           iconBgColor: 'bg-amber-50',
           iconColor: 'text-amber-700',
-          badges: [
+          subItems: [
             {
               id: 'disputed',
               show: data?.host.disputedOrders.totalCount > 0,
@@ -212,20 +213,22 @@ export const HostTodoList = () => {
       ]
         .map(item => ({
           ...item,
-          badges: item.badges.filter(badge => badge.show),
+          subItems: item.subItems.filter(badge => badge.show),
         }))
-        .filter(item => item.badges.length > 0),
+        .filter(item => item.subItems.length > 0),
 
     [data, account, intl],
   );
 
   return (
-    <div className="space-y-3">
-      <div className="text-lg font-bold">
-        <FormattedMessage defaultMessage="To do" id="vwqEeH" />
-      </div>
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle>
+          <FormattedMessage defaultMessage="To do" id="vwqEeH" />
+        </CardTitle>
+      </CardHeader>
 
-      <div className="divide-y rounded-xl border">
+      <div className="divide-y border-t">
         {filteredTodoList.map(item => {
           const IconComponent = item.icon;
 
@@ -238,7 +241,7 @@ export const HostTodoList = () => {
                 <span className="sr-only">{item.title}</span>
               </Link>
 
-              <div className="pointer-events-none relative flex flex-col justify-between p-3 sm:flex-row sm:items-center">
+              <div className="pointer-events-none relative flex flex-col justify-between px-4 py-3 sm:flex-row sm:items-center">
                 <div className="mb-2 flex items-center gap-3 sm:mb-0">
                   <div className={`rounded-md ${item.iconBgColor} p-2`}>
                     <IconComponent className={`h-5 w-5 ${item.iconColor}`} />
@@ -246,14 +249,14 @@ export const HostTodoList = () => {
                   <h3 className="font-medium">{item.title}</h3>
                 </div>
                 <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-                  {item.badges.map(badge => (
-                    <Link key={badge.id} href={`${item.href}${badge.queryParams ?? ''}`}>
+                  {item.subItems.map(subItem => (
+                    <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
                       <Badge
                         type="outline"
-                        className={'badge-hover gap-1 hover:relative hover:z-10 hover:bg-primary/5'}
+                        className={'badge-hover gap-1 text-foreground hover:relative hover:z-10 hover:bg-primary/5'}
                       >
-                        {badge.Icon && <badge.Icon className="h-3 w-3" />}
-                        <span>{badge.label}</span>
+                        {subItem.Icon && <subItem.Icon className="h-3 w-3" />}
+                        <span>{subItem.label}</span>
                       </Badge>
                     </Link>
                   ))}
@@ -264,7 +267,7 @@ export const HostTodoList = () => {
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 };
 
