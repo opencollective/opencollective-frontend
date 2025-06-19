@@ -46,6 +46,7 @@ import { userMustSetAccountingCategory } from '../expenses/lib/accounting-catego
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
@@ -1456,7 +1457,7 @@ async function buildFormOptions(
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
       options.accountingCategories = host.accountingCategories.nodes;
     } else {
-      options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT];
+      options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.STRIPE];
     }
 
     if (payeeHost && host && payeeHost.id === host.id) {
@@ -1469,6 +1470,10 @@ async function buildFormOptions(
 
     if (payee && (AccountTypesWithHost as readonly string[]).includes(payee.type)) {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
+    }
+
+    if (!loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_STRIPE_SUPPORT)) {
+      options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.STRIPE);
     }
 
     if ((account?.supportedExpenseTypes ?? []).length > 0) {
@@ -1517,7 +1522,9 @@ async function buildFormOptions(
       }
 
       // Filter out ACCOUNT_BALANCE from the list of payout methods, since we add it manually to the default list
-      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.ACCOUNT_BALANCE);
+      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(
+        t => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(t),
+      );
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);

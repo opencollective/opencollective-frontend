@@ -27,6 +27,10 @@ export const I18nPayoutMethodLabels = defineMessages({
     id: 'PayoutMethod.Type.Other',
     defaultMessage: 'Other',
   },
+  [PayoutMethodType.STRIPE]: {
+    defaultMessage: 'Stripe',
+    id: 'iBmKeP',
+  },
 });
 
 type PayoutMethodLabelProps = {
@@ -79,7 +83,11 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
   }
 
   if (!defaultLabel) {
-    defaultLabel = <FormattedMessage {...I18nPayoutMethodLabels[pm.type]} />;
+    defaultLabel = I18nPayoutMethodLabels[pm.type] ? (
+      <FormattedMessage {...I18nPayoutMethodLabels[pm.type]} />
+    ) : (
+      pm.type
+    );
   }
 
   return (

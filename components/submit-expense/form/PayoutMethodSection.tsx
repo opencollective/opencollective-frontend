@@ -501,7 +501,10 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const intl = useIntl();
   const { toast } = useToast();
 
-  const isEditable = props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE && props.isEditable;
+  const isEditable =
+    props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE &&
+    props.isEditable &&
+    ('canBeEdited' in props.payoutMethod ? props.payoutMethod.canBeEdited : true);
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
