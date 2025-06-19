@@ -1472,7 +1472,7 @@ async function buildFormOptions(
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
 
-    if (!loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_STRIPE_SUPPORT)) {
+    if (!loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_STRIPE_SUPPORT)) {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.STRIPE);
     }
 
