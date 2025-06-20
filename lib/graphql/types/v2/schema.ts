@@ -2499,6 +2499,7 @@ export enum CollectiveFeatureStatus {
 export type CollectiveFeatures = {
   __typename?: 'CollectiveFeatures';
   ABOUT?: Maybe<CollectiveFeatureStatus>;
+  ACCOUNTING_CATEGORY_PREDICTIONS?: Maybe<CollectiveFeatureStatus>;
   ALIPAY?: Maybe<CollectiveFeatureStatus>;
   ALL?: Maybe<CollectiveFeatureStatus>;
   COLLECTIVE_GOALS?: Maybe<CollectiveFeatureStatus>;
@@ -4527,6 +4528,8 @@ export type Expense = {
   accountCurrencyFxRate: Scalars['Float']['output'];
   /** The accounting category attached to this expense */
   accountingCategory?: Maybe<AccountingCategory>;
+  /** The accounting category predictions for this expense */
+  accountingCategoryPrediction?: Maybe<AccountingCategory>;
   /** The list of activities (ie. approved, edited, etc) for this expense ordered by date ascending */
   activities: Array<Activity>;
   /**

@@ -1074,6 +1074,7 @@ type CollectiveFeatures {
   """
   id: String!
   ALL: CollectiveFeatureStatus
+  ACCOUNTING_CATEGORY_PREDICTIONS: CollectiveFeatureStatus
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus

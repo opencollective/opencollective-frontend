@@ -17,6 +17,7 @@ export const SECTIONS = {
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
   HOST_TAX_FORMS: 'host-tax-forms',
+  HOST_UNCATEGORIZED_EXPENSES: 'host-uncategorized-expenses',
   CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
@@ -122,6 +123,7 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.GRANTS,
   ALL_SECTIONS.HOSTED_GRANTS,
   ALL_SECTIONS.HOSTED_FUNDS,
+  ALL_SECTIONS.HOST_UNCATEGORIZED_EXPENSES,
 ];
 
 export const SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS = [ALL_SECTIONS.OVERVIEW, ALL_SECTIONS.UPDATES];
@@ -326,5 +328,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SUBMITTED_GRANTS]: {
     defaultMessage: 'Issued Grant Requests',
     id: 'qKKz2G',
+  },
+  [ALL_SECTIONS.HOST_UNCATEGORIZED_EXPENSES]: {
+    defaultMessage: 'Uncategorized Expenses',
+    id: 'HostUncategorizedExpenses',
   },
 });
