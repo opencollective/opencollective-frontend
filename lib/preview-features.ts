@@ -134,7 +134,7 @@ export const previewFeatures: PreviewFeature[] = [
   },
   {
     key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-    title: 'Reorganize Grants and Funds tools in Dashboard',
+    title: 'Funds & Grants Dashboard Tools',
     description: 'Grants and Funds are organized into their own Dashboard sections',
     alwaysEnableInDev: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
