@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -9,12 +9,13 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import dayjs from '@/lib/dayjs';
 import type { HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import { formatDate } from '@/lib/utils';
+import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
 import { DataTable } from '@/components/table/DataTable';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
@@ -46,6 +47,8 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
   const [showSetupGuide, setShowSetupGuide] = React.useState(false);
   const router = useRouter();
+  const intl = useIntl();
+
   const queryFilter = useQueryFilter<typeof schema, HostOverviewMetricsQueryVariables>({
     schema,
     toVariables: {
@@ -102,40 +105,13 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
   const metrics: MetricProps[] = [
     {
-      id: 'openingBalance',
-      label: <FormattedMessage defaultMessage="Opening Balance" id="xHJK6V" />,
+      id: 'balance',
+      label: <FormattedMessage id="Balance" defaultMessage="Balance" />,
       helpLabel: (
-        <FormattedMessage
-          defaultMessage="As of {date}"
-          id="fnHxpp"
-          values={{ date: formatDate(queryFilter.variables.dateFrom, { dateStyle: 'full', timeStyle: 'long' }) }}
-        />
+        <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
       ),
-      amount: {
-        // TODO: Add API support for host context filtering to not have to make this calculation in the frontend
-        current:
-          queryFilter.values.context === 'ALL'
-            ? data?.host.allOpeningBalance.totalMoneyManaged
-            : queryFilter.values.context === 'ORGANIZATION'
-              ? data?.host.orgStats.openingBalance
-              : {
-                  ...data?.host.allOpeningBalance.totalMoneyManaged,
-                  valueInCents:
-                    data?.host.allOpeningBalance.totalMoneyManaged.valueInCents -
-                    data?.host.orgStats.openingBalance.valueInCents,
-                },
-      },
-    },
-    {
-      id: 'closingBalance',
-      label: <FormattedMessage defaultMessage="Closing Balance" id="JWu/xI" />,
-      helpLabel: (
-        <FormattedMessage
-          defaultMessage="As of {date}"
-          id="fnHxpp"
-          values={{ date: formatDate(queryFilter.variables.dateTo, { dateStyle: 'full', timeStyle: 'long' }) }}
-        />
-      ),
+      isSnapshot: true,
+
       amount: {
         // TODO: Add API support for host context filtering to not have to make this calculation in the frontend
         current:
@@ -149,32 +125,43 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
                     data?.host.allClosingBalance.totalMoneyManaged.valueInCents -
                     data?.host.orgStats.closingBalance.valueInCents,
                 },
+        comparison:
+          queryFilter.values.context === 'ALL'
+            ? data?.host.allOpeningBalance.totalMoneyManaged
+            : queryFilter.values.context === 'ORGANIZATION'
+              ? data?.host.orgStats.openingBalance
+              : {
+                  ...data?.host.allOpeningBalance.totalMoneyManaged,
+                  valueInCents:
+                    data?.host.allOpeningBalance.totalMoneyManaged.valueInCents -
+                    data?.host.orgStats.openingBalance.valueInCents,
+                },
       },
     },
   ];
 
   return (
     <div className="max-w-(--breakpoint-lg) space-y-6">
-      <div className="flex flex-col gap-3">
-        <DashboardHeader
-          title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
-          titleRoute={getDashboardRoute(account, 'overview')}
-          actions={
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setShowSetupGuide(open => !open);
-              }}
-            >
-              {showSetupGuide ? (
-                <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-              ) : (
-                <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-              )}
-            </Button>
-          }
-        />
+      <DashboardHeader
+        title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
+        titleRoute={getDashboardRoute(account, 'overview')}
+        actions={
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setShowSetupGuide(open => !open);
+            }}
+          >
+            {showSetupGuide ? (
+              <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
+            ) : (
+              <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
+            )}
+          </Button>
+        }
+      />
+      <div className="space-y-8">
         <Collapsible open={showSetupGuide}>
           <CollapsibleContent>
             <Card>
@@ -188,71 +175,87 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
             </Card>
           </CollapsibleContent>
         </Collapsible>
-        <Filterbar hideSeparator {...queryFilter} />
 
-        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-          {metrics
-            .filter(metric => !metric.hide)
-            .map(metric => (
-              <Metric key={metric.id} {...metric} loading={loading} />
-            ))}
-        </div>
-        <div>
-          <DataTable
-            data-cy="transactions-table"
-            innerClassName="table-fixed text-muted-foreground"
-            columns={columns}
-            data={data?.transactions?.nodes || []}
-            loading={loading}
-            nbPlaceholders={data?.transactions.limit || 5}
-            mobileTableView
-            columnVisibility={{ clearedAt: false, debit: false, credit: false }}
-            getRowId={row => String(row.legacyId)}
-            compact
-          />
-        </div>
-        {loading ? (
-          <div className="h-8" />
-        ) : (
-          <Button
-            size="xs"
-            variant="ghost"
-            onClick={() => {
-              hostTransactionsQueryFilter.resetFilters(
-                {
-                  ...(queryFilter.values.context === 'ORGANIZATION'
-                    ? {
-                        account: account.slug,
-                      }
-                    : queryFilter.values.context === 'HOSTED'
-                      ? {
-                          excludeAccount: account.slug,
-                        }
-                      : {}),
-                  date: {
-                    gte: dayjs(queryFilter.variables.dateFrom).format('YYYY-MM-DD'),
-                    lte: dayjs(queryFilter.variables.dateTo).format('YYYY-MM-DD'),
-                    type: DateFilterType.BETWEEN,
-                  },
-                },
-                `/dashboard/${account.slug}/host-transactions`,
-              );
-            }}
-          >
-            <FormattedMessage
-              defaultMessage="View {count} more transactions"
-              id="VKGqF7"
-              values={{ count: data.transactions.totalCount - data.transactions.limit }}
-            />
-          </Button>
-        )}
+        <HostTodoList />
+
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <FormattedMessage defaultMessage="Recent Financial Activity" id="BAvsQv" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Filterbar hideSeparator {...queryFilter} />
+
+            <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+              {metrics
+                .filter(metric => !metric.hide)
+                .map(metric => (
+                  <Metric key={metric.id} {...metric} loading={loading} />
+                ))}
+            </div>
+            <div>
+              <DataTable
+                data-cy="transactions-table"
+                innerClassName="table-fixed text-muted-foreground"
+                columns={columns}
+                data={data?.transactions?.nodes || []}
+                loading={loading}
+                nbPlaceholders={data?.transactions.limit || 5}
+                mobileTableView
+                columnVisibility={{ clearedAt: false, debit: false, credit: false }}
+                getRowId={row => String(row.legacyId)}
+                compact
+                fullWidth={true}
+              />
+            </div>
+            {loading ? (
+              <div className="flex h-8 w-full items-center justify-center">
+                <Skeleton className="h-5 w-40" />
+              </div>
+            ) : data.transactions.totalCount > data.transactions.limit ? (
+              <Button
+                size="xs"
+                className="w-full"
+                variant="ghost"
+                onClick={() => {
+                  hostTransactionsQueryFilter.resetFilters(
+                    {
+                      ...(queryFilter.values.context === 'ORGANIZATION'
+                        ? {
+                            account: account.slug,
+                          }
+                        : queryFilter.values.context === 'HOSTED'
+                          ? {
+                              excludeAccount: account.slug,
+                            }
+                          : {}),
+                      date: {
+                        gte: dayjs(queryFilter.variables.dateFrom).format('YYYY-MM-DD'),
+                        lte: dayjs(queryFilter.variables.dateTo).format('YYYY-MM-DD'),
+                        type: DateFilterType.BETWEEN,
+                      },
+                    },
+                    `/dashboard/${account.slug}/host-transactions`,
+                  );
+                }}
+              >
+                <FormattedMessage
+                  defaultMessage="View {count} more transactions in {period}"
+                  id="GwHMxd"
+                  values={{
+                    count: data.transactions.totalCount - data.transactions.limit,
+                    period: intl.formatMessage(i18nPeriodFilterType[queryFilter.values.period.type]).toLowerCase(),
+                  }}
+                />
+              </Button>
+            ) : null}
+          </CardContent>
+        </Card>
       </div>
-
-      <hr />
 
       <div className="grid grid-cols-1 gap-6">
         <div className="order-1 space-y-6 xl:order-none">
-          <HostTodoList />
           <Timeline accountSlug={router.query?.as ?? accountSlug} />
         </div>
       </div>

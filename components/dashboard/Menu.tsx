@@ -273,7 +273,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOSTED_COLLECTIVES,
         },
         {
-          label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
+          label: intl.formatMessage({ id: 'HostApplications.Applications', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
         },
       ],
