@@ -25,7 +25,7 @@ export function CommentResult({ comment, highlights }: { comment: CommentResultD
           ) : comment.hostApplication ? (
             <span>Host Application #{comment.hostApplication.id}</span>
           ) : comment.order ? (
-            <span>Order #{comment.order.legacyId}</span>
+            <span>Contribution #{comment.order.legacyId}</span>
           ) : comment.conversation ? (
             <span>Conversation</span>
           ) : (

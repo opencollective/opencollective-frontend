@@ -372,9 +372,9 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
 
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.newPayoutMethod.data?.accountHolderName ?? '';
-    const payeeLegalName: string = props.payee?.legalName ?? '';
+    const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
     return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
-  }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName]);
+  }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
     props.newPayoutMethod.data?.accountHolderName?.length &&
@@ -505,9 +505,9 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
-    const payeeLegalName: string = props.payee?.legalName ?? '';
+    const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
     return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
-  }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName]);
+  }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
     props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
