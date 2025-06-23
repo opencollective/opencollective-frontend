@@ -11,6 +11,7 @@ import { generateNotFoundError } from '../lib/errors';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { FEATURES, getFeatureStatus } from '@/lib/allowed-features';
 import { getRequestIntl } from '@/lib/i18n/request';
 import { getWhitelabelRedirection } from '@/lib/whitelabel';
 
@@ -149,6 +150,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
       canonicalURL={getCollectivePageCanonicalURL(collective)}
       {...getCollectivePageMetadata(collective)}
       loading={loading}
+      updatesRss={getFeatureStatus(collective, FEATURES.UPDATES) === 'ACTIVE'}
     >
       <GlobalStyles />
       {loading ? (
