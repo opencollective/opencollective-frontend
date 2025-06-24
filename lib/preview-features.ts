@@ -15,7 +15,6 @@ export enum PREVIEW_FEATURE_KEYS {
   PLAID_INTEGRATION = 'PLAID_INTEGRATION',
   GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
   HOST_OVERVIEW = 'HOST_OVERVIEW',
-  EXPENSE_STRIPE_SUPPORT = 'EXPENSE_STRIPE_SUPPORT',
 }
 
 export type PreviewFeature = {
@@ -146,14 +145,6 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Host Dashboard Overview',
     description: 'A dashboard landing page for Host accounts that provides an overview of the organization.',
     alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
-    publicBeta: false,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.EXPENSE_STRIPE_SUPPORT,
-    title: 'Enable Stripe as Expense payout method',
-    description: 'Enable hosts with Stripe accounts to be paid through expenses',
-    alwaysEnableInDev: true,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
     publicBeta: false,
   },

@@ -46,7 +46,6 @@ import { userMustSetAccountingCategory } from '../expenses/lib/accounting-catego
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
@@ -1470,10 +1469,6 @@ async function buildFormOptions(
 
     if (payee && (AccountTypesWithHost as readonly string[]).includes(payee.type)) {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
-    }
-
-    if (!loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_STRIPE_SUPPORT)) {
-      options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.STRIPE);
     }
 
     if ((account?.supportedExpenseTypes ?? []).length > 0) {
