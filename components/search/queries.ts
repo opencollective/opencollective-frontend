@@ -165,6 +165,7 @@ export const searchCommandQuery = gql`
             nodes {
               id
               legacyId
+              slug
               title
               account {
                 ...SearchAccountFields
