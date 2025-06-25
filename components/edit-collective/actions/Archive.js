@@ -15,7 +15,7 @@ import { P } from '../../Text';
 import { Button } from '../../ui/Button';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const archiveCollectiveMutation = gqlV1/* GraphQL */ `
+const archiveCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation ArchiveCollective($id: Int!) {
     archiveCollective(id: $id) {
       id
@@ -24,7 +24,7 @@ const archiveCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const unarchiveCollectiveMutation = gqlV1/* GraphQL */ `
+const unarchiveCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation UnarchiveCollective($id: Int!) {
     unarchiveCollective(id: $id) {
       id
