@@ -20550,21 +20550,6 @@ type Mutation {
   ): Fund
 
   """
-  Create an Organization. Scope: "account".
-  """
-  createOrganization(
-    """
-    Information about the organization to create (name, slug, description, website, ...)
-    """
-    organization: OrganizationCreateInput!
-
-    """
-    List of members to invite on Organization creation.
-    """
-    inviteMembers: [InviteMemberInput]
-  ): Organization
-
-  """
   Create a Project. Scope: "account".
   """
   createProject(
@@ -21777,6 +21762,32 @@ type Mutation {
   ): Account!
 
   """
+  Create an Organization. Scope: "account".
+  """
+  createOrganization(
+    """
+    Information about the organization to create (name, slug, description, website, ...)
+    """
+    organization: OrganizationCreateInput!
+
+    """
+    List of members to invite on Organization creation.
+    """
+    inviteMembers: [InviteMemberInput]
+
+    """
+    If creating organization as a new user, provide the user information (name, email, password, etc.).
+    """
+    individual: IndividualCreateInput
+
+    """
+    Description of the role of the user creating the organization.
+    """
+    roleDescription: String
+    captcha: CaptchaInputType
+  ): Organization
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -22654,7 +22665,8 @@ The `Upload` scalar type represents a file upload.
 scalar Upload
 
 input IndividualCreateInput {
-  name: String!
+  name: String
+  legalName: String
   email: String!
 }
 
@@ -22715,25 +22727,6 @@ input FundCreateInput {
   slug: String!
   description: String!
   tags: [String]
-  settings: JSON
-
-  """
-  The profile avatar image
-  """
-  image: Upload
-
-  """
-  The profile background image, for the banner and social media sharing
-  """
-  backgroundImage: Upload
-}
-
-input OrganizationCreateInput {
-  name: String!
-  legalName: String
-  slug: String!
-  description: String!
-  website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 
   """
@@ -24370,6 +24363,45 @@ input PendingOrderEditInput {
   The accounting category of this order
   """
   accountingCategory: AccountingCategoryReferenceInput
+}
+
+input OrganizationCreateInput {
+  name: String!
+  legalName: String
+  slug: String!
+  description: String!
+  website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
+  settings: JSON
+
+  """
+  Two-letters country code following ISO31661
+  """
+  countryISO: String
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
+}
+
+"""
+Input type for captcha verification
+"""
+input CaptchaInputType {
+  """
+  The captcha token to verify
+  """
+  token: String!
+
+  """
+  The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
+  """
+  provider: String!
 }
 
 type CreditCardWithStripeError {
