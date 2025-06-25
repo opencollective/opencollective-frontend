@@ -61,11 +61,17 @@ const DialogContent = React.forwardRef<
     VariantProps<typeof dialogVariants> & {
       hideCloseButton?: boolean;
       overlayClassName?: string;
+      ignoreOutsideInteraction?: boolean;
     }
 >(({ className, children, hideCloseButton, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay size={props.size} className={props.overlayClassName}>
-      <DialogPrimitive.Content ref={ref} className={cn(dialogVariants({ size: props.size, className }))} {...props}>
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(dialogVariants({ size: props.size, className }))}
+        onInteractOutside={props.ignoreOutsideInteraction ? e => e.preventDefault() : props.onInteractOutside}
+        {...props}
+      >
         {children}
         {!hideCloseButton && (
           <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
