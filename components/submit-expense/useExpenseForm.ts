@@ -1456,7 +1456,7 @@ async function buildFormOptions(
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
       options.accountingCategories = host.accountingCategories.nodes;
     } else {
-      options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.STRIPE];
+      options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT];
     }
 
     if (payeeHost && host && payeeHost.id === host.id) {
