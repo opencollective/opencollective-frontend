@@ -158,6 +158,7 @@ export const transactionsPageQuery = gql`
       name
       type
       createdAt
+      isActive
       imageUrl(height: 256)
       currency
       settings
