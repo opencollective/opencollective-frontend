@@ -333,7 +333,7 @@ class SignInOrJoinFree extends React.Component {
   }
 }
 
-const signupMutation = gqlV1/* GraphQL */ `
+const signupMutation = gqlV1 /* GraphQL */ `
   mutation Signup(
     $user: UserInputType!
     $organization: CollectiveInputType

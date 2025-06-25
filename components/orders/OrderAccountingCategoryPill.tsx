@@ -13,7 +13,7 @@ import StyledSpinner from '../StyledSpinner';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
-const updateOrderAccountingCategoryMutation = gql/* GraphQL */ `
+const updateOrderAccountingCategoryMutation = gql /* GraphQL */ `
   mutation EditOrderAccountingCategory($order: OrderReferenceInput!, $category: AccountingCategoryReferenceInput) {
     updateOrderAccountingCategory(order: $order, accountingCategory: $category) {
       id

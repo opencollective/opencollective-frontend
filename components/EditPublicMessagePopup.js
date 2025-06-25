@@ -93,7 +93,7 @@ const Arrow = styled('div')`
   }
 `;
 
-const editPublicMessageMutation = gqlV1/* GraphQL */ `
+const editPublicMessageMutation = gqlV1 /* GraphQL */ `
   mutation EditPublicMessage($fromCollectiveId: Int!, $collectiveId: Int!, $message: String) {
     editPublicMessage(FromCollectiveId: $fromCollectiveId, CollectiveId: $collectiveId, message: $message) {
       id
