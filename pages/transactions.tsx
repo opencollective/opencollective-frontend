@@ -5,12 +5,11 @@ import styled from 'styled-components';
 import type { z } from 'zod';
 
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
-import { loggedInUserCanAccessFinancialData } from '../lib/collective';
+import { isIndividualAccount, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import type { TransactionsPageQuery } from '@/lib/graphql/types/v2/graphql';
-import type { Account } from '@/lib/graphql/types/v2/schema';
 import { getSSRVariablesFromQuery } from '@/lib/hooks/useQueryFilter';
 
 import Body from '../components/Body';
@@ -83,7 +82,7 @@ export default function TransactionsPage(props: InferGetServerSidePropsType<type
         collective={account}
         LoggedInUser={LoggedInUser}
         canonicalURL={`${getCollectivePageCanonicalURL(account)}/transactions`}
-        noRobots={['USER', 'INDIVIDUAL'].includes(account?.type) && !(account as unknown as Account).isHost}
+        noRobots={(isIndividualAccount(account) && !account['isHost']) || !account.isActive}
       />
       <Body>
         <CollectiveNavbar

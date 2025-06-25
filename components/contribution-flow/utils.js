@@ -302,7 +302,7 @@ export const getContributionFlowMetadata = (intl, account, tier) => {
   return {
     ...baseMetadata,
     canonicalURL: getCanonicalURL(account, tier),
-    noRobots: false,
+    noRobots: !account.isActive,
     title:
       account.type === CollectiveType.EVENT
         ? intl.formatMessage(PAGE_META_MSGS.eventTitle, { event: account.name })

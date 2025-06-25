@@ -27,7 +27,7 @@ const HostName = styled(P)`
 
 dayjs.extend(utc);
 
-const invoicesQuery = gqlV1/* GraphQL */ `
+const invoicesQuery = gqlV1 /* GraphQL */ `
   query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug

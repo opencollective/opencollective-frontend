@@ -10,6 +10,7 @@ import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { stripHTML } from '../lib/html';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { FEATURES, getFeatureStatus } from '@/lib/allowed-features';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -186,6 +187,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
       canonicalURL={`${getCollectivePageCanonicalURL(account)}/updates/${updateSlug}`}
       metaTitle={`${update.title} - ${account.name}`}
       noRobots={!shouldIndexAccountOnSearchEngines(account)}
+      updatesRss={getFeatureStatus(account, FEATURES.UPDATES) === 'ACTIVE'}
     >
       <CollectiveNavbar
         collective={account}

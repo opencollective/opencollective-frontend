@@ -34,6 +34,7 @@ interface PageProps {
   showProfileAndChangelogMenu?: boolean;
   loading?: boolean;
   withTopBar?: boolean;
+  updatesRss?: boolean;
 }
 
 const Page = ({
@@ -55,6 +56,7 @@ const Page = ({
   showFooter = true,
   showProfileAndChangelogMenu = true,
   loading,
+  updatesRss,
 }: PageProps) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -78,6 +80,7 @@ const Page = ({
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
         loading={loading}
         withTopBar={withTopBar}
+        updatesRss={updatesRss}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}

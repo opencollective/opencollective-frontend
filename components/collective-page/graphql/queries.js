@@ -4,7 +4,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/con
 
 import * as fragments from './fragments';
 
-export const collectivePageQuery = gqlV1/* GraphQL */ `
+export const collectivePageQuery = gqlV1 /* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id

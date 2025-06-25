@@ -261,7 +261,7 @@ class RedeemPage extends React.Component {
   }
 }
 
-const redeemPageQuery = gqlV1/* GraphQL */ `
+const redeemPageQuery = gqlV1 /* GraphQL */ `
   query RedeemPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug) {
       id
@@ -280,7 +280,7 @@ const addRedeemPageData = graphql(redeemPageQuery, {
   skip: props => !props.collectiveSlug,
 });
 
-const redeemPaymentMethodMutation = gqlV1/* GraphQL */ `
+const redeemPaymentMethodMutation = gqlV1 /* GraphQL */ `
   mutation RedeemPaymentMethod($code: String!, $user: UserInputType) {
     claimPaymentMethod(code: $code, user: $user) {
       id

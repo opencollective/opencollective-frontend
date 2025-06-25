@@ -9,7 +9,7 @@ import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box } from '../../Grid';
 import { P } from '../../Text';
 
-export const totalCollectiveContributionsQuery = gqlV1/* GraphQL */ `
+export const totalCollectiveContributionsQuery = gqlV1 /* GraphQL */ `
   query HeroTotalCollectiveContributions($slug: String!) {
     Collective(slug: $slug) {
       id

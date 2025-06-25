@@ -9,7 +9,7 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
+const collectivePickerSearchQuery = gqlV1 /* GraphQL */ `
   query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]
