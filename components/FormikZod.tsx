@@ -73,7 +73,11 @@ export const getCustomZodErrorMap =
             : intl.formatMessage(RICH_ERROR_MESSAGES.minLength, { count: error.minimum as number });
       }
     } else if (error.code === 'invalid_string') {
+      if (error.validation === 'email') {
+        message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidEmail);
+      } else {
       message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
+      }
     } else if (error.code === 'invalid_enum_value') {
       message = intl.formatMessage(RICH_ERROR_MESSAGES.enum, { options: error.options.join(', ') });
     } else if (error.code === 'invalid_type') {
