@@ -117,11 +117,18 @@ function getErrorsObjectFromZodSchema<Values>(
   const result = zodSchema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
   if (!result.success) {
     const errorResult = result as z.SafeParseError<typeof values>;
-    for (const error of errorResult.error.issues) {
+    const checkIssues = (issues: typeof errorResult.error.issues) => {
+      for (const error of issues) {
+        if ('unionErrors' in error) {
+          error.unionErrors.forEach(unionError => checkIssues(unionError.issues));
+        }
       if (!get(errors, error.path)) {
         set(errors, error.path.join('.'), error.message);
       }
     }
+    };
+
+    checkIssues(errorResult.error.issues);
   }
 
   return errors;
