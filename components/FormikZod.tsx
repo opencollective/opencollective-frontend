@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FormikConfig, FormikErrors, FormikValues } from 'formik';
 import { Formik, useFormik } from 'formik';
-import { get, isNil, mapValues, max, merge, set, xor } from 'lodash';
+import { defaultsDeep, get, isNil, mapValues, max, merge, set, xor } from 'lodash';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import type { ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';
@@ -76,7 +76,7 @@ export const getCustomZodErrorMap =
       if (error.validation === 'email') {
         message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidEmail);
       } else {
-      message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
+        message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
       }
     } else if (error.code === 'invalid_enum_value') {
       message = intl.formatMessage(RICH_ERROR_MESSAGES.enum, { options: error.options.join(', ') });
@@ -122,10 +122,10 @@ function getErrorsObjectFromZodSchema<Values>(
         if ('unionErrors' in error) {
           error.unionErrors.forEach(unionError => checkIssues(unionError.issues));
         }
-      if (!get(errors, error.path)) {
-        set(errors, error.path.join('.'), error.message);
+        if (!get(errors, error.path)) {
+          set(errors, error.path.join('.'), error.message);
+        }
       }
-    }
     };
 
     checkIssues(errorResult.error.issues);
@@ -341,16 +341,17 @@ export function useFormikZod<Values extends FormikValues = FormikValues>({
 export function FormikZod<Values extends FormikValues = FormikValues>({
   schema,
   config,
+  validate: _validate,
   ...props
-}: Omit<React.ComponentProps<typeof Formik<Values>>, 'initialStatus' | 'validate' | 'render'> & {
+}: Omit<React.ComponentProps<typeof Formik<Values>>, 'initialStatus' | 'render'> & {
   schema: SupportedZodSchema<Values>;
   config?: FormikZodConfig;
 }) {
   const intl = useIntl();
   const context = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
-    values => getErrorsObjectFromZodSchema<Values>(intl, schema, values),
-    [intl, schema],
+    values => defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), _validate?.(values) || {}),
+    [intl, schema, _validate],
   );
   return (
     <FormikZodContext.Provider value={context}>
