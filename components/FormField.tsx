@@ -36,6 +36,7 @@ export function FormField({
   min?: number;
   max?: number;
   inputType?: string;
+  type?: string;
   disabled?: boolean;
   htmlFor?: string;
   error?: string;
@@ -43,6 +44,7 @@ export function FormField({
   validate?: any;
   className?: string;
   onFocus?: () => void;
+  onChange?: (e) => void;
 }) {
   const intl = useIntl();
   const htmlFor = props.htmlFor || `input-${name}`;
@@ -61,7 +63,7 @@ export function FormField({
               ...field,
               name: name || htmlFor,
               id: htmlFor,
-              type: props.inputType,
+              type: props.inputType || props.type,
               disabled: props.disabled,
               min: props.min,
               max: props.max,
@@ -69,6 +71,7 @@ export function FormField({
               error: hasError,
               placeholder,
               onFocus: props.onFocus,
+              onChange: props.onChange || field.onChange,
             },
             value => value !== undefined,
           ),
@@ -100,10 +103,10 @@ export function FormField({
                 )}
               </Label>
             )}
-            {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
             {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
+            {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
             {hasError && showError && (
-              <p className="text-xs text-red-600">{isOCError(error) ? formatFormErrorMessage(intl, error) : error}</p>
+              <p className="text-sm text-red-600">{isOCError(error) ? formatFormErrorMessage(intl, error) : error}</p>
             )}
           </div>
         );
