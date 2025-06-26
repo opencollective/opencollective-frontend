@@ -15461,6 +15461,46 @@ enum VirtualCardRequestStatus {
 }
 
 """
+A financial institution for off-platform transactions
+"""
+type OffPlatformTransactionsInstitution {
+  """
+  The unique identifier for the institution
+  """
+  id: String!
+
+  """
+  The name of the institution
+  """
+  name: String!
+
+  """
+  The BIC (Bank Identifier Code) of the institution
+  """
+  bic: String!
+
+  """
+  URL to the institution logo
+  """
+  logoUrl: String
+
+  """
+  List of country codes supported by this institution
+  """
+  supportedCountries: [String!]!
+
+  """
+  Maximum number of days the access can be valid for
+  """
+  maxAccessValidForDays: Int!
+
+  """
+  Total number of days of transaction data available
+  """
+  transactionTotalDays: Int!
+}
+
+"""
 This is the root query
 """
 type Query {
@@ -16666,6 +16706,21 @@ type Query {
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
   hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
+
+  """
+  Get financial institutions for off-platform transactions
+  """
+  offPlatformTransactionsInstitutions(
+    """
+    The country code to get institutions for
+    """
+    country: String!
+
+    """
+    The provider to use for fetching institutions
+    """
+    provider: OffPlatformTransactionsProvider!
+  ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
 }
@@ -20463,6 +20518,21 @@ input HostApplicationReferenceInput {
   The public id identifying the host application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String
+}
+
+"""
+Provider for off-platform transactions
+"""
+enum OffPlatformTransactionsProvider {
+  """
+  GoCardless bank account data provider
+  """
+  GOCARDLESS
+
+  """
+  Plaid bank account data provider
+  """
+  PLAID
 }
 
 """
