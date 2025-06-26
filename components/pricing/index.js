@@ -359,7 +359,7 @@ const Pricing = () => {
             </ListWrapper>
           </Box>
           <Container display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
-            <Link href="/organizations/new">
+            <Link href="/signup/organization">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', null, '160px']}
