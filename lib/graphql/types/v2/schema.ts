@@ -5837,8 +5837,10 @@ export type Host = Account & AccountWithContributions & {
   /** EXPERIMENTAL (this may change or be removed) */
   hostExpensesReport?: Maybe<HostExpensesReports>;
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
+  /** @deprecated 2025-06-24: Low performance query, see if `hostStats` is sufficient */
   hostMetrics: HostMetrics;
   hostMetricsTimeSeries: HostMetricsTimeSeries;
+  hostStats: HostStats;
   /** EXPERIMENTAL (this may change or be removed) */
   hostTransactionsReports?: Maybe<HostTransactionReports>;
   /** Returns agreements with Hosted Accounts */
@@ -6159,6 +6161,12 @@ export type HostHostMetricsTimeSeriesArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** This represents an Host account */
+export type HostHostStatsArgs = {
+  hostContext?: InputMaybe<HostContext>;
 };
 
 
@@ -6580,6 +6588,15 @@ export type HostCollection = Collection & {
   totalCount?: Maybe<Scalars['Int']['output']>;
 };
 
+export enum HostContext {
+  /** Both the Host Organizations internal accounts and Hosted Collectives */
+  ALL = 'ALL',
+  /** Only Hosted Collectives (including their projects/events) */
+  HOSTED = 'HOSTED',
+  /** Only the Host Organization (including its projects/events) */
+  INTERNAL = 'INTERNAL'
+}
+
 export type HostExpensesReportNode = {
   __typename?: 'HostExpensesReportNode';
   accountingCategory?: Maybe<AccountingCategory>;
@@ -6692,6 +6709,33 @@ export type HostPlan = {
   transferwisePayouts?: Maybe<Scalars['Int']['output']>;
   /** Amount limit for the transferwise payouts feature under this plan */
   transferwisePayoutsLimit?: Maybe<Scalars['Int']['output']>;
+};
+
+export type HostStats = {
+  __typename?: 'HostStats';
+  balance?: Maybe<Amount>;
+  totalAmountReceived?: Maybe<Amount>;
+  totalAmountSpent?: Maybe<Amount>;
+};
+
+
+export type HostStatsBalanceArgs = {
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type HostStatsTotalAmountReceivedArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  net?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type HostStatsTotalAmountSpentArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  includeGiftCards?: InputMaybe<Scalars['Boolean']['input']>;
+  net?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type HostTransactionReportNode = {
@@ -8950,6 +8994,33 @@ export type OcrParsingOptionsInput = {
   currency?: InputMaybe<Currency>;
 };
 
+/** A financial institution for off-platform transactions */
+export type OffPlatformTransactionsInstitution = {
+  __typename?: 'OffPlatformTransactionsInstitution';
+  /** The BIC (Bank Identifier Code) of the institution */
+  bic: Scalars['String']['output'];
+  /** The unique identifier for the institution */
+  id: Scalars['String']['output'];
+  /** URL to the institution logo */
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  /** Maximum number of days the access can be valid for */
+  maxAccessValidForDays: Scalars['Int']['output'];
+  /** The name of the institution */
+  name: Scalars['String']['output'];
+  /** List of country codes supported by this institution */
+  supportedCountries: Array<Scalars['String']['output']>;
+  /** Total number of days of transaction data available */
+  transactionTotalDays: Scalars['Int']['output'];
+};
+
+/** Provider for off-platform transactions */
+export enum OffPlatformTransactionsProvider {
+  /** GoCardless bank account data provider */
+  GOCARDLESS = 'GOCARDLESS',
+  /** Plaid bank account data provider */
+  PLAID = 'PLAID'
+}
+
 /** Order model */
 export type Order = {
   __typename?: 'Order';
@@ -10903,6 +10974,8 @@ export type Query = {
   me?: Maybe<Individual>;
   /** [AUTHENTICATED] Returns the pending invitations */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
+  /** Get financial institutions for off-platform transactions */
+  offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
   order?: Maybe<Order>;
   orders: OrderCollection;
   organization?: Maybe<Organization>;
@@ -11124,6 +11197,13 @@ export type QueryMemberInvitationsArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   memberAccount?: InputMaybe<AccountReferenceInput>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+};
+
+
+/** This is the root query */
+export type QueryOffPlatformTransactionsInstitutionsArgs = {
+  country: Scalars['String']['input'];
+  provider: OffPlatformTransactionsProvider;
 };
 
 
