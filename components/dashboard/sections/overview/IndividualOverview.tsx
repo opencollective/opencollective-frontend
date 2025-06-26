@@ -35,7 +35,12 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
         />
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <AccountTodoList />
-          <Timeline accountSlug={slug} withFilter />
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">
+              <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+            </h3>
+            <Timeline accountSlug={slug} />
+          </div>
         </div>
       </div>
       <div className="xl:ml-8 xl:w-64">
