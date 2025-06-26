@@ -5010,6 +5010,8 @@ export enum ExpenseProcessAction {
   MARK_AS_SPAM = 'MARK_AS_SPAM',
   /** To mark the expense as unpaid (marks the transaction as refunded) */
   MARK_AS_UNPAID = 'MARK_AS_UNPAID',
+  /** To mark expense as paid with stripe, can still be processing */
+  PAID_WITH_STRIPE = 'PAID_WITH_STRIPE',
   /** To trigger the payment */
   PAY = 'PAY',
   /** To mark the expense as rejected */
@@ -7659,6 +7661,8 @@ export type Mutation = {
   createEvent?: Maybe<Event>;
   /** Submit an expense to a collective. Scope: "expenses". */
   createExpense: Expense;
+  /** Create a Stripe payment intent */
+  createExpensePaymentIntent: PaymentIntent;
   /** Create a Fund. Scope: "account". */
   createFund?: Maybe<Fund>;
   /** [Root only] Create a member entry directly. For non-root users, use `inviteMember` */
@@ -8074,6 +8078,12 @@ export type MutationCreateExpenseArgs = {
   privateComment?: InputMaybe<Scalars['String']['input']>;
   recurring?: InputMaybe<RecurringExpenseInput>;
   transactionsImportRow?: InputMaybe<TransactionsImportRowReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationCreateExpensePaymentIntentArgs = {
+  expense: ExpenseReferenceInput;
 };
 
 
@@ -10051,7 +10061,8 @@ export enum PayoutMethodType {
   BANK_ACCOUNT = 'BANK_ACCOUNT',
   CREDIT_CARD = 'CREDIT_CARD',
   OTHER = 'OTHER',
-  PAYPAL = 'PAYPAL'
+  PAYPAL = 'PAYPAL',
+  STRIPE = 'STRIPE'
 }
 
 export type PaypalPaymentInput = {

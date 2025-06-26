@@ -244,7 +244,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const creatablePmTypes =
       payeeIsCollectiveFamilyType && !payeeIsSelfHosted
         ? []
-        : pmTypes.filter(pmType => pmType !== PayoutMethodType.ACCOUNT_BALANCE);
+        : pmTypes.filter(pmType => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(pmType));
 
     const groupedPms = groupBy(payoutMethods, 'type');
 

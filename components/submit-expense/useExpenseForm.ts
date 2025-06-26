@@ -1517,7 +1517,9 @@ async function buildFormOptions(
       }
 
       // Filter out ACCOUNT_BALANCE from the list of payout methods, since we add it manually to the default list
-      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.ACCOUNT_BALANCE);
+      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(
+        t => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(t),
+      );
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);

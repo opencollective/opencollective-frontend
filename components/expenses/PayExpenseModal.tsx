@@ -10,7 +10,7 @@ import type { BorderProps, SpaceProps } from 'styled-system';
 import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
-import { EXPENSE_PAYMENT_METHOD_SERVICES } from '../../lib/constants/payment-methods';
+import { EXPENSE_PAYMENT_METHOD_SERVICES, PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
@@ -39,6 +39,7 @@ import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
+import { PayExpenseWithStripe } from './PayExpenseWithStripe';
 import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
@@ -414,9 +415,11 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
-  const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
-    payoutMethodType,
-  );
+  const hasAutomaticManualPicker = ![
+    PayoutMethodType.OTHER,
+    PayoutMethodType.ACCOUNT_BALANCE,
+    PayoutMethodType.STRIPE,
+  ].includes(payoutMethodType);
   const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
 
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
@@ -454,6 +457,15 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     amountInBalance &&
     amountBatched &&
     amountInBalance.valueInCents >= amountBatched.valueInCents + amounts.totalAmount?.valueInCents;
+
+  const isStripePayment = payoutMethodType === PayoutMethodType.STRIPE;
+
+  const onPayWithStripeSuccess = React.useCallback(() => {
+    onSubmit({
+      action: 'PAID_WITH_STRIPE',
+      paymentMethodService: PAYMENT_METHOD_SERVICE.STRIPE,
+    });
+  }, [onSubmit]);
 
   return (
     <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal">
@@ -805,40 +817,45 @@ Please add funds to your Wise {currency} account."
                 </P>
               </MessageBox>
             )}
-            <Flex flexWrap="wrap" justifyContent="space-evenly">
-              <StyledButton
-                buttonStyle="success"
-                width="100%"
-                m={1}
-                type="submit"
-                loading={formik.isSubmitting}
-                data-cy="mark-as-paid-button"
-                disabled={
-                  canQuote && !isManualPayment && (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)
-                }
-              >
-                {isManualPayment ? (
-                  <React.Fragment>
-                    <Check size="1.5em" />
-                    <Span css={{ verticalAlign: 'middle' }} ml={1}>
-                      <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
-                    </Span>
-                  </React.Fragment>
-                ) : isScheduling ? (
-                  <FormattedMessage
-                    id="expense.schedule.btn"
-                    defaultMessage="Schedule to Pay with {paymentMethod}"
-                    values={{ paymentMethod: payoutMethodLabel }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="expense.pay.btn"
-                    defaultMessage="Pay with {paymentMethod}"
-                    values={{ paymentMethod: payoutMethodLabel }}
-                  />
-                )}
-              </StyledButton>
-            </Flex>
+            {isStripePayment && <PayExpenseWithStripe onSuccess={onPayWithStripeSuccess} expense={expense} />}
+            {!isStripePayment && (
+              <Flex flexWrap="wrap" justifyContent="space-evenly">
+                <StyledButton
+                  buttonStyle="success"
+                  width="100%"
+                  m={1}
+                  type="submit"
+                  loading={formik.isSubmitting}
+                  data-cy="mark-as-paid-button"
+                  disabled={
+                    canQuote &&
+                    !isManualPayment &&
+                    (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)
+                  }
+                >
+                  {isManualPayment ? (
+                    <React.Fragment>
+                      <Check size="1.5em" />
+                      <Span css={{ verticalAlign: 'middle' }} ml={1}>
+                        <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
+                      </Span>
+                    </React.Fragment>
+                  ) : isScheduling ? (
+                    <FormattedMessage
+                      id="expense.schedule.btn"
+                      defaultMessage="Schedule to Pay with {paymentMethod}"
+                      values={{ paymentMethod: payoutMethodLabel }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="expense.pay.btn"
+                      defaultMessage="Pay with {paymentMethod}"
+                      values={{ paymentMethod: payoutMethodLabel }}
+                    />
+                  )}
+                </StyledButton>
+              </Flex>
+            )}
           </FormikProvider>
         </form>
       </ModalBody>

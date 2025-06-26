@@ -5055,6 +5055,7 @@ enum PayoutMethodType {
   BANK_ACCOUNT
   ACCOUNT_BALANCE
   CREDIT_CARD
+  STRIPE
 }
 
 """
@@ -21195,6 +21196,16 @@ type Mutation {
   ): Expense!
 
   """
+  Create a Stripe payment intent
+  """
+  createExpensePaymentIntent(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): PaymentIntent!
+
+  """
   Sends an email for guest to confirm their emails and create their Open Collective account
   """
   sendGuestConfirmationEmail(
@@ -23469,6 +23480,11 @@ enum ExpenseProcessAction {
   PAY
 
   """
+  To mark expense as paid with stripe, can still be processing
+  """
+  PAID_WITH_STRIPE
+
+  """
   To mark the expense as spam
   """
   MARK_AS_SPAM
@@ -23671,6 +23687,16 @@ input ExpenseInviteeOrganizationInput {
   name: String
   slug: String
   website: String
+}
+
+"""
+A Stripe payment intent
+"""
+type PaymentIntent {
+  id: String!
+  paymentIntentClientSecret: String!
+  stripeAccount: String!
+  stripeAccountPublishableSecret: String!
 }
 
 """
@@ -24107,16 +24133,6 @@ enum ProcessOrderAction {
   To mark the order as paid
   """
   MARK_AS_PAID
-}
-
-"""
-A Stripe payment intent
-"""
-type PaymentIntent {
-  id: String!
-  paymentIntentClientSecret: String!
-  stripeAccount: String!
-  stripeAccountPublishableSecret: String!
 }
 
 """
