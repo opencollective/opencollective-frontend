@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { isEmpty, max, omit, orderBy, pick, set } from 'lodash';
+import { isEmpty, max, min, omit, orderBy, pick, set } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -190,7 +190,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         innerRef={formikRef}
       >
         {({ touched, values, setFieldValue, isValid }) => (
-          <Form className="flex flex-col gap-8">
+          <Form className="flex flex-col gap-8" data-cy="create-organization-form">
             <Card>
               <CardContent className="flex flex-col gap-4 pt-6">
                 <header>
@@ -296,7 +296,11 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                     >
                       {({ field }) => (
                         <label className="ml-2 flex cursor-pointer items-center gap-2 text-sm leading-normal font-normal">
-                          <Checkbox checked={field.value} onCheckedChange={value => setFieldValue(field.name, value)} />
+                          <Checkbox
+                            data-cy="tos-agreement-button"
+                            checked={field.value}
+                            onCheckedChange={value => setFieldValue(field.name, value)}
+                          />
                           <div>
                             <FormattedMessage
                               defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective"
@@ -335,15 +339,19 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                 >
                   {({ field }) => (
                     <Select value={field.value} open={showCountrySelect} onOpenChange={setShowCountrySelect}>
-                      <SelectTrigger className={cn(!field.value && 'text-muted-foreground')}>
+                      <SelectTrigger
+                        className={cn(!field.value && 'text-muted-foreground')}
+                        data-cy="organization-country-trigger"
+                      >
                         {field.value ? i18nCountryName(intl, field.value) : 'Select Country'}
                       </SelectTrigger>
                       <SelectContent className="max-h-[50vh]">
                         <Command>
                           <CommandInput
                             placeholder={intl.formatMessage({ defaultMessage: 'Search countries...', id: '37zpJw' })}
+                            data-cy="organization-country-search"
                           />
-                          <CommandList>
+                          <CommandList data-cy="organization-country-list">
                             <CommandEmpty>
                               <FormattedMessage defaultMessage="No country found." id="OotY1c" />
                             </CommandEmpty>
@@ -420,36 +428,36 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                     />
                   </p>
                 </header>
-                {Array.from({ length: max([1, values.invitedAdmins?.filter(v => !isEmpty(v)).length + 1]) }).map(
-                  (_, index) => (
-                    <FormField
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`invitedAdmins.${index}`}
-                      name={`invitedAdmins.${index}`}
-                      label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                      type="email"
-                    >
-                      {({ field }) => (
-                        <div className="flex gap-1">
-                          <Input
-                            {...field}
-                            onChange={e => {
-                              const value = e.target.value;
-                              if (isEmpty(value)) {
-                                setFieldValue(
-                                  'invitedAdmins',
-                                  values.invitedAdmins.filter((_, i) => i !== index),
-                                );
-                              } else {
-                                setFieldValue(`invitedAdmins.${index}`, e.target.value);
-                              }
-                            }}
-                          />
-                        </div>
-                      )}
-                    </FormField>
-                  ),
-                )}
+                {Array.from({
+                  length: min([max([1, values.invitedAdmins?.filter(v => !isEmpty(v)).length + 1]), 5]),
+                }).map((_, index) => (
+                  <FormField
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={`invitedAdmins.${index}`}
+                    name={`invitedAdmins.${index}`}
+                    label={<FormattedMessage id="Email" defaultMessage="Email" />}
+                    type="email"
+                  >
+                    {({ field }) => (
+                      <div className="flex gap-1">
+                        <Input
+                          {...field}
+                          onChange={e => {
+                            const value = e.target.value;
+                            if (isEmpty(value)) {
+                              setFieldValue(
+                                'invitedAdmins',
+                                values.invitedAdmins.filter((_, i) => i !== index),
+                              );
+                            } else {
+                              setFieldValue(`invitedAdmins.${index}`, e.target.value);
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
+                  </FormField>
+                ))}
               </CardContent>
             </Card>
             {isCaptchaEnabled() && (
