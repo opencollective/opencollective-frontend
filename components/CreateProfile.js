@@ -288,18 +288,12 @@ const CreateProfile = ({
           </Box>
           <Box mt="8px" fontSize="12px" fontWeight={400} lineHeight="18px">
             <FormattedMessage
-              defaultMessage="You are creating your personal account first, once inside, you will be able to create a profile for your company."
-              id="OvoOan"
+              defaultMessage="If you are creating a profile for your organization, <a>click here</a>."
+              id="tApWSV"
+              values={{
+                a: chunk => <a href="/signup/organization">{chunk}</a>,
+              }}
             />
-            <Box mt="8px">
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://docs.opencollective.com/help/financial-contributors/organizations#what-is-an-organization"
-              >
-                <FormattedMessage defaultMessage="Read more about organization accounts" id="OuFEXI" />
-              </a>
-            </Box>
           </Box>
         </MessageBox>
         {emailAlreadyExists && (
