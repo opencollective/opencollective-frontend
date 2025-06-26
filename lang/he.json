@@ -3619,6 +3619,7 @@
   "To": "אל",
   "ToCollectives": "To Collectives",
   "TodaysCharge": "חיוב להיום",
+  "ToDo.EmptyStateMessage": "You’re all caught up.",
   "TodoList.Contributions.Disputed": "{count} disputed",
   "TodoList.Contributions.InReview": "{count} in review",
   "TodoList.Expenses.Errored": "{count, plural, one {# error} other {# errors}}",

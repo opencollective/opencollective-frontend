@@ -3619,6 +3619,7 @@
   "To": "Do",
   "ToCollectives": "To Collectives",
   "TodaysCharge": "Obecna opłata",
+  "ToDo.EmptyStateMessage": "You’re all caught up.",
   "TodoList.Contributions.Disputed": "{count} disputed",
   "TodoList.Contributions.InReview": "{count} in review",
   "TodoList.Expenses.Errored": "{count, plural, one {# error} other {# errors}}",
