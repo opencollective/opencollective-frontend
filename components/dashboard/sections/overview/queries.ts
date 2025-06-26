@@ -400,6 +400,44 @@ export const overviewMetricsQuery = gql`
   ${accountHoverCardFields}
 `;
 
+export const orgOverviewMetricsQuery = gql`
+  query OrgOverviewMetrics($slug: String!, $dateFrom: DateTime, $dateTo: DateTime) {
+    account(slug: $slug) {
+      id
+      isActive
+      ...AccountHoverCardFields
+      spent: stats {
+        id
+        current: totalAmountSpent(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
+          currency
+          valueInCents
+        }
+      }
+      received: stats {
+        id
+        current: totalAmountReceived(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
+          currency
+          valueInCents
+        }
+      }
+
+      transactions(
+        limit: 5
+        includeDebts: true
+        includeChildrenTransactions: true
+        includeIncognitoTransactions: true
+        dateFrom: $dateFrom
+        dateTo: $dateTo
+        orderBy: { direction: DESC, field: CREATED_AT }
+      ) {
+        ...TransactionsTableQueryCollectionFragment
+      }
+    }
+  }
+  ${accountHoverCardFields}
+  ${transactionsTableQueryCollectionFragment}
+`;
+
 export const hostOverviewMetricsQuery = gql`
   query HostOverviewMetrics(
     $slug: String!
