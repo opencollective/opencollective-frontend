@@ -3820,6 +3820,7 @@ type Host implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   hostTransactionsReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostTransactionReports
+  hostStats(hostContext: HostContext = ALL): HostStats!
   hostMetrics(
     """
     A collection of accounts for which the metrics should be returned.
@@ -3835,7 +3836,7 @@ type Host implements Account & AccountWithContributions {
     The end date of the time series
     """
     dateTo: DateTime
-  ): HostMetrics!
+  ): HostMetrics! @deprecated(reason: "2025-06-24: Low performance query, see if `hostStats` is sufficient")
   hostMetricsTimeSeries(
     """
     A collection of accounts for which the metrics should be returned.
@@ -7013,6 +7014,69 @@ type HostTransactionReportNode {
   date: DateTime!
   managedFunds: TransactionReport!
   operationalFunds: TransactionReport!
+}
+
+type HostStats {
+  balance(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): Amount
+  totalAmountSpent(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+
+    """
+    Include transactions using Gift Cards
+    """
+    includeGiftCards: Boolean = false
+  ): Amount
+  totalAmountReceived(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+  ): Amount
+}
+
+enum HostContext {
+  """
+  Both the Host Organizations internal accounts and Hosted Collectives
+  """
+  ALL
+
+  """
+  Only the Host Organization (including its projects/events)
+  """
+  INTERNAL
+
+  """
+  Only Hosted Collectives (including their projects/events)
+  """
+  HOSTED
 }
 
 """

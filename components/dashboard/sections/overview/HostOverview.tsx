@@ -8,7 +8,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import dayjs from '@/lib/dayjs';
-import type { HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { HostContext, type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
@@ -53,28 +53,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
     schema,
     toVariables: {
       period: periodFilter.toVariables,
-      context: value => {
-        switch (value) {
-          case 'ALL':
-            return {
-              includeOrgStats: false,
-            };
-          case 'ORGANIZATION':
-            return {
-              includeOrgStats: true,
-              transactionsForAccount: {
-                slug: account.slug,
-              },
-            };
-          case 'HOSTED':
-            return {
-              includeOrgStats: true,
-              excludeTransactionsForAccount: {
-                slug: account.slug,
-              },
-            };
-        }
-      },
+      context: hostContext => ({ hostContext }),
       as: slug => ({ slug }),
     },
     filters: {
@@ -110,32 +89,25 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
       helpLabel: (
         <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
       ),
-      isSnapshot: true,
-
       amount: {
-        // TODO: Add API support for host context filtering to not have to make this calculation in the frontend
-        current:
-          queryFilter.values.context === 'ALL'
-            ? data?.host.allClosingBalance.totalMoneyManaged
-            : queryFilter.values.context === 'ORGANIZATION'
-              ? data?.host.orgStats.closingBalance
-              : {
-                  ...data?.host.allClosingBalance.totalMoneyManaged,
-                  valueInCents:
-                    data?.host.allClosingBalance.totalMoneyManaged.valueInCents -
-                    data?.host.orgStats.closingBalance.valueInCents,
-                },
-        comparison:
-          queryFilter.values.context === 'ALL'
-            ? data?.host.allOpeningBalance.totalMoneyManaged
-            : queryFilter.values.context === 'ORGANIZATION'
-              ? data?.host.orgStats.openingBalance
-              : {
-                  ...data?.host.allOpeningBalance.totalMoneyManaged,
-                  valueInCents:
-                    data?.host.allOpeningBalance.totalMoneyManaged.valueInCents -
-                    data?.host.orgStats.openingBalance.valueInCents,
-                },
+        current: data?.host.hostStats.balance,
+        comparison: data?.host.hostStats.comparisonBalance,
+      },
+    },
+    {
+      id: 'received',
+      label: <FormattedMessage defaultMessage="Received" id="z/wUXE" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />,
+      amount: {
+        current: data?.host.hostStats.totalAmountReceived,
+      },
+    },
+    {
+      id: 'spent',
+      label: <FormattedMessage defaultMessage="Spent" id="111qQK" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />,
+      amount: {
+        current: data?.host.hostStats.totalAmountSpent,
       },
     },
   ];
@@ -221,11 +193,11 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
                 onClick={() => {
                   hostTransactionsQueryFilter.resetFilters(
                     {
-                      ...(queryFilter.values.context === 'ORGANIZATION'
+                      ...(queryFilter.values.context === HostContext.INTERNAL
                         ? {
                             account: account.slug,
                           }
-                        : queryFilter.values.context === 'HOSTED'
+                        : queryFilter.values.context === HostContext.HOSTED
                           ? {
                               excludeAccount: account.slug,
                             }

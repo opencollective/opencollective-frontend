@@ -3,10 +3,11 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import { HostContext } from '@/lib/graphql/types/v2/graphql';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
-const schema = z.enum(['ALL', 'ORGANIZATION', 'HOSTED']).default('ALL');
+const schema = z.nativeEnum(HostContext).default(HostContext.ALL);
 
 export const hostContextFilter: FilterConfig<z.infer<typeof schema>> = {
   schema,
@@ -20,13 +21,13 @@ function HostContextFilter({ value, onChange }: FilterComponentProps<string>) {
   return (
     <Tabs value={value} onValueChange={onChange}>
       <TabsList className="h-9">
-        <TabsTrigger className="h-7" value={'ALL'}>
+        <TabsTrigger className="h-7" value={HostContext.ALL}>
           <FormattedMessage defaultMessage="All" id="zQvVDJ" />
         </TabsTrigger>
-        <TabsTrigger className="h-7" value={'ORGANIZATION'}>
+        <TabsTrigger className="h-7" value={HostContext.INTERNAL}>
           <FormattedMessage defaultMessage="Organization" id="Tags.ORGANIZATION" />
         </TabsTrigger>
-        <TabsTrigger className="h-7" value={'HOSTED'}>
+        <TabsTrigger className="h-7" value={HostContext.HOSTED}>
           <FormattedMessage defaultMessage="Hosted" id="HostContextFilter.Hosted" />
         </TabsTrigger>
       </TabsList>

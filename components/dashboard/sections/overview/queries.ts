@@ -405,7 +405,7 @@ export const hostOverviewMetricsQuery = gql`
     $slug: String!
     $dateFrom: DateTime
     $dateTo: DateTime
-    $includeOrgStats: Boolean!
+    $hostContext: HostContext
     $transactionsForAccount: [AccountReferenceInput!]
     $excludeTransactionsForAccount: [AccountReferenceInput!]
   ) {
@@ -413,26 +413,22 @@ export const hostOverviewMetricsQuery = gql`
       id
       isActive
       ...AccountHoverCardFields
-      allOpeningBalance: hostMetrics(dateTo: $dateFrom) {
-        totalMoneyManaged {
-          currency
+      hostStats(hostContext: $hostContext) {
+        balance(dateTo: $dateTo) {
           valueInCents
+          currency
         }
-      }
-      allClosingBalance: hostMetrics(dateTo: $dateTo) {
-        totalMoneyManaged {
-          currency
+        comparisonBalance: balance(dateTo: $dateFrom) {
           valueInCents
+          currency
         }
-      }
-      orgStats: stats @include(if: $includeOrgStats) {
-        openingBalance: balance(includeChildren: true, dateTo: $dateFrom) {
-          currency
+        totalAmountSpent(dateFrom: $dateFrom, dateTo: $dateTo) {
           valueInCents
+          currency
         }
-        closingBalance: balance(includeChildren: true, dateTo: $dateTo) {
-          currency
+        totalAmountReceived(dateFrom: $dateFrom, dateTo: $dateTo) {
           valueInCents
+          currency
         }
       }
     }
