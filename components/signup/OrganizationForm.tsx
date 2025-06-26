@@ -86,7 +86,7 @@ export type OrganizationFormProps = {
 
 const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
   const intl = useIntl();
-  const formikRef = useRef<FormikProps<FormValuesSchema>>();
+  const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
   const { LoggedInUser } = useLoggedInUser();
   const [createOrganization, { loading }] = useMutation(createOrganizationMutation, { context: API_V2_CONTEXT });
   const [userForm, setUserForm] = useState<'LOGIN' | 'NEW_USER' | string>('NEW_USER');
