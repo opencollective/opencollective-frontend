@@ -138,7 +138,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
           <CollapsibleContent>
             <Card>
               <CardHeader>
-                <CardTitle>
+                <CardTitle className="text-xl">
                   <FormattedMessage defaultMessage="Setup guide" id="SetupGuide.Title" />
                 </CardTitle>
                 <CardDescription>Get going with Open Collective!</CardDescription>
@@ -152,7 +152,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="text-xl">
               <FormattedMessage defaultMessage="Recent Financial Activity" id="BAvsQv" />
             </CardTitle>
           </CardHeader>
@@ -228,7 +228,7 @@ export function HostOverview({ accountSlug }: DashboardSectionProps) {
 
       <div className="grid grid-cols-1 gap-6">
         <div className="order-1 space-y-6 xl:order-none">
-          <Timeline accountSlug={router.query?.as ?? accountSlug} />
+          <Timeline withTitle accountSlug={router.query?.as ?? accountSlug} />
         </div>
       </div>
     </div>
