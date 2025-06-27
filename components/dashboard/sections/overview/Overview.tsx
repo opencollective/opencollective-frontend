@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { isHostAccount, isIndividualAccount } from '../../../../lib/collective';
+import { isIndividualAccount } from '../../../../lib/collective';
 
 import { DashboardContext } from '../../DashboardContext';
 import type { DashboardSectionProps } from '../../types';
 
 import { CollectiveOverview } from './CollectiveOverview';
-import { HostOverview } from './HostOverview';
 import IndividualOverview from './IndividualOverview';
+import { OrgOverview } from './OrgOverview';
 
 export default function Overview({ accountSlug, subpath }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
@@ -16,8 +16,8 @@ export default function Overview({ accountSlug, subpath }: DashboardSectionProps
     return <IndividualOverview accountSlug={accountSlug} subpath={subpath} />;
   }
 
-  if (isHostAccount(account)) {
-    return <HostOverview accountSlug={accountSlug} subpath={subpath} />;
+  if (account.type === 'ORGANIZATION') {
+    return <OrgOverview />;
   }
 
   return <CollectiveOverview accountSlug={accountSlug} subpath={subpath} />;
