@@ -4219,7 +4219,7 @@
   "zvczgi": "С начала года по настоящее время",
   "ZvWD3X": "Поддержите мероприятие или купите билеты для участия.",
   "zvz2Xk": "Посмотреть на Stripe",
-  "zw0B0K": "Не удалось выполнить платеж <FromAccount></FromAccount> для <Order>вклада</Order> на <Account></Account>",
+  "zw0B0K": "<FromAccount></FromAccount>'s payment for <Order>contribution</Order> to <Account></Account> failed",
   "zWgbGg": "Сегодня",
   "zz6ObK": "Restore",
   "zzd7ZI": "Скопировать ID транзакции"
