@@ -7,7 +7,12 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { itemHasOCR } from '../components/expenses/lib/ocr';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective';
+import {
+  expenseSubmissionAllowed,
+  getCollectivePageMetadata,
+  getCollectiveTypeForUrl,
+  isHiddenAccount,
+} from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
@@ -310,7 +315,7 @@ class CreateExpensePage extends React.Component {
     if (!data.loading) {
       if (data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.account) {
+      } else if (!data.account || isHiddenAccount(data.account)) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (
         !hasFeature(data.account, FEATURES.RECEIVE_EXPENSES) ||
@@ -547,6 +552,7 @@ const createExpensePageQuery = gql`
       currency
       isArchived
       isActive
+      isSuspended
       expensePolicy
       supportedExpenseTypes
       features {
