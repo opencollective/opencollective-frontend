@@ -53,6 +53,7 @@ import UserSecurity from './sections/UserSecurity';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
+import FiscalHost from './sections/FiscalHost';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
@@ -490,7 +491,7 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return null;
+        return <FiscalHost collective={collective} />;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
@@ -718,7 +719,7 @@ class EditCollectiveForm extends React.Component {
         },
         ...this.getApplicableTaxesFields(),
       ],
-      'fiscal-hosting': [
+      'fiscal-hosting-off': [
         {
           name: 'application',
           className: 'horizontal',
@@ -862,4 +863,5 @@ class EditCollectiveForm extends React.Component {
   }
 }
 
+/** @type {any} */
 export default withRouter(injectIntl(EditCollectiveForm));
