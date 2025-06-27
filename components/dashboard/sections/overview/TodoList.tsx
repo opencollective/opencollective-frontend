@@ -85,35 +85,6 @@ export const HostTodoList = () => {
     () =>
       [
         {
-          id: 'applications',
-          title: intl.formatMessage({ defaultMessage: 'Applications', id: 'HostApplications.Applications' }),
-          href: getDashboardRoute(account, 'host-applications'),
-          icon: Building,
-          iconBgColor: 'bg-blue-50',
-          iconColor: 'text-blue-700',
-          subItems: [
-            {
-              id: 'unreplied',
-              show: data?.host.unrepliedApplications.totalCount > 0,
-              Icon: MailOpen,
-              label: intl.formatMessage(
-                { defaultMessage: '{count} unreplied', id: 'TodoList.Unreplied' },
-                { count: data?.host.unrepliedApplications.totalCount },
-              ),
-              queryParams: '?lastCommentBy=COLLECTIVE_ADMIN',
-            },
-            {
-              id: 'pending',
-              show: data?.host.pendingApplications.totalCount > 0,
-              label: intl.formatMessage(
-                { defaultMessage: '{count} pending', id: 'TodoList.Pending' },
-                { count: data?.host.pendingApplications.totalCount },
-              ),
-              queryParams: '?status=PENDING&lastCommentBy=ALL',
-            },
-          ],
-        },
-        {
           id: 'expenses',
           title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
           href: getDashboardRoute(account, 'host-expenses'),
@@ -211,6 +182,35 @@ export const HostTodoList = () => {
             },
           ],
         },
+        {
+          id: 'applications',
+          title: intl.formatMessage({ defaultMessage: 'Applications', id: 'HostApplications.Applications' }),
+          href: getDashboardRoute(account, 'host-applications'),
+          icon: Building,
+          iconBgColor: 'bg-blue-50',
+          iconColor: 'text-blue-700',
+          subItems: [
+            {
+              id: 'unreplied',
+              show: data?.host.unrepliedApplications.totalCount > 0,
+              Icon: MailOpen,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} unreplied', id: 'TodoList.Unreplied' },
+                { count: data?.host.unrepliedApplications.totalCount },
+              ),
+              queryParams: '?lastCommentBy=COLLECTIVE_ADMIN',
+            },
+            {
+              id: 'pending',
+              show: data?.host.pendingApplications.totalCount > 0,
+              label: intl.formatMessage(
+                { defaultMessage: '{count} pending', id: 'TodoList.Pending' },
+                { count: data?.host.pendingApplications.totalCount },
+              ),
+              queryParams: '?status=PENDING&lastCommentBy=ALL',
+            },
+          ],
+        },
       ]
         .map(item => ({
           ...item,
@@ -221,14 +221,6 @@ export const HostTodoList = () => {
     [data, account, intl],
   );
 
-  if (loading) {
-    return <Skeleton className="h-20" />;
-  }
-
-  if (!filteredTodoList.length) {
-    return null;
-  }
-
   return (
     <Card className="overflow-hidden">
       <CardHeader>
@@ -238,43 +230,53 @@ export const HostTodoList = () => {
       </CardHeader>
 
       <div className="divide-y border-t">
-        {filteredTodoList.map(item => {
-          const IconComponent = item.icon;
+        {loading ? (
+          <div className="px-6 py-4">
+            <Skeleton className="h-6 w-36" />
+          </div>
+        ) : filteredTodoList.length === 0 ? (
+          <p className="px-6 py-4 text-muted-foreground">
+            <FormattedMessage defaultMessage="You’re all caught up." id="ToDo.EmptyStateMessage" />
+          </p>
+        ) : (
+          filteredTodoList.map(item => {
+            const IconComponent = item.icon;
 
-          return (
-            <div
-              key={item.id}
-              className="group relative transition-colors hover:bg-primary/5 has-[.badge-hover:hover]:bg-background"
-            >
-              <Link href={item.href} className="absolute inset-0" aria-label={item.title}>
-                <span className="sr-only">{item.title}</span>
-              </Link>
+            return (
+              <div
+                key={item.id}
+                className="group relative transition-colors hover:bg-primary/5 has-[.badge-hover:hover]:bg-background"
+              >
+                <Link href={item.href} className="absolute inset-0" aria-label={item.title}>
+                  <span className="sr-only">{item.title}</span>
+                </Link>
 
-              <div className="pointer-events-none relative flex flex-col justify-between px-4 py-3 sm:flex-row sm:items-center">
-                <div className="mb-2 flex items-center gap-3 sm:mb-0">
-                  <div className={`rounded-md ${item.iconBgColor} p-2`}>
-                    <IconComponent className={`h-5 w-5 ${item.iconColor}`} />
+                <div className="pointer-events-none relative flex flex-col justify-between px-4 py-3 sm:flex-row sm:items-center">
+                  <div className="mb-2 flex items-center gap-3 sm:mb-0">
+                    <div className={`rounded-md ${item.iconBgColor} p-2`}>
+                      <IconComponent className={`h-5 w-5 ${item.iconColor}`} />
+                    </div>
+                    <h3 className="font-medium">{item.title}</h3>
                   </div>
-                  <h3 className="font-medium">{item.title}</h3>
-                </div>
-                <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-                  {item.subItems.map(subItem => (
-                    <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
-                      <Badge
-                        type="outline"
-                        className={'badge-hover gap-1 text-foreground hover:relative hover:z-10 hover:bg-primary/5'}
-                      >
-                        {subItem.Icon && <subItem.Icon className="h-3 w-3" />}
-                        <span>{subItem.label}</span>
-                      </Badge>
-                    </Link>
-                  ))}
-                  <ArrowRight className="ml-1 hidden h-4 w-4 sm:block" />
+                  <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+                    {item.subItems.map(subItem => (
+                      <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
+                        <Badge
+                          type="outline"
+                          className={'badge-hover gap-1 text-foreground hover:relative hover:z-10 hover:bg-primary/5'}
+                        >
+                          {subItem.Icon && <subItem.Icon className="h-3 w-3" />}
+                          <span>{subItem.label}</span>
+                        </Badge>
+                      </Link>
+                    ))}
+                    <ArrowRight className="ml-1 hidden h-4 w-4 sm:block" />
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </Card>
   );
