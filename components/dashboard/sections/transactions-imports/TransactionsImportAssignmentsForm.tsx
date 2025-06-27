@@ -95,7 +95,13 @@ export const TransactionsImportAssignmentsForm = ({
   };
   plaidStatus: PlaidDialogStatus;
   onOpenChange: (isOpen: boolean) => void;
-  showPlaidDialog: ({ accountsSelectionEnabled }: { accountsSelectionEnabled?: boolean }) => void;
+  showPlaidDialog: ({
+    accountsSelectionEnabled,
+    transactionImportId,
+  }: {
+    accountsSelectionEnabled?: boolean;
+    transactionImportId: string;
+  }) => void;
   isDeleting: boolean;
 }) => {
   const intl = useIntl();
@@ -132,17 +138,14 @@ export const TransactionsImportAssignmentsForm = ({
     >
       {({ dirty, isSubmitting, setValues, values }) => {
         const getAssignmentAccounts = (accountId: string) =>
-          values.find(assignment => assignment.importedAccountId === accountId)?.accounts || null;
+          values.find(assignment => assignment.importedAccountId === accountId)?.accounts || [];
         return (
           <Form>
             {transactionsImport.type === 'PLAID' ? (
               <div className="mt-4">
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-sm font-medium">
-                    <FormattedMessage
-                      defaultMessage="Connected Plaid accounts"
-                      id="settings.accounts.connectedAccounts"
-                    />
+                    <FormattedMessage defaultMessage="Connected sub-accounts" id="jMHLZq" />
                   </p>
                   {transactionsImport.connectedAccount && (
                     <Button
@@ -151,7 +154,12 @@ export const TransactionsImportAssignmentsForm = ({
                       className="text-xs text-wrap"
                       loading={plaidStatus === 'loading' || plaidStatus === 'active'}
                       disabled={plaidStatus === 'disabled' || isDeleting || isSubmitting}
-                      onClick={() => showPlaidDialog({ accountsSelectionEnabled: true })}
+                      onClick={() =>
+                        showPlaidDialog({
+                          accountsSelectionEnabled: true,
+                          transactionImportId: transactionsImport.id,
+                        })
+                      }
                     >
                       <Landmark size={14} />
                       <FormattedMessage defaultMessage="Update selection" id="FyTcpa" />
@@ -163,15 +171,12 @@ export const TransactionsImportAssignmentsForm = ({
                     defaultMessage="By default, imported transactions will be assigned to the account selected here."
                     id="Neyl6Y"
                   />{' '}
-                  <FormattedMessage
-                    defaultMessage="You can override this assignment for each sub-account."
-                    id="Kn0NEC"
-                  />
+                  <FormattedMessage defaultMessage="You can override this assignment for each account." id="wckrmL" />
                 </p>
                 {!transactionsImport.plaidAccounts?.length ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
                     <FormattedMessage
-                      defaultMessage="The sub-accounts for this import are not available."
+                      defaultMessage="The accounts for this import are not available."
                       id="settings.accounts.noAccounts"
                     />
                   </p>
@@ -207,6 +212,7 @@ export const TransactionsImportAssignmentsForm = ({
                             onChange={value => {
                               setValues(updateValues(values, plaidAccount.accountId, value));
                             }}
+                            truncationThreshold={30}
                           />
                         </CardContent>
                       </Card>

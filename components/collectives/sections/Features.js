@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -85,19 +84,19 @@ const LineBreak = styled.br`
 const features = [
   {
     id: 'shareBudget',
-    learnMoreLink: 'https://docs.opencollective.com/help/collectives/budget',
+    learnMoreLink: 'https://documentation.opencollective.com/collectives/managing-money',
   },
   {
     id: 'receiveContributions',
-    learnMoreLink: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',
+    learnMoreLink: 'https://documentation.opencollective.com/giving-to-collectives/giving-to-collectives',
   },
   {
     id: 'manageExpenses',
-    learnMoreLink: 'https://docs.opencollective.com/help/expenses-and-getting-paid/expenses',
+    learnMoreLink: 'https://documentation.opencollective.com/expenses-and-getting-paid/expenses-and-getting-paid',
   },
   {
     id: 'engageCommunity',
-    learnMoreLink: 'https://docs.opencollective.com/help/collectives/conversations',
+    learnMoreLink: 'https://documentation.opencollective.com/collectives/keeping-your-community-updated/conversations',
   },
   {
     id: 'celebrateSupporters',
@@ -192,12 +191,6 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
   );
 };
 
-FeatureTitle.propTypes = {
-  id: PropTypes.string.isRequired,
-  activeFeature: PropTypes.string,
-  intl: PropTypes.any.isRequired,
-};
-
 const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
   <Box {...props}>
     <P
@@ -225,12 +218,6 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
   </Box>
 );
 
-FeatureDescription.propTypes = {
-  id: PropTypes.string.isRequired,
-  intl: PropTypes.any.isRequired,
-  learnMoreLink: PropTypes.string,
-};
-
 const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
     <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, 'none']} />
@@ -252,12 +239,6 @@ const Feature = ({ id, learnMoreLink, intl }) => (
     <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', 'none']} mt={2} />
   </Container>
 );
-
-Feature.propTypes = {
-  id: PropTypes.string.isRequired,
-  intl: PropTypes.any.isRequired,
-  learnMoreLink: PropTypes.string,
-};
 
 const Features = ({ sectionTitle, sectionSubtitle }) => {
   const [activeFeature, setActiveFeature] = useState(features[0]);
@@ -307,11 +288,6 @@ const Features = ({ sectionTitle, sectionSubtitle }) => {
       </Flex>
     </Flex>
   );
-};
-
-Features.propTypes = {
-  sectionTitle: PropTypes.string,
-  sectionSubtitle: PropTypes.string,
 };
 
 export default Features;

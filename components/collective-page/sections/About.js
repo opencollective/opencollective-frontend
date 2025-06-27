@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -107,25 +106,6 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
       </Container>
     </ContainerSectionContent>
   );
-};
-
-SectionAbout.propTypes = {
-  /** The collective to display description for */
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    longDescription: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isArchived: PropTypes.bool,
-    settings: PropTypes.object,
-    currency: PropTypes.string,
-  }).isRequired,
-
-  /** Can user edit the description? */
-  canEdit: PropTypes.bool,
-
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
 };
 
 export default React.memo(injectIntl(SectionAbout));

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -16,7 +15,7 @@ import { P } from '../../Text';
 import { Button } from '../../ui/Button';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const archiveCollectiveMutation = gqlV1/* GraphQL */ `
+const archiveCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation ArchiveCollective($id: Int!) {
     archiveCollective(id: $id) {
       id
@@ -25,7 +24,7 @@ const archiveCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const unarchiveCollectiveMutation = gqlV1/* GraphQL */ `
+const unarchiveCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation UnarchiveCollective($id: Int!) {
     unarchiveCollective(id: $id) {
       id
@@ -244,12 +243,6 @@ const ArchiveCollective = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-ArchiveCollective.propTypes = {
-  collective: PropTypes.object.isRequired,
-  archiveCollective: PropTypes.func,
-  unarchiveCollective: PropTypes.func,
 };
 
 export default ArchiveCollective;

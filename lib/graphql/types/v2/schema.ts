@@ -184,6 +184,12 @@ export type AccountChildrenAccountsArgs = {
 
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountConversationsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -209,6 +215,7 @@ export type AccountExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -216,6 +223,7 @@ export type AccountExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -313,6 +321,7 @@ export type AccountOAuthApplicationsArgs = {
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -382,6 +391,7 @@ export type AccountTransactionReportsArgs = {
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1590,6 +1600,12 @@ export type BotChildrenAccountsArgs = {
 
 
 /** This represents a Bot account */
+export type BotConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents a Bot account */
 export type BotConversationsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -1615,6 +1631,7 @@ export type BotExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -1622,6 +1639,7 @@ export type BotExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -1725,6 +1743,7 @@ export type BotOAuthApplicationsArgs = {
 
 /** This represents a Bot account */
 export type BotOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1794,6 +1813,7 @@ export type BotTransactionReportsArgs = {
 /** This represents a Bot account */
 export type BotTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2107,6 +2127,12 @@ export type CollectiveChildrenAccountsArgs = {
 
 
 /** This represents a Collective account */
+export type CollectiveConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents a Collective account */
 export type CollectiveContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -2140,6 +2166,7 @@ export type CollectiveExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -2147,6 +2174,7 @@ export type CollectiveExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -2264,6 +2292,7 @@ export type CollectiveOAuthApplicationsArgs = {
 
 /** This represents a Collective account */
 export type CollectiveOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2353,6 +2382,7 @@ export type CollectiveTransactionReportsArgs = {
 /** This represents a Collective account */
 export type CollectiveTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2581,8 +2611,13 @@ export type ConfirmGuestAccountResponse = {
 /** This represents a Connected Account */
 export type ConnectedAccount = {
   __typename?: 'ConnectedAccount';
+  /** The accounts that are mirroring this connected account */
+  accountsMirrored: Array<Maybe<Account>>;
   /** The date on which the ConnectedAccount was created */
   createdAt: Scalars['DateTime']['output'];
+  /** The account who connected this account */
+  createdByAccount?: Maybe<Account>;
+  hash?: Maybe<Scalars['String']['output']>;
   /** Unique identifier for this connected account */
   id: Scalars['String']['output'];
   /**
@@ -3361,6 +3396,7 @@ export type Credit = Transaction & {
   /** The permissions given to current logged in user for this transaction */
   permissions: TransactionPermissions;
   platformFee: Amount;
+  refundKind?: Maybe<RefundKind>;
   refundTransaction?: Maybe<Transaction>;
   relatedTransactions: Array<Maybe<Transaction>>;
   taxAmount: Amount;
@@ -3822,6 +3858,7 @@ export type Debit = Transaction & {
   /** The permissions given to current logged in user for this transaction */
   permissions: TransactionPermissions;
   platformFee: Amount;
+  refundKind?: Maybe<RefundKind>;
   refundTransaction?: Maybe<Transaction>;
   relatedTransactions: Array<Maybe<Transaction>>;
   taxAmount: Amount;
@@ -4113,6 +4150,12 @@ export type EventChildrenAccountsArgs = {
 
 
 /** This represents an Event account */
+export type EventConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Event account */
 export type EventContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -4146,6 +4189,7 @@ export type EventExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -4153,6 +4197,7 @@ export type EventExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -4270,6 +4315,7 @@ export type EventOAuthApplicationsArgs = {
 
 /** This represents an Event account */
 export type EventOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4359,6 +4405,7 @@ export type EventTransactionReportsArgs = {
 /** This represents an Event account */
 export type EventTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4514,6 +4561,8 @@ export type Expense = {
   /** The account from where the expense was paid */
   host?: Maybe<Host>;
   id: Scalars['String']['output'];
+  /** Date of the expense */
+  incurredAt: Scalars['DateTime']['output'];
   /** (Optional - applicable to invoice expense only) The invoice file for this expense */
   invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
@@ -4858,8 +4907,11 @@ export type ExpenseParsedFileInfo = {
 export type ExpensePermissions = {
   __typename?: 'ExpensePermissions';
   approve: Permission;
+  attachReceipts: Permission;
   /** Whether the current user can approve this expense */
   canApprove: Scalars['Boolean']['output'];
+  /** Whether the current user can attach receipts */
+  canAttachReceipts: Scalars['Boolean']['output'];
   /** Whether the current user can comment and see comments for this expense */
   canComment: Scalars['Boolean']['output'];
   /** Whether the user or the given draft key is allowed decline the expense invite */
@@ -4871,8 +4923,22 @@ export type ExpensePermissions = {
   canEdit: Scalars['Boolean']['output'];
   /** Whether the current user can edit the expense accounting category */
   canEditAccountingCategory: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense item descriptions */
+  canEditItemDescription: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense items and attachments */
+  canEditItems: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the paid by account */
+  canEditPaidBy: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the payee */
+  canEditPayee: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the payout method */
+  canEditPayoutMethod: Scalars['Boolean']['output'];
   /** Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid */
   canEditTags: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense title */
+  canEditTitle: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense type */
+  canEditType: Scalars['Boolean']['output'];
   canHold: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as incomplete */
   canMarkAsIncomplete: Scalars['Boolean']['output'];
@@ -4902,7 +4968,14 @@ export type ExpensePermissions = {
   edit: Permission;
   /** Whether the current user can edit the expense accounting category */
   editAccountingCategory: Scalars['Boolean']['output'];
+  editItemDescription: Permission;
+  editItems: Permission;
+  editPaidBy: Permission;
+  editPayee: Permission;
+  editPayoutMethod: Permission;
   editTags: Permission;
+  editTitle: Permission;
+  editType: Permission;
   hold: Permission;
   id: Scalars['String']['output'];
   markAsSpam: Permission;
@@ -5098,6 +5171,8 @@ export type ExpenseValuesByRole = {
   /** The values provided by the host admin(s) */
   hostAdmin?: Maybe<ExpenseValuesRoleDetails>;
   id: Scalars['NonEmptyString']['output'];
+  /** The values provided by the prediction service */
+  prediction?: Maybe<ExpenseValuesRoleDetails>;
   /** The values provided by the expense submitter(s) */
   submitter?: Maybe<ExpenseValuesRoleDetails>;
 };
@@ -5321,6 +5396,12 @@ export type FundChildrenAccountsArgs = {
 
 
 /** This represents an Project account */
+export type FundConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Project account */
 export type FundContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -5354,6 +5435,7 @@ export type FundExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -5361,6 +5443,7 @@ export type FundExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -5478,6 +5561,7 @@ export type FundOAuthApplicationsArgs = {
 
 /** This represents an Project account */
 export type FundOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5567,6 +5651,7 @@ export type FundTransactionReportsArgs = {
 /** This represents an Project account */
 export type FundTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5752,8 +5837,10 @@ export type Host = Account & AccountWithContributions & {
   /** EXPERIMENTAL (this may change or be removed) */
   hostExpensesReport?: Maybe<HostExpensesReports>;
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
+  /** @deprecated 2025-06-24: Low performance query, see if `hostStats` is sufficient */
   hostMetrics: HostMetrics;
   hostMetricsTimeSeries: HostMetricsTimeSeries;
+  hostStats: HostStats;
   /** EXPERIMENTAL (this may change or be removed) */
   hostTransactionsReports?: Maybe<HostTransactionReports>;
   /** Returns agreements with Hosted Accounts */
@@ -5803,6 +5890,9 @@ export type Host = Account & AccountWithContributions & {
   name?: Maybe<Scalars['String']['output']>;
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
+  offPlatformTransactions: TransactionsImportRowCollection;
+  /** Returns stats for off platform transactions */
+  offPlatformTransactionsStats: TransactionsImportStats;
   orders: OrderCollection;
   /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
@@ -5929,6 +6019,12 @@ export type HostChildrenAccountsArgs = {
 
 
 /** This represents an Host account */
+export type HostConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Host account */
 export type HostContributionStatsArgs = {
   account?: InputMaybe<Array<AccountReferenceInput>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5980,6 +6076,7 @@ export type HostExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -5987,6 +6084,7 @@ export type HostExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -6063,6 +6161,12 @@ export type HostHostMetricsTimeSeriesArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** This represents an Host account */
+export type HostHostStatsArgs = {
+  hostContext?: InputMaybe<HostContext>;
 };
 
 
@@ -6204,7 +6308,21 @@ export type HostOAuthApplicationsArgs = {
 
 
 /** This represents an Host account */
+export type HostOffPlatformTransactionsArgs = {
+  accountId?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
+  importId?: InputMaybe<Array<Scalars['NonEmptyString']['input']>>;
+  importType?: InputMaybe<Array<TransactionsImportType>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  orderBy?: TransactionsImportRowOrderInput;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TransactionsImportRowStatus>;
+};
+
+
+/** This represents an Host account */
 export type HostOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6303,6 +6421,7 @@ export type HostTransactionReportsArgs = {
 /** This represents an Host account */
 export type HostTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6347,6 +6466,14 @@ export type HostTransactionsImportsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  status?: InputMaybe<TransactionsImportStatus>;
+  type?: InputMaybe<Array<InputMaybe<TransactionsImportType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostTransactionsImportsSourcesArgs = {
+  type?: InputMaybe<Array<InputMaybe<TransactionsImportType>>>;
 };
 
 
@@ -6375,6 +6502,7 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 
@@ -6459,6 +6587,15 @@ export type HostCollection = Collection & {
   offset?: Maybe<Scalars['Int']['output']>;
   totalCount?: Maybe<Scalars['Int']['output']>;
 };
+
+export enum HostContext {
+  /** Both the Host Organizations internal accounts and Hosted Collectives */
+  ALL = 'ALL',
+  /** Only Hosted Collectives (including their projects/events) */
+  HOSTED = 'HOSTED',
+  /** Only the Host Organization (including its projects/events) */
+  INTERNAL = 'INTERNAL'
+}
 
 export type HostExpensesReportNode = {
   __typename?: 'HostExpensesReportNode';
@@ -6572,6 +6709,33 @@ export type HostPlan = {
   transferwisePayouts?: Maybe<Scalars['Int']['output']>;
   /** Amount limit for the transferwise payouts feature under this plan */
   transferwisePayoutsLimit?: Maybe<Scalars['Int']['output']>;
+};
+
+export type HostStats = {
+  __typename?: 'HostStats';
+  balance?: Maybe<Amount>;
+  totalAmountReceived?: Maybe<Amount>;
+  totalAmountSpent?: Maybe<Amount>;
+};
+
+
+export type HostStatsBalanceArgs = {
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type HostStatsTotalAmountReceivedArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  net?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type HostStatsTotalAmountSpentArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  includeGiftCards?: InputMaybe<Scalars['Boolean']['input']>;
+  net?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type HostTransactionReportNode = {
@@ -6859,6 +7023,12 @@ export type IndividualChildrenAccountsArgs = {
 
 
 /** This represents an Individual account */
+export type IndividualConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Individual account */
 export type IndividualContributorProfilesArgs = {
   forAccount: AccountReferenceInput;
 };
@@ -6890,6 +7060,7 @@ export type IndividualExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -6897,6 +7068,7 @@ export type IndividualExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -7013,6 +7185,7 @@ export type IndividualOAuthAuthorizationsArgs = {
 
 /** This represents an Individual account */
 export type IndividualOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -7089,6 +7262,7 @@ export type IndividualTransactionReportsArgs = {
 /** This represents an Individual account */
 export type IndividualTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -7218,7 +7392,10 @@ export type LegalDocument = {
   documentLink?: Maybe<Scalars['URL']['output']>;
   /** Unique identifier for this legal document */
   id: Scalars['String']['output'];
-  /** Whether this legal document is expired */
+  /**
+   * Whether this legal document is expired
+   * @deprecated 2025-05-27: Use "status" = "EXPIRED" instead
+   */
   isExpired: Scalars['Boolean']['output'];
   /** The date and time the request for this legal document was created */
   requestedAt: Scalars['DateTime']['output'];
@@ -7246,6 +7423,7 @@ export type LegalDocumentCollection = Collection & {
 /** Status for a legal document */
 export enum LegalDocumentRequestStatus {
   ERROR = 'ERROR',
+  EXPIRED = 'EXPIRED',
   INVALID = 'INVALID',
   NOT_REQUESTED = 'NOT_REQUESTED',
   RECEIVED = 'RECEIVED',
@@ -7413,6 +7591,7 @@ export enum MemberRole {
   ADMIN = 'ADMIN',
   ATTENDEE = 'ATTENDEE',
   BACKER = 'BACKER',
+  COMMUNITY_MANAGER = 'COMMUNITY_MANAGER',
   CONNECTED_ACCOUNT = 'CONNECTED_ACCOUNT',
   CONTRIBUTOR = 'CONTRIBUTOR',
   FOLLOWER = 'FOLLOWER',
@@ -7599,6 +7778,8 @@ export type Mutation = {
   inviteMember: MemberInvitation;
   /** [Root only] Merge two accounts, returns the result account */
   mergeAccounts: MergeAccountsResponse;
+  /** Moves an expense from one account within a Collective to another */
+  moveExpense: Expense;
   /** [Root only] A mutation to move expenses from one account to another */
   moveExpenses: Array<Maybe<Expense>>;
   /** [Root only] A mutation to move orders from one account to another */
@@ -8369,6 +8550,13 @@ export type MutationMergeAccountsArgs = {
 
 
 /** This is the root mutation */
+export type MutationMoveExpenseArgs = {
+  destinationAccount: AccountReferenceInput;
+  expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationMoveExpensesArgs = {
   destinationAccount: AccountReferenceInput;
   expenses: Array<ExpenseReferenceInput>;
@@ -8685,8 +8873,7 @@ export type MutationUpdateSocialLinksArgs = {
 /** This is the root mutation */
 export type MutationUpdateTransactionsImportRowsArgs = {
   action: TransactionsImportRowAction;
-  id: Scalars['NonEmptyString']['input'];
-  rows?: InputMaybe<Array<TransactionsImportRowUpdateInput>>;
+  rows: Array<TransactionsImportRowUpdateInput>;
 };
 
 
@@ -8900,7 +9087,9 @@ export enum OrderByFieldType {
   RANK = 'RANK',
   /** Order by start date */
   STARTS_AT = 'STARTS_AT',
-  TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED'
+  TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED',
+  /** Order by the date the collective was unhosted */
+  UNHOSTED_AT = 'UNHOSTED_AT'
 }
 
 /** Input to order collection */
@@ -9270,6 +9459,12 @@ export type OrganizationChildrenAccountsArgs = {
 
 
 /** This represents an Organization account */
+export type OrganizationConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Organization account */
 export type OrganizationContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -9303,6 +9498,7 @@ export type OrganizationExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -9310,6 +9506,7 @@ export type OrganizationExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -9413,6 +9610,7 @@ export type OrganizationOAuthApplicationsArgs = {
 
 /** This represents an Organization account */
 export type OrganizationOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9495,6 +9693,7 @@ export type OrganizationTransactionReportsArgs = {
 /** This represents an Organization account */
 export type OrganizationTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9651,6 +9850,7 @@ export type PaymentMethod = {
 
 /** PaymentMethod model */
 export type PaymentMethodOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9810,8 +10010,10 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
-  /** Whether this payout method can be edit or deleted */
-  canBeEditedOrDeleted?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether this payout method can be deleted or only archived */
+  canBeDeleted?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether this payout method can be edited */
+  canBeEdited?: Maybe<Scalars['Boolean']['output']>;
   /** The actual data for this payout method. Content depends on the type. */
   data?: Maybe<Scalars['JSON']['output']>;
   /** Unique identifier for this payout method */
@@ -10367,6 +10569,12 @@ export type ProjectChildrenAccountsArgs = {
 
 
 /** This represents an Project account */
+export type ProjectConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Project account */
 export type ProjectContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -10400,6 +10608,7 @@ export type ProjectExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -10407,6 +10616,7 @@ export type ProjectExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -10524,6 +10734,7 @@ export type ProjectOAuthApplicationsArgs = {
 
 /** This represents an Project account */
 export type ProjectOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10613,6 +10824,7 @@ export type ProjectTransactionReportsArgs = {
 /** This represents an Project account */
 export type ProjectTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10873,12 +11085,14 @@ export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -10966,6 +11180,7 @@ export type QueryOrderArgs = {
 /** This is the root query */
 export type QueryOrdersArgs = {
   account?: InputMaybe<AccountReferenceInput>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11090,6 +11305,7 @@ export type QueryTransactionGroupsArgs = {
 export type QueryTransactionsArgs = {
   account?: InputMaybe<Array<AccountReferenceInput>>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11131,7 +11347,7 @@ export type QueryTransactionsArgs = {
 
 /** This is the root query */
 export type QueryTransactionsImportArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['NonEmptyString']['input'];
 };
 
 
@@ -11209,6 +11425,19 @@ export enum RecurringExpenseInterval {
   quarter = 'quarter',
   week = 'week',
   year = 'year'
+}
+
+export enum RefundKind {
+  /** Transaction was refunded due to a dispute */
+  DISPUTE = 'DISPUTE',
+  /** Transaction was refunded by the platform to fix a duplicated transaction */
+  DUPLICATE = 'DUPLICATE',
+  /** Transaction reversed due to an edit */
+  EDIT = 'EDIT',
+  /** Refund issued by the host */
+  REFUND = 'REFUND',
+  /** Rejection issued by the host or collective admin */
+  REJECT = 'REJECT'
 }
 
 export type SearchResponse = {
@@ -11763,6 +11992,7 @@ export type Transaction = {
   payoutMethod?: Maybe<PayoutMethod>;
   permissions?: Maybe<TransactionPermissions>;
   platformFee: Amount;
+  refundKind?: Maybe<RefundKind>;
   refundTransaction?: Maybe<Transaction>;
   relatedTransactions: Array<Maybe<Transaction>>;
   taxAmount: Amount;
@@ -11972,11 +12202,14 @@ export type TransactionsImport = {
   name: Scalars['NonEmptyString']['output'];
   /** List of available accounts for the import */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
-  /** List of rows in the import */
+  /**
+   * List of rows in the import
+   * @deprecated 2025-04-29: Please use `host.offPlatformTransactions` instead.
+   */
   rows: TransactionsImportRowCollection;
   /** Source of the import (e.g. "Bank of America", "Eventbrite", etc...) */
   source: Scalars['NonEmptyString']['output'];
-  stats?: Maybe<TransactionsImportStats>;
+  stats: TransactionsImportStats;
   /** Type of the import */
   type: TransactionsImportType;
   /** When the import was last updated */
@@ -12007,10 +12240,10 @@ export type TransactionsImportAssignmentInput = {
 
 export type TransactionsImportEditResponse = {
   __typename?: 'TransactionsImportEditResponse';
-  /** Updated import */
-  import: TransactionsImport;
+  /** The host account that owns the off-platform transactions */
+  host?: Maybe<Host>;
   /** The rows updated by the mutation */
-  rows: Array<Maybe<TransactionsImportRow>>;
+  rows: Array<TransactionsImportRow>;
 };
 
 export type TransactionsImportReferenceInput = {
@@ -12025,6 +12258,8 @@ export type TransactionsImportRow = {
   accountId?: Maybe<Scalars['String']['output']>;
   /** The amount of the row */
   amount: Amount;
+  /** The accounts assigned to the row, based on its account ID */
+  assignedAccounts: Array<Maybe<Account>>;
   /** The date of the row */
   date: Scalars['DateTime']['output'];
   /** The description of the row */
@@ -12037,6 +12272,8 @@ export type TransactionsImportRow = {
   note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
   order?: Maybe<Order>;
+  /** If the row was imported from plaid, this is the account it was imported from */
+  plaidAccount?: Maybe<PlaidAccount>;
   /** The raw data of the row */
   rawValue?: Maybe<Scalars['JSONObject']['output']>;
   /** The source id of the row */
@@ -12076,6 +12313,18 @@ export type TransactionsImportRowCreateInput = {
   /** The source id of the row */
   sourceId: Scalars['NonEmptyString']['input'];
 };
+
+/** Input to order off platform transactions chronologically */
+export type TransactionsImportRowOrderInput = {
+  /** Ordering direction. */
+  direction?: OrderDirection;
+  /** Field to order by */
+  field?: TransactionsImportRowOrderInputField;
+};
+
+export enum TransactionsImportRowOrderInputField {
+  DATE = 'DATE'
+}
 
 export type TransactionsImportRowReferenceInput = {
   /** The id of the row */
@@ -12121,6 +12370,8 @@ export type TransactionsImportStats = {
   expenses: Scalars['Int']['output'];
   /** Number of rows that have been ignored */
   ignored: Scalars['Int']['output'];
+  /** Number of rows that have been imported (converted to expenses or orders) */
+  imported: Scalars['Int']['output'];
   /** Number of rows that are invalid (e.g. linked but without an expense or order) */
   invalid: Scalars['Int']['output'];
   /** Number of rows that are on hold */
@@ -12134,6 +12385,14 @@ export type TransactionsImportStats = {
   /** Total number of rows in the import */
   total: Scalars['Int']['output'];
 };
+
+/** Status of the import */
+export enum TransactionsImportStatus {
+  /** The import is connected and ready to sync */
+  ACTIVE = 'ACTIVE',
+  /** The import is disconnected / archived */
+  DISCONNECTED = 'DISCONNECTED'
+}
 
 /** Type of the import */
 export enum TransactionsImportType {
@@ -12532,6 +12791,8 @@ export type Vendor = Account & AccountWithContributions & {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host */
+  visibleToAccounts: Array<Maybe<Account>>;
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
@@ -12573,6 +12834,12 @@ export type VendorChildrenAccountsArgs = {
 
 
 /** This represents a Vendor account */
+export type VendorConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents a Vendor account */
 export type VendorContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -12606,6 +12873,7 @@ export type VendorExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -12613,6 +12881,7 @@ export type VendorExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -12716,6 +12985,7 @@ export type VendorOAuthApplicationsArgs = {
 
 /** This represents a Vendor account */
 export type VendorOrdersArgs = {
+  amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -12798,6 +13068,7 @@ export type VendorTransactionReportsArgs = {
 /** This represents a Vendor account */
 export type VendorTransactionsArgs = {
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  amount?: InputMaybe<AmountRangeInput>;
   clearedFrom?: InputMaybe<Scalars['DateTime']['input']>;
   clearedTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -12917,6 +13188,7 @@ export type VendorCreateInput = {
   payoutMethod?: InputMaybe<PayoutMethodInput>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 export type VendorEditInput = {
@@ -12941,6 +13213,7 @@ export type VendorEditInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 /** Some context about the vendor */

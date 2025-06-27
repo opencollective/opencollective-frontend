@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
 
 const NewsAndUpdatesContext = React.createContext({
   setShowNewsAndUpdates: () => {},
@@ -14,10 +13,6 @@ const NewsAndUpdatesProvider = ({ children }) => {
   };
 
   return <NewsAndUpdatesContext.Provider value={context}>{children}</NewsAndUpdatesContext.Provider>;
-};
-
-NewsAndUpdatesProvider.propTypes = {
-  children: PropTypes.node,
 };
 
 export const useNewsAndUpdates = () => {

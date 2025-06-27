@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
@@ -248,21 +247,6 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
       </P>
     </div>
   );
-};
-
-StepProfileGuestForm.propTypes = {
-  stepDetails: PropTypes.shape({
-    amount: PropTypes.number,
-    interval: PropTypes.string,
-  }).isRequired,
-  data: PropTypes.object,
-  collective: PropTypes.object,
-  onSignInClick: PropTypes.func,
-  onChange: PropTypes.func,
-  defaultEmail: PropTypes.string,
-  defaultName: PropTypes.string,
-  isEmbed: PropTypes.bool,
-  tier: PropTypes.object,
 };
 
 export default StepProfileGuestForm;

@@ -168,7 +168,7 @@ const MessagesPerType: Record<
   },
 };
 
-type ConfirmProcessExpenseModalType =
+export type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
   | 'MARK_AS_SPAM'
@@ -253,7 +253,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
   }, [type, message, intl, processExpense]);
 
   return (
-    <StyledModal role="alertdialog" onClose={onClose} trapFocus>
+    <StyledModal role="alertdialog" onClose={onClose}>
       <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
       <ModalBody pt={2}>
         <Flex>

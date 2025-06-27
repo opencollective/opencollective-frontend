@@ -10,6 +10,8 @@ import { space } from 'styled-system';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -48,7 +50,7 @@ const StyledMenuEntry = styled(Link)`
           backgroundColor: '#f3f4f6',
         })
       : css({
-          ':hover': {
+          '&:hover': {
             backgroundColor: '#f3f4f6',
           },
         })}
@@ -69,8 +71,8 @@ const DropdownButton = styled.button`
   cursor: pointer;
   overflow: hidden;
   &:hover,
-  :active,
-  :focus {
+  &:active,
+  &:focus {
     background: #f8fafc;
   }
 
@@ -121,7 +123,8 @@ const EMPTY_GROUP_STATE = {
 };
 
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
-  const isAdministratedAccount = m => ['ADMIN', 'ACCOUNTANT'].includes(m.role) && !m.collective.isIncognito;
+  const isAdministratedAccount = m =>
+    ['ADMIN', 'ACCOUNTANT', 'COMMUNITY_MANAGER'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
@@ -146,6 +149,24 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   return groupedAccounts;
 });
 
+const generateOptionDescription = (collective: GraphQLV1Collective, LoggedInUser: LoggedInUser) => {
+  if (LoggedInUser && !LoggedInUser.isAdminOfCollective(collective)) {
+    if (LoggedInUser.isAccountantOnly(collective)) {
+      return <FormattedMessage id="Member.Role.ACCOUNTANT" defaultMessage="Accountant" />;
+    } else if (LoggedInUser.isCommunityManagerOnly(collective)) {
+      return <FormattedMessage id="Member.Role.COMMUNITY_MANAGER" defaultMessage="Community Manager" />;
+    }
+  }
+
+  return (
+    <FormattedMessage
+      id="AccountSwitcher.Description"
+      defaultMessage="{type, select, USER {Personal profile} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
+      values={{ type: collective?.type }}
+    />
+  );
+};
+
 const Option = ({
   collective,
   description,
@@ -156,17 +177,12 @@ const Option = ({
   description?: string | ReactElement;
   isChild?: boolean;
 }) => {
-  description = description || (
-    <FormattedMessage
-      id="AccountSwitcher.Description"
-      defaultMessage="{type, select, USER {Personal profile} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
-      values={{ type: collective?.type }}
-    />
-  );
+  const { LoggedInUser } = useLoggedInUser();
+  description = description || generateOptionDescription(collective, LoggedInUser);
   return (
     <Flex alignItems="center" gridGap="12px" overflow="hidden" {...props}>
       <Avatar collective={collective} size={isChild ? 20 : 32} useIcon={isChild} />
-      <Flex flexDirection="column" overflow="hidden">
+      <Flex flexDirection="column" overflow="hidden" gap="2px">
         <P color="black.800" fontSize="14px" letterSpacing="0" fontWeight="500" truncateOverflow>
           {collective?.name}
         </P>
@@ -335,7 +351,9 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                       )}
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map(account => <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />)}
+                        .map(account => (
+                          <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
+                        ))}
                     </div>
                   );
                 })}

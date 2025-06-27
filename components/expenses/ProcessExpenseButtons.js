@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
@@ -19,8 +18,8 @@ import {
   scheduledExpensesQuery,
 } from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import Link from '../Link';
-import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
@@ -103,10 +102,10 @@ const getErrorContent = (intl, error, host) => {
 const PermissionButton = ({ icon, label, permission, ...props }) => {
   const intl = useIntl();
   let button = (
-    <StyledButton {...props} disabled={!permission.allowed}>
+    <Button {...props} disabled={!permission.allowed}>
       {permission.reason ? <InfoCircle size={14} /> : icon}
       {label}
-    </StyledButton>
+    </Button>
   );
   const message = permission.reason && intl.formatMessage(ReasonMessage[permission.reason], permission.reasonDetails);
   if (message) {
@@ -114,16 +113,6 @@ const PermissionButton = ({ icon, label, permission, ...props }) => {
   }
 
   return button;
-};
-
-PermissionButton.propTypes = {
-  icon: PropTypes.element.isRequired,
-  label: PropTypes.element.isRequired,
-  permission: PropTypes.shape({
-    allowed: PropTypes.bool,
-    reason: PropTypes.string,
-    reasonDetails: PropTypes.object,
-  }).isRequired,
 };
 
 /**
@@ -232,22 +221,22 @@ const ProcessExpenseButtons = ({
         />
       )}
       {permissions.canReject && !isViewingExpenseInHostContext && (
-        <StyledButton
+        <Button
           {...getButtonProps('REJECT')}
           onClick={() => setConfirmProcessExpenseAction('REJECT')}
-          buttonStyle="dangerSecondary"
+          variant="outlineDestructive"
           data-cy="reject-button"
         >
           <RejectIcon size={14} />
           <ButtonLabel>
             <FormattedMessage id="actions.reject" defaultMessage="Reject" />
           </ButtonLabel>
-        </StyledButton>
+        </Button>
       )}
       {permissions.canMarkAsSpam && !isMoreActions && (
-        <StyledButton
+        <Button
           {...getButtonProps('MARK_AS_SPAM')}
-          buttonStyle="dangerSecondary"
+          variant="outlineDestructive"
           data-cy="spam-button"
           onClick={() => {
             const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
@@ -273,28 +262,28 @@ const ProcessExpenseButtons = ({
           <ButtonLabel>
             <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
           </ButtonLabel>
-        </StyledButton>
+        </Button>
       )}
 
       {permissions.canUnapprove && !isViewingExpenseInHostContext && (
-        <StyledButton
+        <Button
           {...getButtonProps('UNAPPROVE')}
           onClick={() => setConfirmProcessExpenseAction('UNAPPROVE')}
-          buttonStyle="dangerSecondary"
+          variant="outlineDestructive"
           data-cy="unapprove-button"
         >
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
           </ButtonLabel>
-        </StyledButton>
+        </Button>
       )}
 
       {permissions.canUnapprove && isViewingExpenseInHostContext && (
-        <StyledButton
+        <Button
           {...getButtonProps('UNAPPROVE')}
           onClick={() => setConfirmProcessExpenseAction('REQUEST_RE_APPROVAL')}
-          buttonStyle="dangerSecondary"
+          variant="outlineDestructive"
           data-cy="request-re-approval-button"
           className="text-nowrap"
         >
@@ -302,20 +291,20 @@ const ProcessExpenseButtons = ({
           <ButtonLabel>
             <FormattedMessage id="expense.requestReApproval.btn" defaultMessage="Request re-approval" />
           </ButtonLabel>
-        </StyledButton>
+        </Button>
       )}
       {permissions.canUnschedulePayment && (
-        <StyledButton
+        <Button
           {...getButtonProps('UNSCHEDULE_PAYMENT')}
           onClick={() => triggerAction('UNSCHEDULE_PAYMENT')}
-          buttonStyle="dangerSecondary"
+          variant="outlineDestructive"
           data-cy="unapprove-button"
         >
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unschedulePayment.btn" defaultMessage="Unschedule Payment" />
           </ButtonLabel>
-        </StyledButton>
+        </Button>
       )}
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
@@ -365,55 +354,6 @@ const ProcessExpenseButtons = ({
       )}
     </React.Fragment>
   );
-};
-
-ProcessExpenseButtons.propTypes = {
-  permissions: PropTypes.shape({
-    canApprove: PropTypes.bool,
-    canUnapprove: PropTypes.bool,
-    canReject: PropTypes.bool,
-    canMarkAsSpam: PropTypes.bool,
-    canPay: PropTypes.bool,
-    canMarkAsUnpaid: PropTypes.bool,
-    canMarkAsIncomplete: PropTypes.bool,
-    canUnschedulePayment: PropTypes.bool,
-    canDelete: PropTypes.bool,
-    approve: PropTypes.shape({
-      allowed: PropTypes.bool,
-      reason: PropTypes.string,
-    }),
-  }).isRequired,
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    status: PropTypes.string,
-    securityChecks: PropTypes.arrayOf(
-      PropTypes.shape({
-        level: PropTypes.string,
-        scope: PropTypes.string,
-        message: PropTypes.string,
-      }),
-    ),
-    createdByAccount: PropTypes.shape({
-      legacyId: PropTypes.number.isRequired,
-    }),
-  }).isRequired,
-  /** The account where the expense has been submitted */
-  collective: PropTypes.object.isRequired,
-  host: PropTypes.object,
-  /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
-  buttonProps: PropTypes.object,
-  onSuccess: PropTypes.func,
-  /** Called when the expense gets deleted */
-  onDelete: PropTypes.func,
-  /** Checks if the delete action is inside the more actions button */
-  isMoreActions: PropTypes.bool,
-  /** Called when a modal is opened/closed with a boolean like (isOpen) */
-  onModalToggle: PropTypes.func,
-  displaySecurityChecks: PropTypes.bool,
-  isViewingExpenseInHostContext: PropTypes.bool,
-  disabled: PropTypes.bool,
-  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

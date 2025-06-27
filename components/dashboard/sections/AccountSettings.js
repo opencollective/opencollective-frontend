@@ -1,11 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { isArray, omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { checkIfOCF } from '../../../lib/collective';
 import { defaultBackgroundImage } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -157,14 +155,8 @@ const AccountSettings = ({ account, section }) => {
       onSubmit={handleEditCollective}
       status={state.status}
       section={section}
-      isLegacyOCFDuplicatedAccount={checkIfOCF(account.host) && account.duplicatedAccounts?.totalCount > 0}
     />
   );
-};
-
-AccountSettings.propTypes = {
-  account: PropTypes.object,
-  section: PropTypes.string,
 };
 
 export default AccountSettings;

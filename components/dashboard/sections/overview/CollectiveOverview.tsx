@@ -30,7 +30,7 @@ import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
-import { TodoList } from './TodoList';
+import { AccountTodoList } from './TodoList';
 
 export const schema = z.object({
   period: periodCompareFilter.schema,
@@ -257,8 +257,13 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 2xl:grid-cols-3">
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
-          <TodoList />
-          <Timeline accountSlug={router.query?.as ?? accountSlug} />
+          <AccountTodoList />
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">
+              <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+            </h3>
+            <Timeline accountSlug={router.query?.as ?? accountSlug} />
+          </div>
         </div>
         {!account.parent && account.isActive && (
           <div className="-order-1 space-y-6 lg:order-none">

@@ -59,6 +59,15 @@ export const vendorFieldFragment = gql`
     expenses(status: PAID, direction: SUBMITTED, limit: 1) {
       totalCount
     }
+
+    visibleToAccounts {
+      id
+      type
+      legacyId
+      slug
+      name
+      imageUrl
+    }
   }
   ${accountHoverCardFields}
 `;

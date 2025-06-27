@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
@@ -45,7 +44,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
     viewProductsMenu: false,
     viewCompanyMenu: false,
   });
-  const innerRef = React.useRef();
+  const innerRef = React.useRef(undefined);
 
   useGlobalBlur(innerRef, isOutside => {
     if (isOutside) {
@@ -154,7 +153,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   justifyContent="space-between"
                   onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
                 >
-                  <FormattedMessage id="company" defaultMessage="Company" />
+                  <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
                   <ChevronDown size={20} />
                 </Flex>
                 {state.viewCompanyMenu && (
@@ -223,13 +222,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
       </Container>
     </React.Fragment>
   );
-};
-
-TopBarMobileMenu.propTypes = {
-  showMobileMenu: PropTypes.bool,
-  closeMenu: PropTypes.func,
-  useDashboard: PropTypes.bool,
-  onHomeRoute: PropTypes.bool,
 };
 
 export default injectIntl(withUser(TopBarMobileMenu));

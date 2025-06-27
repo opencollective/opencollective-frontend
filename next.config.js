@@ -52,7 +52,6 @@ const nextConfig = {
         OC_ENV: null,
         API_KEY: null,
         API_URL: null,
-        PDF_SERVICE_URL: null,
         PDF_SERVICE_V2_URL: null,
         ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
@@ -64,7 +63,6 @@ const nextConfig = {
         WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
-        OCF_DUPLICATE_FLOW: false,
         TURNSTILE_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
@@ -72,11 +70,11 @@ const nextConfig = {
         OC_APPLICATION: null,
         HEROKU_SLUG_COMMIT: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+        DISABLE_CONTACT_FORM: false,
       }),
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      // eslint-disable-next-line n/no-unpublished-require
       const CircularDependencyPlugin = require('circular-dependency-plugin');
       config.plugins.push(
         new CircularDependencyPlugin({
@@ -103,6 +101,12 @@ const nextConfig = {
             // eslint-disable-next-line n/no-extraneous-require
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
+          },
+          {
+            // eslint-disable-next-line n/no-extraneous-require
+            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'build/pdf.worker.min.mjs'),
+            to: path.join(__dirname, 'public/static/scripts/pdf.worker.min.mjs'),
+            info: { minimized: true },
           },
         ],
       }),
@@ -304,23 +308,29 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig(
-  {
-    ...nextConfig,
-    sentry: {
-      hideSourceMaps: true,
+let exportedConfig = nextConfig;
+
+if (process.env.SENTRY_AUTH_TOKEN) {
+  exportedConfig = withSentryConfig(
+    {
+      ...nextConfig,
+      sentry: {
+        hideSourceMaps: true,
+      },
     },
-  },
-  {
-    org: 'open-collective',
-    project: 'oc-frontend',
-    authToken: process.env.SENTRY_AUTH_TOKEN,
-    silent: true,
-  },
-);
+    {
+      org: 'open-collective',
+      project: 'oc-frontend',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: true,
+    },
+  );
+} else if (process.env.OC_ENV === 'production') {
+  // eslint-disable-next-line no-console
+  console.warn('[!!! WARNING !!!] SENTRY_AUTH_TOKEN not found. Skipping Sentry configuration.');
+}
 
 if (process.env.ANALYZE) {
-  // eslint-disable-next-line n/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });

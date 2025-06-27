@@ -10,6 +10,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { TaxInput } from '../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../lib/i18n/taxes';
+import type { ConfirmContributionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -132,8 +133,16 @@ export const ConfirmContributionForm = ({
   footer = null,
   FormBodyContainer = Fragment,
   initialValues = {},
+}: {
+  onSubmit: () => void;
+  onSuccess: () => void;
+  onFailure: () => void;
+  footer?: React.ReactNode;
+  FormBodyContainer?: React.ComponentType<{ children: React.ReactNode }>;
+  initialValues?: { amountReceived?: number; processedAt?: string; transactionsImportRow?: { id: string } };
+  order: ConfirmContributionFieldsFragment;
 }) => {
-  const defaultHostFeePercent = order.hostFeePercent || order.toAccount.bankTransfersHostFeePercent || 0;
+  const defaultHostFeePercent = order.hostFeePercent ?? order.toAccount['bankTransfersHostFeePercent'] ?? 0;
   const defaultTaxPercent = order.tax?.rate * 100 || 0;
   const defaultPlatformTip = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + defaultPlatformTip;
@@ -152,8 +161,8 @@ export const ConfirmContributionForm = ({
   const taxAmount = taxPercent ? Math.round(contributionAmount - grossContributionAmount) : null;
   const hostFee = Math.round((contributionAmount - taxAmount) * hostFeePercent) / 100;
   const netAmount = contributionAmount - paymentProcessorFee - hostFee - taxAmount;
-  const canAddHostFee = !order.toAccount.isHost;
-  const applicableTax = getApplicableTaxType(order.toAccount, order.toAccount.host);
+  const canAddHostFee = !order.toAccount['isHost'];
+  const applicableTax = getApplicableTaxType(order.toAccount, order.toAccount['host']);
 
   return (
     <form

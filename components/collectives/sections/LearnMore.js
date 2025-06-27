@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -71,7 +70,7 @@ const learningChannels = [
   {
     id: 'documentation',
     name: 'Documentation',
-    link: 'https://docs.opencollective.com',
+    link: 'https://documentation.opencollective.com',
     desktopItemOrder: 1,
   },
   {
@@ -244,10 +243,6 @@ const LearnMore = ({ page }) => {
       )}
     </Container>
   );
-};
-
-LearnMore.propTypes = {
-  page: PropTypes.string,
 };
 
 export default LearnMore;

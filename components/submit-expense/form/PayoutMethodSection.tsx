@@ -15,7 +15,7 @@ import {
   type SavePayoutMethodMutation,
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
-import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
 import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
@@ -46,8 +46,10 @@ type PayoutMethodSectionProps = {
 function getFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
-    ...pick(form.values, ['payeeSlug', 'payoutMethodId']),
+    ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.options, [
+      'host',
+      'isHostAdmin',
       'payee',
       'payoutMethods',
       'newPayoutMethodTypes',
@@ -134,7 +136,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
 
-  const isVendor = props.payee?.type === CollectiveType.VENDOR;
+  const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
 
   const onPaymentMethodDeleted = React.useCallback(
     async deletedPayoutMethodId => {
@@ -154,19 +156,53 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     [refresh, setFieldValue],
   );
 
+  if (isVendor && !props.isHostAdmin) {
+    if (!props.payee || props.payee?.['hasPayoutMethod']) {
+      return (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="The vendor payout method is managed by the host." id="KnF5xM" />
+        </MessageBox>
+      );
+    } else {
+      return (
+        <MessageBox type="error">
+          <FormattedMessage
+            defaultMessage="This vendor is missing payout method information, please contact {hostName} before submitting to this vendor."
+            id="H4wPrV"
+            values={{
+              hostName: props.host?.name,
+            }}
+          />
+        </MessageBox>
+      );
+    }
+  }
+
   return (
     <div>
       {!isLoading &&
       !isLoadingPayee &&
       !isPickingProfileAdministered &&
       !isVendor &&
+      props.payeeSlug !== '__newVendor' &&
       !props.isAdminOfPayee &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
         <MessageBox type="info">
-          <FormattedMessage
-            defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
-            id="LHdznY"
-          />
+          {props.expenseTypeOption === ExpenseType.GRANT ? (
+            <FormattedMessage
+              defaultMessage="The person you are inviting to submit this grant request will be asked to provide payout method details."
+              id="lsGVcb"
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+              id="LHdznY"
+            />
+          )}
+        </MessageBox>
+      ) : props.payeeSlug === '__newVendor' ? (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="Save the vendor information to create a payout method" id="E8oTcs" />
         </MessageBox>
       ) : (
         <RadioGroup
@@ -199,18 +235,20 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             </RadioGroupCard>
           )}
 
-          {!(isLoading || isLoadingPayee) && !isVendor && props.newPayoutMethodTypes?.length > 0 && (
-            <RadioGroupCard
-              value="__newPayoutMethod"
-              data-cy="add-new-payout-method"
-              checked={isNewPayoutMethodSelected}
-              disabled={isLoading || props.initialLoading || props.isSubmitting}
-              showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
-              subContent={<NewPayoutMethodOptionWrapper />}
-            >
-              <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
-            </RadioGroupCard>
-          )}
+          {!(isLoading || isLoadingPayee) &&
+            props.newPayoutMethodTypes?.length > 0 &&
+            !(isVendor && payoutMethods.length > 0) && (
+              <RadioGroupCard
+                value="__newPayoutMethod"
+                data-cy="add-new-payout-method"
+                checked={isNewPayoutMethodSelected}
+                disabled={isLoading || props.initialLoading || props.isSubmitting}
+                showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
+                subContent={<NewPayoutMethodOptionWrapper />}
+              >
+                <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+              </RadioGroupCard>
+            )}
         </RadioGroup>
       )}
     </div>
@@ -325,15 +363,18 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   );
 
   const onPayoutMethodTypeChange = React.useCallback(
-    value => setFieldValue('newPayoutMethod.type', value as PayoutMethodType),
+    value => {
+      setFieldValue('newPayoutMethod.data', {});
+      setFieldValue('newPayoutMethod.type', value as PayoutMethodType);
+    },
     [setFieldValue],
   );
 
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.newPayoutMethod.data?.accountHolderName ?? '';
-    const payeeLegalName: string = props.payee?.legalName ?? '';
+    const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
     return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
-  }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName]);
+  }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
     props.newPayoutMethod.data?.accountHolderName?.length &&
@@ -455,7 +496,6 @@ type PayoutMethodRadioGroupItemProps = {
   moreActions?: React.ReactNode;
 };
 
-// eslint-disable-next-line prefer-arrow-callback
 export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
   const CardComponent = props.Component || RadioGroupCard;
   const intl = useIntl();
@@ -465,9 +505,9 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
-    const payeeLegalName: string = props.payee?.legalName ?? '';
+    const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
     return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
-  }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName]);
+  }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
     props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
@@ -559,7 +599,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
       e.stopPropagation();
       e.preventDefault();
       showConfirmationModal({
-        title: props.payoutMethod?.canBeEditedOrDeleted
+        title: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({
               defaultMessage: 'Delete Payout Method?',
               id: 'weGvmF',
@@ -568,7 +608,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
               defaultMessage: 'Archive Payout Method?',
               id: 'dX2XCG',
             }),
-        description: props.payoutMethod?.canBeEditedOrDeleted
+        description: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({
               defaultMessage: 'Are you sure you want to delete this payout method?',
               id: 'uR+TjD',
@@ -589,7 +629,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             await props.onPaymentMethodDeleted(props.payoutMethod.id);
             toast({
               variant: 'success',
-              message: props.payoutMethod?.canBeEditedOrDeleted ? (
+              message: props.payoutMethod?.canBeDeleted ? (
                 <FormattedMessage defaultMessage="Payout Method deleted successfully" id="2sVunP" />
               ) : (
                 <FormattedMessage defaultMessage="Payout Method archived successfully" id="njlj6i" />
@@ -602,7 +642,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             });
           }
         },
-        confirmLabel: props.payoutMethod?.canBeEditedOrDeleted
+        confirmLabel: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({ defaultMessage: 'Delete Payout Method', id: 'Rs7g0Y' })
           : intl.formatMessage({ defaultMessage: 'Archive Payout Method', id: 'L0TUHP' }),
         variant: 'destructive',

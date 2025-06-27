@@ -18,6 +18,9 @@ const buttonVariants = cva(
         outlineDestructive:
           'border border-destructive bg-background text-destructive hover:bg-destructive hover:text-primary-foreground',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        success: 'bg-green-600 text-primary-foreground hover:bg-green-600/80',
+        outlineSuccess:
+          'border border-green-600 bg-background text-green-600 hover:bg-green-600 hover:text-primary-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
@@ -84,4 +87,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+const AsyncCallButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({ onClick, ...props }, ref) => {
+  const [loading, setLoading] = React.useState(false);
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await onClick?.(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return <Button {...props} ref={ref} onClick={handleClick} loading={loading} />;
+});
+
+export { Button, AsyncCallButton, buttonVariants };

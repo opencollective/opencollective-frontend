@@ -20,12 +20,31 @@ export const adminPanelQuery = gql`
       canHaveChangelogUpdates
       connectedAccounts {
         id
+        hash
         service
       }
       duplicatedAccounts {
         totalCount
       }
-      pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
+      pendingExpenses: expenses(
+        status: PENDING
+        direction: RECEIVED
+        includeChildrenExpenses: true
+        limit: 0
+        types: [INVOICE, RECEIPT, FUNDING_REQUEST, UNCLASSIFIED, CHARGE, SETTLEMENT]
+      ) {
+        totalCount
+      }
+      pendingGrants: expenses(
+        status: PENDING
+        direction: RECEIVED
+        includeChildrenExpenses: true
+        limit: 0
+        type: GRANT
+      ) {
+        totalCount
+      }
+      issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
         totalCount
       }
       pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {

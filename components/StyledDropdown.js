@@ -55,7 +55,7 @@ export const DropdownArrow = styled('div')`
  * @deprecated Use `ui/DropdownMenu` instead
  */
 export const Dropdown = styled(({ children, trigger, ...props }) => {
-  const dropdownRef = useRef();
+  const dropdownRef = useRef(undefined);
   const [isDisplayed, setDisplayed] = React.useState(false);
   const closeDropdown = React.useCallback(() => {
     if (isDisplayed) {
@@ -76,7 +76,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
 
   if (typeof children === 'function' && trigger === 'click') {
     return (
-      <div ref={dropdownRef} {...props} data-expanded={isDisplayed}>
+      <div {...props} ref={dropdownRef} data-expanded={isDisplayed}>
         {children({
           isDisplayed,
           triggerProps: {
@@ -103,7 +103,6 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     <div
       role="button"
       tabIndex={0}
-      // eslint-disable-next-line react/no-unknown-property
       trigger={trigger}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}

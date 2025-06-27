@@ -15,6 +15,8 @@ import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Drawer } from '../../../Drawer';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -43,7 +45,7 @@ import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT']),
   defaultValue: {
     field: 'CREATED_AT',
     direction: 'DESC',
@@ -95,14 +97,16 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   },
   type: {
     labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
-    Component: ({ intl, ...props }) => {
+    Component: ({ intl, meta, ...props }) => {
       const options = useMemo(
         () =>
-          Object.values(HostedCollectiveTypes).map(value => ({
-            label: formatCollectiveType(intl, value),
-            value,
-          })),
-        [intl],
+          Object.values(HostedCollectiveTypes)
+            .filter(type => (meta.hasGrantAndFundsReorgEnabled ? type !== HostedCollectiveTypes.FUND : true))
+            .map(value => ({
+              label: formatCollectiveType(intl, value),
+              value,
+            })),
+        [intl, meta.hasGrantAndFundsReorgEnabled],
       );
       return <ComboSelectFilter options={options} isMulti {...props} />;
     },
@@ -118,8 +122,18 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const router = useRouter();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
+
+  const { LoggedInUser } = useLoggedInUser();
+  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const accountTypes = hasGrantAndFundsReorgEnabled
+    ? [CollectiveType.COLLECTIVE]
+    : [CollectiveType.COLLECTIVE, CollectiveType.FUND];
+
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
-    variables: { hostSlug },
+    variables: { hostSlug, accountTypes },
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     context: API_V2_CONTEXT,
   });
@@ -142,26 +156,35 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       id: 'all',
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {
-        type: [CollectiveType.COLLECTIVE, CollectiveType.FUND],
+        type: accountTypes,
       },
       count: metadata?.host?.all?.totalCount,
     },
     {
       id: 'active',
       label: intl.formatMessage(CollectiveStatusMessages[COLLECTIVE_STATUS.ACTIVE]),
-      filter: { status: COLLECTIVE_STATUS.ACTIVE, type: [CollectiveType.COLLECTIVE, CollectiveType.FUND] },
+      filter: {
+        status: COLLECTIVE_STATUS.ACTIVE,
+        type: accountTypes,
+      },
       count: metadata?.host?.active?.totalCount,
     },
     {
       id: 'frozen',
       label: intl.formatMessage(CollectiveStatusMessages[COLLECTIVE_STATUS.FROZEN]),
-      filter: { status: COLLECTIVE_STATUS.FROZEN, type: [CollectiveType.COLLECTIVE, CollectiveType.FUND] },
+      filter: {
+        status: COLLECTIVE_STATUS.FROZEN,
+        type: accountTypes,
+      },
       count: metadata?.host?.frozen?.totalCount,
     },
     {
       id: 'unhosted',
       label: intl.formatMessage(CollectiveStatusMessages[COLLECTIVE_STATUS.UNHOSTED]),
-      filter: { status: COLLECTIVE_STATUS.UNHOSTED, type: [CollectiveType.COLLECTIVE, CollectiveType.FUND] },
+      filter: {
+        status: COLLECTIVE_STATUS.UNHOSTED,
+        type: accountTypes,
+      },
       count: metadata?.host?.unhosted?.totalCount,
     },
   ];
@@ -171,7 +194,11 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     schema,
     toVariables,
     views,
-    meta: { currency: metadata?.host?.currency, currencies: metadata?.host?.all?.currencies },
+    meta: {
+      currency: metadata?.host?.currency,
+      currencies: metadata?.host?.all?.currencies,
+      hasGrantAndFundsReorgEnabled,
+    },
   });
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
@@ -239,6 +266,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
               cols.team,
               !isUnhosted && cols.fee,
               !isUnhosted && cols.hostedSince,
+              isUnhosted && cols.unhostedAt,
               cols.consolidatedBalance,
               cols.actions,
             ])}
@@ -253,7 +281,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
                 onEdit: handleEdit,
                 host: data?.host,
                 openCollectiveDetails: handleDrawer,
-              } as HostedCollectivesDataTableMeta
+              } as unknown as HostedCollectivesDataTableMeta
             }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
@@ -271,7 +299,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       >
         {showCollectiveOverview && (
           <CollectiveDetails
-            collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
+            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}
             onCancel={() => handleDrawer(null)}

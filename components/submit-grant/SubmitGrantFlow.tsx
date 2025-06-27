@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
   CreateExpenseFromDashboardMutation,
@@ -14,6 +15,7 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { objectKeys } from '@/lib/utils';
 
 import { I18nBold } from '../I18nFormatters';
@@ -44,6 +46,7 @@ type SubmitGrantFlowProps = {
   expenseId?: number;
   draftKey?: string;
   handleOnClose: () => void;
+  onGrantSubmitted?: (grantId: number) => void;
 };
 
 export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
@@ -53,8 +56,21 @@ export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
       draftKey={props.draftKey}
       account={props.account}
       handleOnClose={props.handleOnClose}
+      onGrantSubmitted={props.onGrantSubmitted}
     />
   );
+}
+
+export function SubmitGrantFlowModal(
+  props: Omit<SubmitGrantFlowProps, 'handleOnClose'> & { open: boolean; setOpen: (open: boolean) => void },
+) {
+  const { open, setOpen, ...rest } = props;
+
+  if (!open) {
+    return null;
+  }
+
+  return <SubmitGrantFlow {...rest} handleOnClose={() => setOpen(false)} />;
 }
 
 type SubmitGrantDialogProps = {
@@ -63,6 +79,7 @@ type SubmitGrantDialogProps = {
   expenseId?: number;
   draftKey?: string;
   account: { slug: string; name?: string };
+  onGrantSubmitted?: (grantId: number) => void;
 };
 
 function SubmitGrantDialog(props: SubmitGrantDialogProps) {
@@ -70,13 +87,28 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [submittedGrantId, setSubmittedGrantId] = React.useState(null);
 
-  const onViewAllExpensesClick = React.useCallback(() => {
+  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const onViewAllGrantRequestsClick = React.useCallback(() => {
     if (LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+      router.replace(
+        `/dashboard/${LoggedInUser.collective.slug}/${hasGrantAndFundsReorgEnabled ? 'submitted-grants' : 'submitted-expenses'}`,
+      );
     } else {
-      router.replace(`${props.account.slug}/expenses`);
+      router.replace(`${props.account.slug}/expenses?type=GRANT`);
     }
-  }, [LoggedInUser, props.account.slug, router]);
+  }, [LoggedInUser, props.account.slug, router, hasGrantAndFundsReorgEnabled]);
+
+  const { onGrantSubmitted: onGrantSubmittedCallback } = props;
+  const onGrantSubmitted = React.useCallback(
+    grantId => {
+      setSubmittedGrantId(grantId);
+      onGrantSubmittedCallback?.(grantId);
+    },
+    [onGrantSubmittedCallback],
+  );
 
   return (
     <Dialog
@@ -103,8 +135,8 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
             <span className="text-xl leading-7 font-bold text-slate-800">
               {!submittedGrantId && (
                 <FormattedMessage
-                  defaultMessage="Grant Application to {accountName}"
-                  id="tk1wte"
+                  defaultMessage="Grant request to {accountName}"
+                  id="8XxCaD"
                   values={{
                     accountName: props.account.name,
                   }}
@@ -113,8 +145,8 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
               {submittedGrantId && (
                 <span className="text-xl leading-7 font-bold text-slate-800">
                   <FormattedMessage
-                    defaultMessage="Grant application #{submittedGrantId} has been submitted successfully!"
-                    id="o4LqjE"
+                    defaultMessage="Grant request #{submittedGrantId} has been submitted successfully!"
+                    id="wpp2sr"
                     values={{ submittedGrantId }}
                   />
                 </span>
@@ -150,7 +182,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
                 draftKey={props.draftKey}
                 expenseId={props.expenseId}
                 accountSlug={props.account.slug}
-                onGrantSubmitted={setSubmittedGrantId}
+                onGrantSubmitted={onGrantSubmitted}
               />
             )}
             {submittedGrantId && (
@@ -163,28 +195,49 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           </main>
           {submittedGrantId && (
             <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
-              <FormattedMessage
-                defaultMessage="<b>Grants are processed as 'expenses'.</b> To view your application, <link>View All Expenses</link>"
-                id="oAwTV8"
-                values={{
-                  b: I18nBold,
-                  link: c => {
-                    return (
-                      <React.Fragment>
-                        &nbsp;
+              {hasGrantAndFundsReorgEnabled ? (
+                <FormattedMessage
+                  defaultMessage="To view your request,<link>View All Grants</link>"
+                  id="bPzQ2t"
+                  values={{
+                    link: c => {
+                      return (
                         <Button
                           className="h-5 px-0 leading-5"
                           size="xs"
                           variant="link"
-                          onClick={onViewAllExpensesClick}
+                          onClick={onViewAllGrantRequestsClick}
                         >
                           {c}
                         </Button>
-                      </React.Fragment>
-                    );
-                  },
-                }}
-              />
+                      );
+                    },
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="<b>Grants are processed as 'expenses'.</b> To view your application, <link>View All Expenses</link>"
+                  id="oAwTV8"
+                  values={{
+                    b: I18nBold,
+                    link: c => {
+                      return (
+                        <React.Fragment>
+                          &nbsp;
+                          <Button
+                            className="h-5 px-0 leading-5"
+                            size="xs"
+                            variant="link"
+                            onClick={onViewAllGrantRequestsClick}
+                          >
+                            {c}
+                          </Button>
+                        </React.Fragment>
+                      );
+                    },
+                  }}
+                />
+              )}
             </DialogFooter>
           )}
         </div>
@@ -205,7 +258,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
 
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,
@@ -223,7 +276,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
     (result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>) => {
       toast({
         variant: 'success',
-        title: <FormattedMessage defaultMessage="Grant Application submitted" id="9XkBTl" />,
+        title: <FormattedMessage defaultMessage="Grant Request submitted" id="m/bWLw" />,
         message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
         duration: 20000,
       });
@@ -298,7 +351,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
         items: [
           {
             name: Step.WHO_WILL_RECEIVE_FUNDS,
-            title: <FormattedMessage defaultMessage="Who will receive the fund?" id="q5ZkgW" />,
+            title: <FormattedMessage defaultMessage="Who will receive the funds?" id="CAYwc2" />,
             formValues: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
           },
           {
@@ -315,8 +368,8 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       },
       {
         name: Step.SUMMARY,
-        previousButtonMessage: <FormattedMessage defaultMessage="Edit Application" id="ByzFz7" />,
-        nextButtonMessage: <FormattedMessage defaultMessage="Submit Application" id="1vrJP6" />,
+        previousButtonMessage: <FormattedMessage defaultMessage="Edit Grant Request" id="rt0pRL" />,
+        nextButtonMessage: <FormattedMessage defaultMessage="Submit Grant Request" id="eUf/fj" />,
         title: <FormattedMessage defaultMessage="Summary" id="Summary" />,
       },
     ],
@@ -491,7 +544,13 @@ function FormContainer(props: FormContainerProps) {
             id={Step.PAYOUT_METHOD}
             inViewChange={onInViewChange}
             title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
-            subtitle={<FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />}
+            subtitle={
+              form.options.payee?.type === CollectiveType.VENDOR || !form.options.isAdminOfPayee ? (
+                <FormattedMessage defaultMessage="Where the money will be sent to" id="IQIlkE" />
+              ) : (
+                <FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />
+              )
+            }
           >
             <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(form)} />
           </FormSectionContainer>
@@ -514,7 +573,7 @@ function FormContainer(props: FormContainerProps) {
           <FormSectionContainer
             id={Step.SUMMARY}
             inViewChange={onInViewChange}
-            title={<FormattedMessage defaultMessage="Review application" id="lB/ra7" />}
+            title={<FormattedMessage defaultMessage="Review grant request" id="QQ0CHl" />}
           >
             <SummarySectionContent form={form} />
           </FormSectionContainer>

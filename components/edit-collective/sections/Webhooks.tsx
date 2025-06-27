@@ -354,11 +354,11 @@ class Webhooks extends React.Component<Props, State> {
             id="gN829M"
             values={{
               GraphqlAPILink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/contributing/development/api#graphql-api',
+                href: 'https://documentation.opencollective.com/development/api',
                 openInNewTab: true,
               }),
               DocLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/collectives/collective-settings/integrations#webhooks-generic-slack-discord',
+                href: 'https://documentation.opencollective.com/collective-settings/integrations#webhooks-generic-slack-discord',
                 openInNewTab: true,
               }),
             }}
@@ -411,7 +411,7 @@ class Webhooks extends React.Component<Props, State> {
   }
 }
 
-const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
+const editCollectiveWebhooksQuery = gqlV1 /* GraphQL */ `
   query EditCollectiveWebhooks($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
@@ -435,7 +435,7 @@ const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
   }
 `;
 
-const editCollectiveWebhooksMutation = gqlV1/* GraphQL */ `
+const editCollectiveWebhooksMutation = gqlV1 /* GraphQL */ `
   mutation EditCollectiveWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
     editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
       id

@@ -345,7 +345,7 @@ class UpdatePaymentPage extends React.Component {
   }
 }
 
-const replaceCreditCardMutation = gqlV1/* GraphQL */ `
+const replaceCreditCardMutation = gqlV1 /* GraphQL */ `
   mutation ReplaceCreditCard(
     $id: Int!
     $collectiveId: Int!
@@ -361,7 +361,7 @@ const replaceCreditCardMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const subscriptionsQuery = gqlV1/* GraphQL */ `
+const subscriptionsQuery = gqlV1 /* GraphQL */ `
   query UpdateSubscriptionsForPaymentMethod($paymentMethodId: Int) {
     PaymentMethod(id: $paymentMethodId) {
       id

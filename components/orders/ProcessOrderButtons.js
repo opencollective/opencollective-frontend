@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
@@ -165,20 +164,6 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
       )}
     </React.Fragment>
   );
-};
-
-ProcessOrderButtons.propTypes = {
-  permissions: PropTypes.shape({
-    canMarkAsExpired: PropTypes.bool,
-    canMarkAsPaid: PropTypes.bool,
-  }).isRequired,
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    paymentMethod: PropTypes.object,
-  }).isRequired,
-  onError: PropTypes.func,
-  onSuccess: PropTypes.func,
 };
 
 export default ProcessOrderButtons;

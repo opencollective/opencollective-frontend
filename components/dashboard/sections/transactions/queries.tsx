@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
-const transactionsTableQueryCollectionFragment = gql`
+export const transactionsTableQueryCollectionFragment = gql`
   fragment TransactionsTableQueryCollectionFragment on TransactionCollection {
     totalCount
     offset
@@ -34,6 +34,7 @@ const transactionsTableQueryCollectionFragment = gql`
         id
         group
       }
+      refundKind
       host {
         id
         slug
@@ -72,6 +73,10 @@ const transactionsTableQueryCollectionFragment = gql`
         canDownloadInvoice
         canReject
       }
+      paymentMethod {
+        id
+        service
+      }
     }
   }
   ${accountHoverCardFields}
@@ -87,6 +92,7 @@ export const transactionsTableQuery = gql`
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
     $paymentMethodService: [PaymentMethodService]
+    $amount: AmountRangeInput
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: DateTime
@@ -121,6 +127,7 @@ export const transactionsTableQuery = gql`
       type: $type
       paymentMethodType: $paymentMethodType
       paymentMethodService: $paymentMethodService
+      amount: $amount
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom

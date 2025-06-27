@@ -26,7 +26,6 @@ const defaults = {
   IMAGES_URL: 'https://images-staging.opencollective.com',
   WEBSITE_URL: 'http://localhost:3000',
   REST_URL: 'https://rest-staging.opencollective.com',
-  PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
   PDF_SERVICE_V2_URL: 'https://pdf-staging.opencollective.com',
   ML_SERVICE_URL: 'https://ml.opencollective.com',
   DISABLE_MOCK_UPLOADS: false,
@@ -35,7 +34,6 @@ const defaults = {
   GOOGLE_MAPS_API_KEY: 'AIzaSyAZJnIxtBw5bxnu2QoCUiLCjV1nk84Vnk0',
   RECAPTCHA_SITE_KEY: '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
   HCAPTCHA_SITEKEY: '10000000-ffff-ffff-ffff-000000000001',
-  OCF_DUPLICATE_FLOW: false,
   TURNSTILE_SITEKEY: '0x4AAAAAAAS6okaJ_ThVJqYq',
   CAPTCHA_ENABLED: false,
   CAPTCHA_PROVIDER: 'HCAPTCHA',
@@ -50,6 +48,7 @@ const defaults = {
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+  DISABLE_CONTACT_FORM: false,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

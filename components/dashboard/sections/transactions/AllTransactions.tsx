@@ -7,6 +7,7 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import type { Currency } from '@/lib/graphql/types/v2/schema';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
@@ -32,7 +33,8 @@ const schema = commonSchema.extend({
 type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
-  hostSlug: string;
+  hostSlug?: string;
+  currency?: Currency;
 };
 
 // Only needed when values and key of filters are different
@@ -61,7 +63,7 @@ const AllTransactions = () => {
     schema,
     toVariables,
     filters,
-    meta: {},
+    meta: { currency: 'USD' as Currency },
     defaultFilterValues: {
       date: {
         number: 1,

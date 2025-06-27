@@ -1,14 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { FormattedMessage } from 'react-intl';
+
+import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import { Box, Flex } from './Grid';
 import Image from './Image';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
 
-export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
+export const InviteCollectiveDropdownOption = ({ onClick, isSearching, expenseType }) => (
   <Flex flexDirection="column">
     {isSearching && (
       <Flex mb="16px">
@@ -27,17 +28,16 @@ export const InviteCollectiveDropdownOption = ({ onClick, isSearching }) => (
       <Flex alignItems="center">
         <PlusCircle size={24} />
         <Box ml="16px" fontSize="11px">
-          <FormattedMessage
-            id="CollectivePicker.InviteMenu.ButtonLabel"
-            defaultMessage="Invite someone to submit an expense"
-          />
+          {expenseType === ExpenseType.GRANT ? (
+            <FormattedMessage defaultMessage="Invite someone to submit a grant request" id="OJwe9I" />
+          ) : (
+            <FormattedMessage
+              id="CollectivePicker.InviteMenu.ButtonLabel"
+              defaultMessage="Invite someone to submit an expense"
+            />
+          )}
         </Box>
       </Flex>
     </StyledButton>
   </Flex>
 );
-
-InviteCollectiveDropdownOption.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  isSearching: PropTypes.bool,
-};

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { isEmpty, startCase } from 'lodash';
 import { AlertTriangle } from 'lucide-react';
@@ -172,33 +171,4 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
       </Container>
     </Flex>
   );
-};
-
-AuthorizedApp.propTypes = {
-  authorization: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    lastUsedAt: PropTypes.string.isRequired,
-    preAuthorize2FA: PropTypes.bool,
-    scope: PropTypes.arrayOf(PropTypes.string.isRequired),
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }).isRequired,
-    application: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      account: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string,
-      }).isRequired,
-    }).isRequired,
-  }),
-  onRevoke: PropTypes.func,
 };

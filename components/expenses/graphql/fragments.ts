@@ -24,7 +24,8 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
       name
       data
       isSaved
-      canBeEditedOrDeleted
+      canBeEdited
+      canBeDeleted
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, COLLECTIVE, FUND]) {
       nodes {
@@ -522,6 +523,13 @@ export const expensePageExpenseFieldsFragment = gql`
       canEdit
       canEditTags
       canEditAccountingCategory
+      canEditType
+      canEditTitle
+      canEditItems
+      canEditPaidBy
+      canEditPayee
+      canEditPayoutMethod
+      canAttachReceipts
       canDelete
       canSeeInvoiceInfo
       canApprove

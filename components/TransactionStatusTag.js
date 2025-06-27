@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../lib/constants/order-status';
@@ -86,23 +85,6 @@ const TransactionStatusTag = ({ transaction, ...props }) => {
     );
   }
   return tag;
-};
-
-TransactionStatusTag.propTypes = {
-  isRefund: PropTypes.bool,
-  isRefunded: PropTypes.bool,
-  isOrderRejected: PropTypes.bool,
-  isProcessingOrPending: PropTypes.bool,
-  transaction: PropTypes.shape({
-    type: PropTypes.string,
-    isRefund: PropTypes.bool,
-    isRefunded: PropTypes.bool,
-    isOrderRejected: PropTypes.bool,
-    isProcessingOrPending: PropTypes.bool,
-    order: PropTypes.shape({
-      status: PropTypes.string,
-    }),
-  }),
 };
 
 export default TransactionStatusTag;

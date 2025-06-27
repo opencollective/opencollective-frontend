@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dynamic from 'next/dynamic';
 
 import InlineEditField from '../InlineEditField';
@@ -38,15 +37,6 @@ const TierVideo = ({ tier, editMutation, canEdit, ...inlineEditFieldProps }) => 
       }}
     </InlineEditField>
   );
-};
-
-TierVideo.propTypes = {
-  tier: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    videoUrl: PropTypes.string,
-  }).isRequired,
-  editMutation: PropTypes.object,
-  canEdit: PropTypes.bool,
 };
 
 export default TierVideo;

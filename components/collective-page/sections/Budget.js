@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -309,7 +308,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
     return isIndividual ? (
       <Link
-        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS,CONTRIBUTION,PLATFORM_TIP`}
+        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION&kind=PLATFORM_TIP`}
         data-cy="view-all-transactions-link"
       >
         <FormattedMessage
@@ -326,14 +325,6 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
   } else {
     return null;
   }
-};
-
-ViewAllLink.propTypes = {
-  collective: PropTypes.object,
-  hasExpenses: PropTypes.bool,
-  isIndividual: PropTypes.bool,
-  hasTransactions: PropTypes.bool,
-  filter: PropTypes.oneOf(FILTERS),
 };
 
 /**
@@ -439,22 +430,6 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
       </Flex>
     </ContainerSectionContent>
   );
-};
-
-SectionBudget.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool,
-    isHost: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.object,
-  }),
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(withUser(SectionBudget));

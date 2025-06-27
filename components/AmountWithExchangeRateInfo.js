@@ -1,10 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { AmountPropTypeShape } from '../lib/prop-types';
 import { cn } from '../lib/utils';
 
 import DateTime from './DateTime';
@@ -78,13 +76,13 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
 
 const AmountWithExchangeRateInfo = ({
   amount: { exchangeRate, currency, value, valueInCents },
-  amountClassName,
-  showCurrencyCode,
-  invertIconPosition,
-  warning,
-  error,
-  amountWrapperClassName,
-  currencyCodeClassName,
+  amountClassName = null,
+  showCurrencyCode = undefined,
+  invertIconPosition = false,
+  warning = null,
+  error = null,
+  amountWrapperClassName = undefined,
+  currencyCodeClassName = undefined,
 }) => {
   const intl = useIntl();
   return (
@@ -112,17 +110,6 @@ const AmountWithExchangeRateInfo = ({
       </Flex>
     </StyledTooltip>
   );
-};
-
-AmountWithExchangeRateInfo.propTypes = {
-  amount: AmountPropTypeShape,
-  showCurrencyCode: PropTypes.bool,
-  invertIconPosition: PropTypes.bool,
-  amountClassName: PropTypes.object,
-  amountWrapperClassName: PropTypes.string,
-  currencyCodeClassName: PropTypes.string,
-  warning: PropTypes.node,
-  error: PropTypes.node,
 };
 
 export default AmountWithExchangeRateInfo;

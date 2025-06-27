@@ -590,6 +590,7 @@ enum ContributorRole {
   HOST
   ADMIN
   MEMBER
+  COMMUNITY_MANAGER
   CONTRIBUTOR
   BACKER
   ATTENDEE
@@ -1053,9 +1054,15 @@ type ConnectedAccountType {
   id: Int
   service: String
   username: String
+  hash: String
   settings: JSON
   createdAt: DateString
   updatedAt: DateString
+
+  """
+  The account who connected this account
+  """
+  createdByUser: UserDetails
 }
 
 """
@@ -4396,6 +4403,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this account has any payout methods saved
   """
   hasPayoutMethod: Boolean
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [CollectiveInterface]
 }
 
 """
@@ -4512,6 +4524,11 @@ type Query {
     Included vendors for specific host ID
     """
     includeVendorsForHostId: Int
+
+    """
+    Only return vendors visible to given account ids
+    """
+    vendorVisibleToAccountIds: [Int]
 
     """
     Whether to skip recent accounts (48h)
@@ -4651,6 +4668,11 @@ type Mutation {
     If true, a signIn link will be sent to the user
     """
     sendSignInLink: Boolean = true
+
+    """
+    Captcha verification data
+    """
+    captcha: CaptchaInputType
   ): CreateUserResult
 
   """
@@ -5000,6 +5022,21 @@ input UserInputType {
 }
 
 scalar Email
+
+"""
+Input type for captcha verification
+"""
+input CaptchaInputType {
+  """
+  The captcha token to verify
+  """
+  token: String!
+
+  """
+  The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
+  """
+  provider: String!
+}
 
 """
 Input type for ConnectedAccountInputType

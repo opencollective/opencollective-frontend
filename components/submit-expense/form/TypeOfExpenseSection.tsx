@@ -139,7 +139,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
-                  policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  policy={props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedCollectiveReceiptExpensePolicy}
                   onAcknowledgedChanged={v => props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)}
                 />
@@ -166,7 +166,7 @@ function getInvoiceFormProps(form: ExpenseForm) {
     initialLoading: form.initialLoading,
     isSubmitting: form.isSubmitting,
     ...pick(form.options, ['isAdminOfPayee', 'payee']),
-    ...pick(form.values, ['invoiceFile', 'hasInvoiceOption']),
+    ...pick(form.values, ['invoiceFile', 'hasInvoiceOption', 'expenseTypeOption']),
   };
 }
 
@@ -211,10 +211,15 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
       <Label>
         {props.isAdminOfPayee || !LoggedInUser ? (
           <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
+        ) : props.expenseTypeOption === ExpenseType.GRANT ? (
+          <FormattedMessage
+            defaultMessage="The person you are inviting to submit this grant request will be asked to provide payout method details."
+            id="lsGVcb"
+          />
         ) : (
           <FormattedMessage
-            defaultMessage="The person you are inviting to submit this expense will be asked to provide an invoice. Do you have one?"
-            id="Sioe6W"
+            defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+            id="LHdznY"
           />
         )}
       </Label>

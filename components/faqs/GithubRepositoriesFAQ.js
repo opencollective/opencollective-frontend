@@ -39,7 +39,7 @@ const GithubRepositoriesFAQ = props => (
     </Entry>
     <Box mt={3}>
       <StyledLink
-        href="https://docs.oscollective.org/faq"
+        href="https://docs.oscollective.org"
         background="#f3f1fe"
         padding="8px 16px"
         borderRadius="100px"

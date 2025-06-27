@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { getTopContributors } from '../../../lib/collective';
@@ -28,21 +27,6 @@ const SectionTopFinancialContributors = ({ collective, financialContributors }) 
       <TopContributors organizations={topOrganizations} individuals={topIndividuals} currency={collective.currency} />
     </ContainerSectionContent>
   );
-};
-
-SectionTopFinancialContributors.propTypes = {
-  collective: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string,
-  }),
-
-  financialContributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-      isBacker: PropTypes.bool,
-      tiersIds: PropTypes.arrayOf(PropTypes.number),
-    }),
-  ),
 };
 
 export default React.memo(SectionTopFinancialContributors);

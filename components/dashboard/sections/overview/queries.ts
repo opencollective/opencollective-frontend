@@ -1,6 +1,7 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { transactionsTableQueryCollectionFragment } from '../transactions/queries';
 
 export const timelineQuery = gql`
   query Timeline($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
@@ -397,4 +398,94 @@ export const overviewMetricsQuery = gql`
     }
   }
   ${accountHoverCardFields}
+`;
+
+export const orgOverviewMetricsQuery = gql`
+  query OrgOverviewMetrics($slug: String!, $dateFrom: DateTime, $dateTo: DateTime) {
+    account(slug: $slug) {
+      id
+      isActive
+      ...AccountHoverCardFields
+      spent: stats {
+        id
+        current: totalAmountSpent(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
+          currency
+          valueInCents
+        }
+      }
+      received: stats {
+        id
+        current: totalAmountReceived(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
+          currency
+          valueInCents
+        }
+      }
+
+      transactions(
+        limit: 5
+        includeDebts: true
+        includeChildrenTransactions: true
+        includeIncognitoTransactions: true
+        dateFrom: $dateFrom
+        dateTo: $dateTo
+        orderBy: { direction: DESC, field: CREATED_AT }
+      ) {
+        ...TransactionsTableQueryCollectionFragment
+      }
+    }
+  }
+  ${accountHoverCardFields}
+  ${transactionsTableQueryCollectionFragment}
+`;
+
+export const hostOverviewMetricsQuery = gql`
+  query HostOverviewMetrics(
+    $slug: String!
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $hostContext: HostContext
+    $transactionsForAccount: [AccountReferenceInput!]
+    $excludeTransactionsForAccount: [AccountReferenceInput!]
+  ) {
+    host(slug: $slug) {
+      id
+      isActive
+      ...AccountHoverCardFields
+      hostStats(hostContext: $hostContext) {
+        balance(dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        comparisonBalance: balance(dateTo: $dateFrom) {
+          valueInCents
+          currency
+        }
+        totalAmountSpent(dateFrom: $dateFrom, dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(dateFrom: $dateFrom, dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+      }
+    }
+
+    transactions(
+      host: { slug: $slug }
+      limit: 5
+      includeDebts: true
+      account: $transactionsForAccount
+      excludeAccount: $excludeTransactionsForAccount
+      includeChildrenTransactions: true
+      includeIncognitoTransactions: true
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      orderBy: { direction: DESC, field: CREATED_AT }
+    ) {
+      ...TransactionsTableQueryCollectionFragment
+    }
+  }
+  ${accountHoverCardFields}
+  ${transactionsTableQueryCollectionFragment}
 `;

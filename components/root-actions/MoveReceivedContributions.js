@@ -271,6 +271,4 @@ const MoveReceivedContributions = () => {
   );
 };
 
-MoveReceivedContributions.propTypes = {};
-
 export default MoveReceivedContributions;

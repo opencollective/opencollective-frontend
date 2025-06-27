@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -65,10 +64,6 @@ const ResendDraftInviteButton = ({ expense }) => {
   );
 };
 
-ResendDraftInviteButton.propTypes = {
-  expense: PropTypes.object.isRequired,
-};
-
 const ResendSignInEmailButton = ({ createdUser }) => {
   const { loading, call, error, data } = useAsyncCall(async () => {
     const userExists = await checkUserExistence(createdUser.email);
@@ -100,10 +95,6 @@ const ResendSignInEmailButton = ({ createdUser }) => {
       )}
     </StyledButton>
   );
-};
-
-ResendSignInEmailButton.propTypes = {
-  createdUser: PropTypes.object.isRequired,
 };
 
 const ExpenseInviteNotificationBanner = props => {
@@ -155,11 +146,6 @@ const ExpenseInviteNotificationBanner = props => {
       </Flex>
     </StyledCard>
   );
-};
-
-ExpenseInviteNotificationBanner.propTypes = {
-  createdUser: PropTypes.object,
-  expense: PropTypes.object.isRequired,
 };
 
 export default ExpenseInviteNotificationBanner;

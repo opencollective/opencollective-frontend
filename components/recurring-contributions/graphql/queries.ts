@@ -80,6 +80,13 @@ export const managedOrderFragment = gql`
       }
       ...AccountHoverCardFields
     }
+    createdByAccount {
+      id
+      name
+      slug
+      type
+      ...AccountHoverCardFields
+    }
     toAccount {
       id
       slug
@@ -90,6 +97,15 @@ export const managedOrderFragment = gql`
       imageUrl
       backgroundImageUrl(height: 256)
       settings
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          name
+          type
+          imageUrl
+        }
+      }
       ... on AccountWithHost {
         host {
           id

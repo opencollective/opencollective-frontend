@@ -387,6 +387,11 @@ interface Account {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -584,6 +589,11 @@ interface Account {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -670,6 +680,11 @@ interface Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -714,6 +729,11 @@ interface Account {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -850,7 +870,12 @@ interface Account {
   """
   The list of connected accounts (Stripe, PayPal, etc ...)
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -1840,6 +1865,7 @@ enum MemberRole {
   HOST
   ATTENDEE
   MEMBER
+  COMMUNITY_MANAGER
   FUNDRAISER @deprecated(reason: "2022-09-12: This role does not exist anymore")
   FOLLOWER
   ACCOUNTANT
@@ -2169,6 +2195,7 @@ interface Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
+  refundKind: RefundKind
   description(
     """
     Wether to generate the description dynamically.
@@ -2322,6 +2349,33 @@ enum TransactionKind {
   TAX
 }
 
+enum RefundKind {
+  """
+  Refund issued by the host
+  """
+  REFUND
+
+  """
+  Rejection issued by the host or collective admin
+  """
+  REJECT
+
+  """
+  Transaction reversed due to an edit
+  """
+  EDIT
+
+  """
+  Transaction was refunded by the platform to fix a duplicated transaction
+  """
+  DUPLICATE
+
+  """
+  Transaction was refunded due to a dispute
+  """
+  DISPUTE
+}
+
 """
 Information about a tax
 """
@@ -2432,6 +2486,11 @@ type Expense {
   The time of creation
   """
   createdAt: DateTime!
+
+  """
+  Date of the expense
+  """
+  incurredAt: DateTime!
 
   """
   Currency that should be used for the payout
@@ -2968,6 +3027,11 @@ type Host implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -3165,6 +3229,11 @@ type Host implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -3251,6 +3320,11 @@ type Host implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -3295,6 +3369,11 @@ type Host implements Account & AccountWithContributions {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -3420,7 +3499,12 @@ type Host implements Account & AccountWithContributions {
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -3736,6 +3820,7 @@ type Host implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   hostTransactionsReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostTransactionReports
+  hostStats(hostContext: HostContext = ALL): HostStats!
   hostMetrics(
     """
     A collection of accounts for which the metrics should be returned.
@@ -3751,7 +3836,7 @@ type Host implements Account & AccountWithContributions {
     The end date of the time series
     """
     dateTo: DateTime
-  ): HostMetrics!
+  ): HostMetrics! @deprecated(reason: "2025-06-24: Low performance query, see if `hostStats` is sufficient")
   hostMetricsTimeSeries(
     """
     A collection of accounts for which the metrics should be returned.
@@ -4008,6 +4093,11 @@ type Host implements Account & AccountWithContributions {
     forAccount: AccountReferenceInput
 
     """
+    Only returns vendors that are visible to the given accounts
+    """
+    visibleToAccounts: [AccountReferenceInput]
+
+    """
     Filter on archived vendors
     """
     isArchived: Boolean
@@ -4164,15 +4254,76 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
 
     """
+    Filter by status of transactions import
+    """
+    status: TransactionsImportStatus
+
+    """
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
   ): TransactionsImportsCollection!
 
   """
   Returns a list of transactions imports sources for this host
   """
-  transactionsImportsSources: [NonEmptyString]!
+  transactionsImportsSources(
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
+  ): [NonEmptyString]!
+  offPlatformTransactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter rows by status
+    """
+    status: TransactionsImportRowStatus
+
+    """
+    Search by text
+    """
+    searchTerm: String
+
+    """
+    Filter rows by plaid account id
+    """
+    accountId: [NonEmptyString]
+
+    """
+    The transactions import id(s)
+    """
+    importId: [NonEmptyString!]
+
+    """
+    Filter rows by import type
+    """
+    importType: [TransactionsImportType!]
+
+    """
+    The order of results
+    """
+    orderBy: TransactionsImportRowOrderInput! = { field: DATE, direction: DESC }
+  ): TransactionsImportRowCollection!
+
+  """
+  Returns stats for off platform transactions
+  """
+  offPlatformTransactionsStats: TransactionsImportStats!
 }
 
 """
@@ -4397,7 +4548,7 @@ type LegalDocument {
   """
   Whether this legal document is expired
   """
-  isExpired: Boolean!
+  isExpired: Boolean! @deprecated(reason: "2025-05-27: Use \"status\" = \"EXPIRED\" instead")
 
   """
   The date and time the request for this legal document was created
@@ -4439,6 +4590,7 @@ enum LegalDocumentRequestStatus {
   RECEIVED
   ERROR
   INVALID
+  EXPIRED
 }
 
 """
@@ -4531,6 +4683,11 @@ enum OrderByFieldType {
   Order by end date
   """
   ENDS_AT
+
+  """
+  Order by the date the collective was unhosted
+  """
+  UNHOSTED_AT
 }
 
 """
@@ -4602,6 +4759,93 @@ enum PaymentMethodService {
   OPENCOLLECTIVE
   THEGIVINGBLOCK
   WISE
+}
+
+"""
+Input type for an amount range with the value and currency
+"""
+input AmountRangeInput {
+  """
+  The minimum amount (inclusive)
+  """
+  gte: AmountInput
+
+  """
+  The maximum amount (inclusive)
+  """
+  lte: AmountInput
+}
+
+"""
+Input type for an amount with the value and currency
+"""
+input AmountInput {
+  """
+  The value in plain
+  """
+  value: Float
+
+  """
+  The currency string
+  """
+  currency: Currency
+
+  """
+  The value in cents
+  """
+  valueInCents: Int
+
+  """
+  If the amount was generated from a currency conversion, this field can be used to provide details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRateInput
+}
+
+"""
+Fields for a currency exchange rate
+"""
+input CurrencyExchangeRateInput {
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Exchange rate value as a float (e.g 1.15 or 0.86)
+  """
+  value: Float!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
 }
 
 input ExpenseReferenceInput {
@@ -5149,9 +5393,14 @@ type PayoutMethod {
   data: JSON
 
   """
-  Whether this payout method can be edit or deleted
+  Whether this payout method can be edited
   """
-  canBeEditedOrDeleted: Boolean
+  canBeEdited: Boolean
+
+  """
+  Whether this payout method can be deleted or only archived
+  """
+  canBeDeleted: Boolean
 }
 
 """
@@ -5252,6 +5501,11 @@ type PaymentMethod {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return orders where the amount is greater than or equal to this value (in cents)
@@ -5365,6 +5619,17 @@ type ConnectedAccount {
   updatedAt: DateTime!
   settings: JSON
   service: ConnectedAccountService!
+
+  """
+  The accounts that are mirroring this connected account
+  """
+  accountsMirrored: [Account]!
+  hash: String
+
+  """
+  The account who connected this account
+  """
+  createdByAccount: Account
 }
 
 """
@@ -6751,6 +7016,69 @@ type HostTransactionReportNode {
   operationalFunds: TransactionReport!
 }
 
+type HostStats {
+  balance(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): Amount
+  totalAmountSpent(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+
+    """
+    Include transactions using Gift Cards
+    """
+    includeGiftCards: Boolean = false
+  ): Amount
+  totalAmountReceived(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+  ): Amount
+}
+
+enum HostContext {
+  """
+  Both the Host Organizations internal accounts and Hosted Collectives
+  """
+  ALL
+
+  """
+  Only the Host Organization (including its projects/events)
+  """
+  INTERNAL
+
+  """
+  Only Hosted Collectives (including their projects/events)
+  """
+  HOSTED
+}
+
 """
 Host metrics related to collected and pending fees/tips.
 """
@@ -6962,78 +7290,6 @@ type StripeConnectedAccount {
 }
 
 """
-Input type for an amount with the value and currency
-"""
-input AmountInput {
-  """
-  The value in plain
-  """
-  value: Float
-
-  """
-  The currency string
-  """
-  currency: Currency
-
-  """
-  The value in cents
-  """
-  valueInCents: Int
-
-  """
-  If the amount was generated from a currency conversion, this field can be used to provide details about the conversion
-  """
-  exchangeRate: CurrencyExchangeRateInput
-}
-
-"""
-Fields for a currency exchange rate
-"""
-input CurrencyExchangeRateInput {
-  """
-  Where does the FX rate comes from
-  """
-  source: CurrencyExchangeRateSourceType!
-  fromCurrency: Currency!
-  toCurrency: Currency!
-
-  """
-  Date of the FX rate
-  """
-  date: DateTime!
-
-  """
-  Exchange rate value as a float (e.g 1.15 or 0.86)
-  """
-  value: Float!
-}
-
-"""
-Where does the FX rate come from
-"""
-enum CurrencyExchangeRateSourceType {
-  """
-  Open Collective internal system, relying on caching and 3rd party APIs
-  """
-  OPENCOLLECTIVE
-
-  """
-  PayPal API
-  """
-  PAYPAL
-
-  """
-  Wise API
-  """
-  WISE
-
-  """
-  User-provided exchange rate
-  """
-  USER
-}
-
-"""
 Contribution statistics related to the given accounts
 """
 type ContributionStats {
@@ -7140,21 +7396,6 @@ type HostedAccountCollection implements Collection {
   totalCount: Int
   nodes: [Account]
   currencies: [String]
-}
-
-"""
-Input type for an amount range with the value and currency
-"""
-input AmountRangeInput {
-  """
-  The minimum amount (inclusive)
-  """
-  gte: AmountInput
-
-  """
-  The maximum amount (inclusive)
-  """
-  lte: AmountInput
 }
 
 """
@@ -7282,7 +7523,8 @@ type TransactionsImport {
     """
     accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
-  stats: TransactionsImportStats
+    @deprecated(reason: "2025-04-29: Please use `host.offPlatformTransactions` instead.")
+  stats: TransactionsImportStats!
 }
 
 """
@@ -7405,6 +7647,16 @@ type TransactionsImportRow {
   accountId: String
 
   """
+  If the row was imported from plaid, this is the account it was imported from
+  """
+  plaidAccount: PlaidAccount
+
+  """
+  The accounts assigned to the row, based on its account ID
+  """
+  assignedAccounts: [Account]!
+
+  """
   The raw data of the row
   """
   rawValue: JSONObject
@@ -7477,6 +7729,11 @@ type TransactionsImportStats {
   processed: Int!
 
   """
+  Number of rows that have been imported (converted to expenses or orders)
+  """
+  imported: Int!
+
+  """
   Number of rows that are on hold
   """
   onHold: Int!
@@ -7490,6 +7747,40 @@ type TransactionsImportStats {
   Number of rows that are invalid (e.g. linked but without an expense or order)
   """
   invalid: Int!
+}
+
+"""
+Status of the import
+"""
+enum TransactionsImportStatus {
+  """
+  The import is connected and ready to sync
+  """
+  ACTIVE
+
+  """
+  The import is disconnected / archived
+  """
+  DISCONNECTED
+}
+
+"""
+Input to order off platform transactions chronologically
+"""
+input TransactionsImportRowOrderInput {
+  """
+  Field to order by
+  """
+  field: TransactionsImportRowOrderInputField! = DATE
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+enum TransactionsImportRowOrderInputField {
+  DATE
 }
 
 enum AccountingCategoryAppliesTo {
@@ -7514,6 +7805,11 @@ type ExpenseValuesByRole {
   The values provided by the host admin(s)
   """
   hostAdmin: ExpenseValuesRoleDetails
+
+  """
+  The values provided by the prediction service
+  """
+  prediction: ExpenseValuesRoleDetails
 }
 
 type ExpenseValuesRoleDetails {
@@ -7662,6 +7958,46 @@ type ExpensePermissions {
   canEdit: Boolean!
 
   """
+  Whether the current user can edit the expense title
+  """
+  canEditTitle: Boolean!
+
+  """
+  Whether the current user can edit the expense type
+  """
+  canEditType: Boolean!
+
+  """
+  Whether the current user can edit the paid by account
+  """
+  canEditPaidBy: Boolean!
+
+  """
+  Whether the current user can edit the payee
+  """
+  canEditPayee: Boolean!
+
+  """
+  Whether the current user can edit the payout method
+  """
+  canEditPayoutMethod: Boolean!
+
+  """
+  Whether the current user can edit the expense items and attachments
+  """
+  canEditItems: Boolean!
+
+  """
+  Whether the current user can attach receipts
+  """
+  canAttachReceipts: Boolean!
+
+  """
+  Whether the current user can edit the expense item descriptions
+  """
+  canEditItemDescription: Boolean!
+
+  """
   Whether the current user can edit the expense accounting category
   """
   canEditAccountingCategory: Boolean!
@@ -7750,6 +8086,14 @@ type ExpensePermissions {
   """
   canSeePayoutMethodPrivateDetails: Boolean!
   edit: Permission!
+  editTitle: Permission!
+  editType: Permission!
+  editPaidBy: Permission!
+  editPayee: Permission!
+  editPayoutMethod: Permission!
+  editItems: Permission!
+  attachReceipts: Permission!
+  editItemDescription: Permission!
 
   """
   Whether the current user can edit the expense accounting category
@@ -8339,6 +8683,11 @@ type Bot implements Account {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -8536,6 +8885,11 @@ type Bot implements Account {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -8622,6 +8976,11 @@ type Bot implements Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -8666,6 +9025,11 @@ type Bot implements Account {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -8791,7 +9155,12 @@ type Bot implements Account {
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -9252,6 +9621,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -9449,6 +9823,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -9535,6 +9914,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -9579,6 +9963,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -9704,7 +10093,12 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -10189,6 +10583,7 @@ type Credit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
+  refundKind: RefundKind
   description(
     """
     Wether to generate the description dynamically.
@@ -10334,6 +10729,7 @@ type Debit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
+  refundKind: RefundKind
   description(
     """
     Wether to generate the description dynamically.
@@ -10714,6 +11110,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -10911,6 +11312,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -10997,6 +11403,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -11041,6 +11452,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -11166,7 +11582,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -11896,6 +12317,11 @@ type Individual implements Account {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -12093,6 +12519,11 @@ type Individual implements Account {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -12179,6 +12610,11 @@ type Individual implements Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -12223,6 +12659,11 @@ type Individual implements Account {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -12348,7 +12789,12 @@ type Individual implements Account {
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -13056,6 +13502,11 @@ type Organization implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -13253,6 +13704,11 @@ type Organization implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -13339,6 +13795,11 @@ type Organization implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -13383,6 +13844,11 @@ type Organization implements Account & AccountWithContributions {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -13508,7 +13974,12 @@ type Organization implements Account & AccountWithContributions {
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -14082,6 +14553,11 @@ type Vendor implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -14279,6 +14755,11 @@ type Vendor implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -14365,6 +14846,11 @@ type Vendor implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -14409,6 +14895,11 @@ type Vendor implements Account & AccountWithContributions {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -14534,7 +15025,12 @@ type Vendor implements Account & AccountWithContributions {
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -14835,6 +15331,11 @@ type Vendor implements Account & AccountWithContributions {
   The account who created this order
   """
   createdByAccount: Account
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [Account]!
 }
 
 """
@@ -15197,6 +15698,11 @@ type Query {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -15241,6 +15747,11 @@ type Query {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -15543,6 +16054,11 @@ type Query {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -15783,6 +16299,11 @@ type Query {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -15976,7 +16497,7 @@ type Query {
     """
     The public id identifying the import (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
     """
-    id: String!
+    id: NonEmptyString!
   ): TransactionsImport
   update(
     """
@@ -17785,6 +18306,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -17982,6 +18508,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -18068,6 +18599,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -18112,6 +18648,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -18237,7 +18778,12 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -18845,6 +19391,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return transactions where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
@@ -19042,6 +19593,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
 
     """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
+
+    """
     Only return orders where the amount is greater than or equal to this value (in cents)
     """
     minAmount: Int
@@ -19128,6 +19684,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -19172,6 +19733,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses that match this amount range
+    """
+    amount: AmountRangeInput
 
     """
     Only return expenses where the amount is greater than or equal to this value (in cents)
@@ -19297,7 +19863,12 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
-  connectedAccounts: [ConnectedAccount]
+  connectedAccounts(
+    """
+    Filter connected accounts by service
+    """
+    service: ConnectedAccountService
+  ): [ConnectedAccount]
 
   """
   The list of applications created by this account. Admin only. Scope: "applications".
@@ -20534,6 +21105,21 @@ type Mutation {
   ): Expense!
 
   """
+  Moves an expense from one account within a Collective to another
+  """
+  moveExpense(
+    """
+    Reference of the expense to move
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    Reference of the account to move the expense to
+    """
+    destinationAccount: AccountReferenceInput!
+  ): Expense!
+
+  """
   Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses".
   """
   deleteExpense(
@@ -21522,14 +22108,9 @@ type Mutation {
   """
   updateTransactionsImportRows(
     """
-    ID of the import to add transactions to
-    """
-    id: NonEmptyString!
-
-    """
     Rows to update
     """
-    rows: [TransactionsImportRowUpdateInput!]
+    rows: [TransactionsImportRowUpdateInput!]!
 
     """
     Action to perform on all non-processed rows
@@ -23850,14 +24431,14 @@ input TransactionsImportRowCreateInput {
 
 type TransactionsImportEditResponse {
   """
-  Updated import
+  The host account that owns the off-platform transactions
   """
-  import: TransactionsImport!
+  host: Host
 
   """
   The rows updated by the mutation
   """
-  rows: [TransactionsImportRow]!
+  rows: [TransactionsImportRow!]!
 }
 
 input TransactionsImportRowUpdateInput {
@@ -24217,6 +24798,7 @@ input VendorCreateInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  visibleToAccounts: [AccountReferenceInput]
 
   """
   The profile avatar image
@@ -24271,6 +24853,7 @@ input VendorEditInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  visibleToAccounts: [AccountReferenceInput]
 
   """
   The profile avatar image

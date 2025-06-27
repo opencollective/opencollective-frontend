@@ -7,11 +7,11 @@ import { createGlobalStyle } from 'styled-components';
 import type { Context } from '../lib/apollo-client';
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
-import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { FEATURES, getFeatureStatus } from '@/lib/allowed-features';
 import { getRequestIntl } from '@/lib/i18n/request';
 import { getWhitelabelRedirection } from '@/lib/whitelabel';
 
@@ -142,7 +142,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
     !['ORGANIZATION', 'FUND', 'INDIVIDUAL', 'USER'].includes(collective?.type) &&
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN) &&
     LoggedInUser?.isAdminOfCollective(collective) &&
-    collective?.host?.id !== OPENCOLLECTIVE_FOUNDATION_ID;
+    collective?.isActive;
 
   return (
     <Page
@@ -150,6 +150,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
       canonicalURL={getCollectivePageCanonicalURL(collective)}
       {...getCollectivePageMetadata(collective)}
       loading={loading}
+      updatesRss={getFeatureStatus(collective, FEATURES.UPDATES) === 'ACTIVE'}
     >
       <GlobalStyles />
       {loading ? (

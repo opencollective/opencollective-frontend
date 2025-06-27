@@ -4,6 +4,7 @@ enum GraphQLV1MemberRole {
   HOST = 'HOST', // holds money on behalf of the collective
   ADMIN = 'ADMIN', // can approve expenses
   MEMBER = 'MEMBER', // member of the collective but cannot approve expenses
+  COMMUNITY_MANAGER = 'COMMUNITY_MANAGER', // can post updates and moderate comments, similar to MEMBER
   CONTRIBUTOR = 'CONTRIBUTOR', // occasional contributor (giving time)
   BACKER = 'BACKER', // supporter giving money
   ATTENDEE = 'ATTENDEE', // someone who registered for a free tier (typically a free event ticket)

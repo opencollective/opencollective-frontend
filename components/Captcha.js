@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import * as Sentry from '@sentry/browser';
 import { toUpper } from 'lodash';
@@ -36,7 +35,7 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
     try {
       const token = await verify();
       if (token) {
-        onVerify({ token });
+        onVerify({ token, provider: PROVIDERS.RECAPTCHA });
         setVerified(true);
       }
     } catch (e) {
@@ -64,11 +63,6 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
   );
 };
 
-ReCaptcha.propTypes = {
-  onVerify: PropTypes.func,
-  onError: PropTypes.func,
-};
-
 /**
  * @type {React.ForwardRefExoticComponent<{ onVerify: (result) => void;}>}
  */
@@ -92,12 +86,13 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
   }
 
   let captcha = null;
+
   if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
     captcha = (
       <HCaptcha
         ref={captchaRef}
         sitekey={HCAPTCHA_SITEKEY}
-        onVerify={token => handleVerify({ token })}
+        onVerify={token => handleVerify({ provider, token })}
         onError={handleError}
       />
     );
@@ -107,7 +102,7 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
     captcha = (
       <Turnstile
         sitekey={TURNSTILE_SITE_KEY}
-        onVerify={token => handleVerify({ token })}
+        onVerify={token => handleVerify({ provider, token })}
         onError={handleError}
         theme="light"
         {...props}
@@ -119,10 +114,5 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
 });
 
 Captcha.displayName = 'Captcha';
-
-Captcha.propTypes = {
-  onVerify: PropTypes.func,
-  provider: PropTypes.string,
-};
 
 export default Captcha;

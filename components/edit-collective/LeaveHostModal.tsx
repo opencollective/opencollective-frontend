@@ -39,7 +39,7 @@ const leaveHostMutation = gql`
   }
 `;
 
-const leaveHostQuery = gql`
+export const leaveHostQuery = gql`
   query AccountInfoForLeaveHost($slug: String) {
     account(slug: $slug, throwIfMissing: true) {
       id
@@ -71,7 +71,7 @@ const LeaveHostFormSchemaWithRecurringContributions = LeaveHostFormSchema.merge(
   }),
 );
 
-const getPortabilitySummary = (
+export const getPortabilitySummary = (
   account,
 ): {
   totalCount: number;

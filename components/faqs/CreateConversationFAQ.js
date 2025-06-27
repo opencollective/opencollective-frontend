@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
@@ -41,9 +40,5 @@ const CreateConversationFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
   </FAQ>
 );
-
-CreateConversationFAQ.propTypes = {
-  defaultOpen: PropTypes.bool,
-};
 
 export default CreateConversationFAQ;

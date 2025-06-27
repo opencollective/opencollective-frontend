@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
@@ -16,10 +15,6 @@ const CreditCard = ({ size, ...props }) => {
       </g>
     </CustomStyledIcon>
   );
-};
-
-CreditCard.propTypes = {
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default CreditCard;

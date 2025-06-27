@@ -26,9 +26,9 @@ export function elementFromClass<K extends keyof React.JSX.IntrinsicElements>(
   type: K,
   className: string,
 ): React.ForwardRefExoticComponent<React.JSX.IntrinsicElements[K]>;
-// eslint-disable-next-line no-redeclare
+
 export function elementFromClass<T>(type: T, className: string): T;
-// eslint-disable-next-line no-redeclare
+
 export function elementFromClass(type, className) {
   const render = (
     {

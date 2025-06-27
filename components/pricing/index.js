@@ -75,7 +75,7 @@ const ListItem = styled.li`
   margin-top: 16px;
   margin-bottom: 16px;
 
-  ::before {
+  &::before {
     content: '•';
     color: ${themeGet('colors.blue.700')};
     display: inline-block;
@@ -214,7 +214,7 @@ const Pricing = () => {
                     values={{
                       ...I18nFormatters,
                       IndependentCollectiveLink: getI18nLink({
-                        href: 'https://docs.opencollective.com/help/independent-collectives',
+                        href: 'https://documentation.opencollective.com/independent-collectives/independent-collectives',
                         openInNewTab: true,
                       }),
                       FiscalHostLink: getI18nLink({

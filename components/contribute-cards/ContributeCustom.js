@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
@@ -31,15 +30,6 @@ const ContributeCustom = ({ intl, collective, contributors, stats, ...props }) =
       {intl.formatMessage(messages.description)}
     </Contribute>
   );
-};
-
-ContributeCustom.propTypes = {
-  intl: PropTypes.object,
-  stats: PropTypes.object,
-  contributors: PropTypes.arrayOf(PropTypes.object),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default injectIntl(ContributeCustom);
