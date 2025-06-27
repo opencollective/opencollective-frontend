@@ -46,7 +46,7 @@ function SelectLimit({ limit, setLimit, defaultLimit }) {
   );
 }
 
-export function Pagination({ total, queryFilter }) {
+export function Pagination({ total, queryFilter, hideLimitSelector = false }) {
   const { LoggedInUser } = useLoggedInUser();
   const { offset, limit } = queryFilter.values;
   const defaultLimit = queryFilter.defaultSchemaValues.limit;
@@ -166,7 +166,9 @@ export function Pagination({ total, queryFilter }) {
     <div className="flex items-center justify-between gap-1">
       <UIPagination className="flex-1 items-center justify-between sm:flex">
         <div className="hidden lg:block">
-          <SelectLimit limit={limit} defaultLimit={defaultLimit} setLimit={l => queryFilter.setFilter('limit', l)} />
+          {!hideLimitSelector && (
+            <SelectLimit limit={limit} defaultLimit={defaultLimit} setLimit={l => queryFilter.setFilter('limit', l)} />
+          )}
         </div>
 
         <div className="block text-sm font-medium text-muted-foreground lg:hidden">

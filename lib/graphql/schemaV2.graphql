@@ -2478,6 +2478,11 @@ type Expense {
   accountingCategory: AccountingCategory
 
   """
+  The accounting category predictions for this expense
+  """
+  accountingCategoryPrediction: AccountingCategory
+
+  """
   If available, this field will contain a breakdown of the expense values depending on who edited it
   """
   valuesByRole: ExpenseValuesByRole
@@ -6337,6 +6342,7 @@ type CollectiveFeatures {
   """
   id: String!
   ALL: CollectiveFeatureStatus
+  ACCOUNTING_CATEGORY_PREDICTIONS: CollectiveFeatureStatus
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
