@@ -249,6 +249,11 @@ interface Account {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -2856,6 +2861,11 @@ type Host implements Account & AccountWithContributions {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -8514,6 +8524,11 @@ type Bot implements Account {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -9450,6 +9465,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -10941,6 +10961,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -12148,6 +12173,11 @@ type Individual implements Account {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -13333,6 +13363,11 @@ type Organization implements Account & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -14384,6 +14419,11 @@ type Vendor implements Account & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -15417,6 +15457,46 @@ enum VirtualCardRequestStatus {
   APPROVED
   REJECTED
   PENDING
+}
+
+"""
+A financial institution for off-platform transactions
+"""
+type OffPlatformTransactionsInstitution {
+  """
+  The unique identifier for the institution
+  """
+  id: String!
+
+  """
+  The name of the institution
+  """
+  name: String!
+
+  """
+  The BIC (Bank Identifier Code) of the institution
+  """
+  bic: String!
+
+  """
+  URL to the institution logo
+  """
+  logoUrl: String
+
+  """
+  List of country codes supported by this institution
+  """
+  supportedCountries: [String!]!
+
+  """
+  Maximum number of days the access can be valid for
+  """
+  maxAccessValidForDays: Int!
+
+  """
+  Total number of days of transaction data available
+  """
+  transactionTotalDays: Int!
 }
 
 """
@@ -16625,6 +16705,21 @@ type Query {
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
   hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
+
+  """
+  Get financial institutions for off-platform transactions
+  """
+  offPlatformTransactionsInstitutions(
+    """
+    The country code to get institutions for
+    """
+    country: String!
+
+    """
+    The provider to use for fetching institutions
+    """
+    provider: OffPlatformTransactionsProvider!
+  ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
 }
@@ -18137,6 +18232,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -19220,6 +19320,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -20412,6 +20517,21 @@ input HostApplicationReferenceInput {
   The public id identifying the host application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String
+}
+
+"""
+Provider for off-platform transactions
+"""
+enum OffPlatformTransactionsProvider {
+  """
+  GoCardless bank account data provider
+  """
+  GOCARDLESS
+
+  """
+  Plaid bank account data provider
+  """
+  PLAID
 }
 
 """
@@ -22127,6 +22247,16 @@ type Mutation {
     """
     id: NonEmptyString!
   ): Boolean!
+
+  """
+  Generate a GoCardless link for bank account data access
+  """
+  generateGoCardlessLink(
+    """
+    Input for creating the GoCardless link
+    """
+    input: GoCardlessLinkInput!
+  ): GoCardlessLink!
 
   """
   Create update. Scope: "updates".
@@ -24496,6 +24626,66 @@ enum TransactionsImportRowAction {
   RESTORE_ALL
   PUT_ON_HOLD_ALL
   UPDATE_ROWS
+}
+
+"""
+A GoCardless link for bank account data access
+"""
+type GoCardlessLink {
+  """
+  The unique identifier for the requisition
+  """
+  id: String!
+
+  """
+  The date & time at which the requisition was created
+  """
+  createdAt: DateTime!
+
+  """
+  Redirect URL to your application after end-user authorization with ASPSP
+  """
+  redirect: URL!
+
+  """
+  The institution ID for this requisition
+  """
+  institutionId: String!
+
+  """
+  Link to initiate authorization with Institution
+  """
+  link: String
+}
+
+"""
+Input for creating a GoCardless link
+"""
+input GoCardlessLinkInput {
+  """
+  The institution ID for this requisition
+  """
+  institutionId: String!
+
+  """
+  Maximum number of days of transaction data to retrieve (default: 90)
+  """
+  maxHistoricalDays: Int
+
+  """
+  Number of days from acceptance that the access can be used (default: 90)
+  """
+  accessValidForDays: Int
+
+  """
+  A two-letter country code (ISO 639-1) (default: "en")
+  """
+  userLanguage: Locale
+
+  """
+  Option to enable account selection view for the end user (default: true)
+  """
+  accountSelection: Boolean
 }
 
 """

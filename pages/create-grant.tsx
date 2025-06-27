@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '@/lib/apollo-client';
-import { getCollectivePageMetadata } from '@/lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount } from '@/lib/collective';
 import { generateNotFoundError } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
@@ -69,7 +69,7 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
     );
   } else if (props.error) {
     return <ErrorPage error={props.error} />;
-  } else if (!props.account) {
+  } else if (!props.account || isHiddenAccount(props.account)) {
     return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
   } else if (!isGrantPreviewEnabled || !(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
     return <PageFeatureNotSupported />;
@@ -108,6 +108,7 @@ const CollectivePageMetadataFieldsFragment = gql`
     description
     backgroundImageUrl
     imageUrl
+    isSuspended
   }
 `;
 
@@ -125,6 +126,7 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
           legacyId
           slug
           supportedExpenseTypes
+          isSuspended
 
           ...CollectivePageMetadataFields
         }

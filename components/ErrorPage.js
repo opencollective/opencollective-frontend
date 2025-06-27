@@ -227,7 +227,7 @@ class ErrorPage extends React.Component {
 
     return (
       <div className="ErrorPage" data-cy="error-page">
-        <Header LoggedInUser={LoggedInUser} />
+        <Header LoggedInUser={LoggedInUser} noRobots />
         <Body>
           <Container py={[5, 6]}>{component}</Container>
         </Body>

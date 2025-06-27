@@ -36,6 +36,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       isVerified
       isArchived
       isFrozen
+      isSuspended
       isHost
       isIncognito
       isGuest

@@ -6,7 +6,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/html';
@@ -52,6 +52,7 @@ const conversationPageQuery = gql`
       imageUrl
       twitterHandle
       backgroundImageUrl
+      isSuspended
       ... on AccountWithParent {
         parent {
           id
@@ -320,7 +321,7 @@ class ConversationPage extends React.Component {
     if (!data.loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.account) {
+      } else if (!data.account || isHiddenAccount(data.account)) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
         return <PageFeatureNotSupported />;
