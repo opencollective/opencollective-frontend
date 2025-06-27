@@ -63,7 +63,7 @@ class UnsubscribeEmail extends React.Component {
 
   render() {
     return (
-      <Page title="Unsubscribe Email">
+      <Page title="Unsubscribe Email" noRobots>
         <Container
           display="flex"
           py={[5, 6]}

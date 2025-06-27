@@ -120,6 +120,12 @@ class NewContributionFlowPage extends React.Component {
     }
   }
 
+  getNoRobots = () => {
+    const { router } = this.props;
+    const personalInfoFields = ['contributeAs', 'customData', 'redirect', 'email', 'name', 'legalName'];
+    return personalInfoFields.some(field => Boolean(router.query?.[field]));
+  };
+
   render() {
     const { data } = this.props;
     if (!data.loading && !data.account) {
@@ -137,6 +143,7 @@ class NewContributionFlowPage extends React.Component {
         menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
         showSearch={false}
         collective={data.account}
+        noRobots={this.getNoRobots()}
       >
         {this.renderPageContent()}
       </Page>
