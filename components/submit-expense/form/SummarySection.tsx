@@ -224,10 +224,10 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
         <FormattedMessage defaultMessage="Items" id="Fields.items" />
       </Label>
       <div role="list">
-        {props.expenseItems.map(ei => (
+        {props.expenseItems.map((ei, index) => (
           <div
             role="listitem"
-            key={`${ei.description}-${ei.incurredAt}-${ei.amount?.valueInCents}`}
+            key={ei.key || ei.id || `expense-item-${index}`}
             className="mb-2 border-b border-dotted border-gray-300 pb-2 text-sm last:mb-0 last:border-b-0"
           >
             <div className="flex items-center justify-between gap-4">

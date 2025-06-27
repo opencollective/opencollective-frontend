@@ -1546,6 +1546,9 @@ async function buildFormOptions(
       options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
     ) {
       options.expenseCurrency = options.expense.currency;
+    } else if (startOptions.duplicateExpense && options.expense) {
+      // When duplicating an expense, preserve the original expense currency
+      options.expenseCurrency = options.expense.currency;
     } else if (values.expenseTypeOption === ExpenseType.GRANT) {
       options.expenseCurrency = options.account?.currency;
     } else if (options.payoutMethod) {

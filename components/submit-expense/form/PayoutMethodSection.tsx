@@ -112,7 +112,10 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       setLastUsedPayoutMethod(null);
     }
 
-    if (!props.payoutMethodId && lastUsed) {
+    // When editing an expense, preserve the current payout method
+    if (props.expense?.payoutMethod?.id && !props.payoutMethodId) {
+      setFieldValue('payoutMethodId', props.expense.payoutMethod.id);
+    } else if (!props.payoutMethodId && lastUsed) {
       setFieldValue('payoutMethodId', lastUsed?.id);
     } else if (
       props.payoutMethodId !== '__newPayoutMethod' &&
@@ -132,6 +135,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     props.payoutMethodId,
     props.payoutMethods,
     payoutMethods,
+    props.expense?.payoutMethod?.id,
   ]);
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';

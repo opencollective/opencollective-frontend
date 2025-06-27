@@ -55,7 +55,7 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
       inViewChange={props.inViewChange}
       subtitle={
         <div className="flex items-center gap-2">
-          <FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />
+          <FormattedMessage defaultMessage="Add the expense items that you'd like to be paid for" id="ox+mWM" />
           <Lock size={14} />
         </div>
       }
@@ -400,7 +400,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
           <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
             {props.hasExpenseItemDate && (
               <FormField
-                required={props.isAdminOfPayee}
+                required={true}
                 disabled={props.isDateLocked || props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
