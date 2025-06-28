@@ -464,7 +464,7 @@
   "AmountInterval": "{amount} {currencyCode} / {interval, select, month {mes} year {año} other {otro}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, month {mes} year {año} other {}}",
   "AmountRaised": "Cantidad recaudada",
-  "amT0Gh": "Revert",
+  "amT0Gh": "Revertir",
   "AndMoreExpenses": "...y {count} más",
   "aojEGT": "No hay actividad todavía",
   "aOO6yW": "Favor de indicar el motivo por el que se ha rechazado este gasto. El motivo se compartirá con el usuario y también se registrará como comentario bajo el gasto.",
