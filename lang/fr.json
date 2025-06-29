@@ -4104,7 +4104,7 @@
   "XohPxN": "De {submitter} à {account} • {submittedAt}",
   "XoSnCy": "Veuillez vérifier {count,plural,one{} other{la date et le montant}} avant de continuer.",
   "Xp9G7Y": "{childAccountType, select, EVENT {Un événement} PROJECT {Un projet} other {Un compte}} par {parentAccount}",
-  "Xq0DWl": "Use field IDs as column headers instead of field names.",
+  "Xq0DWl": "Utilisez le champ IDs comme en-tête de colonne au lieu du champ noms.",
   "xqDu0y": "Réception estimée : le {estimatedDelivery, date, medium} à {estimatedDelivery, time, short}. Référence: {reference}.",
   "XqtbM9": "Fournisseur mis à jour",
   "xQXSru": "Nom du jeton d'accès",
