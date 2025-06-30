@@ -53,7 +53,7 @@ const internalTransferMutation = gql`
   }
 `;
 
-const fromCollectiveSearchQuery = gqlV1/* GraphQL */ `
+const fromCollectiveSearchQuery = gqlV1 /* GraphQL */ `
   query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]

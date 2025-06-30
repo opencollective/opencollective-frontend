@@ -102,6 +102,12 @@ const nextConfig = {
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
           },
+          {
+            // eslint-disable-next-line n/no-extraneous-require
+            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'build/pdf.worker.min.mjs'),
+            to: path.join(__dirname, 'public/static/scripts/pdf.worker.min.mjs'),
+            info: { minimized: true },
+          },
         ],
       }),
     );
@@ -302,20 +308,27 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig(
-  {
-    ...nextConfig,
-    sentry: {
-      hideSourceMaps: true,
+let exportedConfig = nextConfig;
+
+if (process.env.SENTRY_AUTH_TOKEN) {
+  exportedConfig = withSentryConfig(
+    {
+      ...nextConfig,
+      sentry: {
+        hideSourceMaps: true,
+      },
     },
-  },
-  {
-    org: 'open-collective',
-    project: 'oc-frontend',
-    authToken: process.env.SENTRY_AUTH_TOKEN,
-    silent: true,
-  },
-);
+    {
+      org: 'open-collective',
+      project: 'oc-frontend',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: true,
+    },
+  );
+} else if (process.env.OC_ENV === 'production') {
+  // eslint-disable-next-line no-console
+  console.warn('[!!! WARNING !!!] SENTRY_AUTH_TOKEN not found. Skipping Sentry configuration.');
+}
 
 if (process.env.ANALYZE) {
   const withBundleAnalyzer = require('@next/bundle-analyzer')({

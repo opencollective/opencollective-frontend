@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { omitBy } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 
@@ -175,12 +174,6 @@ const ActivityTypeFilter = ({ account, onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-ActivityTypeFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-  account: PropTypes.shape({ type: PropTypes.string }),
 };
 
 export default ActivityTypeFilter;

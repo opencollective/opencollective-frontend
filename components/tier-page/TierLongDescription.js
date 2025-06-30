@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { NAVBAR_HEIGHT } from '../collective-navbar';
@@ -40,15 +39,6 @@ const TierLongDescription = ({ tier, editMutation, canEdit, ...inlineEditFieldPr
       }}
     </InlineEditField>
   );
-};
-
-TierLongDescription.propTypes = {
-  tier: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    longDescription: PropTypes.string,
-  }).isRequired,
-  editMutation: PropTypes.object,
-  canEdit: PropTypes.bool,
 };
 
 export default TierLongDescription;

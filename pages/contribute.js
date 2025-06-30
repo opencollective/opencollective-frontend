@@ -345,7 +345,7 @@ class ContributePage extends React.Component {
   }
 }
 
-const contributePageQuery = gqlV1/* GraphQL */ `
+const contributePageQuery = gqlV1 /* GraphQL */ `
   query ContributePage(
     $slug: String!
     $nbContributorsPerContributeCard: Int

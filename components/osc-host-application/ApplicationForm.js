@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
@@ -225,8 +224,8 @@ const ApplicationForm = ({
                 defaultMessage="Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
-                    <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
-                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Read our FAQs" />
+                    <StyledLink href="https://docs.oscollective.org/how-to-apply" openInNewTab color="purple.500">
+                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Visit our docs" />
                     </StyledLink>
                   ),
                 }}
@@ -804,31 +803,6 @@ const ApplicationForm = ({
       </Flex>
     </React.Fragment>
   );
-};
-
-ApplicationForm.propTypes = {
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  refetchLoggedInUser: PropTypes.func,
-  initialValues: PropTypes.object,
-  setInitialValues: PropTypes.func,
-  collective: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isAdmin: PropTypes.bool,
-    description: PropTypes.description,
-  }),
-  host: PropTypes.shape({
-    id: PropTypes.string,
-    slug: PropTypes.string,
-    policies: PropTypes.object,
-  }),
-  popularTags: PropTypes.arrayOf(PropTypes.string),
-  loadingCollective: PropTypes.bool,
-  canApplyWithCollective: PropTypes.bool,
-  router: PropTypes.object,
 };
 
 export default withRouter(ApplicationForm);

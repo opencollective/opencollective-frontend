@@ -51,6 +51,11 @@ interface CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
   isGuest: Boolean
   canApply: Boolean
   canContact: Boolean
@@ -2238,6 +2243,11 @@ type Collective implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2516,6 +2526,11 @@ type Event implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2798,6 +2813,11 @@ type Fund implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3078,6 +3098,11 @@ type Organization implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3356,6 +3381,11 @@ type Project implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -3933,6 +3963,11 @@ type User implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4215,6 +4250,11 @@ type Vendor implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4403,6 +4443,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this account has any payout methods saved
   """
   hasPayoutMethod: Boolean
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [CollectiveInterface]
 }
 
 """
@@ -4519,6 +4564,11 @@ type Query {
     Included vendors for specific host ID
     """
     includeVendorsForHostId: Int
+
+    """
+    Only return vendors visible to given account ids
+    """
+    vendorVisibleToAccountIds: [Int]
 
     """
     Whether to skip recent accounts (48h)

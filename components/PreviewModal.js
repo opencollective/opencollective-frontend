@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -12,9 +11,9 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal'
  * A image preview modal that can be used to display a preview image for a
  * an Email Template or an Invoice Receipt.
  */
-const PreviewModal = ({ previewImage, heading, subheading, imgHeight, imgWidth, onClose }) => {
+const PreviewModal = ({ previewImage, heading, subheading = null, imgHeight, imgWidth, onClose }) => {
   return (
-    <StyledModal onClose={onClose} trapFocus>
+    <StyledModal onClose={onClose}>
       <ModalHeader>{heading}</ModalHeader>
       <ModalBody mb={0}>
         {subheading && (
@@ -33,15 +32,6 @@ const PreviewModal = ({ previewImage, heading, subheading, imgHeight, imgWidth, 
       </ModalFooter>
     </StyledModal>
   );
-};
-
-PreviewModal.propTypes = {
-  previewImage: PropTypes.string.isRequired,
-  heading: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-  subheading: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  imgHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  imgWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  onClose: PropTypes.func,
 };
 
 export default PreviewModal;

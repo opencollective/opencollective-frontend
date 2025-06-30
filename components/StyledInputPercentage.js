@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { clamp as lodashClamp, round } from 'lodash';
 
 import StyledInputGroup from './StyledInputGroup';
@@ -33,13 +32,6 @@ const StyledInputPercentage = ({ value, onChange, onBlur = null, clamp = true, .
       }}
     />
   );
-};
-
-StyledInputPercentage.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  onBlur: PropTypes.func,
-  value: PropTypes.number,
-  clamp: PropTypes.bool,
 };
 
 export default StyledInputPercentage;

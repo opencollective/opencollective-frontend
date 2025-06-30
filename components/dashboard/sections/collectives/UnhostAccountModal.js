@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -294,33 +293,6 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
       </ModalFooter>
     </StyledModal>
   );
-};
-
-UnhostAccountModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  collective: PropTypes.shape({
-    id: PropTypes.string,
-    hostFeePercent: PropTypes.number,
-    isFrozen: PropTypes.bool,
-    settings: PropTypes.object,
-    parent: PropTypes.object,
-    type: PropTypes.string,
-    currency: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    stats: PropTypes.shape({
-      balance: PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-    }),
-  }).isRequired,
-  host: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-  }).isRequired,
 };
 
 export default UnhostAccountModal;

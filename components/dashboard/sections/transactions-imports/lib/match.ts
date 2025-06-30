@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 import type { Expense, Order, TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
 
 export const getMatchInfo = (
@@ -12,14 +14,14 @@ export const getMatchInfo = (
   | undefined => {
   if (selectedExpense) {
     return {
-      date: row.date === selectedExpense.incurredAt,
+      date: dayjs(row.date).isSame(selectedExpense.incurredAt, 'day'),
       amount:
         Math.abs(row.amount.valueInCents) === Math.abs(selectedExpense.amountV2.valueInCents) &&
         row.amount.currency === selectedExpense.amountV2.currency,
     };
   } else if (selectedContribution) {
     return {
-      date: row.date === selectedContribution.createdAt,
+      date: dayjs(row.date).isSame(selectedContribution.createdAt, 'day'),
       amount:
         Math.abs(row.amount.valueInCents) === Math.abs(selectedContribution.totalAmount.valueInCents) &&
         row.amount.currency === selectedContribution.totalAmount.currency,

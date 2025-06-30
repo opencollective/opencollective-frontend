@@ -9,8 +9,13 @@ import { usePlaidLink } from 'react-plaid-link';
 import { confettiFireworks } from '@/lib/confettis';
 import { i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type { ConnectPlaidAccountMutation, ConnectPlaidAccountMutationVariables } from '@/lib/graphql/types/v2/graphql';
-import { connectPlaidAccountMutation } from '@/lib/hooks/usePlaidConnectDialog';
+import type {
+  ConnectPlaidAccountMutation,
+  ConnectPlaidAccountMutationVariables,
+  RefreshPlaidAccountMutation,
+  RefreshPlaidAccountMutationVariables,
+} from '@/lib/graphql/types/v2/graphql';
+import { connectPlaidAccountMutation, refreshPlaidAccountMutation } from '@/lib/hooks/usePlaidConnectDialog';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '@/lib/local-storage';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
@@ -29,6 +34,7 @@ const getWindowData = () => {
       return {
         receivedRedirectUri: window.location.href,
         accessToken: plaidToken.token,
+        transactionImportId: plaidToken.transactionImportId,
         hostId: plaidToken.hostId,
       };
     } catch {
@@ -48,25 +54,39 @@ const PlaidOAuthCallbackPage = () => {
     ConnectPlaidAccountMutation,
     ConnectPlaidAccountMutationVariables
   >(connectPlaidAccountMutation, { context: API_V2_CONTEXT });
+  const [refreshPlaidAccount] = useMutation<RefreshPlaidAccountMutation, RefreshPlaidAccountMutationVariables>(
+    refreshPlaidAccountMutation,
+    { context: API_V2_CONTEXT },
+  );
   const { open, ready } = usePlaidLink({
     receivedRedirectUri: windowData.receivedRedirectUri,
     token: windowData.accessToken,
     onSuccess: async (publicToken, metadata) => {
       try {
         setIsLoading(true);
-        const result = await connectPlaidAccount({
-          variables: {
-            publicToken,
-            host: { id: windowData.hostId },
-            sourceName: metadata.institution.name,
-            name: metadata.accounts.map(a => a.name).join(', '),
-          },
-        });
 
-        const { transactionsImport } = result.data.connectPlaidAccount;
-        const hostSlug = transactionsImport.account.slug;
-        confettiFireworks(3000);
-        router.push(getOffPlatformTransactionsRoute(hostSlug, transactionsImport.id));
+        if (windowData.transactionImportId) {
+          const result = await refreshPlaidAccount({
+            variables: { transactionImport: { id: windowData.transactionImportId } },
+          });
+          const resultTransactionsImport = result.data.refreshPlaidAccount.transactionsImport;
+          const hostSlug = resultTransactionsImport.account.slug;
+          router.push(getOffPlatformTransactionsRoute(hostSlug, resultTransactionsImport.id));
+        } else {
+          const result = await connectPlaidAccount({
+            variables: {
+              publicToken,
+              host: { id: windowData.hostId },
+              sourceName: metadata.institution.name,
+              name: metadata.accounts.map(a => a.name).join(', '),
+            },
+          });
+
+          const { transactionsImport } = result.data.connectPlaidAccount;
+          const hostSlug = transactionsImport.account.slug;
+          confettiFireworks(3000);
+          router.push(getOffPlatformTransactionsRoute(hostSlug, transactionsImport.id));
+        }
       } catch (e) {
         setIsLoading(false);
         setApiError(i18nGraphqlException(intl, e));

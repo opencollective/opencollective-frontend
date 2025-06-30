@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Envelope } from '@styled-icons/fa-solid/Envelope';
 import { FormattedMessage } from 'react-intl';
 
@@ -69,10 +68,6 @@ const Newsletter = ({ defaultEmail }) => {
       </Flex>
     </Container>
   );
-};
-
-Newsletter.propTypes = {
-  defaultEmail: PropTypes.string,
 };
 
 export default Newsletter;

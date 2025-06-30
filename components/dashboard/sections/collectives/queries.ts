@@ -212,7 +212,19 @@ const hostedCollectiveFields = gql`
         valueInCents
         currency
       }
-      totalAmountSpent(includeChildren: true) {
+      consolidatedTotalAmountRaised: totalAmountReceived(includeChildren: true) {
+        valueInCents
+        currency
+      }
+      consolidatedTotalNetAmountRaised: totalAmountReceived(net: true, includeChildren: true) {
+        valueInCents
+        currency
+      }
+      totalAmountSpent: totalAmountSpent {
+        valueInCents
+        currency
+      }
+      consolidatedTotalAmountSpent: totalAmountSpent(includeChildren: true) {
         valueInCents
         currency
       }

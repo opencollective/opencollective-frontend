@@ -1,11 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+
 import Container from '../Container';
 import { Box, boxProps } from '../Grid';
 
 const StyledSvg = styled(Box).withConfig({
-  shouldForwardProp: (prop, defaultFilter) => !boxProps.propNames.includes(prop) && defaultFilter(prop),
+  shouldForwardProp: prop => !boxProps.propNames.includes(prop) && defaultShouldForwardProp(prop),
 })`
   #logoContainer {
     transform-origin: 50% 50%;

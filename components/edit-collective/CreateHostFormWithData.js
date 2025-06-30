@@ -69,7 +69,7 @@ class CreateHostFormWithData extends React.Component {
   }
 }
 
-const editCollectiveConnectedAccountsQuery = gqlV1/* GraphQL */ `
+const editCollectiveConnectedAccountsQuery = gqlV1 /* GraphQL */ `
   query EditCollectiveConnectedAccounts($slug: String!) {
     Collective(slug: $slug) {
       id
@@ -110,7 +110,7 @@ const addEditCollectiveConnectedAccountsData = graphql(editCollectiveConnectedAc
   }),
 });
 
-const editCollectiveCreateHostMutation = gqlV1/* GraphQL */ `
+const editCollectiveCreateHostMutation = gqlV1 /* GraphQL */ `
   mutation EditCollectiveCreateHost($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id

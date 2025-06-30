@@ -12,6 +12,8 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import type { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
+import StackedAvatars from '@/components/StackedAvatars';
+
 import Avatar from '../../Avatar';
 import DismissibleMessage from '../../DismissibleMessage';
 import { Drawer } from '../../Drawer';
@@ -50,6 +52,7 @@ enum VendorsTab {
 const dashboardVendorsQuery = gql`
   fragment HostFields on Host {
     id
+    legacyId
     name
     legalName
     slug
@@ -108,6 +111,7 @@ const dashboardVendorsQuery = gql`
   ) {
     account(slug: $slug) {
       id
+      legacyId
       ... on AccountWithHost {
         host {
           id
@@ -128,6 +132,7 @@ const dashboardVendorsQuery = gql`
 const VendorsTable = ({ vendors, loading, editVendor, openVendor, handleSetArchive }) => {
   const columns = [
     {
+      header: () => <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />,
       accessorKey: 'vendor',
       cell: ({ row }) => {
         const vendor = row.original;
@@ -151,6 +156,30 @@ const VendorsTable = ({ vendors, loading, editVendor, openVendor, handleSetArchi
       },
     },
     {
+      header: () => <FormattedMessage defaultMessage="Visible to" id="zJePa1" />,
+      accessorKey: 'visibleToAccounts',
+      cell: ({ cell }) => {
+        const visibleToAccounts = cell.getValue();
+
+        if (!visibleToAccounts?.length) {
+          return (
+            <span className="text-muted-foreground">
+              <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
+            </span>
+          );
+        }
+
+        return (
+          <StackedAvatars
+            accounts={visibleToAccounts}
+            imageSize={24}
+            withHoverCard={{ includeAdminMembership: true }}
+          />
+        );
+      },
+    },
+    {
+      header: '',
       accessorKey: 'actions',
       meta: { className: 'flex justify-end items-center' },
       cell: ({ row }) => {
@@ -196,7 +225,6 @@ const VendorsTable = ({ vendors, loading, editVendor, openVendor, handleSetArchi
       emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
       loading={loading}
       mobileTableView
-      hideHeader
     />
   );
 };

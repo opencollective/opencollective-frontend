@@ -85,7 +85,7 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
     props.href &&
     css`
       @media (hover: hover) {
-        :hover {
+        &:hover {
           color: #0f172a !important;
           background-color: #f1f5f9;
         }
@@ -102,12 +102,6 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
   `}
   font-weight: 500;
   ${props => props.$isActive && `background-color: #f1f5f9;`}
-
-  span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 `;
 
 const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
@@ -157,7 +151,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef(undefined);
   const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;

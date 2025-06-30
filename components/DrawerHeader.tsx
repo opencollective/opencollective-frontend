@@ -85,7 +85,9 @@ export default function DrawerHeader({
                   <DropdownMenuSeparator />
                 )}
 
-                {secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {secondary?.map(action => (
+                  <DropdownActionItem key={action.label} action={action} />
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

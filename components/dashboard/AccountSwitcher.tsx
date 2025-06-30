@@ -50,7 +50,7 @@ const StyledMenuEntry = styled(Link)`
           backgroundColor: '#f3f4f6',
         })
       : css({
-          ':hover': {
+          '&:hover': {
             backgroundColor: '#f3f4f6',
           },
         })}
@@ -71,8 +71,8 @@ const DropdownButton = styled.button`
   cursor: pointer;
   overflow: hidden;
   &:hover,
-  :active,
-  :focus {
+  &:active,
+  &:focus {
     background: #f8fafc;
   }
 
@@ -351,7 +351,9 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                       )}
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map(account => <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />)}
+                        .map(account => (
+                          <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
+                        ))}
                     </div>
                   );
                 })}

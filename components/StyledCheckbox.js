@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
@@ -194,33 +193,6 @@ StyledCheckbox.defaultProps = {
   defaultChecked: false,
   width: 'auto',
   alignItems: 'center',
-};
-
-StyledCheckbox.propTypes = {
-  /** The name of the input */
-  name: PropTypes.string.isRequired,
-  /** Called when state change with an object like { name, checked, type, target: { value } }*/
-  onChange: PropTypes.func,
-  /** Whether the checkbox is checked. Use it to control the component. If not provided, component will maintain its own state. */
-  checked: PropTypes.bool,
-  /** Whether the checkbox should be checked by default. Ignored if `checked` is provided. */
-  defaultChecked: PropTypes.bool,
-  /** And optional ID for the `<input/>` */
-  inputId: PropTypes.string,
-  /** Whether checkbox should be disabled */
-  disabled: PropTypes.bool,
-  /** An optional label to display next to checkbox */
-  label: PropTypes.node,
-  /** An optional size */
-  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  fontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /** Set this to 'auto' to not take the full width */
-  width: PropTypes.string,
-  /** If true, the checkbox will be replaced by a spinner */
-  isLoading: PropTypes.bool,
-  /** Default to center */
-  alignItems: PropTypes.string,
-  error: PropTypes.any,
 };
 
 /**

@@ -121,6 +121,4 @@ const getConnectCTA = (fromAccount, toAccount) => {
   }
 };
 
-ConnectAccountsForm.propTypes = {};
-
 export default ConnectAccountsForm;

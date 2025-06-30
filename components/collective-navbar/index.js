@@ -1,5 +1,4 @@
 import React, { Fragment, useRef } from 'react';
-import { PropTypes } from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
@@ -46,7 +45,6 @@ import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
-import { NAVBAR_CATEGORIES } from './constants';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
 
@@ -441,17 +439,17 @@ export const NAVBAR_HEIGHT = [56, 64];
  */
 const CollectiveNavbar = ({
   collective,
-  isAdmin,
-  isLoading,
-  sections: sectionsFromParent,
+  isAdmin = undefined,
+  isLoading = false,
+  sections: sectionsFromParent = undefined,
   selectedCategory,
   callsToAction = {},
-  onCollectiveClick,
+  onCollectiveClick = undefined,
   isInHero = false,
   onlyInfos = false,
   showBackButton = true,
-  useAnchorsForCategories,
-  showSelectedCategoryOnMobile,
+  useAnchorsForCategories = false,
+  showSelectedCategoryOnMobile = false,
 }) => {
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -502,8 +500,8 @@ const CollectiveNavbar = ({
       isNewGrantFlowEnabled,
       () => setIsSubmitExpenseModalOpen(true),
     );
-  const navbarRef = useRef();
-  const mainContainerRef = useRef();
+  const navbarRef = useRef(undefined);
+  const mainContainerRef = useRef(undefined);
 
   /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
    * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */
@@ -675,58 +673,6 @@ const CollectiveNavbar = ({
       )}
     </Fragment>
   );
-};
-
-CollectiveNavbar.propTypes = {
-  /** Collective to show info about */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    path: PropTypes.string,
-    isArchived: PropTypes.bool,
-    canContact: PropTypes.bool,
-    canApply: PropTypes.bool,
-    host: PropTypes.object,
-    plan: PropTypes.object,
-    parentCollective: PropTypes.object,
-  }),
-  /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
-  callsToAction: PropTypes.shape({
-    hasContact: PropTypes.bool,
-    hasSubmitExpense: PropTypes.bool,
-    hasApply: PropTypes.bool,
-    hasDashboard: PropTypes.bool,
-    hasManageSubscriptions: PropTypes.bool,
-    hasSettings: PropTypes.bool,
-  }),
-  /** Used to check what sections can be used */
-  isAdmin: PropTypes.bool,
-  /** Will show loading state */
-  isLoading: PropTypes.bool,
-  /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
-  sections: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.oneOf(['CATEGORY', 'SECTION']),
-      name: PropTypes.string,
-    }),
-  ),
-  /** Called when users click the collective logo or name */
-  onCollectiveClick: PropTypes.func,
-  /** Currently selected category */
-  selectedCategory: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
-  /** The behavior of the navbar is slightly different when integrated in a hero (in the collective page) */
-  isInHero: PropTypes.bool,
-  /** If true, the CTAs will be hidden on mobile */
-  hideButtonsOnMobile: PropTypes.bool,
-  /** If true, the Navbar items and buttons will be skipped  */
-  onlyInfos: PropTypes.bool,
-  /** Set this to true to make the component smaller in height */
-  isSmall: PropTypes.bool,
-  showBackButton: PropTypes.bool,
-  showSelectedCategoryOnMobile: PropTypes.bool,
-  /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
-  useAnchorsForCategories: PropTypes.bool,
 };
 
 export default React.memo(CollectiveNavbar);

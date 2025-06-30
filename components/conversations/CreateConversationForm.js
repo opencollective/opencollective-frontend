@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { pick } from 'lodash';
@@ -225,21 +224,6 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
       </StyledButton>
     </form>
   );
-};
-
-CreateConversationForm.propTypes = {
-  /** the collective where the conversation will be created */
-  collective: PropTypes.object.isRequired,
-  /** Called when the conversation gets successfully created. Return a promise if you want to keep the submitting state active. */
-  onSuccess: PropTypes.func.isRequired,
-  /** Will disable the form */
-  disabled: PropTypes.bool,
-  /** Will show a loading state. Use this if loggedInUser or required data is not loaded yet. */
-  loading: PropTypes.bool,
-  /** Tags suggested for this new conversation */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  /** LoggedInUser */
-  LoggedInUser: PropTypes.object,
 };
 
 export default CreateConversationForm;

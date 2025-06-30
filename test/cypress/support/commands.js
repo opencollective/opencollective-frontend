@@ -96,7 +96,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollective',
-      query: gqlV1/* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation CreateCollective($collective: CollectiveInputType!) {
           createCollective(collective: $collective) {
             id
@@ -124,7 +124,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
     return graphqlQuery(token, {
       operationName: 'EditCollective',
-      query: gqlV1/* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation EditCollective($collective: CollectiveInputType!) {
           editCollective(collective: $collective) {
             id
@@ -221,7 +221,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollectiveWithHost',
-      query: gqlV1/* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
           createCollectiveFromGithub(collective: $collective) {
             id
@@ -696,7 +696,7 @@ function getTokenFromRedirectUrl(url) {
 /**
  * @param {object} user - should have `email` and `id` set
  */
-function signinRequestAndReturnToken(user, redirect) {
+export function signinRequestAndReturnToken(user, redirect) {
   return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
@@ -713,7 +713,7 @@ function graphqlQuery(token, body) {
   });
 }
 
-function graphqlQueryV2(token, body) {
+export function graphqlQueryV2(token, body) {
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',

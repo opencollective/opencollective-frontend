@@ -9,7 +9,7 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-const expenseTagFilterSchema = isMulti(z.string()).optional();
+const expenseTagFilterSchema = z.nullable(isMulti(z.string())).optional();
 
 type ExpenseTagFilterValue = z.infer<typeof expenseTagFilterSchema>;
 

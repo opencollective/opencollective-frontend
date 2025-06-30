@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 
 import { isHeavyAccount } from '../../../lib/collective';
@@ -104,21 +103,6 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
       </Flex>
     </ContainerSectionContent>
   );
-};
-
-SectionFinancialOverview.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.object,
-  }),
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(withUser(SectionFinancialOverview));

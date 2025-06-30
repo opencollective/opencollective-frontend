@@ -58,11 +58,11 @@ const Link = ({ href, children, className, openInNewTab, innerRef, onClick, titl
         href={href}
         title={title}
         onClick={onClick}
-        ref={innerRef}
         className={className}
         data-cy={props['data-cy']}
         {...props}
         {...(openInNewTab || isIframe ? { target: '_blank', rel: 'noopener noreferrer' } : null)}
+        ref={innerRef}
       >
         {children}
       </NextLink>

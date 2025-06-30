@@ -89,6 +89,8 @@ export type Account = {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   /**
@@ -1509,6 +1511,8 @@ export type Bot = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -2016,6 +2020,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -4033,6 +4039,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -5171,6 +5179,8 @@ export type ExpenseValuesByRole = {
   /** The values provided by the host admin(s) */
   hostAdmin?: Maybe<ExpenseValuesRoleDetails>;
   id: Scalars['NonEmptyString']['output'];
+  /** The values provided by the prediction service */
+  prediction?: Maybe<ExpenseValuesRoleDetails>;
   /** The values provided by the expense submitter(s) */
   submitter?: Maybe<ExpenseValuesRoleDetails>;
 };
@@ -5283,6 +5293,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -5760,6 +5772,35 @@ export type GenericFileInfo = FileInfo & {
   url: Scalars['URL']['output'];
 };
 
+/** A GoCardless link for bank account data access */
+export type GoCardlessLink = {
+  __typename?: 'GoCardlessLink';
+  /** The date & time at which the requisition was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** The unique identifier for the requisition */
+  id: Scalars['String']['output'];
+  /** The institution ID for this requisition */
+  institutionId: Scalars['String']['output'];
+  /** Link to initiate authorization with Institution */
+  link?: Maybe<Scalars['String']['output']>;
+  /** Redirect URL to your application after end-user authorization with ASPSP */
+  redirect: Scalars['URL']['output'];
+};
+
+/** Input for creating a GoCardless link */
+export type GoCardlessLinkInput = {
+  /** Number of days from acceptance that the access can be used (default: 90) */
+  accessValidForDays?: InputMaybe<Scalars['Int']['input']>;
+  /** Option to enable account selection view for the end user (default: true) */
+  accountSelection?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The institution ID for this requisition */
+  institutionId: Scalars['String']['input'];
+  /** Maximum number of days of transaction data to retrieve (default: 90) */
+  maxHistoricalDays?: InputMaybe<Scalars['Int']['input']>;
+  /** A two-letter country code (ISO 639-1) (default: "en") */
+  userLanguage?: InputMaybe<Scalars['Locale']['input']>;
+};
+
 /** Input type for guest contributions */
 export type GuestInfoInput = {
   /** Captcha validation for creating an order */
@@ -5835,8 +5876,10 @@ export type Host = Account & AccountWithContributions & {
   /** EXPERIMENTAL (this may change or be removed) */
   hostExpensesReport?: Maybe<HostExpensesReports>;
   hostFeePercent?: Maybe<Scalars['Float']['output']>;
+  /** @deprecated 2025-06-24: Low performance query, see if `hostStats` is sufficient */
   hostMetrics: HostMetrics;
   hostMetricsTimeSeries: HostMetricsTimeSeries;
+  hostStats: HostStats;
   /** EXPERIMENTAL (this may change or be removed) */
   hostTransactionsReports?: Maybe<HostTransactionReports>;
   /** Returns agreements with Hosted Accounts */
@@ -5865,6 +5908,8 @@ export type Host = Account & AccountWithContributions & {
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
   isOpenToApplications?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Returns whether the host is trusted or not */
   isTrustedHost: Scalars['Boolean']['output'];
   /** Whether the account is verified */
@@ -6157,6 +6202,12 @@ export type HostHostMetricsTimeSeriesArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** This represents an Host account */
+export type HostHostStatsArgs = {
+  hostContext?: InputMaybe<HostContext>;
 };
 
 
@@ -6492,6 +6543,7 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 
@@ -6576,6 +6628,15 @@ export type HostCollection = Collection & {
   offset?: Maybe<Scalars['Int']['output']>;
   totalCount?: Maybe<Scalars['Int']['output']>;
 };
+
+export enum HostContext {
+  /** Both the Host Organizations internal accounts and Hosted Collectives */
+  ALL = 'ALL',
+  /** Only Hosted Collectives (including their projects/events) */
+  HOSTED = 'HOSTED',
+  /** Only the Host Organization (including its projects/events) */
+  INTERNAL = 'INTERNAL'
+}
 
 export type HostExpensesReportNode = {
   __typename?: 'HostExpensesReportNode';
@@ -6689,6 +6750,33 @@ export type HostPlan = {
   transferwisePayouts?: Maybe<Scalars['Int']['output']>;
   /** Amount limit for the transferwise payouts feature under this plan */
   transferwisePayoutsLimit?: Maybe<Scalars['Int']['output']>;
+};
+
+export type HostStats = {
+  __typename?: 'HostStats';
+  balance?: Maybe<Amount>;
+  totalAmountReceived?: Maybe<Amount>;
+  totalAmountSpent?: Maybe<Amount>;
+};
+
+
+export type HostStatsBalanceArgs = {
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type HostStatsTotalAmountReceivedArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  net?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type HostStatsTotalAmountSpentArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  includeGiftCards?: InputMaybe<Scalars['Boolean']['input']>;
+  net?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type HostTransactionReportNode = {
@@ -6873,6 +6961,8 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -7723,6 +7813,8 @@ export type Mutation = {
   followAccount: FollowAccountResult;
   /** Returns true if user is following, false otherwise. Must be authenticated. Scope: "conversations". */
   followConversation?: Maybe<Scalars['Boolean']['output']>;
+  /** Generate a GoCardless link for bank account data access */
+  generateGoCardlessLink: GoCardlessLink;
   /** Generate a Plaid Link token */
   generatePlaidLinkToken: PlaidLinkTokenCreateResponse;
   /** Import transactions, manually or from a CSV file */
@@ -8466,6 +8558,12 @@ export type MutationFollowConversationArgs = {
 
 
 /** This is the root mutation */
+export type MutationGenerateGoCardlessLinkArgs = {
+  input: GoCardlessLinkInput;
+};
+
+
+/** This is the root mutation */
 export type MutationGeneratePlaidLinkTokenArgs = {
   accountSelectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   countries?: InputMaybe<Array<CountryIso>>;
@@ -8947,6 +9045,33 @@ export type OcrParsingOptionsInput = {
   currency?: InputMaybe<Currency>;
 };
 
+/** A financial institution for off-platform transactions */
+export type OffPlatformTransactionsInstitution = {
+  __typename?: 'OffPlatformTransactionsInstitution';
+  /** The BIC (Bank Identifier Code) of the institution */
+  bic: Scalars['String']['output'];
+  /** The unique identifier for the institution */
+  id: Scalars['String']['output'];
+  /** URL to the institution logo */
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  /** Maximum number of days the access can be valid for */
+  maxAccessValidForDays: Scalars['Int']['output'];
+  /** The name of the institution */
+  name: Scalars['String']['output'];
+  /** List of country codes supported by this institution */
+  supportedCountries: Array<Scalars['String']['output']>;
+  /** Total number of days of transaction data available */
+  transactionTotalDays: Scalars['Int']['output'];
+};
+
+/** Provider for off-platform transactions */
+export enum OffPlatformTransactionsProvider {
+  /** GoCardless bank account data provider */
+  GOCARDLESS = 'GOCARDLESS',
+  /** Plaid bank account data provider */
+  PLAID = 'PLAID'
+}
+
 /** Order model */
 export type Order = {
   __typename?: 'Order';
@@ -9298,6 +9423,8 @@ export type Organization = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -10409,6 +10536,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -10900,6 +11029,8 @@ export type Query = {
   me?: Maybe<Individual>;
   /** [AUTHENTICATED] Returns the pending invitations */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
+  /** Get financial institutions for off-platform transactions */
+  offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
   order?: Maybe<Order>;
   orders: OrderCollection;
   organization?: Maybe<Organization>;
@@ -11121,6 +11252,13 @@ export type QueryMemberInvitationsArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   memberAccount?: InputMaybe<AccountReferenceInput>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+};
+
+
+/** This is the root query */
+export type QueryOffPlatformTransactionsInstitutionsArgs = {
+  country: Scalars['String']['input'];
+  provider: OffPlatformTransactionsProvider;
 };
 
 
@@ -12676,6 +12814,8 @@ export type Vendor = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -12744,6 +12884,8 @@ export type Vendor = Account & AccountWithContributions & {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host */
+  visibleToAccounts: Array<Maybe<Account>>;
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
@@ -13139,6 +13281,7 @@ export type VendorCreateInput = {
   payoutMethod?: InputMaybe<PayoutMethodInput>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 export type VendorEditInput = {
@@ -13163,6 +13306,7 @@ export type VendorEditInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 /** Some context about the vendor */

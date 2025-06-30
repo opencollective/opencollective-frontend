@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { NotepadText } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
@@ -109,31 +108,6 @@ const Thread = ({
   );
 };
 
-Thread.propTypes = {
-  /** The list of items to display, sorted by chronoligal order */
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      __typename: PropTypes.oneOf(['Comment', 'Activity']),
-      id: PropTypes.string.isRequired,
-    }),
-  ),
-  /** Called when a comment get deleted */
-  onCommentDeleted: PropTypes.func,
-  /** Collective where the thread is created */
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }).isRequired,
-  /** Indicate whether there are more comments to fetch */
-  hasMore: PropTypes.bool,
-  /** function to fetch more comments */
-  fetchMore: PropTypes.func,
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.object,
-  /** @ignore from withTheme */
-  theme: PropTypes.object,
-  getClickedComment: PropTypes.func,
-};
-
 const DefaultThreadVariant = React.memo(withUser(withTheme(Thread)));
 
 /**
@@ -141,7 +115,6 @@ const DefaultThreadVariant = React.memo(withUser(withTheme(Thread)));
  * @param {import('./types').ThreadPropsWithVariant} props
  */
 export default function ThreadComponent(props) {
-  // eslint-disable-next-line react/prop-types
   if (props.variant === 'small') {
     return <SmallThread {...props} />;
   }

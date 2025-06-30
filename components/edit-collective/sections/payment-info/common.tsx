@@ -24,7 +24,7 @@ export const MethodCard = ({ children, showSubcontent, subContent, ...props }: M
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-lg bg-card text-sm text-card-foreground ring-1 shadow-xs ring-border',
+        'overflow-hidden rounded-lg bg-card text-sm text-card-foreground shadow-xs ring-1 ring-border',
         props.disabled && 'bg-gray-50 ring-0',
       )}
       {...props}

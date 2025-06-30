@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
@@ -165,14 +164,6 @@ const Tiers = ({ collective }) => {
       </Box>
     </div>
   );
-};
-
-Tiers.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
-  }).isRequired,
 };
 
 export default Tiers;

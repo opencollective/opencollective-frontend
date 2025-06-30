@@ -87,93 +87,6 @@ export type CSVField =
   | 'reverseLegacyId'
   | 'reverseKind';
 
-const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
-  transaction: [
-    'date',
-    'datetime',
-    'effectiveDate',
-    'id',
-    'legacyId',
-    'shortId',
-    'shortGroup',
-    'group',
-    'description',
-    'type',
-    'kind',
-    'isRefund',
-    'isRefunded',
-    'refundId',
-    'shortRefundId',
-    'refundKind',
-    'displayAmount',
-    'amount',
-    'paymentProcessorFee',
-    'netAmount',
-    'balance',
-    'currency',
-    'accountingCategoryCode',
-    'accountingCategoryName',
-    'debitAndCreditAmounts',
-  ],
-  accounts: [
-    'accountSlug',
-    'accountName',
-    'accountType',
-    'accountEmail',
-    'oppositeAccountSlug',
-    'oppositeAccountName',
-    'oppositeAccountType',
-    'oppositeAccountEmail',
-    'hostSlug',
-    'hostName',
-    'hostType',
-  ],
-  order: [
-    'orderId',
-    'orderLegacyId',
-    'orderMemo',
-    'orderFrequency',
-    'orderProcessedDate',
-    'orderCustomData',
-    'paymentMethodService',
-    'paymentMethodType',
-    'orderContributorAddress',
-    'orderContributorCountry',
-  ],
-  expense: [
-    'expenseId',
-    'expenseLegacyId',
-    'expenseType',
-    'expenseTags',
-    'payoutMethodType',
-    'merchantId',
-    'expenseReference',
-    'expenseTransferReference',
-    'expensePayeeAddress',
-    'expensePayeeCountry',
-  ],
-  tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
-  legacy: ['platformFee', 'hostFee'],
-};
-
-export const FIELD_GROUPS_2024: Record<string, readonly CSVField[]> = {
-  transaction: FIELD_GROUPS.transaction.filter(field => field !== 'paymentProcessorFee'),
-  accounts: FIELD_GROUPS.accounts,
-  order: FIELD_GROUPS.order,
-  expense: FIELD_GROUPS.expense,
-  tax: FIELD_GROUPS.tax.filter(field => field !== 'taxAmount'),
-  legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee', 'taxAmount'],
-};
-
-export const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
-  transaction: <FormattedMessage defaultMessage="Transaction" id="1+ROfp" />,
-  accounts: <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-  order: <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />,
-  expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
-  tax: <FormattedMessage defaultMessage="Tax" id="AwzkSM" />,
-  legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
-};
-
 export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   accountingCategoryCode: 'Accounting Category Code',
   accountingCategoryName: 'Accounting Category Name',
@@ -239,11 +152,6 @@ export enum FIELD_OPTIONS {
   NEW_PRESET = 'NEW_PRESET',
 }
 
-export enum LEGACY_FIELD_OPTIONS {
-  DEFAULT = 'DEFAULT',
-  CUSTOM = 'CUSTOM',
-}
-
 export const FieldOptionsLabels = {
   [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Platform Default" id="5kf2KT" />,
   [FIELD_OPTIONS.DEFAULT_2023]: <FormattedMessage defaultMessage="Legacy Platform Default (Pre-2024)" id="JP+lOn" />,
@@ -252,7 +160,6 @@ export const FieldOptionsLabels = {
       <FormattedMessage defaultMessage="New Preset" id="99ZtbG" />
     </span>
   ),
-  [LEGACY_FIELD_OPTIONS.CUSTOM]: <FormattedMessage defaultMessage="Custom" id="Sjo1P4" />,
 };
 
 export const GROUPS = {
@@ -941,7 +848,7 @@ export const GROUP_FIELDS = Object.keys(GROUPS).reduce((dict, groupId) => {
   return { ...dict, [groupId]: FIELDS.filter(f => f.group === groupId).map(f => f.id) };
 }, {});
 
-export const DEFAULT_FIELDS_2023: Array<CSVField> = [
+const DEFAULT_FIELDS_2023: Array<CSVField> = [
   'datetime',
   'shortId',
   'shortGroup',

@@ -161,7 +161,7 @@ class EditUserEmailForm extends React.Component {
   }
 }
 
-const loggedInUserEmailQuery = gqlV1/* GraphQL */ `
+const loggedInUserEmailQuery = gqlV1 /* GraphQL */ `
   query LoggedInUserEmail {
     LoggedInUser {
       id
@@ -177,7 +177,7 @@ const addLoggedInUserEmailData = graphql(loggedInUserEmailQuery, {
   },
 });
 
-const updateUserEmailMutation = gqlV1/* GraphQL */ `
+const updateUserEmailMutation = gqlV1 /* GraphQL */ `
   mutation UpdateUserEmail($email: String!) {
     updateUserEmail(email: $email) {
       id

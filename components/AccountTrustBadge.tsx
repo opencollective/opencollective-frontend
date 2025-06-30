@@ -22,7 +22,7 @@ export const AccountTrustBadge = ({
     host?: Pick<Host | GraphQLV1Collective, 'id' | 'name' | 'isFirstPartyHost' | 'isVerified'>;
   };
 }) => {
-  const badgeStyles = cn('cursor-help bg-white transition-all duration-200 hover:scale-110', className);
+  const badgeStyles = cn('cursor-help transition-all duration-200 hover:scale-110', className);
   const isSelfHost = account.host && account.host.id === account.id;
   if (account.isFirstPartyHost || (isSelfHost && account.host.isFirstPartyHost)) {
     return (

@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
@@ -348,11 +347,6 @@ const BankTransfer = props => {
       )}
     </Flex>
   );
-};
-
-BankTransfer.propTypes = {
-  collectiveSlug: PropTypes.string.isRequired,
-  hideTopsection: PropTypes.func.isRequired,
 };
 
 export default injectIntl(BankTransfer);

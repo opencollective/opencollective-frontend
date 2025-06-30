@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, flatten } from 'lodash';
 import { useRouter } from 'next/router';
@@ -156,26 +155,6 @@ const GroupSettings = ({ accounts, group, title, ...boxProps }) => {
       </Box>
     </Box>
   );
-};
-
-GroupSettings.propTypes = {
-  accounts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-      imageUrl: PropTypes.string,
-      activitySubscriptions: PropTypes.arrayOf(
-        PropTypes.shape({
-          type: PropTypes.string,
-          active: PropTypes.bool,
-        }),
-      ),
-    }),
-  ),
-  group: PropTypes.string,
-  title: PropTypes.node,
 };
 
 const NotificationsSettings = ({ accountSlug, subpath }) => {
@@ -445,11 +424,6 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
       )}
     </Box>
   );
-};
-
-NotificationsSettings.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
-  subpath: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default NotificationsSettings;

@@ -29,13 +29,13 @@ type FilterMeta = CommonFilterMeta & {
   accountSlug: string;
 };
 
-const schema = commonSchema.extend({
+export const schema = commonSchema.extend({
   account: childAccountFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
 
-const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
+export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: (value, key, meta) => {
     if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
