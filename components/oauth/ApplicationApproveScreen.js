@@ -105,7 +105,14 @@ const SCOPES_INFO = {
   */
 };
 
-const fetchAuthorize = (application, redirectUri = null, state = null, scopes = null) => {
+const fetchAuthorize = (
+  application,
+  redirectUri = null,
+  state = null,
+  scopes = null,
+  codeChallenge = null,
+  codeChallengeMethod = null,
+) => {
   const authorizeParams = new URLSearchParams({
     /* eslint-disable camelcase */
     response_type: 'code',
@@ -114,6 +121,11 @@ const fetchAuthorize = (application, redirectUri = null, state = null, scopes = 
     state,
     /* eslint-enable camelcase */
   });
+
+  if (codeChallenge || codeChallengeMethod) {
+    authorizeParams.set('code_challenge', codeChallenge);
+    authorizeParams.set('code_challenge_method', codeChallengeMethod);
+  }
 
   if (scopes && scopes.length > 0) {
     authorizeParams.set('scope', scopes.join(','));
@@ -138,7 +150,15 @@ const prepareScopes = scopes => {
   );
 };
 
-export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state, scope }) => {
+export const ApplicationApproveScreen = ({
+  application,
+  redirectUri,
+  autoApprove,
+  state,
+  codeChallenge,
+  codeChallengeMethod,
+  scope,
+}) => {
   const { LoggedInUser, logout } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -151,7 +171,14 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   } = useAsyncCall(async () => {
     let response = null;
     try {
-      response = await fetchAuthorize(application, redirectUri, state, filteredScopes);
+      response = await fetchAuthorize(
+        application,
+        redirectUri,
+        state,
+        filteredScopes,
+        codeChallenge,
+        codeChallengeMethod,
+      );
     } catch {
       setRedirecting(false); // To show errors with autoApprove
       throw formatErrorType(intl, ERROR.NETWORK);
