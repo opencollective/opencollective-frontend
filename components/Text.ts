@@ -12,6 +12,7 @@ import type {
   WordBreakProps,
 } from '../lib/styled-system-custom-properties';
 import { cursor, overflowWrap, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 
 type TextProps = ColorProps &
   DisplayProps &
@@ -30,7 +31,7 @@ const CUSTOM_TEXT_PROPS = new Set(['fontSize', 'letterSpacing', 'textDecoration'
 
 export const P = styled.p
   .withConfig({
-    shouldForwardProp: (prop, validate) => validate(prop) && !CUSTOM_TEXT_PROPS.has(prop),
+    shouldForwardProp: prop => defaultShouldForwardProp(prop) && !CUSTOM_TEXT_PROPS.has(prop),
   })
   .attrs<TextProps>(props => ({
     // Overrides default margin Y to avoid global styles

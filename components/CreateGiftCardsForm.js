@@ -350,7 +350,6 @@ class CreateGiftCardsForm extends Component {
           </label>
           <StyledMultiEmailInput
             id="gift-cards-recipients"
-            className="gift-cards-recipients"
             mt="0.25em"
             invalids={errors.emails}
             initialState={multiEmailsInitialState}
@@ -642,7 +641,7 @@ class CreateGiftCardsForm extends Component {
  * gift cards, as a gift card cannot be used as a source payment method
  * for another payment method.
  */
-const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
+const collectiveSourcePaymentMethodsQuery = gqlV1 /* GraphQL */ `
   query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
@@ -685,7 +684,7 @@ const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMe
   }),
 });
 
-const createGiftCardsMutation = gqlV1/* GraphQL */ `
+const createGiftCardsMutation = gqlV1 /* GraphQL */ `
   mutation CreateGiftCards(
     $collectiveId: Int!
     $numberOfGiftCards: Int

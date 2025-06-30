@@ -1,5 +1,4 @@
 import React from 'react';
-import { PropTypes } from 'prop-types';
 import { get, has } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -106,27 +105,6 @@ const HeroBackground = ({ collective }) => {
       )}
     </StyledHeroBackground>
   );
-};
-
-HeroBackground.propTypes = {
-  /** The collective to show the image for */
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    /** The background image */
-    backgroundImage: PropTypes.string,
-    backgroundImageUrl: PropTypes.string,
-    /** Collective settings */
-    settings: PropTypes.shape({
-      collectivePage: PropTypes.shape({
-        background: PropTypes.shape({
-          /** Used to display the background at the right position */
-          offset: PropTypes.shape({ y: PropTypes.number.isRequired }),
-          /** Only used for the editor */
-          crop: PropTypes.shape({ y: PropTypes.number.isRequired }),
-        }),
-      }),
-    }),
-  }).isRequired,
 };
 
 /** @component */

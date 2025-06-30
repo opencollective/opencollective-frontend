@@ -186,7 +186,9 @@ const UpdatesList = () => {
             />
           ) : (
             <React.Fragment>
-              {updates?.nodes?.map(update => <UpdatePost key={update.id} update={update} account={account} />)}
+              {updates?.nodes?.map(update => (
+                <UpdatePost key={update.id} update={update} account={account} />
+              ))}
               <Pagination total={(data || previousData)?.account?.updates?.totalCount} queryFilter={queryFilter} />
             </React.Fragment>
           )}

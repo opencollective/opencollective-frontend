@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { trim } from 'lodash';
@@ -223,11 +222,6 @@ const EditPayPalAccount = props => {
       </div>
     );
   }
-};
-
-EditPayPalAccount.propTypes = {
-  collective: PropTypes.object,
-  variation: PropTypes.string,
 };
 
 export default EditPayPalAccount;

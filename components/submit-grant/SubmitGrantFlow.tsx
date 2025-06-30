@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
   CreateExpenseFromDashboardMutation,
@@ -257,7 +258,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
-  const formRef = React.useRef<HTMLFormElement>();
+  const formRef = React.useRef<HTMLFormElement>(undefined);
 
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,
@@ -350,7 +351,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
         items: [
           {
             name: Step.WHO_WILL_RECEIVE_FUNDS,
-            title: <FormattedMessage defaultMessage="Who will receive the fund?" id="q5ZkgW" />,
+            title: <FormattedMessage defaultMessage="Who will receive the funds?" id="CAYwc2" />,
             formValues: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
           },
           {
@@ -543,7 +544,13 @@ function FormContainer(props: FormContainerProps) {
             id={Step.PAYOUT_METHOD}
             inViewChange={onInViewChange}
             title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
-            subtitle={<FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />}
+            subtitle={
+              form.options.payee?.type === CollectiveType.VENDOR || !form.options.isAdminOfPayee ? (
+                <FormattedMessage defaultMessage="Where the money will be sent to" id="IQIlkE" />
+              ) : (
+                <FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />
+              )
+            }
           >
             <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(form)} />
           </FormSectionContainer>

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -55,11 +54,6 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
       )}
     </Container>
   );
-};
-
-EmptyBalance.propTypes = {
-  collective: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
 };
 
 export default EmptyBalance;

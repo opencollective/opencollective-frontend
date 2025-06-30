@@ -1,10 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
@@ -194,29 +192,6 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
       )}
     </StyledCard>
   );
-};
-
-ReplyToMemberInvitationCard.propTypes = {
-  isSelected: PropTypes.bool,
-  invitation: PropTypes.shape({
-    id: PropTypes.string,
-    role: PropTypes.oneOf(Object.values(roles)),
-    account: PropTypes.shape({
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      host: PropTypes.shape({
-        name: PropTypes.string,
-        termsUrl: PropTypes.string,
-      }),
-    }),
-    inviter: PropTypes.shape({
-      name: PropTypes.string,
-    }),
-    createdAt: PropTypes.string,
-  }),
-  /** @ignore form withUser */
-  refetchLoggedInUser: PropTypes.func,
-  redirectOnAccept: PropTypes.bool,
 };
 
 export default withUser(ReplyToMemberInvitationCard);

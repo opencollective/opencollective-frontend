@@ -2,7 +2,7 @@ import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
-export const tierPageQuery = gqlV1/* GraphQL */ `
+export const tierPageQuery = gqlV1 /* GraphQL */ `
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id

@@ -75,7 +75,7 @@ const ListItem = styled.li`
   margin-top: 16px;
   margin-bottom: 16px;
 
-  ::before {
+  &::before {
     content: '•';
     color: ${themeGet('colors.blue.700')};
     display: inline-block;

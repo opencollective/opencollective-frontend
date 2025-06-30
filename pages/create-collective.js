@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { isHiddenAccount } from '@/lib/collective';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
@@ -21,6 +21,7 @@ const createCollectiveHostQuery = gql`
       name
       currency
       isOpenToApplications
+      isSuspended
       termsUrl
       policies {
         id
@@ -46,7 +47,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
     return <ErrorPage loading={true} />;
   }
 
-  if (!skipQuery && (!data || !data.host)) {
+  if (!skipQuery && (!data || !data.host || isHiddenAccount(data.host))) {
     return <ErrorPage error={generateNotFoundError(slug)} data={{ error }} log={false} />;
   }
 
@@ -61,11 +62,6 @@ CreateCollectivePage.getInitialProps = () => {
   return {
     scripts: { googleMaps: true }, // To enable location autocomplete
   };
-};
-
-CreateCollectivePage.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
 };
 
 // next.js export

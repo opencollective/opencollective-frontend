@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
@@ -24,7 +23,7 @@ const SecurityCheckItem = styled(Flex)`
   justify-content: space-between;
   min-height: 72px;
   padding: 12px 16px;
-  :not(:last-child) {
+  &:not(:last-child) {
     border-bottom: 1px solid ${themeGet('colors.black.300')};
   }
 `;
@@ -120,7 +119,7 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   const [scope, setScope] = React.useState();
 
   return (
-    <StyledModal trapFocus onClose={onClose} data-cy="security-check-modal" {...modalProps}>
+    <StyledModal onClose={onClose} data-cy="security-check-modal" {...modalProps}>
       <ModalHeader onClose={onClose}>
         <Box>
           <H1 color="black.900" fontSize="20px" lineHeight="28px">
@@ -170,19 +169,6 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   );
 };
 
-SecurityChecksModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  expense: PropTypes.shape({
-    securityChecks: PropTypes.arrayOf(
-      PropTypes.shape({
-        scope: PropTypes.string,
-        level: PropTypes.string,
-        message: PropTypes.string,
-      }),
-    ),
-  }),
-};
-
 const Indicator = styled.div`
   position: absolute;
   display: flex;
@@ -203,6 +189,7 @@ const Indicator = styled.div`
 
 const RoundButton = styled(StyledRoundButton)`
   position: relative;
+  margin: 0;
 `;
 
 const LEVEL_BUTTON_STYLE = {
@@ -241,13 +228,6 @@ export const SecurityChecksButton = ({ expense, enableKeyboardShortcuts, ...butt
       {displayModal && <SecurityChecksModal expense={expense} onClose={() => setDisplayModal(false)} />}
     </React.Fragment>
   );
-};
-
-SecurityChecksButton.propTypes = {
-  ...SecurityChecksModal.propTypes,
-  isOpen: PropTypes.bool,
-  onConfirm: PropTypes.func,
-  onClose: PropTypes.func,
 };
 
 export default SecurityChecksModal;

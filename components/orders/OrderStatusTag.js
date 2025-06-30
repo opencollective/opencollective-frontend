@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -43,10 +42,6 @@ const OrderStatusTag = ({ status, ...props }) => {
       {i18nOrderStatus(intl, status)}
     </StyledTag>
   );
-};
-
-OrderStatusTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(ORDER_STATUS)),
 };
 
 export default OrderStatusTag;

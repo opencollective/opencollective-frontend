@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -28,7 +27,7 @@ const HostName = styled(P)`
 
 dayjs.extend(utc);
 
-const invoicesQuery = gqlV1/* GraphQL */ `
+const invoicesQuery = gqlV1 /* GraphQL */ `
   query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug
@@ -151,24 +150,6 @@ const ReceiptCard = ({ ...props }) => (
   </StyledCard>
 );
 
-ReceiptCard.propTypes = {
-  host: PropTypes.shape({
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-    slug: PropTypes.string,
-  }),
-  loadingInvoice: PropTypes.bool,
-  fromCollective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  downloadInvoice: PropTypes.func,
-  dateFrom: PropTypes.string,
-  dateTo: PropTypes.string,
-  totalTransactions: PropTypes.number,
-  month: PropTypes.number,
-  year: PropTypes.number,
-};
-
 const Receipts = ({ invoices }) => {
   const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice, { useErrorToast: true });
   const byMonthYear = groupBy(invoices, invoice => `${invoice.month}-${invoice.year}`);
@@ -261,14 +242,6 @@ const PaymentReceipts = ({ collective }) => {
       </Box>
     </Flex>
   );
-};
-
-PaymentReceipts.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default PaymentReceipts;

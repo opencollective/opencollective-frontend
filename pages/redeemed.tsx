@@ -16,7 +16,7 @@ import Page from '../components/Page';
 import { Button } from '../components/ui/Button';
 import { Skeleton } from '../components/ui/Skeleton';
 
-const redeemedPageQuery = gqlV1/* GraphQL */ `
+const redeemedPageQuery = gqlV1 /* GraphQL */ `
   query RedeemedPage($collectiveSlug: String!, $code: String!) {
     Collective(slug: $collectiveSlug) {
       id

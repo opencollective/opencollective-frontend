@@ -255,7 +255,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
   });
 
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const order = query.data?.order;
   const actions = React.useMemo(
     () => (order ? props.getActions(order, dropdownTriggerRef) : null),

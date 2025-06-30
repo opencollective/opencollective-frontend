@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
@@ -32,24 +31,6 @@ const ContributeProject = ({ collective, project, ...props }) => {
       {description}
     </Contribute>
   );
-};
-
-ContributeProject.propTypes = {
-  project: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    backgroundImageUrl: PropTypes.string,
-    contributors: PropTypes.arrayOf(PropTypes.object),
-    stats: PropTypes.shape({
-      backers: PropTypes.object,
-    }).isRequired,
-    isArchived: PropTypes.bool,
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
 };
 
 export default ContributeProject;

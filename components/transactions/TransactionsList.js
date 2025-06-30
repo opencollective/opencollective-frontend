@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import StyledCard from '../StyledCard';
@@ -35,23 +34,6 @@ const TransactionsList = ({ transactions, collective, displayActions, onMutation
       })}
     </StyledCard>
   );
-};
-
-TransactionsList.propTypes = {
-  isLoading: PropTypes.bool,
-  displayActions: PropTypes.bool,
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
-  transactions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }),
-  ),
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionsList;

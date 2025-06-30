@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -116,28 +115,6 @@ const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxP
       {advancedSettings && !big && <StyledHr width="100%" mt={displayAdvancedSettings ? 4 : 3} borderStyle="dashed" />}
     </Box>
   );
-};
-
-CollectiveSettings.propTypes = {
-  account: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    imageUrl: PropTypes.string,
-    activitySubscriptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.string,
-        active: PropTypes.bool,
-      }),
-    ),
-    host: PropTypes.shape({
-      totalHostedCollectives: PropTypes.number,
-    }),
-  }),
-  advancedSettings: PropTypes.bool,
-  big: PropTypes.bool,
-  roleLabel: PropTypes.node,
 };
 
 export default CollectiveSettings;

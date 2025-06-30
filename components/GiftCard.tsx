@@ -53,6 +53,7 @@ const GiftCard = ({
               m="0px"
               collective={emitter}
               mb={3}
+              // @ts-expect-error size is not properly typed
               size={[48, 64]}
               avatarSize={[24, 32]}
               fontSize="14px"

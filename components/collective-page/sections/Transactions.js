@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -154,33 +153,6 @@ const SectionTransactions = props => {
       )}
     </Box>
   );
-};
-
-SectionTransactions.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    platformFeePercent: PropTypes.number,
-  }).isRequired,
-
-  /** Whether user is admin of `collective` */
-  isAdmin: PropTypes.bool,
-
-  /** Whether user is root user */
-  isRoot: PropTypes.bool,
-
-  /** @ignore from withData */
-  data: PropTypes.shape({
-    loading: PropTypes.bool,
-    refetch: PropTypes.func,
-    transactions: PropTypes.arrayOf(PropTypes.object),
-  }),
-
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
 };
 
 export default React.memo(injectIntl(SectionTransactions));

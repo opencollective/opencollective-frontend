@@ -14,6 +14,7 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   PLAID_INTEGRATION = 'PLAID_INTEGRATION',
   GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
+  HOST_OVERVIEW = 'HOST_OVERVIEW',
 }
 
 export type PreviewFeature = {
@@ -133,10 +134,18 @@ export const previewFeatures: PreviewFeature[] = [
   },
   {
     key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-    title: 'Reorganize Grands and Funds tools in Dashboard',
-    description: 'Grands and Funds are organized into their own Dashboard sections',
+    title: 'Funds & Grants Dashboard Tools',
+    description: 'Grants and Funds are organized into their own Dashboard sections',
     alwaysEnableInDev: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    publicBeta: false,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.HOST_OVERVIEW,
+    title: 'Host Dashboard Overview',
+    description: 'A dashboard landing page for Host accounts that provides an overview of the organization.',
+    alwaysEnableInDev: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
     publicBeta: false,
   },
 ];

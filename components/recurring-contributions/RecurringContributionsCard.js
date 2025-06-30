@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -180,28 +179,6 @@ const RecurringContributionsCard = ({
       )}
     </StyledCollectiveCard>
   );
-};
-
-RecurringContributionsCard.propTypes = {
-  collective: PropTypes.object.isRequired,
-  isEditing: PropTypes.bool,
-  isAdmin: PropTypes.bool,
-  canEdit: PropTypes.bool,
-  onCloseEdit: PropTypes.func,
-  onEdit: PropTypes.func,
-  contribution: PropTypes.shape({
-    amount: PropTypes.object.isRequired,
-    totalAmount: PropTypes.object.isRequired,
-    platformTipAmount: PropTypes.object,
-    frequency: PropTypes.string.isRequired,
-    totalDonations: PropTypes.object.isRequired,
-    paymentMethod: PropTypes.object,
-    fromAccount: PropTypes.object,
-  }),
-  status: PropTypes.string.isRequired,
-  LoggedInUser: PropTypes.object,
-  account: PropTypes.object.isRequired,
-  showPaymentMethod: PropTypes.bool,
 };
 
 export default RecurringContributionsCard;

@@ -82,7 +82,7 @@ const getIsConfirmedFromFilter = (filter: string | undefined): boolean | undefin
   return filter === 'redeemed';
 };
 
-const giftCardsQuery = gqlV1/* GraphQL */ `
+const giftCardsQuery = gqlV1 /* GraphQL */ `
   query EditCollectiveGiftCards($collectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
     Collective(id: $collectiveId) {
       id
@@ -377,6 +377,7 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
             <React.Fragment>
               {paymentMethods.map(v => (
                 <div key={v.id}>
+                  {/* @ts-expect-error giftCard is not properly typed */}
                   <GiftCardDetails giftCard={v} collectiveSlug={collectiveSlug} />
                   {v !== lastGiftCard && <hr className="my-6" />}
                 </div>

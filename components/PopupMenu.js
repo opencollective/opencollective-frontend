@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Popper } from 'react-popper';
 import styled from 'styled-components';
 
@@ -17,9 +16,17 @@ const Popup = styled(Box)`
   z-index: ${props => props.zIndex ?? 1000};
 `;
 
-const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex, popupMarginTop }) => {
+const PopupMenu = ({
+  Button,
+  children,
+  placement = 'bottom',
+  onClose = undefined,
+  closingEvents = undefined,
+  zIndex = undefined,
+  popupMarginTop = undefined,
+}) => {
   const [isOpen, setOpen] = React.useState(false);
-  const ref = React.useRef();
+  const ref = React.useRef(undefined);
   useGlobalBlur(
     ref,
     outside => {
@@ -61,20 +68,6 @@ const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex
       )}
     </Box>
   );
-};
-
-PopupMenu.propTypes = {
-  Button: PropTypes.func.isRequired,
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
-  placement: PropTypes.string,
-  onClose: PropTypes.func,
-  zIndex: PropTypes.number,
-  /*
-   * The mouse or keyboard events that are passed to close the popup menu.
-   * For example, mouseover, mousedown, mouseup, blur, focusin, focusout etc.
-   */
-  closingEvents: PropTypes.array,
-  popupMarginTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default PopupMenu;

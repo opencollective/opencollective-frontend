@@ -2,7 +2,6 @@
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/withData.js
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 
 import { withTwoFactorAuthentication } from './two-factor-authentication/TwoFactorAuthenticationContext';
@@ -54,11 +53,6 @@ const withData = ComposedComponent => {
     }
 
     static displayName = `WithData(${getComponentDisplayName(ComposedComponent)})`;
-
-    static propTypes = {
-      options: PropTypes.object,
-      twoFactorAuthContext: PropTypes.object,
-    };
 
     constructor(props) {
       super(props);

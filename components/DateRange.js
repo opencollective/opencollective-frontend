@@ -1,9 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
-import dayjs from '../lib/dayjs';
 
 import DateTime from './DateTime';
 
@@ -64,10 +61,4 @@ export const DateRange = ({ from, to, isUTC }) => {
   } else {
     return <React.Fragment>{message} (UTC)</React.Fragment>;
   }
-};
-
-DateRange.propTypes = {
-  from: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]),
-  to: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]),
-  isUTC: PropTypes.bool,
 };

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -46,11 +45,6 @@ const UpdateOrderByFilter = ({ value, onChange, ...props }) => {
       />
     </Container>
   );
-};
-
-UpdateOrderByFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 };
 
 export default React.memo(UpdateOrderByFilter);

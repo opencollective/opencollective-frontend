@@ -1,19 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TruncatedTextWithTooltip component renders default options 1`] = `"A short string"`;
+exports[`TruncatedTextWithTooltip component renders default options 1`] = `
+<div>
+  A short string
+</div>
+`;
 
 exports[`TruncatedTextWithTooltip component renders default options 2`] = `
-<button
-  className="cursor-help"
-  data-state="closed"
-  onBlur={[Function]}
-  onClick={[Function]}
-  onFocus={[Function]}
-  onPointerDown={[Function]}
-  onPointerLeave={[Function]}
-  onPointerMove={[Function]}
-  type="button"
->
-  a string that is more than ...
-</button>
+<div>
+  <button
+    class="cursor-help"
+    data-state="closed"
+    type="button"
+  >
+    a string that is more than ...
+  </button>
+</div>
 `;

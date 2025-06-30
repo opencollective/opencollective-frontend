@@ -792,7 +792,6 @@ class EditCollectiveForm extends React.Component {
                       className={field.className}
                       defaultValue={this.getFieldDefaultValue(field)}
                       validate={field.validate}
-                      ref={field.name}
                       name={field.name}
                       label={field.label}
                       description={field.description}

@@ -21,6 +21,58 @@ import {
   getQueryValueFromFilterValue,
   structureQueryValues,
 } from '../filters/filter-utils';
+import { omitDeepBy } from '../utils';
+
+/**
+ * Helper function to extract filter variables from the query using server-side rendering context.
+ */
+export function getSSRVariablesFromQuery<
+  S extends z.ZodObject<z.ZodRawShape, any, any>,
+  GQLQueryVars,
+  FilterMeta = any,
+>({
+  query,
+  schema,
+  toVariables,
+  meta,
+  defaultFilterValues = {},
+}: {
+  query: any;
+  schema: S;
+  meta?: FilterMeta;
+  toVariables: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
+  defaultFilterValues?: Partial<z.infer<S>>;
+}): Partial<z.infer<S>> {
+  const structuredQuery = structureQueryValues(query);
+  const queryWithDefaultFilterValues = Object.keys(defaultFilterValues).reduce(
+    (acc, filterName) => ({
+      ...acc,
+      [filterName]: getFilterValueFromQueryValue(structuredQuery[filterName], defaultFilterValues[filterName]),
+    }),
+    structuredQuery,
+  );
+
+  // This will validate the query values against the schema (and add the default schema values if those fields are not set))
+  const values = schema.safeParse(queryWithDefaultFilterValues)?.data;
+  let apiVariables: Partial<GQLQueryVars> = {};
+
+  // Iterate over each entry in the values object
+  for (const [key, value] of Object.entries(omitBy(values, isUndefined))) {
+    // If a specific toVariables function exists for this key, use it
+    if (toVariables?.[key]) {
+      apiVariables = {
+        ...apiVariables,
+        ...toVariables[key](value, key, meta),
+      };
+    } else {
+      apiVariables = {
+        ...apiVariables,
+        [key]: value,
+      };
+    }
+  }
+  return omitDeepBy(apiVariables, isUndefined);
+}
 
 export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars> = {
   values: z.infer<S>;
@@ -45,6 +97,7 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQu
   views?: readonly View<z.infer<S>>[];
   skipRouter?: boolean; // Used when not updating the URL query is desired, this will instead use internal state.
   activeViewId?: string; // To use as a control for the active view
+  shallow?: boolean; // If true, the router will not reload the page when updating the query
 };
 
 export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any>(
@@ -143,7 +196,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
               query,
             },
             null,
-            { scroll: false },
+            { scroll: false, shallow: opts.shallow || false },
           );
         }
       }
@@ -199,11 +252,13 @@ function addFilterValidationErrorToast(error, intl) {
     errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
   });
 
-  setImmediate(() => {
-    toast({
-      variant: 'error',
-      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
-      message: errorMessage,
+  if (typeof setImmediate !== 'undefined') {
+    setImmediate(() => {
+      toast({
+        variant: 'error',
+        title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
+        message: errorMessage,
+      });
     });
-  });
+  }
 }

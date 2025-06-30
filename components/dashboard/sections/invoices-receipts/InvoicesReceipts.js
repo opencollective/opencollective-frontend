@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
@@ -206,13 +205,6 @@ const InvoicesReceipts = ({ account }) => {
       </div>
     </Container>
   );
-};
-
-InvoicesReceipts.propTypes = {
-  account: PropTypes.shape({
-    legacyId: PropTypes.number.isRequired,
-    settings: PropTypes.object,
-  }).isRequired,
 };
 
 export default InvoicesReceipts;

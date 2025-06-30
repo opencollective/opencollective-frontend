@@ -6,11 +6,12 @@ import { createGlobalStyle } from 'styled-components';
 
 import type { Context } from '../lib/apollo-client';
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective';
+import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { FEATURES, getFeatureStatus } from '@/lib/allowed-features';
 import { getRequestIntl } from '@/lib/i18n/request';
 import { getWhitelabelRedirection } from '@/lib/whitelabel';
 
@@ -123,7 +124,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
   } else if (!loading) {
     if (!data || queryResult.error) {
       return <ErrorPage data={data} />;
-    } else if (!collective || collective.type === 'VENDOR') {
+    } else if (!collective || isHiddenAccount(collective)) {
       return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
     } else if (collective.isIncognito) {
       return <IncognitoUserCollective collective={collective} />;
@@ -149,6 +150,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
       canonicalURL={getCollectivePageCanonicalURL(collective)}
       {...getCollectivePageMetadata(collective)}
       loading={loading}
+      updatesRss={getFeatureStatus(collective, FEATURES.UPDATES) === 'ACTIVE'}
     >
       <GlobalStyles />
       {loading ? (

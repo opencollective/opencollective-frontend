@@ -4,7 +4,7 @@ import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
+import { FEATURES, getFeatureStatus, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
@@ -178,6 +178,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
         LoggedInUser={LoggedInUser}
         canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
         noRobots={!shouldIndexAccountOnSearchEngines(collective)}
+        updatesRss={getFeatureStatus(collective, FEATURES.UPDATES) === 'ACTIVE'}
       />
 
       <Body>

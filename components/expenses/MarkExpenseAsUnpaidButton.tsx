@@ -10,10 +10,10 @@ import { i18nExpenseStatus } from '../../lib/i18n/expense';
 import ConfirmationModal from '../ConfirmationModal';
 import { Box } from '../Grid';
 import RichTextEditor from '../RichTextEditor';
-import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledSelect from '../StyledSelect';
 import { Label, P } from '../Text';
+import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
 const generateNewExpenseStatusOptions = intl => [
@@ -72,9 +72,9 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
   }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message]);
 
   const button = (
-    <StyledButton {...props} buttonStyle="dangerSecondary" onClick={() => setHasModal(true)}>
+    <Button {...props} variant="outlineDestructive" onClick={() => setHasModal(true)}>
       <FormattedMessage id="expense.markAsUnpaid.btn" defaultMessage="Mark as unpaid" />
-    </StyledButton>
+    </Button>
   );
 
   if (!hasModal) {

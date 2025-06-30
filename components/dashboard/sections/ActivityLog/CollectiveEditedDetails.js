@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { diffArrays, diffChars, diffJson } from 'diff';
 import { has, isEmpty, pickBy, startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -165,8 +164,4 @@ export const CollectiveEditedDetails = ({ activity }) => {
       </DiffLine>
     );
   });
-};
-
-CollectiveEditedDetails.propTypes = {
-  activity: PropTypes.shape({ type: PropTypes.string.isRequired, data: PropTypes.object }).isRequired,
 };

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { trim } from 'lodash';
 import { withRouter } from 'next/router';
@@ -434,13 +433,4 @@ const CreateOrganizationForm = props => {
   );
 };
 
-CreateOrganizationForm.propTypes = {
-  collective: PropTypes.object,
-  LoggedInUser: PropTypes.object,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  onSubmit: PropTypes.func,
-  updateAdmins: PropTypes.func,
-  intl: PropTypes.object.isRequired,
-};
 export default injectIntl(withRouter(withUser(CreateOrganizationForm)));

@@ -62,11 +62,17 @@ export const connectPlaidAccountMutation = gql`
   }
 `;
 
-const refreshPlaidAccountMutation = gql`
+export const refreshPlaidAccountMutation = gql`
   mutation RefreshPlaidAccount($transactionImport: TransactionsImportReferenceInput) {
     refreshPlaidAccount(transactionImport: $transactionImport) {
       transactionsImport {
         id
+        source
+        name
+        account {
+          id
+          slug
+        }
         plaidAccounts {
           accountId
           mask
@@ -86,23 +92,20 @@ export const usePlaidConnectDialog = ({
   host,
   onConnectSuccess,
   onUpdateSuccess,
-  disabled,
   onOpen,
-  transactionImportId,
 }: {
   host: Host;
   onConnectSuccess?: (result: ConnectPlaidAccountMutation['connectPlaidAccount']) => void;
-  onUpdateSuccess?: () => void;
-  disabled?: boolean;
+  onUpdateSuccess?: (result: RefreshPlaidAccountMutation['refreshPlaidAccount']) => void;
   onOpen?: () => void;
-  transactionImportId?: string;
 }): {
   status: PlaidDialogStatus;
-  show: (options?: { accountSelectionEnabled?: boolean }) => Promise<void>;
+  show: (options?: { accountSelectionEnabled?: boolean; transactionImportId?: string }) => Promise<void>;
 } => {
   const [status, setStatus] = React.useState<PlaidDialogStatus>('idle');
   const intl = useIntl();
   const { toast } = useToast();
+  const [transactionImportId, setTransactionImportId] = React.useState<string | undefined>(undefined);
   const [generatePlaidToken, { data: plaidTokenData, reset: resetPlaidToken }] = useMutation<
     GeneratePlaidLinkTokenMutation,
     GeneratePlaidLinkTokenMutationVariables
@@ -127,25 +130,25 @@ export const usePlaidConnectDialog = ({
     onExit: err => {
       resetPlaidToken();
       setStatus('idle');
+      setTransactionImportId(undefined);
       if (err) {
         toast({ variant: 'error', message: err.display_message });
       }
     },
     onSuccess: async (publicToken, metadata) => {
-      let result: Awaited<ReturnType<typeof connectPlaidAccount>>;
-
       if (transactionImportId) {
-        // There is no need to re-connect the account in the API if the transaction import is already connected
-        setStatus('success');
+        let result: Awaited<ReturnType<typeof refreshPlaidAccount>>;
         try {
-          await refreshPlaidAccount({ variables: { transactionImport: { id: transactionImportId } } });
+          result = await refreshPlaidAccount({ variables: { transactionImport: { id: transactionImportId } } });
         } catch (e) {
           toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           return;
         }
 
-        onUpdateSuccess?.();
+        setStatus('success');
+        onUpdateSuccess?.(result.data?.refreshPlaidAccount);
       } else {
+        let result: Awaited<ReturnType<typeof connectPlaidAccount>>;
         try {
           result = await connectPlaidAccount({
             variables: {
@@ -169,12 +172,16 @@ export const usePlaidConnectDialog = ({
   const show = React.useCallback(
     async ({
       accountSelectionEnabled,
+      transactionImportId,
     }: {
       accountSelectionEnabled?: boolean;
+      transactionImportId?: string | undefined;
     } = {}) => {
-      if (status === 'idle') {
+      if (status === 'idle' || status === 'success') {
         try {
           setStatus('loading');
+          setTransactionImportId(transactionImportId);
+
           const result = await generatePlaidToken({
             variables: {
               host: getAccountReferenceInput(host),
@@ -190,6 +197,7 @@ export const usePlaidConnectDialog = ({
             LOCAL_STORAGE_KEYS.PLAID_LINK_TOKEN,
             JSON.stringify({
               hostId: host.id,
+              transactionImportId,
               token: result.data.generatePlaidLinkToken.linkToken,
             }),
           );
@@ -201,7 +209,7 @@ export const usePlaidConnectDialog = ({
         }
       }
     },
-    [intl, status, generatePlaidToken, toast, host, transactionImportId],
+    [intl, status, generatePlaidToken, toast, host],
   );
 
   React.useEffect(() => {
@@ -211,7 +219,7 @@ export const usePlaidConnectDialog = ({
   }, [ready, linkToken, open]);
 
   return {
-    status: !host || disabled ? 'disabled' : status,
+    status: !host ? 'disabled' : status,
     show,
   };
 };

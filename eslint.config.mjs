@@ -89,6 +89,7 @@ export default defineConfig([
       'react/react-in-jsx-scope': ['error'],
       'react/sort-comp': ['error'],
       'react/no-this-in-sfc': ['error'],
+      'react/prop-types': 'off',
       'n/no-unsupported-features/node-builtins': 'off',
       'jsx-a11y/no-autofocus': ['off'],
       'jsx-a11y/label-has-associated-control': ['off'],
@@ -136,7 +137,6 @@ export default defineConfig([
     files: ['**/*.js', '**/*.jsx'],
     plugins: { formatjs },
     rules: {
-      'react/prop-types': ['error'],
       'no-unused-vars': ['error'],
     },
   },

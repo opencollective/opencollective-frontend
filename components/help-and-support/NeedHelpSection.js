@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -41,12 +40,6 @@ const NeedHelp = ({ title, description, actions }) => {
       <Box my="16px">{actions}</Box>
     </Flex>
   );
-};
-
-NeedHelp.propTypes = {
-  title: PropTypes.node,
-  description: PropTypes.node,
-  actions: PropTypes.node,
 };
 
 export default NeedHelp;
