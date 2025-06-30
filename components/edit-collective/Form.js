@@ -37,6 +37,7 @@ import ConnectedAccounts from './sections/ConnectedAccounts';
 import CustomMessage from './sections/CustomMessage';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
+import FiscalHost from './sections/FiscalHost';
 import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
@@ -490,7 +491,7 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return null;
+        return <FiscalHost collective={collective} account={this.props.account} />;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
@@ -718,42 +719,6 @@ class EditCollectiveForm extends React.Component {
         },
         ...this.getApplicableTaxesFields(),
       ],
-      'fiscal-hosting': [
-        {
-          name: 'application',
-          className: 'horizontal',
-          type: 'switch',
-          defaultValue: get(this.state.collective, 'settings.apply'),
-          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.settings.apply),
-        },
-        {
-          name: 'application.message',
-          className: 'horizontal',
-          type: 'textarea',
-          defaultValue: get(this.state.collective, 'settings.applyMessage'),
-          placeholder: intl.formatMessage(this.messages['application.message.defaultValue']),
-          disabled: !this.state.collective.settings?.apply,
-          maxLength: 1000,
-          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.settings.apply),
-        },
-        {
-          name: 'hostFeePercent',
-          type: 'number',
-          className: 'horizontal',
-          step: '0.01',
-          post: '%',
-          defaultValue: get(this.state.collective, 'hostFeePercent'),
-          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.hostFeePercent !== 0),
-        },
-        {
-          name: 'tos',
-          type: 'text',
-          placeholder: '',
-          className: 'horizontal',
-          defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.settings.tos),
-        },
-      ],
     };
 
     for (const fieldname in this.fields) {
@@ -862,4 +827,5 @@ class EditCollectiveForm extends React.Component {
   }
 }
 
+/** @type {any} */
 export default withRouter(injectIntl(EditCollectiveForm));
