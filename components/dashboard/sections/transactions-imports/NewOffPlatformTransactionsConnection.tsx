@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
+import { pick } from 'lodash';
 import { ArrowLeft, Building2, Globe, Loader2, Search, Sparkles } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,6 +14,7 @@ import type {
 import type { OffPlatformTransactionsInstitution } from '@/lib/graphql/types/v2/schema';
 import { OffPlatformTransactionsProvider } from '@/lib/graphql/types/v2/schema';
 import { i18nCountryName } from '@/lib/i18n';
+import { LOCAL_STORAGE_KEYS, setLocalStorage } from '@/lib/local-storage';
 import { cn } from '@/lib/utils';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
@@ -292,11 +294,13 @@ const InstitutionStep = ({
   selectedInstitution,
   setSelectedInstitution,
   onBack,
+  hostId,
 }: {
   selectedCountry: string;
   selectedInstitution: OffPlatformTransactionsInstitution | null;
   setSelectedInstitution: (institution: OffPlatformTransactionsInstitution) => void;
   onBack: () => void;
+  hostId: string;
 }) => {
   const intl = useIntl();
   const [institutionFilter, setInstitutionFilter] = React.useState('');
@@ -339,6 +343,14 @@ const InstitutionStep = ({
       const link = result.data?.generateGoCardlessLink?.link;
       if (link) {
         // Redirect to the GoCardless authorization page
+        setLocalStorage(
+          LOCAL_STORAGE_KEYS.GOCARDLESS_DATA,
+          JSON.stringify({
+            date: new Date().toISOString(),
+            hostId,
+            requisitionId: result.data?.generateGoCardlessLink?.id,
+          }),
+        );
         window.location.href = link;
       } else {
         throw new Error('No link received from GoCardless');
@@ -487,11 +499,13 @@ export const NewOffPlatformTransactionsConnection = ({
   onOpenChange,
   onPlaidConnect,
   hostCountry,
+  hostId,
 }: {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onPlaidConnect: () => void;
   hostCountry: string;
+  hostId: string;
 }) => {
   const [step, setStep] = React.useState<'region' | 'country' | 'institution'>('region');
   const [selectedRegion, setSelectedRegion] = React.useState<Region | null>(null);
@@ -554,6 +568,7 @@ export const NewOffPlatformTransactionsConnection = ({
             selectedInstitution={selectedInstitution}
             setSelectedInstitution={setSelectedInstitution}
             onBack={handleBack}
+            hostId={hostId}
           />
         );
       default:
