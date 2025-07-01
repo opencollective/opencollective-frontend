@@ -1,20 +1,16 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
-import { getDashboardRoute } from '@/lib/url-helpers';
 
-import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
-import Link from '@/components/Link';
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
-import { DashboardContext } from '../../DashboardContext';
 
 import { timelineQuery } from './queries';
 import TimelineItem from './TimelineItem';
@@ -22,7 +18,6 @@ import TimelineItem from './TimelineItem';
 const PAGE_SIZE = 20;
 
 export function Timeline({ accountSlug, withTitle = false }) {
-  const { account } = useContext(DashboardContext);
   const [isTimelineBeingGenerated, setIsTimelineBeingGenerated] = React.useState(false);
   const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
 
@@ -50,30 +45,10 @@ export function Timeline({ accountSlug, withTitle = false }) {
   return (
     <Card>
       {withTitle && (
-        <CardHeader className="relative">
-          <CardTitle className="relative text-xl">
-            <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />{' '}
-            <InfoTooltipIcon className="inline-block" contentClassname="font-normal">
-              <FormattedMessage
-                defaultMessage="This is a selection of activities happening on your account, go to the <Link>Activity log</Link> to see everything."
-                id="hTYdKy"
-                values={{
-                  Link: label => (
-                    <Link className="underline" href={getDashboardRoute(account, 'activity-log')}>
-                      {label}
-                    </Link>
-                  ),
-                }}
-              />
-            </InfoTooltipIcon>
+        <CardHeader>
+          <CardTitle className="text-xl">
+            <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
           </CardTitle>
-          <CardAction>
-            <Button asChild variant="ghost">
-              <Link href={getDashboardRoute(account, 'activity-log')}>
-                <FormattedMessage defaultMessage="Go to activity log" id="zOk9pq" />
-              </Link>
-            </Button>
-          </CardAction>
         </CardHeader>
       )}
       <CardContent className={!withTitle && 'pt-6'}>

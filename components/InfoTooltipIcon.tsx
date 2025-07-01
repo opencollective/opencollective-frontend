@@ -12,14 +12,12 @@ export function InfoTooltipIcon({
   contentClassname,
   size = 16,
   side,
-  sideOffset,
 }: {
   children: React.ReactNode;
   className?: string;
   contentClassname?: string;
   size?: number;
   side?: TooltipContentProps['side'];
-  sideOffset?: number;
 }) {
   return (
     <Tooltip delayDuration={100}>
@@ -28,8 +26,7 @@ export function InfoTooltipIcon({
       </TooltipTrigger>
       <TooltipContent
         side={side}
-        sideOffset={sideOffset}
-        className={cn('z-[9999] max-w-xs text-left', contentClassname)}
+        className={cn('max-w-xs text-left', contentClassname)}
         onPointerDownOutside={e => e.preventDefault()}
       >
         {children}
