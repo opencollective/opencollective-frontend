@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Требуется имя",
   "Error.Network": "A network error occurred, please check your connectivity or try again later",
   "error.reload": "Перезагрузить страницу",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Проверка не удалась",
   "error.unauthorized.description": "You have to be an admin of {name} to apply with this initiative.",
   "Error.Unknown": "An unknown error occurred",

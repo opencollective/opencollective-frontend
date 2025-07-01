@@ -1361,6 +1361,8 @@
   "error.name.invalid": "O nome é obrigatório",
   "Error.Network": "Ocorreu um erro de rede, verifique sua conexão ou tente novamente mais tarde",
   "error.reload": "Recarregue a página",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Falha na validação",
   "error.unauthorized.description": "Você precisa ser um administrador para participar do(a) {name}.",
   "Error.Unknown": "Um erro desconhecido ocorreu",

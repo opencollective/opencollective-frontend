@@ -1361,6 +1361,8 @@
   "error.name.invalid": "名称必填",
   "Error.Network": "网络请求出错，请检查互联网连接并重试",
   "error.reload": "重载页面",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "验证失败",
   "error.unauthorized.description": "你必须是 {name} 的管理员才能使用此倡议。",
   "Error.Unknown": "发生了未知错误",

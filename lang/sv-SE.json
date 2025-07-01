@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Namn krävs",
   "Error.Network": "A network error occurred, please check your connectivity or try again later",
   "error.reload": "Ladda om sidan",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Validering misslyckades",
   "error.unauthorized.description": "Du måste vara administratör för {name} för att ansöka med detta initiativ.",
   "Error.Unknown": "An unknown error occurred",

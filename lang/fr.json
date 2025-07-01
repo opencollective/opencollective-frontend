@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Le nom est requis",
   "Error.Network": "Une erreur réseau s'est produite, veuillez vérifier votre connexion ou réessayer plus tard",
   "error.reload": "Recharger la page",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Échec de la validation",
   "error.unauthorized.description": "Vous devez être administrateur de {name} pour postuler avec cette initiative.",
   "Error.Unknown": "Une erreur inconnue s'est produite",
