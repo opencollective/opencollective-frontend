@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Naam is verplicht",
   "Error.Network": "Er is een netwerkfout opgetreden, controleer uw verbinding of probeer het later opnieuw",
   "error.reload": "Herlaad de pagina",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Validatie mislukt",
   "error.unauthorized.description": "You have to be an admin of {name} to apply with this initiative.",
   "Error.Unknown": "Er is een onbekende fout opgetreden",

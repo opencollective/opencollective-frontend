@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Nazwa jest wymagana",
   "Error.Network": "Wystąpił błąd sieci, sprawdź połączenie lub spróbuj ponownie później",
   "error.reload": "Odśwież stronę",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Weryfikacja nie powiodła się",
   "error.unauthorized.description": "Musisz być administratorem {name}, aby zastosować tę inicjatywę.",
   "Error.Unknown": "Wystąpił nieznany błąd",

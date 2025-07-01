@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Nombre es requerido",
   "Error.Network": "Hubo un error de red, por favor verifica tu conectividad o inténtalo más tarde",
   "error.reload": "Recargar página",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Error de verificación",
   "error.unauthorized.description": "Debes ser un administrador de {name} para solicitar esta iniciativa.",
   "Error.Unknown": "Se produjo un error desconocido",

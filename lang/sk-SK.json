@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Je vyžadovaný názov",
   "Error.Network": "A network error occurred, please check your connectivity or try again later",
   "error.reload": "Obnoviť túto stránku",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Overenie zlyhalo",
   "error.unauthorized.description": "Ak chcete podať žiadosť v rámci tejto iniciatívy, je potrebné byť správcom {name}.",
   "Error.Unknown": "An unknown error occurred",

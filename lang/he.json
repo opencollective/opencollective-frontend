@@ -1361,6 +1361,8 @@
   "error.name.invalid": "חובה לציין שם",
   "Error.Network": "A network error occurred, please check your connectivity or try again later",
   "error.reload": "טעינת העמוד מחדש",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "האימות נכשל",
   "error.unauthorized.description": "צריך להיות מנהל {name} כדי לבקש להצטרך ליוזמה זו.",
   "Error.Unknown": "An unknown error occurred",

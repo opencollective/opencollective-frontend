@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Il nome è obbligatorio",
   "Error.Network": "A network error occurred, please check your connectivity or try again later",
   "error.reload": "Ricarica la pagina",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Convalida non riuscita",
   "error.unauthorized.description": "You have to be an admin of {name} to apply with this initiative.",
   "Error.Unknown": "Si è verificato un errore sconosciuto",

@@ -1361,6 +1361,8 @@
   "error.name.invalid": "Name ist erforderlich",
   "Error.Network": "Ein Netzwerkfehler ist aufgetreten, bitte überprüfe deine Verbindung oder versuche es später noch einmal",
   "error.reload": "Seite neu laden",
+  "Error.SlugNotAllowed": "This slug is not allowed.",
+  "Error.SlugUsed": "This slug is already used. Please choose another one.",
   "error.title": "Validierung fehlgeschlagen",
   "error.unauthorized.description": "Du musst ein Administrator von {name} sein, um dich mit dieser Initiative zu bewerben.",
   "Error.Unknown": "Ein unbekannter Fehler ist aufgetreten",
