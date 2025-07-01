@@ -44,7 +44,7 @@ const offPlatformConnectionsQuery = gql`
       location {
         country
       }
-      transactionsImports(limit: $limit, offset: $offset, type: [PLAID]) {
+      transactionsImports(limit: $limit, offset: $offset, type: [PLAID, GOCARDLESS]) {
         totalCount
         limit
         offset
@@ -260,6 +260,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
           onOpenChange={setShowNewConnectionDialog}
           onPlaidConnect={handlePlaidConnect}
           hostCountry={data.host.location?.country}
+          hostId={data.host.id}
         />
       )}
     </div>
