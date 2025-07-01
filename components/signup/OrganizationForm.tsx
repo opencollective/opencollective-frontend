@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { suggestSlug } from '@/lib/collective';
+import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { OrganizationSignupMutation } from '@/lib/graphql/types/v2/graphql';
 import { CountryIso } from '@/lib/graphql/types/v2/graphql';
@@ -173,9 +174,13 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         }),
       });
     } catch (error) {
+      const gqlError = getErrorFromGraphqlException(error);
+      if (gqlError?.payload?.code?.includes('SLUG')) {
+        formikRef.current?.setFieldError('organization.slug', formatErrorMessage(intl, gqlError));
+      }
       toast({
         variant: 'error',
-        message: error.message || 'An error occurred while creating the organization',
+        message: formatErrorMessage(intl, gqlError) || 'An error occurred while creating the organization',
       });
     }
   };
