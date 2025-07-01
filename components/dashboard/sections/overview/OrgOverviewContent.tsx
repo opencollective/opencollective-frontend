@@ -90,7 +90,7 @@ export function OrgOverviewContent({ accountSlug }: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <Card>
+      <Card className="pb-3">
         <CardHeader>
           <CardTitle className="text-xl">
             <FormattedMessage defaultMessage="Recent Financial Activity" id="BAvsQv" />
@@ -118,16 +118,14 @@ export function OrgOverviewContent({ accountSlug }: DashboardSectionProps) {
               columnVisibility={{ clearedAt: false, debit: false, credit: false }}
               getRowId={row => String(row.legacyId)}
               compact
-              fullWidth={true}
             />
           </div>
           {loading ? (
-            <div className="flex h-8 w-full items-center justify-center">
+            <div className="flex h-10 w-full items-center justify-center">
               <Skeleton className="h-5 w-40" />
             </div>
           ) : data?.account.transactions.totalCount > data?.account.transactions.limit ? (
             <Button
-              size="xs"
               className="w-full"
               variant="ghost"
               onClick={() => {

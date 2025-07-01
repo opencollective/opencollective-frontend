@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
+import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -48,7 +49,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
   }, [error, data]);
 
   return (
-    <Card>
+    <Card className="pb-3">
       {withTitle && (
         <CardHeader className="relative">
           <CardTitle className="relative text-xl">
@@ -68,9 +69,9 @@ export function Timeline({ accountSlug, withTitle = false }) {
             </InfoTooltipIcon>
           </CardTitle>
           <CardAction>
-            <Button asChild variant="ghost">
+            <Button asChild variant="outline">
               <Link href={getDashboardRoute(account, 'activity-log')}>
-                <FormattedMessage defaultMessage="Go to activity log" id="zOk9pq" />
+                <FormattedMessage defaultMessage="Go to activity log" id="zOk9pq" /> <ArrowRight size={14} />
               </Link>
             </Button>
           </CardAction>
@@ -78,7 +79,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
       )}
       <CardContent className={!withTitle && 'pt-6'}>
         <div className="space-y-3">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3 divide-y">
             {error && !isTimelineBeingGenerated ? (
               <MessageBoxGraphqlError error={error} />
             ) : isTimelineBeingGenerated || (!activities.length && loading) ? (
@@ -106,8 +107,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
             {canViewMore && (
               <Button
                 className="w-full"
-                size="sm"
-                variant="outline"
+                variant="ghost"
                 loading={loading}
                 onClick={() =>
                   fetchMore({
