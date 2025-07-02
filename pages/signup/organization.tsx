@@ -31,7 +31,7 @@ export default function SignupOrganizationPage() {
 
   return (
     <Page title="Create Organization" showFooter={!createdOrganization}>
-      <div className="mx-auto my-32 max-w-2xl px-2 md:px-3 lg:px-4">
+      <div className="mx-auto my-6 mb-16 max-w-2xl px-2 md:my-32 md:px-3 lg:px-4">
         {createdOrganization ? (
           <React.Fragment>
             <div className="mb-8 flex justify-center">
@@ -88,7 +88,7 @@ export default function SignupOrganizationPage() {
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <h1 className="mb-8 text-2xl font-semibold">
+            <h1 className="mb-4 text-2xl font-semibold md:mb-8">
               <FormattedMessage id="organization.create" defaultMessage="Create Organization" />
             </h1>
             <OrganizationForm onSuccess={handleSuccess} />
