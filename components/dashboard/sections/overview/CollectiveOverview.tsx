@@ -258,7 +258,12 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 2xl:grid-cols-3">
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <AccountTodoList />
-          <Timeline accountSlug={router.query?.as ?? accountSlug} />
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">
+              <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+            </h3>
+            <Timeline accountSlug={router.query?.as ?? accountSlug} />
+          </div>
         </div>
         {!account.parent && account.isActive && (
           <div className="-order-1 space-y-6 lg:order-none">

@@ -51,6 +51,11 @@ interface CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
   isGuest: Boolean
   canApply: Boolean
   canContact: Boolean
@@ -2239,6 +2244,11 @@ type Collective implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2517,6 +2527,11 @@ type Event implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2799,6 +2814,11 @@ type Fund implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3079,6 +3099,11 @@ type Organization implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3357,6 +3382,11 @@ type Project implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -3934,6 +3964,11 @@ type User implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4214,6 +4249,11 @@ type Vendor implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
