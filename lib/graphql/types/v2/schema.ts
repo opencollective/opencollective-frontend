@@ -2658,6 +2658,7 @@ export type ConnectedAccountReferenceInput = {
 /** All supported services a user can connect with */
 export enum ConnectedAccountService {
   github = 'github',
+  gocardless = 'gocardless',
   /** @deprecated Not using this service anymore */
   meetup = 'meetup',
   paypal = 'paypal',
@@ -5762,6 +5763,47 @@ export type GenericFileInfo = FileInfo & {
   url: Scalars['URL']['output'];
 };
 
+export type GoCardlessConnectAccountResponse = {
+  __typename?: 'GoCardlessConnectAccountResponse';
+  /** The connected account that was created */
+  connectedAccount: ConnectedAccount;
+  /** The transactions import that was created */
+  transactionsImport: TransactionsImport;
+};
+
+/** A GoCardless link for bank account data access */
+export type GoCardlessLink = {
+  __typename?: 'GoCardlessLink';
+  /** The date & time at which the requisition was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** The unique identifier for the requisition */
+  id: Scalars['String']['output'];
+  /** The institution ID for this requisition */
+  institutionId: Scalars['String']['output'];
+  /** Link to initiate authorization with Institution */
+  link?: Maybe<Scalars['String']['output']>;
+  /** Redirect URL to your application after end-user authorization with ASPSP */
+  redirect: Scalars['URL']['output'];
+  /** The reference for the requisition */
+  reference: Scalars['String']['output'];
+  /** The requisition ID for the link */
+  requisitionId: Scalars['String']['output'];
+};
+
+/** Input for creating a GoCardless link */
+export type GoCardlessLinkInput = {
+  /** Number of days from acceptance that the access can be used (default: 90) */
+  accessValidForDays?: InputMaybe<Scalars['Int']['input']>;
+  /** Option to enable account selection view for the end user (default: true) */
+  accountSelection?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The institution ID for this requisition */
+  institutionId: Scalars['String']['input'];
+  /** Maximum number of days of transaction data to retrieve (default: 90) */
+  maxHistoricalDays?: InputMaybe<Scalars['Int']['input']>;
+  /** A two-letter country code (ISO 639-1) (default: "en") */
+  userLanguage?: InputMaybe<Scalars['Locale']['input']>;
+};
+
 /** Input type for guest contributions */
 export type GuestInfoInput = {
   /** Captcha validation for creating an order */
@@ -7642,6 +7684,8 @@ export type Mutation = {
   confirmGuestAccount: ConfirmGuestAccountResponse;
   /** Confirm an order (strong customer authentication). Scope: "orders". */
   confirmOrder: OrderWithPayment;
+  /** Connect a GoCardless account */
+  connectGoCardlessAccount: GoCardlessConnectAccountResponse;
   /** Connect a Plaid account */
   connectPlaidAccount: PlaidConnectAccountResponse;
   /** Convert an organization to a vendor */
@@ -7770,6 +7814,8 @@ export type Mutation = {
   followAccount: FollowAccountResult;
   /** Returns true if user is following, false otherwise. Must be authenticated. Scope: "conversations". */
   followConversation?: Maybe<Scalars['Boolean']['output']>;
+  /** Generate a GoCardless link for bank account data access */
+  generateGoCardlessLink: GoCardlessLink;
   /** Generate a Plaid Link token */
   generatePlaidLinkToken: PlaidLinkTokenCreateResponse;
   /** Import transactions, manually or from a CSV file */
@@ -7794,6 +7840,8 @@ export type Mutation = {
   processPendingOrder: Order;
   /** Publish update. Scope: "updates". */
   publishUpdate: Update;
+  /** Refresh the GoCardless account data */
+  refreshGoCardlessAccount: GoCardlessConnectAccountResponse;
   /** Refresh the list of sub-accounts & other metadata by re-fetching the account info */
   refreshPlaidAccount: PlaidConnectAccountResponse;
   /** Refunds a transaction. Scope: "transactions". */
@@ -7998,6 +8046,15 @@ export type MutationConfirmGuestAccountArgs = {
 export type MutationConfirmOrderArgs = {
   guestToken?: InputMaybe<Scalars['String']['input']>;
   order: OrderReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationConnectGoCardlessAccountArgs = {
+  host: AccountReferenceInput;
+  name?: InputMaybe<Scalars['String']['input']>;
+  requisitionId: Scalars['String']['input'];
+  sourceName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -8513,6 +8570,12 @@ export type MutationFollowConversationArgs = {
 
 
 /** This is the root mutation */
+export type MutationGenerateGoCardlessLinkArgs = {
+  input: GoCardlessLinkInput;
+};
+
+
+/** This is the root mutation */
 export type MutationGeneratePlaidLinkTokenArgs = {
   accountSelectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   countries?: InputMaybe<Array<CountryIso>>;
@@ -8609,6 +8672,12 @@ export type MutationProcessPendingOrderArgs = {
 export type MutationPublishUpdateArgs = {
   id: Scalars['String']['input'];
   notificationAudience?: InputMaybe<UpdateAudience>;
+};
+
+
+/** This is the root mutation */
+export type MutationRefreshGoCardlessAccountArgs = {
+  transactionImport: TransactionsImportReferenceInput;
 };
 
 
@@ -12228,6 +12297,8 @@ export type TransactionsImport = {
   file?: Maybe<FileInfo>;
   /** The public id of the import */
   id: Scalars['String']['output'];
+  /** List of available accounts for the import */
+  institutionAccounts?: Maybe<Array<Maybe<TransactionsImportAccount>>>;
   /** Whether the import is currently syncing */
   isSyncing: Scalars['Boolean']['output'];
   /** When the import was last synced */
@@ -12236,7 +12307,10 @@ export type TransactionsImport = {
   lastSyncCursor?: Maybe<Scalars['String']['output']>;
   /** Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024") */
   name: Scalars['NonEmptyString']['output'];
-  /** List of available accounts for the import */
+  /**
+   * List of available accounts for the import
+   * @deprecated 2025-07-02: Please use the generic accounts field instead.
+   */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
   /**
    * List of rows in the import
@@ -12259,6 +12333,21 @@ export type TransactionsImportRowsArgs = {
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<TransactionsImportRowStatus>;
+};
+
+/** An account available in a transactions import (Plaid or GoCardless) */
+export type TransactionsImportAccount = {
+  __typename?: 'TransactionsImportAccount';
+  /** The unique identifier for the account */
+  id: Scalars['NonEmptyString']['output'];
+  /** The mask of the account (Plaid only) */
+  mask?: Maybe<Scalars['String']['output']>;
+  /** The name of the account */
+  name: Scalars['NonEmptyString']['output'];
+  /** The subtype of the account (Plaid only) */
+  subtype?: Maybe<Scalars['String']['output']>;
+  /** The type of the account (Plaid only) */
+  type?: Maybe<Scalars['String']['output']>;
 };
 
 export type TransactionsImportAssignment = {
@@ -12304,11 +12393,16 @@ export type TransactionsImportRow = {
   expense?: Maybe<Expense>;
   /** The public id of the imported row */
   id: Scalars['String']['output'];
+  /** Corresponding account for the row, based on its account ID */
+  institutionAccount?: Maybe<TransactionsImportAccount>;
   /** Optional note for the row */
   note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
   order?: Maybe<Order>;
-  /** If the row was imported from plaid, this is the account it was imported from */
+  /**
+   * If the row was imported from plaid, this is the account it was imported from
+   * @deprecated 2025-07-02: Please use the generic institutionAccount field instead.
+   */
   plaidAccount?: Maybe<PlaidAccount>;
   /** The raw data of the row */
   rawValue?: Maybe<Scalars['JSONObject']['output']>;
@@ -12338,6 +12432,8 @@ export type TransactionsImportRowCollection = Collection & {
 };
 
 export type TransactionsImportRowCreateInput = {
+  /** The account ID associated with the row */
+  accountId?: InputMaybe<Scalars['String']['input']>;
   /** The amount of the row */
   amount: AmountInput;
   /** The date of the row */
@@ -12380,6 +12476,8 @@ export enum TransactionsImportRowStatus {
 }
 
 export type TransactionsImportRowUpdateInput = {
+  /** The account ID associated with the row */
+  accountId?: InputMaybe<Scalars['String']['input']>;
   /** The amount of the row */
   amount?: InputMaybe<AmountInput>;
   /** The date of the row */
@@ -12433,6 +12531,7 @@ export enum TransactionsImportStatus {
 /** Type of the import */
 export enum TransactionsImportType {
   CSV = 'CSV',
+  GOCARDLESS = 'GOCARDLESS',
   MANUAL = 'MANUAL',
   PLAID = 'PLAID'
 }

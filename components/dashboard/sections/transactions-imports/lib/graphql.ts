@@ -39,13 +39,12 @@ export const TransactionImportListFieldsFragment = gql`
     updatedAt
     lastSyncAt
     isSyncing
-    plaidAccounts {
-      accountId
-      mask
+    institutionAccounts {
+      id
       name
-      officialName
-      subtype
       type
+      subtype
+      mask
     }
     assignments {
       ...TransactionsImportAssignmentFields

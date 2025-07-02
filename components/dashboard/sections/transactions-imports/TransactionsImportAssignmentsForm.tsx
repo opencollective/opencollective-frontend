@@ -85,7 +85,7 @@ export const TransactionsImportAssignmentsForm = ({
   showPlaidDialog,
   isDeleting,
 }: {
-  transactionsImport: Pick<TransactionsImport, 'id' | 'type' | 'plaidAccounts'> & {
+  transactionsImport: Pick<TransactionsImport, 'id' | 'type' | 'institutionAccounts'> & {
     connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
     account: Pick<TransactionsImport['account'], 'legacyId'>;
     assignments: Array<{
@@ -141,13 +141,13 @@ export const TransactionsImportAssignmentsForm = ({
           values.find(assignment => assignment.importedAccountId === accountId)?.accounts || [];
         return (
           <Form>
-            {transactionsImport.type === 'PLAID' ? (
+            {transactionsImport.type === 'PLAID' || transactionsImport.type === 'GOCARDLESS' ? (
               <div className="mt-4">
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-sm font-medium">
                     <FormattedMessage defaultMessage="Connected sub-accounts" id="jMHLZq" />
                   </p>
-                  {transactionsImport.connectedAccount && (
+                  {transactionsImport.connectedAccount && transactionsImport.type === 'PLAID' && (
                     <Button
                       variant="outline"
                       size="xs"
@@ -173,7 +173,7 @@ export const TransactionsImportAssignmentsForm = ({
                   />{' '}
                   <FormattedMessage defaultMessage="You can override this assignment for each account." id="wckrmL" />
                 </p>
-                {!transactionsImport.plaidAccounts?.length ? (
+                {!transactionsImport.institutionAccounts?.length ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="The accounts for this import are not available."
@@ -182,35 +182,43 @@ export const TransactionsImportAssignmentsForm = ({
                   </p>
                 ) : (
                   <div className="max-h-[calc(100vh-200px)] space-y-4 overflow-y-auto">
-                    {transactionsImport.plaidAccounts.map(plaidAccount => (
-                      <Card className="overflow-hidden" key={plaidAccount.accountId}>
+                    {(transactionsImport.institutionAccounts || []).map(account => (
+                      <Card className="overflow-hidden" key={account.id}>
                         <CardContent className="p-3">
                           <div className="mb-2 flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                              {getPlaidAccountIcon(plaidAccount.type)}
-                              <span className="text-sm font-medium text-gray-700">{plaidAccount.name}</span>
+                              {account.type ? getPlaidAccountIcon(account.type) : <Landmark size={16} />}
+                              <span className="text-sm font-medium text-gray-700">{account.name}</span>
                             </div>
-                            <span className="text-xs font-medium text-gray-500">****{plaidAccount.mask}</span>
+                            {account.mask && (
+                              <span className="text-xs font-medium text-gray-500">****{account.mask}</span>
+                            )}
                           </div>
-                          <div className="mb-2 flex items-center justify-between text-xs">
-                            <span className="text-gray-500 capitalize">
-                              {plaidAccount.type} - {plaidAccount.subtype}
-                            </span>
-                          </div>
+                          {account.type ? (
+                            <div className="mb-2 flex items-center justify-between text-xs">
+                              <span className="text-gray-500 capitalize">
+                                {account.type} - {account.subtype}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="mb-2 flex items-center justify-between text-xs">
+                              <span className="text-gray-500 capitalize">{account.id}</span>
+                            </div>
+                          )}
                           <CollectivePickerAsync
-                            inputId={`plaid-account-${plaidAccount.accountId}`}
+                            inputId={`institution-account-${account.id}`}
                             hostCollectiveIds={[transactionsImport.account.legacyId]}
                             isMulti
                             fontSize="12px"
-                            collective={getAssignmentAccounts(plaidAccount.accountId)}
+                            collective={getAssignmentAccounts(account.id)}
                             styles={CollectivePickerReactSelectStyles}
                             placeholder={intl.formatMessage(
                               { defaultMessage: 'Assign {account} transactions to…', id: 'KJ1bsa' },
-                              { account: plaidAccount.name },
+                              { account: account.name },
                             )}
                             disabled={isSubmitting}
                             onChange={value => {
-                              setValues(updateValues(values, plaidAccount.accountId, value));
+                              setValues(updateValues(values, account.id, value));
                             }}
                             truncationThreshold={30}
                           />

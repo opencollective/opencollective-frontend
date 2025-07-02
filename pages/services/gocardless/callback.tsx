@@ -94,7 +94,7 @@ const GoCardlessOAuthCallbackPage = () => {
     if (ref && windowData.requisitionId && windowData.hostId) {
       handleCallback();
     }
-  }, [ref, windowData, intl, connectGoCardlessAccount, router]);
+  }, []);
 
   const hasSuccess = Boolean(data?.connectGoCardlessAccount?.transactionsImport);
 
