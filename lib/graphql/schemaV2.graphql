@@ -5653,6 +5653,7 @@ enum ConnectedAccountService {
   github
   transferwise
   plaid
+  gocardless
   twitter
   privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
@@ -6379,6 +6380,7 @@ type CollectiveFeatures {
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
+  OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7493,7 +7495,12 @@ type TransactionsImport {
   """
   List of available accounts for the import
   """
-  plaidAccounts: [PlaidAccount]
+  plaidAccounts: [PlaidAccount] @deprecated(reason: "2025-07-02: Please use the generic accounts field instead.")
+
+  """
+  List of available accounts for the import
+  """
+  institutionAccounts: [TransactionsImportAccount]
 
   """
   Assignments for the import, as a map of account id to legacy collective IDs. The `__default__` key can be use to set the default assignment.
@@ -7550,6 +7557,7 @@ enum TransactionsImportType {
   CSV
   MANUAL
   PLAID
+  GOCARDLESS
 }
 
 type PlaidAccount {
@@ -7591,6 +7599,36 @@ enum PlaidAccountType {
   Other
   """
   other
+}
+
+"""
+An account available in a transactions import (Plaid or GoCardless)
+"""
+type TransactionsImportAccount {
+  """
+  The unique identifier for the account
+  """
+  id: NonEmptyString!
+
+  """
+  The name of the account
+  """
+  name: NonEmptyString!
+
+  """
+  The subtype of the account (Plaid only)
+  """
+  subtype: String
+
+  """
+  The type of the account (Plaid only)
+  """
+  type: String
+
+  """
+  The mask of the account (Plaid only)
+  """
+  mask: String
 }
 
 type TransactionsImportAssignment {
@@ -7660,7 +7698,12 @@ type TransactionsImportRow {
   """
   If the row was imported from plaid, this is the account it was imported from
   """
-  plaidAccount: PlaidAccount
+  plaidAccount: PlaidAccount @deprecated(reason: "2025-07-02: Please use the generic institutionAccount field instead.")
+
+  """
+  Corresponding account for the row, based on its account ID
+  """
+  institutionAccount: TransactionsImportAccount
 
   """
   The accounts assigned to the row, based on its account ID
@@ -22026,6 +22069,46 @@ type Mutation {
   ): PlaidConnectAccountResponse!
 
   """
+  Generate a GoCardless link for bank account data access
+  """
+  generateGoCardlessLink(
+    """
+    Input for creating the GoCardless link
+    """
+    input: GoCardlessLinkInput!
+
+    """
+    The account to which the GoCardless link should be generated
+    """
+    host: AccountReferenceInput!
+  ): GoCardlessLink!
+
+  """
+  Connect a GoCardless account
+  """
+  connectGoCardlessAccount(
+    """
+    The requisition ID returned by the GoCardless flow
+    """
+    requisitionId: String!
+
+    """
+    The account to which the GoCardless account should be connected
+    """
+    host: AccountReferenceInput!
+
+    """
+    The name of the institution
+    """
+    sourceName: String
+
+    """
+    The name of the account. Will be inferred if not provided.
+    """
+    name: String
+  ): GoCardlessConnectAccountResponse!
+
+  """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
   """
   editAccountFlags(
@@ -24550,6 +24633,88 @@ type PlaidConnectAccountResponse {
   transactionsImport: TransactionsImport!
 }
 
+"""
+A GoCardless link for bank account data access
+"""
+type GoCardlessLink {
+  """
+  The unique identifier for the requisition
+  """
+  id: String!
+
+  """
+  The date & time at which the requisition was created
+  """
+  createdAt: DateTime!
+
+  """
+  The reference for the requisition
+  """
+  reference: String!
+
+  """
+  The requisition ID for the link
+  """
+  requisitionId: String!
+
+  """
+  Redirect URL to your application after end-user authorization with ASPSP
+  """
+  redirect: URL!
+
+  """
+  The institution ID for this requisition
+  """
+  institutionId: String!
+
+  """
+  Link to initiate authorization with Institution
+  """
+  link: String
+}
+
+"""
+Input for creating a GoCardless link
+"""
+input GoCardlessLinkInput {
+  """
+  The institution ID for this requisition
+  """
+  institutionId: String!
+
+  """
+  Maximum number of days of transaction data to retrieve (default: 90)
+  """
+  maxHistoricalDays: Int
+
+  """
+  Number of days from acceptance that the access can be used (default: 90)
+  """
+  accessValidForDays: Int
+
+  """
+  A two-letter country code (ISO 639-1) (default: "en")
+  """
+  userLanguage: Locale
+
+  """
+  Option to enable account selection view for the end user (default: true)
+  """
+  accountSelection: Boolean
+}
+
+type GoCardlessConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The transactions import that was created
+  """
+  transactionsImport: TransactionsImport!
+}
+
 enum AccountCacheType {
   CLOUDFLARE
   GRAPHQL_QUERIES
@@ -24619,6 +24784,11 @@ input TransactionsImportRowCreateInput {
   amount: AmountInput!
 
   """
+  The account ID associated with the row
+  """
+  accountId: String
+
+  """
   The raw value of the row
   """
   rawValue: JSONObject
@@ -24681,6 +24851,11 @@ input TransactionsImportRowUpdateInput {
   Optional note for the row
   """
   note: String
+
+  """
+  The account ID associated with the row
+  """
+  accountId: String
 }
 
 """

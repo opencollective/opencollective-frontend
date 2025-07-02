@@ -14,7 +14,7 @@ import Avatar from '../../Avatar';
 import ComboSelectFilter from './ComboSelectFilter';
 
 const accountQuery = gql`
-  query Account($slug: String!) {
+  query HostsFilter($slug: String!) {
     account(slug: $slug) {
       id
       ...AccountHoverCardFields

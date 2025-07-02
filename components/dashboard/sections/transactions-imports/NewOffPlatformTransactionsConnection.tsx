@@ -1,8 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
-import { pick } from 'lodash';
-import { ArrowLeft, Building2, Globe, Loader2, Search, Sparkles } from 'lucide-react';
+import { ArrowLeft, Building2, ExternalLink, Globe, Loader2, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -17,8 +16,10 @@ import { i18nCountryName } from '@/lib/i18n';
 import { LOCAL_STORAGE_KEYS, setLocalStorage } from '@/lib/local-storage';
 import { cn } from '@/lib/utils';
 
+import { WebsiteName } from '@/components/I18nFormatters';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
+import { Alert, AlertDescription } from '../../../ui/Alert';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Card, CardContent } from '../../../ui/Card';
@@ -76,8 +77,8 @@ const offPlatformTransactionsInstitutionsQuery = gql`
 `;
 
 const generateGoCardlessLinkMutation = gql`
-  mutation GenerateGoCardlessLink($input: GoCardlessLinkInput!) {
-    generateGoCardlessLink(input: $input) {
+  mutation GenerateGoCardlessLink($input: GoCardlessLinkInput!, $host: AccountReferenceInput!) {
+    generateGoCardlessLink(input: $input, host: $host) {
       id
       institutionId
       link
@@ -105,7 +106,7 @@ const CountryCard = ({
     <Button
       variant="ghost"
       className={cn(
-        'h-auto w-full justify-start p-0 transition-colors hover:bg-primary/5',
+        'h-auto w-full cursor-pointer justify-start p-0 transition-colors hover:bg-primary/5',
         isSelected && 'ring-2 ring-primary',
       )}
       onClick={onClick}
@@ -294,17 +295,16 @@ const InstitutionStep = ({
   selectedInstitution,
   setSelectedInstitution,
   onBack,
-  hostId,
+  onConfirmInstitution,
 }: {
   selectedCountry: string;
   selectedInstitution: OffPlatformTransactionsInstitution | null;
   setSelectedInstitution: (institution: OffPlatformTransactionsInstitution) => void;
   onBack: () => void;
-  hostId: string;
+  onConfirmInstitution: (institution: OffPlatformTransactionsInstitution) => void;
 }) => {
   const intl = useIntl();
   const [institutionFilter, setInstitutionFilter] = React.useState('');
-  const { toast } = useToast();
   const {
     data: institutionsData,
     loading: institutionsLoading,
@@ -319,57 +319,10 @@ const InstitutionStep = ({
       },
     },
   );
-  const [generateGoCardlessLink, { loading: isGeneratingLink, data: generateGoCardlessLinkResponse }] = useMutation(
-    generateGoCardlessLinkMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
 
-  const handleInstitutionSelect = async (institution: OffPlatformTransactionsInstitution) => {
+  const handleInstitutionSelect = (institution: OffPlatformTransactionsInstitution) => {
     setSelectedInstitution(institution);
-
-    try {
-      const result = await generateGoCardlessLink({
-        variables: {
-          input: {
-            institutionId: institution.id,
-            userLanguage: intl.locale ?? 'en',
-            accountSelection: true,
-          },
-        },
-      });
-
-      const link = result.data?.generateGoCardlessLink?.link;
-      if (link) {
-        // Redirect to the GoCardless authorization page
-        setLocalStorage(
-          LOCAL_STORAGE_KEYS.GOCARDLESS_DATA,
-          JSON.stringify({
-            date: new Date().toISOString(),
-            hostId,
-            requisitionId: result.data?.generateGoCardlessLink?.id,
-          }),
-        );
-        window.location.href = link;
-      } else {
-        throw new Error('No link received from GoCardless');
-      }
-    } catch (error) {
-      toast({
-        variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Connection failed', id: 'connection.failed' }),
-        message: intl.formatMessage(
-          {
-            defaultMessage: 'Failed to generate GoCardless link: {error}',
-            id: 'gocardless.link.error',
-          },
-          { error: error instanceof Error ? error.message : 'Unknown error' },
-        ),
-      });
-      // Reset the selected institution on error
-      setSelectedInstitution(null);
-    }
+    onConfirmInstitution(institution);
   };
 
   // Filter institutions based on search input
@@ -408,11 +361,10 @@ const InstitutionStep = ({
     );
   }, [institutionsData?.offPlatformTransactionsInstitutions, institutionFilter]);
 
-  const isRedirecting = Boolean(generateGoCardlessLinkResponse?.generateGoCardlessLink?.link);
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm" onClick={onBack} disabled={isGeneratingLink || isRedirecting}>
+        <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <p className="text-sm text-muted-foreground">
@@ -445,7 +397,6 @@ const InstitutionStep = ({
               value={institutionFilter}
               onChange={e => setInstitutionFilter(e.target.value)}
               className="pl-10"
-              disabled={isGeneratingLink || isRedirecting}
             />
           </div>
           <div className="grid max-h-96 gap-2 overflow-x-visible overflow-y-auto p-1">
@@ -461,10 +412,8 @@ const InstitutionStep = ({
                   className={cn(
                     'h-auto w-full justify-start p-0 transition-colors hover:bg-primary/5',
                     selectedInstitution?.id === institution.id && 'ring-2 ring-primary',
-                    (isGeneratingLink || isRedirecting) && 'pointer-events-none cursor-not-allowed opacity-50',
                   )}
                   onClick={() => handleInstitutionSelect(institution)}
-                  disabled={isGeneratingLink || isRedirecting}
                 >
                   <Card className="w-full bg-transparent">
                     <CardContent className="flex items-center space-x-3 p-3">
@@ -479,9 +428,6 @@ const InstitutionStep = ({
                         <h3 className="font-medium">{institution.name}</h3>
                         {institution.bic && <p className="text-sm text-muted-foreground">BIC: {institution.bic}</p>}
                       </div>
-                      {(isGeneratingLink || isRedirecting) && selectedInstitution?.id === institution.id && (
-                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                      )}
                     </CardContent>
                   </Card>
                 </Button>
@@ -490,6 +436,131 @@ const InstitutionStep = ({
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const ConfirmationStep = ({
+  selectedInstitution,
+  onBack,
+  onConfirm,
+  isConnecting,
+}: {
+  selectedInstitution: OffPlatformTransactionsInstitution;
+  onBack: () => void;
+  onConfirm: () => void;
+  isConnecting: boolean;
+}) => {
+  return (
+    <div>
+      <div className="mb-2 flex items-center space-x-2">
+        <Button variant="ghost" size="sm" onClick={onBack} disabled={isConnecting}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          <FormattedMessage defaultMessage="Confirm connection" id="confirm.connection" />
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="rounded-lg border bg-muted/50 p-4">
+          <div className="flex items-center space-x-3">
+            {selectedInstitution.logoUrl ? (
+              <img
+                src={selectedInstitution.logoUrl}
+                alt={selectedInstitution.name}
+                className="h-12 w-12 object-contain"
+              />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                <Building2 className="h-6 w-6 text-gray-600" />
+              </div>
+            )}
+            <div>
+              <h3 className="font-medium">{selectedInstitution.name}</h3>
+              {selectedInstitution.bic && (
+                <p className="text-sm text-muted-foreground">BIC: {selectedInstitution.bic}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-medium">
+            <FormattedMessage defaultMessage="What happens next?" id="what.happens.next" />
+          </h4>
+          <ol className="space-y-3 pl-1 text-sm">
+            <li className="flex items-start space-x-3">
+              <Badge type="info" size="sm">
+                1
+              </Badge>
+              <p>
+                <FormattedMessage
+                  defaultMessage="You'll be redirected to GoCardless, our open banking partner."
+                  id="step.1.gocardless.redirect"
+                />
+              </p>
+            </li>
+            <li className="flex items-start space-x-3">
+              <Badge type="info" size="sm">
+                2
+              </Badge>
+              <p>
+                <FormattedMessage
+                  defaultMessage="Sign in to your bank account using your usual credentials."
+                  id="step.2.bank.signin"
+                />
+              </p>
+            </li>
+            <li className="flex items-start space-x-3">
+              <Badge type="info" size="sm">
+                3
+              </Badge>
+              <p>
+                <FormattedMessage
+                  defaultMessage="You'll be redirected back to {WebsiteName} to finalize the connection."
+                  id="step.3.finalize.connection"
+                  values={{ WebsiteName }}
+                />
+              </p>
+            </li>
+          </ol>
+        </div>
+
+        <Alert className="flex items-start">
+          <div className="mr-3 flex-shrink-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
+              <ShieldCheck className="h-5 w-5 text-neutral-500" />
+            </div>
+          </div>
+          <AlertDescription className="">
+            <FormattedMessage
+              defaultMessage="Your bank credentials are never shared with {WebsiteName}. Your data is protected with industry-standard encryption and handled according to open banking protocols."
+              id="security.note"
+              values={{ WebsiteName }}
+            />
+          </AlertDescription>
+        </Alert>
+      </div>
+
+      <div className="mt-6 flex space-x-3">
+        <Button variant="outline" onClick={onBack} disabled={isConnecting} className="flex-1">
+          <FormattedMessage defaultMessage="Back" id="back" />
+        </Button>
+        <Button onClick={onConfirm} disabled={isConnecting} className="flex-1">
+          {isConnecting ? (
+            <React.Fragment>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <FormattedMessage defaultMessage="Redirecting…" id="ET/GW3" />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <ExternalLink className="h-4 w-4" />
+              <FormattedMessage defaultMessage="Connect Bank" id="connect.bank" />
+            </React.Fragment>
+          )}
+        </Button>
+      </div>
     </div>
   );
 };
@@ -507,11 +578,18 @@ export const NewOffPlatformTransactionsConnection = ({
   hostCountry: string;
   hostId: string;
 }) => {
-  const [step, setStep] = React.useState<'region' | 'country' | 'institution'>('region');
+  const [step, setStep] = React.useState<'region' | 'country' | 'institution' | 'confirmation'>('region');
   const [selectedRegion, setSelectedRegion] = React.useState<Region | null>(null);
   const [selectedCountry, setSelectedCountry] = React.useState<string | null>(null);
   const [selectedInstitution, setSelectedInstitution] = React.useState<OffPlatformTransactionsInstitution | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isConnecting, setIsConnecting] = React.useState(false);
+  const { toast } = useToast();
+  const intl = useIntl();
+
+  const [generateGoCardlessLink, { loading: isGeneratingLink }] = useMutation(generateGoCardlessLinkMutation, {
+    context: API_V2_CONTEXT,
+  });
 
   const handleRegionSelect = (region: Region) => {
     setSelectedRegion(region);
@@ -529,6 +607,60 @@ export const NewOffPlatformTransactionsConnection = ({
     setStep('institution');
   };
 
+  const handleInstitutionConfirm = (institution: OffPlatformTransactionsInstitution) => {
+    setSelectedInstitution(institution);
+    setStep('confirmation');
+  };
+
+  const handleConnectionConfirm = async () => {
+    if (!selectedInstitution) {
+      return;
+    }
+
+    setIsConnecting(true);
+
+    try {
+      const result = await generateGoCardlessLink({
+        variables: {
+          input: {
+            institutionId: selectedInstitution.id,
+            userLanguage: intl.locale ?? 'en',
+            accountSelection: true,
+          },
+        },
+      });
+
+      const link = result.data?.generateGoCardlessLink?.link;
+      if (link) {
+        // Redirect to the GoCardless authorization page
+        setLocalStorage(
+          LOCAL_STORAGE_KEYS.GOCARDLESS_DATA,
+          JSON.stringify({
+            date: new Date().toISOString(),
+            hostId,
+            requisitionId: result.data?.generateGoCardlessLink?.id,
+          }),
+        );
+        window.location.href = link;
+      } else {
+        throw new Error('No link received from GoCardless');
+      }
+    } catch (error) {
+      toast({
+        variant: 'error',
+        title: intl.formatMessage({ defaultMessage: 'Connection failed', id: 'connection.failed' }),
+        message: intl.formatMessage(
+          {
+            defaultMessage: 'Failed to generate GoCardless link: {error}',
+            id: 'gocardless.link.error',
+          },
+          { error: error instanceof Error ? error.message : 'Unknown error' },
+        ),
+      });
+      setIsConnecting(false);
+    }
+  };
+
   const handleBack = () => {
     if (step === 'country') {
       setStep('region');
@@ -536,6 +668,9 @@ export const NewOffPlatformTransactionsConnection = ({
     } else if (step === 'institution') {
       setStep('country');
       setSelectedCountry(null);
+      setSelectedInstitution(null);
+    } else if (step === 'confirmation') {
+      setStep('institution');
       setSelectedInstitution(null);
     }
   };
@@ -546,6 +681,7 @@ export const NewOffPlatformTransactionsConnection = ({
     setSelectedRegion(null);
     setSelectedCountry(null);
     setSelectedInstitution(null);
+    setIsConnecting(false);
   };
 
   const renderStep = () => {
@@ -568,7 +704,16 @@ export const NewOffPlatformTransactionsConnection = ({
             selectedInstitution={selectedInstitution}
             setSelectedInstitution={setSelectedInstitution}
             onBack={handleBack}
-            hostId={hostId}
+            onConfirmInstitution={handleInstitutionConfirm}
+          />
+        );
+      case 'confirmation':
+        return (
+          <ConfirmationStep
+            selectedInstitution={selectedInstitution!}
+            onBack={handleBack}
+            onConfirm={handleConnectionConfirm}
+            isConnecting={isConnecting || isGeneratingLink}
           />
         );
       default:

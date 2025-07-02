@@ -80,7 +80,7 @@ export default function TransactionsImportSettingsModal({
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
   transactionsImport: Pick<
     TransactionsImport,
-    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'plaidAccounts'
+    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts'
   > &
     React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
       connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
