@@ -12,6 +12,7 @@ export const LOCAL_STORAGE_KEYS = {
   UPDATES_FORM_STATE: 'updatesFormState',
   RECENTLY_VISITED: 'recentlyVisited',
   PLAID_LINK_TOKEN: 'plaidLinkToken',
+  GOCARDLESS_DATA: 'gocardlessData',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:
