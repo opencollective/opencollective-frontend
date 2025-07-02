@@ -90,7 +90,7 @@ const PayoutMethodTypeWithIcon = ({
         <Flex alignItems="center">
           <StripeS size={iconSize} />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            <FormattedMessage defaultMessage="Stripe" id="iBmKeP" />
+            Stripe
           </Span>
         </Flex>
       );

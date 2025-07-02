@@ -460,9 +460,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
 
   const isStripePayment = payoutMethodType === PayoutMethodType.STRIPE;
 
-  const onPayWithStripeSuccess = React.useCallback(() => {
-    onSubmit({
-      action: 'PAID_WITH_STRIPE',
+  const onPayWithStripeSuccess = React.useCallback(async () => {
+    await onSubmit({
+      action: 'MARK_AS_PAID_WITH_STRIPE',
       paymentMethodService: PAYMENT_METHOD_SERVICE.STRIPE,
     });
   }, [onSubmit]);

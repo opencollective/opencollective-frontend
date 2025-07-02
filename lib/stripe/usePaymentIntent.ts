@@ -22,9 +22,9 @@ const createPaymentIntentMutation = gql`
   }
 `;
 
-const createExpensePaymentIntentMutation = gql`
-  mutation CreateExpensePaymentIntent($expense: ExpenseReferenceInput!) {
-    paymentIntent: createExpensePaymentIntent(expense: $expense) {
+const createExpenseStripePaymentIntentMutation = gql`
+  mutation CreateExpenseStripePaymentIntent($expense: ExpenseReferenceInput!) {
+    paymentIntent: createExpenseStripePaymentIntent(expense: $expense) {
       id
       paymentIntentClientSecret
       stripeAccount
@@ -73,7 +73,7 @@ export default function usePaymentIntent({
       const abortController = (abort.current = new AbortController());
       try {
         const createPaymentIntentResp = await apolloClient.mutate({
-          mutation: expense ? createExpensePaymentIntentMutation : createPaymentIntentMutation,
+          mutation: expense ? createExpenseStripePaymentIntentMutation : createPaymentIntentMutation,
           context: { ...API_V2_CONTEXT, fetchOptions: { signal: abort.current.signal } },
           variables: expense
             ? {

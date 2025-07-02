@@ -32,13 +32,14 @@ import { toast } from '../ui/useToast';
 
 type PayExpenseWithStripeProps = {
   expense: ExpenseReferenceInput & { account: Pick<Expense['account'], 'slug'> };
-  onSuccess: () => void;
+  onSuccess: () => Promise<void>;
 };
 
 export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
   const intl = useIntl();
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = React.useState(null);
-  const [isPayButtonLoading, setIsPayButtonLoading] = React.useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = React.useState(false);
+  const [isConfirmingExpenseStatus, setIsConfirmingExpenseStatus] = React.useState(false);
   const [paymentElementData, setPaymentElementData] = React.useState(null);
   const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
     expense: pick(props.expense, ['id', 'legacyId']),
@@ -110,7 +111,7 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
 
     const selectedPaymentMethod = savedPaymentMethods.find(pm => pm.id === selectedPaymentMethodId);
     try {
-      setIsPayButtonLoading(true);
+      setIsConfirmingPayment(true);
       await confirmPayment(
         stripe,
         paymentIntent?.client_secret,
@@ -130,11 +131,13 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
           redirect: 'if_required',
         },
       );
-      onSuccess();
+      setIsConfirmingExpenseStatus(true);
+      await onSuccess();
     } catch (err) {
       toast({ variant: 'error', message: err.message });
     } finally {
-      setIsPayButtonLoading(false);
+      setIsConfirmingPayment(false);
+      setIsConfirmingExpenseStatus(false);
     }
   }, [
     stripe,
@@ -168,8 +171,10 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
   );
 
   return (
-    <Elements options={options} stripe={stripe}>
-      {savedPaymentMethods?.length ? (
+    <Elements key={stripe['_stripeObjId']} options={options} stripe={stripe}>
+      {isConfirmingExpenseStatus ? (
+        <Skeleton className="h-6 w-full" />
+      ) : savedPaymentMethods?.length ? (
         <RadioGroup id="paymentMethod" value={selectedPaymentMethodId} onValueChange={setSelectedPaymentMethodId}>
           {savedPaymentMethods.map(pm => (
             <RadioGroupCard key={pm.id} value={pm.id}>
@@ -188,7 +193,7 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
           >
             <FormattedMessage
               defaultMessage="New: {methods}"
-              id="F9QkrV"
+              id="paymentMethods.new"
               values={{ methods: availableMethodLabels.join(', ') }}
             />
           </RadioGroupCard>
@@ -201,7 +206,7 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
         onClick={onPayClick}
         variant="success"
         className="mt-4 w-full"
-        loading={isPayButtonLoading}
+        loading={isConfirmingPayment}
         disabled={isPayButtonDisabled}
       >
         <FormattedMessage defaultMessage="Pay" id="lD3+8a" />

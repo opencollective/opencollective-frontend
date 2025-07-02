@@ -1,9 +1,10 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
+import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -12,6 +13,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
 
 import {
   getScheduledExpensesQueryVariables,
@@ -144,6 +146,51 @@ const ProcessExpenseButtons = ({
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
 
+  const [getExpenseStatus] = useLazyQuery(
+    gql`
+      query ProcessExpenseButtonsExpenseStatus($expense: ExpenseReferenceInput!) {
+        expense(expense: $expense) {
+          id
+          legacyId
+          status
+          ...ExpensePageExpenseFields
+        }
+      }
+
+      ${expensePageExpenseFieldsFragment}
+    `,
+    {
+      context: API_V2_CONTEXT,
+    },
+  );
+
+  const waitExpenseStatus = React.useCallback(async () => {
+    let maxAttempts = 10;
+    while (true) {
+      if (maxAttempts-- <= 0) {
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      const result = await getExpenseStatus({
+        variables: {
+          expense: pick(expense, ['id', 'legacyId']),
+        },
+      });
+
+      if (result.error) {
+        continue;
+      }
+
+      const updatedExpense = result.data.expense;
+
+      if (updatedExpense.status === ExpenseStatus.PAID || updatedExpense.status === ExpenseStatus.PROCESSING) {
+        return;
+      }
+    }
+  }, [getExpenseStatus, expense]);
+
   React.useEffect(() => {
     onModalToggle?.(!!confirmProcessExpenseAction);
     return () => onModalToggle?.(false);
@@ -169,6 +216,11 @@ const ProcessExpenseButtons = ({
       }
 
       await processExpense({ variables, refetchQueries });
+
+      if (action === 'MARK_AS_PAID_WITH_STRIPE') {
+        await waitExpenseStatus();
+      }
+
       return true;
     } catch (e) {
       toast({ variant: 'error', ...getErrorContent(intl, e, host) });
