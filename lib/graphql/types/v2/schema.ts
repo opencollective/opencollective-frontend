@@ -5014,12 +5014,12 @@ export enum ExpenseProcessAction {
   HOLD = 'HOLD',
   /** To mark the expense as incomplete and notify the payee it requires more information */
   MARK_AS_INCOMPLETE = 'MARK_AS_INCOMPLETE',
+  /** To mark expense as paid with stripe, can still be processing */
+  MARK_AS_PAID_WITH_STRIPE = 'MARK_AS_PAID_WITH_STRIPE',
   /** To mark the expense as spam */
   MARK_AS_SPAM = 'MARK_AS_SPAM',
   /** To mark the expense as unpaid (marks the transaction as refunded) */
   MARK_AS_UNPAID = 'MARK_AS_UNPAID',
-  /** To mark expense as paid with stripe, can still be processing */
-  PAID_WITH_STRIPE = 'PAID_WITH_STRIPE',
   /** To trigger the payment */
   PAY = 'PAY',
   /** To mark the expense as rejected */
@@ -5772,35 +5772,6 @@ export type GenericFileInfo = FileInfo & {
   type: Scalars['String']['output'];
   /** URL to access the file */
   url: Scalars['URL']['output'];
-};
-
-/** A GoCardless link for bank account data access */
-export type GoCardlessLink = {
-  __typename?: 'GoCardlessLink';
-  /** The date & time at which the requisition was created */
-  createdAt: Scalars['DateTime']['output'];
-  /** The unique identifier for the requisition */
-  id: Scalars['String']['output'];
-  /** The institution ID for this requisition */
-  institutionId: Scalars['String']['output'];
-  /** Link to initiate authorization with Institution */
-  link?: Maybe<Scalars['String']['output']>;
-  /** Redirect URL to your application after end-user authorization with ASPSP */
-  redirect: Scalars['URL']['output'];
-};
-
-/** Input for creating a GoCardless link */
-export type GoCardlessLinkInput = {
-  /** Number of days from acceptance that the access can be used (default: 90) */
-  accessValidForDays?: InputMaybe<Scalars['Int']['input']>;
-  /** Option to enable account selection view for the end user (default: true) */
-  accountSelection?: InputMaybe<Scalars['Boolean']['input']>;
-  /** The institution ID for this requisition */
-  institutionId: Scalars['String']['input'];
-  /** Maximum number of days of transaction data to retrieve (default: 90) */
-  maxHistoricalDays?: InputMaybe<Scalars['Int']['input']>;
-  /** A two-letter country code (ISO 639-1) (default: "en") */
-  userLanguage?: InputMaybe<Scalars['Locale']['input']>;
 };
 
 /** Input type for guest contributions */
@@ -7705,7 +7676,7 @@ export type Mutation = {
   /** Submit an expense to a collective. Scope: "expenses". */
   createExpense: Expense;
   /** Create a Stripe payment intent */
-  createExpensePaymentIntent: PaymentIntent;
+  createExpenseStripePaymentIntent: PaymentIntent;
   /** Create a Fund. Scope: "account". */
   createFund?: Maybe<Fund>;
   /** [Root only] Create a member entry directly. For non-root users, use `inviteMember` */
@@ -7817,8 +7788,6 @@ export type Mutation = {
   followAccount: FollowAccountResult;
   /** Returns true if user is following, false otherwise. Must be authenticated. Scope: "conversations". */
   followConversation?: Maybe<Scalars['Boolean']['output']>;
-  /** Generate a GoCardless link for bank account data access */
-  generateGoCardlessLink: GoCardlessLink;
   /** Generate a Plaid Link token */
   generatePlaidLinkToken: PlaidLinkTokenCreateResponse;
   /** Import transactions, manually or from a CSV file */
@@ -8127,7 +8096,7 @@ export type MutationCreateExpenseArgs = {
 
 
 /** This is the root mutation */
-export type MutationCreateExpensePaymentIntentArgs = {
+export type MutationCreateExpenseStripePaymentIntentArgs = {
   expense: ExpenseReferenceInput;
 };
 
@@ -8564,12 +8533,6 @@ export type MutationFollowAccountArgs = {
 export type MutationFollowConversationArgs = {
   id: Scalars['String']['input'];
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-/** This is the root mutation */
-export type MutationGenerateGoCardlessLinkArgs = {
-  input: GoCardlessLinkInput;
 };
 
 
@@ -9054,33 +9017,6 @@ export type OcrParsingOptionsInput = {
   /** The currency that you'd like to use for the amounts */
   currency?: InputMaybe<Currency>;
 };
-
-/** A financial institution for off-platform transactions */
-export type OffPlatformTransactionsInstitution = {
-  __typename?: 'OffPlatformTransactionsInstitution';
-  /** The BIC (Bank Identifier Code) of the institution */
-  bic: Scalars['String']['output'];
-  /** The unique identifier for the institution */
-  id: Scalars['String']['output'];
-  /** URL to the institution logo */
-  logoUrl?: Maybe<Scalars['String']['output']>;
-  /** Maximum number of days the access can be valid for */
-  maxAccessValidForDays: Scalars['Int']['output'];
-  /** The name of the institution */
-  name: Scalars['String']['output'];
-  /** List of country codes supported by this institution */
-  supportedCountries: Array<Scalars['String']['output']>;
-  /** Total number of days of transaction data available */
-  transactionTotalDays: Scalars['Int']['output'];
-};
-
-/** Provider for off-platform transactions */
-export enum OffPlatformTransactionsProvider {
-  /** GoCardless bank account data provider */
-  GOCARDLESS = 'GOCARDLESS',
-  /** Plaid bank account data provider */
-  PLAID = 'PLAID'
-}
 
 /** Order model */
 export type Order = {
@@ -11040,8 +10976,6 @@ export type Query = {
   me?: Maybe<Individual>;
   /** [AUTHENTICATED] Returns the pending invitations */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
-  /** Get financial institutions for off-platform transactions */
-  offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
   order?: Maybe<Order>;
   orders: OrderCollection;
   organization?: Maybe<Organization>;
@@ -11263,13 +11197,6 @@ export type QueryMemberInvitationsArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   memberAccount?: InputMaybe<AccountReferenceInput>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
-};
-
-
-/** This is the root query */
-export type QueryOffPlatformTransactionsInstitutionsArgs = {
-  country: Scalars['String']['input'];
-  provider: OffPlatformTransactionsProvider;
 };
 
 
