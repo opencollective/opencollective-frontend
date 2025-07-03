@@ -8,6 +8,7 @@ export const adminPanelQuery = gql`
       id
       legacyId
       createdAt
+      currency
       slug
       name
       isHost
