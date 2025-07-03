@@ -86,7 +86,7 @@ const hostTransactionsMetaDataQuery = gql`
   }
 `;
 
-const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
@@ -117,7 +117,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) 
     toVariables,
     filters,
     meta: {
-      currency: metaData?.host?.currency,
+      currency: account?.currency,
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
