@@ -77,7 +77,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
           </CardAction>
         </CardHeader>
       )}
-      <CardContent className={!withTitle && 'pt-6'}>
+      <CardContent>
         <div className="space-y-3">
           <div className="flex flex-col gap-3 divide-y">
             {error && !isTimelineBeingGenerated ? (
