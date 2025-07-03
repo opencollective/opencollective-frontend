@@ -5065,6 +5065,7 @@ enum PayoutMethodType {
   BANK_ACCOUNT
   ACCOUNT_BALANCE
   CREDIT_CARD
+  STRIPE
 }
 
 """
@@ -15460,46 +15461,6 @@ enum VirtualCardRequestStatus {
 }
 
 """
-A financial institution for off-platform transactions
-"""
-type OffPlatformTransactionsInstitution {
-  """
-  The unique identifier for the institution
-  """
-  id: String!
-
-  """
-  The name of the institution
-  """
-  name: String!
-
-  """
-  The BIC (Bank Identifier Code) of the institution
-  """
-  bic: String!
-
-  """
-  URL to the institution logo
-  """
-  logoUrl: String
-
-  """
-  List of country codes supported by this institution
-  """
-  supportedCountries: [String!]!
-
-  """
-  Maximum number of days the access can be valid for
-  """
-  maxAccessValidForDays: Int!
-
-  """
-  Total number of days of transaction data available
-  """
-  transactionTotalDays: Int!
-}
-
-"""
 This is the root query
 """
 type Query {
@@ -16705,21 +16666,6 @@ type Query {
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
   hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
-
-  """
-  Get financial institutions for off-platform transactions
-  """
-  offPlatformTransactionsInstitutions(
-    """
-    The country code to get institutions for
-    """
-    country: String!
-
-    """
-    The provider to use for fetching institutions
-    """
-    provider: OffPlatformTransactionsProvider!
-  ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
 }
@@ -20520,21 +20466,6 @@ input HostApplicationReferenceInput {
 }
 
 """
-Provider for off-platform transactions
-"""
-enum OffPlatformTransactionsProvider {
-  """
-  GoCardless bank account data provider
-  """
-  GOCARDLESS
-
-  """
-  Plaid bank account data provider
-  """
-  PLAID
-}
-
-"""
 This is the root mutation
 """
 type Mutation {
@@ -21313,6 +21244,16 @@ type Mutation {
     """
     expense: ExpenseReferenceInput!
   ): Expense!
+
+  """
+  Create a Stripe payment intent
+  """
+  createExpenseStripePaymentIntent(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): PaymentIntent!
 
   """
   Sends an email for guest to confirm their emails and create their Open Collective account
@@ -22247,16 +22188,6 @@ type Mutation {
     """
     id: NonEmptyString!
   ): Boolean!
-
-  """
-  Generate a GoCardless link for bank account data access
-  """
-  generateGoCardlessLink(
-    """
-    Input for creating the GoCardless link
-    """
-    input: GoCardlessLinkInput!
-  ): GoCardlessLink!
 
   """
   Create update. Scope: "updates".
@@ -23599,6 +23530,11 @@ enum ExpenseProcessAction {
   PAY
 
   """
+  To mark expense as paid with stripe, can still be processing
+  """
+  MARK_AS_PAID_WITH_STRIPE
+
+  """
   To mark the expense as spam
   """
   MARK_AS_SPAM
@@ -23801,6 +23737,16 @@ input ExpenseInviteeOrganizationInput {
   name: String
   slug: String
   website: String
+}
+
+"""
+A Stripe payment intent
+"""
+type PaymentIntent {
+  id: String!
+  paymentIntentClientSecret: String!
+  stripeAccount: String!
+  stripeAccountPublishableSecret: String!
 }
 
 """
@@ -24240,16 +24186,6 @@ enum ProcessOrderAction {
 }
 
 """
-A Stripe payment intent
-"""
-type PaymentIntent {
-  id: String!
-  paymentIntentClientSecret: String!
-  stripeAccount: String!
-  stripeAccountPublishableSecret: String!
-}
-
-"""
 Input to create a Stripe payment intent
 """
 input PaymentIntentInput {
@@ -24626,66 +24562,6 @@ enum TransactionsImportRowAction {
   RESTORE_ALL
   PUT_ON_HOLD_ALL
   UPDATE_ROWS
-}
-
-"""
-A GoCardless link for bank account data access
-"""
-type GoCardlessLink {
-  """
-  The unique identifier for the requisition
-  """
-  id: String!
-
-  """
-  The date & time at which the requisition was created
-  """
-  createdAt: DateTime!
-
-  """
-  Redirect URL to your application after end-user authorization with ASPSP
-  """
-  redirect: URL!
-
-  """
-  The institution ID for this requisition
-  """
-  institutionId: String!
-
-  """
-  Link to initiate authorization with Institution
-  """
-  link: String
-}
-
-"""
-Input for creating a GoCardless link
-"""
-input GoCardlessLinkInput {
-  """
-  The institution ID for this requisition
-  """
-  institutionId: String!
-
-  """
-  Maximum number of days of transaction data to retrieve (default: 90)
-  """
-  maxHistoricalDays: Int
-
-  """
-  Number of days from acceptance that the access can be used (default: 90)
-  """
-  accessValidForDays: Int
-
-  """
-  A two-letter country code (ISO 639-1) (default: "en")
-  """
-  userLanguage: Locale
-
-  """
-  Option to enable account selection view for the end user (default: true)
-  """
-  accountSelection: Boolean
 }
 
 """

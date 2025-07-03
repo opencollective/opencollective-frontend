@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getAmountInCents } from '../../lib/currency-utils';
 import useKeyboardKey, { P } from '../../lib/hooks/useKeyboardKey';
+import expenseTypes from '@/lib/constants/expenseTypes';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
 import StyledTooltip from '../StyledTooltip';
@@ -28,7 +29,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
     return (
       <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
     );
-  } else if (balance < expenseAmountInAccountCurrency) {
+  } else if (expense.type !== expenseTypes.SETTLEMENT && balance < expenseAmountInAccountCurrency) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (

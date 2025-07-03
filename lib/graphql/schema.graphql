@@ -941,6 +941,7 @@ enum PayoutMethodTypeEnum {
   BANK_ACCOUNT
   ACCOUNT_BALANCE
   CREDIT_CARD
+  STRIPE
 }
 
 """

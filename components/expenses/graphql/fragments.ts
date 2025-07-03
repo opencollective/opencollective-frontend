@@ -512,6 +512,8 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       data
       isSaved
+      canBeEdited
+      canBeDeleted
     }
     virtualCard {
       id

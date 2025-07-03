@@ -1,5 +1,6 @@
 import React from 'react';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
+import { StripeS } from '@styled-icons/fa-brands/StripeS';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { University as BankIcon } from '@styled-icons/fa-solid/University';
@@ -81,6 +82,15 @@ const PayoutMethodTypeWithIcon = ({
           <CreditCard size={iconSize} color="#9D9FA3" />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
             {name || <FormattedMessage id="PayoutMethod.Type.VirtualCard" defaultMessage="Virtual Card" />}
+          </Span>
+        </Flex>
+      );
+    case PayoutMethodType.STRIPE:
+      return (
+        <Flex alignItems="center">
+          <StripeS size={iconSize} />
+          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
+            Stripe
           </Span>
         </Flex>
       );
