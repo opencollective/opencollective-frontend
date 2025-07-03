@@ -75,7 +75,7 @@ describe('Create Organization Form', () => {
     cy.getByDataCy('tos-agreement-button').click();
     cy.getByDataCy('organization-country-trigger').click();
     cy.getByDataCy('organization-country-search').focus().type('Puerto');
-    cy.getByDataCy('organization-country-list').find('[data-value="Puerto Rico"]').click();
+    cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
 
     cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff Inc.');
     cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff');
@@ -96,7 +96,7 @@ describe('Create Organization Form', () => {
     cy.get('[data-cy="create-organization-form"]').as('form');
     cy.getByDataCy('organization-country-trigger').click();
     cy.getByDataCy('organization-country-search').focus().type('Puerto');
-    cy.getByDataCy('organization-country-list').find('[data-value="Puerto Rico"]').click();
+    cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
 
     cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff 2 Inc.');
     cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff 2');

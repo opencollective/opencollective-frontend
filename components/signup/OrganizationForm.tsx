@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
@@ -13,7 +13,7 @@ import type { OrganizationSignupMutation } from '@/lib/graphql/types/v2/graphql'
 import { CountryIso } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nCountryName } from '@/lib/i18n';
-import { getCountryCodeFromLocalBrowserLanguage } from '@/lib/i18n/countries';
+import { getCountryCodeFromLocalBrowserLanguage, getFlagEmoji } from '@/lib/i18n/countries';
 import { cn } from '@/lib/utils';
 
 import Avatar from '../Avatar';
@@ -88,23 +88,39 @@ export type OrganizationFormProps = {
 const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
+  const countryInputRef = useRef<HTMLInputElement>(null);
   const { LoggedInUser } = useLoggedInUser();
   const [createOrganization, { loading }] = useMutation(createOrganizationMutation, { context: API_V2_CONTEXT });
   const [userForm, setUserForm] = useState<'LOGIN' | 'NEW_USER' | string>('NEW_USER');
   const [showSignInPopup, setShowSignInPopup] = useState(false);
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
+  const getCountryLabel = useCallback(
+    (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
+    [intl],
+  );
   const countryOptions = useMemo(
     () =>
       orderBy(
         Object.keys(CountryIso).map(code => ({
           value: code,
-          label: i18nCountryName(intl, code),
+          label: getCountryLabel(code),
         })),
         ['label'],
         ['asc'],
       ),
-    [intl],
+    [getCountryLabel],
+  );
+  const handleOpenCountrySelect = useCallback(
+    open => {
+      setShowCountrySelect(open);
+      if (open) {
+        setTimeout(() => {
+          countryInputRef.current?.focus();
+        }, 100);
+      }
+    },
+    [countryInputRef],
   );
 
   useEffect(() => {
@@ -343,18 +359,19 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                   }
                 >
                   {({ field }) => (
-                    <Select value={field.value} open={showCountrySelect} onOpenChange={setShowCountrySelect}>
+                    <Select value={field.value} open={showCountrySelect} onOpenChange={handleOpenCountrySelect}>
                       <SelectTrigger
                         className={cn(!field.value && 'text-muted-foreground')}
                         data-cy="organization-country-trigger"
                       >
-                        {field.value ? i18nCountryName(intl, field.value) : 'Select Country'}
+                        {field.value ? getCountryLabel(field.value) : 'Select Country'}
                       </SelectTrigger>
                       <SelectContent className="max-h-[50vh]">
                         <Command>
                           <CommandInput
                             placeholder={intl.formatMessage({ defaultMessage: 'Search countries...', id: '37zpJw' })}
                             data-cy="organization-country-search"
+                            ref={countryInputRef}
                           />
                           <CommandList data-cy="organization-country-list">
                             <CommandEmpty>
@@ -364,6 +381,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                               {countryOptions.map(({ value, label }) => (
                                 <CommandItem
                                   key={value}
+                                  data-cy={`organization-country-${value}`}
                                   onSelect={() => {
                                     setFieldValue(field.name, value as CountryIso);
                                     setShowCountrySelect(false);
