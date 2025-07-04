@@ -66,7 +66,6 @@ const ActivityContent = ({
 
 const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
   const intl = useIntl();
-
   const isLoading = !activity;
   const isLastWeek = dayjs(activity?.createdAt).isAfter(dayjs().subtract(1, 'week'));
 
