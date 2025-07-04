@@ -272,9 +272,11 @@ function RangeSelector({
 function toVariables(value: PeriodCompareFilterValueType) {
   const { dateFrom, dateTo } = getPeriodDates(value);
 
+  const dateFromIso = dateFrom?.toISOString();
+  const dateToIso = dateTo?.toISOString();
   return {
-    dateFrom: dateFrom?.toISOString(),
-    dateTo: dateTo?.toISOString(),
+    dateFrom: dateFromIso,
+    dateTo: dateToIso === dayjs().endOf('day').toISOString() ? undefined : dateTo?.toISOString(),
   };
 }
 
