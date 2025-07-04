@@ -37,6 +37,10 @@ export const RICH_ERROR_MESSAGES = defineMessages({
     id: 'FormError.pattern',
     defaultMessage: 'This value is not formatted properly',
   },
+  invalidEmail: {
+    id: 'FormError.InvalidEmail',
+    defaultMessage: 'This email address is not valid',
+  },
   enum: {
     id: 'FormError.enum',
     defaultMessage: 'Must be one of: {options}',

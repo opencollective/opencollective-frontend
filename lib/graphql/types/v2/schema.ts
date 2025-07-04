@@ -1923,6 +1923,14 @@ export type CaptchaInput = {
   token: Scalars['String']['input'];
 };
 
+/** Input type for captcha verification */
+export type CaptchaInputType = {
+  /** The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE) */
+  provider: Scalars['String']['input'];
+  /** The captcha token to verify */
+  token: Scalars['String']['input'];
+};
+
 /** Implemented Captcha Providers */
 export enum CaptchaProvider {
   HCAPTCHA = 'HCAPTCHA',
@@ -7373,7 +7381,8 @@ export type IndividualConfirmEmailResponse = {
 
 export type IndividualCreateInput = {
   email: Scalars['String']['input'];
-  name: Scalars['String']['input'];
+  legalName?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type InviteMemberInput = {
@@ -8126,8 +8135,11 @@ export type MutationCreateOrderArgs = {
 
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
+  captcha?: InputMaybe<CaptchaInputType>;
+  individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;
+  roleDescription?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -9807,6 +9819,8 @@ export type OrganizationWebhooksArgs = {
 export type OrganizationCreateInput = {
   /** The profile background image, for the banner and social media sharing */
   backgroundImage?: InputMaybe<Scalars['Upload']['input']>;
+  /** Two-letters country code following ISO31661 */
+  countryISO?: InputMaybe<Scalars['String']['input']>;
   description: Scalars['String']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;

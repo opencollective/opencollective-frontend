@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo "> Setting locale to en_US"
+export LANGUAGE=en-US
+export LANG=en-US
+export LC_ALL=en-US
+
 echo "> Starting stripe webhook listener"
 export STRIPE_WEBHOOK_SIGNING_SECRET=$(stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe --print-secret)
 stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe >/dev/null &
