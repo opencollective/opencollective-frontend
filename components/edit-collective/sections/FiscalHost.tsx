@@ -100,7 +100,7 @@ const FiscalHost = ({ account }) => {
         {({ handleSubmit, setFieldValue, values, dirty }) => {
           return (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <Card className="flex items-center justify-between p-4">
+              <Card className="flex flex-row items-center justify-between p-4">
                 <div>
                   <h1 className="font-bold">
                     <FormattedMessage defaultMessage="Open to Applications" id="collective.application.label" />
