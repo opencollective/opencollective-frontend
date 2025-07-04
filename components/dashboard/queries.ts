@@ -82,6 +82,7 @@ export const adminPanelQuery = gql`
         host {
           id
           requiredLegalDocuments
+          hostFeePercent
         }
       }
       ... on AccountWithParent {

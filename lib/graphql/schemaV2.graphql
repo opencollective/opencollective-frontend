@@ -20774,7 +20774,7 @@ type Mutation {
     Account to edit.
     """
     account: AccountUpdateInput!
-  ): Host!
+  ): Account!
 
   """
   Adds or removes a policy on a given account. Scope: "account".
@@ -22821,6 +22821,33 @@ input AccountUpdateInput {
   """
   id: String!
   currency: Currency
+
+  """
+  The host fee percentage for this account. Must be between 0 and 100.
+  """
+  hostFeePercent: Int
+
+  """
+  Settings for the account.
+  """
+  settings: AccountUpdateSettingsInput
+}
+
+input AccountUpdateSettingsInput {
+  """
+  Whether this host account is accepting fiscal sponsorship applications.
+  """
+  apply: Boolean
+
+  """
+  Message shown to users when applying to join this account.
+  """
+  applyMessage: String
+
+  """
+  Terms of Service for this account.
+  """
+  tos: String
 }
 
 input PoliciesInput {
