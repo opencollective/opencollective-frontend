@@ -7,7 +7,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
 }
 
-const BASE_INPUT_CLASS =
+export const BASE_INPUT_CLASS =
   'flex h-10 duration-300 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-[color,box-shadow] file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-within:ring-2 ring-ring focus-within:outline-hidden disabled:cursor-not-allowed disabled:opacity-50';
 
 export const BASE_INPUT_ERROR_CLASS = 'border-red-500 ring-red-500/30';
