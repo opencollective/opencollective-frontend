@@ -199,7 +199,7 @@ const MENU_SECTIONS = {
     }),
     plusButton: {
       text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),
-      href: '/organizations/new',
+      href: '/signup/organization',
     },
   },
   ARCHIVED: {
