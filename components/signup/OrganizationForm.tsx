@@ -213,7 +213,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         {({ touched, values, setFieldValue, isValid }) => (
           <Form className="flex flex-col gap-8" data-cy="create-organization-form">
             <Card>
-              <CardContent className="flex flex-col gap-4 pt-6">
+              <CardContent className="flex flex-col gap-4">
                 <header>
                   <h3 className="text-lg font-medium">
                     <FormattedMessage id="firstAdmin" defaultMessage="Personal Information" />
@@ -343,7 +343,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="flex flex-col gap-4 pt-6">
+              <CardContent className="flex flex-col gap-4">
                 <header>
                   <h3 className="text-lg font-medium">
                     <FormattedMessage defaultMessage="Organization Information" id="o0606E" />
@@ -439,7 +439,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
             </Card>
 
             <Card>
-              <CardContent className="flex flex-col gap-4 pt-6">
+              <CardContent className="flex flex-col gap-4">
                 <header>
                   <h3 className="text-lg font-medium">
                     <FormattedMessage id="InviteTeamMembers" defaultMessage="Invite Team Members" />
