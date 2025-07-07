@@ -55,13 +55,6 @@ export const ImportedTransactionDataList = ({
               }
             />
             <DataListItem
-              label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-              value={row.description}
-              itemClassName="truncate max-w-full"
-              labelClassName="basis-1/3 min-w-auto max-w-auto"
-              showValueAsItemTitle
-            />
-            <DataListItem
               label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
               value={transactionsImport.source}
               itemClassName="truncate max-w-full"
@@ -72,6 +65,12 @@ export const ImportedTransactionDataList = ({
               label={<FormattedMessage defaultMessage="Transaction ID" id="oK0S4l" />}
               value={row.sourceId}
               itemClassName="truncate max-w-full"
+              labelClassName="basis-1/3 min-w-auto max-w-auto"
+              showValueAsItemTitle
+            />
+            <DataListItem
+              label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+              value={row.description}
               labelClassName="basis-1/3 min-w-auto max-w-auto"
               showValueAsItemTitle
             />

@@ -695,13 +695,6 @@ export const MatchDebitDialog = ({
                   </React.Fragment>
                 )}
                 <DataListItem
-                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                  value={selectedExpense?.description || selectedContribution?.description}
-                  itemClassName="truncate max-w-full"
-                  labelClassName="basis-1/3 min-w-auto max-w-auto"
-                  showValueAsItemTitle
-                />
-                <DataListItem
                   label={<FormattedMessage defaultMessage="Status" id="tzMNF3" />}
                   itemClassName="truncate max-w-full"
                   labelClassName="basis-1/3 min-w-auto max-w-auto"
@@ -712,6 +705,13 @@ export const MatchDebitDialog = ({
                       <OrderStatusTag status={selectedContribution.status} />
                     )
                   }
+                />
+                <DataListItem
+                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+                  value={selectedExpense?.description || selectedContribution?.description}
+                  itemClassName="truncate max-w-full"
+                  labelClassName="basis-1/3 min-w-auto max-w-auto"
+                  showValueAsItemTitle
                 />
               </DataList>
 
