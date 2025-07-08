@@ -129,6 +129,7 @@ type FilesViewerModalProps = {
     url: string;
     name?: string;
     info?: { width: number; type: string };
+    type?: string;
   }[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
@@ -184,7 +185,7 @@ export default function FilesViewerModal({
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files?.[selectedIndex] : null;
-  const selectedItemContentType = selectedItem?.info?.type;
+  const selectedItemContentType = selectedItem?.info?.type || selectedItem?.type;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
