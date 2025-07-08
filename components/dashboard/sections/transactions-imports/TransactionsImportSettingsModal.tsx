@@ -221,7 +221,7 @@ export default function TransactionsImportSettingsModal({
           </TabsContent>
           <TabsContent value="advanced">
             {transactionsImport.type === 'PLAID' && transactionsImport.connectedAccount && (
-              <Card className="mb-4">
+              <Card className="mb-4 p-0 shadow-xs">
                 <CardContent className="pt-6">
                   <h3 className="mb-2 text-sm font-medium">
                     <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />

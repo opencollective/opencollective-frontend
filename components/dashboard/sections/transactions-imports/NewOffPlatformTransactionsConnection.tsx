@@ -111,7 +111,7 @@ const CountryCard = ({
       )}
       onClick={onClick}
     >
-      <Card className="w-full bg-transparent">
+      <Card className="w-full bg-transparent p-0 shadow-xs">
         <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <h3 className="text-left font-medium">
@@ -122,7 +122,7 @@ const CountryCard = ({
               <div className="flex items-center">
                 <Sparkles className="mr-2 h-4 w-4 text-yellow-500" />
                 <Badge type="info" size="sm">
-                  <FormattedMessage defaultMessage="Host" id="host.label" />
+                  <FormattedMessage defaultMessage="Host" id="Member.Role.HOST" />
                 </Badge>
               </div>
             )}
@@ -158,14 +158,18 @@ const RegionStep = ({
           )}
           onClick={() => onRegionSelect('US')}
         >
-          <Card className="w-full bg-transparent">
+          <Card className="w-full bg-transparent p-0 shadow-xs">
             <CardContent className="flex items-center justify-between p-4">
               <div className="flex items-center space-x-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">🇺🇸</div>
                 <div>
                   <h3 className="text-left font-medium">{i18nCountryName(intl, 'US')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    <FormattedMessage defaultMessage="Connect via Plaid" id="connect.via.plaid" />
+                    <FormattedMessage
+                      defaultMessage="Connect via {service}"
+                      id="cw72RY"
+                      values={{ service: 'Plaid' }}
+                    />
                   </p>
                 </div>
               </div>
@@ -184,7 +188,7 @@ const RegionStep = ({
           onClick={() => onRegionSelect('EU')}
           disabled={isLoading}
         >
-          <Card className="w-full bg-transparent">
+          <Card className="w-full bg-transparent p-0 shadow-xs">
             <CardContent className="flex items-center space-x-3 p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">🇪🇺</div>
               <div>
@@ -192,14 +196,18 @@ const RegionStep = ({
                   <FormattedMessage defaultMessage="Europe" id="X3AIiK" />
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  <FormattedMessage defaultMessage="Connect via GoCardless" id="YX9cQw" />
+                  <FormattedMessage
+                    defaultMessage="Connect via {service}"
+                    id="cw72RY"
+                    values={{ service: 'GoCardless' }}
+                  />
                 </p>
               </div>
             </CardContent>
           </Card>
         </Button>
 
-        <Card className="pointer-events-none cursor-not-allowed opacity-50">
+        <Card className="pointer-events-none cursor-not-allowed p-0 opacity-50 shadow-xs">
           <CardContent className="flex items-center space-x-3 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
               <Globe className="h-5 w-5 text-gray-600" />
@@ -415,7 +423,7 @@ const InstitutionStep = ({
                   )}
                   onClick={() => handleInstitutionSelect(institution)}
                 >
-                  <Card className="w-full bg-transparent">
+                  <Card className="w-full bg-transparent p-0 shadow-xs">
                     <CardContent className="flex items-center space-x-3 p-3">
                       {institution.logoUrl ? (
                         <img src={institution.logoUrl} alt={institution.name} className="h-8 w-8 object-contain" />
@@ -545,7 +553,7 @@ const ConfirmationStep = ({
 
       <div className="mt-6 flex space-x-3">
         <Button variant="outline" onClick={onBack} disabled={isConnecting} className="flex-1">
-          <FormattedMessage defaultMessage="Back" id="back" />
+          <FormattedMessage defaultMessage="Back" id="Back" />
         </Button>
         <Button onClick={onConfirm} disabled={isConnecting} className="flex-1">
           {isConnecting ? (
@@ -622,6 +630,9 @@ export const NewOffPlatformTransactionsConnection = ({
     try {
       const result = await generateGoCardlessLink({
         variables: {
+          host: {
+            id: hostId,
+          },
           input: {
             institutionId: selectedInstitution.id,
             userLanguage: intl.locale ?? 'en',

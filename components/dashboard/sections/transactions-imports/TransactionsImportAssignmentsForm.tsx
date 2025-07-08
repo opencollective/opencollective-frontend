@@ -183,7 +183,7 @@ export const TransactionsImportAssignmentsForm = ({
                 ) : (
                   <div className="max-h-[calc(100vh-200px)] space-y-4 overflow-y-auto">
                     {(transactionsImport.institutionAccounts || []).map(account => (
-                      <Card className="overflow-hidden" key={account.id}>
+                      <Card className="overflow-hidden p-0 shadow-xs" key={account.id}>
                         <CardContent className="p-3">
                           <div className="mb-2 flex items-center justify-between">
                             <div className="flex items-center space-x-2">
