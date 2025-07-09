@@ -763,8 +763,21 @@ export enum AccountType {
 
 export type AccountUpdateInput = {
   currency?: InputMaybe<Currency>;
+  /** The host fee percentage for this account. Must be between 0 and 100. */
+  hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
+  /** Settings for the account. */
+  settings?: InputMaybe<AccountUpdateSettingsInput>;
+};
+
+export type AccountUpdateSettingsInput = {
+  /** Whether this host account is accepting fiscal sponsorship applications. */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Message shown to users when applying to join this account. */
+  applyMessage?: InputMaybe<Scalars['String']['input']>;
+  /** Terms of Service for this account. */
+  tos?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** An account that can receive financial contributions */
@@ -2526,6 +2539,7 @@ export type CollectiveFeatures = {
   EVENTS?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
+  OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
   ORDER?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_DONATIONS?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_PAYOUTS?: Maybe<CollectiveFeatureStatus>;
@@ -7747,7 +7761,7 @@ export type Mutation = {
   /** Duplicate an account. Scope: "account". */
   duplicateAccount: Account;
   /** Edit key properties of an account. Scope: "account". */
-  editAccount: Host;
+  editAccount: Account;
   /** An endpoint for hosts to edit the fees structure of their hosted accounts. Scope: "host". */
   editAccountFeeStructure: Account;
   /** [Root only] Edits account flags (deleted, banned, archived, trusted host) */
