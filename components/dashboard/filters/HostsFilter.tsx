@@ -5,23 +5,14 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import type { AccountHoverCardFieldsFragment, HostsFilterQuery } from '../../../lib/graphql/types/v2/graphql';
+import type { AccountFilterQuery, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../../lib/graphql/types/v2/schema';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
 
+import { accountFilterQuery } from './AccountFilter';
 import ComboSelectFilter from './ComboSelectFilter';
-
-const accountQuery = gql`
-  query HostsFilter($slug: String!) {
-    account(slug: $slug) {
-      id
-      ...AccountHoverCardFields
-    }
-  }
-  ${accountHoverCardFields}
-`;
 
 const hostsFilterSearchQuery = gql`
   query HostsFilterSearch($searchTerm: String, $orderBy: OrderByInput) {
@@ -44,7 +35,7 @@ const AccountRenderer = ({
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
-  const { data } = useQuery<HostsFilterQuery>(accountQuery, {
+  const { data } = useQuery<AccountFilterQuery>(accountFilterQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
     context: API_V2_CONTEXT,
