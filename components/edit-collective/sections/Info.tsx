@@ -95,7 +95,7 @@ const editAccountMutation = gql`
 `;
 
 const editAccountQuery = gql`
-  query EditAccount($id: String!) {
+  query InfoSettingsDashboard($id: String!) {
     account(id: $id) {
       id
       ...EditAccountFragment

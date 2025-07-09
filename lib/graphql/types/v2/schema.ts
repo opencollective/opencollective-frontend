@@ -311,6 +311,7 @@ export type AccountMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -1555,7 +1556,7 @@ export type Bot = Account & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -1755,6 +1756,7 @@ export type BotMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -1767,6 +1769,7 @@ export type BotMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -2072,7 +2075,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -2314,6 +2317,7 @@ export type CollectiveMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -2326,6 +2330,7 @@ export type CollectiveMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -4093,7 +4098,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -4343,6 +4348,7 @@ export type EventMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -4355,6 +4361,7 @@ export type EventMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -5351,7 +5358,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -5593,6 +5600,7 @@ export type FundMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -5605,6 +5613,7 @@ export type FundMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -5980,7 +5989,7 @@ export type Host = Account & AccountWithContributions & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -6384,6 +6393,7 @@ export type HostMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -6396,6 +6406,7 @@ export type HostMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -7039,7 +7050,7 @@ export type Individual = Account & {
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -7257,6 +7268,7 @@ export type IndividualMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -7269,6 +7281,7 @@ export type IndividualMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -7961,7 +7974,10 @@ export type Mutation = {
   startResumeOrdersProcess: Account;
   /** Submit a legal document */
   submitLegalDocument: LegalDocument;
-  /** Manually request a sync for Plaid account */
+  /**
+   * Manually request a sync for Plaid account
+   * @deprecated 2025-07-23: Use `syncTransactionsImport` instead
+   */
   syncPlaidAccount: TransactionsImport;
   /** Manually request a sync for a transactions import (works for both Plaid and GoCardless) */
   syncTransactionsImport: TransactionsImport;
@@ -9534,7 +9550,7 @@ export type Organization = Account & AccountWithContributions & {
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -9759,6 +9775,7 @@ export type OrganizationMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -9771,6 +9788,7 @@ export type OrganizationMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -10644,7 +10662,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -10888,6 +10906,7 @@ export type ProjectMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -10900,6 +10919,7 @@ export type ProjectMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -11123,7 +11143,7 @@ export type Query = {
   individual?: Maybe<Individual>;
   loggedInAccount?: Maybe<Individual>;
   me?: Maybe<Individual>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   /** Get financial institutions for off-platform transactions */
   offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
@@ -12954,7 +12974,7 @@ export type Vendor = Account & AccountWithContributions & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -13182,6 +13202,7 @@ export type VendorMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -13194,6 +13215,7 @@ export type VendorMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 

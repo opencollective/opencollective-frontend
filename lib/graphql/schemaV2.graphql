@@ -2932,7 +2932,7 @@ type Host implements Account & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -8635,7 +8635,7 @@ type Bot implements Account {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -9588,7 +9588,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -11092,7 +11092,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -12319,7 +12319,7 @@ type Individual implements Account {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -13524,7 +13524,7 @@ type Organization implements Account & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -14590,7 +14590,7 @@ type Vendor implements Account & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -16172,7 +16172,7 @@ type Query {
   ): Individual
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -18413,7 +18413,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -19513,7 +19513,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -22161,7 +22161,7 @@ type Mutation {
     The connected account to refresh
     """
     connectedAccount: ConnectedAccountReferenceInput!
-  ): TransactionsImport!
+  ): TransactionsImport! @deprecated(reason: "2025-07-23: Use `syncTransactionsImport` instead")
 
   """
   Refresh the list of sub-accounts & other metadata by re-fetching the account info
