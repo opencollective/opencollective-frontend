@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty, isNil, orderBy } from 'lodash';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
@@ -395,14 +395,22 @@ const SetupStep = (step: SetupStep) => {
   );
 };
 
-export const SetupCategory = ({ title, steps }: SetupCategory) => {
+export const SetupCategory = ({
+  id,
+  title,
+  steps,
+  expanded,
+  onExpand,
+}: SetupCategory & { expanded: boolean; onExpand: (string) => void }) => {
   const completedSteps = steps.filter(step => step.completed).length;
   const isCompleted = completedSteps === steps.length;
-  const [isExpanded, setIsExpanded] = useState(!isCompleted);
 
   return (
     <div className="flex flex-col gap-4 pb-6">
-      <button className="flex flex-row items-center justify-between gap-2" onClick={() => setIsExpanded(!isExpanded)}>
+      <button
+        className="flex flex-row items-center justify-between gap-2"
+        onClick={() => onExpand(expanded ? null : id)}
+      >
         <h1 className="text-base font-bold">{title}</h1>
         <div className="flex items-center gap-2">
           <Label
@@ -415,14 +423,14 @@ export const SetupCategory = ({ title, steps }: SetupCategory) => {
               values={{ completed: completedSteps, total: steps.length }}
             />
           </Label>
-          {isExpanded ? (
+          {expanded ? (
             <ChevronUp className="text-slate-700" size="24px" />
           ) : (
             <ChevronDown className="text-slate-700" size="24px" />
           )}
         </div>
       </button>
-      {isExpanded && (
+      {expanded && (
         <div className="flex flex-col gap-4">
           {steps.map(step => (
             <SetupStep key={step.id} {...step} />
@@ -441,10 +449,20 @@ export const SetupGuideCard = ({ account }) => {
     context: API_V2_CONTEXT,
   });
   const { LoggedInUser } = useLoggedInUser();
+  const [expandedCategory, setExpandedCategory] = useState(null);
   const categories = useMemo(
     () => (data?.account ? runChecks({ account: data?.account, router, LoggedInUser }) : []),
     [data?.account, router, LoggedInUser],
   );
+  const firstIncompleteCategory = useMemo(
+    () => categories.find(category => category.steps.some(step => !step.completed)),
+    [categories],
+  );
+  useEffect(() => {
+    if (firstIncompleteCategory && !expandedCategory) {
+      setExpandedCategory(firstIncompleteCategory.id);
+    }
+  }, [firstIncompleteCategory, expandedCategory]);
 
   return (
     <Card>
@@ -456,7 +474,12 @@ export const SetupGuideCard = ({ account }) => {
       </CardHeader>
       <CardContent className="flex flex-col gap-6 divide-y">
         {categories?.map(category => (
-          <SetupCategory key={category.id} {...category} />
+          <SetupCategory
+            key={category.id}
+            expanded={expandedCategory === category.id}
+            onExpand={setExpandedCategory}
+            {...category}
+          />
         ))}
       </CardContent>
     </Card>
