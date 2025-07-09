@@ -3,52 +3,45 @@ import { FormattedMessage } from 'react-intl';
 
 import { isHostAccount } from '@/lib/collective';
 
-// import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-// import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
-// import { Button } from '../../../ui/Button';
+import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
+
+import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 
 import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
+import { SetupGuideCard } from './SetupGuide';
 
 export function OrgOverview() {
   const { account } = React.useContext(DashboardContext);
-  // const [showSetupGuide, setShowSetupGuide] = React.useState(false);
+  const [showSetupGuide, setShowSetupGuide] = React.useState(true);
 
   return (
     <div className="max-w-(--breakpoint-lg) space-y-6">
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
-        // actions={
-        //   <Button
-        //     size="sm"
-        //     variant="outline"
-        //     onClick={() => {
-        //       setShowSetupGuide(open => !open);
-        //     }}
-        //   >
-        //     {showSetupGuide ? (
-        //       <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-        //     ) : (
-        //       <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-        //     )}
-        //   </Button>
-        // }
+        actions={
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setShowSetupGuide(open => !open);
+            }}
+          >
+            {showSetupGuide ? (
+              <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
+            ) : (
+              <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
+            )}
+          </Button>
+        }
       />
-      {/* <Collapsible open={showSetupGuide}>
+      <Collapsible open={showSetupGuide}>
         <CollapsibleContent>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">
-                <FormattedMessage defaultMessage="Setup guide" id="SetupGuide.Title" />
-              </CardTitle>
-              <CardDescription>Get going with Open Collective!</CardDescription>
-            </CardHeader>
-            <CardContent>TBD</CardContent>
-          </Card>
+          <SetupGuideCard account={account} />
         </CollapsibleContent>
-      </Collapsible> */}
+      </Collapsible>
 
       {isHostAccount(account) ? (
         <HostOverviewContent accountSlug={account.slug} />
