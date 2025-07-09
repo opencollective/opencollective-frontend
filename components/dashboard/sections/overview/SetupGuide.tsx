@@ -188,7 +188,8 @@ const runChecks = ({
           />
         ),
         completed:
-          'host' in account && account.host.accountingCategories?.nodes?.filter(c => c.appliesTo === 'HOST').length > 0,
+          'host' in account &&
+          account.host?.accountingCategories?.nodes?.filter(c => c.appliesTo === 'HOST').length > 0,
         action: {
           label: <FormattedMessage defaultMessage="Add chart of accounts" id="SetupGuide.ChartOfAccounts.Action" />,
           onClick: () => {
@@ -358,7 +359,7 @@ const runChecks = ({
 ];
 
 const SetupStep = (step: SetupStep) => {
-  const [isExpanded, setIsExpanded] = useState(!step.completed);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div>
