@@ -23,6 +23,7 @@ const COMMON_DIRECTIVES = {
     'blob:', // For upload images previews
     'i.ytimg.com', // For youtube embeds
     'storage.googleapis.com', // For GoCardless institutions images
+    'cdn-logos.gocardless.com', // For GoCardless institutions images
   ].filter(Boolean),
   workerSrc: [SELF],
   styleSrc: [
