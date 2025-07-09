@@ -11,6 +11,7 @@ export type UserContextProps = {
   login: (token?: string) => Promise<LoggedInUser>;
   logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => Promise<void>;
   refetchLoggedInUser: () => Promise<void>;
+  updateLoggedInUserFromCache: () => void;
 };
 
 const useLoggedInUser = (): UserContextProps => React.useContext(UserContext);

@@ -53,6 +53,7 @@ export const filterRawValueEntries = ([key, value]: [string, unknown], csvConfig
         'transaction_id',
         'transactionAmount',
         'remittanceInformationUnstructured',
+        'remittanceInformationUnstructuredArray',
         // Ignore some irrelevant columns
         'personal_finance_category',
         'personal_finance_category_icon_url',
