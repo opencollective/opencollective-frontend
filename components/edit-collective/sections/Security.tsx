@@ -23,8 +23,8 @@ import { useToast } from '../../ui/useToast';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const accountQuery = gql`
-  query AccountSecurity($slug: String) {
+const securityAccountQuery = gql`
+  query SecurityAccount($slug: String) {
     account(slug: $slug) {
       id
       slug
@@ -88,7 +88,10 @@ const getInitialValues = account => {
 const Security = ({ collective }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { data, loading } = useQuery(accountQuery, { variables: { slug: collective.slug }, context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(securityAccountQuery, {
+    variables: { slug: collective.slug },
+    context: API_V2_CONTEXT,
+  });
   const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation, {
     context: API_V2_CONTEXT,
   });
