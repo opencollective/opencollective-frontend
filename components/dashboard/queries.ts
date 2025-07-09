@@ -73,6 +73,7 @@ export const adminPanelQuery = gql`
         VIRTUAL_CARDS
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
+        OFF_PLATFORM_TRANSACTIONS
       }
       policies {
         id

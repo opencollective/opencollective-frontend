@@ -12,7 +12,6 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
-  PLAID_INTEGRATION = 'PLAID_INTEGRATION',
   GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
   HOST_OVERVIEW = 'HOST_OVERVIEW',
 }
@@ -123,14 +122,6 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Transactions Imports',
     description: 'A new tool to import batches of transactions.',
     publicBeta: true,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.PLAID_INTEGRATION,
-    title: 'Bank Account synchronization',
-    description: 'Connect your bank account to import transactions',
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-    dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
   },
   {
     key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,

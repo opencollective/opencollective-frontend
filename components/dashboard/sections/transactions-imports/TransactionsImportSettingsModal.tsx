@@ -80,7 +80,7 @@ export default function TransactionsImportSettingsModal({
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
   transactionsImport: Pick<
     TransactionsImport,
-    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'plaidAccounts'
+    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts'
   > &
     React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
       connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
@@ -221,7 +221,7 @@ export default function TransactionsImportSettingsModal({
           </TabsContent>
           <TabsContent value="advanced">
             {transactionsImport.type === 'PLAID' && transactionsImport.connectedAccount && (
-              <Card className="mb-4">
+              <Card className="mb-4 p-0 shadow-xs">
                 <CardContent className="pt-6">
                   <h3 className="mb-2 text-sm font-medium">
                     <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />

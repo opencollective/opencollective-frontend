@@ -153,13 +153,12 @@ const transactionsImportQuery = gql`
       assignments {
         ...TransactionsImportAssignmentFields
       }
-      plaidAccounts {
-        accountId
-        mask
+      institutionAccounts {
+        id
         name
-        officialName
-        subtype
         type
+        subtype
+        mask
       }
       connectedAccount {
         id
