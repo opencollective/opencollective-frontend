@@ -144,7 +144,7 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.HOST_OVERVIEW,
     title: 'Host Dashboard Overview',
     description: 'A dashboard landing page for Host accounts that provides an overview of the organization.',
-    alwaysEnableInDev: false,
+    alwaysEnableInDev: true,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
     publicBeta: false,
   },
