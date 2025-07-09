@@ -643,6 +643,10 @@ export const expensePageExpenseFieldsFragment = gql`
             valueInCents
             currency
           }
+          netAmount {
+            valueInCents
+            currency
+          }
         }
       }
     }
