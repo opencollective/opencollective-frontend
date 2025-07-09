@@ -266,8 +266,8 @@ class LoggedInUser {
      */
     const availablePreviewFeatures = previewFeatures.filter(feature => {
       const userHaveSetting = typeof earlyAccess[feature.key] !== 'undefined';
-      const hasClosedBetaAccess = feature.closedBetaAccessFor?.some(slug =>
-        this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+      const hasClosedBetaAccess = feature.closedBetaAccessFor?.some(
+        slug => slug === this.collective.slug || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
       );
       const enabledByDefault = feature.enabledByDefaultFor?.some(
         slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
@@ -278,13 +278,14 @@ class LoggedInUser {
         (['development', 'staging'].includes(process.env.NODE_ENV) || ['e2e'].includes(process.env.OC_ENV));
       const hasAccess = feature.hasAccess?.(this);
       return (
-        isEnabledInEnv &&
-        (isEnabledByDevEnv ||
-          feature.publicBeta ||
-          userHaveSetting ||
-          hasClosedBetaAccess ||
-          enabledByDefault ||
-          hasAccess)
+        feature.isEnabled?.() || // Always show enabled custom features
+        (isEnabledInEnv &&
+          (isEnabledByDevEnv ||
+            feature.publicBeta ||
+            userHaveSetting ||
+            hasClosedBetaAccess ||
+            enabledByDefault ||
+            hasAccess))
       );
     });
 

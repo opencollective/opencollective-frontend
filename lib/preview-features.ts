@@ -7,7 +7,6 @@ export enum PREVIEW_FEATURE_KEYS {
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
   INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
-  TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
@@ -32,6 +31,7 @@ export type PreviewFeature = {
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
+const ENGINEERS = ['znarf', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
 export const FIRST_PARTY_HOSTS = [
   'opencollective',
   'opensource',
@@ -46,6 +46,20 @@ export const FIRST_PARTY_HOSTS = [
  * List of current preview features.
  */
 export const previewFeatures: PreviewFeature[] = [
+  {
+    key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
+    title: 'Crowdfunding Redesign',
+    description:
+      'Be part of the crowdfunding redesign effort and get access to previews of new crowdfunding and profile pages',
+    alwaysEnableInDev: true,
+    publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
+    title: 'Keyboard Shortcuts',
+    description: 'Use keyboard shortcuts to navigate the expense flow',
+    publicBeta: true,
+  },
   {
     key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
     title: 'New expense submission flow',
@@ -63,18 +77,33 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {
-    key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
-    title: 'Crowdfunding Redesign',
-    description:
-      'Be part of the crowdfunding redesign effort and get access to previews of new crowdfunding and profile pages',
-    alwaysEnableInDev: true,
-    publicBeta: true,
+    key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
+    publicBeta: false,
+    title: 'Search command menu',
+    description: 'A new way to search for collectives, transactions, expenses and more',
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+    title: 'Funds & Grants Dashboard Tools',
+    description: 'Grants and Funds are organized into their own Dashboard sections',
+    alwaysEnableInDev: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    publicBeta: false,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.HOST_OVERVIEW,
+    title: 'Host Dashboard Overview',
+    description: 'A dashboard landing page for Host accounts that provides an overview of the organization.',
+    alwaysEnableInDev: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
+    publicBeta: false,
   },
   {
     key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,
     title: 'Authenticated SSR',
     description: 'Uses cookie based authentication to generate initial page loads on the server',
-    closedBetaAccessFor: PLATFORM_ACCOUNTS,
+    closedBetaAccessFor: ENGINEERS,
     publicBeta: false,
     isEnabled() {
       return document.cookie.indexOf('enableAuthSsr') !== -1;
@@ -92,7 +121,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Vercel Backend',
     description: 'Uses Vercel as the frontend backend provider',
     publicBeta: false,
-    closedBetaAccessFor: PLATFORM_ACCOUNTS,
+    closedBetaAccessFor: ENGINEERS,
     isEnabled() {
       return document.cookie.indexOf('backend=vercel') !== -1;
     },
@@ -103,40 +132,5 @@ export const previewFeatures: PreviewFeature[] = [
         document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
       }
     },
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
-    title: 'Keyboard Shortcuts',
-    description: 'Use keyboard shortcuts to navigate the expense flow',
-    publicBeta: true,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
-    publicBeta: false,
-    title: 'Search command menu',
-    description: 'A new way to search for collectives, transactions, expenses and more',
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
-    title: 'Transactions Imports',
-    description: 'A new tool to import batches of transactions.',
-    publicBeta: true,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-    title: 'Funds & Grants Dashboard Tools',
-    description: 'Grants and Funds are organized into their own Dashboard sections',
-    alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-    publicBeta: false,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.HOST_OVERVIEW,
-    title: 'Host Dashboard Overview',
-    description: 'A dashboard landing page for Host accounts that provides an overview of the organization.',
-    alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
-    publicBeta: false,
   },
 ];
