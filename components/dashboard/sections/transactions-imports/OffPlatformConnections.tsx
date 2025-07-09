@@ -69,7 +69,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const { data, loading, refetch, error } = useQuery(offPlatformConnectionsQuery, {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
-    pollInterval: importsWithSyncRequest.size ? 5_000 : 30_000,
+    pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
   });
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
