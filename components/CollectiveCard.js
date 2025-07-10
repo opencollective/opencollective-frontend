@@ -291,26 +291,6 @@ class CollectiveCard extends React.Component {
                 </div>
               </StatsWrapper>
             )}
-            {collective.stats && collective.stats.collectives && (
-              <StatsWrapper>
-                <div className="backers">
-                  <ValueWrapper>{get(collective, 'stats.collectives.hosted')}</ValueWrapper>
-                  <LabelWrapper>
-                    <FormattedMessage
-                      id="collective.card.collectives.count"
-                      defaultMessage="Hosted {n, plural, one {Collective} other {Collectives}}"
-                      values={{ n: get(collective, 'stats.collectives.hosted') }}
-                    />
-                  </LabelWrapper>
-                </div>
-                <div className="currency">
-                  <ValueWrapper>{collective.currency}</ValueWrapper>
-                  <LabelWrapper>
-                    <FormattedMessage id="currency" defaultMessage="currency" />
-                  </LabelWrapper>
-                </div>
-              </StatsWrapper>
-            )}
             {!hideRoles && roles.size > 0 && (
               <MembershipWrapper>
                 <Container

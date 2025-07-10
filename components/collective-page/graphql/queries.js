@@ -53,10 +53,6 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
         id
         ...NavbarFields
       }
-      ordersFromCollective(subscriptionsOnly: true) {
-        id
-        isSubscriptionActive
-      }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id
       }
