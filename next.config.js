@@ -281,12 +281,33 @@ const nextConfig = {
         destination: '/dashboard/:slug/:section*/:subpath*',
         permanent: false,
       },
-      // Legacy subscriptions
+      // Legacy manage subscriptions URLs
       {
         source: '/subscriptions',
-        destination: '/manage-contributions',
+        destination: '/dashboard/me/outgoing-contributions',
         permanent: false,
       },
+      {
+        source: '/:slug/subscriptions',
+        destination: '/dashboard/:slug/outgoing-contributions',
+        permanent: false,
+      },
+      {
+        source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
+        destination: '/dashboard/:slug/outgoing-contributions',
+        permanent: false,
+      },
+      {
+        source: '/manage-contributions/:tab(recurring|processing)?',
+        destination: '/dashboard/me/outgoing-contributions',
+        permanent: false,
+      },
+      {
+        source: '/:slug/manage-contributions/:tab(recurring|processing)?',
+        destination: '/dashboard/:slug/outgoing-contributions',
+        permanent: false,
+      },
+      // Update payment method page
       {
         source: '/:collectiveSlug/paymentmethod/:paymentMethodId/update',
         destination: '/paymentmethod/:paymentMethodId/update',
