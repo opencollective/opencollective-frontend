@@ -48,15 +48,6 @@ export const tierPageQuery = gqlV1 /* GraphQL */ `
         host {
           id
         }
-        stats {
-          id
-          updates
-          balance
-          transactions {
-            id
-            all
-          }
-        }
         features {
           id
           ...NavbarFields
