@@ -16,27 +16,24 @@ export const TransactionsImportRowStatusBadge = ({
   };
 }) => {
   const intl = useIntl();
+  const badgeProps = { size: 'sm', className: 'whitespace-nowrap' } as const;
   if (row.status === TransactionsImportRowStatus.IGNORED) {
-    return (
-      <Badge className="whitespace-nowrap" size="sm">
-        {i18nTransactionsRowStatus(intl, 'IGNORED')}
-      </Badge>
-    );
+    return <Badge {...badgeProps}>{i18nTransactionsRowStatus(intl, 'IGNORED')}</Badge>;
   } else if (row.expense || row.order) {
     return (
-      <Badge type="success" size="sm">
+      <Badge {...badgeProps} type="success">
         {i18nTransactionsRowStatus(intl, 'LINKED')}
       </Badge>
     );
   } else if (row.status === TransactionsImportRowStatus.ON_HOLD) {
     return (
-      <Badge type="warning" size="sm">
+      <Badge {...badgeProps} type="warning">
         {i18nTransactionsRowStatus(intl, 'ON_HOLD')}
       </Badge>
     );
   } else {
     return (
-      <Badge type="info" size="sm">
+      <Badge {...badgeProps} type="info">
         {i18nTransactionsRowStatus(intl, 'PENDING')}
       </Badge>
     );
