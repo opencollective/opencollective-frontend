@@ -508,7 +508,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.EXPORT,
-          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]),
+          if: isOneOfTypes(account, [COLLECTIVE, PROJECT, FUND]),
         },
         {
           section: ALL_SECTIONS.FOR_DEVELOPERS,
