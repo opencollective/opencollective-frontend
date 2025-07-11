@@ -7,7 +7,9 @@ import StyledLink from './StyledLink';
 // utility library
 
 export const getI18nLink = linkProps => chunks => (
-  <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>
+  <StyledLink color="var(--color-primary)" {...linkProps}>
+    {linkProps?.children || chunks}
+  </StyledLink>
 );
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
@@ -66,6 +68,7 @@ const I18nFormatters = {
   ol: I18nOrderedList,
   ul: I18nUnorderedList,
   li: I18nListItem,
+  newLine: <br />,
 };
 
 export default I18nFormatters;
