@@ -74,6 +74,8 @@ declare global {
       ): Chainable<{ id: string; legacyId: number; slug: string }>;
 
       createVendor: typeof createVendor;
+
+      getAccount: typeof getAccount;
     }
   }
 }
@@ -118,6 +120,36 @@ function createVendor(
       variables: { hostSlug, vendor },
     }).then(({ body }) => {
       return body.data.createVendor;
+    });
+  });
+}
+
+Cypress.Commands.add('getAccount', getAccount);
+function getAccount(
+  accountSlug: string,
+  userEmail: string,
+): Cypress.Chainable<{ name: string; payoutMethods: { id: string; type: string }[] }> {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'GetAccount',
+      query: gql`
+        query GetAccount($accountSlug: String!) {
+          account(slug: $accountSlug) {
+            id
+            legacyId
+            name
+            slug
+            __typename
+            payoutMethods {
+              id
+              type
+            }
+          }
+        }
+      `,
+      variables: { accountSlug },
+    }).then(({ body }) => {
+      return body.data.account;
     });
   });
 }
