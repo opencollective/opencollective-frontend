@@ -110,7 +110,7 @@ const SetupStep = (step: Step) => {
   );
 };
 
-export const SetupCategory = ({
+const SetupCategory = ({
   id,
   title,
   steps,
