@@ -1521,19 +1521,18 @@ async function buildFormOptions(
         t => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(t),
       );
 
+      options.isAdminOfPayee =
+        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
+        values.payeeSlug === '__findAccountIAdminister';
+
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
       } else if (
         values.payoutMethodId === '__newPayoutMethod' &&
-        options.payee &&
-        (options.payee.type !== CollectiveType.VENDOR || options.isHostAdmin)
+        ((options.payee?.type === CollectiveType.VENDOR && options.isHostAdmin) || options.isAdminOfPayee)
       ) {
         options.payoutMethod = values.newPayoutMethod;
       }
-
-      options.isAdminOfPayee =
-        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        values.payeeSlug === '__findAccountIAdminister';
     } else {
       options.payoutMethod = values.newPayoutMethod;
       options.newPayoutMethodTypes = options.supportedPayoutMethods;
