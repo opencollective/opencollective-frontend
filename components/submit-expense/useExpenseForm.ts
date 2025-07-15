@@ -1525,7 +1525,8 @@ async function buildFormOptions(
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
       } else if (
         values.payoutMethodId === '__newPayoutMethod' &&
-        ((options.payee && options.payee.type !== CollectiveType.VENDOR) || options.isHostAdmin)
+        options.payee &&
+        (options.payee.type !== CollectiveType.VENDOR || options.isHostAdmin)
       ) {
         options.payoutMethod = values.newPayoutMethod;
       }
