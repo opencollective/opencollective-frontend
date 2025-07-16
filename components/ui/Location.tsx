@@ -5,6 +5,14 @@ import { cn } from '@/lib/utils';
 
 import Link from '../Link';
 
+const ZOOM_RATIO = 0.01; // Adjust this value to change the zoom level
+const Map = ({ lat, long }) => {
+  const bbox = `${long * (1 - ZOOM_RATIO)}%2C${lat * (1 - ZOOM_RATIO)}%2C${long * (1 + ZOOM_RATIO)}%2C${lat * (1 + ZOOM_RATIO)}`;
+  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&marker=${lat}%2C${long}&layer=mapnik`;
+
+  return <iframe loading="lazy" title="Open Street Map" width="100%" height="100%" src={src}></iframe>;
+};
+
 export const Location = ({ location, className }: { location: Readonly<LocationType>; className?: string }) => {
   if (!location) {
     return null;
@@ -37,13 +45,3 @@ export const Location = ({ location, className }: { location: Readonly<LocationT
     </div>
   );
 };
-
-const ZOOM_RATIO = 0.01; // Adjust this value to change the zoom level
-const Map = ({ lat, long }) => {
-  const bbox = `${long * (1 - ZOOM_RATIO)}%2C${lat * (1 - ZOOM_RATIO)}%2C${long * (1 + ZOOM_RATIO)}%2C${lat * (1 + ZOOM_RATIO)}`;
-  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&marker=${lat}%2C${long}&layer=mapnik`;
-
-  return <iframe loading="lazy" title="Open Street Map" width="100%" height="100%" src={src}></iframe>;
-};
-
-export default Map;

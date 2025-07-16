@@ -1,18 +1,23 @@
 import React, { Fragment, useMemo, useRef } from 'react';
 import type { Fixture } from '@ubilabs/react-geosuggest';
 import Geosuggest from '@ubilabs/react-geosuggest';
-import { get, isNil, omitBy } from 'lodash';
+import { get, isNil, omitBy, pick } from 'lodash';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { cn } from '@/lib/utils';
 
+import I18nAddressFields, { NewSimpleLocationFieldRenderer } from '@/components/I18nAddressFields';
+import I18nFormatters from '@/components/I18nFormatters';
+
+import InputCountry from '../InputCountry';
 import MessageBox from '../MessageBox';
 
 import { Button } from './Button';
 import { BASE_INPUT_CLASS, Input } from './Input';
 import { Label } from './Label';
 import { Location } from './Location';
+import { Textarea } from './Textarea';
 
 const removeCountryFromAddress = address => address.split(', ').slice(0, -1).join(', ');
 
@@ -153,6 +158,88 @@ const LocationInput = ({ value, onChange, placeholder }) => {
             <Location location={value} />
           )}
         </Fragment>
+      )}
+    </div>
+  );
+};
+
+const DEFAULT_LOCATION = {
+  country: null,
+  address: null,
+  structured: null,
+};
+
+/**
+ * A component to input a location. It tries to use the structured address if available,
+ * and fallbacks on the raw address if not.
+ */
+export const UserLocationInput = ({
+  location,
+  labelFontSize = undefined,
+  labelFontWeight = undefined,
+  onChange,
+  errors = undefined,
+  required = true,
+  onLoadSuccess = undefined,
+  useStructuredForFallback = false,
+}) => {
+  const [useFallback, setUseFallback] = React.useState(false);
+  const forceLegacyFormat = Boolean(!location?.structured && location?.address);
+  const hasCountry = Boolean(location?.country);
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <Label className="leading-normal">Country</Label>
+        <InputCountry
+          value={location?.country}
+          onChange={country => onChange(pick({ ...(location || DEFAULT_LOCATION), country }, ['country']))}
+        />
+      </div>
+      {hasCountry && !useFallback && !forceLegacyFormat ? (
+        <I18nAddressFields
+          selectedCountry={location?.country}
+          value={location?.structured || {}}
+          onLoadError={() => setUseFallback(true)} // TODO convert from structured to raw
+          onLoadSuccess={onLoadSuccess}
+          Component={NewSimpleLocationFieldRenderer}
+          fieldProps={{ labelFontSize, labelFontWeight }}
+          required={required}
+          prefix=""
+          errors={errors?.structured}
+          onCountryChange={structured =>
+            onChange(pick({ ...(location || DEFAULT_LOCATION), structured }, ['country', 'structured']))
+          }
+        />
+      ) : useFallback ? (
+        <MessageBox type="error" withIcon mt={2}>
+          <FormattedMessage
+            defaultMessage="Failed to load the structured address fields. Please reload the page or <SupportLink>contact support</SupportLink>."
+            id="5A4zUi"
+            values={I18nFormatters}
+          />
+        </MessageBox>
+      ) : (
+        <div className="flex flex-col gap-1">
+          <Label className="leading-normal">
+            <FormattedMessage id="collective.address.label" defaultMessage="Address" />
+          </Label>
+          <Textarea
+            value={location?.address}
+            onChange={e => {
+              const address = e.target.value;
+              if (!useStructuredForFallback) {
+                onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+              } else {
+                onChange(
+                  pick({ ...(location || DEFAULT_LOCATION), structured: { address1: address } }, [
+                    'country',
+                    'structured',
+                  ]),
+                );
+              }
+            }}
+          />
+        </div>
       )}
     </div>
   );

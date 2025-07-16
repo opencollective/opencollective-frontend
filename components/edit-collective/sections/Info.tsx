@@ -25,7 +25,7 @@ import { useModal } from '@/components/ModalContext';
 import RichTextEditor from '@/components/RichTextEditor';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/Command';
 import { InputGroup } from '@/components/ui/Input';
-import LocationInput from '@/components/ui/LocationInput';
+import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 
@@ -142,13 +142,13 @@ const formSchema = z.union([
     ...baseInfo.shape,
     startsAt: z.string().datetime({ local: true }).nullable().optional(),
     endsAt: z.string().datetime({ local: true }).nullable().optional(),
-    timezone: z.string().optional(),
-    privateInstrunctions: z.string().max(10000).optional(),
+    timezone: z.string().optional().nullable(),
+    privateInstrunctions: z.string().max(10000).optional().nullable(),
   }),
   z.object({
     type: z.literal(INDIVIDUAL),
     ...baseInfo.shape,
-    company: z.string().max(255).optional(),
+    company: z.string().max(255).optional().nullable(),
   }),
   z.object({
     type: z.enum([COLLECTIVE, FUND, PROJECT, ORGANIZATION]),
@@ -473,20 +473,30 @@ const Info = ({ account }) => {
                   </FormField>
                 </React.Fragment>
               )}
-              {account.type !== INDIVIDUAL && (
-                <FormField
-                  name="location"
-                  label={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
-                >
-                  {({ field }) => (
+              <FormField
+                name="location"
+                label={
+                  account.type !== INDIVIDUAL ? (
+                    <FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />
+                  ) : null
+                }
+              >
+                {({ field }) =>
+                  account.type !== INDIVIDUAL ? (
                     <LocationInput
                       className="w-full"
                       {...field}
                       onChange={location => setFieldValue(field.name, location)}
                     />
-                  )}
-                </FormField>
-              )}
+                  ) : (
+                    <UserLocationInput
+                      {...field}
+                      location={field.value}
+                      onChange={location => setFieldValue(field.name, location)}
+                    />
+                  )
+                }
+              </FormField>
               {![EVENT, PROJECT].includes(account.type) && (
                 <FormField
                   name="currency"
@@ -571,7 +581,11 @@ const Info = ({ account }) => {
                   >
                     {({ field }) => (
                       <Select value={field.value} onValueChange={value => setFieldValue(field.name, value)}>
-                        <SelectTrigger id={field.name} className={cn('truncate', { 'border-red-500': field.error })}>
+                        <SelectTrigger
+                          id={field.name}
+                          data-cy="VAT"
+                          className={cn('truncate', { 'border-red-500': field.error })}
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -613,7 +627,7 @@ const Info = ({ account }) => {
                 />
               )}
               <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
-                <Button className="grow" type="submit" loading={submitting} disabled={!dirty}>
+                <Button data-cy="save" className="grow" type="submit" loading={submitting} disabled={!dirty}>
                   <FormattedMessage id="save" defaultMessage="Save" />
                 </Button>
               </div>
