@@ -17,6 +17,7 @@ import { AccountType, Currency } from '@/lib/graphql/types/v2/schema';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
+import { collectivePageQuery } from '@/components/collective-page/graphql/queries';
 import EditTags from '@/components/EditTags';
 import { FormField } from '@/components/FormField';
 import { FormikZod } from '@/components/FormikZod';
@@ -169,6 +170,7 @@ const Info = ({ account }) => {
   const { toast } = useToast();
   const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
     context: API_V2_CONTEXT,
+    refetchQueries: [{ query: collectivePageQuery, variables: { slug: account.slug } }],
   });
   const getInitialValues = useCallback(
     account => ({
