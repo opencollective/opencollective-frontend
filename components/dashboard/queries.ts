@@ -1,11 +1,13 @@
 import { gql } from '../../lib/graphql/helpers';
 
 import { accountNavbarFieldsFragment } from '../collective-navbar/fragments';
+import { editAccountFragment } from '../edit-collective/sections/Info';
 
 export const adminPanelQuery = gql`
   query Dashboard($slug: String!) {
     account(slug: $slug) {
       id
+      ...EditAccountFragment
       legacyId
       createdAt
       currency
@@ -125,4 +127,5 @@ export const adminPanelQuery = gql`
     }
   }
   ${accountNavbarFieldsFragment}
+  ${editAccountFragment}
 `;
