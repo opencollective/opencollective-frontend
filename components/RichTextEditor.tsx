@@ -85,7 +85,7 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     props.withBorders &&
     css({
       border: '1px solid',
-      borderColor: !props.error ? 'black.300' : 'red.300',
+      borderColor: !props.error ? 'oklch(92.9% 0.013 255.508)' : 'red.300',
       borderRadius: 10,
       padding: 3,
     })}
@@ -140,8 +140,7 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
         ? css`
             min-height: 0px;
             margin-bottom: 0;
-            box-shadow: 0px 4px 4px -5px #b7b7b7;
-            padding-bottom: 6px;
+            padding: 0 !important;
           `
         : css`
             box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
