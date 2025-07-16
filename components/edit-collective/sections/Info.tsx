@@ -591,14 +591,14 @@ const Info = ({ account }) => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value={null}>
+                          <SelectItem value={null} data-cy="select-option">
                             <FormattedMessage defaultMessage="Not subject to VAT" id="EditCollective.VAT.None" />
                           </SelectItem>
-                          <SelectItem value={VAT_OPTIONS.OWN}>
+                          <SelectItem value={VAT_OPTIONS.OWN} data-cy="select-option">
                             <FormattedMessage defaultMessage="Use my own VAT number" id="EditCollective.VAT.Own" />
                           </SelectItem>
                           {(!account.isHost || field.value === VAT_OPTIONS.HOST) && (
-                            <SelectItem value={VAT_OPTIONS.HOST}>
+                            <SelectItem value={VAT_OPTIONS.HOST} data-cy="select-option">
                               <FormattedMessage
                                 defaultMessage="Use the host VAT settings"
                                 id="EditCollective.VAT.Host"
