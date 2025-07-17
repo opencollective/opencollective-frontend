@@ -49,6 +49,7 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
     fromAccount,
     fetchHostForExpenses: true,
     hasAmountInCreatedByAccountCurrency: true, // To generate the `amountInCreatedByAccountCurrency` field below
+    fetchGrantHistory: false,
     ...queryFilter.variables,
     type: ExpenseType.GRANT,
   };
