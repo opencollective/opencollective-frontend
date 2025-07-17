@@ -1081,7 +1081,7 @@ function buildFormSchema(
         v => {
           if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
             const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
-            const payeeLegalName: string = options.payee?.legalName ?? '';
+            const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
             if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
               return !!v;
             }
