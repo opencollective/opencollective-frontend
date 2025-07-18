@@ -47,6 +47,7 @@ export const collectiveNavbarFieldsFragment = gqlV1 /* GraphQL */ `
     CONTACT_FORM
     RECEIVE_HOST_APPLICATIONS
     HOST_DASHBOARD
+    HOST_ACCOUNTS
     TRANSACTIONS
   }
 `;
