@@ -2537,6 +2537,7 @@ export type CollectiveFeatures = {
   EMAIL_NOTIFICATIONS_PANEL?: Maybe<CollectiveFeatureStatus>;
   EMIT_GIFT_CARDS?: Maybe<CollectiveFeatureStatus>;
   EVENTS?: Maybe<CollectiveFeatureStatus>;
+  HOST_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -5213,6 +5214,51 @@ export type ExpenseValuesByRole = {
 export type ExpenseValuesRoleDetails = {
   __typename?: 'ExpenseValuesRoleDetails';
   accountingCategory?: Maybe<AccountingCategory>;
+};
+
+export enum Feature {
+  ABOUT = 'ABOUT',
+  ALIPAY = 'ALIPAY',
+  ALL = 'ALL',
+  COLLECTIVE_GOALS = 'COLLECTIVE_GOALS',
+  CONNECTED_ACCOUNTS = 'CONNECTED_ACCOUNTS',
+  CONTACT_COLLECTIVE = 'CONTACT_COLLECTIVE',
+  CONTACT_FORM = 'CONTACT_FORM',
+  CONVERSATIONS = 'CONVERSATIONS',
+  CREATE_COLLECTIVE = 'CREATE_COLLECTIVE',
+  EMAIL_NOTIFICATIONS_PANEL = 'EMAIL_NOTIFICATIONS_PANEL',
+  EMIT_GIFT_CARDS = 'EMIT_GIFT_CARDS',
+  EVENTS = 'EVENTS',
+  HOST_ACCOUNTS = 'HOST_ACCOUNTS',
+  HOST_DASHBOARD = 'HOST_DASHBOARD',
+  MULTI_CURRENCY_EXPENSES = 'MULTI_CURRENCY_EXPENSES',
+  OFF_PLATFORM_TRANSACTIONS = 'OFF_PLATFORM_TRANSACTIONS',
+  ORDER = 'ORDER',
+  PAYPAL_DONATIONS = 'PAYPAL_DONATIONS',
+  PAYPAL_PAYOUTS = 'PAYPAL_PAYOUTS',
+  PROJECTS = 'PROJECTS',
+  RECEIVE_EXPENSES = 'RECEIVE_EXPENSES',
+  RECEIVE_FINANCIAL_CONTRIBUTIONS = 'RECEIVE_FINANCIAL_CONTRIBUTIONS',
+  RECEIVE_HOST_APPLICATIONS = 'RECEIVE_HOST_APPLICATIONS',
+  RECURRING_CONTRIBUTIONS = 'RECURRING_CONTRIBUTIONS',
+  REQUEST_VIRTUAL_CARDS = 'REQUEST_VIRTUAL_CARDS',
+  STRIPE_PAYMENT_INTENT = 'STRIPE_PAYMENT_INTENT',
+  TEAM = 'TEAM',
+  TOP_FINANCIAL_CONTRIBUTORS = 'TOP_FINANCIAL_CONTRIBUTORS',
+  TRANSACTIONS = 'TRANSACTIONS',
+  TRANSFERWISE = 'TRANSFERWISE',
+  UPDATES = 'UPDATES',
+  USE_EXPENSES = 'USE_EXPENSES',
+  USE_PAYMENT_METHODS = 'USE_PAYMENT_METHODS',
+  VIRTUAL_CARDS = 'VIRTUAL_CARDS'
+}
+
+/** Input type for toggling features on or off for an acccount */
+export type FeatureToggleInput = {
+  /** Feature to toggle. */
+  key: Feature;
+  /** Status to set the feature to. */
+  status: CollectiveFeatureStatus;
 };
 
 /** All supported expense types */
@@ -7940,6 +7986,8 @@ export type Mutation = {
   submitLegalDocument: LegalDocument;
   /** Manually request a sync for Plaid account */
   syncPlaidAccount: TransactionsImport;
+  /** Toggle a feature for an account. Scope: "account". */
+  toggleFeature: Account;
   /** Unfollows a given Collective. Scope: "account" */
   unfollowAccount: UnfollowAccountResult;
   /** Unpublish update. Scope: "updates". */
@@ -8204,6 +8252,7 @@ export type MutationCreateOrderArgs = {
 
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
+  activateBudget?: InputMaybe<Scalars['Boolean']['input']>;
   captcha?: InputMaybe<CaptchaInputType>;
   individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
@@ -8931,6 +8980,13 @@ export type MutationSubmitLegalDocumentArgs = {
 /** This is the root mutation */
 export type MutationSyncPlaidAccountArgs = {
   connectedAccount: ConnectedAccountReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationToggleFeatureArgs = {
+  account: AccountReferenceInput;
+  feature: FeatureToggleInput;
 };
 
 

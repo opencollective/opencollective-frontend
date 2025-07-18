@@ -22,6 +22,7 @@ export const accountNavbarFieldsFragment = gql`
     CONTACT_FORM
     RECEIVE_HOST_APPLICATIONS
     HOST_DASHBOARD
+    HOST_ACCOUNTS
     TRANSACTIONS
     REQUEST_VIRTUAL_CARDS
   }

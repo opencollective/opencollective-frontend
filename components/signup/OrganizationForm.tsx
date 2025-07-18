@@ -46,6 +46,7 @@ const createOrganizationMutation = gql`
       inviteMembers: $inviteMembers
       captcha: $captcha
       roleDescription: $roleDescription
+      activateBudget: true
     ) {
       id
       name
