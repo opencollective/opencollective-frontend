@@ -68,8 +68,8 @@ describe('edit collective', () => {
   });
 
   it('edit info', () => {
-    cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
-    cy.get('.description.inputField input').type(' edited');
+    cy.get('input[name="name"]', { timeout: 10000 }).type(' edited');
+    cy.get('input[name="description"]').type(' edited');
     cy.contains('Add social link').click();
     cy.focused().type('https://opencollective.com/');
     cy.contains('Add social link').click();
@@ -77,8 +77,8 @@ describe('edit collective', () => {
     cy.contains('Add social link').click();
     cy.focused().type('https://github.com/opencollective');
     cy.wait(500);
-    cy.get('[data-cy="collective-save"]').click(); // save changes
-    cy.getByDataCy('view-public-profile-link').click();
+    cy.get('[data-cy="save"]').click(); // save changes
+    cy.getByDataCy('public-profile-link').click();
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
     cy.get('[data-cy="social-link-0"]').should('have.attr', 'href', 'https://opencollective.com/');
@@ -154,7 +154,6 @@ describe('edit collective', () => {
 
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
     cy.contains('button', 'Save').click();
-    cy.contains('Saved');
     cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();

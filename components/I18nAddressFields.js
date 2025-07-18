@@ -1,9 +1,15 @@
 import React from 'react';
 import AddressFormatter from '@shopify/address';
 import { Field } from 'formik';
-import { cloneDeep, get, isEmpty, isNil, orderBy, pick, set, truncate } from 'lodash';
-import { useIntl } from 'react-intl';
+import { cloneDeep, get, isEmpty, isNil, orderBy, pick, pickBy, set, truncate } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import { isOCError } from '@/lib/errors';
+import { formatFormErrorMessage } from '@/lib/form-utils';
+
+import { Input } from './ui/Input';
+import { Label } from './ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
@@ -84,9 +90,19 @@ const buildZoneOption = zone => {
   return { value: zone.name, label: `${truncate(zone.name, { length: 30 })} - ${zone.code}` };
 };
 
-const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, ...props }) => {
-  const zones = info || [];
-  const zoneOptions = React.useMemo(() => orderBy(zones.map(buildZoneOption), 'label'), [zones]);
+const ZoneSelect = ({
+  info,
+  required,
+  value,
+  name,
+  label,
+  onChange,
+  id,
+  error,
+  useLegacyComponent = true,
+  ...props
+}) => {
+  const zoneOptions = React.useMemo(() => orderBy((info || []).map(buildZoneOption), 'label'), [info]);
 
   // Reset zone if not supported
   React.useEffect(() => {
@@ -98,21 +114,43 @@ const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, .
     }
   }, [zoneOptions]);
 
-  return (
-    <StyledSelect
-      {...{ name, required, ...props }}
-      inputId={id}
-      minWidth={150}
-      options={zoneOptions}
-      error={error}
-      placeholder={`Please select your ${label}`} // TODO i18n
-      data-cy={`address-${name}`} // TODO: Should not be locked on payee-address
-      value={zoneOptions.find(option => option?.value === value) || null}
-      onChange={v => {
-        onChange({ target: { name: name, value: v.value } });
-      }}
-    />
-  );
+  if (useLegacyComponent) {
+    return (
+      <StyledSelect
+        {...{ name, required, ...props }}
+        inputId={id}
+        minWidth={150}
+        options={zoneOptions}
+        error={error}
+        placeholder={`Please select your ${label}`} // TODO i18n
+        data-cy={`address-${name}`} // TODO: Should not be locked on payee-address
+        value={zoneOptions.find(option => option?.value === value) || null}
+        onChange={v => {
+          onChange({ target: { name: name, value: v.value } });
+        }}
+      />
+    );
+  } else {
+    return (
+      <Select
+        onValueChange={v => {
+          onChange({ target: { name: name, value: v } });
+        }}
+        value={value}
+      >
+        <SelectTrigger data-cy={`address-${name}`}>
+          <SelectValue placeholder={`Please select your ${label}`} />
+        </SelectTrigger>
+        <SelectContent className="relative max-h-80 max-w-full">
+          {zoneOptions.map(option => (
+            <SelectItem key={option.value} value={option.value} className="cursor-pointer">
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
 };
 
 const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
@@ -204,6 +242,67 @@ export const SimpleLocationFieldRenderer = ({
         }
       }}
     </StyledInputField>
+  );
+};
+
+export const NewSimpleLocationFieldRenderer = ({
+  name,
+  label,
+  error,
+  required,
+  prefix,
+  value,
+  info,
+  onChange,
+  fieldProps,
+}) => {
+  const [isTouched, setIsTouched] = React.useState(false);
+  const intl = useIntl();
+  const htmlFor = prefix ? `${prefix}.${name}` : name;
+  error = error || (required && isTouched && isNil(value) ? `${label} is required` : undefined);
+  const dispatchOnChange = e => {
+    onChange(e);
+    if (!isTouched) {
+      setIsTouched(true);
+    }
+  };
+  const fieldAttributes = {
+    ...pickBy(
+      {
+        ...fieldProps,
+        value: value,
+        name: name || htmlFor,
+        id: htmlFor,
+        required,
+        error,
+        info,
+        onChange: dispatchOnChange,
+      },
+      value => value !== undefined,
+    ),
+  };
+
+  return (
+    <div className={'flex w-full flex-col gap-1'}>
+      {label && (
+        <Label className="leading-normal">
+          {label}{' '}
+          {!required && (
+            <span className="font-normal text-muted-foreground">
+              (<FormattedMessage defaultMessage="optional" id="FormField.optional" />)
+            </span>
+          )}
+        </Label>
+      )}
+      {name === 'zone' ? (
+        <ZoneSelect {...fieldAttributes} useLegacyComponent={false} />
+      ) : (
+        <Input {...fieldAttributes} />
+      )}
+      {error && (
+        <p className="text-sm text-red-600">{isOCError(error) ? formatFormErrorMessage(intl, error) : error}</p>
+      )}
+    </div>
   );
 };
 

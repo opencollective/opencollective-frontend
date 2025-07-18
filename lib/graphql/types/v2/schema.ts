@@ -762,16 +762,35 @@ export enum AccountType {
 }
 
 export type AccountUpdateInput = {
+  company?: InputMaybe<Scalars['String']['input']>;
   currency?: InputMaybe<Currency>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** The Event end date and time */
+  endsAt?: InputMaybe<Scalars['DateTime']['input']>;
   /** The host fee percentage for this account. Must be between 0 and 100. */
   hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
+  legalName?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<LocationInput>;
+  longDescription?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Private instructions for the host to be sent to participating users. */
+  privateInstructions?: InputMaybe<Scalars['String']['input']>;
   /** Settings for the account. */
   settings?: InputMaybe<AccountUpdateSettingsInput>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  socialLinks?: InputMaybe<Array<SocialLinkInput>>;
+  /** The Event start date and time */
+  startsAt?: InputMaybe<Scalars['DateTime']['input']>;
+  tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin) */
+  timezone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AccountUpdateSettingsInput = {
+  GST?: InputMaybe<Scalars['JSON']['input']>;
+  VAT?: InputMaybe<Scalars['JSON']['input']>;
   /** Whether this host account is accepting fiscal sponsorship applications. */
   apply?: InputMaybe<Scalars['Boolean']['input']>;
   /** Message shown to users when applying to join this account. */
@@ -4102,6 +4121,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   platformFeePercent: Scalars['Float']['output'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** Private instructions for the host to be sent to participating users. */
+  privateInstructions?: Maybe<Scalars['String']['output']>;
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']['output']>;
   settings: Scalars['JSON']['output'];
@@ -6945,6 +6966,8 @@ export type Individual = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Company slugs the user is part of. */
+  company?: Maybe<Scalars['String']['output']>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributorProfiles: Array<Maybe<ContributorProfile>>;
