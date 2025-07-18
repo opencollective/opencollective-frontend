@@ -6372,6 +6372,7 @@ type CollectiveFeatures {
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
+  HOST_ACCOUNTS: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
   ALIPAY: CollectiveFeatureStatus
   STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
@@ -20921,6 +20922,21 @@ type Mutation {
   regenerateRecoveryCodes: [String!]
 
   """
+  Toggle a feature for an account. Scope: "account".
+  """
+  toggleFeature(
+    """
+    Account where the feature will be toggled
+    """
+    account: AccountReferenceInput!
+
+    """
+    Feature and status to toggle
+    """
+    feature: FeatureToggleInput!
+  ): Account!
+
+  """
   Edit an accounting category. Returns the account with the updated categories.
   """
   editAccountingCategories(
@@ -21898,6 +21914,11 @@ type Mutation {
     """
     roleDescription: String
     captcha: CaptchaInputType
+
+    """
+    If true, the budget will be activated upon creation, allowing the organization to receive contributions and pay for expenses. Defaults to false.
+    """
+    activateBudget: Boolean = false
   ): Organization
 
   """
@@ -23040,6 +23061,58 @@ input PoliciesContributorInfoThresholdsInput {
 
 type SendMessageResult {
   success: Boolean
+}
+
+"""
+Input type for toggling features on or off for an acccount
+"""
+input FeatureToggleInput {
+  """
+  Feature to toggle.
+  """
+  key: Feature!
+
+  """
+  Status to set the feature to.
+  """
+  status: CollectiveFeatureStatus!
+}
+
+enum Feature {
+  ALL
+  RECEIVE_FINANCIAL_CONTRIBUTIONS
+  RECURRING_CONTRIBUTIONS
+  TRANSACTIONS
+  EVENTS
+  PROJECTS
+  USE_EXPENSES
+  RECEIVE_EXPENSES
+  MULTI_CURRENCY_EXPENSES
+  RECEIVE_HOST_APPLICATIONS
+  COLLECTIVE_GOALS
+  TOP_FINANCIAL_CONTRIBUTORS
+  CONVERSATIONS
+  UPDATES
+  ABOUT
+  TEAM
+  ORDER
+  CONTACT_COLLECTIVE
+  CONTACT_FORM
+  CREATE_COLLECTIVE
+  TRANSFERWISE
+  PAYPAL_PAYOUTS
+  PAYPAL_DONATIONS
+  HOST_DASHBOARD
+  HOST_ACCOUNTS
+  CONNECTED_ACCOUNTS
+  ALIPAY
+  STRIPE_PAYMENT_INTENT
+  USE_PAYMENT_METHODS
+  EMIT_GIFT_CARDS
+  EMAIL_NOTIFICATIONS_PANEL
+  VIRTUAL_CARDS
+  REQUEST_VIRTUAL_CARDS
+  OFF_PLATFORM_TRANSACTIONS
 }
 
 """
