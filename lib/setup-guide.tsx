@@ -60,7 +60,7 @@ export const runChecks = ({
       {
         id: 'invite-admins',
         title: <FormattedMessage defaultMessage="Invite additional admins" id="SetupGuide.InviteAdmins" />,
-        completed: account.admins?.totalCount >= 2,
+        completed: account.admins?.totalCount >= 2 || account.adminInvites?.length > 0,
         description: (
           <FormattedMessage
             defaultMessage="We require there be at least two admins in the organizations. This guarantees that no one person holds exclusive access to the account. It also reduces the potential for fraudulent use of the account."
