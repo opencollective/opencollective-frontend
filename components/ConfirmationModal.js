@@ -40,6 +40,7 @@ export const CONFIRMATION_MODAL_TERMINATE = { __CONFIRMATION_MODAL_TERMINATE: tr
 /**
  * ConfirmationModal component. Uses `StyledModal` to create a reusable modal mainly for
  * confirmation purpose.
+ * @deprecated: Use `NewConfirmationModal` instead
  */
 const ConfirmationModal = ({
   header = undefined,

@@ -7,28 +7,26 @@ import AttachedFiles from '../attached-files/AttachedFiles';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import LinkCollective from '../LinkCollective';
-import { InfoList, InfoListItem } from '../ui/InfoList';
+import { DataList, DataListItem } from '../ui/DataList';
 
 type AgreementProps = {
   agreement: GraphQLAgreement;
   openFileViewer?: (url: string) => void;
 };
 
-export default function Agreement({ agreement, openFileViewer = undefined }: AgreementProps) {
+export default function AgreementDetails({ agreement, openFileViewer = undefined }: AgreementProps) {
   return (
     <div>
-      <h4 className="mb-4 text-lg font-medium text-slate-900">{agreement.title}</h4>
-      <InfoList className="sm:grid-cols-2">
+      <DataList className="gap-6">
         {agreement.attachment && (
-          <InfoListItem
-            title={<FormattedMessage defaultMessage="Agreement file" id="i22tK5" />}
+          <DataListItem
+            label={<FormattedMessage defaultMessage="Agreement file" id="i22tK5" />}
             value={<AttachedFiles files={[agreement.attachment]} size={128} openFileViewer={openFileViewer} />}
-            className="sm:col-span-2"
           />
         )}
 
-        <InfoListItem
-          title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
+        <DataListItem
+          label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
           value={
             <LinkCollective
               collective={agreement.account}
@@ -41,8 +39,8 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
           }
         />
 
-        <InfoListItem
-          title={<FormattedMessage id="Agreement.createdBy" defaultMessage="Created by" />}
+        <DataListItem
+          label={<FormattedMessage id="Agreement.createdBy" defaultMessage="Created by" />}
           value={
             <LinkCollective
               collective={agreement.createdBy}
@@ -55,12 +53,12 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
             </LinkCollective>
           }
         />
-        <InfoListItem
-          title={<FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />}
+        <DataListItem
+          label={<FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />}
           value={<DateTime value={agreement.createdAt} />}
         />
-        <InfoListItem
-          title={<FormattedMessage id="agreement.expiresOn" defaultMessage="Expires on" />}
+        <DataListItem
+          label={<FormattedMessage id="agreement.expiresOn" defaultMessage="Expires on" />}
           value={
             agreement.expiresAt ? (
               <DateTime value={agreement.expiresAt} />
@@ -72,13 +70,12 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
           }
         />
         {agreement.notes && (
-          <InfoListItem
-            className="sm:col-span-2"
-            title={<FormattedMessage id="expense.notes" defaultMessage="Notes" />}
+          <DataListItem
+            label={<FormattedMessage id="expense.notes" defaultMessage="Notes" />}
             value={<p className="whitespace-pre-line">{agreement.notes}</p>}
           />
         )}
-      </InfoList>
+      </DataList>
     </div>
   );
 }
