@@ -256,10 +256,10 @@
     "globals": "^16.0.0",
     "html-loader": "^5.0.0",
     "husky": "^4.3.8",
-    "jest": "^29.7.0",
+    "jest": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.5",
     "jest-styled-components": "^7.2.0",
     "jsdoc-api": "^9.0.0",
-    "jsdom": "^26.0.0",
     "lint-staged": "^16.0.0",
     "markdown-loader": "^8.0.0",
     "mkdirp": "^3.0.1",
@@ -313,7 +313,8 @@
       "pdfjs-dist",
       "@typescript-eslint/eslint-plugin",
       "eslint-import-resolver-typescript",
-      "typescript-eslint"
+      "typescript-eslint",
+      "jest-environment-jsdom"
     ]
   }
 }
