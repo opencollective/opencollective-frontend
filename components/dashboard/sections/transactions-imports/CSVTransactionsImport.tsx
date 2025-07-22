@@ -689,6 +689,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
       />
       {hasSettingsModal && (
         <TransactionsImportSettingsModal
+          hostId={importData.account.id}
           transactionsImport={importData as typeof importData & Required<Pick<typeof importData, 'account'>>} // Account is nullable because of the @skip(fetchOnlyRowIds) directive
           onOpenChange={setHasSettingsModal}
           hasRequestedSync={hasRequestedSync}

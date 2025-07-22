@@ -9,6 +9,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
+import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
 
 import DateTime from '@/components/DateTime';
 
@@ -60,6 +61,7 @@ const deleteConnectedAccountMutation = gql`
 `;
 
 export default function TransactionsImportSettingsModal({
+  hostId,
   transactionsImport,
   plaidStatus,
   onOpenChange,
@@ -70,6 +72,7 @@ export default function TransactionsImportSettingsModal({
   onDelete,
   onArchived,
 }: {
+  hostId: string;
   onOpenChange: (isOpen: boolean) => void;
   onDelete: () => void;
   onArchived?: () => void;
@@ -80,7 +83,7 @@ export default function TransactionsImportSettingsModal({
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
   transactionsImport: Pick<
     TransactionsImport,
-    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts'
+    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts' | 'institutionId'
   > &
     React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
       connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
@@ -90,6 +93,7 @@ export default function TransactionsImportSettingsModal({
   const intl = useIntl();
   const mutationParams = { context: API_V2_CONTEXT };
   const apolloClient = useApolloClient();
+  const { redirectToGoCardlessConnect, isRedirecting } = useRedirectToGoCardlessConnect();
   const [editTransactionsImport] = useMutation(editTransactionsImportMutation, mutationParams);
   const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(
     deleteConnectedAccountMutation,
@@ -283,6 +287,39 @@ export default function TransactionsImportSettingsModal({
                     size="default"
                     className="w-full"
                   />
+                </CardContent>
+              </Card>
+            )}
+            {transactionsImport.type === 'GOCARDLESS' && transactionsImport.connectedAccount && (
+              <Card className="mb-4 p-0 shadow-xs">
+                <CardContent className="py-6">
+                  <h3 className="mb-2 text-sm font-medium">
+                    <FormattedMessage defaultMessage="Reconnect" id="collective.connectedAccounts.reconnect.button" />
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="If the synchronization stopped working, you can reconnect the bank account."
+                      id="ZMw3dZ"
+                    />
+                  </p>
+                  <Button
+                    loading={isRedirecting}
+                    onClick={async () => {
+                      try {
+                        await redirectToGoCardlessConnect(hostId, transactionsImport.institutionId, {
+                          locale: intl.locale ?? 'en',
+                          transactionImportId: transactionsImport.id,
+                        });
+                      } catch (e) {
+                        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+                      }
+                    }}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Plug size={16} />
+                    <FormattedMessage defaultMessage="Reconnect" id="collective.connectedAccounts.reconnect.button" />
+                  </Button>
                 </CardContent>
               </Card>
             )}
