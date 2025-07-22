@@ -86,7 +86,8 @@ const offPlatformTransactionsQuery = gql`
           ...AccountingCategoryFields
         }
       }
-      transactionsImports(status: ACTIVE, limit: 100) @skip(if: $fetchOnlyRowIds) {
+      transactionsImports(status: ACTIVE, type: [PLAID, GOCARDLESS], limit: 100) @skip(if: $fetchOnlyRowIds) {
+        totalCount
         nodes {
           id
           source
@@ -384,12 +385,12 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
       <div className="flex items-center justify-between">
         <DashboardHeader
           className="mb-6"
-          title={intl.formatMessage({ defaultMessage: 'Off-platform Transactions', id: 'MlrieI' })}
+          title={intl.formatMessage({ defaultMessage: 'Bank Account Synchronization', id: 'R9kjJI' })}
           titleRoute={`/dashboard/${accountSlug}/off-platform-transactions`}
           description={
             <FormattedMessage
-              defaultMessage="Platform transactions imported from <Link>connected sources.</Link>"
-              id="MFxlzT"
+              defaultMessage="Transactions imported from <Link>connected bank accounts</Link>."
+              id="slHtsr"
               values={{
                 Link: getI18nLink({
                   as: Link,
@@ -496,9 +497,25 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     setFocus({ rowId: row.original.id });
                   }
                 }}
-                emptyMessage={() => (
-                  <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
-                )}
+                emptyMessage={() => {
+                  if (host.transactionsImports.totalCount === 0) {
+                    return (
+                      <FormattedMessage
+                        defaultMessage="No bank accounts connected. Go to the <Link>connected bank accounts</Link> to setup your first connection."
+                        id="ihLQxw"
+                        values={{
+                          Link: getI18nLink({
+                            as: Link,
+                            href: `/dashboard/${accountSlug}/off-platform-connections`,
+                            textDecoration: 'underline',
+                          }),
+                        }}
+                      />
+                    );
+                  } else {
+                    return <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />;
+                  }
+                }}
                 columns={[
                   {
                     id: 'select',
