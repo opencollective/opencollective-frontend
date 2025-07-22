@@ -122,7 +122,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   return (
     <div>
       <DashboardHeader
-        title="Off-Platform Connections"
+        title={<FormattedMessage defaultMessage="Connected Bank Accounts" id="qPhmMo" />}
         className="mb-6"
         description={
           <FormattedMessage
@@ -207,7 +207,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                           <EllipsisVertical size={16} />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="min-w-[240px]" align="end">
+                      <DropdownMenuContent className="min-w-[180px]" align="end">
                         <DropdownMenuItem onClick={() => setSelectedImport(row.original)}>
                           <Settings size={16} />
                           <FormattedMessage defaultMessage="Settings" id="Settings" />
@@ -217,7 +217,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                             href={`/dashboard/${accountSlug}/off-platform-transactions?importIds=${row.original.id}`}
                           >
                             <ArrowRightLeftIcon size={16} />
-                            <FormattedMessage defaultMessage="View off-platform transactions" id="iqPSC0" />
+                            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
                           </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

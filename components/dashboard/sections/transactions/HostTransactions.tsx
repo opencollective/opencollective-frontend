@@ -194,7 +194,7 @@ const HostTransactions = props => {
             <div>
               This page has moved, please go to the new{' '}
               <Link className="text-blue-600 underline" href={getOffPlatformTransactionsRoute(props.accountSlug)}>
-                Off-platform Transactions tool
+                Bank Account Sync tool
               </Link>{' '}
               to continue.
             </div>

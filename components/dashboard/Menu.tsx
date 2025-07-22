@@ -361,7 +361,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
-          label: intl.formatMessage({ defaultMessage: 'Off-platform Transactions', id: 'MlrieI' }),
+          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
           if: isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
         },
         {
