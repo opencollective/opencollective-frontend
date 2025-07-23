@@ -33,8 +33,8 @@ import { Separator } from '../../../ui/Separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/Tabs';
 import { useToast } from '../../../ui/useToast';
 
-import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
 import { TransactionsImportAssignmentsForm } from './TransactionsImportAssignmentsForm';
+import { TransactionsImportForceSyncButton } from './TransactionsImportForceSyncButton';
 
 const deleteTransactionsImportMutation = gql`
   mutation DeleteTransactionsImport($id: NonEmptyString!) {
@@ -226,7 +226,7 @@ export default function TransactionsImportSettingsModal({
           <TabsContent value="advanced">
             {transactionsImport.type === 'PLAID' && transactionsImport.connectedAccount && (
               <Card className="mb-4 p-0 shadow-xs">
-                <CardContent className="pt-6">
+                <CardContent className="py-6">
                   <h3 className="mb-2 text-sm font-medium">
                     <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />
                   </h3>
@@ -279,10 +279,10 @@ export default function TransactionsImportSettingsModal({
                     />
                   </p>
 
-                  <SyncPlaidAccountButton
+                  <TransactionsImportForceSyncButton
                     hasRequestedSync={hasRequestedSync}
                     setHasRequestedSync={setHasRequestedSync}
-                    connectedAccountId={transactionsImport.connectedAccount.id}
+                    transactionImportId={transactionsImport.id}
                     isSyncing={transactionsImport.isSyncing}
                     size="default"
                     className="w-full"
@@ -294,7 +294,7 @@ export default function TransactionsImportSettingsModal({
               <Card className="mb-4 p-0 shadow-xs">
                 <CardContent className="py-6">
                   <h3 className="mb-2 text-sm font-medium">
-                    <FormattedMessage defaultMessage="Reconnect" id="collective.connectedAccounts.reconnect.button" />
+                    <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />
                   </h3>
                   <p className="mb-4 text-sm text-muted-foreground">
                     <FormattedMessage
@@ -320,6 +320,42 @@ export default function TransactionsImportSettingsModal({
                     <Plug size={16} />
                     <FormattedMessage defaultMessage="Reconnect" id="collective.connectedAccounts.reconnect.button" />
                   </Button>
+                  <Separator className="my-4" />
+                  <h3 className="mb-2 text-sm font-medium">
+                    <FormattedMessage defaultMessage="Force synchronization" id="w4ZT18" />
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      id="withColon"
+                      defaultMessage="{item}:"
+                      values={{
+                        item: <FormattedMessage defaultMessage="Last sync" id="transactions.import.lastSync" />,
+                      }}
+                    />{' '}
+                    {transactionsImport.lastSyncAt ? (
+                      <span className="underline decoration-dotted underline-offset-2">
+                        <DateTime value={transactionsImport.lastSyncAt} timeStyle="short" />
+                      </span>
+                    ) : (
+                      <FormattedMessage defaultMessage="Never" id="du1laW" />
+                    )}
+                    .
+                  </p>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="The synchronization is automatic and happens up to 4 times per day. You can manually request a sync at any time using the button below."
+                      id="fRDMf8"
+                    />
+                  </p>
+
+                  <TransactionsImportForceSyncButton
+                    hasRequestedSync={hasRequestedSync}
+                    setHasRequestedSync={setHasRequestedSync}
+                    transactionImportId={transactionsImport.id}
+                    isSyncing={transactionsImport.isSyncing}
+                    size="default"
+                    className="w-full"
+                  />
                 </CardContent>
               </Card>
             )}
