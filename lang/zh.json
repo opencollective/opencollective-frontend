@@ -1008,6 +1008,7 @@
   "ContributionType.TierPassed": "过往等级",
   "Contributor": "贡献者",
   "Contributors": "贡献者",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "所有贡献者",
   "ContributorsFilter.Financial": "财政贡献者",
   "Conversation.created": "会话被创建",

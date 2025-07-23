@@ -1008,6 +1008,7 @@
   "ContributionType.TierPassed": "Nível anterior",
   "Contributor": "Contribuidor",
   "Contributors": "Contribuidores",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Todos os colaboradores",
   "ContributorsFilter.Financial": "Colaboradores financeiros",
   "Conversation.created": "Conversa criada",

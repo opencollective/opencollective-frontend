@@ -1008,6 +1008,7 @@
   "ContributionType.TierPassed": "Past tier",
   "Contributor": "Contributor",
   "Contributors": "Contributors",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Tots els col·laboradors",
   "ContributorsFilter.Financial": "Col·laboradors financers",
   "Conversation.created": "Conversation created",

@@ -1008,6 +1008,7 @@
   "ContributionType.TierPassed": "Minulá úroveň",
   "Contributor": "Prispievateľ",
   "Contributors": "Prispievatelia",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Všetci prispievatelia",
   "ContributorsFilter.Financial": "Finanční prispievatelia",
   "Conversation.created": "Konverzácia bola vytvorená",

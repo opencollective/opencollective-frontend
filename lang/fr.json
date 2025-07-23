@@ -1008,6 +1008,7 @@
   "ContributionType.TierPassed": "Ancienne contribution",
   "Contributor": "Contributeur",
   "Contributors": "Contributeurs",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Tous les contributeurs",
   "ContributorsFilter.Financial": "Contributeurs financiers",
   "Conversation.created": "Conversation créée",
