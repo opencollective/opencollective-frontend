@@ -7498,6 +7498,11 @@ type TransactionsImport {
   plaidAccounts: [PlaidAccount] @deprecated(reason: "2025-07-02: Please use the generic accounts field instead.")
 
   """
+  Institution ID (for Gocardless only)
+  """
+  institutionId: String
+
+  """
   List of available accounts for the import
   """
   institutionAccounts: [TransactionsImportAccount]
@@ -22106,6 +22111,11 @@ type Mutation {
     The name of the account. Will be inferred if not provided.
     """
     name: String
+
+    """
+    If re-connecting an existing account, the transactions import to reconnect
+    """
+    transactionImport: TransactionsImportReferenceInput
   ): GoCardlessConnectAccountResponse!
 
   """

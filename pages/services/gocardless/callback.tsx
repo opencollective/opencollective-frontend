@@ -19,8 +19,12 @@ import * as SyncAnimation from '../../../public/static/animations/sync-bank-oc.j
 
 // GraphQL mutation for connecting GoCardless account
 const connectGoCardlessAccountMutation = gql`
-  mutation ConnectGoCardlessAccount($requisitionId: String!, $host: AccountReferenceInput!) {
-    connectGoCardlessAccount(requisitionId: $requisitionId, host: $host) {
+  mutation ConnectGoCardlessAccount(
+    $requisitionId: String!
+    $host: AccountReferenceInput!
+    $transactionImport: TransactionsImportReferenceInput
+  ) {
+    connectGoCardlessAccount(requisitionId: $requisitionId, host: $host, transactionImport: $transactionImport) {
       connectedAccount {
         id
         service
@@ -47,6 +51,7 @@ const getWindowData = () => {
       return {
         requisitionId: gocardlessData.requisitionId,
         hostId: gocardlessData.hostId,
+        transactionImportId: gocardlessData.transactionImportId,
       };
     } catch {
       return {};
@@ -75,6 +80,7 @@ const GoCardlessOAuthCallbackPage = () => {
           variables: {
             requisitionId: windowData.requisitionId,
             host: { id: windowData.hostId },
+            ...(!windowData.transactionImportId ? {} : { transactionImport: { id: windowData.transactionImportId } }),
           },
         });
 

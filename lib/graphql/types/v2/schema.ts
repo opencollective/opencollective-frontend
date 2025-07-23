@@ -8094,6 +8094,7 @@ export type MutationConnectGoCardlessAccountArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   requisitionId: Scalars['String']['input'];
   sourceName?: InputMaybe<Scalars['String']['input']>;
+  transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
 };
 
 
@@ -12349,6 +12350,8 @@ export type TransactionsImport = {
   id: Scalars['String']['output'];
   /** List of available accounts for the import */
   institutionAccounts?: Maybe<Array<Maybe<TransactionsImportAccount>>>;
+  /** Institution ID (for Gocardless only) */
+  institutionId?: Maybe<Scalars['String']['output']>;
   /** Whether the import is currently syncing */
   isSyncing: Scalars['Boolean']['output'];
   /** When the import was last synced */

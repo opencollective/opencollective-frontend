@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { ArrowLeft, Building2, ExternalLink, Globe, Loader2, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,8 +12,8 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import type { OffPlatformTransactionsInstitution } from '@/lib/graphql/types/v2/schema';
 import { OffPlatformTransactionsProvider } from '@/lib/graphql/types/v2/schema';
+import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
 import { i18nCountryName } from '@/lib/i18n';
-import { LOCAL_STORAGE_KEYS, setLocalStorage } from '@/lib/local-storage';
 import { cn } from '@/lib/utils';
 
 import { WebsiteName } from '@/components/I18nFormatters';
@@ -72,17 +72,6 @@ const offPlatformTransactionsInstitutionsQuery = gql`
       supportedCountries
       maxAccessValidForDays
       transactionTotalDays
-    }
-  }
-`;
-
-const generateGoCardlessLinkMutation = gql`
-  mutation GenerateGoCardlessLink($input: GoCardlessLinkInput!, $host: AccountReferenceInput!) {
-    generateGoCardlessLink(input: $input, host: $host) {
-      id
-      institutionId
-      link
-      redirect
     }
   }
 `;
@@ -594,10 +583,7 @@ export const NewOffPlatformTransactionsConnection = ({
   const [isConnecting, setIsConnecting] = React.useState(false);
   const { toast } = useToast();
   const intl = useIntl();
-
-  const [generateGoCardlessLink, { loading: isGeneratingLink }] = useMutation(generateGoCardlessLinkMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const { redirectToGoCardlessConnect, isRedirecting } = useRedirectToGoCardlessConnect();
 
   const handleRegionSelect = (region: Region) => {
     setSelectedRegion(region);
@@ -628,34 +614,7 @@ export const NewOffPlatformTransactionsConnection = ({
     setIsConnecting(true);
 
     try {
-      const result = await generateGoCardlessLink({
-        variables: {
-          host: {
-            id: hostId,
-          },
-          input: {
-            institutionId: selectedInstitution.id,
-            userLanguage: intl.locale ?? 'en',
-            accountSelection: true,
-          },
-        },
-      });
-
-      const link = result.data?.generateGoCardlessLink?.link;
-      if (link) {
-        // Redirect to the GoCardless authorization page
-        setLocalStorage(
-          LOCAL_STORAGE_KEYS.GOCARDLESS_DATA,
-          JSON.stringify({
-            date: new Date().toISOString(),
-            hostId,
-            requisitionId: result.data?.generateGoCardlessLink?.id,
-          }),
-        );
-        window.location.href = link;
-      } else {
-        throw new Error('No link received from GoCardless');
-      }
+      await redirectToGoCardlessConnect(hostId, selectedInstitution.id, { locale: intl.locale ?? 'en' });
     } catch (error) {
       toast({
         variant: 'error',
@@ -724,7 +683,7 @@ export const NewOffPlatformTransactionsConnection = ({
             selectedInstitution={selectedInstitution!}
             onBack={handleBack}
             onConfirm={handleConnectionConfirm}
-            isConnecting={isConnecting || isGeneratingLink}
+            isConnecting={isConnecting || isRedirecting}
           />
         );
       default:

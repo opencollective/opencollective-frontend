@@ -232,6 +232,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
       )}
       {selectedImport && (
         <TransactionsImportSettingsModal
+          hostId={data.host.id}
           transactionsImport={selectedImport}
           onOpenChange={() => setSelectedImport(null)}
           plaidStatus={plaidConnectDialog.status}
@@ -250,8 +251,20 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               return newSet;
             });
           }}
-          onDelete={() => setSelectedImport(null)}
-          onArchived={() => setSelectedImport(null)}
+          onDelete={() => {
+            setSelectedImport(null);
+            toast({
+              variant: 'success',
+              title: intl.formatMessage({ defaultMessage: 'Connection deleted', id: 'BOy+bE' }),
+            });
+          }}
+          onArchived={() => {
+            setSelectedImport(null);
+            toast({
+              variant: 'success',
+              title: intl.formatMessage({ defaultMessage: 'Connection archived', id: 'jZM4f3' }),
+            });
+          }}
         />
       )}
       {showNewConnectionDialog && (

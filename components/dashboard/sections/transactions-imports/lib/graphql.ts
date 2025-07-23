@@ -39,6 +39,7 @@ export const TransactionImportListFieldsFragment = gql`
     updatedAt
     lastSyncAt
     isSyncing
+    institutionId
     institutionAccounts {
       id
       name
