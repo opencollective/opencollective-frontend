@@ -22359,6 +22359,16 @@ type Mutation {
   ): Transaction!
 
   """
+  Manually request a sync for a transactions import (works for both Plaid and GoCardless)
+  """
+  syncTransactionsImport(
+    """
+    The transactions import to sync
+    """
+    transactionImport: TransactionsImportReferenceInput!
+  ): TransactionsImport!
+
+  """
   Create a new import. To manually add transactions to it, use `importTransactions`.
   """
   createTransactionsImport(

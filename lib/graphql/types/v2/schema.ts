@@ -7940,6 +7940,8 @@ export type Mutation = {
   submitLegalDocument: LegalDocument;
   /** Manually request a sync for Plaid account */
   syncPlaidAccount: TransactionsImport;
+  /** Manually request a sync for a transactions import (works for both Plaid and GoCardless) */
+  syncTransactionsImport: TransactionsImport;
   /** Unfollows a given Collective. Scope: "account" */
   unfollowAccount: UnfollowAccountResult;
   /** Unpublish update. Scope: "updates". */
@@ -8932,6 +8934,12 @@ export type MutationSubmitLegalDocumentArgs = {
 /** This is the root mutation */
 export type MutationSyncPlaidAccountArgs = {
   connectedAccount: ConnectedAccountReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationSyncTransactionsImportArgs = {
+  transactionImport: TransactionsImportReferenceInput;
 };
 
 

@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { LoaderCircle } from 'lucide-react';
 
 import { mergeRefs } from '../../lib/react-utils';
 import { cn } from '../../lib/utils';
-
-import StyledSpinner from '../StyledSpinner';
 
 const buttonVariants = cva(
   'relative inline-flex items-center justify-center gap-1 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50',
@@ -65,7 +64,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }, [loading]);
     const realChildren = loading ? (
       <span>
-        <StyledSpinner size={16} />
+        <LoaderCircle className="animate-spin duration-1500" size={16} />
       </span>
     ) : (
       children
