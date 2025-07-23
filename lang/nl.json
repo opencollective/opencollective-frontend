@@ -1009,6 +1009,7 @@
   "ContributionType.TierPassed": "Niveau afgelopen",
   "Contributor": "Bijdrager",
   "Contributors": "Bijdragers",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Alle bijdragers",
   "ContributorsFilter.Financial": "Financiële bijdragers",
   "Conversation.created": "Gesprek aangemaakt",

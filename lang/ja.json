@@ -1009,6 +1009,7 @@
   "ContributionType.TierPassed": "過去のTier",
   "Contributor": "Contributor",
   "Contributors": "Contributors",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "すべてのコントリビューター",
   "ContributorsFilter.Financial": "財政コントリビューター",
   "Conversation.created": "会話を作成しました",

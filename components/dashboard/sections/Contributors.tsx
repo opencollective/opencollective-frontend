@@ -56,6 +56,32 @@ const memberRoleFilter: FilterConfig<z.infer<typeof MemberRoleSchema>> = {
   },
 };
 
+const TierReferenceSchema = z.union([z.coerce.number(), z.literal('__NO_TIER__')]).optional();
+const tierFilter: FilterConfig<z.infer<typeof TierReferenceSchema>> = {
+  schema: TierReferenceSchema,
+  toVariables: value => {
+    if (!value) {
+      return {};
+    } else if (value === '__NO_TIER__') {
+      return { tier: null };
+    } else {
+      return { tier: { legacyId: value } };
+    }
+  },
+  filter: {
+    labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
+    Component: ({ meta, ...props }) => {
+      return <ComboSelectFilter options={meta.tierOptions} {...props} />;
+    },
+    valueRenderer: ({ value, meta }) => {
+      if (value === '__NO_TIER__') {
+        return meta.tierOptions?.find(tier => tier.value === '__NO_TIER__')?.label ?? 'No tier';
+      }
+      return meta.tierOptions?.find(tier => tier.value === value)?.label ?? value;
+    },
+  },
+};
+
 enum ContributorsTab {
   ALL = 'ALL',
   FOLLOWERS = 'FOLLOWERS',
@@ -81,6 +107,15 @@ const dashboardContributorsMetadataQuery = gql`
           slug
         }
       }
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            id
+            legacyId
+            name
+          }
+        }
+      }
       ALL: members(role: [BACKER, FOLLOWER]) {
         totalCount
       }
@@ -102,10 +137,11 @@ const dashboardContributorsQuery = gql`
     $role: [MemberRole!]
     $orderBy: ChronologicalOrderInput
     $email: EmailAddress
+    $tier: TierReferenceInput
   ) {
     account(slug: $slug) {
       id
-      members(role: $role, offset: $offset, limit: $limit, orderBy: $orderBy, email: $email) {
+      members(role: $role, offset: $offset, limit: $limit, orderBy: $orderBy, email: $email, tier: $tier) {
         totalCount
         nodes {
           id
@@ -235,6 +271,27 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     },
   ];
 
+  // Prepare tier options for the filter
+  const tierOptions = React.useMemo(() => {
+    const options = [];
+
+    // Add option for contributors without tiers
+    options.push({
+      label: <i>{intl.formatMessage({ defaultMessage: 'Default (no tier)', id: 'Contributors.NoTier' })}</i>,
+      value: '__NO_TIER__',
+      key: '__NO_TIER__',
+    });
+
+    // Add all available tiers
+    if (metadata?.account?.tiers?.nodes) {
+      metadata.account.tiers.nodes.forEach(tier => {
+        options.push({ label: tier.name, value: tier.legacyId, key: tier.id });
+      });
+    }
+
+    return options;
+  }, [metadata?.account?.tiers?.nodes, intl]);
+
   const queryFilter = useQueryFilter({
     schema: z.object({
       limit: integer.default(PAGE_SIZE),
@@ -242,16 +299,22 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
       role: memberRoleFilter.schema,
       orderBy: orderByFilter.schema,
       email: emailFilter.schema,
+      tierId: tierFilter.schema,
     }),
     views,
     toVariables: {
       orderBy: orderByFilter.toVariables,
       email: emailFilter.toVariables,
+      tierId: tierFilter.toVariables,
     },
     filters: {
       role: memberRoleFilter.filter,
       orderBy: orderByFilter.filter,
       email: emailFilter.filter,
+      tierId: tierFilter.filter,
+    },
+    meta: {
+      tierOptions,
     },
   });
 

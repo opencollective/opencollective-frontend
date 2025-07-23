@@ -1009,6 +1009,7 @@
   "ContributionType.TierPassed": "הדרגה הקודמת",
   "Contributor": "Contributor",
   "Contributors": "Contributors",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "כל התורמים",
   "ContributorsFilter.Financial": "תורמים כלכליים",
   "Conversation.created": "נוצר דיון",

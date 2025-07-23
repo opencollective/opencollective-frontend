@@ -1009,6 +1009,7 @@
   "ContributionType.TierPassed": "Прошлый уровень",
   "Contributor": "Вкладчик",
   "Contributors": "Вкладчики",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Все вкладчики",
   "ContributorsFilter.Financial": "Финансовые вкладчики",
   "Conversation.created": "Обсуждение создано",

@@ -1009,6 +1009,7 @@
   "ContributionType.TierPassed": "Letzte Stufe",
   "Contributor": "Mitwirkende(r)",
   "Contributors": "Unterstützende",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "Alle Unterstützer",
   "ContributorsFilter.Financial": "Finanzielle Unterstützer",
   "Conversation.created": "Unterhaltung erstellt",

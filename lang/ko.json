@@ -1009,6 +1009,7 @@
   "ContributionType.TierPassed": "이전 티어",
   "Contributor": "Contributor",
   "Contributors": "Contributors",
+  "Contributors.NoTier": "Default (no tier)",
   "ContributorsFilter.All": "모든 기여자",
   "ContributorsFilter.Financial": "재정 기여자",
   "Conversation.created": "Conversation created",

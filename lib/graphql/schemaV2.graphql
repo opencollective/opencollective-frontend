@@ -288,6 +288,11 @@ interface Account {
     """
     accountType: [AccountType]
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -1925,6 +1930,23 @@ enum OrderDirection {
   DESC
 }
 
+input TierReferenceInput {
+  """
+  The id assigned to the Tier
+  """
+  id: String
+
+  """
+  The DB id assigned to the Tier
+  """
+  legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
+}
+
 """
 An invitation to join the members of a collective
 """
@@ -2902,6 +2924,11 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -2979,6 +3006,11 @@ type Host implements Account & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -4971,23 +5003,6 @@ Account orders filter (INCOMING or OUTGOING)
 enum AccountOrdersFilter {
   INCOMING
   OUTGOING
-}
-
-input TierReferenceInput {
-  """
-  The id assigned to the Tier
-  """
-  id: String
-
-  """
-  The DB id assigned to the Tier
-  """
-  legacyId: Int
-
-  """
-  Pass this flag to reference the custom tier (/donate)
-  """
-  isCustom: Boolean
 }
 
 """
@@ -8612,6 +8627,11 @@ type Bot implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -8689,6 +8709,11 @@ type Bot implements Account {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -9555,6 +9580,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -9632,6 +9662,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -11049,6 +11084,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -11126,6 +11166,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -12261,6 +12306,11 @@ type Individual implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -12338,6 +12388,11 @@ type Individual implements Account {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -13451,6 +13506,11 @@ type Organization implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -13528,6 +13588,11 @@ type Organization implements Account & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -14507,6 +14572,11 @@ type Vendor implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -14584,6 +14654,11 @@ type Vendor implements Account & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -18320,6 +18395,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -18397,6 +18477,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -19410,6 +19495,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -19487,6 +19577,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
