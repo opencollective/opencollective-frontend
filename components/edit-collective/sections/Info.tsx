@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
@@ -12,12 +12,12 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import timezones from '@/lib/constants/timezones';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
-import type { AccountUpdateInput } from '@/lib/graphql/types/v2/schema';
+import type { Account, AccountUpdateInput } from '@/lib/graphql/types/v2/schema';
 import { AccountType, Currency } from '@/lib/graphql/types/v2/schema';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
-import { collectivePageQuery } from '@/components/collective-page/graphql/queries';
+import { collectivePageQuery, getCollectivePageQueryVariables } from '@/components/collective-page/graphql/queries';
 import EditTags from '@/components/EditTags';
 import { FormField } from '@/components/FormField';
 import { FormikZod } from '@/components/FormikZod';
@@ -28,6 +28,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
 import { Button } from '../../ui/Button';
@@ -36,7 +37,7 @@ import SocialLinksFormField from '../SocialLinksFormField';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, INDIVIDUAL } = AccountType;
 
-export const editAccountFragment = gql`
+const editAccountFragment = gql`
   fragment EditAccountFragment on Account {
     legacyId
     name
@@ -86,6 +87,15 @@ const editAccountMutation = gql`
   mutation EditAccount($account: AccountUpdateInput!) {
     editAccount(account: $account) {
       id
+      ...EditAccountFragment
+    }
+  }
+  ${editAccountFragment}
+`;
+
+const editAccountQuery = gql`
+  query EditAccount($id: String!) {
+    account(id: $id) {
       ...EditAccountFragment
     }
   }
@@ -159,7 +169,7 @@ const formSchema = z.union([
 
 type FormValuesSchema = z.infer<typeof formSchema>;
 
-const Info = ({ account }) => {
+const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 'slug'> }) => {
   const intl = useIntl();
   const { showConfirmationModal } = useModal();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
@@ -168,18 +178,29 @@ const Info = ({ account }) => {
   const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const { toast } = useToast();
+  const { data, loading } = useQuery(editAccountQuery, {
+    context: API_V2_CONTEXT,
+    variables: { id: accountFromParent.id },
+  });
   const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: collectivePageQuery, variables: { slug: account.slug } }],
+    refetchQueries: [
+      { query: collectivePageQuery, variables: getCollectivePageQueryVariables(accountFromParent.slug) },
+    ],
   });
-  const getInitialValues = useCallback(
-    account => ({
-      ...account,
-      privateInstructions: get(account, 'data.privateInstructions'),
-      endsAt: account.endsAt && dayjs(account.endsAt).format('YYYY-MM-DDTHH:mm:ss'),
-      startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
-    }),
-    [],
+
+  const account = data?.account;
+  const initialValues = useMemo(
+    () =>
+      !account
+        ? {}
+        : {
+            ...account,
+            privateInstructions: get(account, 'data.privateInstructions'),
+            endsAt: account.endsAt && dayjs(account.endsAt).format('YYYY-MM-DDTHH:mm:ss'),
+            startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
+          },
+    [account],
   );
 
   const currencyOptions = useMemo(
@@ -283,280 +304,185 @@ const Info = ({ account }) => {
     }
   };
 
-  const country = get(account, 'location.country') || get(account.host, 'location.country');
+  if (loading) {
+    return (
+      <div className="mt-6 flex flex-col gap-6">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
 
   return (
-    <React.Fragment>
-      <FormikZod<FormValuesSchema>
-        schema={formSchema}
-        onSubmit={onSubmit}
-        initialValues={getInitialValues(account)}
-        innerRef={formikRef}
-      >
-        {({ setFieldValue, values, dirty }) => {
-          const taxes = getApplicableTaxesForCountry(values.location?.country || country);
-          return (
-            <Form className="flex flex-col gap-4">
+    <FormikZod<FormValuesSchema>
+      schema={formSchema}
+      onSubmit={onSubmit}
+      initialValues={initialValues}
+      innerRef={formikRef}
+    >
+      {({ setFieldValue, values, dirty }) => {
+        const taxes = getApplicableTaxesForCountry(
+          values.location?.country || get(account, 'location.country') || get(account, 'host.location.country'),
+        );
+        return (
+          <Form className="flex flex-col gap-4">
+            <FormField
+              name="name"
+              label={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
+              placeholder={
+                account.type === INDIVIDUAL ? 'e.g. Miles, John, Ella' : 'e.g. OFiCo, Open Collective, Sentry'
+              }
+              hint={
+                <FormattedMessage
+                  defaultMessage="Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc."
+                  id="Fields.name.description"
+                />
+              }
+            />
+            {([ORGANIZATION, INDIVIDUAL].includes(account.type) || account.isHost) && (
               <FormField
-                name="name"
-                label={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
+                name="legalName"
+                label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                 placeholder={
-                  account.type === INDIVIDUAL ? 'e.g. Miles, John, Ella' : 'e.g. OFiCo, Open Collective, Sentry'
+                  account.type === INDIVIDUAL
+                    ? 'e.g. Miles Davis, John Coltrane, Ella Fitzgerald'
+                    : 'e.g. Open Finance Consortium Inc., Functional Software, Inc.'
                 }
                 hint={
                   <FormattedMessage
-                    defaultMessage="Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc."
-                    id="Fields.name.description"
+                    defaultMessage="Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins."
+                    id="editCollective.legalName.description"
                   />
                 }
               />
-              {([ORGANIZATION, INDIVIDUAL].includes(account.type) || account.isHost) && (
-                <FormField
-                  name="legalName"
-                  label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
+            )}
+            {account.type === INDIVIDUAL && (
+              <FormField
+                name="company"
+                label={<FormattedMessage id="collective.company.label" defaultMessage="Company" />}
+                hint={
+                  <FormattedMessage
+                    id="collective.company.description"
+                    defaultMessage="Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb."
+                  />
+                }
+              />
+            )}
+            {account.type !== EVENT && (
+              <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
+                {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
+              </FormField>
+            )}
+            <FormField
+              name="tags"
+              label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
+              hint={
+                <FormattedMessage
+                  defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+                  id="collective.tags.info"
+                />
+              }
+            >
+              {({ field }) => (
+                <EditTags
+                  {...field}
+                  onChange={entries =>
+                    setFieldValue(
+                      field.name,
+                      entries.map(e => e.value),
+                    )
+                  }
+                />
+              )}
+            </FormField>
+            <FormField
+              name="description"
+              label={<FormattedMessage defaultMessage="Short description" id="collective.description.label" />}
+            />
+            <FormField
+              name="longDescription"
+              label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
+            >
+              {({ field }) => (
+                <RichTextEditor
+                  kind="ACCOUNT_LONG_DESCRIPTION"
+                  {...field}
+                  withStickyToolbar
+                  toolbarOffsetY={0}
+                  defaultValue={field.value}
+                  onChange={e => setFieldValue('longDescription', e.target.value)}
+                  videoEmbedEnabled
+                  withBorders
                   placeholder={
-                    account.type === INDIVIDUAL
-                      ? 'e.g. Miles Davis, John Coltrane, Ella Fitzgerald'
-                      : 'e.g. Open Finance Consortium Inc., Functional Software, Inc.'
-                  }
-                  hint={
                     <FormattedMessage
-                      defaultMessage="Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins."
-                      id="editCollective.legalName.description"
+                      defaultMessage="Tell your story and explain your purpose."
+                      id="SectionAbout.Why"
                     />
                   }
                 />
               )}
-              {account.type === INDIVIDUAL && (
+            </FormField>
+            {account.type === EVENT && (
+              <React.Fragment>
                 <FormField
-                  name="company"
-                  label={<FormattedMessage id="collective.company.label" defaultMessage="Company" />}
+                  type="datetime-local"
+                  name="startsAt"
+                  label={<FormattedMessage defaultMessage="Start date" id="n5QvJy" />}
+                />
+                <FormField
+                  type="datetime-local"
+                  name="endsAt"
+                  label={<FormattedMessage defaultMessage="End date" id="Humfno" />}
+                  onChange={e => setFieldValue('endsAt', e.target.value === '' ? null : e.target.value)}
+                />
+                <FormField
+                  name="timezone"
+                  label={<FormattedMessage defaultMessage="Timezone" id="7nUCu9" />}
                   hint={
                     <FormattedMessage
-                      id="collective.company.description"
-                      defaultMessage="Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb."
+                      defaultMessage="The timezone of the event. This is used to display the start and end times in the correct timezone."
+                      id="collective.timezone.hint"
                     />
-                  }
-                />
-              )}
-              {account.type !== EVENT && (
-                <FormField name="slug" label={<FormattedMessage id="account.slug.label" defaultMessage="Handle" />}>
-                  {({ field }) => <InputGroup className="w-full" prepend="opencollective.com/" {...field} />}
-                </FormField>
-              )}
-              <FormField
-                name="tags"
-                label={<FormattedMessage defaultMessage="Tags" id="Tags" />}
-                hint={
-                  <FormattedMessage
-                    defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
-                    id="collective.tags.info"
-                  />
-                }
-              >
-                {({ field }) => (
-                  <EditTags
-                    {...field}
-                    onChange={entries =>
-                      setFieldValue(
-                        field.name,
-                        entries.map(e => e.value),
-                      )
-                    }
-                  />
-                )}
-              </FormField>
-              <FormField
-                name="description"
-                label={<FormattedMessage defaultMessage="Short description" id="collective.description.label" />}
-              />
-              <FormField
-                name="longDescription"
-                label={<FormattedMessage id="collective.about.title" defaultMessage="About" />}
-              >
-                {({ field }) => (
-                  <RichTextEditor
-                    kind="ACCOUNT_LONG_DESCRIPTION"
-                    {...field}
-                    withStickyToolbar
-                    toolbarOffsetY={0}
-                    defaultValue={field.value}
-                    onChange={e => setFieldValue('longDescription', e.target.value)}
-                    videoEmbedEnabled
-                    withBorders
-                    placeholder={
-                      <FormattedMessage
-                        defaultMessage="Tell your story and explain your purpose."
-                        id="SectionAbout.Why"
-                      />
-                    }
-                  />
-                )}
-              </FormField>
-              {account.type === EVENT && (
-                <React.Fragment>
-                  <FormField
-                    type="datetime-local"
-                    name="startsAt"
-                    label={<FormattedMessage defaultMessage="Start date" id="n5QvJy" />}
-                  />
-                  <FormField
-                    type="datetime-local"
-                    name="endsAt"
-                    label={<FormattedMessage defaultMessage="End date" id="Humfno" />}
-                    onChange={e => setFieldValue('endsAt', e.target.value === '' ? null : e.target.value)}
-                  />
-                  <FormField
-                    name="timezone"
-                    label={<FormattedMessage defaultMessage="Timezone" id="7nUCu9" />}
-                    hint={
-                      <FormattedMessage
-                        defaultMessage="The timezone of the event. This is used to display the start and end times in the correct timezone."
-                        id="collective.timezone.hint"
-                      />
-                    }
-                  >
-                    {({ field }) => (
-                      <Select
-                        value={field.value}
-                        open={showTimezoneSelect}
-                        onOpenChange={openTimezoneSelect}
-                        disabled={field.disabled}
-                      >
-                        <SelectTrigger
-                          className={cn(!field.value && 'text-muted-foreground')}
-                          data-cy="organization-timezone-trigger"
-                        >
-                          {field.value ? (
-                            timezoneOptions.find(option => option.value === field.value)?.label || field.value
-                          ) : (
-                            <FormattedMessage defaultMessage="Select timezone" id="collective.timezone.placeholder" />
-                          )}
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[50vh]">
-                          <Command>
-                            <CommandInput
-                              placeholder={intl.formatMessage({ defaultMessage: 'Search timezones...', id: 'VzPJtr' })}
-                              data-cy="organization-timezone-search"
-                              ref={timezoneInputRef}
-                            />
-                            <CommandList data-cy="organization-timezone-list">
-                              <CommandEmpty>
-                                <FormattedMessage defaultMessage="No timezone found." id="GTBZLL" />
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {timezoneOptions.map(({ value, label }) => (
-                                  <CommandItem
-                                    key={value}
-                                    data-cy={`organization-country-${value}`}
-                                    onSelect={() => {
-                                      setFieldValue(field.name, value as Currency);
-                                      setShowTimezoneSelect(false);
-                                    }}
-                                  >
-                                    <span>{label}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </FormField>
-                  <FormField
-                    name="privateInstructions"
-                    label={
-                      <FormattedMessage id="event.privateInstructions.label" defaultMessage="Private instructions" />
-                    }
-                    hint={
-                      <FormattedMessage
-                        id="event.privateInstructions.description"
-                        defaultMessage="These instructions will be provided by email to the participants."
-                      />
-                    }
-                  >
-                    {({ field }) => <Textarea maxLength={10000} className="min-h-20" {...field} />}
-                  </FormField>
-                </React.Fragment>
-              )}
-              <FormField
-                name="location"
-                label={
-                  account.type !== INDIVIDUAL ? (
-                    <FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />
-                  ) : null
-                }
-              >
-                {({ field }) =>
-                  account.type !== INDIVIDUAL ? (
-                    <LocationInput
-                      className="w-full"
-                      {...field}
-                      onChange={location => setFieldValue(field.name, location)}
-                    />
-                  ) : (
-                    <UserLocationInput
-                      {...field}
-                      location={field.value}
-                      onChange={location => setFieldValue(field.name, location)}
-                    />
-                  )
-                }
-              </FormField>
-              {![EVENT, PROJECT].includes(account.type) && (
-                <FormField
-                  name="currency"
-                  disabled={
-                    ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? true : false
-                  }
-                  label={<FormattedMessage id="Currency" defaultMessage="Currency" />}
-                  hint={
-                    ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? (
-                      <FormattedMessage
-                        id="collective.currency.warning"
-                        defaultMessage="Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue."
-                        values={{ SupportLink: I18nSupportLink }}
-                      />
-                    ) : null
                   }
                 >
                   {({ field }) => (
                     <Select
                       value={field.value}
-                      open={showCurrencySelect}
-                      onOpenChange={openCurrencySelect}
+                      open={showTimezoneSelect}
+                      onOpenChange={openTimezoneSelect}
                       disabled={field.disabled}
                     >
                       <SelectTrigger
                         className={cn(!field.value && 'text-muted-foreground')}
-                        data-cy="organization-currency-trigger"
+                        data-cy="organization-timezone-trigger"
                       >
                         {field.value ? (
-                          field.value
+                          timezoneOptions.find(option => option.value === field.value)?.label || field.value
                         ) : (
-                          <FormattedMessage defaultMessage="Select currency" id="collective.curency.placeholder" />
+                          <FormattedMessage defaultMessage="Select timezone" id="collective.timezone.placeholder" />
                         )}
                       </SelectTrigger>
                       <SelectContent className="max-h-[50vh]">
                         <Command>
                           <CommandInput
-                            placeholder={intl.formatMessage({ defaultMessage: 'Search currencies...', id: 'fDMc8k' })}
-                            data-cy="organization-currency-search"
-                            ref={currencyInputRef}
+                            placeholder={intl.formatMessage({ defaultMessage: 'Search timezones...', id: 'VzPJtr' })}
+                            data-cy="organization-timezone-search"
+                            ref={timezoneInputRef}
                           />
-                          <CommandList data-cy="organization-currency-list">
+                          <CommandList data-cy="organization-timezone-list">
                             <CommandEmpty>
-                              <FormattedMessage defaultMessage="No currency found." id="moOGSq" />
+                              <FormattedMessage defaultMessage="No timezone found." id="GTBZLL" />
                             </CommandEmpty>
                             <CommandGroup>
-                              {currencyOptions.map(({ value, label }) => (
+                              {timezoneOptions.map(({ value, label }) => (
                                 <CommandItem
                                   key={value}
                                   data-cy={`organization-country-${value}`}
                                   onSelect={() => {
                                     setFieldValue(field.name, value as Currency);
-                                    setShowCurrencySelect(false);
+                                    setShowTimezoneSelect(false);
                                   }}
                                 >
                                   <span>{label}</span>
@@ -569,80 +495,181 @@ const Info = ({ account }) => {
                     </Select>
                   )}
                 </FormField>
-              )}
-              <FormField name="socialLinks" label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}>
-                {({ field }) => (
-                  <SocialLinksFormField
-                    value={field.value || field.defaultValue}
-                    onChange={event => setFieldValue(field.name, event)}
-                    touched={field.formModified}
-                    useLegacyInput={false}
+                <FormField
+                  name="privateInstructions"
+                  label={
+                    <FormattedMessage id="event.privateInstructions.label" defaultMessage="Private instructions" />
+                  }
+                  hint={
+                    <FormattedMessage
+                      id="event.privateInstructions.description"
+                      defaultMessage="These instructions will be provided by email to the participants."
+                    />
+                  }
+                >
+                  {({ field }) => <Textarea maxLength={10000} className="min-h-20" {...field} />}
+                </FormField>
+              </React.Fragment>
+            )}
+            <FormField
+              name="location"
+              label={
+                account.type !== INDIVIDUAL ? (
+                  <FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />
+                ) : null
+              }
+            >
+              {({ field }) =>
+                account.type !== INDIVIDUAL ? (
+                  <LocationInput
+                    className="w-full"
+                    {...field}
+                    onChange={location => setFieldValue(field.name, location)}
                   />
+                ) : (
+                  <UserLocationInput
+                    {...field}
+                    location={field.value}
+                    onChange={location => setFieldValue(field.name, location)}
+                  />
+                )
+              }
+            </FormField>
+            {![EVENT, PROJECT].includes(account.type) && (
+              <FormField
+                name="currency"
+                disabled={
+                  ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? true : false
+                }
+                label={<FormattedMessage id="Currency" defaultMessage="Currency" />}
+                hint={
+                  ([COLLECTIVE, FUND].includes(account.type) && account.isActive) || account.isHost ? (
+                    <FormattedMessage
+                      id="collective.currency.warning"
+                      defaultMessage="Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue."
+                      values={{ SupportLink: I18nSupportLink }}
+                    />
+                  ) : null
+                }
+              >
+                {({ field }) => (
+                  <Select
+                    value={field.value}
+                    open={showCurrencySelect}
+                    onOpenChange={openCurrencySelect}
+                    disabled={field.disabled}
+                  >
+                    <SelectTrigger
+                      className={cn(!field.value && 'text-muted-foreground')}
+                      data-cy="organization-currency-trigger"
+                    >
+                      {field.value ? (
+                        field.value
+                      ) : (
+                        <FormattedMessage defaultMessage="Select currency" id="collective.curency.placeholder" />
+                      )}
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[50vh]">
+                      <Command>
+                        <CommandInput
+                          placeholder={intl.formatMessage({ defaultMessage: 'Search currencies...', id: 'fDMc8k' })}
+                          data-cy="organization-currency-search"
+                          ref={currencyInputRef}
+                        />
+                        <CommandList data-cy="organization-currency-list">
+                          <CommandEmpty>
+                            <FormattedMessage defaultMessage="No currency found." id="moOGSq" />
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {currencyOptions.map(({ value, label }) => (
+                              <CommandItem
+                                key={value}
+                                data-cy={`organization-country-${value}`}
+                                onSelect={() => {
+                                  setFieldValue(field.name, value as Currency);
+                                  setShowCurrencySelect(false);
+                                }}
+                              >
+                                <span>{label}</span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </SelectContent>
+                  </Select>
                 )}
               </FormField>
-              {taxes.includes(TaxType.VAT) && (
-                <React.Fragment>
-                  <FormField
-                    name="settings.VAT.type"
-                    label={<FormattedMessage defaultMessage="VAT settings" id="EditCollective.VAT" />}
-                  >
-                    {({ field }) => (
-                      <Select value={field.value} onValueChange={value => setFieldValue(field.name, value)}>
-                        <SelectTrigger
-                          id={field.name}
-                          data-cy="VAT"
-                          className={cn('truncate', { 'border-red-500': field.error })}
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={null} data-cy="select-option">
-                            <FormattedMessage defaultMessage="Not subject to VAT" id="EditCollective.VAT.None" />
-                          </SelectItem>
-                          <SelectItem value={VAT_OPTIONS.OWN} data-cy="select-option">
-                            <FormattedMessage defaultMessage="Use my own VAT number" id="EditCollective.VAT.Own" />
-                          </SelectItem>
-                          {(!account.isHost || field.value === VAT_OPTIONS.HOST) && (
-                            <SelectItem value={VAT_OPTIONS.HOST} data-cy="select-option">
-                              <FormattedMessage
-                                defaultMessage="Use the host VAT settings"
-                                id="EditCollective.VAT.Host"
-                              />
-                            </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </FormField>
-                  <FormField
-                    name="settings.VAT.number"
-                    label={<FormattedMessage defaultMessage="VAT number" id="EditCollective.VATNumber" />}
-                    hint={
-                      <FormattedMessage
-                        id="EditCollective.VATNumber.Description"
-                        defaultMessage="Your European Value Added Tax (VAT) number"
-                      />
-                    }
-                  />
-                </React.Fragment>
-              )}{' '}
-              {taxes.includes(TaxType.GST) && account.isHost && (
-                <FormField
-                  name="settings.GST.number"
-                  label={<FormattedMessage defaultMessage="GST number" id="EditCollective.GSTNumber" />}
-                  placeholder="9429037631147"
+            )}
+            <FormField name="socialLinks" label={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}>
+              {({ field }) => (
+                <SocialLinksFormField
+                  value={field.value || field.defaultValue}
+                  onChange={event => setFieldValue(field.name, event)}
+                  touched={field.formModified}
+                  useLegacyInput={false}
                 />
               )}
-              <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
-                <Button data-cy="save" className="grow" type="submit" loading={submitting} disabled={!dirty}>
-                  <FormattedMessage id="save" defaultMessage="Save" />
-                </Button>
-              </div>
-            </Form>
-          );
-        }}
-      </FormikZod>
-    </React.Fragment>
+            </FormField>
+            {taxes.includes(TaxType.VAT) && (
+              <React.Fragment>
+                <FormField
+                  name="settings.VAT.type"
+                  label={<FormattedMessage defaultMessage="VAT settings" id="EditCollective.VAT" />}
+                >
+                  {({ field }) => (
+                    <Select value={field.value} onValueChange={value => setFieldValue(field.name, value)}>
+                      <SelectTrigger
+                        id={field.name}
+                        data-cy="VAT"
+                        className={cn('truncate', { 'border-red-500': field.error })}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={null} data-cy="select-option">
+                          <FormattedMessage defaultMessage="Not subject to VAT" id="EditCollective.VAT.None" />
+                        </SelectItem>
+                        <SelectItem value={VAT_OPTIONS.OWN} data-cy="select-option">
+                          <FormattedMessage defaultMessage="Use my own VAT number" id="EditCollective.VAT.Own" />
+                        </SelectItem>
+                        {(!account.isHost || field.value === VAT_OPTIONS.HOST) && (
+                          <SelectItem value={VAT_OPTIONS.HOST} data-cy="select-option">
+                            <FormattedMessage defaultMessage="Use the host VAT settings" id="EditCollective.VAT.Host" />
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </FormField>
+                <FormField
+                  name="settings.VAT.number"
+                  label={<FormattedMessage defaultMessage="VAT number" id="EditCollective.VATNumber" />}
+                  hint={
+                    <FormattedMessage
+                      id="EditCollective.VATNumber.Description"
+                      defaultMessage="Your European Value Added Tax (VAT) number"
+                    />
+                  }
+                />
+              </React.Fragment>
+            )}{' '}
+            {taxes.includes(TaxType.GST) && account.isHost && (
+              <FormField
+                name="settings.GST.number"
+                label={<FormattedMessage defaultMessage="GST number" id="EditCollective.GSTNumber" />}
+                placeholder="9429037631147"
+              />
+            )}
+            <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
+              <Button data-cy="save" className="grow" type="submit" loading={submitting} disabled={!dirty}>
+                <FormattedMessage id="save" defaultMessage="Save" />
+              </Button>
+            </div>
+          </Form>
+        );
+      }}
+    </FormikZod>
   );
 };
 
