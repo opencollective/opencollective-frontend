@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { get, isEqual, isNil, isUndefined } from 'lodash';
+import { get, isEqual, isNil, isUndefined, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -39,6 +39,7 @@ const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, INDIVIDUAL } = AccountTy
 
 const editAccountFragment = gql`
   fragment EditAccountFragment on Account {
+    id
     legacyId
     name
     slug
@@ -96,6 +97,7 @@ const editAccountMutation = gql`
 const editAccountQuery = gql`
   query EditAccount($id: String!) {
     account(id: $id) {
+      id
       ...EditAccountFragment
     }
   }
@@ -147,20 +149,24 @@ const baseInfo = z.object({
     .nullable(),
 });
 
+const eventShape = z.object({
+  type: z.literal(EVENT),
+  ...baseInfo.shape,
+  startsAt: z.string().datetime({ local: true }).nullable().optional(),
+  endsAt: z.string().datetime({ local: true }).nullable().optional(),
+  timezone: z.string().optional().nullable(),
+  privateInstructions: z.string().max(10000).optional().nullable(),
+});
+
+const individualShape = z.object({
+  type: z.literal(INDIVIDUAL),
+  ...baseInfo.shape,
+  company: z.string().max(255).optional().nullable(),
+});
+
 const formSchema = z.union([
-  z.object({
-    type: z.literal(EVENT),
-    ...baseInfo.shape,
-    startsAt: z.string().datetime({ local: true }).nullable().optional(),
-    endsAt: z.string().datetime({ local: true }).nullable().optional(),
-    timezone: z.string().optional().nullable(),
-    privateInstructions: z.string().max(10000).optional().nullable(),
-  }),
-  z.object({
-    type: z.literal(INDIVIDUAL),
-    ...baseInfo.shape,
-    company: z.string().max(255).optional().nullable(),
-  }),
+  eventShape,
+  individualShape,
   z.object({
     type: z.enum([COLLECTIVE, FUND, PROJECT, ORGANIZATION]),
     ...baseInfo.shape,
@@ -195,7 +201,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
       !account
         ? {}
         : {
-            ...account,
+            ...pick(account, [
+              'type',
+              ...Object.keys(baseInfo.shape),
+              ...Object.keys(eventShape.shape),
+              ...Object.keys(individualShape.shape),
+            ]),
             privateInstructions: get(account, 'data.privateInstructions'),
             endsAt: account.endsAt && dayjs(account.endsAt).format('YYYY-MM-DDTHH:mm:ss'),
             startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
@@ -246,6 +257,10 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
 
   const onSubmit = async (values: FormValuesSchema) => {
     const diff = omitDeepBy(values, (value, key) => isEqual(value, get(account, key)) || isUndefined(value));
+    if (diff.settings) {
+      diff.settings = pick(diff.settings, ['VAT', 'GST']);
+    }
+
     try {
       const parseLocalDateTime = (date: string | null) =>
         isNil(date) ? null : dayjs.tz(date, 'timezone' in values ? values.timezone : 'UTC').toISOString();
