@@ -97,7 +97,7 @@ const baseInfo = z.object({
   slug: z.string().max(255),
   legalName: z.string().min(5).max(255).nullable(),
   description: z.string().max(255).nullable(),
-  longDescription: z.string().max(255).nullable(),
+  longDescription: z.string().max(30000).nullable(),
   currency: z.string().max(3).nullable(),
   tags: z.array(z.string()).nullable(),
   location: z
@@ -144,7 +144,7 @@ const formSchema = z.union([
     startsAt: z.string().datetime({ local: true }).nullable().optional(),
     endsAt: z.string().datetime({ local: true }).nullable().optional(),
     timezone: z.string().optional().nullable(),
-    privateInstrunctions: z.string().max(10000).optional().nullable(),
+    privateInstructions: z.string().max(10000).optional().nullable(),
   }),
   z.object({
     type: z.literal(INDIVIDUAL),
@@ -174,8 +174,8 @@ const Info = ({ account }) => {
   });
   const getInitialValues = useCallback(
     account => ({
-      ...formSchema.parse(account),
-      privateInstrunctions: get(account, 'data.privateInstructions'),
+      ...account,
+      privateInstructions: get(account, 'data.privateInstructions'),
       endsAt: account.endsAt && dayjs(account.endsAt).format('YYYY-MM-DDTHH:mm:ss'),
       startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
     }),
@@ -382,9 +382,14 @@ const Info = ({ account }) => {
                     toolbarOffsetY={0}
                     defaultValue={field.value}
                     onChange={e => setFieldValue('longDescription', e.target.value)}
-                    placeholder="Tell your story..."
                     videoEmbedEnabled
                     withBorders
+                    placeholder={
+                      <FormattedMessage
+                        defaultMessage="Tell your story and explain your purpose."
+                        id="SectionAbout.Why"
+                      />
+                    }
                   />
                 )}
               </FormField>
