@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -49,7 +50,25 @@ export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
     schema,
     toVariables: {
       period: periodFilter.toVariables,
-      context: hostContext => ({ hostContext }),
+      context: hostContext => {
+        if (hostContext === HostContext.HOSTED) {
+          return {
+            hostContext,
+            excludeTransactionsForAccount: {
+              slug: accountSlug,
+            },
+          };
+        } else if (hostContext === HostContext.INTERNAL) {
+          return {
+            hostContext,
+            transactionsForAccount: {
+              slug: accountSlug,
+            },
+          };
+        } else {
+          return { hostContext };
+        }
+      },
       as: slug => ({ slug }),
     },
     filters: {
@@ -112,7 +131,7 @@ export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
     <React.Fragment>
       <HostTodoList />
 
-      <Card>
+      <Card className="pb-3">
         <CardHeader>
           <CardTitle className="text-xl">
             <FormattedMessage defaultMessage="Recent Financial Activity" id="BAvsQv" />
@@ -140,51 +159,52 @@ export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
               columnVisibility={{ clearedAt: false, debit: false, credit: false }}
               getRowId={row => String(row.legacyId)}
               compact
-              fullWidth={true}
             />
           </div>
           {loading ? (
-            <div className="flex h-8 w-full items-center justify-center">
+            <div className="flex h-10 w-full items-center justify-center">
               <Skeleton className="h-5 w-40" />
             </div>
           ) : data.transactions.totalCount > data.transactions.limit ? (
-            <Button
-              size="xs"
-              className="w-full"
-              variant="ghost"
-              onClick={() => {
-                const hostContext =
-                  queryFilter.values.context === HostContext.INTERNAL
-                    ? {
-                        account: account.slug,
-                      }
-                    : queryFilter.values.context === HostContext.HOSTED
+            <div className="flex justify-center">
+              <Button
+                className="w-full"
+                variant="ghost"
+                onClick={() => {
+                  const hostContext =
+                    queryFilter.values.context === HostContext.INTERNAL
                       ? {
-                          excludeAccount: account.slug,
+                          account: account.slug,
                         }
-                      : {};
-                hostTransactionsQueryFilter.resetFilters(
-                  {
-                    ...hostContext,
-                    date: {
-                      gte: dayjs(queryFilter.variables.dateFrom).format('YYYY-MM-DD'),
-                      lte: dayjs(queryFilter.variables.dateTo).format('YYYY-MM-DD'),
-                      type: DateFilterType.BETWEEN,
+                      : queryFilter.values.context === HostContext.HOSTED
+                        ? {
+                            excludeAccount: account.slug,
+                          }
+                        : {};
+                  hostTransactionsQueryFilter.resetFilters(
+                    {
+                      ...hostContext,
+                      date: {
+                        gte: dayjs(queryFilter.variables.dateFrom).format('YYYY-MM-DD'),
+                        lte: dayjs(queryFilter.variables.dateTo).format('YYYY-MM-DD'),
+                        type: DateFilterType.BETWEEN,
+                      },
                     },
-                  },
-                  `/dashboard/${account.slug}/host-transactions`,
-                );
-              }}
-            >
-              <FormattedMessage
-                defaultMessage="View {count} more transactions in {period}"
-                id="GwHMxd"
-                values={{
-                  count: data.transactions.totalCount - data.transactions.limit,
-                  period: intl.formatMessage(i18nPeriodFilterType[queryFilter.values.period.type]).toLowerCase(),
+                    `/dashboard/${account.slug}/host-transactions`,
+                  );
                 }}
-              />
-            </Button>
+              >
+                <FormattedMessage
+                  defaultMessage="View {count} more transactions in {period}"
+                  id="GwHMxd"
+                  values={{
+                    count: data.transactions.totalCount - data.transactions.limit,
+                    period: intl.formatMessage(i18nPeriodFilterType[queryFilter.values.period.type]).toLowerCase(),
+                  }}
+                />{' '}
+                <ArrowRight size={14} />
+              </Button>
+            </div>
           ) : null}
         </CardContent>
       </Card>

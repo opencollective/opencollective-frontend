@@ -50,7 +50,7 @@ describe('Grant Submission Flow', () => {
     // Add a new payout method
     cy.get('[data-cy="add-new-payout-method"]').click();
     cy.get('[data-cy="payout-method-type-select"]').click();
-    cy.contains('[data-cy="select-option"]', 'Bank account');
+    cy.contains('[data-cy="select-option"]', 'Bank transfer');
     cy.contains('[data-cy="select-option"]', 'Other').click();
     cy.get('[data-cy="currency-picker"]').click();
     cy.contains('[data-cy="select-option"]', 'AUD').click();

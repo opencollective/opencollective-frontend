@@ -99,7 +99,7 @@ const StyledDropdownContent = styled(DropdownContent)`
 `;
 
 const CREATE_NEW_LINKS = {
-  ORGANIZATION: '/organizations/new',
+  ORGANIZATION: '/signup/organization',
   FUND: '/fund/create',
   COLLECTIVE: '/create',
 };

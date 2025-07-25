@@ -24,7 +24,7 @@ import { useToast } from '../../ui/useToast';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const accountQuery = gql`
-  query Account($slug: String) {
+  query AccountSecurity($slug: String) {
     account(slug: $slug) {
       id
       slug
@@ -162,7 +162,7 @@ const Security = ({ collective }) => {
               <H4 htmlFor="rollingLimit" mb="16px" fontSize="16px" lineHeight="24px">
                 <FormattedMessage id="editCollective.rollingLimit.label" defaultMessage="Rolling payout limit" />
               </H4>
-              <CheckboxContainer htmlFor="enable-rolling-limit-checkbox" mb={24}>
+              <CheckboxContainer htmlFor="enable-rolling-limit-checkbox" className="mb-6">
                 <Box width="32px">
                   <StyledCheckbox
                     inputId="enable-rolling-limit-checkbox"

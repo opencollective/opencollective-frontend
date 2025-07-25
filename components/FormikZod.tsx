@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FormikConfig, FormikErrors, FormikValues } from 'formik';
 import { Formik, useFormik } from 'formik';
-import { get, isNil, mapValues, max, merge, set, xor } from 'lodash';
+import { defaultsDeep, get, isNil, mapValues, max, merge, set, xor } from 'lodash';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import type { ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';
@@ -73,7 +73,11 @@ export const getCustomZodErrorMap =
             : intl.formatMessage(RICH_ERROR_MESSAGES.minLength, { count: error.minimum as number });
       }
     } else if (error.code === 'invalid_string') {
-      message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
+      if (error.validation === 'email') {
+        message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidEmail);
+      } else {
+        message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
+      }
     } else if (error.code === 'invalid_enum_value') {
       message = intl.formatMessage(RICH_ERROR_MESSAGES.enum, { options: error.options.join(', ') });
     } else if (error.code === 'invalid_type') {
@@ -113,11 +117,18 @@ function getErrorsObjectFromZodSchema<Values>(
   const result = zodSchema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
   if (!result.success) {
     const errorResult = result as z.SafeParseError<typeof values>;
-    for (const error of errorResult.error.issues) {
-      if (!get(errors, error.path)) {
-        set(errors, error.path.join('.'), error.message);
+    const checkIssues = (issues: typeof errorResult.error.issues) => {
+      for (const error of issues) {
+        if ('unionErrors' in error) {
+          error.unionErrors.forEach(unionError => checkIssues(unionError.issues));
+        }
+        if (!get(errors, error.path)) {
+          set(errors, error.path.join('.'), error.message);
+        }
       }
-    }
+    };
+
+    checkIssues(errorResult.error.issues);
   }
 
   return errors;
@@ -330,16 +341,17 @@ export function useFormikZod<Values extends FormikValues = FormikValues>({
 export function FormikZod<Values extends FormikValues = FormikValues>({
   schema,
   config,
+  validate: _validate,
   ...props
-}: Omit<React.ComponentProps<typeof Formik<Values>>, 'initialStatus' | 'validate' | 'render'> & {
+}: Omit<React.ComponentProps<typeof Formik<Values>>, 'initialStatus' | 'render'> & {
   schema: SupportedZodSchema<Values>;
   config?: FormikZodConfig;
 }) {
   const intl = useIntl();
   const context = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
-    values => getErrorsObjectFromZodSchema<Values>(intl, schema, values),
-    [intl, schema],
+    values => defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), _validate?.(values) || {}),
+    [intl, schema, _validate],
   );
   return (
     <FormikZodContext.Provider value={context}>

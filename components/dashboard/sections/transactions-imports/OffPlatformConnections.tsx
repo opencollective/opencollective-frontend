@@ -25,6 +25,7 @@ import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
 
+import { NewOffPlatformTransactionsConnection } from './NewOffPlatformTransactionsConnection';
 import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
 
@@ -40,7 +41,10 @@ const offPlatformConnectionsQuery = gql`
     host(slug: $accountSlug) {
       id
       slug
-      transactionsImports(limit: $limit, offset: $offset, type: [PLAID]) {
+      location {
+        country
+      }
+      transactionsImports(limit: $limit, offset: $offset, type: [PLAID, GOCARDLESS]) {
         totalCount
         limit
         offset
@@ -61,10 +65,11 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
   const [selectedImport, setSelectedImport] = React.useState(null);
+  const [showNewConnectionDialog, setShowNewConnectionDialog] = React.useState(false);
   const { data, loading, refetch, error } = useQuery(offPlatformConnectionsQuery, {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
-    pollInterval: importsWithSyncRequest.size ? 5_000 : 30_000,
+    pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
   });
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
@@ -96,6 +101,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   );
   const onPlaidDialogOpen = React.useCallback(() => {
     setSelectedImport(null);
+    setShowNewConnectionDialog(false);
   }, []);
 
   const plaidConnectDialog = usePlaidConnectDialog({
@@ -105,10 +111,18 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     onOpen: onPlaidDialogOpen,
   });
 
+  const handleNewConnection = React.useCallback(() => {
+    setShowNewConnectionDialog(true);
+  }, []);
+
+  const handlePlaidConnect = React.useCallback(() => {
+    plaidConnectDialog.show();
+  }, [plaidConnectDialog]);
+
   return (
     <div>
       <DashboardHeader
-        title="Off-Platform Connections"
+        title={<FormattedMessage defaultMessage="Connected Bank Accounts" id="qPhmMo" />}
         className="mb-6"
         description={
           <FormattedMessage
@@ -129,7 +143,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => plaidConnectDialog.show()}
+              onClick={handleNewConnection}
               disabled={!['idle', 'success'].includes(plaidConnectDialog.status)}
               loading={plaidConnectDialog.status === 'loading'}
             >
@@ -193,7 +207,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                           <EllipsisVertical size={16} />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="min-w-[240px]" align="end">
+                      <DropdownMenuContent className="min-w-[180px]" align="end">
                         <DropdownMenuItem onClick={() => setSelectedImport(row.original)}>
                           <Settings size={16} />
                           <FormattedMessage defaultMessage="Settings" id="Settings" />
@@ -203,7 +217,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                             href={`/dashboard/${accountSlug}/off-platform-transactions?importIds=${row.original.id}`}
                           >
                             <ArrowRightLeftIcon size={16} />
-                            <FormattedMessage defaultMessage="View off-platform transactions" id="iqPSC0" />
+                            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
                           </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -218,6 +232,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
       )}
       {selectedImport && (
         <TransactionsImportSettingsModal
+          hostId={data.host.id}
           transactionsImport={selectedImport}
           onOpenChange={() => setSelectedImport(null)}
           plaidStatus={plaidConnectDialog.status}
@@ -236,8 +251,29 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               return newSet;
             });
           }}
-          onDelete={() => setSelectedImport(null)}
-          onArchived={() => setSelectedImport(null)}
+          onDelete={() => {
+            setSelectedImport(null);
+            toast({
+              variant: 'success',
+              title: intl.formatMessage({ defaultMessage: 'Connection deleted', id: 'BOy+bE' }),
+            });
+          }}
+          onArchived={() => {
+            setSelectedImport(null);
+            toast({
+              variant: 'success',
+              title: intl.formatMessage({ defaultMessage: 'Connection archived', id: 'jZM4f3' }),
+            });
+          }}
+        />
+      )}
+      {showNewConnectionDialog && (
+        <NewOffPlatformTransactionsConnection
+          isOpen
+          onOpenChange={setShowNewConnectionDialog}
+          onPlaidConnect={handlePlaidConnect}
+          hostCountry={data.host.location?.country}
+          hostId={data.host.id}
         />
       )}
     </div>

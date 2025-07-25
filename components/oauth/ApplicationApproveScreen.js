@@ -105,7 +105,15 @@ const SCOPES_INFO = {
   */
 };
 
-const fetchAuthorize = (application, redirectUri = null, state = null, scopes = null) => {
+const fetchAuthorize = (
+  application,
+  redirectUri = null,
+  state = null,
+  scopes = null,
+  codeChallenge = null,
+  codeChallengeMethod = null,
+  allowed = false,
+) => {
   const authorizeParams = new URLSearchParams({
     /* eslint-disable camelcase */
     response_type: 'code',
@@ -115,8 +123,17 @@ const fetchAuthorize = (application, redirectUri = null, state = null, scopes = 
     /* eslint-enable camelcase */
   });
 
-  if (scopes && scopes.length > 0) {
-    authorizeParams.set('scope', scopes.join(','));
+  if (allowed === false) {
+    authorizeParams.set('allowed', 'false');
+  } else {
+    if (codeChallenge || codeChallengeMethod) {
+      authorizeParams.set('code_challenge', codeChallenge);
+      authorizeParams.set('code_challenge_method', codeChallengeMethod);
+    }
+
+    if (scopes && scopes.length > 0) {
+      authorizeParams.set('scope', scopes.join(','));
+    }
   }
 
   return fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
@@ -138,7 +155,15 @@ const prepareScopes = scopes => {
   );
 };
 
-export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state, scope }) => {
+export const ApplicationApproveScreen = ({
+  application,
+  redirectUri,
+  autoApprove,
+  state,
+  codeChallenge,
+  codeChallengeMethod,
+  scope,
+}) => {
   const { LoggedInUser, logout } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -148,10 +173,18 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
     call: callAuthorize,
     loading,
     error,
-  } = useAsyncCall(async () => {
+  } = useAsyncCall(async (allowed = true) => {
     let response = null;
     try {
-      response = await fetchAuthorize(application, redirectUri, state, filteredScopes);
+      response = await fetchAuthorize(
+        application,
+        redirectUri,
+        state,
+        filteredScopes,
+        codeChallenge,
+        codeChallengeMethod,
+        allowed,
+      );
     } catch {
       setRedirecting(false); // To show errors with autoApprove
       throw formatErrorType(intl, ERROR.NETWORK);
@@ -287,18 +320,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
       </StyledCard>
       {!isRedirecting && (
         <Flex mt={24} justifyContent="center" gap="24px" flexWrap="wrap">
-          <StyledButton
-            minWidth={175}
-            disabled={loading}
-            onClick={() => {
-              // If we're on the first page of the history, close the window. Otherwise, go back.
-              if (window.history.length === 0) {
-                window.close();
-              } else {
-                window.history.back();
-              }
-            }}
-          >
+          <StyledButton minWidth={175} disabled={loading} onClick={() => callAuthorize(false)}>
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
           <StyledButton minWidth={175} buttonStyle="primary" loading={loading} onClick={callAuthorize}>

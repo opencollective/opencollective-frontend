@@ -14,7 +14,7 @@ import type {
   OffPlatformTransactionsQuery,
   OffPlatformTransactionsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Amount, PlaidAccount, TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
+import type { Amount, TransactionsImport, TransactionsImportAccount } from '../../../../lib/graphql/types/v2/schema';
 import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
@@ -60,7 +60,7 @@ const offPlatformTransactionsQuery = gql`
     $offset: Int = 0
     $status: TransactionsImportRowStatus
     $searchTerm: String
-    $plaidAccountId: [NonEmptyString]
+    $subAccountId: [NonEmptyString]
     $importIds: [NonEmptyString!]
     $importId: NonEmptyString!
     $hasImportFilter: Boolean!
@@ -86,7 +86,8 @@ const offPlatformTransactionsQuery = gql`
           ...AccountingCategoryFields
         }
       }
-      transactionsImports(status: ACTIVE, limit: 100) @skip(if: $fetchOnlyRowIds) {
+      transactionsImports(status: ACTIVE, type: [PLAID, GOCARDLESS], limit: 100) @skip(if: $fetchOnlyRowIds) {
+        totalCount
         nodes {
           id
           source
@@ -101,8 +102,8 @@ const offPlatformTransactionsQuery = gql`
         offset: $offset
         status: $status
         searchTerm: $searchTerm
-        accountId: $plaidAccountId
-        importType: PLAID
+        accountId: $subAccountId
+        importType: [PLAID, GOCARDLESS]
         importId: $importIds
         orderBy: $orderBy
       ) {
@@ -117,8 +118,8 @@ const offPlatformTransactionsQuery = gql`
             source
             name
           }
-          plaidAccount @skip(if: $fetchOnlyRowIds) {
-            accountId
+          institutionAccount @skip(if: $fetchOnlyRowIds) {
+            id
             name
           }
         }
@@ -130,13 +131,12 @@ const offPlatformTransactionsQuery = gql`
       connectedAccount {
         id
       }
-      plaidAccounts {
-        accountId
-        mask
+      institutionAccounts {
+        id
         name
-        officialName
-        subtype
         type
+        subtype
+        mask
       }
     }
   }
@@ -189,7 +189,7 @@ const addCountsToViews = (views, stats) => {
 };
 
 const rowStatusFilterSchema = z.nativeEnum(TransactionsImportRowStatus).optional();
-const plaidAccountFilterSchema = isMulti(z.string()).optional();
+const subAccountFilterSchema = isMulti(z.string()).optional();
 const transactionsImportFilterSchema = isMulti(z.string()).optional();
 const orderByFilter = buildOrderByFilter(z.enum(['DATE,DESC', 'DATE,ASC']).default('DATE,DESC'), {
   'DATE,DESC': defineMessage({ id: 'ExpensesOrder.NewestFirst', defaultMessage: 'Newest First' }),
@@ -212,28 +212,28 @@ const rowStatusFilter: FilterConfig<z.infer<typeof rowStatusFilterSchema>> = {
   },
 };
 
-const plaidAccountFilter: FilterConfig<z.infer<typeof plaidAccountFilterSchema>> = {
-  schema: plaidAccountFilterSchema,
-  toVariables: value => ({ plaidAccountId: value }),
+const subAccountFilter: FilterConfig<z.infer<typeof subAccountFilterSchema>> = {
+  schema: subAccountFilterSchema,
+  toVariables: value => ({ subAccountId: value }),
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     static: true,
-    hide: ({ meta }) => !meta.plaidAccounts || meta.plaidAccounts.length < 2,
+    hide: ({ meta }) => !meta.institutionAccounts || meta.institutionAccounts.length < 2,
     Component: ({ meta, ...props }) => {
-      const plaidAccounts = meta.plaidAccounts as PlaidAccount[];
+      const institutionAccounts = meta.institutionAccounts as TransactionsImportAccount[];
       return (
         <ComboSelectFilter
           isMulti
-          options={plaidAccounts
-            .map(plaidAccount => ({ value: plaidAccount.accountId, label: plaidAccount.name }))
+          options={institutionAccounts
+            .map(account => ({ value: account.id, label: account.name }))
             .sort(sortSelectOptions)}
           {...props}
         />
       );
     },
     valueRenderer: ({ value, meta }) => {
-      const plaidAccount = meta.plaidAccounts?.find(plaidAccount => plaidAccount.accountId === value);
-      return plaidAccount?.name;
+      const account = meta.institutionAccounts?.find(account => account.accountId === value);
+      return account?.name;
     },
   },
 };
@@ -273,7 +273,7 @@ const filters = {
   searchTerm: searchFilter.filter,
   status: rowStatusFilter.filter,
   importIds: transactionsImportFilter.filter,
-  plaidAccountId: plaidAccountFilter.filter,
+  subAccountId: subAccountFilter.filter,
   orderBy: orderByFilter.filter,
 };
 
@@ -283,7 +283,7 @@ const queryFilterSchema = z.object({
   searchTerm: searchFilter.schema,
   status: rowStatusFilter.schema,
   importIds: transactionsImportFilterSchema,
-  plaidAccountId: plaidAccountFilter.schema,
+  subAccountId: subAccountFilter.schema,
   orderBy: orderByFilter.schema,
 });
 
@@ -374,7 +374,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
 
   const filtersMeta = React.useMemo(() => {
     return {
-      plaidAccounts: importData?.plaidAccounts,
+      institutionAccounts: importData?.institutionAccounts,
       hostSlug: host?.slug,
       transactionsImports: host?.transactionsImports?.nodes,
     };
@@ -385,12 +385,12 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
       <div className="flex items-center justify-between">
         <DashboardHeader
           className="mb-6"
-          title={intl.formatMessage({ defaultMessage: 'Off-platform Transactions', id: 'MlrieI' })}
+          title={intl.formatMessage({ defaultMessage: 'Bank Account Synchronization', id: 'R9kjJI' })}
           titleRoute={`/dashboard/${accountSlug}/off-platform-transactions`}
           description={
             <FormattedMessage
-              defaultMessage="Platform transactions imported from <Link>connected sources.</Link>"
-              id="MFxlzT"
+              defaultMessage="Transactions imported from <Link>connected bank accounts</Link>."
+              id="slHtsr"
               values={{
                 Link: getI18nLink({
                   as: Link,
@@ -497,9 +497,25 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     setFocus({ rowId: row.original.id });
                   }
                 }}
-                emptyMessage={() => (
-                  <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
-                )}
+                emptyMessage={() => {
+                  if (host.transactionsImports.totalCount === 0) {
+                    return (
+                      <FormattedMessage
+                        defaultMessage="No bank accounts connected. Go to the <Link>connected bank accounts</Link> to setup your first connection."
+                        id="ihLQxw"
+                        values={{
+                          Link: getI18nLink({
+                            as: Link,
+                            href: `/dashboard/${accountSlug}/off-platform-connections`,
+                            textDecoration: 'underline',
+                          }),
+                        }}
+                      />
+                    );
+                  } else {
+                    return <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />;
+                  }
+                }}
                 columns={[
                   {
                     id: 'select',
@@ -543,9 +559,9 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                       return (
                         <div>
                           <div className="mb-1 font-medium">{importRow.transactionsImport.source}</div>
-                          {importRow.plaidAccount && (
+                          {importRow.institutionAccount && (
                             <div className="text-sm text-neutral-500">
-                              {importRow.plaidAccount.name || `#${importRow.plaidAccount.accountId}`}
+                              {importRow.institutionAccount.name || `#${importRow.institutionAccount.id}`}
                             </div>
                           )}
                         </div>

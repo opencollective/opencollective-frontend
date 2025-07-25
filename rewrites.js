@@ -423,6 +423,10 @@ exports.REWRITES = [
     source: '/services/plaid/oauth/callback',
     destination: '/services/plaid/oauth/callback',
   },
+  {
+    source: '/services/gocardless/callback',
+    destination: '/services/gocardless/callback',
+  },
   // Robots.txt
   {
     source: '/robots.txt',

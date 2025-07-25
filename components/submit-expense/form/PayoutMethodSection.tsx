@@ -16,6 +16,7 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
@@ -28,7 +29,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
 import MessageBox from '../../MessageBox';
-import { I18nPayoutMethodLabels, PayoutMethodLabel } from '../../PayoutMethodLabel';
+import { PayoutMethodLabel } from '../../PayoutMethodLabel';
 import { Button } from '../../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
@@ -357,7 +358,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     () =>
       props.newPayoutMethodTypes.map(m => ({
         value: m,
-        label: intl.formatMessage(I18nPayoutMethodLabels[m]),
+        label: i18nPayoutMethodType(intl, m),
       })),
     [intl, props.newPayoutMethodTypes],
   );
@@ -501,7 +502,10 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const intl = useIntl();
   const { toast } = useToast();
 
-  const isEditable = props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE && props.isEditable;
+  const isEditable =
+    props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE &&
+    props.isEditable &&
+    ('canBeEdited' in props.payoutMethod ? props.payoutMethod.canBeEdited : true);
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';

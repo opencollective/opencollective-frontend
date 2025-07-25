@@ -143,6 +143,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           </DetailTitle>
           <DetailDescription>
             {renderDetailsString({
+              relatedTransactions: transaction.relatedTransactions,
               amount,
               platformFee,
               hostFee,

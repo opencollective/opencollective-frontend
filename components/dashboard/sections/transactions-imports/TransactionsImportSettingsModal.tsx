@@ -9,6 +9,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
+import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
 
 import DateTime from '@/components/DateTime';
 
@@ -32,8 +33,8 @@ import { Separator } from '../../../ui/Separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/Tabs';
 import { useToast } from '../../../ui/useToast';
 
-import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
 import { TransactionsImportAssignmentsForm } from './TransactionsImportAssignmentsForm';
+import { TransactionsImportForceSyncButton } from './TransactionsImportForceSyncButton';
 
 const deleteTransactionsImportMutation = gql`
   mutation DeleteTransactionsImport($id: NonEmptyString!) {
@@ -60,6 +61,7 @@ const deleteConnectedAccountMutation = gql`
 `;
 
 export default function TransactionsImportSettingsModal({
+  hostId,
   transactionsImport,
   plaidStatus,
   onOpenChange,
@@ -70,6 +72,7 @@ export default function TransactionsImportSettingsModal({
   onDelete,
   onArchived,
 }: {
+  hostId: string;
   onOpenChange: (isOpen: boolean) => void;
   onDelete: () => void;
   onArchived?: () => void;
@@ -80,7 +83,7 @@ export default function TransactionsImportSettingsModal({
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
   transactionsImport: Pick<
     TransactionsImport,
-    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'plaidAccounts'
+    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'institutionAccounts' | 'institutionId'
   > &
     React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
       connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
@@ -90,6 +93,7 @@ export default function TransactionsImportSettingsModal({
   const intl = useIntl();
   const mutationParams = { context: API_V2_CONTEXT };
   const apolloClient = useApolloClient();
+  const { redirectToGoCardlessConnect, isRedirecting } = useRedirectToGoCardlessConnect();
   const [editTransactionsImport] = useMutation(editTransactionsImportMutation, mutationParams);
   const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(
     deleteConnectedAccountMutation,
@@ -221,8 +225,8 @@ export default function TransactionsImportSettingsModal({
           </TabsContent>
           <TabsContent value="advanced">
             {transactionsImport.type === 'PLAID' && transactionsImport.connectedAccount && (
-              <Card className="mb-4">
-                <CardContent className="pt-6">
+              <Card className="mb-4 p-0 shadow-xs">
+                <CardContent className="py-6">
                   <h3 className="mb-2 text-sm font-medium">
                     <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />
                   </h3>
@@ -275,10 +279,79 @@ export default function TransactionsImportSettingsModal({
                     />
                   </p>
 
-                  <SyncPlaidAccountButton
+                  <TransactionsImportForceSyncButton
                     hasRequestedSync={hasRequestedSync}
                     setHasRequestedSync={setHasRequestedSync}
-                    connectedAccountId={transactionsImport.connectedAccount.id}
+                    transactionImportId={transactionsImport.id}
+                    isSyncing={transactionsImport.isSyncing}
+                    size="default"
+                    className="w-full"
+                  />
+                </CardContent>
+              </Card>
+            )}
+            {transactionsImport.type === 'GOCARDLESS' && transactionsImport.connectedAccount && (
+              <Card className="mb-4 p-0 shadow-xs">
+                <CardContent className="py-6">
+                  <h3 className="mb-2 text-sm font-medium">
+                    <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="If the synchronization stopped working, you can reconnect the bank account."
+                      id="ZMw3dZ"
+                    />
+                  </p>
+                  <Button
+                    loading={isRedirecting}
+                    onClick={async () => {
+                      try {
+                        await redirectToGoCardlessConnect(hostId, transactionsImport.institutionId, {
+                          locale: intl.locale ?? 'en',
+                          transactionImportId: transactionsImport.id,
+                        });
+                      } catch (e) {
+                        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+                      }
+                    }}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Plug size={16} />
+                    <FormattedMessage defaultMessage="Reconnect" id="collective.connectedAccounts.reconnect.button" />
+                  </Button>
+                  <Separator className="my-4" />
+                  <h3 className="mb-2 text-sm font-medium">
+                    <FormattedMessage defaultMessage="Force synchronization" id="w4ZT18" />
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      id="withColon"
+                      defaultMessage="{item}:"
+                      values={{
+                        item: <FormattedMessage defaultMessage="Last sync" id="transactions.import.lastSync" />,
+                      }}
+                    />{' '}
+                    {transactionsImport.lastSyncAt ? (
+                      <span className="underline decoration-dotted underline-offset-2">
+                        <DateTime value={transactionsImport.lastSyncAt} timeStyle="short" />
+                      </span>
+                    ) : (
+                      <FormattedMessage defaultMessage="Never" id="du1laW" />
+                    )}
+                    .
+                  </p>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="The synchronization is automatic and happens up to 4 times per day. You can manually request a sync at any time using the button below."
+                      id="fRDMf8"
+                    />
+                  </p>
+
+                  <TransactionsImportForceSyncButton
+                    hasRequestedSync={hasRequestedSync}
+                    setHasRequestedSync={setHasRequestedSync}
+                    transactionImportId={transactionsImport.id}
                     isSyncing={transactionsImport.isSyncing}
                     size="default"
                     className="w-full"

@@ -3,6 +3,7 @@ import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -138,11 +139,7 @@ interface DashboardSectionProps {
   section?: string;
   subpath?: string[];
   /** The account. Can be null if isLoading is true */
-  account?: {
-    slug: string;
-    name?: string;
-    isHost?: boolean;
-  };
+  account?: DashboardQuery['account'];
 }
 
 const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
@@ -173,7 +170,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (DashboardComponent) {
     return (
       <div className="w-full pb-6">
-        <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
+        <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
       </div>
     );
   }

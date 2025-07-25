@@ -222,7 +222,7 @@ export const HostTodoList = () => {
   );
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden pb-0">
       <CardHeader>
         <CardTitle className="text-xl">
           <FormattedMessage defaultMessage="To do" id="vwqEeH" />
@@ -263,7 +263,9 @@ export const HostTodoList = () => {
                       <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
                         <Badge
                           type="outline"
-                          className={'badge-hover gap-1 text-foreground hover:relative hover:z-10 hover:bg-primary/5'}
+                          className={
+                            'badge-hover gap-1 rounded-full text-foreground hover:relative hover:z-10 hover:bg-primary/5'
+                          }
                         >
                           {subItem.Icon && <subItem.Icon className="h-3 w-3" />}
                           <span>{subItem.label}</span>

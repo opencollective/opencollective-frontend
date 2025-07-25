@@ -264,7 +264,7 @@ const ExportTransactionsCSVModal = ({
 
   const customFields = React.useMemo(
     () =>
-      canCreatePreset
+      !canCreatePreset
         ? []
         : updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
           account?.settings?.exportedTransactionsFieldSets ||

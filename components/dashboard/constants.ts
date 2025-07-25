@@ -200,8 +200,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Sending Money',
   },
   [ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS]: {
-    defaultMessage: 'Off-Platform Connections',
-    id: 'tn46Lk',
+    defaultMessage: 'Connected Bank Accounts',
+    id: 'qPhmMo',
   },
   [ALL_SECTIONS.FISCAL_HOSTING]: {
     id: 'editCollective.fiscalHosting',

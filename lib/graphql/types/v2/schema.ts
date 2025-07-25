@@ -89,6 +89,8 @@ export type Account = {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   /**
@@ -760,9 +762,41 @@ export enum AccountType {
 }
 
 export type AccountUpdateInput = {
+  company?: InputMaybe<Scalars['String']['input']>;
   currency?: InputMaybe<Currency>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** The Event end date and time */
+  endsAt?: InputMaybe<Scalars['DateTime']['input']>;
+  /** The host fee percentage for this account. Must be between 0 and 100. */
+  hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
+  legalName?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<LocationInput>;
+  longDescription?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Private instructions for the host to be sent to participating users. */
+  privateInstructions?: InputMaybe<Scalars['String']['input']>;
+  /** Settings for the account. */
+  settings?: InputMaybe<AccountUpdateSettingsInput>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  socialLinks?: InputMaybe<Array<SocialLinkInput>>;
+  /** The Event start date and time */
+  startsAt?: InputMaybe<Scalars['DateTime']['input']>;
+  tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin) */
+  timezone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AccountUpdateSettingsInput = {
+  GST?: InputMaybe<Scalars['JSON']['input']>;
+  VAT?: InputMaybe<Scalars['JSON']['input']>;
+  /** Whether this host account is accepting fiscal sponsorship applications. */
+  apply?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Message shown to users when applying to join this account. */
+  applyMessage?: InputMaybe<Scalars['String']['input']>;
+  /** Terms of Service for this account. */
+  tos?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** An account that can receive financial contributions */
@@ -1509,6 +1543,8 @@ export type Bot = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -1919,6 +1955,14 @@ export type CaptchaInput = {
   token: Scalars['String']['input'];
 };
 
+/** Input type for captcha verification */
+export type CaptchaInputType = {
+  /** The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE) */
+  provider: Scalars['String']['input'];
+  /** The captcha token to verify */
+  token: Scalars['String']['input'];
+};
+
 /** Implemented Captcha Providers */
 export enum CaptchaProvider {
   HCAPTCHA = 'HCAPTCHA',
@@ -2016,6 +2060,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -2512,6 +2558,7 @@ export type CollectiveFeatures = {
   EVENTS?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
+  OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
   ORDER?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_DONATIONS?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_PAYOUTS?: Maybe<CollectiveFeatureStatus>;
@@ -2658,6 +2705,7 @@ export type ConnectedAccountReferenceInput = {
 /** All supported services a user can connect with */
 export enum ConnectedAccountService {
   github = 'github',
+  gocardless = 'gocardless',
   /** @deprecated Not using this service anymore */
   meetup = 'meetup',
   paypal = 'paypal',
@@ -4033,6 +4081,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -4071,6 +4121,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   platformFeePercent: Scalars['Float']['output'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** Private instructions for the host to be sent to participating users. */
+  privateInstructions?: Maybe<Scalars['String']['output']>;
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']['output']>;
   settings: Scalars['JSON']['output'];
@@ -5006,6 +5058,8 @@ export enum ExpenseProcessAction {
   HOLD = 'HOLD',
   /** To mark the expense as incomplete and notify the payee it requires more information */
   MARK_AS_INCOMPLETE = 'MARK_AS_INCOMPLETE',
+  /** To mark expense as paid with stripe, can still be processing */
+  MARK_AS_PAID_WITH_STRIPE = 'MARK_AS_PAID_WITH_STRIPE',
   /** To mark the expense as spam */
   MARK_AS_SPAM = 'MARK_AS_SPAM',
   /** To mark the expense as unpaid (marks the transaction as refunded) */
@@ -5285,6 +5339,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -5762,6 +5818,47 @@ export type GenericFileInfo = FileInfo & {
   url: Scalars['URL']['output'];
 };
 
+export type GoCardlessConnectAccountResponse = {
+  __typename?: 'GoCardlessConnectAccountResponse';
+  /** The connected account that was created */
+  connectedAccount: ConnectedAccount;
+  /** The transactions import that was created */
+  transactionsImport: TransactionsImport;
+};
+
+/** A GoCardless link for bank account data access */
+export type GoCardlessLink = {
+  __typename?: 'GoCardlessLink';
+  /** The date & time at which the requisition was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** The unique identifier for the requisition */
+  id: Scalars['String']['output'];
+  /** The institution ID for this requisition */
+  institutionId: Scalars['String']['output'];
+  /** Link to initiate authorization with Institution */
+  link?: Maybe<Scalars['String']['output']>;
+  /** Redirect URL to your application after end-user authorization with ASPSP */
+  redirect: Scalars['URL']['output'];
+  /** The reference for the requisition */
+  reference: Scalars['String']['output'];
+  /** The requisition ID for the link */
+  requisitionId: Scalars['String']['output'];
+};
+
+/** Input for creating a GoCardless link */
+export type GoCardlessLinkInput = {
+  /** Number of days from acceptance that the access can be used (default: 90) */
+  accessValidForDays?: InputMaybe<Scalars['Int']['input']>;
+  /** Option to enable account selection view for the end user (default: true) */
+  accountSelection?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The institution ID for this requisition */
+  institutionId: Scalars['String']['input'];
+  /** Maximum number of days of transaction data to retrieve (default: 90) */
+  maxHistoricalDays?: InputMaybe<Scalars['Int']['input']>;
+  /** A two-letter country code (ISO 639-1) (default: "en") */
+  userLanguage?: InputMaybe<Scalars['Locale']['input']>;
+};
+
 /** Input type for guest contributions */
 export type GuestInfoInput = {
   /** Captcha validation for creating an order */
@@ -5869,6 +5966,8 @@ export type Host = Account & AccountWithContributions & {
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
   isOpenToApplications?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Returns whether the host is trusted or not */
   isTrustedHost: Scalars['Boolean']['output'];
   /** Whether the account is verified */
@@ -6867,6 +6966,8 @@ export type Individual = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Company slugs the user is part of. */
+  company?: Maybe<Scalars['String']['output']>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributorProfiles: Array<Maybe<ContributorProfile>>;
@@ -6920,6 +7021,8 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -7357,7 +7460,8 @@ export type IndividualConfirmEmailResponse = {
 
 export type IndividualCreateInput = {
   email: Scalars['String']['input'];
-  name: Scalars['String']['input'];
+  legalName?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type InviteMemberInput = {
@@ -7642,6 +7746,8 @@ export type Mutation = {
   confirmGuestAccount: ConfirmGuestAccountResponse;
   /** Confirm an order (strong customer authentication). Scope: "orders". */
   confirmOrder: OrderWithPayment;
+  /** Connect a GoCardless account */
+  connectGoCardlessAccount: GoCardlessConnectAccountResponse;
   /** Connect a Plaid account */
   connectPlaidAccount: PlaidConnectAccountResponse;
   /** Convert an organization to a vendor */
@@ -7659,6 +7765,8 @@ export type Mutation = {
   createEvent?: Maybe<Event>;
   /** Submit an expense to a collective. Scope: "expenses". */
   createExpense: Expense;
+  /** Create a Stripe payment intent */
+  createExpenseStripePaymentIntent: PaymentIntent;
   /** Create a Fund. Scope: "account". */
   createFund?: Maybe<Fund>;
   /** [Root only] Create a member entry directly. For non-root users, use `inviteMember` */
@@ -7720,7 +7828,7 @@ export type Mutation = {
   /** Duplicate an account. Scope: "account". */
   duplicateAccount: Account;
   /** Edit key properties of an account. Scope: "account". */
-  editAccount: Host;
+  editAccount: Account;
   /** An endpoint for hosts to edit the fees structure of their hosted accounts. Scope: "host". */
   editAccountFeeStructure: Account;
   /** [Root only] Edits account flags (deleted, banned, archived, trusted host) */
@@ -7770,6 +7878,8 @@ export type Mutation = {
   followAccount: FollowAccountResult;
   /** Returns true if user is following, false otherwise. Must be authenticated. Scope: "conversations". */
   followConversation?: Maybe<Scalars['Boolean']['output']>;
+  /** Generate a GoCardless link for bank account data access */
+  generateGoCardlessLink: GoCardlessLink;
   /** Generate a Plaid Link token */
   generatePlaidLinkToken: PlaidLinkTokenCreateResponse;
   /** Import transactions, manually or from a CSV file */
@@ -7853,6 +7963,8 @@ export type Mutation = {
   submitLegalDocument: LegalDocument;
   /** Manually request a sync for Plaid account */
   syncPlaidAccount: TransactionsImport;
+  /** Manually request a sync for a transactions import (works for both Plaid and GoCardless) */
+  syncTransactionsImport: TransactionsImport;
   /** Unfollows a given Collective. Scope: "account" */
   unfollowAccount: UnfollowAccountResult;
   /** Unpublish update. Scope: "updates". */
@@ -8002,6 +8114,16 @@ export type MutationConfirmOrderArgs = {
 
 
 /** This is the root mutation */
+export type MutationConnectGoCardlessAccountArgs = {
+  host: AccountReferenceInput;
+  name?: InputMaybe<Scalars['String']['input']>;
+  requisitionId: Scalars['String']['input'];
+  sourceName?: InputMaybe<Scalars['String']['input']>;
+  transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
+};
+
+
+/** This is the root mutation */
 export type MutationConnectPlaidAccountArgs = {
   host: AccountReferenceInput;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -8078,6 +8200,12 @@ export type MutationCreateExpenseArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreateExpenseStripePaymentIntentArgs = {
+  expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateFundArgs = {
   fund: FundCreateInput;
   host?: InputMaybe<AccountReferenceInput>;
@@ -8102,8 +8230,11 @@ export type MutationCreateOrderArgs = {
 
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
+  captcha?: InputMaybe<CaptchaInputType>;
+  individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;
+  roleDescription?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -8513,6 +8644,13 @@ export type MutationFollowConversationArgs = {
 
 
 /** This is the root mutation */
+export type MutationGenerateGoCardlessLinkArgs = {
+  host: AccountReferenceInput;
+  input: GoCardlessLinkInput;
+};
+
+
+/** This is the root mutation */
 export type MutationGeneratePlaidLinkTokenArgs = {
   accountSelectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   countries?: InputMaybe<Array<CountryIso>>;
@@ -8823,6 +8961,12 @@ export type MutationSyncPlaidAccountArgs = {
 
 
 /** This is the root mutation */
+export type MutationSyncTransactionsImportArgs = {
+  transactionImport: TransactionsImportReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationUnfollowAccountArgs = {
   account: AccountReferenceInput;
 };
@@ -8993,6 +9137,33 @@ export type OcrParsingOptionsInput = {
   /** The currency that you'd like to use for the amounts */
   currency?: InputMaybe<Currency>;
 };
+
+/** A financial institution for off-platform transactions */
+export type OffPlatformTransactionsInstitution = {
+  __typename?: 'OffPlatformTransactionsInstitution';
+  /** The BIC (Bank Identifier Code) of the institution */
+  bic: Scalars['String']['output'];
+  /** The unique identifier for the institution */
+  id: Scalars['String']['output'];
+  /** URL to the institution logo */
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  /** Maximum number of days the access can be valid for */
+  maxAccessValidForDays: Scalars['Int']['output'];
+  /** The name of the institution */
+  name: Scalars['String']['output'];
+  /** List of country codes supported by this institution */
+  supportedCountries: Array<Scalars['String']['output']>;
+  /** Total number of days of transaction data available */
+  transactionTotalDays: Scalars['Int']['output'];
+};
+
+/** Provider for off-platform transactions */
+export enum OffPlatformTransactionsProvider {
+  /** GoCardless bank account data provider */
+  GOCARDLESS = 'GOCARDLESS',
+  /** Plaid bank account data provider */
+  PLAID = 'PLAID'
+}
 
 /** Order model */
 export type Order = {
@@ -9345,6 +9516,8 @@ export type Organization = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -9781,6 +9954,8 @@ export type OrganizationWebhooksArgs = {
 export type OrganizationCreateInput = {
   /** The profile background image, for the banner and social media sharing */
   backgroundImage?: InputMaybe<Scalars['Upload']['input']>;
+  /** Two-letters country code following ISO31661 */
+  countryISO?: InputMaybe<Scalars['String']['input']>;
   description: Scalars['String']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
@@ -10051,7 +10226,8 @@ export enum PayoutMethodType {
   BANK_ACCOUNT = 'BANK_ACCOUNT',
   CREDIT_CARD = 'CREDIT_CARD',
   OTHER = 'OTHER',
-  PAYPAL = 'PAYPAL'
+  PAYPAL = 'PAYPAL',
+  STRIPE = 'STRIPE'
 }
 
 export type PaypalPaymentInput = {
@@ -10456,6 +10632,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
@@ -10947,6 +11125,8 @@ export type Query = {
   me?: Maybe<Individual>;
   /** [AUTHENTICATED] Returns the pending invitations */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
+  /** Get financial institutions for off-platform transactions */
+  offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
   order?: Maybe<Order>;
   orders: OrderCollection;
   organization?: Maybe<Organization>;
@@ -11168,6 +11348,13 @@ export type QueryMemberInvitationsArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   memberAccount?: InputMaybe<AccountReferenceInput>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+};
+
+
+/** This is the root query */
+export type QueryOffPlatformTransactionsInstitutionsArgs = {
+  country: Scalars['String']['input'];
+  provider: OffPlatformTransactionsProvider;
 };
 
 
@@ -12192,6 +12379,10 @@ export type TransactionsImport = {
   file?: Maybe<FileInfo>;
   /** The public id of the import */
   id: Scalars['String']['output'];
+  /** List of available accounts for the import */
+  institutionAccounts?: Maybe<Array<Maybe<TransactionsImportAccount>>>;
+  /** Institution ID (for Gocardless only) */
+  institutionId?: Maybe<Scalars['String']['output']>;
   /** Whether the import is currently syncing */
   isSyncing: Scalars['Boolean']['output'];
   /** When the import was last synced */
@@ -12200,7 +12391,10 @@ export type TransactionsImport = {
   lastSyncCursor?: Maybe<Scalars['String']['output']>;
   /** Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024") */
   name: Scalars['NonEmptyString']['output'];
-  /** List of available accounts for the import */
+  /**
+   * List of available accounts for the import
+   * @deprecated 2025-07-02: Please use the generic accounts field instead.
+   */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
   /**
    * List of rows in the import
@@ -12223,6 +12417,21 @@ export type TransactionsImportRowsArgs = {
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<TransactionsImportRowStatus>;
+};
+
+/** An account available in a transactions import (Plaid or GoCardless) */
+export type TransactionsImportAccount = {
+  __typename?: 'TransactionsImportAccount';
+  /** The unique identifier for the account */
+  id: Scalars['NonEmptyString']['output'];
+  /** The mask of the account (Plaid only) */
+  mask?: Maybe<Scalars['String']['output']>;
+  /** The name of the account */
+  name: Scalars['NonEmptyString']['output'];
+  /** The subtype of the account (Plaid only) */
+  subtype?: Maybe<Scalars['String']['output']>;
+  /** The type of the account (Plaid only) */
+  type?: Maybe<Scalars['String']['output']>;
 };
 
 export type TransactionsImportAssignment = {
@@ -12268,11 +12477,16 @@ export type TransactionsImportRow = {
   expense?: Maybe<Expense>;
   /** The public id of the imported row */
   id: Scalars['String']['output'];
+  /** Corresponding account for the row, based on its account ID */
+  institutionAccount?: Maybe<TransactionsImportAccount>;
   /** Optional note for the row */
   note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
   order?: Maybe<Order>;
-  /** If the row was imported from plaid, this is the account it was imported from */
+  /**
+   * If the row was imported from plaid, this is the account it was imported from
+   * @deprecated 2025-07-02: Please use the generic institutionAccount field instead.
+   */
   plaidAccount?: Maybe<PlaidAccount>;
   /** The raw data of the row */
   rawValue?: Maybe<Scalars['JSONObject']['output']>;
@@ -12302,6 +12516,8 @@ export type TransactionsImportRowCollection = Collection & {
 };
 
 export type TransactionsImportRowCreateInput = {
+  /** The account ID associated with the row */
+  accountId?: InputMaybe<Scalars['String']['input']>;
   /** The amount of the row */
   amount: AmountInput;
   /** The date of the row */
@@ -12344,6 +12560,8 @@ export enum TransactionsImportRowStatus {
 }
 
 export type TransactionsImportRowUpdateInput = {
+  /** The account ID associated with the row */
+  accountId?: InputMaybe<Scalars['String']['input']>;
   /** The amount of the row */
   amount?: InputMaybe<AmountInput>;
   /** The date of the row */
@@ -12397,6 +12615,7 @@ export enum TransactionsImportStatus {
 /** Type of the import */
 export enum TransactionsImportType {
   CSV = 'CSV',
+  GOCARDLESS = 'GOCARDLESS',
   MANUAL = 'MANUAL',
   PLAID = 'PLAID'
 }
@@ -12723,6 +12942,8 @@ export type Vendor = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether this account is suspended */
+  isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];

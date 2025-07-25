@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
+import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
+import Link from '@/components/Link';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 
 import { timelineQuery } from './queries';
 import TimelineItem from './TimelineItem';
@@ -18,6 +23,7 @@ import TimelineItem from './TimelineItem';
 const PAGE_SIZE = 20;
 
 export function Timeline({ accountSlug, withTitle = false }) {
+  const { account } = useContext(DashboardContext);
   const [isTimelineBeingGenerated, setIsTimelineBeingGenerated] = React.useState(false);
   const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
 
@@ -43,17 +49,37 @@ export function Timeline({ accountSlug, withTitle = false }) {
   }, [error, data]);
 
   return (
-    <Card>
+    <Card className="pb-3">
       {withTitle && (
-        <CardHeader>
-          <CardTitle className="text-xl">
-            <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+        <CardHeader className="relative">
+          <CardTitle className="relative text-xl">
+            <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />{' '}
+            <InfoTooltipIcon className="inline-block" contentClassname="font-normal">
+              <FormattedMessage
+                defaultMessage="This is a selection of activities happening on your account, go to the <Link>Activity log</Link> to see everything."
+                id="hTYdKy"
+                values={{
+                  Link: label => (
+                    <Link className="underline" href={getDashboardRoute(account, 'activity-log')}>
+                      {label}
+                    </Link>
+                  ),
+                }}
+              />
+            </InfoTooltipIcon>
           </CardTitle>
+          <CardAction>
+            <Button asChild variant="outline">
+              <Link href={getDashboardRoute(account, 'activity-log')}>
+                <FormattedMessage defaultMessage="Go to activity log" id="zOk9pq" /> <ArrowRight size={14} />
+              </Link>
+            </Button>
+          </CardAction>
         </CardHeader>
       )}
-      <CardContent className={!withTitle && 'pt-6'}>
+      <CardContent>
         <div className="space-y-3">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3 divide-y">
             {error && !isTimelineBeingGenerated ? (
               <MessageBoxGraphqlError error={error} />
             ) : isTimelineBeingGenerated || (!activities.length && loading) ? (
@@ -81,8 +107,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
             {canViewMore && (
               <Button
                 className="w-full"
-                size="sm"
-                variant="outline"
+                variant="ghost"
                 loading={loading}
                 onClick={() =>
                   fetchMore({

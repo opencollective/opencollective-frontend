@@ -23,6 +23,7 @@ export const UserContext = React.createContext({
   logout: async () => null,
   login: async () => null,
   async refetchLoggedInUser() {},
+  updateLoggedInUserFromCache: () => {},
 });
 
 class UserProvider extends React.Component {
@@ -212,10 +213,25 @@ class UserProvider extends React.Component {
     return true;
   };
 
+  /**
+   * Reloads the logged in user from the Apollo cache
+   */
+  updateLoggedInUserFromCache = () => {
+    const { getLoggedInUserFromCache } = this.props;
+    const LoggedInUser = getLoggedInUserFromCache();
+    this.setState({ LoggedInUser });
+  };
+
   render() {
     return (
       <UserContext.Provider
-        value={{ ...this.state, logout: this.logout, login: this.login, refetchLoggedInUser: this.refetchLoggedInUser }}
+        value={{
+          ...this.state,
+          logout: this.logout,
+          login: this.login,
+          refetchLoggedInUser: this.refetchLoggedInUser,
+          updateLoggedInUserFromCache: this.updateLoggedInUserFromCache,
+        }}
       >
         {this.props.children}
       </UserContext.Provider>

@@ -15,6 +15,7 @@ import { Slack } from '@styled-icons/feather/Slack';
 import { Twitch } from '@styled-icons/feather/Twitch';
 import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
+import { FolderGit2 } from 'lucide-react';
 
 import { SocialLinkType } from './graphql/types/v2/schema';
 
@@ -36,7 +37,7 @@ const SocialLinkIcon: Record<SocialLinkType, typeof Discord | React.FunctionComp
   [SocialLinkType.DISCOURSE]: Discourse,
   [SocialLinkType.FACEBOOK]: Facebook,
   [SocialLinkType.GHOST]: Globe,
-  [SocialLinkType.GIT]: Globe,
+  [SocialLinkType.GIT]: FolderGit2,
   [SocialLinkType.GITHUB]: Github,
   [SocialLinkType.GITLAB]: Gitlab,
   [SocialLinkType.INSTAGRAM]: Instagram,

@@ -119,6 +119,10 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   const collective = expense?.account;
   const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
 
+  if (draftKey && !metadata.noRobots) {
+    metadata.noRobots = true;
+  }
+
   return (
     <Page collective={collective} canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`} {...metadata}>
       <CollectiveNavbar collective={collective} isLoading={!collective} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />

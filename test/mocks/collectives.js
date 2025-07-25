@@ -97,7 +97,6 @@ export const webpackCollective = {
     backers: { all: 1018, users: 793, organizations: 225, collectives: 0, __typename: 'BackersStatsType' },
     collectives: { hosted: 0, memberOf: 0, __typename: 'CollectivesStatsType' },
     transactions: { id: 302, all: 9014, __typename: 'TransactionsStatsType' },
-    expenses: { id: 302, all: 359, __typename: 'ExpensesStatsType' },
     updates: 0,
     events: 0,
     totalAmountSpent: 46426248,

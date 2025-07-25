@@ -90,7 +90,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
   const contentKey = i18nMsg?.content;
 
   return (
-    <div className="text-sm">
+    <div className="pb-3 text-sm">
       <div className="flex flex-1 items-start gap-3">
         {isLoading ? (
           <Skeleton className="h-8 w-8 shrink-0 rounded-full" />

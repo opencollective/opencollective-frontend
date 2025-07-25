@@ -7,15 +7,16 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
 }
 
+export const BASE_INPUT_CLASS =
+  'flex h-10 duration-300 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-[color,box-shadow] file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-within:ring-2 ring-ring focus-within:outline-hidden disabled:cursor-not-allowed disabled:opacity-50';
+
+export const BASE_INPUT_ERROR_CLASS = 'border-red-500 ring-red-500/30';
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
   return (
     <input
       type={type}
-      className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
-        props.error && 'ring-2 ring-red-500 ring-offset-2',
-        className,
-      )}
+      className={cn(BASE_INPUT_CLASS, props.error && BASE_INPUT_ERROR_CLASS, className)}
       ref={ref}
       {...props}
     />
@@ -35,8 +36,9 @@ const InputGroup = React.forwardRef<
 >(({ className, prepend, append, prependClassName, appendClassName, ...props }, ref) => (
   <div
     className={cn(
-      'flex h-10 w-fit overflow-hidden rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:outline-hidden',
-      props.error && 'ring-2 ring-red-500 ring-offset-2',
+      BASE_INPUT_CLASS,
+      'w-fit overflow-hidden p-0',
+      props.error && BASE_INPUT_ERROR_CLASS,
       props.disabled && 'cursor-not-allowed opacity-50',
       className,
     )}

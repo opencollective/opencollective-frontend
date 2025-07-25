@@ -51,6 +51,11 @@ interface CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
   isGuest: Boolean
   canApply: Boolean
   canContact: Boolean
@@ -376,16 +381,6 @@ type OrderType {
   currency: String
   createdAt: DateString
   updatedAt: DateString
-
-  """
-  Whether this subscription is past due or not
-  """
-  isPastDue: Boolean @deprecated(reason: "2024-12-13: Not used, so we stop returning it.")
-
-  """
-  If there is a subscription, is it active?
-  """
-  isSubscriptionActive: Boolean
 
   """
   Current status for an order
@@ -936,6 +931,7 @@ enum PayoutMethodTypeEnum {
   BANK_ACCOUNT
   ACCOUNT_BALANCE
   CREDIT_CARD
+  STRIPE
 }
 
 """
@@ -1105,6 +1101,7 @@ type CollectiveFeatures {
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
+  OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1992,36 +1989,6 @@ type CollectiveStatsType {
   backers: BackersStatsType
 
   """
-  Number of collectives under this collective
-  """
-  collectives: CollectivesStatsType
-
-  """
-  Number of updates published by this collective
-  """
-  updates: Int
-
-  """
-  Number of events under this collective
-  """
-  events: Int
-
-  """
-  Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)
-  """
-  expenses: ExpensesStatsType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
-
-  """
-  Number of transactions
-  """
-  transactions: TransactionsStatsType
-
-  """
-  Average amount spent per month based on the last 90 days
-  """
-  monthlySpending: Float
-
-  """
   Total amount spent
   """
   totalAmountSpent: Float
@@ -2072,75 +2039,6 @@ type BackersStatsType {
   Number of collectives that have given money to this collective
   """
   collectives: Int
-}
-
-"""
-Breakdown of collectives under this collective by role (all/hosted/memberOf/events)
-"""
-type CollectivesStatsType {
-  id: Int
-  all: Int
-
-  """
-  Returns the collectives hosted by this collective
-  """
-  hosted: Int
-
-  """
-  Returns the number of collectives that have this collective has parent
-  """
-  memberOf: Int
-
-  """
-  Returns the number of events that have this collective has parent
-  """
-  events: Int
-}
-
-"""
-Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)
-"""
-type ExpensesStatsType {
-  id: Int
-  all: Int
-
-  """
-  Returns the number of expenses that are pending
-  """
-  pending: Int
-
-  """
-  Returns the number of expenses that are approved
-  """
-  approved: Int
-
-  """
-  Returns the number of expenses that are rejected
-  """
-  rejected: Int
-
-  """
-  Returns the number of expenses that are paid
-  """
-  paid: Int
-}
-
-"""
-Breakdown of transactions per type (ALL/CREDIT/DEBIT)
-"""
-type TransactionsStatsType {
-  id: Int
-  all: Int
-
-  """
-  Returns the number of CREDIT transactions
-  """
-  credit: Int
-
-  """
-  Returns the number of DEBIT transactions
-  """
-  debit: Int
 }
 
 """
@@ -2236,6 +2134,11 @@ type Collective implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2407,7 +2310,7 @@ type Collective implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -2518,6 +2421,11 @@ type Event implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2687,7 +2595,7 @@ type Event implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -2798,6 +2706,11 @@ type Fund implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2967,7 +2880,7 @@ type Fund implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -3078,6 +2991,11 @@ type Organization implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3247,7 +3165,7 @@ type Organization implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -3358,6 +3276,11 @@ type Project implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -3527,7 +3450,7 @@ type Project implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -3933,6 +3856,11 @@ type User implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4102,7 +4030,7 @@ type User implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -4215,6 +4143,11 @@ type Vendor implements CollectiveInterface {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -4384,7 +4317,7 @@ type Vendor implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -4422,10 +4355,10 @@ type Query {
     If false, will return null instead of an error if collective is not found
     """
     throwIfMissing: Boolean = true
-  ): CollectiveInterface
+  ): CollectiveInterface @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   Tier(id: Int!): Tier @deprecated(reason: "2023-05-04: Please use GraphQL V2")
-  LoggedInUser: UserDetails
-  allInvoices(fromCollectiveSlug: String!): [InvoiceType]
+  LoggedInUser: UserDetails @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  allInvoices(fromCollectiveSlug: String!): [InvoiceType] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
   allTransactions(
@@ -4443,8 +4376,8 @@ type Query {
     """
     includeExpenseTransactions: Boolean
     includeHostedCollectivesTransactions: Boolean
-  ): [Transaction]
-  Transaction(id: Int, uuid: String): Transaction
+  ): [Transaction] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  Transaction(id: Int, uuid: String): Transaction @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   Returns all public hosts that are open for applications
@@ -4465,7 +4398,7 @@ type Query {
     offset: Int = 0
     onlyOpenHosts: Boolean = true
     minNbCollectivesHosted: Int! = 0
-  ): CollectiveSearchResults
+  ): CollectiveSearchResults @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4483,8 +4416,8 @@ type Query {
     orderDirection: String
     limit: Int
     offset: Int
-  ): [Member]
-  PaymentMethod(id: Int, code: String): PaymentMethodType
+  ): [Member] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  PaymentMethod(id: Int, code: String): PaymentMethodType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   Search for collectives. Results are returned with best matches first.
@@ -4545,7 +4478,7 @@ type Query {
     """
     limit: Int = 20
     offset: Int = 0
-  ): CollectiveSearchResults
+  ): CollectiveSearchResults @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 }
 
 """

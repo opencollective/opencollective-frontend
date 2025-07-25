@@ -2,6 +2,7 @@ import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
+import type { GetActions } from '../../lib/actions/types';
 import type { Agreement } from '../../lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -10,10 +11,8 @@ import DateTime from '../DateTime';
 import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLinkButton from '../StyledLinkButton';
-import { DataTable } from '../table/DataTable';
+import { actionsColumn, DataTable } from '../table/DataTable';
 import { P } from '../Text';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
-import { TableActionsButton } from '../ui/Table';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 interface AgreementMeta extends TableMeta<Agreement> {
@@ -96,29 +95,10 @@ const columns: ColumnDef<Agreement>[] = [
     },
   },
   {
-    accessorKey: 'actions',
-    header: null,
-    meta: { className: 'w-14' },
-    cell: ({ table, row }) => {
-      const { openAgreement } = table.options.meta as AgreementMeta;
-      const application = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <TableActionsButton />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={e => {
-                e.stopPropagation();
-                openAgreement(application);
-              }}
-            >
-              <FormattedMessage defaultMessage="View details" id="MnpUD7" />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+    ...actionsColumn,
+    meta: { className: 'w-24 text-right' },
+    header: () => {
+      return <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />;
     },
   },
 ];
@@ -130,6 +110,7 @@ type AgreementsTableProps = {
   loading?: boolean;
   nbPlaceholders?: number;
   onFilePreview?: (agreement: Agreement) => void;
+  getActions?: GetActions<Agreement>;
 };
 
 export default function AgreementsTable({
@@ -139,6 +120,7 @@ export default function AgreementsTable({
   nbPlaceholders,
   resetFilters,
   onFilePreview,
+  getActions,
 }: AgreementsTableProps) {
   return (
     <DataTable
@@ -151,6 +133,7 @@ export default function AgreementsTable({
       loading={loading}
       nbPlaceholders={nbPlaceholders}
       onClickRow={row => openAgreement(row.original)}
+      getActions={getActions}
       emptyMessage={() => (
         <div>
           <P fontSize="16px">

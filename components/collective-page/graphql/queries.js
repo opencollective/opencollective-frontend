@@ -36,6 +36,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       isVerified
       isArchived
       isFrozen
+      isSuspended
       isHost
       isIncognito
       isGuest
@@ -51,10 +52,6 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       features {
         id
         ...NavbarFields
-      }
-      ordersFromCollective(subscriptionsOnly: true) {
-        id
-        isSubscriptionActive
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id

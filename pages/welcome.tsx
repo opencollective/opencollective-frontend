@@ -66,7 +66,7 @@ const Welcome = () => {
           </div>
 
           <div className="mt-2 w-full rounded-lg bg-white p-2 hover:bg-blue-50 lg:w-[472px]">
-            <Link href="/organizations/new">
+            <Link href="/signup/organization">
               <div className="flex items-center px-4 py-3">
                 <div className="w-full">
                   <div className="text-black-900 text-lg leading-7 font-bold">

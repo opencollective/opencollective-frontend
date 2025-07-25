@@ -11,29 +11,29 @@ import type { ButtonProps } from '../../../ui/Button';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
-const syncPlaidAccountMutation = gql`
-  mutation SyncPlaidAccount($connectedAccount: ConnectedAccountReferenceInput!) {
-    syncPlaidAccount(connectedAccount: $connectedAccount) {
+const syncTransactionsImportMutation = gql`
+  mutation SyncTransactionsImport($transactionImport: TransactionsImportReferenceInput!) {
+    syncTransactionsImport(transactionImport: $transactionImport) {
       id
     }
   }
 `;
 
-export const SyncPlaidAccountButton = ({
+export const TransactionsImportForceSyncButton = ({
   hasRequestedSync,
   setHasRequestedSync,
-  connectedAccountId,
+  transactionImportId,
   isSyncing,
   ...props
 }: {
   hasRequestedSync: boolean;
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
-  connectedAccountId: string;
+  transactionImportId: string;
   isSyncing: boolean;
 } & ButtonProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [syncPlaidAccount] = useMutation(syncPlaidAccountMutation, { context: API_V2_CONTEXT });
+  const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation, { context: API_V2_CONTEXT });
   const setHasRequestedSyncTimeout = useRef(null);
   const prevIsSyncing = usePrevious(isSyncing);
 
@@ -64,11 +64,11 @@ export const SyncPlaidAccountButton = ({
       onClick={async () => {
         setHasRequestedSync(true);
         try {
-          await syncPlaidAccount({ variables: { connectedAccount: { id: connectedAccountId } } });
+          await syncTransactionsImport({ variables: { transactionImport: { id: transactionImportId } } });
           toast({
             message: (
               <span className="flex items-center gap-2">
-                <RefreshCw size={16} />
+                <RefreshCw size={16} className="animate-spin duration-1500" />
                 <FormattedMessage defaultMessage="Bank account synchronization requested" id="7RMLZz" />
               </span>
             ),

@@ -249,6 +249,11 @@ interface Account {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -283,6 +288,11 @@ interface Account {
     """
     accountType: [AccountType]
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -1920,6 +1930,23 @@ enum OrderDirection {
   DESC
 }
 
+input TierReferenceInput {
+  """
+  The id assigned to the Tier
+  """
+  id: String
+
+  """
+  The DB id assigned to the Tier
+  """
+  legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
+}
+
 """
 An invitation to join the members of a collective
 """
@@ -2858,6 +2885,11 @@ type Host implements Account & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -2892,6 +2924,11 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -2969,6 +3006,11 @@ type Host implements Account & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -4963,23 +5005,6 @@ enum AccountOrdersFilter {
   OUTGOING
 }
 
-input TierReferenceInput {
-  """
-  The id assigned to the Tier
-  """
-  id: String
-
-  """
-  The DB id assigned to the Tier
-  """
-  legacyId: Int
-
-  """
-  Pass this flag to reference the custom tier (/donate)
-  """
-  isCustom: Boolean
-}
-
 """
 Expected funds filter (ALL_EXPECTED_FUNDS, ONLY_PENDING, ONLY_MANUAL)
 """
@@ -5055,6 +5080,7 @@ enum PayoutMethodType {
   BANK_ACCOUNT
   ACCOUNT_BALANCE
   CREDIT_CARD
+  STRIPE
 }
 
 """
@@ -5642,6 +5668,7 @@ enum ConnectedAccountService {
   github
   transferwise
   plaid
+  gocardless
   twitter
   privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
@@ -6368,6 +6395,7 @@ type CollectiveFeatures {
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
+  OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7482,7 +7510,17 @@ type TransactionsImport {
   """
   List of available accounts for the import
   """
-  plaidAccounts: [PlaidAccount]
+  plaidAccounts: [PlaidAccount] @deprecated(reason: "2025-07-02: Please use the generic accounts field instead.")
+
+  """
+  Institution ID (for Gocardless only)
+  """
+  institutionId: String
+
+  """
+  List of available accounts for the import
+  """
+  institutionAccounts: [TransactionsImportAccount]
 
   """
   Assignments for the import, as a map of account id to legacy collective IDs. The `__default__` key can be use to set the default assignment.
@@ -7539,6 +7577,7 @@ enum TransactionsImportType {
   CSV
   MANUAL
   PLAID
+  GOCARDLESS
 }
 
 type PlaidAccount {
@@ -7580,6 +7619,36 @@ enum PlaidAccountType {
   Other
   """
   other
+}
+
+"""
+An account available in a transactions import (Plaid or GoCardless)
+"""
+type TransactionsImportAccount {
+  """
+  The unique identifier for the account
+  """
+  id: NonEmptyString!
+
+  """
+  The name of the account
+  """
+  name: NonEmptyString!
+
+  """
+  The subtype of the account (Plaid only)
+  """
+  subtype: String
+
+  """
+  The type of the account (Plaid only)
+  """
+  type: String
+
+  """
+  The mask of the account (Plaid only)
+  """
+  mask: String
 }
 
 type TransactionsImportAssignment {
@@ -7649,7 +7718,12 @@ type TransactionsImportRow {
   """
   If the row was imported from plaid, this is the account it was imported from
   """
-  plaidAccount: PlaidAccount
+  plaidAccount: PlaidAccount @deprecated(reason: "2025-07-02: Please use the generic institutionAccount field instead.")
+
+  """
+  Corresponding account for the row, based on its account ID
+  """
+  institutionAccount: TransactionsImportAccount
 
   """
   The accounts assigned to the row, based on its account ID
@@ -8514,6 +8588,11 @@ type Bot implements Account {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -8548,6 +8627,11 @@ type Bot implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -8625,6 +8709,11 @@ type Bot implements Account {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -9452,6 +9541,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -9486,6 +9580,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -9563,6 +9662,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -10941,6 +11045,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -10975,6 +11084,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -11052,6 +11166,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -11958,6 +12077,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
   """
   timezone: String
+
+  """
+  Private instructions for the host to be sent to participating users.
+  """
+  privateInstructions: String
 }
 
 """
@@ -12148,6 +12272,11 @@ type Individual implements Account {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -12182,6 +12311,11 @@ type Individual implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -12259,6 +12393,11 @@ type Individual implements Account {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -13008,6 +13147,11 @@ type Individual implements Account {
   ): WebhookCollection!
 
   """
+  Company slugs the user is part of.
+  """
+  company: String
+
+  """
   Email for the account. For authenticated user: scope: "email".
   """
   email: String
@@ -13333,6 +13477,11 @@ type Organization implements Account & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -13367,6 +13516,11 @@ type Organization implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -13444,6 +13598,11 @@ type Organization implements Account & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -14384,6 +14543,11 @@ type Vendor implements Account & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -14418,6 +14582,11 @@ type Vendor implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -14495,6 +14664,11 @@ type Vendor implements Account & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -15417,6 +15591,46 @@ enum VirtualCardRequestStatus {
   APPROVED
   REJECTED
   PENDING
+}
+
+"""
+A financial institution for off-platform transactions
+"""
+type OffPlatformTransactionsInstitution {
+  """
+  The unique identifier for the institution
+  """
+  id: String!
+
+  """
+  The name of the institution
+  """
+  name: String!
+
+  """
+  The BIC (Bank Identifier Code) of the institution
+  """
+  bic: String!
+
+  """
+  URL to the institution logo
+  """
+  logoUrl: String
+
+  """
+  List of country codes supported by this institution
+  """
+  supportedCountries: [String!]!
+
+  """
+  Maximum number of days the access can be valid for
+  """
+  maxAccessValidForDays: Int!
+
+  """
+  Total number of days of transaction data available
+  """
+  transactionTotalDays: Int!
 }
 
 """
@@ -16625,6 +16839,21 @@ type Query {
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
   hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
+
+  """
+  Get financial institutions for off-platform transactions
+  """
+  offPlatformTransactionsInstitutions(
+    """
+    The country code to get institutions for
+    """
+    country: String!
+
+    """
+    The provider to use for fetching institutions
+    """
+    provider: OffPlatformTransactionsProvider!
+  ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
 }
@@ -18137,6 +18366,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -18171,6 +18405,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -18248,6 +18487,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -19222,6 +19466,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   isFrozen: Boolean!
 
   """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -19256,6 +19505,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
     includeInherited: Boolean = true
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
   ): MemberCollection!
 
   """
@@ -19333,6 +19587,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Order the query by requested role order
     """
     orderByRoles: Boolean
+
+    """
+    Filter members by tier
+    """
+    tier: TierReferenceInput
   ): MemberOfCollection!
 
   """
@@ -20415,6 +20674,21 @@ input HostApplicationReferenceInput {
 }
 
 """
+Provider for off-platform transactions
+"""
+enum OffPlatformTransactionsProvider {
+  """
+  GoCardless bank account data provider
+  """
+  GOCARDLESS
+
+  """
+  Plaid bank account data provider
+  """
+  PLAID
+}
+
+"""
 This is the root mutation
 """
 type Mutation {
@@ -20497,21 +20771,6 @@ type Mutation {
     """
     host: AccountReferenceInput
   ): Fund
-
-  """
-  Create an Organization. Scope: "account".
-  """
-  createOrganization(
-    """
-    Information about the organization to create (name, slug, description, website, ...)
-    """
-    organization: OrganizationCreateInput!
-
-    """
-    List of members to invite on Organization creation.
-    """
-    inviteMembers: [InviteMemberInput]
-  ): Organization
 
   """
   Create a Project. Scope: "account".
@@ -20723,7 +20982,7 @@ type Mutation {
     Account to edit.
     """
     account: AccountUpdateInput!
-  ): Host!
+  ): Account!
 
   """
   Adds or removes a policy on a given account. Scope: "account".
@@ -21193,6 +21452,16 @@ type Mutation {
     """
     expense: ExpenseReferenceInput!
   ): Expense!
+
+  """
+  Create a Stripe payment intent
+  """
+  createExpenseStripePaymentIntent(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): PaymentIntent!
 
   """
   Sends an email for guest to confirm their emails and create their Open Collective account
@@ -21716,6 +21985,32 @@ type Mutation {
   ): Account!
 
   """
+  Create an Organization. Scope: "account".
+  """
+  createOrganization(
+    """
+    Information about the organization to create (name, slug, description, website, ...)
+    """
+    organization: OrganizationCreateInput!
+
+    """
+    List of members to invite on Organization creation.
+    """
+    inviteMembers: [InviteMemberInput]
+
+    """
+    If creating organization as a new user, provide the user information (name, email, password, etc.).
+    """
+    individual: IndividualCreateInput
+
+    """
+    Description of the role of the user creating the organization.
+    """
+    roleDescription: String
+    captcha: CaptchaInputType
+  ): Organization
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -21884,6 +22179,51 @@ type Mutation {
   ): PlaidConnectAccountResponse!
 
   """
+  Generate a GoCardless link for bank account data access
+  """
+  generateGoCardlessLink(
+    """
+    Input for creating the GoCardless link
+    """
+    input: GoCardlessLinkInput!
+
+    """
+    The account to which the GoCardless link should be generated
+    """
+    host: AccountReferenceInput!
+  ): GoCardlessLink!
+
+  """
+  Connect a GoCardless account
+  """
+  connectGoCardlessAccount(
+    """
+    The requisition ID returned by the GoCardless flow
+    """
+    requisitionId: String!
+
+    """
+    The account to which the GoCardless account should be connected
+    """
+    host: AccountReferenceInput!
+
+    """
+    The name of the institution
+    """
+    sourceName: String
+
+    """
+    The name of the account. Will be inferred if not provided.
+    """
+    name: String
+
+    """
+    If re-connecting an existing account, the transactions import to reconnect
+    """
+    transactionImport: TransactionsImportReferenceInput
+  ): GoCardlessConnectAccountResponse!
+
+  """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
   """
   editAccountFlags(
@@ -22027,6 +22367,16 @@ type Mutation {
     """
     message: String
   ): Transaction!
+
+  """
+  Manually request a sync for a transactions import (works for both Plaid and GoCardless)
+  """
+  syncTransactionsImport(
+    """
+    The transactions import to sync
+    """
+    transactionImport: TransactionsImportReferenceInput!
+  ): TransactionsImport!
 
   """
   Create a new import. To manually add transactions to it, use `importTransactions`.
@@ -22593,7 +22943,8 @@ The `Upload` scalar type represents a file upload.
 scalar Upload
 
 input IndividualCreateInput {
-  name: String!
+  name: String
+  legalName: String
   email: String!
 }
 
@@ -22654,25 +23005,6 @@ input FundCreateInput {
   slug: String!
   description: String!
   tags: [String]
-  settings: JSON
-
-  """
-  The profile avatar image
-  """
-  image: Upload
-
-  """
-  The profile background image, for the banner and social media sharing
-  """
-  backgroundImage: Upload
-}
-
-input OrganizationCreateInput {
-  name: String!
-  legalName: String
-  slug: String!
-  description: String!
-  website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 
   """
@@ -22759,7 +23091,65 @@ input AccountUpdateInput {
   The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String!
+  name: String
+  legalName: String
+  slug: String
+  description: String
+  longDescription: String
+  company: String
+  tags: [String]
+  location: LocationInput
+  socialLinks: [SocialLinkInput!]
   currency: Currency
+
+  """
+  The host fee percentage for this account. Must be between 0 and 100.
+  """
+  hostFeePercent: Int
+
+  """
+  Settings for the account.
+  """
+  settings: AccountUpdateSettingsInput
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime
+
+  """
+  Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
+  """
+  timezone: String
+
+  """
+  Private instructions for the host to be sent to participating users.
+  """
+  privateInstructions: String
+}
+
+input AccountUpdateSettingsInput {
+  """
+  Whether this host account is accepting fiscal sponsorship applications.
+  """
+  apply: Boolean
+
+  """
+  Message shown to users when applying to join this account.
+  """
+  applyMessage: String
+
+  """
+  Terms of Service for this account.
+  """
+  tos: String
+  VAT: JSON
+  GST: JSON
 }
 
 input PoliciesInput {
@@ -23469,6 +23859,11 @@ enum ExpenseProcessAction {
   PAY
 
   """
+  To mark expense as paid with stripe, can still be processing
+  """
+  MARK_AS_PAID_WITH_STRIPE
+
+  """
   To mark the expense as spam
   """
   MARK_AS_SPAM
@@ -23671,6 +24066,16 @@ input ExpenseInviteeOrganizationInput {
   name: String
   slug: String
   website: String
+}
+
+"""
+A Stripe payment intent
+"""
+type PaymentIntent {
+  id: String!
+  paymentIntentClientSecret: String!
+  stripeAccount: String!
+  stripeAccountPublishableSecret: String!
 }
 
 """
@@ -24110,16 +24515,6 @@ enum ProcessOrderAction {
 }
 
 """
-A Stripe payment intent
-"""
-type PaymentIntent {
-  id: String!
-  paymentIntentClientSecret: String!
-  stripeAccount: String!
-  stripeAccountPublishableSecret: String!
-}
-
-"""
 Input to create a Stripe payment intent
 """
 input PaymentIntentInput {
@@ -24279,6 +24674,45 @@ input PendingOrderEditInput {
   accountingCategory: AccountingCategoryReferenceInput
 }
 
+input OrganizationCreateInput {
+  name: String!
+  legalName: String
+  slug: String!
+  description: String!
+  website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
+  settings: JSON
+
+  """
+  Two-letters country code following ISO31661
+  """
+  countryISO: String
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
+}
+
+"""
+Input type for captcha verification
+"""
+input CaptchaInputType {
+  """
+  The captcha token to verify
+  """
+  token: String!
+
+  """
+  The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
+  """
+  provider: String!
+}
+
 type CreditCardWithStripeError {
   """
   The payment method created
@@ -24344,6 +24778,88 @@ The locale in the format of a BCP 47 (RFC 5646) standard string
 scalar Locale
 
 type PlaidConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The transactions import that was created
+  """
+  transactionsImport: TransactionsImport!
+}
+
+"""
+A GoCardless link for bank account data access
+"""
+type GoCardlessLink {
+  """
+  The unique identifier for the requisition
+  """
+  id: String!
+
+  """
+  The date & time at which the requisition was created
+  """
+  createdAt: DateTime!
+
+  """
+  The reference for the requisition
+  """
+  reference: String!
+
+  """
+  The requisition ID for the link
+  """
+  requisitionId: String!
+
+  """
+  Redirect URL to your application after end-user authorization with ASPSP
+  """
+  redirect: URL!
+
+  """
+  The institution ID for this requisition
+  """
+  institutionId: String!
+
+  """
+  Link to initiate authorization with Institution
+  """
+  link: String
+}
+
+"""
+Input for creating a GoCardless link
+"""
+input GoCardlessLinkInput {
+  """
+  The institution ID for this requisition
+  """
+  institutionId: String!
+
+  """
+  Maximum number of days of transaction data to retrieve (default: 90)
+  """
+  maxHistoricalDays: Int
+
+  """
+  Number of days from acceptance that the access can be used (default: 90)
+  """
+  accessValidForDays: Int
+
+  """
+  A two-letter country code (ISO 639-1) (default: "en")
+  """
+  userLanguage: Locale
+
+  """
+  Option to enable account selection view for the end user (default: true)
+  """
+  accountSelection: Boolean
+}
+
+type GoCardlessConnectAccountResponse {
   """
   The connected account that was created
   """
@@ -24424,6 +24940,11 @@ input TransactionsImportRowCreateInput {
   amount: AmountInput!
 
   """
+  The account ID associated with the row
+  """
+  accountId: String
+
+  """
   The raw value of the row
   """
   rawValue: JSONObject
@@ -24486,6 +25007,11 @@ input TransactionsImportRowUpdateInput {
   Optional note for the row
   """
   note: String
+
+  """
+  The account ID associated with the row
+  """
+  accountId: String
 }
 
 """

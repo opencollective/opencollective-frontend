@@ -27,7 +27,7 @@ import {
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -119,7 +119,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const hasPendingGrants = account.pendingGrants?.totalCount > 0;
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
-
   const items: MenuItem[] = [
     {
       if:
@@ -362,8 +361,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
-          label: intl.formatMessage({ defaultMessage: 'Off-platform Transactions', id: 'MlrieI' }),
-          if: LoggedInUser?.hasPreviewFeatureEnabled('PLAID_INTEGRATION'),
+          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
+          if: isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
         },
         {
           section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
@@ -439,7 +438,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS,
-                if: !isAccountantOnly,
+                if: !isAccountantOnly && isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
               },
               {
                 section: ALL_SECTIONS.CHART_OF_ACCOUNTS,

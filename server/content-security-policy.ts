@@ -22,6 +22,8 @@ const COMMON_DIRECTIVES = {
     'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
     'i.ytimg.com', // For youtube embeds
+    'storage.googleapis.com', // For GoCardless institutions images
+    'cdn-logos.gocardless.com', // For GoCardless institutions images
   ].filter(Boolean),
   workerSrc: [SELF],
   styleSrc: [
