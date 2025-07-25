@@ -721,7 +721,7 @@
   "collective.category.meetup": "Encontros",
   "collective.category.movement": "Movimento",
   "collective.company.description": "Use este campo para exibir publicamente suas afiliações. Comece com @ para mencionar uma organização registrada no Open Collective, por exemplo: @airbnb.",
-  "collective.company.label": "empresa",
+  "collective.company.label": "Company",
   "collective.connectedAccounts.disconnect.button": "Desconectar",
   "collective.connectedAccounts.github.description": "Conecte-se a uma conta do GitHub para verificar sua identidade e adicioná-la ao seu perfil",
   "collective.connectedAccounts.reconnect.button": "Reconectar",
