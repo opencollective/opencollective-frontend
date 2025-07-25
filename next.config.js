@@ -8,6 +8,7 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
+const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
@@ -128,6 +129,15 @@ const nextConfig = {
         filter(file) {
           return file.isChunk && file.name.match(/^i18n-messages-.*/);
         },
+      }),
+    );
+
+    // Put the Codecov webpack plugin after all other plugins
+    config.plugins.push(
+      codecovWebpackPlugin({
+        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+        bundleName: 'opencollective-frontend',
+        uploadToken: process.env.CODECOV_TOKEN,
       }),
     );
 
