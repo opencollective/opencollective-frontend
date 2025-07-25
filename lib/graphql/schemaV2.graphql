@@ -12077,6 +12077,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
   """
   timezone: String
+
+  """
+  Private instructions for the host to be sent to participating users.
+  """
+  privateInstructions: String
 }
 
 """
@@ -13140,6 +13145,11 @@ type Individual implements Account {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Company slugs the user is part of.
+  """
+  company: String
 
   """
   Email for the account. For authenticated user: scope: "email".
@@ -23081,6 +23091,15 @@ input AccountUpdateInput {
   The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String!
+  name: String
+  legalName: String
+  slug: String
+  description: String
+  longDescription: String
+  company: String
+  tags: [String]
+  location: LocationInput
+  socialLinks: [SocialLinkInput!]
   currency: Currency
 
   """
@@ -23092,6 +23111,26 @@ input AccountUpdateInput {
   Settings for the account.
   """
   settings: AccountUpdateSettingsInput
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime
+
+  """
+  Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
+  """
+  timezone: String
+
+  """
+  Private instructions for the host to be sent to participating users.
+  """
+  privateInstructions: String
 }
 
 input AccountUpdateSettingsInput {
@@ -23109,6 +23148,8 @@ input AccountUpdateSettingsInput {
   Terms of Service for this account.
   """
   tos: String
+  VAT: JSON
+  GST: JSON
 }
 
 input PoliciesInput {

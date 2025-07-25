@@ -56,10 +56,9 @@ describe('event.create.test.js', () => {
     cy.get('[data-cy="menu-item-Settings"]:visible').click();
 
     // edit event info
-    cy.get('.inputs .inputField.name input').type(`{selectall}${updatedTitle}`);
+    cy.get('input[name="name"]').type(`{selectall}${updatedTitle}`);
     cy.wait(400);
-    cy.get('[data-cy="collective-save"]').click();
-    cy.get('[data-cy="collective-save"]').contains('Saved');
+    cy.get('[data-cy="save"]').click();
     // edit event tickets
     cy.getByDataCy('menu-item-tickets').click();
     cy.getByDataCy('contribute-card-tier').last().find('button').click();
