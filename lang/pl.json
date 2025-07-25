@@ -1943,6 +1943,7 @@
   "GsX5Fk": "Last {number} {period}",
   "Gsyrfa": "Stawka {taxName}",
   "gT672Y": "Not supported yet",
+  "GTBZLL": "No timezone found.",
   "GTK0Wf": "Wybrany przez Ciebie Gospodarz podatkowy wymaga dodania minimum {numberOfAdmins, plural, one {# administratora} few {# administratorów} many {# administratorów} other {# administratorów} }. Możesz zarządzać swoimi administratorami z poziomu Ustawień zbiorów.",
   "guestJoin.contactSupport": "Skontaktuj się z <SupportLink>pomocą techniczną</SupportLink>, aby uzyskać więcej informacji na temat procedury przejęcia konta. Proszę załączyć identyfikator wkładu do Twojego zgłoszenia: {orderId}",
   "guestJoin.noEmail": "Nie znaleźliśmy żadnych wkładów dołączonych do tej przeglądarki.",
