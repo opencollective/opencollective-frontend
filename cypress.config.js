@@ -29,7 +29,6 @@ module.exports = defineConfig({
   },
   e2e: {
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config);
       require('cypress-terminal-report/src/installLogsPrinter')(on, {
         printLogsToConsole: 'onFail',
       });
