@@ -4,6 +4,7 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { get, isEqual, isNil, isUndefined, pick } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -183,6 +184,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const timezoneInputRef = useRef<HTMLInputElement>(null);
   const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
+  const router = useRouter();
   const { toast } = useToast();
   const { data, loading } = useQuery(editAccountQuery, {
     context: API_V2_CONTEXT,
@@ -304,7 +306,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
           ),
           onConfirm: async () => {
             await update();
-            window.location.href = process.env.WEBSITE_URL + getDashboardRoute(variables.account, 'info');
+            router.replace(getDashboardRoute(variables.account, 'info'));
           },
         });
       } else {
