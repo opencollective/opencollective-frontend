@@ -205,7 +205,7 @@
   "5y2qWO": "Připojování...",
   "5yfmfv": "File type is not supported. Supported file types are: {availableExtensions}.",
   "5YI3tk": "Some details were pre-filled for you by the person who invited you. Make sure you double check all the information that was pre-filled and correct it if necessary. If you have any questions contact this person directly off-platform.",
-  "5Zh4DV": ".",
+  "5Zh4DV": "The Reference Number submitted by the user with the expense.",
   "6/UjBO": "Add expense",
   "62ZM+e": "Unfreeze {collectiveType, select, FUND {fund} other {collective}}",
   "64TD/d": "Contact us at {email}",
