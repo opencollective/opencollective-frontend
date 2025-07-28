@@ -27,7 +27,7 @@ const editAccountSettingMutation = gql`
 
 export function OrgOverview() {
   const { account } = useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showSetupGuide, setShowSetupGuide] = useState(undefined);
   const [editAccountSetting] = useMutation(editAccountSettingMutation, {
     context: API_V2_CONTEXT,
@@ -52,8 +52,9 @@ export function OrgOverview() {
           value: open,
         },
       }).catch(() => {});
+      await refetchLoggedInUser();
     },
-    [account, LoggedInUser, editAccountSetting],
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
   );
 
   return (
