@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Search, X } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
@@ -36,7 +35,7 @@ const SearchInput = styled(Box)`
     border: none;
     margin-right: 1.5rem;
     ${typography}
-    ::placeholder {
+    &::placeholder {
       color: #9d9fa3;
     }
   }
@@ -156,36 +155,6 @@ class SearchForm extends React.Component {
     );
   }
 }
-
-SearchForm.propTypes = {
-  fontSize: PropTypes.string,
-  defaultValue: PropTypes.string,
-  py: PropTypes.string,
-  value: PropTypes.string,
-  onSubmit: PropTypes.func,
-  placeholder: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  onChange: PropTypes.func,
-  borderRadius: PropTypes.string,
-  borderColor: PropTypes.string,
-  height: PropTypes.string,
-  router: PropTypes.object,
-  disabled: PropTypes.bool,
-  autoFocus: PropTypes.bool,
-  showSearchButton: PropTypes.bool,
-  searchButtonStyles: PropTypes.object,
-  onFocus: PropTypes.func,
-  autoComplete: PropTypes.string,
-  fontStyle: PropTypes.string,
-  letterSpacing: PropTypes.string,
-  lineHeight: PropTypes.string,
-  fontWeight: PropTypes.string,
-  className: PropTypes.string,
-  closeSearchModal: PropTypes.func,
-  onClearFilter: PropTypes.func,
-  intl: PropTypes.object,
-};
 
 const composedFunction = compose(withRouter, injectIntl);
 

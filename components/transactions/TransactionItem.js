@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
@@ -102,22 +101,6 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
   } else {
     return <React.Fragment>{children}</React.Fragment>;
   }
-};
-
-ItemTitleWrapper.propTypes = {
-  children: PropTypes.node.isRequired,
-  expense: PropTypes.shape({
-    legacyId: PropTypes.number,
-    account: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
-  order: PropTypes.shape({
-    legacyId: PropTypes.number,
-    toAccount: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
 };
 
 const KindTag = styled(StyledTag).attrs({
@@ -366,82 +349,6 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
       )}
     </Item>
   );
-};
-
-TransactionItem.propTypes = {
-  /* Display Refund and Download buttons in transactions */
-  displayActions: PropTypes.bool,
-  transaction: PropTypes.shape({
-    isRefunded: PropTypes.bool,
-    isRefund: PropTypes.bool,
-    isOrderRejected: PropTypes.bool,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-      isIncognito: PropTypes.bool,
-    }).isRequired,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    toAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    giftCardEmitterAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    order: PropTypes.shape({
-      id: PropTypes.string,
-      legacyId: PropTypes.number,
-      status: PropTypes.string,
-    }),
-    expense: PropTypes.shape({
-      id: PropTypes.string,
-      status: PropTypes.string,
-      legacyId: PropTypes.number,
-      comments: PropTypes.shape({
-        totalCount: PropTypes.number,
-      }),
-    }),
-    id: PropTypes.string,
-    uuid: PropTypes.string,
-    type: PropTypes.oneOf(Object.values(TransactionTypes)),
-    kind: PropTypes.oneOf(Object.values(TransactionKind)),
-    currency: PropTypes.string,
-    description: PropTypes.string,
-    createdAt: PropTypes.string,
-    hostFeeInHostCurrency: PropTypes.number,
-    platformFeeInHostCurrency: PropTypes.number,
-    paymentProcessorFeeInHostCurrency: PropTypes.number,
-    taxAmount: PropTypes.object,
-    amount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    netAmount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    netAmountInCollectiveCurrency: PropTypes.number,
-    usingGiftCardFromCollective: PropTypes.object,
-    paymentMethod: PropTypes.object,
-  }),
-  collective: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    slug: PropTypes.string.isRequired,
-  }).isRequired,
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionItem;

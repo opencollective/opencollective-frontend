@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
@@ -10,7 +9,7 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
+const collectivePickerSearchQuery = gqlV1 /* GraphQL */ `
   query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]
@@ -20,6 +19,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
     $skipGuests: Boolean
     $includeArchived: Boolean
     $includeVendorsForHostId: Int
+    $vendorVisibleToAccountIds: [Int]
   ) {
     search(
       term: $term
@@ -30,6 +30,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
       skipGuests: $skipGuests
       includeArchived: $includeArchived
       includeVendorsForHostId: $includeVendorsForHostId
+      vendorVisibleToAccountIds: $vendorVisibleToAccountIds
     ) {
       id
       collectives {
@@ -50,6 +51,11 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isHost
         ... on Vendor {
           hasPayoutMethod
+          visibleToAccounts {
+            id
+            slug
+            name
+          }
         }
         ... on User {
           isTwoFactorAuthEnabled
@@ -96,7 +102,7 @@ const Messages = defineMessages({
  * If a single type is selected, will return a label like: `Search for users`
  * Otherwise it just returns `Search`
  */
-const getPlaceholder = (intl, types) => {
+const getPlaceholder = (intl, types, { useBeneficiaryForVendor } = {}) => {
   const nbTypes = types ? types.length : 0;
   if (nbTypes === 0 || nbTypes > 3) {
     return intl.formatMessage(Messages.search);
@@ -104,14 +110,16 @@ const getPlaceholder = (intl, types) => {
     if (types[0] === CollectiveType.USER) {
       return intl.formatMessage(Messages.searchForUsers);
     } else {
-      return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
+      return intl.formatMessage(Messages.searchForType, {
+        entity: formatCollectiveType(intl, types[0], 100, { useBeneficiaryForVendor }),
+      });
     }
   } else {
     // Format by passing a map of entities like { entity1: 'Collectives' }
     return intl.formatMessage(
       Messages[`searchForType_${nbTypes}`],
       types.reduce((i18nParams, type, index) => {
-        i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100);
+        i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100, { useBeneficiaryForVendor });
         return i18nParams;
       }, {}),
     );
@@ -138,6 +146,8 @@ const CollectivePickerAsync = ({
   includeArchived = false,
   includeVendorsForHostId = undefined,
   defaultCollectives = undefined,
+  vendorVisibleToAccountIds = undefined,
+  useBeneficiaryForVendor = false,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -186,7 +196,7 @@ const CollectivePickerAsync = ({
   }, [term, preload, data, loading, filteredDefaultCollectives]);
 
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
-  const placeholder = getPlaceholder(intl, types);
+  const placeholder = getPlaceholder(intl, types, { useBeneficiaryForVendor });
 
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
@@ -200,9 +210,10 @@ const CollectivePickerAsync = ({
         skipGuests,
         includeArchived,
         includeVendorsForHostId,
+        vendorVisibleToAccountIds,
       });
     }
-  }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, term]);
 
   return (
     <CollectivePicker
@@ -222,45 +233,10 @@ const CollectivePickerAsync = ({
         setTerm(newTerm.trim());
       }}
       customOptions={!term ? emptyCustomOptions : []}
+      useBeneficiaryForVendor={useBeneficiaryForVendor}
       {...props}
     />
   );
-};
-
-CollectivePickerAsync.propTypes = {
-  ...CollectivePicker.propTypes,
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** The types of collectives to retrieve */
-  types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
-  /** Whether we should group collectives by type. By default, this is true when there's more than one type */
-  groupByType: PropTypes.bool,
-  /** Max number of collectives displayed at the same time */
-  limit: PropTypes.number,
-  /** If set, only the collectives under this host will be retrieved */
-  hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
-  /** If set, only the collectives under this parent collective will be retrieved */
-  parentCollectiveIds: PropTypes.arrayOf(PropTypes.number),
-  /** If true, a query will be triggered even if search is empty */
-  preload: PropTypes.bool,
-  /** If true, results won't be cached (Apollo "network-only" mode) */
-  noCache: PropTypes.bool,
-  /** Query to use for the search. Override to add custom fields */
-  searchQuery: PropTypes.any,
-  /** Custom options that are displayed when the field is empty */
-  emptyCustomOptions: PropTypes.any,
-  /** Function to filter results returned by the API */
-  filterResults: PropTypes.func,
-  /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
-  /** If true, a permanent option to invite a new user will be displayed in the select */
-  invitable: PropTypes.bool,
-  skipGuests: PropTypes.bool,
-  onInvite: PropTypes.func,
-  /** Include archived collectives **/
-  includeArchived: PropTypes.bool,
-  /** Include vendors for the given host id**/
-  includeVendorsForHostId: PropTypes.number,
 };
 
 export default CollectivePickerAsync;

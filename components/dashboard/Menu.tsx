@@ -16,6 +16,7 @@ import {
   Megaphone,
   Receipt,
   Settings,
+  Signature,
   Store,
   Ticket,
   Users,
@@ -26,7 +27,7 @@ import {
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -107,13 +108,23 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
+  const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
 
+  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const hasPendingGrants = account.pendingGrants?.totalCount > 0;
+  const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const items: MenuItem[] = [
     {
-      if: isIndividual || !isHost,
+      if:
+        isIndividual ||
+        !isHost ||
+        (isHost && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_OVERVIEW)),
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
@@ -124,13 +135,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
-      if: !isIndividual && !isChild,
+      if: !isIndividual && !isChild && !isCommunityManagerOnly,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
       Icon: Receipt,
@@ -163,19 +174,57 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isIndividual,
+      if: isIndividual && hasGrantAndFundsReorgEnabled,
+      Icon: Receipt,
+      label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+      section: ALL_SECTIONS.SUBMITTED_GRANTS,
+    },
+    {
+      if: !isIndividual && hasGrantAndFundsReorgEnabled,
+      type: 'group',
+      Icon: Receipt,
+      label:
+        isHost || isSelfHosted
+          ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
+          : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      subMenu: [
+        {
+          if: isHost,
+          section: ALL_SECTIONS.HOSTED_FUNDS,
+        },
+        {
+          if: isHost || isSelfHosted,
+          section: ALL_SECTIONS.HOSTED_GRANTS,
+          label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+        },
+        {
+          if: !isIndividual && !(isHost || isSelfHosted),
+          section: ALL_SECTIONS.GRANTS,
+        },
+        {
+          if: isHost || isSelfHosted ? hasPendingGrants : !isIndividual,
+          section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
+        },
+        {
+          if: isHost || isSelfHosted ? hasIssuedGrantRequests : true,
+          section: ALL_SECTIONS.SUBMITTED_GRANTS,
+        },
+      ],
+    },
+    {
+      if: isIndividual && !isCommunityManagerOnly,
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
       Icon: BookUserIcon,
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
@@ -208,45 +257,40 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost || isSelfHosted,
+      if: (isHost || isSelfHosted) && !isCommunityManagerOnly,
       label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
       Icon: Coins,
       section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },
     {
-      if: isHost && !isAccountantOnly,
+      if: isHost && !isAccountantOnly && !isCommunityManagerOnly,
       type: 'group',
       Icon: Building,
-      label: intl.formatMessage({ id: 'Collectives', defaultMessage: 'Collectives' }),
+      label: intl.formatMessage({ defaultMessage: 'Hosting', id: 'DkzeEN' }),
       subMenu: [
         {
           section: ALL_SECTIONS.HOSTED_COLLECTIVES,
         },
         {
-          label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
+          label: intl.formatMessage({ id: 'HostApplications.Applications', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
         },
       ],
     },
     {
+      section: ALL_SECTIONS.HOST_AGREEMENTS,
       if: isHost,
-      type: 'group',
-      Icon: FileText,
-      label: intl.formatMessage({ defaultMessage: 'Legal Documents', id: 'lSFdN4' }),
-      subMenu: [
-        {
-          section: ALL_SECTIONS.HOST_AGREEMENTS,
-          label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
-        },
-        {
-          section: ALL_SECTIONS.HOST_TAX_FORMS,
-          label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-          if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
-        },
-      ],
+      Icon: Signature,
+      label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
-      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
+      section: ALL_SECTIONS.HOST_TAX_FORMS,
+      Icon: FileText,
+      label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+      if: isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+    },
+    {
+      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
       Icon: CreditCard,
@@ -262,7 +306,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost,
+      if: isHost && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
@@ -278,38 +322,53 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isHost && !isIndividual,
+      if: !isHost && !isIndividual && !isCommunityManagerOnly,
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
-      if: (isHost || isSelfHosted) && !isAccountantOnly,
+      if: (isHost || isSelfHosted) && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },
     {
-      if: isType(account, EVENT),
+      if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isType(account, EVENT),
+      if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
     },
     {
-      if: !isHost,
+      if: !isHost && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
     },
     {
-      if: isHost,
-      section: ALL_SECTIONS.HOST_TRANSACTIONS,
+      if: isHost && !isCommunityManagerOnly,
+      type: 'group',
+      label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
       Icon: ArrowRightLeft,
-      label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+      subMenu: [
+        {
+          section: ALL_SECTIONS.HOST_TRANSACTIONS,
+          label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
+          label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
+          if: isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+        },
+        {
+          section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
+          label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
+        },
+      ],
     },
     {
       if: !isIndividual,
@@ -318,12 +377,15 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if:
-        !isOneOfTypes(account, [EVENT, USER]) && (account.type !== 'ORGANIZATION' || isActiveHost) && !isAccountantOnly,
+        !isOneOfTypes(account, [EVENT, USER]) &&
+        (account.type !== 'ORGANIZATION' || isActiveHost) &&
+        !isAccountantOnly &&
+        !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual && !isAccountantOnly,
+      if: !isIndividual && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TEAM,
       Icon: Users2,
     },
@@ -331,11 +393,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if:
         isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
         hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
-        account.isApproved,
+        account.isApproved &&
+        !isCommunityManagerOnly,
       section: ALL_SECTIONS.VIRTUAL_CARDS,
       Icon: CreditCard,
     },
     {
+      if: !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' }),
       Icon: Settings,
@@ -371,6 +435,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               {
                 section: ALL_SECTIONS.SENDING_MONEY,
                 if: !isAccountantOnly,
+              },
+              {
+                section: ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS,
+                if: !isAccountantOnly && isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
               },
               {
                 section: ALL_SECTIONS.CHART_OF_ACCOUNTS,

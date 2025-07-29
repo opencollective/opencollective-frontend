@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useSwipeable } from 'react-swipeable';
 import styled from 'styled-components';
 
@@ -187,15 +186,6 @@ const StyledCarousel = ({
       </Container>
     </Container>
   );
-};
-
-StyledCarousel.propTypes = {
-  children: PropTypes.any,
-  showArrowController: PropTypes.bool,
-  controllerPosition: PropTypes.string,
-  contentPosition: PropTypes.string,
-  onChange: PropTypes.func,
-  display: PropTypes.array,
 };
 
 export default StyledCarousel;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -63,34 +62,20 @@ const TagsForAdmins = ({ expense, order, suggestedTags }) => {
   return <EditTags disabled={loading} value={tagList} suggestedTags={suggestedTags} onChange={onChange} />;
 };
 
-TagsForAdmins.propTypes = {
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-    account: PropTypes.shape({
-      slug: PropTypes.string,
-    }),
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-};
-
 const Tag = styled(StyledTag).attrs({
-  mb: '4px',
-  mr: '4px',
-  variant: 'rounded',
+  variant: 'rounded-right',
 })``;
 
-const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+const Tags = ({
+  expense = null,
+  order = null,
+  limit = 4,
+  getTagProps = undefined,
+  children = undefined,
+  canEdit = false,
+  suggestedTags = undefined,
+  showUntagged = false,
+}) => {
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 
@@ -106,7 +91,7 @@ const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, sugge
     return children ? children({ key: tag, tag, renderedTag, props: extraTagProps }) : renderedTag;
   };
   return (
-    <Flex flexWrap="wrap" alignItems="flex-start">
+    <Flex flexWrap="wrap" alignItems="flex-start" gap={2}>
       {canEdit ? (
         <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />
       ) : (
@@ -133,35 +118,6 @@ const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, sugge
       )}
     </Flex>
   );
-};
-
-Tags.propTypes = {
-  /** Max number of tags to display */
-  limit: PropTypes.number,
-  /** A render func that gets passed the tag */
-  children: PropTypes.func,
-  /** A function to build the tag props dynamically */
-  getTagProps: PropTypes.func,
-  /** Whether current user can edit the tags */
-  canEdit: PropTypes.bool,
-  /** If canEdit is true, this array is used to display suggested tags */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  order: PropTypes.shape({
-    id: PropTypes.string,
-    status: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    legacyId: PropTypes.number,
-    type: PropTypes.string,
-  }),
-  /** Whether to show an "Untagged" tag (when used for filtering) */
-  showUntagged: PropTypes.bool,
 };
 
 export default Tags;

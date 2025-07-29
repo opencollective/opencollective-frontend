@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -99,12 +98,6 @@ const JoinUsActionContainer = ({ title, description, link }) => {
   );
 };
 
-JoinUsActionContainer.propTypes = {
-  title: PropTypes.node,
-  description: PropTypes.node,
-  link: PropTypes.string,
-};
-
 const JoinUs = ({ page }) => (
   <JoinUsWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
@@ -151,7 +144,7 @@ const JoinUs = ({ page }) => (
 
       <Container ml={[null, null, null, 3, 6]}>
         <JoinUsActionContainer
-          link={page === 'becomeAHost' ? '/organizations/new' : '/create'}
+          link={page === 'becomeAHost' ? '/signup/organization' : '/create'}
           title={
             page === 'becomeAHost' ? (
               <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
@@ -201,9 +194,5 @@ const JoinUs = ({ page }) => (
     </Flex>
   </JoinUsWrapper>
 );
-
-JoinUs.propTypes = {
-  page: PropTypes.string,
-};
 
 export default JoinUs;

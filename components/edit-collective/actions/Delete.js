@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -16,7 +15,7 @@ import { Button } from '../../ui/Button';
 import { withUser } from '../../UserProvider';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const deleteCollectiveMutation = gqlV1/* GraphQL */ `
+const deleteCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation DeleteCollective($id: Int!) {
     deleteCollective(id: $id) {
       id
@@ -24,7 +23,7 @@ const deleteCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const deleteUserCollectiveMutation = gqlV1/* GraphQL */ `
+const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
   mutation DeleteUserCollective($id: Int!) {
     deleteUserCollective(id: $id) {
       id
@@ -168,12 +167,6 @@ const DeleteCollective = ({ collective, ...props }) => {
       )}
     </Container>
   );
-};
-
-DeleteCollective.propTypes = {
-  collective: PropTypes.object.isRequired,
-  refetchLoggedInUser: PropTypes.func,
-  router: PropTypes.object,
 };
 
 export default withUser(withRouter(DeleteCollective));

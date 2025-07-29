@@ -62,7 +62,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:15.12
+        image: postgres:16.9
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -281,7 +281,8 @@ jobs:
           path: test/cypress/downloads
         if: ${{ failure() }}
 
-      - name: Report coverage
-        uses: codecov/codecov-action@v4
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

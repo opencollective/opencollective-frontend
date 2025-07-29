@@ -13,9 +13,11 @@ export type GraphQLV1Collective = {
   isFirstPartyHost?: boolean;
   isTrustedHost?: boolean;
   isVerified?: boolean;
+  currency?: string;
   settings?: Record<string, unknown>;
   isHost?: boolean;
   policies: Policies;
+  children?: GraphQLV1Collective[];
 };
 
 export interface GraphQLV1PaymentMethod {

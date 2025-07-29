@@ -24,7 +24,7 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
@@ -50,7 +50,14 @@ const TABS = Object.keys(GROUP_FIELDS).map(group => ({
   count: GROUP_FIELDS[group].length,
 }));
 
-const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }) => {
+const makeUrl = ({
+  account,
+  isHostReport,
+  queryFilter,
+  flattenTaxesAndPaymentProcessorFees,
+  useFieldNames,
+  fields,
+}) => {
   const url = isHostReport
     ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
     : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
@@ -151,6 +158,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     url.searchParams.set('flattenTax', '1');
   }
 
+  if (useFieldNames) {
+    url.searchParams.set('useFieldNames', '1');
+  }
+
   if (!isEmpty(fields)) {
     const selectedFields = fields.join(',').replace('debitAndCreditAmounts', 'debitAmount,creditAmount');
     url.searchParams.set('fields', selectedFields);
@@ -219,10 +230,11 @@ const editAccountSettingsMutation = gql`
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
+  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
+  canCreatePreset?: boolean;
 };
 
 const ExportTransactionsCSVModal = ({
@@ -232,12 +244,14 @@ const ExportTransactionsCSVModal = ({
   trigger,
   queryFilter,
   isHostReport,
+  canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
+  const [useFieldNames, setUseFieldNames] = React.useState(false);
   const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
@@ -250,10 +264,12 @@ const ExportTransactionsCSVModal = ({
 
   const customFields = React.useMemo(
     () =>
-      updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
-      account?.settings?.exportedTransactionsFieldSets ||
-      {},
-    [updateSettingsData, account],
+      !canCreatePreset
+        ? []
+        : updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
+          account?.settings?.exportedTransactionsFieldSets ||
+          {},
+    [updateSettingsData, account, canCreatePreset],
   );
 
   const {
@@ -263,7 +279,14 @@ const ExportTransactionsCSVModal = ({
   } = useAsyncCall(async () => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (accessToken) {
-      const url = makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields });
+      const url = makeUrl({
+        account,
+        isHostReport,
+        queryFilter,
+        flattenTaxesAndPaymentProcessorFees,
+        useFieldNames,
+        fields,
+      });
       const response = await fetch(url, {
         method: 'HEAD',
         headers: {
@@ -280,17 +303,23 @@ const ExportTransactionsCSVModal = ({
     label: string;
     fields?: Array<CSVField>;
     flattenTaxesAndPaymentProcessorFees?: boolean;
+    useFieldNames?: boolean;
   }> = React.useMemo(() => {
     return [
-      ...Object.keys(customFields).map(key => ({
-        value: key,
-        label: customFields[key].name,
-        fields: customFields[key].fields,
-        flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
+      ...(canCreatePreset
+        ? Object.keys(customFields).map(key => ({
+            value: key,
+            label: customFields[key].name,
+            fields: customFields[key].fields,
+            flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
+          }))
+        : []),
+      ...Object.keys(canCreatePreset ? FIELD_OPTIONS : omit(FIELD_OPTIONS, [FIELD_OPTIONS.NEW_PRESET])).map(value => ({
+        value,
+        label: FieldOptionsLabels[value],
       })),
-      ...Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] })),
     ];
-  }, [customFields]);
+  }, [customFields, canCreatePreset]);
 
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
@@ -308,6 +337,15 @@ const ExportTransactionsCSVModal = ({
       } else {
         setFlattenTaxesAndPaymentProcessorFees(false);
       }
+
+      if (!isNil(selectedSet.useFieldNames)) {
+        setUseFieldNames(selectedSet.useFieldNames);
+      } else {
+        setUseFieldNames(false);
+      }
+    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+      setUseFieldNames(true);
+      handleTaxAndPaymentProcessorFeeSwitch(false);
     }
   }, [presetOptions, preset]);
 
@@ -319,8 +357,10 @@ const ExportTransactionsCSVModal = ({
 
   React.useEffect(() => {
     setRestAuthorizationCookie();
-    setDownloadUrl(makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }));
-  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl]);
+    setDownloadUrl(
+      makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, useFieldNames, fields }),
+    );
+  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl, useFieldNames]);
 
   const handleFieldSwitch = React.useCallback(
     ({ name, checked }) => {
@@ -341,6 +381,8 @@ const ExportTransactionsCSVModal = ({
     setFlattenTaxesAndPaymentProcessorFees(checked);
     if (checked) {
       setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
+    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+      setFields(without(fields, 'paymentProcessorFee', 'taxAmount'));
     } else {
       const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
       setFields(selectedSet?.fields || []);
@@ -393,7 +435,7 @@ const ExportTransactionsCSVModal = ({
       variables: {
         account: { slug: account?.slug },
         key: `exportedTransactionsFieldSets.${key}`,
-        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees },
+        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees, useFieldNames },
       },
     });
     setIsEditingPreset(false);
@@ -604,23 +646,43 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
             </div>
-            {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+            <div className="flex flex-col gap-2">
+              <h1 className="font-bold">
+                <FormattedMessage defaultMessage="Export options" id="b7Sq18" />
+              </h1>
               <div className="flex flex-row items-center gap-2">
-                <Switch
-                  checked={flattenTaxesAndPaymentProcessorFees}
-                  onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
-                />
+                <Switch checked={!useFieldNames} onCheckedChange={checked => setUseFieldNames(!checked)} />
                 <p className="text-sm">
-                  <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
+                  <FormattedMessage
+                    defaultMessage="Use field IDs as column headers instead of field names."
+                    id="Xq0DWl"
+                  />
                 </p>
                 <InfoTooltipIcon>
                   <FormattedMessage
-                    defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
-                    id="frVonU"
+                    defaultMessage="Select this option to export a backward-compatible CSV header using field IDs (effectiveDate, legacyId) instead of field names (Effective Date & Time, Transaction ID)."
+                    id="ArRZh5"
                   />
                 </InfoTooltipIcon>
               </div>
-            )}
+              {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+                <div className="flex flex-row items-center gap-2">
+                  <Switch
+                    checked={flattenTaxesAndPaymentProcessorFees}
+                    onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
+                  />
+                  <p className="text-sm">
+                    <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
+                  </p>
+                  <InfoTooltipIcon>
+                    <FormattedMessage
+                      defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
+                      id="frVonU"
+                    />
+                  </InfoTooltipIcon>
+                </div>
+              )}
+            </div>
             {isAboveRowLimit && (
               <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">

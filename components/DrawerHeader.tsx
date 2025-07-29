@@ -36,7 +36,7 @@ export default function DrawerHeader({
 
         <div className="flex items-center gap-1">
           <SheetClose asChild>
-            <Button variant="ghost" size="icon-xs" className="shrink-0">
+            <Button variant="ghost" size="icon-xs" className="shrink-0" data-cy="close-drawer-btn">
               <X className="h-4 w-4" />
               <span className="sr-only">
                 <FormattedMessage id="Close" defaultMessage="Close" />
@@ -85,7 +85,9 @@ export default function DrawerHeader({
                   <DropdownMenuSeparator />
                 )}
 
-                {secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {secondary?.map(action => (
+                  <DropdownActionItem key={action.label} action={action} />
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

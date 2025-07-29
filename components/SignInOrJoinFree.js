@@ -217,6 +217,7 @@ class SignInOrJoinFree extends React.Component {
           organization,
           redirect: this.getRedirectURL(),
           websiteUrl: getWebsiteUrl(),
+          captcha: data.captcha,
         },
       });
       await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
@@ -312,7 +313,7 @@ class SignInOrJoinFree extends React.Component {
               width={1}
             >
               <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
-              <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
+              <Flex justifyContent="space-between" gap="8px" flexDirection={['column', 'row']} alignItems="center">
                 <Span>
                   <SignInFooterLink href="/privacypolicy">
                     <FormattedMessage defaultMessage="Read our privacy policy" id="8aLrwg" />
@@ -332,9 +333,21 @@ class SignInOrJoinFree extends React.Component {
   }
 }
 
-const signupMutation = gqlV1/* GraphQL */ `
-  mutation Signup($user: UserInputType!, $organization: CollectiveInputType, $redirect: String, $websiteUrl: String) {
-    createUser(user: $user, organization: $organization, redirect: $redirect, websiteUrl: $websiteUrl) {
+const signupMutation = gqlV1 /* GraphQL */ `
+  mutation Signup(
+    $user: UserInputType!
+    $organization: CollectiveInputType
+    $redirect: String
+    $websiteUrl: String
+    $captcha: CaptchaInputType
+  ) {
+    createUser(
+      user: $user
+      organization: $organization
+      redirect: $redirect
+      websiteUrl: $websiteUrl
+      captcha: $captcha
+    ) {
       user {
         id
         email

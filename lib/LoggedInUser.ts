@@ -16,6 +16,7 @@ class LoggedInUser {
   public CollectiveId: number;
   public collective: GraphQLV1Collective;
   public isRoot: boolean;
+  public id: number;
   public hasTwoFactorAuth: boolean;
   public email: string;
   public memberOf: Array<{ id: number; role: ReverseCompatibleMemberRole; collective: GraphQLV1Collective }>;
@@ -112,7 +113,7 @@ class LoggedInUser {
     }
 
     return (
-      this.hasRole([MemberRole.HOST, MemberRole.ADMIN], comment.account) ||
+      this.hasRole([MemberRole.HOST, MemberRole.ADMIN, MemberRole.COMMUNITY_MANAGER], comment.account) ||
       this.isHostAdmin(comment.account) ||
       this.isSelf(comment.fromAccount) ||
       this.canEditEvent(comment.account)
@@ -182,6 +183,8 @@ class LoggedInUser {
       return true; // if admin of collective author
     } else if (this.isAdminOfCollectiveOrHost(update.account)) {
       return true;
+    } else if (this.hasRole([MemberRole.COMMUNITY_MANAGER], update.account)) {
+      return true; // if community manager of the collective
     }
   }
 
@@ -214,6 +217,13 @@ class LoggedInUser {
    */
   isAccountantOnly(collective) {
     return !this.isAdminOfCollective(collective) && this.hasRole(MemberRole.ACCOUNTANT, collective);
+  }
+
+  /**
+   * Returns true if the logged in user is a community manager of the collective, and nothing else
+   */
+  isCommunityManagerOnly(collective) {
+    return !this.isAdminOfCollective(collective) && this.hasRole(MemberRole.COMMUNITY_MANAGER, collective);
   }
 
   hasPreviewFeatureEnabled(featureKey: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`) {
@@ -256,8 +266,8 @@ class LoggedInUser {
      */
     const availablePreviewFeatures = previewFeatures.filter(feature => {
       const userHaveSetting = typeof earlyAccess[feature.key] !== 'undefined';
-      const hasClosedBetaAccess = feature.closedBetaAccessFor?.some(slug =>
-        this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+      const hasClosedBetaAccess = feature.closedBetaAccessFor?.some(
+        slug => slug === this.collective.slug || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
       );
       const enabledByDefault = feature.enabledByDefaultFor?.some(
         slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
@@ -268,13 +278,14 @@ class LoggedInUser {
         (['development', 'staging'].includes(process.env.NODE_ENV) || ['e2e'].includes(process.env.OC_ENV));
       const hasAccess = feature.hasAccess?.(this);
       return (
-        isEnabledInEnv &&
-        (isEnabledByDevEnv ||
-          feature.publicBeta ||
-          userHaveSetting ||
-          hasClosedBetaAccess ||
-          enabledByDefault ||
-          hasAccess)
+        feature.isEnabled?.() || // Always show enabled custom features
+        (isEnabledInEnv &&
+          (isEnabledByDevEnv ||
+            feature.publicBeta ||
+            userHaveSetting ||
+            hasClosedBetaAccess ||
+            enabledByDefault ||
+            hasAccess))
       );
     });
 

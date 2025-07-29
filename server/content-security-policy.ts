@@ -14,6 +14,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.IMAGES_URL,
     process.env.NEXT_IMAGES_URL,
+    process.env.PDF_SERVICE_V2_URL,
     'data:',
     '*.paypal.com',
     '*.paypalobjects.com',
@@ -21,6 +22,8 @@ const COMMON_DIRECTIVES = {
     'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
     'i.ytimg.com', // For youtube embeds
+    'storage.googleapis.com', // For GoCardless institutions images
+    'cdn-logos.gocardless.com', // For GoCardless institutions images
   ].filter(Boolean),
   workerSrc: [SELF],
   styleSrc: [
@@ -33,7 +36,6 @@ const COMMON_DIRECTIVES = {
   connectSrc: [
     SELF,
     process.env.API_URL,
-    process.env.PDF_SERVICE_URL,
     process.env.PDF_SERVICE_V2_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,

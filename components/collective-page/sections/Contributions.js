@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { uniqWith } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -429,38 +428,6 @@ const SectionContributions = ({ collective }) => {
       )}
     </Box>
   );
-};
-
-SectionContributions.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
-};
-
-const ContributionsGrid = ({ entries, children }) => {
-  return (
-    <Container
-      data-cy="Contributions"
-      maxWidth={Dimensions.MAX_SECTION_WIDTH}
-      px={Dimensions.PADDING_X}
-      mt={4}
-      mx="auto"
-    >
-      <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-        {entries.map(entry => (
-          <MembershipCardContainer key={entry.id} data-cy="collective-contribution">
-            {children(entry)}
-          </MembershipCardContainer>
-        ))}
-      </Grid>
-    </Container>
-  );
-};
-
-ContributionsGrid.propTypes = {
-  entries: PropTypes.array.isRequired,
-  children: PropTypes.func.isRequired,
 };
 
 export default SectionContributions;

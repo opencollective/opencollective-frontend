@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -15,7 +14,7 @@ import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const activateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
+const activateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
   mutation ActivateCollectiveAsHost($id: Int!) {
     activateCollectiveAsHost(id: $id) {
       id
@@ -31,7 +30,7 @@ const activateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const deactivateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
+const deactivateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
   mutation DeactivateCollectiveAsHost($id: Int!) {
     deactivateCollectiveAsHost(id: $id) {
       id
@@ -47,7 +46,7 @@ const deactivateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const activateBudgetMutation = gqlV1/* GraphQL */ `
+const activateBudgetMutation = gqlV1 /* GraphQL */ `
   mutation ActivateHostBudget($id: Int!) {
     activateBudget(id: $id) {
       id
@@ -56,7 +55,7 @@ const activateBudgetMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const deactivateBudgetMutation = gqlV1/* GraphQL */ `
+const deactivateBudgetMutation = gqlV1 /* GraphQL */ `
   mutation DeactivateHostBudget($id: Int!) {
     deactivateBudget(id: $id) {
       id
@@ -389,10 +388,6 @@ const FiscalHosting = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-FiscalHosting.propTypes = {
-  collective: PropTypes.object.isRequired,
 };
 
 export default FiscalHosting;

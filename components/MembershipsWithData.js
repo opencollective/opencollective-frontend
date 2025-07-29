@@ -115,7 +115,7 @@ class MembershipsWithData extends React.Component {
   }
 }
 
-const membershipsQuery = gqlV1/* GraphQL */ `
+const membershipsQuery = gqlV1 /* GraphQL */ `
   query Memberships($memberCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String) {
     allMembers(
       memberCollectiveSlug: $memberCollectiveSlug

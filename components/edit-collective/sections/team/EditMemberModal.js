@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { Trash } from 'lucide-react';
@@ -337,16 +336,6 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
       </StyledModal>
     </Container>
   );
-};
-
-EditMemberModal.propTypes = {
-  collective: PropTypes.object,
-  cancelHandler: PropTypes.func,
-  onEdit: PropTypes.func,
-  intl: PropTypes.object.isRequired,
-  isLastAdmin: PropTypes.bool,
-  member: PropTypes.object,
-  canRemove: PropTypes.bool,
 };
 
 export default EditMemberModal;

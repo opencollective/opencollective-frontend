@@ -4,7 +4,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/con
 
 import * as fragments from './fragments';
 
-export const collectivePageQuery = gqlV1/* GraphQL */ `
+export const collectivePageQuery = gqlV1 /* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
@@ -36,6 +36,7 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       isVerified
       isArchived
       isFrozen
+      isSuspended
       isHost
       isIncognito
       isGuest
@@ -51,10 +52,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       features {
         id
         ...NavbarFields
-      }
-      ordersFromCollective(subscriptionsOnly: true) {
-        id
-        isSubscriptionActive
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id

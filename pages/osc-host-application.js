@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -203,12 +202,6 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
       {step === 'success' && <YourInitiativeIsNearlyThere />}
     </Page>
   );
-};
-
-OSCHostApplication.propTypes = {
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  refetchLoggedInUser: PropTypes.func,
 };
 
 // next.js export

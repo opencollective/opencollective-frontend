@@ -48,17 +48,20 @@ const RadioGroupCard = React.forwardRef<
   return (
     <div
       className={cn(
-        `rounded-lg bg-card text-sm text-card-foreground ring-1 shadow-xs ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has([role="radio"]:focus-visible)]:bg-primary/5`,
+        `rounded-lg bg-card text-sm text-card-foreground shadow-xs ring-1 ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has([role="radio"]:focus-visible)]:bg-primary/5`,
+        className,
       )}
     >
       <RadioGroupPrimitive.Item
         ref={ref}
-        className={cn('group w-full p-4 text-left outline-hidden', className)}
+        className={cn(
+          'group w-full p-4 text-left outline-hidden disabled:cursor-not-allowed disabled:text-muted-foreground disabled:[&_.border]:border-muted-foreground/50',
+        )}
         asChild={false}
         {...props}
       >
         <div className="flex w-full items-center gap-4">
-          <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+          <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             <RadioGroupPrimitive.Indicator>
               <Circle className="h-2.5 w-2.5 fill-current text-current" />
             </RadioGroupPrimitive.Indicator>

@@ -195,7 +195,7 @@ const AccountDetails = ({ accountId, getActions }: AccountDetailsProps) => {
     context: API_V2_CONTEXT,
   });
 
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const account = data?.account;
 
   const actions = getActions(account, dropdownTriggerRef, refetch);

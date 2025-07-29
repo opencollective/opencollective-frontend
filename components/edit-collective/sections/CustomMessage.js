@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -150,22 +149,6 @@ const CustomMessage = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-CustomMessage.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    type: PropTypes.string,
-    settings: PropTypes.shape({
-      customEmailMessage: PropTypes.string,
-    }),
-    parentCollective: PropTypes.shape({
-      settings: PropTypes.shape({
-        customEmailMessage: PropTypes.string,
-      }),
-    }),
-  }),
-  isInheritSettings: PropTypes.bool,
 };
 
 export default CustomMessage;

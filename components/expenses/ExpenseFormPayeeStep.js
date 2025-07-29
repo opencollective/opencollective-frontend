@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
@@ -394,6 +393,7 @@ const ExpenseFormPayeeStep = ({
                     onInvite={onInvite}
                     LoggedInUser={loggedInAccount}
                     includeVendorsForHostId={collective.host?.legacyId || undefined}
+                    vendorVisibleToAccountIds={[collective.legacyId]}
                     addLoggedInUserAsAdmin
                     excludeAdminFields
                     searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
@@ -589,34 +589,6 @@ const ExpenseFormPayeeStep = ({
         ))}
     </Fragment>
   );
-};
-
-ExpenseFormPayeeStep.propTypes = {
-  formik: PropTypes.object,
-  editingExpense: PropTypes.bool,
-  canEditPayoutMethod: PropTypes.bool,
-  payoutProfiles: PropTypes.array,
-  onCancel: PropTypes.func,
-  handleClearPayeeStep: PropTypes.func,
-  onNext: PropTypes.func,
-  onInvite: PropTypes.func,
-  onChange: PropTypes.func,
-  isOnBehalf: PropTypes.bool,
-  disablePayee: PropTypes.bool,
-  loggedInAccount: PropTypes.object,
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      legacyId: PropTypes.number,
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-    }),
-    settings: PropTypes.object,
-  }).isRequired,
-  drawerActionsContainer: PropTypes.object,
 };
 
 export default ExpenseFormPayeeStep;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
@@ -135,20 +134,5 @@ const ContributeFAQ = ({ collective, ...props }) => (
     </Box>
   </FAQ>
 );
-
-ContributeFAQ.propTypes = {
-  collective: PropTypes.shape({
-    name: PropTypes.string,
-    contributionPolicy: PropTypes.string,
-    host: PropTypes.shape({
-      name: PropTypes.string,
-      contributionPolicy: PropTypes.string,
-    }),
-    parent: PropTypes.shape({
-      name: PropTypes.string,
-      contributionPolicy: PropTypes.string,
-    }),
-  }),
-};
 
 export default ContributeFAQ;

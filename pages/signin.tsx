@@ -261,6 +261,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
           showSearch={false}
           showProfileAndChangelogMenu={false}
           withTopBar={!this.props.requestedByWhitelabelProvider}
+          noRobots={Boolean(this.props.token || this.props.email)}
         />
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>

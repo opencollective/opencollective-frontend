@@ -9,12 +9,16 @@ import DateTime from '../../../DateTime';
 import ExpenseStatusTag from '../../../expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { DataTable } from '../../../table/DataTable';
-import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { EmptyResults } from '../../EmptyResults';
 
-export const SuggestedExpensesTable = ({
+type ExpenseForRow = Pick<Expense, 'id' | 'legacyId' | 'incurredAt' | 'amountV2' | 'description' | 'status'> & {
+  account: Pick<Account, 'id' | 'slug' | 'name' | 'type' | 'imageUrl'>;
+  payee: Pick<Account, 'id' | 'slug' | 'name' | 'type' | 'imageUrl'>;
+};
+
+export const SuggestedExpensesTable = <ExpenseType extends ExpenseForRow>({
   loading,
   selectedExpense,
   setSelectedExpense,
@@ -24,16 +28,16 @@ export const SuggestedExpensesTable = ({
   onCreateExpenseClick,
 }: {
   loading: boolean;
-  selectedExpense: Expense;
-  setSelectedExpense: (expense: Expense) => void;
-  expenses: Expense[];
+  selectedExpense: ExpenseType;
+  setSelectedExpense: (expense: ExpenseType) => void;
+  expenses: ExpenseType[];
   totalExpenses: number;
   queryFilter: any;
   onCreateExpenseClick: () => void;
 }) => {
   return (
     <RadioGroup value={selectedExpense?.id}>
-      <DataTable<Expense, unknown>
+      <DataTable<ExpenseType, unknown>
         loading={loading}
         nbPlaceholders={3}
         onClickRow={({ original }) => setSelectedExpense(original)}
@@ -41,7 +45,7 @@ export const SuggestedExpensesTable = ({
         getRowClassName={({ original }) =>
           selectedExpense?.id === original.id
             ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 border-l-2! border-l-blue-500'
-            : ''
+            : 'border-l-2! border-l-transparent'
         }
         emptyMessage={() => (
           <EmptyResults
@@ -67,13 +71,16 @@ export const SuggestedExpensesTable = ({
             id: 'id',
             header: () => <FormattedMessage id="Fields.id" defaultMessage="ID" />,
             accessorKey: 'legacyId',
-            cell: ({ cell }) => <Badge size="xs">#{cell.getValue() as number}</Badge>,
+            cell: ({ cell }) => `#${cell.getValue() as number}`,
           },
           {
-            id: 'description',
-            header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
-            accessorKey: 'description',
-            cell: ({ cell }) => <div className="flex items-center gap-1">{cell.getValue() as string}</div>,
+            id: 'date',
+            header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+            accessorKey: 'incurredAt',
+            cell: ({ cell }) => {
+              const date = cell.getValue() as string;
+              return <DateTime value={new Date(date)} dateStyle="medium" />;
+            },
           },
           {
             id: 'amount',
@@ -83,35 +90,6 @@ export const SuggestedExpensesTable = ({
               const value = cell.getValue() as Amount;
               return (
                 <FormattedMoneyAmount amount={value.valueInCents} currency={value.currency} showCurrencyCode={false} />
-              );
-            },
-          },
-          {
-            id: 'status',
-            accessorKey: 'status',
-            header: () => <FormattedMessage defaultMessage="Status" id="Fields.status" />,
-            cell: ({ cell }) => <ExpenseStatusTag status={cell.getValue() as string} />,
-          },
-          {
-            id: 'date',
-            header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-            accessorKey: 'createdAt',
-            cell: ({ cell }) => {
-              const date = cell.getValue() as string;
-              return <DateTime value={new Date(date)} timeStyle="short" />;
-            },
-          },
-          {
-            id: 'payee',
-            header: () => <FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />,
-            accessorKey: 'payee',
-            cell: ({ cell }) => {
-              const account = cell.getValue() as Account;
-              return (
-                <div className="flex items-center gap-1">
-                  <Avatar account={account} size={24} />
-                  {account.name}
-                </div>
               );
             },
           },
@@ -129,14 +107,40 @@ export const SuggestedExpensesTable = ({
               );
             },
           },
+          {
+            id: 'payee',
+            header: () => <FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />,
+            accessorKey: 'payee',
+            cell: ({ cell }) => {
+              const account = cell.getValue() as Account;
+              return (
+                <div className="flex items-center gap-1">
+                  <Avatar account={account} size={24} />
+                  {account.name}
+                </div>
+              );
+            },
+          },
+          {
+            id: 'description',
+            header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
+            accessorKey: 'description',
+            cell: ({ cell }) => <div className="flex items-center gap-1">{cell.getValue() as string}</div>,
+          },
+          {
+            id: 'status',
+            accessorKey: 'status',
+            header: () => <FormattedMessage defaultMessage="Status" id="Fields.status" />,
+            cell: ({ cell }) => <ExpenseStatusTag status={cell.getValue() as string} />,
+          },
         ]}
         footer={
           totalExpenses > expenses.length && (
             <div className="flex justify-center border-t border-neutral-200 p-3 text-center">
               <FormattedMessage
                 id="SuggestedExpensesTable.MoreResults"
-                defaultMessage="{totalExpenses, plural, one {# expense} other {# expenses}} also match your filters. Narrow down your search to see them."
-                values={{ totalExpenses }}
+                defaultMessage="{nbExpenses, plural, one {# expense} other {# expenses}} also match your filters. Narrow down your search to see {nbExpenses, plural, one {it} other {them}}."
+                values={{ nbExpenses: totalExpenses - expenses.length }}
               />
             </div>
           )

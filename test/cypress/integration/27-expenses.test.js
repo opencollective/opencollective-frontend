@@ -775,7 +775,6 @@ describe('Expense flow', () => {
 
     it('Downloads PDF', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
-      cy.getByDataCy('more-actions').click();
       cy.getByDataCy('download-expense-invoice-btn').click({ force: true });
       const date = new Date(expense.createdAt).toISOString().split('T')[0];
       const filename = `Expense-${expense.legacyId}-${collective.slug}-invoice-${date}.pdf`;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
@@ -17,10 +16,6 @@ const MessageBoxGraphqlError = ({ error, ...props }) => {
       {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
     </MessageBox>
   );
-};
-
-MessageBoxGraphqlError.propTypes = {
-  error: PropTypes.any,
 };
 
 export default MessageBoxGraphqlError;

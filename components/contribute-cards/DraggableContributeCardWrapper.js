@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import PropTypes from 'prop-types';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Move as MoveIcon } from '@styled-icons/feather/Move';
@@ -64,13 +63,6 @@ export const ContributeCardWithDragHandle = ({ Component, componentProps, dragHa
   );
 };
 
-ContributeCardWithDragHandle.propTypes = {
-  Component: PropTypes.any.isRequired,
-  componentProps: PropTypes.object,
-  dragHandleProps: PropTypes.object,
-  isDragOverlay: PropTypes.bool,
-};
-
 // Memoized for improved performance when dragging
 const MemoizedContributeCardWithDragHandle = memo(ContributeCardWithDragHandle);
 
@@ -91,9 +83,3 @@ export default function DraggableContributeCardWrapper(props) {
     </MainContainer>
   );
 }
-
-DraggableContributeCardWrapper.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  Component: PropTypes.any.isRequired,
-  componentProps: PropTypes.object,
-};

@@ -9,7 +9,10 @@ import { Span } from './Text';
 const FilterButton = styled(StyledButton).attrs({
   buttonSize: 'tiny',
   buttonStyle: 'standard',
-})`
+})<{
+  height: string | number;
+  padding: string | number;
+}>`
   font-size: 14px;
   font-weight: 400;
   height: ${props => props.height};

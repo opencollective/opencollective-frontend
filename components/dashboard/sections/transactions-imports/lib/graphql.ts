@@ -1,5 +1,34 @@
 import { gql } from '@apollo/client';
 
+export const TransactionsImportStatsFragment = gql`
+  fragment TransactionsImportStats on TransactionsImportStats {
+    total
+    ignored
+    onHold
+    expenses
+    orders
+    processed
+    pending
+    imported
+  }
+`;
+
+export const TransactionsImportAssignmentFieldsFragment = gql`
+  fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
+    importedAccountId
+    accounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
+    }
+  }
+`;
+
 export const TransactionImportListFieldsFragment = gql`
   fragment TransactionImportListFields on TransactionsImport {
     id
@@ -9,20 +38,31 @@ export const TransactionImportListFieldsFragment = gql`
     createdAt
     updatedAt
     lastSyncAt
+    isSyncing
+    institutionId
+    institutionAccounts {
+      id
+      name
+      type
+      subtype
+      mask
+    }
+    assignments {
+      ...TransactionsImportAssignmentFields
+    }
     stats {
-      total
-      ignored
-      expenses
-      orders
-      processed
+      ...TransactionsImportStats
     }
     account {
-      ... on Host {
-        id
-        transactionsImportsSources
-      }
+      id
+      legacyId
+    }
+    connectedAccount {
+      id
     }
   }
+  ${TransactionsImportStatsFragment}
+  ${TransactionsImportAssignmentFieldsFragment}
 `;
 
 export const TransactionsImportRowFieldsFragment = gql`
@@ -38,6 +78,16 @@ export const TransactionsImportRowFieldsFragment = gql`
     amount {
       valueInCents
       currency
+    }
+    assignedAccounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
     }
     expense {
       id
@@ -64,43 +114,15 @@ export const TransactionsImportRowFieldsFragment = gql`
   }
 `;
 
-export const TransactionsImportStatsFragment = gql`
-  fragment TransactionsImportStats on TransactionsImportStats {
-    total
-    ignored
-    onHold
-    expenses
-    orders
-    processed
-    pending
-  }
-`;
-
-export const TransactionsImportAssignmentFieldsFragment = gql`
-  fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
-    importedAccountId
-    accounts {
-      id
-      legacyId
-      slug
-      type
-      name
-      legalName
-      currency
-      imageUrl(height: 32)
-    }
-  }
-`;
 export const updateTransactionsImportRows = gql`
   mutation UpdateTransactionsImportRow(
-    $importId: NonEmptyString!
-    $rows: [TransactionsImportRowUpdateInput!]
+    $rows: [TransactionsImportRowUpdateInput!]!
     $action: TransactionsImportRowAction!
   ) {
-    updateTransactionsImportRows(id: $importId, rows: $rows, action: $action) {
-      import {
+    updateTransactionsImportRows(rows: $rows, action: $action) {
+      host {
         id
-        stats {
+        offPlatformTransactionsStats {
           ...TransactionsImportStats
         }
       }
@@ -112,22 +134,4 @@ export const updateTransactionsImportRows = gql`
   }
   ${TransactionsImportRowFieldsFragment}
   ${TransactionsImportStatsFragment}
-`;
-
-export const transactionsImportsQuery = gql`
-  query HostTransactionImports($accountSlug: String!, $limit: Int, $offset: Int) {
-    host(slug: $accountSlug) {
-      id
-      transactionsImports(limit: $limit, offset: $offset) {
-        totalCount
-        limit
-        offset
-        nodes {
-          id
-          ...TransactionImportListFields
-        }
-      }
-    }
-  }
-  ${TransactionImportListFieldsFragment}
 `;

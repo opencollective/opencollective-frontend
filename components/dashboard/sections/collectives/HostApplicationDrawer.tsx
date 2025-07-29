@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { get, isEmpty } from 'lodash';
 import { AlertTriangle, ExternalLink, LinkIcon, ShieldCheck } from 'lucide-react';
@@ -51,13 +50,17 @@ const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRai
 
 const ACTIONS = ProcessHostApplicationAction;
 
-const StatusTag = ({ status }) => {
+interface StatusTagProps {
+  status?: HostApplicationStatus;
+}
+
+const StatusTag = ({ status }: StatusTagProps) => {
   const tagProps = {
     display: 'block',
     textTransform: 'uppercase',
     fontWeight: 700,
     fontSize: '12px',
-  };
+  } as const;
 
   switch (status) {
     case 'PENDING':
@@ -81,10 +84,6 @@ const StatusTag = ({ status }) => {
     default:
       return null;
   }
-};
-
-StatusTag.propTypes = {
-  status: PropTypes.oneOf(['PENDING', 'REJECTED', 'APPROVED']),
 };
 
 const getSuccessToast = (intl, action, collective, result): Toast => {

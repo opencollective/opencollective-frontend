@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -152,14 +151,6 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
       )}
     </div>
   );
-};
-
-OAuthApplicationsList.propTypes = {
-  account: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  onApplicationCreated: PropTypes.func.isRequired,
-  offset: PropTypes.number,
 };
 
 export default OAuthApplicationsList;

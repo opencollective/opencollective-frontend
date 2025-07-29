@@ -512,6 +512,8 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       data
       isSaved
+      canBeEdited
+      canBeDeleted
     }
     virtualCard {
       id
@@ -523,6 +525,13 @@ export const expensePageExpenseFieldsFragment = gql`
       canEdit
       canEditTags
       canEditAccountingCategory
+      canEditType
+      canEditTitle
+      canEditItems
+      canEditPaidBy
+      canEditPayee
+      canEditPayoutMethod
+      canAttachReceipts
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -631,6 +640,10 @@ export const expensePageExpenseFieldsFragment = gql`
           type
           kind
           amount {
+            valueInCents
+            currency
+          }
+          netAmount {
             valueInCents
             currency
           }

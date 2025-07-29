@@ -12,6 +12,7 @@ import PayoutMethodData from '../expenses/PayoutMethodData';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LocationAddress from '../LocationAddress';
+import StackedAvatars from '../StackedAvatars';
 import { H4 } from '../Text';
 import { Button } from '../ui/Button';
 
@@ -76,6 +77,20 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
               {vendor.createdByAccount.name}
             </LinkCollective>
           </React.Fragment>
+        </HeaderInfo>
+      </div>
+      <div className="mt-5 flex gap-8">
+        <HeaderInfo>
+          <FormattedMessage defaultMessage="Visible to" id="zJePa1" />
+          {vendor.visibleToAccounts?.length > 0 ? (
+            <StackedAvatars
+              accounts={vendor.visibleToAccounts}
+              imageSize={24}
+              withHoverCard={{ includeAdminMembership: true }}
+            />
+          ) : (
+            <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
+          )}
         </HeaderInfo>
       </div>
       {contact && (

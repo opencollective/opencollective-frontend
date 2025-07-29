@@ -49,7 +49,7 @@ export function LanguageSwitcher() {
 
           <SelectContent className="relative max-h-80 max-w-full">
             {languageOptions.map(option => (
-              <SelectItem key={option.value} value={option.value} data-cy="language-option">
+              <SelectItem key={option.value} value={option.value} data-cy="language-option" className="cursor-pointer">
                 <div className="flex max-w-(--radix-popper-anchor-width) items-center gap-1">
                   <span className="truncate">{option.label}</span>
                   <span>({option.completion})</span>

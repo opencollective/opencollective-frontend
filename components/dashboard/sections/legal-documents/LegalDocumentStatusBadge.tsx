@@ -6,31 +6,27 @@ import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 
 import { Badge } from '../../../ui/Badge';
 
-const getBadgeType = (status: LegalDocumentRequestStatus, isExpired: boolean) => {
+const getBadgeType = (status: LegalDocumentRequestStatus) => {
   switch (status) {
     case LegalDocumentRequestStatus.ERROR:
     case LegalDocumentRequestStatus.INVALID:
       return 'error';
+    case LegalDocumentRequestStatus.EXPIRED:
+      return 'neutral';
     case LegalDocumentRequestStatus.REQUESTED:
-      return isExpired ? 'neutral' : 'info';
+      return 'info';
     case LegalDocumentRequestStatus.RECEIVED:
-      return isExpired ? 'neutral' : 'success';
+      return 'success';
     default:
       return 'neutral';
   }
 };
 
-export const LegalDocumentStatusBadge = ({
-  status,
-  isExpired,
-}: {
-  status: LegalDocumentRequestStatus;
-  isExpired: boolean;
-}) => {
+export const LegalDocumentStatusBadge = ({ status }: { status: LegalDocumentRequestStatus }) => {
   const intl = useIntl();
   return (
-    <Badge className="text-nowrap whitespace-nowrap" type={getBadgeType(status, isExpired)}>
-      {i18nLegalDocumentStatus(intl, status, isExpired)}
+    <Badge className="text-nowrap whitespace-nowrap" type={getBadgeType(status)}>
+      {i18nLegalDocumentStatus(intl, status)}
     </Badge>
   );
 };

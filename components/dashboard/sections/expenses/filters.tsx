@@ -1,5 +1,5 @@
 import React from 'react';
-import { omit } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -21,6 +21,7 @@ import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { ExpenseMetaStatuses } from '@/lib/expense';
 
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
@@ -61,6 +62,7 @@ export type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
+  hideExpensesMetaStatuses?: boolean;
 };
 
 // Only needed when either the key or the expected query variables are different
@@ -71,9 +73,10 @@ export const toVariables: FiltersToVariables<
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,
   payout: value => ({ payoutMethodType: value }),
-  tag: value => ({ tags: value }),
+  tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
+  status: value => (isEmpty(value) ? undefined : { status: value }),
 };
 
 // The filters config is used to populate the Filters component.
@@ -89,6 +92,10 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
         options={Object.values(ExpenseStatusFilter)
+          .filter(
+            value =>
+              !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
+          )
           .map(value => ({ label: valueRenderer({ intl, value }), value }))
           .sort(sortSelectOptions)}
         isMulti

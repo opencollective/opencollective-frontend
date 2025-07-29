@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 
@@ -84,19 +83,6 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
       />
     );
   }
-};
-
-AddPaymentMethod.propTypes = {
-  setNewPaymentMethodInfo: PropTypes.func,
-  onStripeReady: PropTypes.func,
-  onPaypalSuccess: PropTypes.func,
-  isSubmitting: PropTypes.bool,
-  order: PropTypes.shape({
-    totalAmount: PropTypes.object,
-    frequency: PropTypes.string,
-    toAccount: PropTypes.object,
-    tier: PropTypes.object,
-  }),
 };
 
 export default AddPaymentMethod;

@@ -16,7 +16,8 @@ import { z } from 'zod';
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/schema';
 
-import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
+import { parseChronologicalOrderInput } from '@/components/dashboard/filters/OrderFilter';
+
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
@@ -36,6 +37,7 @@ const i18nFieldLabels = defineMessages({
   [OrderByFieldType.BALANCE]: { defaultMessage: 'Balance', id: 'Balance' },
   [OrderByFieldType.CREATED_AT]: { defaultMessage: 'Date', id: 'expense.incurredAt' },
   [OrderByFieldType.NAME]: { defaultMessage: 'Name', id: 'Fields.name' },
+  [OrderByFieldType.UNHOSTED_AT]: { defaultMessage: 'Unhosted since', id: 'UnhostedSince' },
 });
 
 const i18nDefaultDirectionLabels = defineMessages({
@@ -71,6 +73,7 @@ const FieldIconTypes = {
   [OrderByFieldType.ACTIVITY]: 'NUMERICAL',
   [OrderByFieldType.BALANCE]: 'NUMERICAL',
   [OrderByFieldType.CREATED_AT]: 'NUMERICAL',
+  [OrderByFieldType.UNHOSTED_AT]: 'NUMERICAL',
   [OrderByFieldType.LAST_CHARGED_AT]: 'NUMERICAL',
   [OrderByFieldType.HOSTED_COLLECTIVES_COUNT]: 'NUMERICAL',
   [OrderByFieldType.HOST_RANK]: 'NUMERICAL',
@@ -141,20 +144,18 @@ export function buildSortFilter({
 }
 const getIcon = (direction, field) => Icons[FieldIconTypes[field]][direction] ?? Icons.DEFAULT[direction];
 
-function buildSortFilterComponent(
-  fieldSchema: z.ZodEnum<any>,
-  i18nCustomLabels?: Record<string, MessageDescriptor>,
-): React.FunctionComponent<
-  FilterComponentProps<
+function buildSortFilterComponent(fieldSchema: z.ZodEnum<any>, i18nCustomLabels?: Record<string, MessageDescriptor>) {
+  return function SortFilter({
+    onChange,
+    value,
+  }: FilterComponentProps<
     z.infer<
       z.ZodObject<{
         field: typeof fieldSchema;
         direction: typeof sortDirectionSchema;
       }>
     >
-  >
-> {
-  return function SortFilter({ onChange, value }) {
+  >) {
     const intl = useIntl();
     const Icon = getIcon(value.direction, value.field);
     const simpleList = true;

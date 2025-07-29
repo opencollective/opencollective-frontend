@@ -3,12 +3,28 @@ import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
-import type { AccountReferenceInput, ContributionFrequency, GuestInfoInput } from '../graphql/types/v2/schema';
+import type {
+  AccountReferenceInput,
+  ContributionFrequency,
+  ExpenseReferenceInput,
+  GuestInfoInput,
+} from '../graphql/types/v2/schema';
 import { loadScriptAsync } from '../utils';
 
 const createPaymentIntentMutation = gql`
   mutation CreatePaymentIntent($paymentIntent: PaymentIntentInput!, $guestInfo: GuestInfoInput) {
-    createPaymentIntent(paymentIntent: $paymentIntent, guestInfo: $guestInfo) {
+    paymentIntent: createPaymentIntent(paymentIntent: $paymentIntent, guestInfo: $guestInfo) {
+      id
+      paymentIntentClientSecret
+      stripeAccount
+      stripeAccountPublishableSecret
+    }
+  }
+`;
+
+const createExpenseStripePaymentIntentMutation = gql`
+  mutation CreateExpenseStripePaymentIntent($expense: ExpenseReferenceInput!) {
+    paymentIntent: createExpenseStripePaymentIntent(expense: $expense) {
       id
       paymentIntentClientSecret
       stripeAccount
@@ -18,16 +34,17 @@ const createPaymentIntentMutation = gql`
 `;
 
 type UsePaymentIntentOptions = {
-  chargeAttempt: number;
-  amount: { valueInCents: number; currency: string };
+  chargeAttempt?: number;
+  amount?: { valueInCents: number; currency: string };
   fromAccount?: AccountReferenceInput;
   guestInfo?: GuestInfoInput;
-  toAccount: AccountReferenceInput;
+  toAccount?: AccountReferenceInput;
   skip?: boolean;
   frequency?: ContributionFrequency;
+  expense?: ExpenseReferenceInput;
 };
 
-type StripePaymentIntent = PaymentIntent & { stripeAccount: string };
+export type StripePaymentIntent = PaymentIntent & { stripeAccount: string };
 
 export default function usePaymentIntent({
   chargeAttempt,
@@ -37,6 +54,7 @@ export default function usePaymentIntent({
   toAccount,
   skip,
   frequency,
+  expense,
 }: UsePaymentIntentOptions): [StripePaymentIntent, Stripe, boolean, Error] {
   const apolloClient = useApolloClient();
   const [error, setError] = React.useState<Error | null>(null);
@@ -55,17 +73,21 @@ export default function usePaymentIntent({
       const abortController = (abort.current = new AbortController());
       try {
         const createPaymentIntentResp = await apolloClient.mutate({
-          mutation: createPaymentIntentMutation,
+          mutation: expense ? createExpenseStripePaymentIntentMutation : createPaymentIntentMutation,
           context: { ...API_V2_CONTEXT, fetchOptions: { signal: abort.current.signal } },
-          variables: {
-            paymentIntent: {
-              amount,
-              fromAccount,
-              toAccount,
-              frequency,
-            },
-            guestInfo,
-          },
+          variables: expense
+            ? {
+                expense,
+              }
+            : {
+                paymentIntent: {
+                  amount,
+                  fromAccount,
+                  toAccount,
+                  frequency,
+                },
+                guestInfo,
+              },
           errorPolicy: 'all',
         });
 
@@ -76,7 +98,7 @@ export default function usePaymentIntent({
         }
 
         const { paymentIntentClientSecret, stripeAccountPublishableSecret, stripeAccount } =
-          createPaymentIntentResp.data?.createPaymentIntent ?? {};
+          createPaymentIntentResp.data?.paymentIntent ?? {};
 
         const stripe = window.Stripe(stripeAccountPublishableSecret, stripeAccount ? { stripeAccount } : {});
         stripe['stripeAccount'] = stripeAccount;
@@ -125,7 +147,7 @@ export default function usePaymentIntent({
       setPaymentIntent(null);
       setStripe(null);
     };
-  }, [skip, guestInfo?.captcha?.token, chargeAttempt]);
+  }, [skip, guestInfo?.captcha?.token, chargeAttempt, expense?.id, expense?.legacyId]);
 
   return [paymentIntent, stripe, loading, error];
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -294,45 +293,6 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
       )}
     </Box>
   );
-};
-
-StepDetails.propTypes = {
-  onChange: PropTypes.func,
-  showPlatformTip: PropTypes.bool,
-  isEmbed: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
-  stepDetails: PropTypes.shape({
-    amount: PropTypes.number,
-    platformTip: PropTypes.number,
-    quantity: PropTypes.number,
-    interval: PropTypes.string,
-    customData: PropTypes.object,
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    host: PropTypes.object,
-  }).isRequired,
-  tier: PropTypes.shape({
-    amountType: PropTypes.string,
-    interval: PropTypes.string,
-    description: PropTypes.string,
-    name: PropTypes.string,
-    maxQuantity: PropTypes.number,
-    availableQuantity: PropTypes.number,
-    type: PropTypes.oneOf(Object.values(TierTypes)),
-    customFields: PropTypes.array,
-    amount: PropTypes.shape({
-      currency: PropTypes.string,
-      valueInCents: PropTypes.number,
-    }),
-    minAmount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-    }),
-    singleTicket: PropTypes.bool,
-  }),
-  router: PropTypes.object,
 };
 
 export default withRouter(StepDetails);

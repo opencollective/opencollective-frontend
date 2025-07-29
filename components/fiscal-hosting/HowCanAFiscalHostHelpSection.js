@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -144,7 +143,7 @@ const messages = defineMessages({
   'fiscalHosting.feature.automaticReporting.description': {
     id: 'fiscalHosting.feature.automaticReporting.description',
     defaultMessage:
-      'No need to spend hours creating reports for funders. The Open Collective platform has automated quantitative reporting built in. Just sent the funder a link to your page! There are great tools for qualitative reporting too, like posting blogs and newsletters, which also serve to keep your wider community engaged and up to date.',
+      'No need to spend hours creating reports for funders. The Open Collective platform has automated quantitative reporting built in. Just send the funder a link to your page! There are great tools for qualitative reporting too, like posting blogs and newsletters, which also serve to keep your wider community engaged and up to date.',
   },
 
   'fiscalHosting.feature.organizeFinance': {
@@ -190,12 +189,6 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
   );
 };
 
-FeatureTitle.propTypes = {
-  id: PropTypes.string.isRequired,
-  activeFeature: PropTypes.string,
-  intl: PropTypes.any.isRequired,
-};
-
 const FeatureDescription = ({ intl, id, ...props }) => (
   <Box {...props}>
     <P
@@ -209,12 +202,6 @@ const FeatureDescription = ({ intl, id, ...props }) => (
     </P>
   </Box>
 );
-
-FeatureDescription.propTypes = {
-  id: PropTypes.string.isRequired,
-  intl: PropTypes.any.isRequired,
-  learnMoreLink: PropTypes.string,
-};
 
 const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
@@ -238,12 +225,6 @@ const Feature = ({ id, learnMoreLink, intl }) => (
     <FeatureDescription intl={intl} id={id} learnMoreLink={learnMoreLink} display={['block', 'none']} mt={2} />
   </Container>
 );
-
-Feature.propTypes = {
-  id: PropTypes.string.isRequired,
-  intl: PropTypes.any.isRequired,
-  learnMoreLink: PropTypes.string,
-};
 
 const HowToUseOpenCollective = () => {
   const [activeFeature, setActiveFeature] = useState(features[0]);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { themeGet } from '@styled-system/theme-get';
 import clsx from 'clsx';
+import { unescape } from 'lodash';
 import { ChevronLeft, ChevronRight, Download, ExternalLink, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -128,12 +129,14 @@ type FilesViewerModalProps = {
     url: string;
     name?: string;
     info?: { width: number; type: string };
+    type?: string;
   }[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
   canDownload?: boolean;
   canOpenInNewWindow?: boolean;
   hideCloseButton?: boolean;
+  setOpenFileUrl?: (url: string) => void;
 };
 
 export default function FilesViewerModal({
@@ -145,6 +148,7 @@ export default function FilesViewerModal({
   canDownload = true,
   canOpenInNewWindow = true,
   hideCloseButton = false,
+  setOpenFileUrl,
 }: FilesViewerModalProps) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
@@ -157,16 +161,31 @@ export default function FilesViewerModal({
     }
   }, [openFileUrl, files]);
 
-  const onArrowLeft = React.useCallback(() => setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)), []);
-  const onArrowRight = React.useCallback(
-    () => setSelectedIndex(selectedIndex => Math.min(selectedIndex + 1, (files?.length || 1) - 1)),
-    [files],
+  const onArrowLeft = React.useCallback(
+    () =>
+      setSelectedIndex(selectedIndex => {
+        const newIndex = Math.max(selectedIndex - 1, 0);
+        setOpenFileUrl?.(files?.[newIndex]?.url || '');
+        return newIndex;
+      }),
+    [files, setOpenFileUrl],
   );
+
+  const onArrowRight = React.useCallback(
+    () =>
+      setSelectedIndex(selectedIndex => {
+        const newIndex = Math.min(selectedIndex + 1, (files?.length || 1) - 1);
+        setOpenFileUrl?.(files?.[newIndex]?.url || '');
+        return newIndex;
+      }),
+    [files, setOpenFileUrl],
+  );
+
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files?.[selectedIndex] : null;
-  const selectedItemContentType = selectedItem?.info?.type;
+  const selectedItemContentType = selectedItem?.info?.type || selectedItem?.type;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
@@ -240,7 +259,8 @@ export default function FilesViewerModal({
                 </Span>
               ) : null}
 
-              <Span>{selectedItem?.name}</Span>
+              {/* Items descriptions can contain HTML entities from the rich text editor, we need to decode them */}
+              <Span>{selectedItem?.name ? unescape(selectedItem.name) : ''}</Span>
             </Span>
           </Box>
           <Flex alignItems="center" gridGap={2}>

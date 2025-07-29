@@ -1,39 +1,25 @@
 import React from 'react';
 import { truncate } from 'lodash';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import type { PayoutMethod } from '../lib/graphql/types/v2/schema';
 import { PayoutMethodType } from '../lib/graphql/types/v2/schema';
+import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
+import { cn } from '@/lib/utils';
 
 import { PayoutMethodIcon } from './PayoutMethodIcon';
 
 const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
 
-export const I18nPayoutMethodLabels = defineMessages({
-  [PayoutMethodType.ACCOUNT_BALANCE]: {
-    id: 'PayoutMethod.AccountBalance',
-    defaultMessage: 'Open Collective (Account Balance)',
-  },
-  [PayoutMethodType.BANK_ACCOUNT]: {
-    id: 'BankAccount',
-    defaultMessage: 'Bank account',
-  },
-  [PayoutMethodType.PAYPAL]: {
-    id: 'PayoutMethod.Type.Paypal',
-    defaultMessage: 'PayPal',
-  },
-  [PayoutMethodType.OTHER]: {
-    id: 'PayoutMethod.Type.Other',
-    defaultMessage: 'Other',
-  },
-});
-
 type PayoutMethodLabelProps = {
+  className?: string;
   showIcon?: boolean;
+  iconSize?: number;
   payoutMethod?: Omit<PayoutMethod, 'id'>;
 };
 
 export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
+  const intl = useIntl();
   if (!props.payoutMethod) {
     return null;
   }
@@ -65,23 +51,19 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
     case PayoutMethodType.OTHER: {
       const content = truncate(pm.data?.content, { length: MAX_PAYOUT_OPTION_DATA_LENGTH }).replace(/\n|\t/g, ' ');
       if (content) {
-        defaultLabel = (
-          <span>
-            <FormattedMessage {...I18nPayoutMethodLabels[PayoutMethodType.OTHER]} /> - {content}
-          </span>
-        );
+        defaultLabel = <span>{i18nPayoutMethodType(intl, PayoutMethodType.OTHER)}</span>;
       }
       break;
     }
   }
 
   if (!defaultLabel) {
-    defaultLabel = <FormattedMessage {...I18nPayoutMethodLabels[pm.type]} />;
+    defaultLabel = i18nPayoutMethodType(intl, pm.type);
   }
 
   return (
-    <div className="flex min-h-8 items-center gap-2 whitespace-nowrap">
-      {props.showIcon && <PayoutMethodIcon payoutMethod={pm} />}
+    <div className={cn('flex min-h-8 items-center gap-2 whitespace-nowrap', props.className)}>
+      {props.showIcon && <PayoutMethodIcon size={props.iconSize} payoutMethod={pm} />}
       {defaultLabel} {customLabel ? <span className="text-muted-foreground">{customLabel}</span> : null}
     </div>
   );

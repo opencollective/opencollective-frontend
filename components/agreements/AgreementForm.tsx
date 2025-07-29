@@ -16,11 +16,11 @@ import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { useDrawerActionsContainer } from '../Drawer';
 import { Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { H4 } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
@@ -86,14 +86,11 @@ const EDIT_AGREEMENT_MUTATION = gql`
 
 const ActionButtons = ({ formik, onCancel, ...props }) => (
   <Flex justifyContent="flex-end" width="100%" {...props}>
-    <StyledButton type="button" minWidth={120} mr={2} onClick={onCancel}>
+    <Button type="button" variant="outline" className="mr-2" onClick={onCancel}>
       <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-    </StyledButton>
-    <StyledButton
+    </Button>
+    <Button
       type="submit"
-      minWidth={120}
-      whiteSpace="nowrap"
-      buttonStyle="primary"
       loading={formik.isSubmitting}
       onClick={e => {
         e.preventDefault();
@@ -105,7 +102,7 @@ const ActionButtons = ({ formik, onCancel, ...props }) => (
       ) : (
         <FormattedMessage defaultMessage="Create Agreement" id="LSsYSm" />
       )}
-    </StyledButton>
+    </Button>
   </Flex>
 );
 

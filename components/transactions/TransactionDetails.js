@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -17,10 +16,10 @@ import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
-import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P, Span } from '../Text';
+import { P } from '../Text';
+import { Button } from '../ui/Button';
 
 import TransactionRefundButton from './TransactionRefundButton';
 import TransactionRejectButton from './TransactionRejectButton';
@@ -144,6 +143,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           </DetailTitle>
           <DetailDescription>
             {renderDetailsString({
+              relatedTransactions: transaction.relatedTransactions,
               amount,
               platformFee,
               hostFee,
@@ -298,31 +298,22 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
       </Flex>
       {displayActions && ( // Let us override so we can hide buttons in the collective page
         <Flex flexDirection="column" width={[1, 0.3]}>
-          <Flex flexWrap="wrap" justifyContent={['flex-start', 'flex-end']} alignItems="center" mt={[2, 0]}>
+          <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
             {(showRefundButton || showRejectButton) && (
               <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)} mt={2}>
-                <Box mx={2}>
-                  <Info color="#1869F5" size={20} />
-                </Box>
+                <Info color="#1869F5" size={20} />
               </StyledTooltip>
             )}
-            {showRefundButton && (
-              <Span mb={2}>
-                <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />
-              </Span>
-            )}
+            {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
             {showRejectButton && (
-              <Span mb={2}>
-                <TransactionRejectButton
-                  id={id}
-                  canRefund={permissions?.canRefund && !isRefunded}
-                  onMutationSuccess={onMutationSuccess}
-                />
-              </Span>
+              <TransactionRejectButton
+                id={id}
+                canRefund={permissions?.canRefund && !isRefunded}
+                onMutationSuccess={onMutationSuccess}
+              />
             )}
             {showDownloadInvoiceButton && (
-              <StyledButton
-                buttonSize="small"
+              <Button
                 data-loading={loadingInvoice}
                 loading={loadingInvoice}
                 onClick={downloadInvoiceWith({
@@ -331,103 +322,18 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                   toCollectiveSlug: toAccount.slug,
                   createdAt: transaction.createdAt,
                 })}
-                minWidth={140}
-                background="transparent"
-                textTransform="capitalize"
-                ml={2}
-                mb={2}
-                px="unset"
+                variant="outline"
                 data-cy="download-transaction-receipt-btn"
               >
                 {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                 {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
-              </StyledButton>
+              </Button>
             )}
-          </Flex>
+          </div>
         </Flex>
       )}
     </DetailsContainer>
   );
-};
-
-TransactionDetails.propTypes = {
-  displayActions: PropTypes.bool,
-  transaction: PropTypes.shape({
-    isRefunded: PropTypes.bool,
-    isRefund: PropTypes.bool,
-    kind: PropTypes.oneOf(Object.values(TransactionKind)),
-    isOrderRejected: PropTypes.bool,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }).isRequired,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    toAccount: PropTypes.shape({
-      id: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    }),
-    order: PropTypes.shape({
-      id: PropTypes.string,
-      status: PropTypes.string,
-      memo: PropTypes.string,
-      processedAt: PropTypes.string,
-    }),
-    expense: PropTypes.object,
-    id: PropTypes.string,
-    uuid: PropTypes.string,
-    type: PropTypes.string,
-    currency: PropTypes.string,
-    description: PropTypes.string,
-    createdAt: PropTypes.string,
-    taxAmount: PropTypes.object,
-    taxInfo: PropTypes.object,
-    paymentMethod: PropTypes.shape({
-      type: PropTypes.string,
-    }),
-    payoutMethod: PropTypes.shape({
-      type: PropTypes.string,
-    }),
-    amount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    netAmount: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    platformFee: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    paymentProcessorFee: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    hostFee: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-    permissions: PropTypes.shape({
-      canRefund: PropTypes.bool,
-      canDownloadInvoice: PropTypes.bool,
-      canReject: PropTypes.bool,
-    }),
-    usingGiftCardFromCollective: PropTypes.object,
-    relatedTransactions: PropTypes.array,
-  }),
-  isHostAdmin: PropTypes.bool,
-  isRoot: PropTypes.bool,
-  isToCollectiveAdmin: PropTypes.bool,
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionDetails;

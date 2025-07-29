@@ -57,7 +57,7 @@ export const teamSectionQuery = gql`
           }
         }
       }
-      members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
+      members(role: [ADMIN, MEMBER, ACCOUNTANT, COMMUNITY_MANAGER], limit: 100) {
         nodes {
           id
           ...MemberFields
@@ -69,7 +69,7 @@ export const teamSectionQuery = gql`
           slug
           type
           name
-          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
+          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT, COMMUNITY_MANAGER], limit: 100) {
             nodes {
               id
               ...MemberFields

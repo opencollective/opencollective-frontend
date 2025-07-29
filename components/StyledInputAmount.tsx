@@ -1,6 +1,5 @@
 // Deprecated, use components/InputAmount.tsx instead
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 import { CurrencyInput } from 'react-currency-input-field';
@@ -14,6 +13,7 @@ import {
   getDefaultCurrencyPrecision,
 } from '../lib/currency-utils';
 import { cn } from '../lib/utils';
+import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 
 import { Separator } from './ui/Separator';
 import { StyledCurrencyPicker } from './StyledCurrencyPicker';
@@ -45,7 +45,26 @@ const useAmountInputMinWidth = (value, max = 1000000000) => {
   return result;
 };
 
-const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, minFxRate, maxFxRate }) => {
+interface ConvertedAmountInputProps {
+  exchangeRate?: {
+    toCurrency: CurrencyEnum;
+    value: number;
+  };
+  onChange?(...args: unknown[]): unknown;
+  baseAmount?: number;
+  minFxRate?: number;
+  maxFxRate?: number;
+  inputId: string;
+}
+
+const ConvertedAmountInput = ({
+  inputId,
+  exchangeRate,
+  onChange,
+  baseAmount,
+  minFxRate,
+  maxFxRate,
+}: ConvertedAmountInputProps) => {
   const intl = useIntl();
   const precision = getDefaultCurrencyPrecision(exchangeRate.toCurrency);
   const targetAmount = round((baseAmount || 0) * exchangeRate.value, precision);
@@ -61,10 +80,10 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   };
 
   return (
-    <div className="flex flex-auto px-2 text-sm whitespace-nowrap text-neutral-500">
+    <div className="flex flex-auto whitespace-nowrap px-2 text-sm text-neutral-500">
       <span className="mr-1 align-middle">= {exchangeRate.toCurrency} </span>
       <CurrencyInput
-        className="w-full flex-auto [appearance:textfield] rounded px-[2px] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-full flex-auto rounded px-[2px] [appearance:textfield] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         allowDecimals={precision !== 0}
         decimalScale={precision === 0 ? undefined : precision} // The `undefined` thingy can be removed once https://github.com/cchanxzy/react-currency-input-field/pull/385 is resolved
         decimalsLimit={precision}
@@ -102,14 +121,6 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
       <span className="ml-1">{getEmojiByCurrencyCode(exchangeRate.toCurrency)}</span>
     </div>
   );
-};
-
-ConvertedAmountInput.propTypes = {
-  exchangeRate: PropTypes.object,
-  onChange: PropTypes.func,
-  baseAmount: PropTypes.number,
-  minFxRate: PropTypes.number,
-  maxFxRate: PropTypes.number,
 };
 
 /** Some custom styles to integrate the currency picker nicely */
@@ -189,7 +200,7 @@ const StyledInputAmount = ({
     >
       <div className="flex flex-auto basis-1/2">
         {!hasCurrencyPicker ? (
-          <div className="flex items-center bg-neutral-50 p-2 text-sm whitespace-nowrap text-neutral-800">
+          <div className="flex items-center whitespace-nowrap bg-neutral-50 p-2 text-sm text-neutral-800">
             {formatCurrencyName(currency, currencyDisplay)}
           </div>
         ) : (
@@ -271,7 +282,7 @@ const StyledInputAmount = ({
       )}
       {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
       {suffix && (
-        <div className="pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs text-muted-foreground">
+        <div className="text-muted-foreground pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs">
           {suffix}
         </div>
       )}

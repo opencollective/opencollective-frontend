@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { LoaderCircle } from 'lucide-react';
 
 import { mergeRefs } from '../../lib/react-utils';
 import { cn } from '../../lib/utils';
-
-import StyledSpinner from '../StyledSpinner';
 
 const buttonVariants = cva(
   'relative inline-flex items-center justify-center gap-1 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50',
@@ -18,6 +17,9 @@ const buttonVariants = cva(
         outlineDestructive:
           'border border-destructive bg-background text-destructive hover:bg-destructive hover:text-primary-foreground',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        success: 'bg-green-600 text-primary-foreground hover:bg-green-600/80',
+        outlineSuccess:
+          'border border-green-600 bg-background text-green-600 hover:bg-green-600 hover:text-primary-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
@@ -27,10 +29,10 @@ const buttonVariants = cva(
         sm: 'h-9 rounded-md px-3',
         lg: 'h-11 rounded-md px-8 text-lg',
         xl: 'h-14 rounded-lg px-8 text-xl',
-        icon: 'h-10 w-10',
-        'icon-xs': 'h-8 w-8',
-        'icon-sm': 'h-9 w-9',
-        'icon-lg': 'h-11 w-11',
+        icon: 'aspect-square h-10 w-10',
+        'icon-xs': 'aspect-square h-8 w-8',
+        'icon-sm': 'aspect-square h-9 w-9',
+        'icon-lg': 'aspect-square h-11 w-11',
       },
     },
     defaultVariants: {
@@ -62,7 +64,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }, [loading]);
     const realChildren = loading ? (
       <span>
-        <StyledSpinner size={16} />
+        <LoaderCircle className="animate-spin duration-1500" size={16} />
       </span>
     ) : (
       children
@@ -84,4 +86,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = 'Button';
 
-export { Button, buttonVariants };
+const AsyncCallButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({ onClick, ...props }, ref) => {
+  const [loading, setLoading] = React.useState(false);
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await onClick?.(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return <Button {...props} ref={ref} onClick={handleClick} loading={loading} />;
+});
+
+export { Button, AsyncCallButton, buttonVariants };

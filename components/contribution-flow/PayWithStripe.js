@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { HelpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
@@ -91,17 +90,17 @@ export function PayWithStripeForm({
             },
           },
           terms: {
-            bancontact: 'always',
-            card: 'always',
-            ideal: 'always',
-            sepaDebit: 'always',
-            sofort: 'always',
-            auBecsDebit: 'always',
-            usBankAccount: 'always',
-            applePay: 'always',
-            cashapp: 'always',
-            googlePay: 'always',
-            paypal: 'always',
+            bancontact: 'auto',
+            card: 'auto',
+            ideal: 'auto',
+            sepaDebit: 'auto',
+            sofort: 'auto',
+            auBecsDebit: 'auto',
+            usBankAccount: 'auto',
+            applePay: 'auto',
+            cashapp: 'auto',
+            googlePay: 'auto',
+            paypal: 'auto',
           },
         }}
         onChange={onElementChange}
@@ -139,15 +138,3 @@ export function PayWithStripeForm({
     </React.Fragment>
   );
 }
-
-PayWithStripeForm.propTypes = {
-  paymentIntentId: PropTypes.string.isRequired,
-  paymentIntentClientSecret: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  bilingDetails: PropTypes.shape({
-    name: PropTypes.string,
-    email: PropTypes.string,
-  }),
-  defaultIsSaved: PropTypes.bool,
-  hasSaveCheckBox: PropTypes.bool,
-};

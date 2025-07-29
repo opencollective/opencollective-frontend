@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
@@ -58,11 +57,6 @@ const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
       <CreateProject parent={data && data.account} />
     </Page>
   );
-};
-
-CreateProjectPage.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
 };
 
 // next.js export

@@ -70,7 +70,7 @@ export default function LegalDocumentDrawer({
   getActions,
 }: Readonly<LegalDocumentDrawerProps>) {
   const intl = useIntl();
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     context: API_V2_CONTEXT,
     variables: { hostId: host.id, accountId: get(document, 'account.id') },
@@ -113,7 +113,7 @@ export default function LegalDocumentDrawer({
               />
               <DataListItem
                 label={intl.formatMessage({ defaultMessage: 'Status', id: 'LegalDocument.Status' })}
-                value={<LegalDocumentStatusBadge status={document.status} isExpired={document.isExpired} />}
+                value={<LegalDocumentStatusBadge status={document.status} />}
               />
               <DataListItem
                 label={intl.formatMessage({ defaultMessage: 'Year', id: 'IFo1oo' })}

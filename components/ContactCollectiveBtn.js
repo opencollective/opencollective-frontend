@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -29,12 +28,6 @@ const ContactCollectiveBtn = ({ children = DefaultContactCollectiveButton, colle
       {showModal && <ContactCollectiveModal collective={collective} onClose={() => setShowModal(null)} />}
     </Fragment>
   );
-};
-
-ContactCollectiveBtn.propTypes = {
-  children: PropTypes.func.isRequired,
-  collective: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object,
 };
 
 export default ContactCollectiveBtn;

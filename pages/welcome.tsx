@@ -20,7 +20,7 @@ const Welcome = () => {
       showSearch={false}
       menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
     >
-      <div className="mt-28 mb-16 flex flex-col items-center justify-center lg:flex-row">
+      <div className="mt-28 flex flex-col items-center justify-center pb-16 lg:flex-row">
         <div className="flex flex-col text-center lg:pr-12">
           <div className="flex justify-center">
             <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} alt="OC Logo" />
@@ -66,7 +66,7 @@ const Welcome = () => {
           </div>
 
           <div className="mt-2 w-full rounded-lg bg-white p-2 hover:bg-blue-50 lg:w-[472px]">
-            <Link href="/organizations/new">
+            <Link href="/signup/organization">
               <div className="flex items-center px-4 py-3">
                 <div className="w-full">
                   <div className="text-black-900 text-lg leading-7 font-bold">

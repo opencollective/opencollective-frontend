@@ -10,9 +10,7 @@ const Table = React.forwardRef<
   <div
     className={cn(
       'table-auto overflow-auto',
-      mobileTableView || fullWidth
-        ? '-mx-4 border-t border-b 2xl:mx-0 2xl:rounded-xl 2xl:border'
-        : 'w-full rounded-xl border',
+      mobileTableView || fullWidth ? '-mx-4 border-t border-b' : 'w-full rounded-xl border',
       fullWidth ? 'sm:-mx-6' : mobileTableView ? 'sm:mx-0 sm:w-full sm:rounded-xl sm:border' : '',
       className,
     )}
@@ -66,7 +64,7 @@ const TableHead = React.forwardRef<
       ref={ref}
       className={cn(
         'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
-        fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
+        fullWidth && 'sm:first:pl-6 sm:last:pr-6',
         className,
       )}
       {...props}
@@ -84,7 +82,7 @@ const TableCell = React.forwardRef<
     className={cn(
       'relative px-2 py-2 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
       withIndicator && 'first:border-l-2 first:border-transparent first:data-[state=indicated]:border-primary',
-      fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
+      fullWidth && 'sm:first:pl-6 sm:last:pr-6',
       compact ? 'h-[49px] min-h-[49px]' : 'h-[56px] min-h-[56px]',
       className,
     )}
@@ -105,7 +103,7 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLA
     <button
       ref={ref}
       className={cn(
-        'flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 ring-2 shadow-xs shadow-transparent ring-transparent transition-colors group-hover/row:border-slate-200 group-hover/row:bg-white hover:text-slate-950 hover:shadow-slate-200 focus:outline-hidden focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:ring-black',
+        'flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-xs ring-2 shadow-transparent ring-transparent transition-colors group-hover/row:border-slate-200 group-hover/row:bg-white hover:text-slate-950 hover:shadow-slate-200 focus:outline-hidden focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:ring-black',
         className,
       )}
       {...props}

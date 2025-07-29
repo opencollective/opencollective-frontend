@@ -7,11 +7,13 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
+import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
-import Link from '../../../Link';
+import Image from '@/components/Image';
+import Link from '@/components/Link';
+import { Card, CardContent } from '@/components/ui/Card';
+
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
@@ -21,7 +23,6 @@ import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
-import { ImportTransactions } from '../transactions-imports';
 
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
@@ -85,10 +86,9 @@ const hostTransactionsMetaDataQuery = gql`
   }
 `;
 
-const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
-  const { LoggedInUser } = useLoggedInUser();
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
     context: API_V2_CONTEXT,
@@ -117,7 +117,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) 
     toVariables,
     filters,
     meta: {
-      currency: metaData?.host?.currency,
+      currency: account?.currency,
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
@@ -142,13 +142,6 @@ const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) 
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={
           <React.Fragment>
-            {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS) && (
-              <Link href={`/dashboard/${hostSlug}/host-transactions/import`}>
-                <Button size="sm" variant="outline">
-                  <FormattedMessage defaultMessage="Imports" id="ofHC1Q" />
-                </Button>
-              </Link>
-            )}
             <ExportTransactionsCSVModal
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
@@ -189,10 +182,26 @@ const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) 
   );
 };
 
+// TODO: This redirection layer should be removed after some time. Should be safe to do after 2025-10-01.
 const HostTransactions = props => {
   const router = useRouter();
   if (router.query.subpath?.[0] === 'import') {
-    return <ImportTransactions {...props} />;
+    return (
+      <div className="flex justify-center py-12">
+        <Card>
+          <CardContent className="flex max-w-xl flex-col items-center justify-center gap-6 pt-4 text-center">
+            <Image src="/static/images/not-found-illustration.png" alt="" width={200} height={200} />
+            <div>
+              This page has moved, please go to the new{' '}
+              <Link className="text-blue-600 underline" href={getOffPlatformTransactionsRoute(props.accountSlug)}>
+                Bank Account Sync tool
+              </Link>{' '}
+              to continue.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   } else {
     return <HostTransactionsBase {...props} />;
   }

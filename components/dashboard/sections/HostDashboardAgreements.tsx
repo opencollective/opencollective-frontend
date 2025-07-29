@@ -1,9 +1,10 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { i18nGraphqlException } from '../../../lib/errors';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
@@ -12,12 +13,15 @@ import type { Agreement } from '../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
+import { useAgreementActions } from '../../agreements/actions';
 import AgreementDrawer from '../../agreements/AgreementDrawer';
 import AgreementsTable from '../../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../../agreements/fragments';
 import FilesViewerModal from '../../FilesViewerModal';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import ConfirmationModal from '../../NewConfirmationModal';
 import { Button } from '../../ui/Button';
+import { useToast } from '../../ui/useToast';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
@@ -41,6 +45,14 @@ const hostDashboardAgreementsQuery = gql`
     }
   }
   ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+`;
+
+const DELETE_AGREEMENT_MUTATION = gql`
+  mutation DeleteAgreement($id: String!) {
+    deleteAgreement(agreement: { id: $id }) {
+      id
+    }
+  }
 `;
 
 const NB_AGREEMENTS_DISPLAYED = 10;
@@ -68,6 +80,11 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
   const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
+  const [isEditingAgreement, setIsEditingAgreement] = React.useState(false);
+  const [agreementToDelete, setAgreementToDelete] = React.useState<Agreement | null>(null);
+  const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION, { context: API_V2_CONTEXT });
+  const { toast } = useToast();
+  const intl = useIntl();
 
   const queryFilter = useQueryFilter({
     filters,
@@ -82,6 +99,25 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   });
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
+
+  const handleEdit = React.useCallback((agreement: Agreement) => {
+    setAgreementInDrawer(agreement);
+    setIsEditingAgreement(true);
+    setAgreementDrawerOpen(true);
+  }, []);
+
+  const handleDelete = React.useCallback((agreement: Agreement) => {
+    setAgreementToDelete(agreement);
+    setAgreementDrawerOpen(false);
+    setIsEditingAgreement(false);
+  }, []);
+
+  const handleFilePreview = React.useCallback((agreement: Agreement) => {
+    setAgreementFilePreview(agreement);
+  }, []);
+
+  const getActions = useAgreementActions(handleEdit, handleDelete);
+
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
@@ -124,11 +160,12 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
             loading={loading}
             nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
             resetFilters={() => queryFilter.resetFilters({})}
-            onFilePreview={setAgreementFilePreview}
+            onFilePreview={handleFilePreview}
             openAgreement={agreement => {
               setAgreementDrawerOpen(true);
               setAgreementInDrawer(agreement);
             }}
+            getActions={getActions}
           />
           <Pagination queryFilter={queryFilter} total={data?.host?.hostedAccountAgreements?.totalCount} />
         </React.Fragment>
@@ -138,17 +175,25 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
         agreement={agreementInDrawer}
         canEdit={canEdit}
         hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
-        onClose={() => setAgreementDrawerOpen(false)}
+        isEditing={isEditingAgreement}
+        getActions={getActions}
+        onClose={() => {
+          setAgreementDrawerOpen(false);
+          setIsEditingAgreement(false);
+        }}
         onCreate={() => {
           setAgreementDrawerOpen(false);
+          setIsEditingAgreement(false);
           refetch({ ...variables, offset: 0 }); // Resetting offset to 0 since entries are displayed by creation date DESC
         }}
-        onEdit={() => {
-          // No need to refetch, local Apollo cache is updated automatically
-          setAgreementDrawerOpen(false);
+        onEdit={updatedAgreement => {
+          // Update the agreement in drawer with the latest data
+          setAgreementInDrawer(updatedAgreement);
+          setIsEditingAgreement(false);
         }}
         onDelete={() => {
           setAgreementDrawerOpen(false);
+          setIsEditingAgreement(false);
           refetch(variables);
         }}
       />
@@ -158,6 +203,38 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
           openFileUrl={agreementFilePreview.attachment.url}
           onClose={() => setAgreementFilePreview(null)}
           parentTitle={`${agreementFilePreview.account.name} / ${agreementFilePreview.title}`}
+        />
+      )}
+      {agreementToDelete && (
+        <ConfirmationModal
+          open={!!agreementToDelete}
+          setOpen={open => !open && setAgreementToDelete(null)}
+          title={<FormattedMessage defaultMessage="Delete Agreement" id="iVzX67" />}
+          description={
+            <FormattedMessage
+              defaultMessage="This will permanently delete the agreement and all its attachments."
+              id="SuVMZP"
+            />
+          }
+          variant="destructive"
+          type="delete"
+          onConfirm={async () => {
+            try {
+              await deleteAgreement({ variables: { id: agreementToDelete.id } });
+              toast({
+                variant: 'success',
+                message: <FormattedMessage defaultMessage="Agreement deleted successfully" id="RJt89q" />,
+              });
+              setAgreementToDelete(null);
+              refetch(variables);
+            } catch (e) {
+              toast({
+                variant: 'error',
+                message: i18nGraphqlException(intl, e),
+              });
+              throw e; // Re-throw to let the modal handle the error
+            }
+          }}
         />
       )}
     </div>

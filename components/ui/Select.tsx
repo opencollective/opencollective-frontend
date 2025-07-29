@@ -20,7 +20,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-10 w-full items-center justify-between gap-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
+      'flex h-10 w-full items-center justify-between gap-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background outline-hidden transition-[color,box-shadow] placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-expanded:ring-2 aria-expanded:ring-ring',
       className,
     )}
     {...props}
@@ -35,7 +35,7 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 const SelectTriggerMini = elementFromClass(
   SelectTrigger,
-  'flex w-fit h-fit text-sm px-0 py-0 text-nowrap rounded-none items-center border-none justify-start gap-1 text-sm text-blue-600 ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex w-fit h-fit text-sm px-0 py-0 text-nowrap rounded-xs items-center border-none justify-start gap-1 text-sm text-blue-600 ring-offset-background placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-ring ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
 );
 
 const SelectContent = React.forwardRef<

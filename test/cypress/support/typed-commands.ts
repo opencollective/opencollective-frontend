@@ -3,6 +3,10 @@
 
 import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
 
+import { fakeTag as gql } from '../../../lib/graphql/helpers';
+
+import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -41,7 +45,7 @@ declare global {
         };
       }): Chainable<{ id: string; slug: string; name; description: string; settings: Record<string, unknown> }>;
 
-      signup(params: {
+      signup(params?: {
         user?: { email?: string; name?: string };
         redirect?: string;
         visitParams?: Partial<Cypress.VisitOptions>;
@@ -63,6 +67,15 @@ declare global {
       openEmail(matcher: (summary: MessageSummary) => boolean): Chainable<Message>;
 
       logout();
+
+      createHostOrganization(
+        email: string,
+        options?: unknown,
+      ): Chainable<{ id: string; legacyId: number; slug: string }>;
+
+      createVendor: typeof createVendor;
+
+      getAccount: typeof getAccount;
     }
   }
 }
@@ -83,5 +96,62 @@ Cypress.Commands.add('retryChain', function <
     }
   });
 });
+
+Cypress.Commands.add('createVendor', createVendor);
+function createVendor(
+  hostSlug: string,
+  vendor: { name: string; payoutMethod?: unknown },
+  userEmail: string,
+): Cypress.Chainable<{ name: string }> {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'CreateVendor',
+      query: gql`
+        mutation CreateVendor($hostSlug: String!, $vendor: VendorCreateInput!) {
+          createVendor(host: { slug: $hostSlug }, vendor: $vendor) {
+            id
+            name
+            slug
+            hasPayoutMethod
+            __typename
+          }
+        }
+      `,
+      variables: { hostSlug, vendor },
+    }).then(({ body }) => {
+      return body.data.createVendor;
+    });
+  });
+}
+
+Cypress.Commands.add('getAccount', getAccount);
+function getAccount(
+  accountSlug: string,
+  userEmail: string,
+): Cypress.Chainable<{ name: string; payoutMethods: { id: string; type: string }[] }> {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'GetAccount',
+      query: gql`
+        query GetAccount($accountSlug: String!) {
+          account(slug: $accountSlug) {
+            id
+            legacyId
+            name
+            slug
+            __typename
+            payoutMethods {
+              id
+              type
+            }
+          }
+        }
+      `,
+      variables: { accountSlug },
+    }).then(({ body }) => {
+      return body.data.account;
+    });
+  });
+}
 
 export {};

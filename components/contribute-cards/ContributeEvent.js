@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
 import { truncate } from 'lodash';
@@ -96,25 +95,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
     </Contribute>
   );
-};
-
-ContributeEvent.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  event: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    backgroundImageUrl: PropTypes.string,
-    startsAt: PropTypes.string,
-    endsAt: PropTypes.string,
-    description: PropTypes.string,
-    contributors: PropTypes.arrayOf(PropTypes.object),
-    stats: PropTypes.shape({
-      backers: PropTypes.object,
-    }).isRequired,
-  }),
 };
 
 export default ContributeEvent;

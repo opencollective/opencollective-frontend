@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Info } from '@styled-icons/feather/Info';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -24,15 +23,6 @@ export const BalancesBreakdown = ({ balances }) => {
   );
 };
 
-BalancesBreakdown.propTypes = {
-  balances: PropTypes.arrayOf(
-    PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
-  ),
-};
-
 const TransferwiseDetailsIcon = ({ size, balances }) => {
   if (!balances || balances.length < 2) {
     return null;
@@ -43,11 +33,6 @@ const TransferwiseDetailsIcon = ({ size, balances }) => {
       </StyledTooltip>
     );
   }
-};
-
-TransferwiseDetailsIcon.propTypes = {
-  size: PropTypes.number,
-  balances: PropTypes.array,
 };
 
 export default TransferwiseDetailsIcon;
