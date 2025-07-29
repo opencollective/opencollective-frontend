@@ -1,5 +1,5 @@
 import React from 'react';
-import { compact, isEmpty, isNil, orderBy } from 'lodash';
+import { isEmpty, isNil, orderBy } from 'lodash';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -27,7 +27,7 @@ export type Category = {
   steps: Array<Step>;
 };
 
-const sortSteps = (steps: Step[]) => orderBy(compact(steps), ['completed'], ['desc']);
+const sortSteps = (steps: Step[]) => orderBy(steps, ['completed'], ['desc']);
 
 export const runChecks = ({
   account,
@@ -80,7 +80,7 @@ export const runChecks = ({
     id: 'financials',
     title: <FormattedMessage defaultMessage="Financial Configuration" id="SetupGuide.Financials" />,
     steps: sortSteps([
-      account.isHost && {
+      {
         id: 'stripe',
         title: <FormattedMessage defaultMessage="Set up Stripe for receiving contributions" id="SetupGuide.Stripe" />,
         description: (
@@ -95,7 +95,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'receiving-money')),
         },
       },
-      account.isHost && {
+      {
         id: 'wise',
         title: <FormattedMessage defaultMessage="Set up Wise for payouts" id="SetupGuide.Wise" />,
         description: (
@@ -110,7 +110,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'sending-money')),
         },
       },
-      account.isHost && {
+      {
         title: <FormattedMessage defaultMessage="Set up your chart of accounts" id="SetupGuide.ChartOfAccounts" />,
         id: 'chart-of-accounts',
         description: (
@@ -193,7 +193,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'security')),
         },
       },
-      account.isHost && {
+      {
         title: (
           <FormattedMessage
             defaultMessage="Extend chart of accounts to managed funds"
@@ -220,7 +220,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'chart-of-accounts')),
         },
       },
-      account.isHost && {
+      {
         title: <FormattedMessage defaultMessage="Set your contribution policy" id="SetupGuide.ContributionPolicy" />,
         description: (
           <FormattedMessage
@@ -237,7 +237,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'policies')),
         },
       },
-      account.isHost && {
+      {
         title: <FormattedMessage defaultMessage="Set your expense policies" id="SetupGuide.ExpensesPolicy" />,
         description: (
           <FormattedMessage
@@ -255,7 +255,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'policies')),
         },
       },
-      account.isHost && {
+      {
         title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
         description: (
           <FormattedMessage
@@ -271,7 +271,7 @@ export const runChecks = ({
           onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
         },
       },
-      account.isHost && {
+      {
         title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
         description: (
           <FormattedMessage
