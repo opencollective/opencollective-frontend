@@ -32,7 +32,7 @@ const schema = z.object({
 });
 
 const ledgerCSVImportsQuery = gql`
-  query LedgerCSVImportsQuery($accountSlug: String!, $limit: Int, $offset: Int) {
+  query LedgerCSVImports($accountSlug: String!, $limit: Int, $offset: Int) {
     host(slug: $accountSlug) {
       id
       transactionsImports(limit: $limit, offset: $offset, type: [CSV, MANUAL]) {
