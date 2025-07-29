@@ -2,6 +2,7 @@ import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getRequestIntl } from '../lib/i18n/request';
+import { getWhitelabelProps } from '../lib/whitelabel';
 
 // import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
@@ -15,7 +16,7 @@ import Page from '../components/Page';
 
 const messages = defineMessages({
   defaultTitle: {
-    defaultMessage: 'Raise and spend money with full transparency.',
+    defaultMessage: 'Raise, manage and disburse money with full transparency.',
     id: 'TZ9FXt',
   },
   defaultDescription: {
@@ -50,7 +51,15 @@ export const HomePage = () => {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export const getServerSideProps = async ({ req, res }) => {
+export const getServerSideProps = async context => {
+  const { req, res } = context;
+
+  const whitelabel = getWhitelabelProps(context);
+  if (whitelabel?.provider) {
+    res?.setHeader('Cache-Control', 'no-cache');
+    return { redirect: { destination: `${whitelabel.provider.domain}/${whitelabel.provider.slug}`, permanent: false } };
+  }
+
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {

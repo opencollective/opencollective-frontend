@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { createGlobalStyle } from 'styled-components';
 
 import { Sheet, SheetContent } from './ui/Sheet';
 import StyledRoundButton from './StyledRoundButton';
@@ -10,12 +9,6 @@ import StyledRoundButton from './StyledRoundButton';
 const DrawerActionsContext = createContext(null);
 
 export const useDrawerActionsContainer = () => useContext(DrawerActionsContext);
-
-const GlobalDrawerStyle = createGlobalStyle<{ drawedWidth: number }>`
-  :root {
-    --drawer-width: ${({ drawedWidth }) => drawedWidth}px;
-  }
-`;
 
 export function Drawer({
   open,
@@ -37,8 +30,7 @@ export function Drawer({
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
 
-  const drawerRef = useRef();
-  const [drawedWidth, setDrawerWidth] = useState(0);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!drawerRef.current) {
@@ -46,15 +38,19 @@ export function Drawer({
     }
 
     const observer = new ResizeObserver(entries => {
-      setDrawerWidth(entries[0].contentRect.width);
+      const width = entries[0].contentRect.width;
+      document.documentElement.style.setProperty('--drawer-width', `${width}px`);
     });
     observer.observe(drawerRef.current);
-    return () => drawerRef.current && observer.unobserve(drawerRef.current);
+    return () => {
+      if (drawerRef.current) {
+        observer.unobserve(drawerRef.current);
+      }
+    };
   }, [drawerRef.current]);
 
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
-      <GlobalDrawerStyle drawedWidth={drawedWidth} />
       <Sheet
         open={open}
         onOpenChange={open => {
@@ -67,7 +63,7 @@ export function Drawer({
           <div className="relative flex-1 overflow-y-scroll px-4 py-6 sm:px-6">
             {showCloseButton && (
               <StyledRoundButton
-                className="absolute right-5 top-5"
+                className="absolute top-5 right-5"
                 size={36}
                 type="button"
                 isBorderless
@@ -82,7 +78,7 @@ export function Drawer({
           </div>
           {showActionsContainer && (
             <div
-              className="flex flex-shrink-0 flex-wrap justify-between gap-2 border-t p-4"
+              className="flex shrink-0 flex-wrap justify-between gap-2 border-t p-4"
               ref={ref => setDrawerActionsContainer(ref)}
             />
           )}

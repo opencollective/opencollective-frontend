@@ -10,7 +10,7 @@ import { isEmail } from 'validator';
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
 import { gqlV1 } from '../lib/graphql/helpers';
-import { getWebsiteUrl } from '../lib/utils';
+import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
 
 import { toast } from './ui/useToast';
 import Container from './Container';
@@ -82,6 +82,14 @@ class SignInOrJoinFree extends React.Component {
     login: PropTypes.func,
     /** whether the input needs to be auto-focused */
     autoFocus: PropTypes.bool,
+    /** whether to update the page title when the sign in form is active */
+    noSignInTitle: PropTypes.bool,
+    whitelabelProvider: PropTypes.shape({
+      name: PropTypes.string,
+      squareLogo: PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    }),
   };
 
   constructor(props) {
@@ -136,23 +144,32 @@ class SignInOrJoinFree extends React.Component {
     this.setState({ submitting: true, error: null });
 
     try {
+      const redirect = this.getRedirectURL();
       const response = await signin({
         user: { email, password },
-        redirect: this.getRedirectURL(),
+        redirect,
         websiteUrl: getWebsiteUrl(),
         sendLink,
         resetPassword,
         createProfile: false,
       });
 
-      // In dev/test, API directly returns a redirect URL for emails like
       // test*@opencollective.com.
       if (response.redirect) {
-        await this.props.router.replace(response.redirect);
+        // Use browser redirection to guarantee page, login, and router state are all updated.
+        window.location.href = response.redirect;
       } else if (response.token) {
         const user = await this.props.login(response.token);
         if (!user) {
           this.setState({ error: 'Token rejected' });
+        }
+        const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(decodeURIComponent(redirect));
+        if (isTrustedWhitelabel) {
+          const parsedUrl = new URL(decodeURIComponent(redirect));
+          parsedUrl.searchParams.set('token', response.token);
+          parsedUrl.searchParams.set('next', parsedUrl.pathname);
+          parsedUrl.pathname = '/signin';
+          window.location.href = parsedUrl.toString();
         }
       } else if (resetPassword) {
         await this.props.router.push({ pathname: '/reset-password/sent', query: { email } });
@@ -200,6 +217,7 @@ class SignInOrJoinFree extends React.Component {
           organization,
           redirect: this.getRedirectURL(),
           websiteUrl: getWebsiteUrl(),
+          captcha: data.captcha,
         },
       });
       await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
@@ -220,6 +238,7 @@ class SignInOrJoinFree extends React.Component {
     const { submitting, error, unknownEmailError, passwordRequired, email, password } = this.state;
     const displayedForm = this.props.form || this.state.form;
     const routes = this.props.routes || {};
+    const whitelabelProvider = this.props.whitelabelProvider;
 
     // No need to show the form if an email is provided
     const hasError = Boolean(unknownEmailError || error);
@@ -257,6 +276,8 @@ class SignInOrJoinFree extends React.Component {
               oAuthAppName={this.props.oAuthApplication?.name}
               oAuthAppImage={this.props.oAuthApplication?.account?.imageUrl}
               autoFocus={this.props.autoFocus}
+              noSignInTitle={this.props.noSignInTitle}
+              whitelabelProvider={whitelabelProvider}
             />
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">
@@ -292,7 +313,7 @@ class SignInOrJoinFree extends React.Component {
               width={1}
             >
               <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
-              <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
+              <Flex justifyContent="space-between" gap="8px" flexDirection={['column', 'row']} alignItems="center">
                 <Span>
                   <SignInFooterLink href="/privacypolicy">
                     <FormattedMessage defaultMessage="Read our privacy policy" id="8aLrwg" />
@@ -312,9 +333,21 @@ class SignInOrJoinFree extends React.Component {
   }
 }
 
-const signupMutation = gqlV1/* GraphQL */ `
-  mutation Signup($user: UserInputType!, $organization: CollectiveInputType, $redirect: String, $websiteUrl: String) {
-    createUser(user: $user, organization: $organization, redirect: $redirect, websiteUrl: $websiteUrl) {
+const signupMutation = gqlV1 /* GraphQL */ `
+  mutation Signup(
+    $user: UserInputType!
+    $organization: CollectiveInputType
+    $redirect: String
+    $websiteUrl: String
+    $captcha: CaptchaInputType
+  ) {
+    createUser(
+      user: $user
+      organization: $organization
+      redirect: $redirect
+      websiteUrl: $websiteUrl
+      captcha: $captcha
+    ) {
       user {
         id
         email

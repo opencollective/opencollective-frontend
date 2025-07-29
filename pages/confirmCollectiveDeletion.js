@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
@@ -94,11 +93,6 @@ class ConfirmCollectiveDeletion extends Component {
     );
   }
 }
-
-ConfirmCollectiveDeletion.propTypes = {
-  type: PropTypes.string.isRequired,
-  logout: PropTypes.func,
-};
 
 // next.js export
 // ts-unused-exports:disable-next-line

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -15,11 +14,11 @@ import Avatar from '../../Avatar';
 import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import { H3, P, Span } from '../../Text';
+import { Button } from '../../ui/Button';
 import SettingsSubtitle from '../SettingsSubtitle';
 
 const HostName = styled(P)`
@@ -28,7 +27,7 @@ const HostName = styled(P)`
 
 dayjs.extend(utc);
 
-const invoicesQuery = gqlV1/* GraphQL */ `
+const invoicesQuery = gqlV1 /* GraphQL */ `
   query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug
@@ -133,14 +132,10 @@ const ReceiptCard = ({ ...props }) => (
         </Span>
       </Box>
     </Flex>
-    <StyledButton
-      lineHeight="16px"
-      fontSize="13px"
-      width="142px"
-      padding="4px 16px"
+    <Button
+      variant="outline"
+      size="xs"
       disabled={props.loadingInvoice}
-      mt={3}
-      borderColor="#C4C7CC"
       onClick={() => {
         props.downloadInvoice({
           fromCollectiveSlug: props.fromCollective.slug,
@@ -151,27 +146,9 @@ const ReceiptCard = ({ ...props }) => (
       }}
     >
       <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />
-    </StyledButton>
+    </Button>
   </StyledCard>
 );
-
-ReceiptCard.propTypes = {
-  host: PropTypes.shape({
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-    slug: PropTypes.string,
-  }),
-  loadingInvoice: PropTypes.bool,
-  fromCollective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  downloadInvoice: PropTypes.func,
-  dateFrom: PropTypes.string,
-  dateTo: PropTypes.string,
-  totalTransactions: PropTypes.number,
-  month: PropTypes.number,
-  year: PropTypes.number,
-};
 
 const Receipts = ({ invoices }) => {
   const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice, { useErrorToast: true });
@@ -265,14 +242,6 @@ const PaymentReceipts = ({ collective }) => {
       </Box>
     </Flex>
   );
-};
-
-PaymentReceipts.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default PaymentReceipts;

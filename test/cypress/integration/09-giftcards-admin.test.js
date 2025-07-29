@@ -41,7 +41,7 @@ describe('Gift cards admin', () => {
     // Mock date to make sure we have the same filename
     cy.getByDataCy('download-gift-cards-btn').click();
     const filename = `${collectiveSlug}-giftcards.pdf`;
-    cy.getDownloadedPDFContent(filename).should('contain', '$542.00	Gift	Card	from	TestOrg');
+    cy.getDownloadedPDFContent(filename).should('contain', '$542.00 Gift Card from TestOrg');
 
     // Links should also be added to gift cards list
     cy.getByDataCy('back-to-giftcards-list').click();
@@ -50,7 +50,7 @@ describe('Gift cards admin', () => {
     });
 
     // Should have pagination
-    cy.get('.vc-pagination').contains(`of ${numberOfPages}`);
+    cy.get('[data-cy="gift-cards-pagination"] button').should('have.length', numberOfPages + 1); // 2 pages + next button
   });
 
   it('send gift cards by emails', () => {
@@ -60,7 +60,7 @@ describe('Gift cards admin', () => {
     checkSubmit(false, 'Create 0 gift cards');
 
     // Multi-email tests
-    const multiEmailSelector = '.gift-cards-recipients .public-DraftEditor-content';
+    const multiEmailSelector = '#gift-cards-recipients textarea';
     cy.get(multiEmailSelector).type('test1@opencollective.com');
     checkSubmit(true, 'Create 1 gift cards');
     // De-duplicate

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -79,7 +78,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                   }
                   currency={contribution.amount.currency}
                   frequency={contribution.frequency}
-                  currencyCodeStyles={{ color: 'black.800' }}
                 />
               </P>
               {Boolean(contribution.platformTipAmount?.valueInCents) && (
@@ -98,7 +96,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}
-                      amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                     />
                     <Span mx="1px"> + </Span>
                     <FormattedMoneyAmount
@@ -106,7 +103,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}
-                      amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                     />
                     )
                   </P>
@@ -135,10 +131,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
       </Flex>
     </StyledCollectiveCard>
   );
-};
-
-ContributorCardWithTier.propTypes = {
-  contribution: PropTypes.object.isRequired,
 };
 
 export default withUser(ContributorCardWithTier);

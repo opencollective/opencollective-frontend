@@ -1,6 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
+
+/**
+ * This circumvents an issue introduced with Tailwind where the body overflow-y is always set to
+ * 'scroll', which we want to avoid for this button page.
+ */
+const GlobalStyle = createGlobalStyle`
+  body {
+    overflow-y: hidden;
+  }
+`;
 
 const CollectButton = styled.div`
   background-color: transparent;
@@ -47,9 +57,12 @@ class ButtonPage extends React.Component {
     const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;
 
     return (
-      <a target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}/${verb}`}>
-        <CollectButton color={color} verb={verb} />
-      </a>
+      <React.Fragment>
+        <GlobalStyle />
+        <a target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}/${verb}`}>
+          <CollectButton color={color} verb={verb} />
+        </a>
+      </React.Fragment>
     );
   }
 }

@@ -1,9 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
-import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
@@ -14,18 +12,18 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective';
+import { isSupportedExpenseType } from '../../lib/expenses';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
-import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
-import CreateVirtualCardBtn from '../CreateVirtualCardBtn';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import RequestVirtualCardBtn from '../RequestVirtualCardBtn';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
@@ -34,7 +32,6 @@ import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
 
-//  Styled components
 const MenuItem = styled('li')`
   display: flex;
   align-items: center;
@@ -174,10 +171,22 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenActionForNonMobile, LoggedInUser }) => {
+const CollectiveNavbarActionsMenu = ({
+  collective,
+  callsToAction = {},
+  hiddenActionForNonMobile,
+  LoggedInUser,
+  onOpenSubmitExpenseModalClick = () => {},
+}) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
+
+  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+
+  const isNewExpenseFlowEnabled =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -226,21 +235,33 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenAct
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink
-                          data-cy="submit-expense-dropdown"
-                          as={Link}
-                          href={`${getCollectivePageRoute(collective)}/expenses/new`}
-                        >
-                          <Container p={ITEM_PADDING}>
-                            <Receipt size="20px" />
-                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                          </Container>
-                        </StyledLink>
+                        {isNewExpenseFlowEnabled ? (
+                          <StyledLink onClick={onOpenSubmitExpenseModalClick}>
+                            <Container p={ITEM_PADDING}>
+                              <Receipt size="20px" />
+                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                            </Container>
+                          </StyledLink>
+                        ) : (
+                          <StyledLink
+                            data-cy="submit-expense-dropdown"
+                            as={Link}
+                            href={`${getCollectivePageRoute(collective)}/expenses/new`}
+                          >
+                            <Container p={ITEM_PADDING}>
+                              <Receipt size="20px" />
+                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                            </Container>
+                          </StyledLink>
+                        )}
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+                        <StyledLink
+                          as={Link}
+                          href={`${getCollectivePageRoute(collective)}/${isNewGrantFlowEnabled ? 'grants' : 'expenses'}/new`}
+                        >
                           <Container p={ITEM_PADDING}>
                             <MoneyCheckAlt size="20px" />
                             <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
@@ -311,60 +332,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenAct
                         />
                       </MenuItem>
                     )}
-                    {callsToAction.createVirtualCard && collective.isApproved && (
-                      <CreateVirtualCardBtn collective={collective} host={collective.host}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CREATE_CARD}
-                          >
-                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <CreditCard size="20px" />
-                              <Span>
-                                <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </CreateVirtualCardBtn>
-                    )}
-                    {callsToAction.assignVirtualCard && collective.isApproved && (
-                      <AssignVirtualCardBtn collective={collective} host={collective.host}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
-                          >
-                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <CreditCard size="20px" />
-                              <Span>
-                                <FormattedMessage id="menu.assignCard" defaultMessage="Assign a Card" />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </AssignVirtualCardBtn>
-                    )}
-                    {callsToAction.requestVirtualCard && collective.isApproved && (
-                      <RequestVirtualCardBtn collective={collective} host={collective.host}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
-                          >
-                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <CreditCard size="20px" />
-                              <Span>
-                                <FormattedMessage
-                                  id="Collective.VirtualCards.RequestCard"
-                                  defaultMessage="Request a Card"
-                                />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </RequestVirtualCardBtn>
-                    )}
                   </Box>
                 </DropdownContent>
               </div>
@@ -374,50 +341,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenAct
       </Box>
     </Container>
   );
-};
-
-CollectiveNavbarActionsMenu.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-    legacyId: PropTypes.number,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    settings: PropTypes.object,
-    tiers: PropTypes.array,
-    isApproved: PropTypes.bool,
-    host: PropTypes.shape({
-      hostFees: PropTypes.bool,
-    }),
-  }),
-  callsToAction: PropTypes.shape({
-    /** Button to contact the collective */
-    hasContact: PropTypes.bool,
-    /** Submit new expense button */
-    hasSubmitExpense: PropTypes.bool,
-    /** Host's "Apply" button */
-    hasApply: PropTypes.bool,
-    /** Host's dashboard */
-    hasDashboard: PropTypes.bool,
-    /** Manage recurring contributions */
-    hasManageSubscriptions: PropTypes.bool,
-    /** Request a grant from a fund */
-    hasRequestGrant: PropTypes.bool,
-    /** Contribute financially to a collective */
-    hasContribute: PropTypes.bool,
-    /** Add funds to a collective */
-    addFunds: PropTypes.bool,
-    /** Create new card for Collective */
-    createVirtualCard: PropTypes.bool,
-    /** Assign card to Collective */
-    assignVirtualCard: PropTypes.bool,
-    /** Request card to Collective */
-    requestVirtualCard: PropTypes.bool,
-    /** Button to Edit the Collective */
-    hasSettings: PropTypes.bool,
-  }).isRequired,
-  hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
-  LoggedInUser: PropTypes.object,
 };
 
 export default CollectiveNavbarActionsMenu;

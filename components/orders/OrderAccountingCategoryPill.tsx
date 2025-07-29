@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/graphql';
+import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/schema';
 import { cn } from '../../lib/utils';
 
 import AccountingCategorySelect from '../AccountingCategorySelect';
@@ -13,7 +13,7 @@ import StyledSpinner from '../StyledSpinner';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
-const updateOrderAccountingCategoryMutation = gql/* GraphQL */ `
+const updateOrderAccountingCategoryMutation = gql /* GraphQL */ `
   mutation EditOrderAccountingCategory($order: OrderReferenceInput!, $category: AccountingCategoryReferenceInput) {
     updateOrderAccountingCategory(order: $order, accountingCategory: $category) {
       id
@@ -31,7 +31,7 @@ type AccountingCategoryPillProps = {
   order: Pick<Order, 'id'> & { accountingCategory?: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> };
   canEdit: boolean;
   account: Pick<Account, 'id' | 'slug'>;
-  host: Pick<Host, 'id' | 'slug'> & {
+  host: Pick<Host, 'id' | 'slug' | 'type'> & {
     accountingCategories?: { nodes: Array<Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'>> };
   };
   /** Whether to allow the user to select "I don't know" */

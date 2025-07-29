@@ -7,7 +7,7 @@ import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { MemberRole } from '../../../lib/graphql/types/v2/graphql';
+import { MemberRole } from '../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
 
@@ -18,6 +18,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { DataTable } from '../../table/DataTable';
 import { Span } from '../../Text';
 import { Button } from '../../ui/Button';
+import { useToast } from '../../ui/useToast';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
@@ -55,6 +56,32 @@ const memberRoleFilter: FilterConfig<z.infer<typeof MemberRoleSchema>> = {
   },
 };
 
+const TierReferenceSchema = z.union([z.coerce.number(), z.literal('__NO_TIER__')]).optional();
+const tierFilter: FilterConfig<z.infer<typeof TierReferenceSchema>> = {
+  schema: TierReferenceSchema,
+  toVariables: value => {
+    if (!value) {
+      return {};
+    } else if (value === '__NO_TIER__') {
+      return { tier: null };
+    } else {
+      return { tier: { legacyId: value } };
+    }
+  },
+  filter: {
+    labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
+    Component: ({ meta, ...props }) => {
+      return <ComboSelectFilter options={meta.tierOptions} {...props} />;
+    },
+    valueRenderer: ({ value, meta }) => {
+      if (value === '__NO_TIER__') {
+        return meta.tierOptions?.find(tier => tier.value === '__NO_TIER__')?.label ?? 'No tier';
+      }
+      return meta.tierOptions?.find(tier => tier.value === value)?.label ?? value;
+    },
+  },
+};
+
 enum ContributorsTab {
   ALL = 'ALL',
   FOLLOWERS = 'FOLLOWERS',
@@ -80,6 +107,15 @@ const dashboardContributorsMetadataQuery = gql`
           slug
         }
       }
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            id
+            legacyId
+            name
+          }
+        }
+      }
       ALL: members(role: [BACKER, FOLLOWER]) {
         totalCount
       }
@@ -101,10 +137,11 @@ const dashboardContributorsQuery = gql`
     $role: [MemberRole!]
     $orderBy: ChronologicalOrderInput
     $email: EmailAddress
+    $tier: TierReferenceInput
   ) {
     account(slug: $slug) {
       id
-      members(role: $role, offset: $offset, limit: $limit, orderBy: $orderBy, email: $email) {
+      members(role: $role, offset: $offset, limit: $limit, orderBy: $orderBy, email: $email, tier: $tier) {
         totalCount
         nodes {
           id
@@ -234,6 +271,27 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     },
   ];
 
+  // Prepare tier options for the filter
+  const tierOptions = React.useMemo(() => {
+    const options = [];
+
+    // Add option for contributors without tiers
+    options.push({
+      label: <i>{intl.formatMessage({ defaultMessage: 'Default (no tier)', id: 'Contributors.NoTier' })}</i>,
+      value: '__NO_TIER__',
+      key: '__NO_TIER__',
+    });
+
+    // Add all available tiers
+    if (metadata?.account?.tiers?.nodes) {
+      metadata.account.tiers.nodes.forEach(tier => {
+        options.push({ label: tier.name, value: tier.legacyId, key: tier.id });
+      });
+    }
+
+    return options;
+  }, [metadata?.account?.tiers?.nodes, intl]);
+
   const queryFilter = useQueryFilter({
     schema: z.object({
       limit: integer.default(PAGE_SIZE),
@@ -241,16 +299,22 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
       role: memberRoleFilter.schema,
       orderBy: orderByFilter.schema,
       email: emailFilter.schema,
+      tierId: tierFilter.schema,
     }),
     views,
     toVariables: {
       orderBy: orderByFilter.toVariables,
       email: emailFilter.toVariables,
+      tierId: tierFilter.toVariables,
     },
     filters: {
       role: memberRoleFilter.filter,
       orderBy: orderByFilter.filter,
       email: emailFilter.filter,
+      tierId: tierFilter.filter,
+    },
+    meta: {
+      tierOptions,
     },
   });
 
@@ -268,6 +332,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   });
 
   const contributors = data?.account?.members.nodes || [];
+  const { toast } = useToast();
 
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
@@ -282,7 +347,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const [isDownloadingCsv, setDownloadingCsv] = React.useState(false);
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />}
         actions={
@@ -297,6 +362,11 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
                   const filename = `${accountSlug}-contributors.csv`;
                   const url = `${process.env.REST_URL}/v2/${accountSlug}/contributors.csv?fetchAll=1`;
                   await fetchCSVFileFromRESTService(url, filename);
+                } catch (error) {
+                  toast({
+                    variant: 'error',
+                    message: error.message,
+                  });
                 } finally {
                   setDownloadingCsv(false);
                 }

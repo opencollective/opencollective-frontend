@@ -1,25 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TruncatedTextWithTooltip component renders default options 1`] = `"A short string"`;
+exports[`TruncatedTextWithTooltip component renders default options 1`] = `
+<div>
+  A short string
+</div>
+`;
 
 exports[`TruncatedTextWithTooltip component renders default options 2`] = `
-.c0 {
-  display: inline-block;
-  cursor: help;
-}
-
-.c0 button:disabled {
-  pointer-events: none;
-}
-
-<div
-  className="c0"
-  cursor="help"
-  data-cy="tooltip-trigger"
-  display="inline-block"
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
->
-  a string that is more than ...
+<div>
+  <button
+    class="cursor-help"
+    data-state="closed"
+    type="button"
+  >
+    a string that is more than ...
+  </button>
 </div>
 `;

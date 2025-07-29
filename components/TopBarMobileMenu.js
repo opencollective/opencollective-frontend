@@ -1,9 +1,7 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -46,7 +44,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
     viewProductsMenu: false,
     viewCompanyMenu: false,
   });
-  const innerRef = React.useRef();
+  const innerRef = React.useRef(undefined);
 
   useGlobalBlur(innerRef, isOutside => {
     if (isOutside) {
@@ -155,7 +153,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   justifyContent="space-between"
                   onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
                 >
-                  <FormattedMessage id="company" defaultMessage="Company" />
+                  <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
                   <ChevronDown size={20} />
                 </Flex>
                 {state.viewCompanyMenu && (
@@ -164,11 +162,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                       <a href="https://blog.opencollective.com/" onClick={closeMenu}>
                         <FormattedMessage id="company.blog" defaultMessage="Blog" />
                       </a>
-                    </SubListItem>
-                    <SubListItem>
-                      <Link href={'/e2c'} onClick={closeMenu}>
-                        <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-                      </Link>
                     </SubListItem>
                   </Box>
                 )}
@@ -209,11 +202,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                 <Blog size={17} color="#9D9FA3" />
               </StyledRoundButton>
             </StyledLink>
-            <StyledLink href="https://twitter.com/opencollect" openInNewTab onClick={closeMenu}>
-              <StyledRoundButton size={40}>
-                <Twitter size={17} color="#9D9FA3" />
-              </StyledRoundButton>
-            </StyledLink>
             <StyledLink href="https://github.com/opencollective" openInNewTab onClick={closeMenu}>
               <StyledRoundButton size={40}>
                 <Github size={17} color="#9D9FA3" />
@@ -234,13 +222,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
       </Container>
     </React.Fragment>
   );
-};
-
-TopBarMobileMenu.propTypes = {
-  showMobileMenu: PropTypes.bool,
-  closeMenu: PropTypes.func,
-  useDashboard: PropTypes.bool,
-  onHomeRoute: PropTypes.bool,
 };
 
 export default injectIntl(withUser(TopBarMobileMenu));

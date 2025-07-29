@@ -26,6 +26,7 @@ export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
 // ts-unused-exports:disable-next-line
 export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
 export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
+export const APOLLO_QUERY_DATA_PROP_NAME = '__APOLLO_QUERY_DATA__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
   if (process.browser) {
@@ -58,8 +59,8 @@ const getCustomAgent = () => {
     const { FETCH_AGENT_KEEP_ALIVE, FETCH_AGENT_KEEP_ALIVE_MSECS } = process.env;
     const keepAlive = FETCH_AGENT_KEEP_ALIVE !== undefined ? parseToBoolean(FETCH_AGENT_KEEP_ALIVE) : true;
     const keepAliveMsecs = FETCH_AGENT_KEEP_ALIVE_MSECS ? Number(FETCH_AGENT_KEEP_ALIVE_MSECS) : 10000;
-    const http = require('http'); // eslint-disable-line @typescript-eslint/no-var-requires
-    const https = require('https'); // eslint-disable-line @typescript-eslint/no-var-requires
+    const http = require('http'); // eslint-disable-line @typescript-eslint/no-require-imports
+    const https = require('https'); // eslint-disable-line @typescript-eslint/no-require-imports
     const httpAgent = new http.Agent({ keepAlive, keepAliveMsecs });
     const httpsAgent = new https.Agent({ keepAlive, keepAliveMsecs });
     customAgent = _parsedURL => (_parsedURL.protocol === 'http:' ? httpAgent : httpsAgent);
@@ -67,9 +68,42 @@ const getCustomAgent = () => {
   return customAgent;
 };
 
+const logRequest = (action = 'Fetched', start, options, result?) => {
+  const end = process.hrtime.bigint();
+  const executionTime = Math.round(Number(end - start) / 1000000);
+  const apiExecutionTime = result?.headers.get('Execution-Time');
+  const graphqlCache = result?.headers.get('GraphQL-Cache');
+  const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
+  const body = JSON.parse(options.body);
+  if (body.operationName || body.variables) {
+    const pickList = [
+      'CollectiveId',
+      'collectiveSlug',
+      'CollectiveSlug',
+      'id',
+      'legacyId',
+      'legacyExpenseId',
+      'slug',
+      'term',
+      'tierId',
+    ];
+    const operationName = body.operationName || 'anonymous GraphQL query';
+    const variables = process.env.NODE_ENV === 'development' ? body.variables : pick(body.variables || {}, pickList);
+    // eslint-disable-next-line no-console
+    console.log(
+      `-> ${action}`,
+      operationName,
+      variables,
+      executionTime ? `in ${executionTime}ms` : '',
+      latencyTime ? `latency=${latencyTime}ms` : '',
+      graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
+    );
+  }
+};
+
 const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
   if (typeof window === 'undefined') {
-    const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-var-requires
+    const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-require-imports
 
     options.agent = getCustomAgent();
 
@@ -78,54 +112,33 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
     options.headers['oc-env'] = process.env.OC_ENV;
     options.headers['oc-secret'] = process.env.OC_SECRET;
     options.headers['oc-application'] = process.env.OC_APPLICATION;
+    options.headers['oc-version'] = process.env.HEROKU_SLUG_COMMIT?.slice(0, 7);
     options.headers['user-agent'] = 'opencollective-frontend/1.0 node-fetch/1.0';
 
     // Start benchmarking if the request is server side
     const start = process.hrtime.bigint();
 
-    const result = await nodeFetch(url, options);
+    try {
+      const result = await nodeFetch(url, options);
 
-    // Complete benchmark measure and log
-    if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
-      const end = process.hrtime.bigint();
-      const executionTime = Math.round(Number(end - start) / 1000000);
-      const apiExecutionTime = result.headers.get('Execution-Time');
-      const graphqlCache = result.headers.get('GraphQL-Cache');
-      const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
-      const body = JSON.parse(options.body);
-      if (body.operationName || body.variables) {
-        const pickList = [
-          'CollectiveId',
-          'collectiveSlug',
-          'CollectiveSlug',
-          'id',
-          'legacyId',
-          'legacyExpenseId',
-          'slug',
-          'term',
-          'tierId',
-        ];
-        const operationName = body.operationName || 'anonymous GraphQL query';
-        const variables = pick(body.variables || {}, pickList);
-        // eslint-disable-next-line no-console
-        console.log(
-          '-> Fetched',
-          operationName,
-          variables,
-          executionTime ? `in ${executionTime}ms` : '',
-          latencyTime ? `latency=${latencyTime}ms` : '',
-          graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
-        );
+      // Complete benchmark measure and log
+      if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+        logRequest('Fetched', start, options, result);
       }
-    }
 
-    return result;
+      return result;
+    } catch (error) {
+      if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+        logRequest('Failed', start, options);
+      }
+      throw error;
+    }
   }
 };
 
-function createLink({ twoFactorAuthContext }) {
+function createLink({ twoFactorAuthContext, accessToken = null }) {
   const authLink = setContext((_, { headers }) => {
-    const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    const token = accessToken || getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (token) {
       return {
         headers: {
@@ -157,19 +170,39 @@ function createLink({ twoFactorAuthContext }) {
     }
   });
 
+  const sentryLink = setContext((_, { headers }) => {
+    if (
+      headers?.['x-sentry-force-sample'] ||
+      (typeof window !== 'undefined' && window.location.search.includes('forceSentryTracing=1'))
+    ) {
+      return {
+        headers: { ...headers, 'x-sentry-force-sample': '1' },
+      };
+    }
+  });
+
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
-  const httpHeaders = { 'oc-application': process.env.OC_APPLICATION };
+  const httpHeaders = {
+    'oc-application': process.env.OC_APPLICATION,
+    'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
+  };
 
   const apiV1DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
+    },
   });
   const apiV2DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
+    },
   });
 
   // Setup internal links handling to be able to split traffic to different API servers
@@ -204,7 +237,7 @@ function createLink({ twoFactorAuthContext }) {
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);
 
-  return ApolloLink.from([errorLink, authLink, twoFactorAuthLink, httpLink]);
+  return ApolloLink.from([sentryLink, errorLink, authLink, twoFactorAuthLink, httpLink]);
 }
 
 function createInMemoryCache() {
@@ -237,13 +270,13 @@ function createInMemoryCache() {
   return inMemoryCache;
 }
 
-function createClient({ initialState, twoFactorAuthContext }: any = {}) {
+function createClient({ initialState, twoFactorAuthContext, accessToken }: any = {}) {
   const cache = createInMemoryCache();
   if (initialState) {
     cache.restore(initialState);
   }
 
-  const link = createLink({ twoFactorAuthContext });
+  const link = createLink({ twoFactorAuthContext, accessToken });
 
   return new ApolloClient({
     cache,
@@ -254,11 +287,13 @@ function createClient({ initialState, twoFactorAuthContext }: any = {}) {
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
+export function initClient({ initialState, twoFactorAuthContext, accessToken }: any = {}): ReturnType<
+  typeof createClient
+> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
-    return createClient({ initialState });
+    return createClient({ initialState, accessToken });
   }
 
   // Reuse client on the client-side
@@ -282,17 +317,22 @@ export function initClient({ initialState, twoFactorAuthContext }: any = {}): Re
   return apolloClient;
 }
 
-type SSRQueryHelperProps<TVariables> = {
+type SSRQueryHelperProps<TVariables, TQueryData> = {
   [APOLLO_STATE_PROP_NAME]: NormalizedCacheObject;
   [APOLLO_VARIABLES_PROP_NAME]: Partial<TVariables>;
   [APOLLO_ERROR_PROP_NAME]: any;
+  [APOLLO_QUERY_DATA_PROP_NAME]: TQueryData;
+};
+
+export type Context = GetServerSidePropsContext & {
+  req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<unknown> };
 };
 
 /**
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
  */
-export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>({
+export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>, TQueryData = Record<string, unknown>>({
   query,
   getVariablesFromContext = undefined,
   getPropsFromContext = undefined,
@@ -302,19 +342,21 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
   getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
   getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
   skipClientIfSSRThrows404?: boolean;
+  preload?: (client: ApolloClient<unknown>, queryResult: TQueryData) => Promise<void>;
 }) {
-  type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
+  type ServerSideProps = TProps & SSRQueryHelperProps<TVariables, TQueryData>;
   return {
-    getServerSideProps: async (
-      context: GetServerSidePropsContext,
-    ): Promise<GetServerSidePropsResult<ServerSideProps>> => {
+    getServerSideProps: async (context: Context): Promise<GetServerSidePropsResult<ServerSideProps>> => {
       const props = (getPropsFromContext && getPropsFromContext(context)) || {};
       const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
-      const client = initClient();
-      let error;
+      const client = context.req.apolloClient;
 
+      let error, result;
       try {
-        await client.query({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+        result = await client.query<TQueryData>({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+        if (queryOptions.preload) {
+          await queryOptions.preload(client, result?.data);
+        }
       } catch (e) {
         error = e;
       }
@@ -322,9 +364,10 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
       return {
         props: {
           ...omitBy<TProps>(props, isUndefined),
-          [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
+          [APOLLO_STATE_PROP_NAME]: client.cache.extract() as NormalizedCacheObject,
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
           [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
+          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data || null,
         } as ServerSideProps,
       };
     },

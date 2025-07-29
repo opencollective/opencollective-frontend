@@ -1,37 +1,44 @@
-import React, { useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isString, omit } from 'lodash';
+import { compact, isUndefined, omit } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { formatCurrency } from '../../../../lib/currency-utils';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  DashboardAccountsQueryFieldsFragment,
+  HostedCollectivesQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { useDrawer } from '@/lib/hooks/useDrawer';
+import formatCollectiveType from '@/lib/i18n/collective-type';
 
-import { Drawer } from '../../../Drawer';
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import { useModal } from '@/components/ModalContext';
+
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { Skeleton } from '../../../ui/Skeleton';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { ACCOUNT_STATUS, accountStatusFilter } from '../../filters/AccountStatusFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
-import type { HostedCollectivesDataTableMeta } from '../collectives/common';
 
-import AccountDetails from './AccountDetails';
-import { cols } from './common';
+import AccountDrawer from './AccountDrawer';
+import { useAccountActions } from './actions';
+import { AddFundsModalAccount, cols } from './common';
+import InternalTransferModal from './InternalTransferModal';
 import { accountsMetadataQuery, accountsQuery } from './queries';
-
 const COLLECTIVES_PER_PAGE = 20;
 
 const schema = z.object({
@@ -51,14 +58,13 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
-    subpath[0],
-  );
-  const { data: metadata, refetch: refetchMetadata } = useQuery(accountsMetadataQuery, {
+  const { data: metadata } = useQuery(accountsMetadataQuery, {
     variables: { accountSlug },
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
+  const { account } = useContext(DashboardContext);
+  const openAccountId = subpath[0];
 
   const pushSubpath = subpath => {
     router.push(
@@ -77,14 +83,14 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     {
       id: 'all',
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      count: metadata?.account?.all?.totalCount + 1,
+      count: !isUndefined(metadata?.account?.all?.totalCount) ? metadata.account.all.totalCount + 1 : undefined,
       filter: {},
     },
     {
       id: 'active',
       label: intl.formatMessage({ id: 'Subscriptions.Active', defaultMessage: 'Active' }),
       filter: { status: ACCOUNT_STATUS.ACTIVE },
-      count: metadata?.account?.active?.totalCount + 1,
+      count: !isUndefined(metadata?.account?.active?.totalCount) ? metadata.account.active.totalCount + 1 : undefined,
     },
     {
       id: 'archived',
@@ -103,73 +109,112 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     meta: { currency: metadata?.host?.currency },
   });
 
-  const { data, error, loading, refetch } = useQuery(accountsQuery, {
+  const { data, error, loading } = useQuery(accountsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
   });
-  useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0]);
-    }
-  }, [subpath[0]]);
 
-  const handleDrawer = (collective: Collective | string | undefined) => {
-    if (collective) {
-      pushSubpath(typeof collective === 'string' ? collective : collective.id);
-    } else {
-      pushSubpath(undefined);
-    }
-    setShowCollectiveOverview(collective);
-  };
+  const { openDrawer, drawerProps } = useDrawer({
+    open: Boolean(openAccountId),
+    onOpen: id => pushSubpath(id),
+    onClose: () => pushSubpath(undefined),
+  });
 
-  const handleEdit = () => {
-    refetchMetadata();
-    refetch();
-  };
-  const onClickRow = row => handleDrawer(row.original);
+  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed) && data?.account.isHost;
+
+  const { showModal } = useModal();
 
   const isArchived = queryFilter.hasFilters && queryFilter.values.status === ACCOUNT_STATUS.ARCHIVED;
   const accounts = compact([!isArchived && data?.account, ...(data?.account?.childrenAccounts?.nodes || [])]);
+  const activeAccounts = React.useMemo(
+    () => [data?.account, ...(data?.account?.childrenAccounts?.nodes.filter(a => a.isActive) || [])],
+    [data?.account],
+  );
+  const getActions = useAccountActions<DashboardAccountsQueryFieldsFragment>({
+    accounts: activeAccounts,
+  });
+
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="CollectiveAccounts" defaultMessage="Collective Accounts" />}
+        title={<FormattedMessage defaultMessage="Accounts" id="FvanT6" />}
+        description={
+          <FormattedMessage
+            defaultMessage="Manage the accounts in your {collectiveType}."
+            id="vPnM7w"
+            values={{ collectiveType: formatCollectiveType(intl, account.type) }}
+          />
+        }
         actions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="xs" variant="outline" className="gap-1">
-                <FormattedMessage id="Accounts.Add" defaultMessage="Add Account" />
-                <ChevronDown className="text-muted-foreground" size={16} />
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="xs" variant="outline" className="gap-1">
+                  <FormattedMessage id="Accounts.Add" defaultMessage="Add Account" />
+                  <ChevronDown className="text-muted-foreground" size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href={`/${accountSlug}/projects/create`}>
+                    <FormattedMessage defaultMessage="New project" id="lJMkin" />
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/${accountSlug}/events/create`}>
+                    <FormattedMessage defaultMessage="New event" id="C+Npdp" />
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {activeAccounts?.length > 1 && (
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => {
+                  showModal(InternalTransferModal, { parentAccount: data?.account }, 'internal-transfer-modal');
+                }}
+              >
+                <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href={`/${accountSlug}/projects/create`}>
-                  <FormattedMessage defaultMessage="New project" id="lJMkin" />
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href={`/${accountSlug}/events/create`}>
-                  <FormattedMessage defaultMessage="New event" id="C+Npdp" />
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+            {isAllowedAddFunds && (
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() =>
+                  showModal(AddFundsModalAccount, { collective: data?.account, host: data?.host }, 'add-funds-modal')
+                }
+              >
+                <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />
+              </Button>
+            )}
+          </div>
         }
       >
-        <div className="flex">
-          <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />:
-          {loading ? (
-            <Skeleton className="ml-1 h-6 w-32" />
-          ) : (
-            <span className="ml-1 font-semibold">
-              {formatCurrency(
-                data?.account?.stats?.consolidatedBalance?.valueInCents,
-                data?.account?.stats?.consolidatedBalance?.currency,
-              )}
-            </span>
-          )}
+        <div className="mt-2 w-full max-w-xs space-y-1 rounded-lg border p-3">
+          <div>
+            <div className="flex items-center gap-1">
+              <span className="block text-sm font-medium tracking-tight">
+                <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />
+              </span>
+            </div>
+
+            {loading ? (
+              <Skeleton className="mt-1 h-7 w-1/2" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="block text-2xl font-bold">
+                  <FormattedMoneyAmount
+                    amount={data?.account?.stats?.consolidatedBalance?.valueInCents}
+                    currency={data?.account?.stats?.consolidatedBalance?.currency}
+                    precision={2}
+                    showCurrencyCode={true}
+                  />
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </DashboardHeader>
       <Filterbar {...queryFilter} />
@@ -185,44 +230,21 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
           <DataTable
             data-cy="transactions-table"
             innerClassName="text-muted-foreground"
-            columns={compact([cols.collective, cols.status, cols.raised, cols.spent, cols.balance])}
+            columns={compact([cols.collective, cols.balance, actionsColumn])}
             data={accounts}
             loading={loading}
             mobileTableView
-            compact
-            meta={
-              {
-                intl,
-                onClickRow,
-                onEdit: handleEdit,
-                host: data?.host,
-                openCollectiveDetails: handleDrawer,
-              } as HostedCollectivesDataTableMeta
-            }
-            onClickRow={onClickRow}
+            onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowDataCy={row => `collective-${row.original.slug}`}
+            getActions={getActions}
+            queryFilter={queryFilter}
+            getRowId={row => String(row.id)}
           />
           <Pagination queryFilter={queryFilter} total={data?.account?.childrenAccounts?.totalCount} />
         </React.Fragment>
       )}
 
-      <Drawer
-        open={Boolean(showCollectiveOverview)}
-        onClose={() => handleDrawer(null)}
-        className={'max-w-2xl'}
-        showActionsContainer
-        showCloseButton
-      >
-        {showCollectiveOverview && (
-          <AccountDetails
-            collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
-            collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
-            onCancel={() => handleDrawer(null)}
-            openCollectiveDetails={handleDrawer}
-            loading={loading}
-          />
-        )}
-      </Drawer>
+      <AccountDrawer {...drawerProps} accountId={openAccountId} getActions={getActions} />
     </div>
   );
 };

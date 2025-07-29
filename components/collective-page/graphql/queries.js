@@ -4,7 +4,7 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/con
 
 import * as fragments from './fragments';
 
-export const collectivePageQuery = gqlV1/* GraphQL */ `
+export const collectivePageQuery = gqlV1 /* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
@@ -16,14 +16,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       backgroundImage
       backgroundImageUrl
       twitterHandle
-      duplicatedCollectives(limit: 1) {
-        collectives {
-          id
-          slug
-          name
-          type
-        }
-      }
       repositoryUrl
       website
       socialLinks {
@@ -41,11 +33,15 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       settings
       isActive
       isApproved
+      isVerified
       isArchived
       isFrozen
+      isSuspended
       isHost
       isIncognito
       isGuest
+      isTrustedHost
+      isFirstPartyHost
       hostFeePercent
       platformFeePercent
       image
@@ -56,10 +52,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       features {
         id
         ...NavbarFields
-      }
-      ordersFromCollective(subscriptionsOnly: true) {
-        id
-        isSubscriptionActive
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id
@@ -111,10 +103,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           id
           hostFees
           hostFeeSharePercent
-        }
-        features {
-          id
-          VIRTUAL_CARDS
         }
         policies {
           id

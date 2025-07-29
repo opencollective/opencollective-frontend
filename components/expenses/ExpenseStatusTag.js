@@ -1,14 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 import { getDashboardRoute } from '../../lib/url-helpers';
-import { parseToBoolean } from '../../lib/utils';
 
 import { Flex } from '../Grid';
-import I18nFormatters, { getI18nLink } from '../I18nFormatters';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
@@ -18,6 +16,7 @@ export const getExpenseStatusMsgType = status => {
     case ExpenseStatus.REJECTED:
     case ExpenseStatus.SPAM:
     case ExpenseStatus.ERROR:
+    case ExpenseStatus.INVITE_DECLINED:
       return 'error';
     case ExpenseStatus.PENDING:
     case ExpenseStatus.UNVERIFIED:
@@ -47,10 +46,6 @@ const ExtendedTag = ({ children, ...props }) => (
   </StyledTag>
 );
 
-ExtendedTag.propTypes = {
-  children: PropTypes.any,
-};
-
 const BaseTag = ({ status, ...props }) => {
   const intl = useIntl();
   return (
@@ -58,10 +53,6 @@ const BaseTag = ({ status, ...props }) => {
       {i18nExpenseStatus(intl, status)}
     </StyledTag>
   );
-};
-
-BaseTag.propTypes = {
-  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
 };
 
 /**
@@ -104,23 +95,15 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...pro
       <Flex alignItems="center">
         <BaseTag status={status} {...tagProps} />
         <StyledTooltip
-          content={() =>
-            parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) ? (
-              <FormattedMessage
-                id="expenseNeedsTaxForm.hover"
-                defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact <SupportLink>support</SupportLink>"
-                values={I18nFormatters}
-              />
-            ) : (
-              <FormattedMessage
-                id="expenseNeedsTaxForm.new.hover"
-                defaultMessage="We can't pay until we receive your tax info. <Link>Click here</Link> to complete your tax form."
-                values={{
-                  Link: getI18nLink({ as: Link, href: getDashboardRoute(payee, 'tax-information') }),
-                }}
-              />
-            )
-          }
+          content={() => (
+            <FormattedMessage
+              id="expenseNeedsTaxForm.new.hover"
+              defaultMessage="We can't pay until we receive your tax info. <Link>Click here</Link> to complete your tax form."
+              values={{
+                Link: getI18nLink({ as: Link, href: getDashboardRoute(payee, 'tax-information') }),
+              }}
+            />
+          )}
         >
           <ExtendedTag fontSize="10px">
             <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
@@ -129,12 +112,6 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...pro
       </Flex>
     );
   }
-};
-
-ExpenseStatusTag.propTypes = {
-  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
-  payee: PropTypes.shape({ isAdmin: PropTypes.bool }),
-  showTaxFormTag: PropTypes.bool,
 };
 
 export default ExpenseStatusTag;

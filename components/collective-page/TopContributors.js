@@ -1,10 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { size } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import formatMemberRole from '../../lib/i18n/member-role';
 
 import { ContributorAvatar } from '../Avatar';
@@ -126,7 +124,6 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                       date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
                       totalDonated: (
                         <FormattedMoneyAmount
-                          amountStyles={null}
                           amount={contributor.totalAmountDonated}
                           currency={currency}
                           precision={0}
@@ -149,24 +146,6 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
       </ContributorsList>
     </Box>
   );
-};
-
-ContributorsBlock.propTypes = {
-  currency: PropTypes.string.isRequired,
-  totalNbContributors: PropTypes.number,
-  title: PropTypes.node.isRequired,
-  showTitle: PropTypes.bool.isRequired,
-  contributors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-      collectiveSlug: PropTypes.string,
-      totalAmountDonated: PropTypes.number.isRequired,
-      since: PropTypes.string.isRequired,
-      isIncognito: PropTypes.bool,
-    }).isRequired,
-  ),
 };
 
 /**
@@ -214,12 +193,6 @@ const TopContributors = ({ organizations, individuals, currency }) => {
       {Blocks[1]}
     </Flex>
   );
-};
-
-TopContributors.propTypes = {
-  currency: PropTypes.string.isRequired,
-  organizations: PropTypes.arrayOf(PropTypes.object),
-  individuals: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default TopContributors;

@@ -20,6 +20,7 @@ class ContributionFlowStepContainer extends React.Component {
     intl: PropTypes.object,
     LoggedInUser: PropTypes.object,
     collective: PropTypes.object,
+    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
     tier: PropTypes.object,
     onChange: PropTypes.func,
     showPlatformTip: PropTypes.bool,
@@ -33,7 +34,6 @@ class ContributionFlowStepContainer extends React.Component {
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
-    contributeProfiles: PropTypes.arrayOf(PropTypes.object),
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.shape({
@@ -92,7 +92,7 @@ class ContributionFlowStepContainer extends React.Component {
       case 'profile': {
         return (
           <StepProfile
-            profiles={this.props.contributeProfiles}
+            profiles={this.props.contributorProfiles}
             collective={collective}
             tier={tier}
             stepDetails={stepDetails}

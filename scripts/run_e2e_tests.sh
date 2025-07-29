@@ -1,8 +1,9 @@
 #!/bin/bash
 
-echo "> Starting maildev server"
-npx maildev@2.0.5 &
-MAILDEV_PID=$!
+echo "> Setting locale to en_US"
+export LANGUAGE=en-US
+export LANG=en-US
+export LC_ALL=en-US
 
 echo "> Starting stripe webhook listener"
 export STRIPE_WEBHOOK_SIGNING_SECRET=$(stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe --print-secret)
@@ -15,8 +16,11 @@ if [ -z "$API_FOLDER" ]; then
 else
   cd $API_FOLDER
 fi
-PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm run start:e2e:server &
+PG_DATABASE=opencollective_dvl MAILPIT_CLIENT=true npm run start:e2e:server &
 API_PID=$!
+echo "> Starting mailpit server"
+npm run mailpit &
+MAILPIT_PID=$!
 cd -
 
 echo "> Starting frontend server"
@@ -45,7 +49,7 @@ if [ -z "$PDF_FOLDER" ]; then
 else
   cd $PDF_FOLDER
 fi
-PORT=3002 npm start &
+PORT=3002 API_URL=http://localhost:3060 npm start &
 PDF_PID=$!
 cd -
 
@@ -62,12 +66,20 @@ fi
 # Wait for a service to be up
 function wait_for_service() {
   echo "> Waiting for $1 to be ready... "
+  local start_time=$(date +%s)
+  local timeout=300  # 5 minutes in seconds
   while true; do
     nc -z "$2" "$3"
     EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then
       echo "> Application $1 is up!"
       break
+    fi
+    local current_time=$(date +%s)
+    local elapsed_time=$((current_time - start_time))
+    if [ $elapsed_time -ge $timeout ]; then
+      echo "> Timeout waiting for $1 after 5 minutes"
+      exit 1
     fi
     sleep 1
   done
@@ -87,7 +99,7 @@ wait_for_service PDF 127.0.0.1 3002
 echo ""
 echo "> Running cypress tests"
 
-npm run cypress:run -- ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
+npm run cypress:run -- ${CYPRESS_RECORD} --browser chromium --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
 
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then

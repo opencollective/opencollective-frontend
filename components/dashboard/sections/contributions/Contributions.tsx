@@ -1,52 +1,52 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
-import { LinkIcon, PlusIcon } from 'lucide-react';
+import { ArrowLeftRightIcon, LinkIcon, Pencil, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
-import type { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { ContributionDrawerQuery } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  ContributionFrequency,
+  ExpectedFundsFilter,
+  OrderStatus,
+  PaymentMethodType,
+} from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import i18nOrderStatus from '../../../../lib/i18n/order-status';
-import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
-import { sortSelectOptions } from '../../../../lib/utils';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
+import { getWebsiteUrl } from '../../../../lib/utils';
 
-import { AccountHoverCard } from '../../../AccountHoverCard';
-import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
+import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
 import { CopyID } from '../../../CopyId';
-import DateTime from '../../../DateTime';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
-import OrderStatusTag from '../../../orders/OrderStatusTag';
-import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
+import { amount, beneficiary, contributionId, contributor, date, expectedAt, paymentMethod, status } from './columns';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters, OrderTypeFilter, schema, toVariables } from './filters';
+import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -69,6 +69,7 @@ const dashboardContributionsMetadataQuery = gql`
     $onlyExpectedFunds: Boolean!
     $expectedFundsFilter: ExpectedFundsFilter
     $includeHostedAccounts: Boolean!
+    $includeChildrenAccounts: Boolean
   ) {
     account(slug: $slug) {
       id
@@ -79,9 +80,31 @@ const dashboardContributionsMetadataQuery = gql`
       settings
       imageUrl
       currency
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          slug
+          name
+          ... on AccountWithContributions {
+            tiers {
+              nodes {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
       ... on AccountWithContributions {
         canStartResumeContributionsProcess
         hasResumeContributionsProcessStarted
+        tiers {
+          nodes {
+            id
+            name
+          }
+        }
       }
       ... on AccountWithParent {
         parent {
@@ -90,13 +113,17 @@ const dashboardContributionsMetadataQuery = gql`
           type
         }
       }
-      ALL: orders(
-        filter: $filter
-        expectedFundsFilter: $expectedFundsFilter
-        includeHostedAccounts: $includeHostedAccounts
-      ) {
-        totalCount
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          imageUrl
+          type
+          hostFeePercent
+        }
       }
+
       PENDING: orders(
         filter: $filter
         expectedFundsFilter: $expectedFundsFilter
@@ -115,9 +142,11 @@ const dashboardContributionsMetadataQuery = gql`
       }
       RECURRING: orders(
         filter: $filter
-        onlyActiveSubscriptions: true
+        frequency: [MONTHLY, YEARLY]
+        status: [ACTIVE, ERROR]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -132,11 +161,12 @@ const dashboardContributionsMetadataQuery = gql`
       }
       ONETIME: orders(
         filter: $filter
-        frequency: ONETIME
+        frequency: [ONETIME]
         status: [PAID, PROCESSING]
         includeIncognito: true
         minAmount: 1
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -146,6 +176,7 @@ const dashboardContributionsMetadataQuery = gql`
         includeIncognito: true
         expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) {
         totalCount
       }
@@ -154,6 +185,16 @@ const dashboardContributionsMetadataQuery = gql`
         status: [PAUSED]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
+      PAUSED_RESUMABLE: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: false
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -184,19 +225,22 @@ const dashboardContributionsQuery = gql`
     $offset: Int
     $limit: Int
     $filter: AccountOrdersFilter!
-    $frequency: ContributionFrequency
+    $frequency: [ContributionFrequency]
     $status: [OrderStatus!]
-    $onlySubscriptions: Boolean
     $includeIncognito: Boolean
-    $minAmount: Int
-    $maxAmount: Int
-    $paymentMethod: PaymentMethodReferenceInput
+    $amount: AmountRangeInput
+    $paymentMethod: [PaymentMethodReferenceInput]
     $includeHostedAccounts: Boolean!
+    $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
     $dateTo: DateTime
     $expectedDateFrom: DateTime
     $expectedDateTo: DateTime
+    $chargedDateFrom: DateTime
+    $chargedDateTo: DateTime
     $expectedFundsFilter: ExpectedFundsFilter
+    $orderBy: ChronologicalOrderInput
+    $tier: [TierReferenceInput!]
   ) {
     account(slug: $slug) {
       id
@@ -208,16 +252,19 @@ const dashboardContributionsQuery = gql`
         filter: $filter
         frequency: $frequency
         status: $status
-        onlySubscriptions: $onlySubscriptions
         includeIncognito: $includeIncognito
-        minAmount: $minAmount
-        maxAmount: $maxAmount
+        amount: $amount
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
         paymentMethod: $paymentMethod
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter
+        orderBy: $orderBy
+        chargedDateFrom: $chargedDateFrom
+        chargedDateTo: $chargedDateTo
+        tier: $tier
       ) {
         totalCount
         nodes {
@@ -230,243 +277,39 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
-  const accounts = {
-    accessorKey: 'toAccount',
-    header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
-    meta: { className: 'max-w-[200px] overflow-hidden' },
-    cell: ({ cell, row }) => {
-      const toAccount = cell.getValue();
-      const fromAccount = row.original.fromAccount;
-      return (
-        <div className="flex items-center gap-5">
-          <div className="relative">
-            <div>
-              <AccountHoverCard
-                account={toAccount}
-                trigger={
-                  <span>
-                    <Avatar size={32} collective={toAccount} displayTitle={false} />
-                  </span>
-                }
-              />
-            </div>
-            <div className="absolute -bottom-[6px] -right-[6px] rounded-full">
-              <AccountHoverCard
-                account={fromAccount}
-                trigger={
-                  <span>
-                    <Avatar size={16} collective={fromAccount} displayTitle={false} />
-                  </span>
-                }
-              />
-            </div>
-          </div>
-          <div className="overflow-hidden">
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium leading-5">
-              {toAccount.name || toAccount.slug}
-            </div>
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-4">
-              {fromAccount.name || fromAccount.slug}
-            </div>
-          </div>
-        </div>
-      );
-    },
-  };
+const getColumns = ({ onlyExpectedFunds }) =>
+  compact([
+    onlyExpectedFunds ? contributionId : null,
+    !onlyExpectedFunds && contributor,
+    beneficiary,
+    amount,
+    date,
+    paymentMethod,
+    onlyExpectedFunds ? expectedAt : null,
+    status,
+    actionsColumn,
+  ]);
 
-  const toAccount = {
-    accessorKey: 'toAccount',
-    header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
-    cell: ({ cell }) => {
-      const toAccount = cell.getValue();
-      return (
-        <AccountHoverCard
-          account={toAccount}
-          trigger={
-            <div className="flex items-center gap-2">
-              <div>
-                <Avatar size={32} collective={toAccount} displayTitle={false} />
-              </div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {toAccount.name || toAccount.slug}
-              </div>
-            </div>
-          }
-        />
-      );
-    },
-  };
-  const fromAccount = {
-    accessorKey: 'fromAccount',
-    header: intl.formatMessage({ id: 'Contributor', defaultMessage: 'Contributor' }),
-    cell: ({ cell }) => {
-      const fromAccount = cell.getValue();
-      return (
-        <AccountHoverCard
-          account={fromAccount}
-          trigger={
-            <div className="flex items-center gap-2">
-              <div>
-                <Avatar size={32} collective={fromAccount} displayTitle={false} />
-              </div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {fromAccount.name || fromAccount.slug}
-              </div>
-            </div>
-          }
-        />
-      );
-    },
-  };
-  const paymentMethod = {
-    accessorKey: 'paymentMethod',
-    header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
-    cell: ({ cell, row }) => {
-      const pm = cell.getValue();
-      if (pm) {
-        return (
-          <div className="flex items-center gap-2 truncate">
-            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />
-          </div>
-        );
-      } else if (row.original?.pendingContributionData?.paymentMethod) {
-        return i18nPaymentMethodProviderType(intl, row.original?.pendingContributionData?.paymentMethod);
-      }
-    },
-  };
-  const status = {
-    accessorKey: 'status',
-    header: intl.formatMessage({ id: 'order.status', defaultMessage: 'Status' }),
-    cell: ({ cell }) => {
-      const status = cell.getValue();
-      return (
-        <div data-cy="contribution-status">
-          <OrderStatusTag status={status} />
-        </div>
-      );
-    },
-  };
+const incomingContributionsFilters = omit(allFilters, ['expectedFundsFilter', 'expectedDate']);
 
-  const totalAmount = {
-    accessorKey: 'totalAmount',
-    header: intl.formatMessage({ defaultMessage: 'Total Amount', id: 'CDTMW3' }),
-    cell: ({ cell }) => {
-      const amount = cell.getValue();
-      return (
-        <div className="flex items-center gap-2 truncate">
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
-        </div>
-      );
-    },
-  };
+const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate', 'tier']);
 
-  const expectedAt = {
-    accessorKey: 'pendingContributionData.expectedAt',
-    header: intl.formatMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
-    cell: ({ cell }) => {
-      const date = cell.getValue();
-      return (
-        date && (
-          <div className="flex items-center gap-2 truncate">
-            <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-          </div>
-        )
-      );
-    },
-  };
-
-  const contributionId = {
-    accessorKey: 'legacyId',
-    header: '#',
-    cell: ({ cell }) => {
-      const legacyId = cell.getValue();
-
-      return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-        <div className="cursor-default" onClick={e => e.stopPropagation()}>
-          <CopyID value={legacyId}>{legacyId}</CopyID>
-        </div>
-      );
-    },
-  };
-
-  if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
-    return compact([
-      onlyExpectedFunds ? contributionId : null,
-      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-      paymentMethod,
-      totalAmount,
-      {
-        accessorKey: 'createdAt',
-        header: intl.formatMessage({ id: 'expense.incurredAt', defaultMessage: 'Date' }),
-        cell: ({ cell }) => {
-          const date = cell.getValue();
-          return (
-            <div className="flex items-center gap-2 truncate">
-              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-            </div>
-          );
-        },
-      },
-      onlyExpectedFunds ? expectedAt : null,
-      status,
-      actionsColumn,
-    ]);
-  } else {
-    const amount = {
-      accessorKey: 'amount',
-      header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
-      cell: ({ cell, row }) => {
-        const amount = cell.getValue();
-        const order = row.original;
-        return (
-          <div className="flex items-center gap-2 truncate">
-            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
-          </div>
-        );
-      },
-    };
-
-    return compact([
-      onlyExpectedFunds ? contributionId : null,
-      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-      paymentMethod,
-      amount,
-      totalAmount,
-      onlyExpectedFunds ? expectedAt : null,
-      status,
-      actionsColumn,
-    ]);
-  }
-};
-
-const filtersWithoutExpectedFunds = {
-  ...omit(filters, ['expectedFundsFilter', 'expectedDate', 'status']),
-  status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
-    Component: ({ valueRenderer, intl, value, onChange, ...props }) => (
-      <ComboSelectFilter
-        value={value}
-        onChange={onChange}
-        options={Object.values(OrderStatus)
-          .filter(s => s !== OrderStatus.PENDING)
-          .map(value => ({ label: valueRenderer({ intl, value }), value }))
-          .sort(sortSelectOptions)}
-        {...props}
-      />
-    ),
-    valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
-  },
-};
+const expectedFundsFilters = omit(allFilters, ['tier']);
 
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
   onlyExpectedFunds?: boolean;
   includeHostedAccounts?: boolean;
+  includeChildrenAccounts?: boolean;
 };
 
-const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHostedAccounts }: ContributionsProps) => {
+const Contributions = ({
+  accountSlug,
+  direction,
+  onlyExpectedFunds,
+  includeHostedAccounts,
+  includeChildrenAccounts,
+}: ContributionsProps) => {
   const { toast } = useToast();
 
   const [expireOrder] = useMutation(
@@ -501,6 +344,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+  const isIncoming = direction === 'INCOMING';
   const {
     data: metadata,
     loading: metadataLoading,
@@ -513,9 +357,10 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       onlyExpectedFunds: !!onlyExpectedFunds,
       expectedFundsFilter: onlyExpectedFunds ? ExpectedFundsFilter.ALL_EXPECTED_FUNDS : null,
       includeHostedAccounts: !!includeHostedAccounts,
+      includeChildrenAccounts: !!includeChildrenAccounts,
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const selectedContributionId = router.query.orderId ? parseInt(router.query.orderId as string) : null;
@@ -539,7 +384,6 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     {
       id: ContributionsTab.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      count: metadata?.account?.ALL.totalCount,
       filter: {
         ...(onlyExpectedFunds ? { expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS } : {}),
       },
@@ -570,7 +414,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
           count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
           filter: {
-            type: OrderTypeFilter.RECURRING,
+            frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
             status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
           },
         }
@@ -581,7 +425,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
           count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
           filter: {
-            type: OrderTypeFilter.ONETIME,
+            frequency: [ContributionFrequency.ONETIME],
             status: [OrderStatus.PAID, OrderStatus.PROCESSING],
           },
         }
@@ -642,8 +486,30 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       : null,
   ].filter(Boolean);
 
+  const tierOptions = React.useMemo(() => {
+    if (!includeChildrenAccounts) {
+      return [];
+    }
+    if (metadata?.account.childrenAccounts.nodes?.length === 0) {
+      return metadata.account?.tiers?.nodes.map(tier => ({ label: tier.name, value: tier.id }));
+    } else {
+      const makeOption = account =>
+        account?.tiers?.nodes.map(tier => ({ label: `${tier.name}  (${account.name})`, value: tier.id }));
+      const options = makeOption(metadata?.account);
+      metadata?.account.childrenAccounts.nodes.forEach(children => {
+        options.push(...makeOption(children));
+      });
+      return options;
+    }
+  }, [metadata?.account]);
+
+  const { account } = useContext(DashboardContext);
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
+    tierOptions: isIncoming ? tierOptions : [],
+    childrenAccounts: account.childrenAccounts?.nodes ?? [],
+    accountSlug: account.slug,
+    showChildAccountFilter: direction === 'INCOMING' && !includeHostedAccounts && includeChildrenAccounts,
   };
 
   const queryFilter = useQueryFilter({
@@ -651,7 +517,11 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     toVariables,
     meta: filterMeta,
     views,
-    filters: onlyExpectedFunds ? filters : filtersWithoutExpectedFunds,
+    filters: onlyExpectedFunds
+      ? expectedFundsFilters
+      : isIncoming && !includeHostedAccounts
+        ? incomingContributionsFilters
+        : filters,
   });
 
   const {
@@ -665,6 +535,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       filter: direction || 'OUTGOING',
       includeIncognito: true,
       includeHostedAccounts: !!includeHostedAccounts,
+      includeChildrenAccounts: !!includeChildrenAccounts,
       ...queryFilter.variables,
       ...(onlyExpectedFunds
         ? {
@@ -674,7 +545,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         : { expectedFundsFilter: null }),
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string | number }; action: EditOrderActions }>({
@@ -701,17 +572,10 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     }
   }, [router, selectedOrders]);
 
-  const isIncoming = direction === 'INCOMING';
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
 
-  const columns = getColumns({
-    tab: queryFilter.activeViewId,
-    intl,
-    isIncoming,
-    includeHostedAccounts,
-    onlyExpectedFunds,
-  });
+  const columns = getColumns({ onlyExpectedFunds });
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
@@ -762,11 +626,14 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     onEditExpectedFundsClick(order) {
       setEditingExpectedFunds(order);
     },
+    onEditAddedFundsClick(order) {
+      setEditOrder({ order, action: 'editAddedFunds' });
+    },
   });
 
   return (
     <React.Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={
             isIncoming ? (
@@ -834,12 +701,15 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         />
         <Filterbar {...queryFilter} />
 
-        {isIncoming && !onlyExpectedFunds && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
-          <PausedIncomingContributionsMessage
-            account={metadata.account}
-            count={metadata.account[ContributionsTab.PAUSED].totalCount}
-          />
-        )}
+        {isIncoming &&
+          !onlyExpectedFunds &&
+          metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
+          !metadata.account.parent && (
+            <PausedIncomingContributionsMessage
+              account={metadata.account}
+              count={metadata.account[ContributionsTab.PAUSED].totalCount}
+            />
+          )}
 
         {error ? (
           <MessageBoxGraphqlError error={error} />
@@ -851,7 +721,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           />
         ) : (
           <div className="flex flex-col gap-4">
-            <DataTable
+            <DataTable<ManagedOrderFieldsFragment, unknown>
               loading={loading}
               columns={columns}
               data={selectedOrders}
@@ -868,6 +738,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
             order={editOrder.order}
             action={editOrder.action}
             onClose={() => setEditOrder({ order: null, action: null })}
+            onSuccess={() => refetch()}
           />
         )}
         <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
@@ -882,7 +753,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         <ContributionConfirmationModal
           order={confirmCompletedOrder}
           onClose={() => setConfirmCompletedOrder(false)}
-          onSuccess={() => {}}
+          onSuccess={() => refetch()}
         />
       )}
       {editingExpectedFunds && (
@@ -901,142 +772,168 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
 };
 
 type GetContributionActionsOptions = {
-  LoggedInUser: LoggedInUserType;
+  LoggedInUser: LoggedInUser;
   intl: IntlShape;
-  onUpdatePaymentMethodClick: (order: ContributionDrawerQuery['order']) => void;
-  onResumeClick: (order: ContributionDrawerQuery['order']) => void;
-  onEditAmountClick: (order: ContributionDrawerQuery['order']) => void;
-  onMarkAsCompletedClick: (order: ContributionDrawerQuery['order']) => void;
-  onMarkAsExpiredClick: (order: ContributionDrawerQuery['order']) => void;
-  onCancelClick: (order: ContributionDrawerQuery['order']) => void;
-  onEditExpectedFundsClick: (order: ContributionDrawerQuery['order']) => void;
+  onUpdatePaymentMethodClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onResumeClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onEditAmountClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onMarkAsCompletedClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onMarkAsExpiredClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onCancelClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onEditExpectedFundsClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
+  onEditAddedFundsClick: (order: ManagedOrderFieldsFragment | ContributionDrawerQuery['order']) => void;
 };
 
-const getContributionActions: (opts: GetContributionActionsOptions) => GetActions<ContributionDrawerQuery['order']> =
-  opts => order => {
-    if (!order) {
-      return null;
-    }
+const getContributionActions: (
+  opts: GetContributionActionsOptions,
+) => GetActions<ManagedOrderFieldsFragment | ContributionDrawerQuery['order']> = opts => order => {
+  if (!order) {
+    return null;
+  }
 
-    const actions: ReturnType<GetActions<any>> = {
-      primary: [],
-      secondary: [],
-    };
+  const transactionsUrl = getTransactionsUrl(opts.LoggedInUser, order);
+  transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
 
-    const isAdminOfOrder = opts.LoggedInUser.isAdminOfCollective(order.fromAccount);
-    const canUpdateActiveOrder =
-      order.frequency !== ContributionFrequency.ONETIME &&
-      ![
-        OrderStatus.PAUSED,
-        OrderStatus.PROCESSING,
-        OrderStatus.PENDING,
-        OrderStatus.CANCELLED,
-        OrderStatus.REFUNDED,
-        OrderStatus.REJECTED,
-      ].includes(order.status) &&
-      isAdminOfOrder;
-
-    const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
-    const canCancel =
-      isAdminOfOrder &&
-      ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
-      order.frequency !== ContributionFrequency.ONETIME;
-    const canMarkAsCompleted =
-      [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
-    const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
-    const isExpectedFunds = !!order.pendingContributionData?.expectedAt;
-
-    const canDoActions = [canUpdateActiveOrder, canResume, canCancel, canMarkAsCompleted, canMarkAsExpired];
-
-    if (!canDoActions.some(Boolean)) {
-      return null;
-    }
-
-    if (canUpdateActiveOrder) {
-      actions.primary.push({
-        label: opts.intl.formatMessage({
-          defaultMessage: 'Update payment method',
-          id: 'subscription.menu.editPaymentMethod',
-        }),
-        onClick: () => opts.onUpdatePaymentMethodClick(order),
-        key: 'update-payment-method',
-      });
-    }
-
-    if (canResume) {
-      actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S' }),
-        onClick: () => opts.onResumeClick(order),
-        key: 'resume-contribution',
-      });
-    }
-
-    if (canUpdateActiveOrder) {
-      actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
-        onClick: () => opts.onEditAmountClick(order),
-        key: 'update-amount',
-      });
-    }
-
-    if (isExpectedFunds && (canMarkAsExpired || canMarkAsCompleted)) {
-      actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
-        onClick: () => opts.onEditExpectedFundsClick(order),
-        key: 'edit',
-      });
-    }
-
-    if (canMarkAsCompleted) {
-      actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
-        onClick: () => opts.onMarkAsCompletedClick(order),
-        'data-cy': 'MARK_AS_PAID-button',
-        key: 'mark-as-paid',
-      });
-    }
-
-    if (canMarkAsExpired) {
-      actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
-        onClick: () => opts.onMarkAsExpiredClick(order),
-        'data-cy': 'MARK_AS_EXPIRED-button',
-        key: 'mark-as-expired',
-      });
-    }
-
-    if (canCancel) {
-      actions.secondary.push({
-        key: 'cancel-contribution',
-        label: opts.intl.formatMessage({
-          defaultMessage: 'Cancel contribution',
-          id: 'subscription.menu.cancelContribution',
-        }),
-        onClick: () => opts.onCancelClick(order),
-        'data-cy': 'recurring-contribution-menu-cancel-option',
-      });
-    }
-
-    const toAccount = order.toAccount;
-    const legacyId = order.legacyId;
-    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
-
-    actions.secondary.push({
-      key: 'copy-link',
-      label: (
-        <CopyID
-          Icon={<LinkIcon size={12} />}
-          value={orderUrl}
-          tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
-          className="inline-flex items-center gap-1"
-        >
-          <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
-        </CopyID>
-      ),
-      onClick: () => {},
-    });
-
-    return actions;
+  const actions: ReturnType<GetActions<any>> = {
+    primary: [
+      {
+        key: 'view-transactions',
+        label: (
+          <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
+            <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
+            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+          </Link>
+        ),
+        onClick: () => {},
+      },
+    ],
+    secondary: [],
   };
+
+  const isAdminOfOrder = opts.LoggedInUser.isAdminOfCollective(order.fromAccount);
+  const canUpdateActiveOrder =
+    order.frequency !== ContributionFrequency.ONETIME &&
+    ![
+      OrderStatus.PAUSED,
+      OrderStatus.PROCESSING,
+      OrderStatus.PENDING,
+      OrderStatus.CANCELLED,
+      OrderStatus.REFUNDED,
+      OrderStatus.REJECTED,
+    ].includes(order.status) &&
+    isAdminOfOrder;
+
+  const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
+  const canCancel =
+    isAdminOfOrder &&
+    ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
+    order.frequency !== ContributionFrequency.ONETIME;
+  const canMarkAsCompleted =
+    [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
+  const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
+  const isExpectedFunds = !!order.pendingContributionData?.expectedAt;
+
+  if (canUpdateActiveOrder) {
+    actions.primary.push({
+      label: opts.intl.formatMessage({
+        defaultMessage: 'Update payment method',
+        id: 'subscription.menu.editPaymentMethod',
+      }),
+      onClick: () => opts.onUpdatePaymentMethodClick(order),
+      key: 'update-payment-method',
+    });
+  }
+
+  if (canResume) {
+    actions.primary.push({
+      label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S' }),
+      onClick: () => opts.onResumeClick(order),
+      key: 'resume-contribution',
+    });
+  }
+
+  if (canUpdateActiveOrder) {
+    actions.primary.push({
+      label: opts.intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
+      onClick: () => opts.onEditAmountClick(order),
+      key: 'update-amount',
+    });
+  }
+
+  if (isExpectedFunds && (canMarkAsExpired || canMarkAsCompleted)) {
+    actions.primary.push({
+      label: opts.intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
+      onClick: () => opts.onEditExpectedFundsClick(order),
+      key: 'edit',
+    });
+  }
+
+  if (canMarkAsCompleted) {
+    actions.primary.push({
+      label: opts.intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
+      onClick: () => opts.onMarkAsCompletedClick(order),
+      'data-cy': 'MARK_AS_PAID-button',
+      key: 'mark-as-paid',
+    });
+  }
+
+  if (canMarkAsExpired) {
+    actions.primary.push({
+      label: opts.intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
+      onClick: () => opts.onMarkAsExpiredClick(order),
+      'data-cy': 'MARK_AS_EXPIRED-button',
+      key: 'mark-as-expired',
+    });
+  }
+
+  if (canCancel) {
+    actions.secondary.push({
+      key: 'cancel-contribution',
+      label: opts.intl.formatMessage({
+        defaultMessage: 'Cancel contribution',
+        id: 'subscription.menu.cancelContribution',
+      }),
+      onClick: () => opts.onCancelClick(order),
+      'data-cy': 'recurring-contribution-menu-cancel-option',
+    });
+  }
+
+  if (order.paymentMethod?.type === PaymentMethodType.HOST) {
+    actions.primary.push({
+      key: 'edit-funds',
+      label: (
+        <React.Fragment>
+          <Pencil size={16} className="text-muted-foreground" />
+          {opts.intl.formatMessage({ defaultMessage: 'Edit funds', id: 'Kbjd3f' })}
+        </React.Fragment>
+      ),
+      onClick: () => opts.onEditAddedFundsClick(order),
+    });
+  }
+
+  const toAccount = order.toAccount;
+  const legacyId = order.legacyId;
+  const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, getWebsiteUrl());
+
+  actions.secondary.push({
+    key: 'copy-link',
+    label: (
+      <CopyID
+        Icon={null}
+        value={orderUrl}
+        tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
+        className=""
+      >
+        <div className="flex flex-row items-center gap-2.5">
+          <LinkIcon size={16} className="text-muted-foreground" />
+          <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
+        </div>
+      </CopyID>
+    ),
+    onClick: () => {},
+  });
+
+  return actions;
+};
 
 export default Contributions;

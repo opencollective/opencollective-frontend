@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import ReactDOM from 'react-dom';
@@ -62,15 +61,16 @@ const CollectiveLabelTextContainer = styled.div`
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
  */
-export const DefaultCollectiveLabel = ({ value: collective }) =>
-  !collective ? (
+export const DefaultCollectiveLabel = ({ value: collective }, context) => {
+  const selected = (context?.selectValue ?? []).some(o => o.value.slug === collective.slug);
+  return !collective ? (
     <Span fontSize="12px" lineHeight="18px" color="black.500">
       <FormattedMessage defaultMessage="No collective" id="159cQ8" />
     </Span>
   ) : (
     <Flex alignItems="center">
       <Avatar collective={collective} radius={16} />
-      <CollectiveLabelTextContainer>
+      <CollectiveLabelTextContainer role="option" value={collective.slug} aria-selected={selected}>
         <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
           {truncate(collective.name, { length: 40 })}
         </Span>
@@ -80,16 +80,6 @@ export const DefaultCollectiveLabel = ({ value: collective }) =>
       </CollectiveLabelTextContainer>
     </Flex>
   );
-
-DefaultCollectiveLabel.propTypes = {
-  value: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    imageUrl: PropTypes.string,
-    email: PropTypes.string,
-  }),
 };
 
 // Some flags to differentiate options in the picker
@@ -239,7 +229,13 @@ class CollectivePicker extends React.PureComponent {
   };
 
   setCreateFormCollectiveType = type => {
-    this.setState({ createFormCollectiveType: type || null });
+    if (typeof this.props.onCreateClick === 'function') {
+      this.props.onChange?.({ label: null, value: null });
+      this.setState({ menuIsOpen: false });
+      this.props.onCreateClick(type);
+    } else {
+      this.setState({ createFormCollectiveType: type || null });
+    }
   };
 
   getMenuIsOpen(menuIsOpenFromProps) {
@@ -266,7 +262,9 @@ class CollectivePicker extends React.PureComponent {
 
   getValue = () => {
     if (this.props.collective !== undefined) {
-      return this.buildCollectiveOption(this.props.collective);
+      return this.props.isMulti && Array.isArray(this.props.collective)
+        ? this.props.collective.map(this.buildCollectiveOption)
+        : this.buildCollectiveOption(this.props.collective);
     } else if (this.state.showCreatedCollective) {
       return this.buildCollectiveOption(last(this.state.createdCollectives));
     } else {
@@ -296,6 +294,8 @@ class CollectivePicker extends React.PureComponent {
       addLoggedInUserAsAdmin,
       renderNewCollectiveOption,
       isSearchable,
+      expenseType,
+      useBeneficiaryForVendor,
       ...props
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
@@ -336,12 +336,14 @@ class CollectivePicker extends React.PureComponent {
                       <CollectiveTypePicker
                         onChange={this.setCreateFormCollectiveType}
                         types={option.types || (typeof creatable === 'object' ? creatable : types)}
+                        useBeneficiaryForVendor={useBeneficiaryForVendor}
                       />
                     );
                   } else if (option[FLAG_INVITE_NEW]) {
                     return (
                       <InviteCollectiveDropdownOption
                         isSearching={!!searchText && !collectives.length}
+                        expenseType={expenseType}
                         onClick={() => {
                           onInvite?.(true);
                           onChange?.({ label: null, value: null });
@@ -419,78 +421,6 @@ class CollectivePicker extends React.PureComponent {
     );
   }
 }
-
-CollectivePicker.propTypes = {
-  ...StyledSelect.propTypes,
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** The list of collectives to display */
-  collectives: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      type: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  ),
-  /** Custom options to be passed to styled select */
-  customOptions: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.node,
-      value: PropTypes.any,
-    }),
-  ),
-  /** Defines if custom options are listed in the top of the list or the bottom */
-  customOptionsPosition: PropTypes.oneOf(Object.values(CUSTOM_OPTIONS_POSITION)),
-  /** Function to sort collectives. Default to sorty by name */
-  sortFunc: PropTypes.func,
-  /** Called when value changes */
-  onChange: PropTypes.func.isRequired,
-  /** Called when search input text changes  */
-  onInputChange: PropTypes.func,
-  /** Get passed the options list, returns the default one */
-  getDefaultOptions: PropTypes.func.isRequired,
-  /** Use this to control the component */
-  getOptions: PropTypes.func.isRequired,
-  /** Function to generate a label from the collective + index */
-  formatOptionLabel: PropTypes.func.isRequired,
-  /** Whether we should group collectives by type */
-  groupByType: PropTypes.bool,
-  /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType)))]),
-  /** If creatable is true, this will be used to render the "Create new ..." */
-  renderNewCollectiveOption: PropTypes.func,
-  /** If true, a permanent option to invite a new user will be displayed in the select */
-  invitable: PropTypes.bool,
-  onInvite: PropTypes.func,
-  /** If true, logged in user will be added as an admin of the created account */
-  addLoggedInUserAsAdmin: PropTypes.bool,
-  excludeAdminFields: PropTypes.bool,
-  /** Force menu to be open. Ignored during collective creation */
-  menuIsOpen: PropTypes.bool,
-  /** Disabled */
-  isDisabled: PropTypes.bool,
-  /** Component min width */
-  minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** Component max width */
-  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** Component width */
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** If creatable is true, only these types will be displayed in the create form */
-  types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))),
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-  /** Use this to control the value of the component */
-  collective: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-  }),
-  /** A list of optional fields to include in the form */
-  createCollectiveOptionalFields: PropTypes.array,
-  /** StyledSelect pass-through property */
-  styles: PropTypes.object,
-  HostCollectiveId: PropTypes.number,
-};
 
 CollectivePicker.defaultProps = {
   groupByType: true,

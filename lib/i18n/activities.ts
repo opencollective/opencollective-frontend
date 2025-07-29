@@ -80,12 +80,14 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     id: '21IyOj',
   },
   ORDER_PAYMENT_FAILED: {
-    defaultMessage: `<Individual></Individual>'s contribution to <Account></Account> failed`,
+    defaultMessage: `<FromAccount></FromAccount>'s contribution to <Account></Account> failed`,
     id: 'YKqXR6',
+    avatar: 'fromAccount',
   },
   PAYMENT_FAILED: {
-    defaultMessage: `<Individual></Individual>'s payment for <Order>contribution</Order> to <Account></Account> failed`,
+    defaultMessage: `<FromAccount></FromAccount>'s payment for <Order>contribution</Order> to <Account></Account> failed`,
     id: 'zw0B0K',
+    avatar: 'fromAccount',
   },
   COLLECTIVE_MEMBER_CREATED: {
     defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
@@ -143,8 +145,15 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     avatar: 'fromAccount',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: '<Individual></Individual> created new <Order>expected funds</Order> to <Account></Account>',
+    defaultMessage: '<FromAccount></FromAccount> created new <Order>expected funds</Order> to <Account></Account>',
     id: 'NvYiK0',
+    avatar: 'fromAccount',
+  },
+  ORDER_PROCESSED: {
+    defaultMessage:
+      "<FromAccount></FromAccount>'s <Order>contribution</Order> to <Account></Account> successfully processed",
+    id: 'HTHBXN',
+    avatar: 'fromAccount',
   },
 });
 
@@ -442,6 +451,11 @@ export const ActivityDescriptionI18n = defineMessages({
       'Crypto <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing',
     id: '6QW6MJ',
   },
+  ORDER_PROCESSED: {
+    defaultMessage:
+      '<Order>Contribution</Order> from <FromAccount></FromAccount> to <Account></Account> processed successfully',
+    id: 'wWPkPb',
+  },
   ORDER_PENDING_CONTRIBUTION_NEW: {
     defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
     id: 'kh8yZm',
@@ -539,6 +553,10 @@ export const ActivityDescriptionI18n = defineMessages({
   VENDOR_CREATED: {
     defaultMessage: 'Vendor <Vendor></Vendor> created',
     id: 'IUlgDG',
+  },
+  ADDED_FUNDS_EDITED: {
+    defaultMessage: '<Individual></Individual> edited added funds',
+    id: 'nxtsKq',
   },
 });
 
@@ -785,9 +803,13 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'New expected funds',
     id: 'kzIWOG',
   },
-  ORDER_THANKYOU: {
-    defaultMessage: 'New contribution',
-    id: 'raUlsb',
+  ORDER_PROCESSED: {
+    defaultMessage: 'Contribution processed',
+    id: 'mrdaqR',
+  },
+  ORDER_PENDING_CREATED: {
+    defaultMessage: 'New expected funds',
+    id: 'kzIWOG',
   },
   ORDERS_SUSPICIOUS: {
     defaultMessage: 'Suspicious contribution',

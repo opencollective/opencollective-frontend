@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get, omit } from 'lodash';
@@ -98,12 +97,11 @@ const MemberForm = props => {
           bindSubmitForm(submitForm);
 
           return (
-            <Form>
+            <Form className="flex flex-col gap-2">
               <StyledInputFormikField
                 name="role"
                 htmlFor="memberForm-role"
                 label={<P fontWeight="bold"> {intl.formatMessage(memberFormMessages.roleLabel)} </P>}
-                mt={3}
               >
                 {({ form, field }) => (
                   <React.Fragment>
@@ -116,14 +114,12 @@ const MemberForm = props => {
                         form.setFieldValue(field.name, value);
                         setMemberRole(value);
                       }}
-                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT])}
+                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT])}
                     />
                     {hasRoleDescription(memberRole) && (
-                      <Flex mb={3}>
-                        <Box mx={1} mt={1} fontSize="12px" color="black.600" fontStyle="italic">
-                          <MemberRoleDescription role={memberRole} />
-                        </Box>
-                      </Flex>
+                      <div className="mt-2 gap-1 text-xs text-muted-foreground">
+                        <MemberRoleDescription role={memberRole} />
+                      </div>
                     )}
                   </React.Fragment>
                 )}
@@ -132,7 +128,6 @@ const MemberForm = props => {
                 name="description"
                 htmlFor="memberForm-description"
                 label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.descriptionLabel)}</P>}
-                mt={3}
               >
                 {({ field }) => <StyledInput {...field} />}
               </StyledInputFormikField>
@@ -141,8 +136,6 @@ const MemberForm = props => {
                 htmlFor="memberForm-since"
                 inputType="date"
                 label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
-                mt={3}
-                required
               >
                 {({ form, field }) => (
                   <StyledInput
@@ -161,14 +154,6 @@ const MemberForm = props => {
       </Formik>
     </Flex>
   );
-};
-
-MemberForm.propTypes = {
-  bindSubmitForm: PropTypes.func,
-  collectiveImg: PropTypes.string,
-  intl: PropTypes.object.isRequired,
-  member: PropTypes.object,
-  triggerSubmit: PropTypes.func,
 };
 
 export default injectIntl(MemberForm);

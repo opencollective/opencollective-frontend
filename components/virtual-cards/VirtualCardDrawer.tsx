@@ -4,8 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
-import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
+import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/schema';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/schema';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
@@ -184,8 +184,8 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                   {
                     AvailableAmount: I18nBold,
                     AmountSeparator: v => <strong>&nbsp;{v}&nbsp;</strong>,
-                    LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-                    LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+                    LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+                    LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
                   },
                 )}
               />
@@ -212,7 +212,6 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               canDeleteVirtualCard={props.canDeleteVirtualCard}
               onDeleteRefetchQuery={props.onDeleteRefetchQuery}
               hideViewTransactions
-              // eslint-disable-next-line react/display-name
               as={React.forwardRef((props, ref: React.ForwardedRef<HTMLButtonElement>) => {
                 return (
                   <StyledButton {...props} ref={ref}>

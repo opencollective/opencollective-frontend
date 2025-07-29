@@ -55,7 +55,8 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
         <Button
           size="icon-xs"
           variant="outline"
-          className="border-transparent text-muted-foreground hover:bg-white hover:text-foreground hover:shadow-sm group-hover/row:border-border data-[state=open]:border-border data-[state=open]:text-foreground"
+          className="border-transparent text-muted-foreground group-hover/row:border-border hover:bg-white hover:text-foreground hover:shadow-xs data-[state=open]:border-border data-[state=open]:text-foreground"
+          data-cy="actions-menu-trigger"
         >
           <MoreHorizontal size={18} />
         </Button>
@@ -64,7 +65,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => openDetails()} className="gap-2.5">
           <PanelRightOpen className="text-muted-foreground" size={16} />
-          <FormattedMessage defaultMessage="Open details" id="iIXH4W" />
+          <FormattedMessage defaultMessage="View details" id="MnpUD7" />
         </DropdownMenuItem>
         {primary?.length > 0 && (
           <React.Fragment>

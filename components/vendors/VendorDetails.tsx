@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import type { Host } from '../../lib/graphql/types/v2/graphql';
+import type { Host } from '../../lib/graphql/types/v2/schema';
 import { elementFromClass } from '../../lib/react-utils';
 
 import Avatar from '../Avatar';
@@ -12,6 +12,7 @@ import PayoutMethodData from '../expenses/PayoutMethodData';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LocationAddress from '../LocationAddress';
+import StackedAvatars from '../StackedAvatars';
 import { H4 } from '../Text';
 import { Button } from '../ui/Button';
 
@@ -78,6 +79,20 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
           </React.Fragment>
         </HeaderInfo>
       </div>
+      <div className="mt-5 flex gap-8">
+        <HeaderInfo>
+          <FormattedMessage defaultMessage="Visible to" id="zJePa1" />
+          {vendor.visibleToAccounts?.length > 0 ? (
+            <StackedAvatars
+              accounts={vendor.visibleToAccounts}
+              imageSize={24}
+              withHoverCard={{ includeAdminMembership: true }}
+            />
+          ) : (
+            <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
+          )}
+        </HeaderInfo>
+      </div>
       {contact && (
         <div className="mt-5 flex flex-col">
           <SectionTitle>
@@ -110,7 +125,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
         )}
         {payoutMethod && (
           <VendorInfo>
-            <FormattedMessage id="SecurityScope.PayoutMethod" defaultMessage="Payout Method" />
+            <FormattedMessage id="PayoutMethod" defaultMessage="Payout Method" />
             <PayoutMethodData payoutMethod={payoutMethod} />
           </VendorInfo>
         )}
@@ -136,7 +151,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
       )}
       {drawerActionsContainer &&
         createPortal(
-          <div className="flex flex-grow justify-between gap-2">
+          <div className="flex grow justify-between gap-2">
             <Button onClick={onCancel} variant="outline" className="rounded-full">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>

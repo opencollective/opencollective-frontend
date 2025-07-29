@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
@@ -126,7 +127,7 @@ describe('signin', () => {
   });
 
   it('after signup shows the /welcome page if there is no redirect', () => {
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.visit('/signin');
 
     // Go to CreateProfile
@@ -141,14 +142,17 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
 
     const expectedEmailSubject = 'Open Collective: Sign In';
-    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click Sign In').click();
-    cy.wait(200);
-    cy.contains('Welcome to Open Collective!');
+    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const resetLink = $html('a:contains("One-click Sign In")');
+      const href = resetLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname);
+    });
   });
 
   it('after signup do not show the welcome page if there is a redirect', () => {
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.visit('/signin?next=how-it-works');
 
     // Go to CreateProfile
@@ -163,10 +167,14 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
 
     const expectedEmailSubject = 'Open Collective: Sign In';
-    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click Sign In').click();
-    cy.wait(200);
-    cy.contains('How Open Collective works');
+    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const signInLink = $html('a:contains("One-click Sign In")');
+      const href = signInLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname + parsedUrl.search);
+      cy.contains('How Open Collective works');
+    });
   });
 
   it('can signup a user with gmail and show Open Gmail button ', () => {

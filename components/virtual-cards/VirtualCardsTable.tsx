@@ -4,8 +4,8 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import type { Account, Host, VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
-import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host, VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/schema';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/schema';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
@@ -75,7 +75,7 @@ const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
       const vc = row.original;
       const meta = table.options.meta as VirtualCardsTableMeta;
       return (
-        <div className="italic text-slate-500">
+        <div className="text-slate-500 italic">
           {getAvailableLimitShortString(
             meta.intl,
             vc.currency,
@@ -83,7 +83,7 @@ const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
             vc.spendingLimitAmount,
             vc.spendingLimitInterval,
             {
-              AvailableAmount: v => <span className="font-medium not-italic text-slate-950">{v}</span>,
+              AvailableAmount: v => <span className="font-medium text-slate-950 not-italic">{v}</span>,
               AmountSeparator: v => <span>&nbsp;{v}&nbsp;</span>,
               LimitAmount: v => <span>{v}</span>,
               LimitInterval: v => <span>{v}</span>,

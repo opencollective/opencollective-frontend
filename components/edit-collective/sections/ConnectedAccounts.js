@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,9 +18,9 @@ const TITLE_OVERRIDE = {
 const ConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
-  let services = [];
+  const services = [];
   if (props.services) {
-    services = [...props.services, ...services];
+    services.push(...props.services);
   } else {
     if (props.collective.type === 'COLLECTIVE' || props.collective.isHost) {
       services.push('twitter');
@@ -55,14 +54,6 @@ const ConnectedAccounts = props => {
       ))}
     </div>
   );
-};
-
-ConnectedAccounts.propTypes = {
-  collective: PropTypes.object.isRequired,
-  connectedAccounts: PropTypes.arrayOf(PropTypes.object),
-  editMode: PropTypes.bool,
-  services: PropTypes.arrayOf(PropTypes.string),
-  variation: PropTypes.oneOf(['SENDING', 'RECEIVING']),
 };
 
 export default ConnectedAccounts;

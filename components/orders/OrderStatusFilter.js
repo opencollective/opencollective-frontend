@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
-import i18nOrderStatus from '../../lib/i18n/order-status';
+import { i18nOrderStatus } from '../../lib/i18n/order';
 import { sortSelectOptions } from '../../lib/utils';
 
 import { StyledSelectFilter } from '../StyledSelectFilter';
@@ -23,11 +22,6 @@ const OrderStatusFilter = ({ onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-OrderStatusFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
 };
 
 export default OrderStatusFilter;

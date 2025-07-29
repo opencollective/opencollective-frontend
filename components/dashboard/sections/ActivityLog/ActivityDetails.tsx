@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/schema';
 
 import { Box } from '../../../Grid';
 
@@ -42,7 +41,15 @@ export const activityHasDetails = (activity: Activity) => {
   return activity.data && !isEmpty(activity.data);
 };
 
-const ActivityDetails = ({ activity, TitleContainer }) => {
+interface ActivityDetailsProps {
+  TitleContainer?: React.ComponentType<{ children: React.ReactNode }>;
+  activity: {
+    type: string;
+    data?: object;
+  };
+}
+
+const ActivityDetails = ({ activity, TitleContainer }: ActivityDetailsProps) => {
   const intl = useIntl();
   const activityConfig = ActivityDetailComponents[activity.type] || ActivityDetailComponents.DEFAULT;
   return (
@@ -53,10 +60,6 @@ const ActivityDetails = ({ activity, TitleContainer }) => {
       </Box>
     </React.Fragment>
   );
-};
-
-ActivityDetails.propTypes = {
-  activity: PropTypes.shape({ type: PropTypes.string.isRequired, data: PropTypes.object }).isRequired,
 };
 
 export default ActivityDetails;

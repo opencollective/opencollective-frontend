@@ -1,4 +1,3 @@
-import styledPropTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import type {
   BackgroundProps,
@@ -38,6 +37,7 @@ type StyledCardProps = BackgroundProps &
  * A simple styled-component to contain content in a card UI using styled-system.
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
+ * @deprecated Use `ui/Card` instead
  */
 const StyledCard = styled.div.attrs<StyledCardProps>(props => ({
   bg: props.bg ?? 'white.full',
@@ -48,18 +48,6 @@ const StyledCard = styled.div.attrs<StyledCardProps>(props => ({
   overflowX: props.overflowX ?? 'hidden',
   overflowY: props.overflowY ?? 'hidden',
 }))<StyledCardProps>(compose(flexbox, typography, background, border, shadow, color, layout, position, space));
-
-StyledCard.propTypes = {
-  ...styledPropTypes.flexbox,
-  ...styledPropTypes.typography,
-  ...styledPropTypes.background,
-  ...styledPropTypes.border,
-  ...styledPropTypes.shadow,
-  ...styledPropTypes.color,
-  ...styledPropTypes.layout,
-  ...styledPropTypes.space,
-  ...styledPropTypes.position,
-};
 
 /** @component */
 export default StyledCard;

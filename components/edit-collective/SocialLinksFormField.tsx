@@ -1,30 +1,36 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Plus } from '@styled-icons/fa-solid/Plus';
-import { Times } from '@styled-icons/fa-solid/Times';
-import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
+import { GripVertical, X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
-import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/schema';
+import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
+import { SocialLinkLabel } from '../../lib/social-links';
 import { isValidUrl } from '../../lib/utils';
 
-import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledSelect from '../StyledSelect';
-import { Span } from '../Text';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 type SocialLinksFormFieldProps = {
   value?: SocialLink[];
   touched?: boolean;
   onChange: (value: SocialLinkInput[]) => void;
+  useLegacyInput?: boolean;
 };
 
-export default function SocialLinksFormField({ value = [], touched, onChange }: SocialLinksFormFieldProps) {
+export default function SocialLinksFormField({
+  value = [],
+  touched,
+  onChange,
+  useLegacyInput = true,
+}: SocialLinksFormFieldProps) {
   const [items, setItems] = React.useState(value.map(({ url, type }, i) => ({ url, type, sortId: i.toString() })));
 
   React.useEffect(() => {
@@ -72,7 +78,7 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <Flex width="100%" flexDirection="column" data-cy="social-link-inputs">
+      <div className="flex flex-col gap-2" data-cy="social-link-inputs">
         <SortableContext items={items.map(item => item.sortId)} strategy={verticalListSortingStrategy}>
           {items.map(socialLink => {
             return (
@@ -82,25 +88,18 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
                 value={socialLink}
                 onChange={onItemChange}
                 onRemoveItem={onRemoveItem}
+                useLegacyInput={useLegacyInput}
               />
             );
           })}
-          <Flex mt={2} justifyContent="center">
-            <StyledButton
-              disabled={value.length >= 10}
-              type="button"
-              buttonSize="tiny"
-              buttonStyle="standard"
-              onClick={addItem}
-            >
+          <div className="flex justify-center gap-2">
+            <Button disabled={value.length >= 10} type="button" size="sm" variant="outline" onClick={addItem}>
               <Plus size="10px" />
-              <Span ml={2}>
-                <FormattedMessage defaultMessage="Add social link" id="FH4TgN" />
-              </Span>
-            </StyledButton>
-          </Flex>
+              <FormattedMessage defaultMessage="Add social link" id="FH4TgN" />
+            </Button>
+          </div>
         </SortableContext>
-      </Flex>
+      </div>
     </DndContext>
   );
 }
@@ -108,106 +107,39 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
 type SocialLinkTypePickerProps = {
   value: SocialLinkType;
   onChange: (value: SocialLinkType) => void;
+  useLegacyInput?: boolean;
 } & any;
 
-function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTypePickerProps) {
-  const options = [
-    {
-      value: SocialLinkType.WEBSITE.toString(),
-      label: 'Website',
-    },
-    {
-      value: SocialLinkType.DISCORD.toString(),
-      label: 'Discord',
-    },
-    {
-      value: SocialLinkType.FACEBOOK.toString(),
-      label: 'Facebook',
-    },
-    {
-      value: SocialLinkType.GITHUB.toString(),
-      label: 'GitHub',
-    },
-    {
-      value: SocialLinkType.GITLAB.toString(),
-      label: 'GitLab',
-    },
-    {
-      value: SocialLinkType.GIT.toString(),
-      label: 'Git Repository',
-    },
-    {
-      value: SocialLinkType.INSTAGRAM.toString(),
-      label: 'Instagram',
-    },
-    {
-      value: SocialLinkType.MASTODON.toString(),
-      label: 'Mastodon',
-    },
-    {
-      value: SocialLinkType.MATTERMOST.toString(),
-      label: 'Mattermost',
-    },
-    {
-      value: SocialLinkType.TUMBLR.toString(),
-      label: 'Tumblr',
-    },
-    {
-      value: SocialLinkType.TWITTER.toString(),
-      label: 'Twitter',
-    },
-    {
-      value: SocialLinkType.YOUTUBE.toString(),
-      label: 'YouTube',
-    },
-    {
-      value: SocialLinkType.MEETUP.toString(),
-      label: 'Meetup',
-    },
-    {
-      value: SocialLinkType.LINKEDIN.toString(),
-      label: 'LinkedIn',
-    },
-    {
-      value: SocialLinkType.SLACK.toString(),
-      label: 'Slack',
-    },
-    {
-      value: SocialLinkType.DISCOURSE.toString(),
-      label: 'Discourse',
-    },
-    {
-      value: SocialLinkType.PIXELFED.toString(),
-      label: 'Pixelfed',
-    },
-    {
-      value: SocialLinkType.GHOST.toString(),
-      label: 'Ghost',
-    },
-    {
-      value: SocialLinkType.PEERTUBE.toString(),
-      label: 'PeerTube',
-    },
-    {
-      value: SocialLinkType.TIKTOK.toString(),
-      label: 'TikTok',
-    },
-    {
-      value: SocialLinkType.TWITCH.toString(),
-      label: 'Twitch',
-    },
-  ];
+const options = Object.keys(SocialLinkType).map(value => ({ value, label: SocialLinkLabel[value] }));
 
-  return (
-    <StyledSelect
-      {...pickerProps}
-      data-cy="social-link-type-picker"
-      value={options.find(o => o.value === value?.toString())}
-      defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
-      onChange={({ value }) => onChange(value)}
-      options={sortBy(options, 'label')}
-    />
-  );
+function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTypePickerProps) {
+  if (pickerProps.useLegacyInput) {
+    return (
+      <StyledSelect
+        {...pickerProps}
+        data-cy="social-link-type-picker"
+        value={options.find(o => o.value === value?.toString())}
+        defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
+        onChange={({ value }) => onChange(value)}
+        options={sortBy(options, 'label')}
+      />
+    );
+  } else {
+    return (
+      <Select value={value} onValueChange={value => onChange(value)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {sortBy(options, 'label').map(({ value, label }) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    );
+  }
 }
 
 type SocialLinkItemProps = {
@@ -215,9 +147,10 @@ type SocialLinkItemProps = {
   error?: boolean;
   onChange: (value: SocialLink, sortId: string) => void;
   onRemoveItem: (sortId: string) => void;
+  useLegacyInput?: boolean;
 };
 
-function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItemProps) {
+function SocialLinkItem({ value, error, onChange, onRemoveItem, useLegacyInput }: SocialLinkItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: value.sortId });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -273,16 +206,22 @@ function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItem
     onRemoveItem(value.sortId);
   }, [onRemoveItem, value.sortId]);
 
+  const InputComponent = useMemo(() => (useLegacyInput ? StyledInput : Input), [useLegacyInput]);
+
   return (
-    <Flex ref={setNodeRef} style={style} alignItems="center" my={1} gap="5px">
-      <div {...listeners} {...attributes}>
-        <DragIndicator size="15px" style={{ cursor: 'grab' }} />
+    <div ref={setNodeRef} style={style} className="items-top flex gap-2 sm:items-center">
+      <div className="flex h-9 items-center" {...listeners} {...attributes}>
+        <GripVertical size="15px" style={{ cursor: 'grab' }} />
       </div>
-      <Flex flexGrow={1} flexWrap="wrap" gap="5px">
-        <Box width={['100%', '120px']}>
-          <SocialLinkTypePicker value={value.type} onChange={type => onFieldChange('type', type)} />
-        </Box>
-        <StyledInput
+      <div className="flex flex-grow flex-col items-center gap-2 sm:flex-row">
+        <div className="w-full sm:max-w-32">
+          <SocialLinkTypePicker
+            value={value.type}
+            onChange={type => onFieldChange('type', type)}
+            useLegacyInput={useLegacyInput}
+          />
+        </div>
+        <InputComponent
           autoFocus={value.url === ''}
           error={error}
           flexGrow={1}
@@ -291,24 +230,16 @@ function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItem
           onChange={onUrlChange}
           placeholder="https://opencollective.com/"
         />
-      </Flex>
-
-      <StyledButton
-        tabIndex={-1}
-        padding={0}
-        width="20px"
-        height="20px"
-        type="button"
-        buttonStyle="borderless"
-        onClick={onRemove}
-      >
-        <Times size="10px" />
-      </StyledButton>
-    </Flex>
+      </div>
+      <Button tabIndex={-1} type="button" variant="outline" size="icon" onClick={onRemove}>
+        <X size="18" />
+      </Button>
+    </div>
   );
 }
 
 const knownSocialLinkDomains = [
+  { type: SocialLinkType.BLUESKY, regexp: /^(https:\/\/)?bsky.app/ },
   { type: SocialLinkType.DISCORD, regexp: /^(https:\/\/)?discord.com/ },
   { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www\.)?facebook.com/ },
   { type: SocialLinkType.GITHUB, regexp: /^(https:\/\/)?github.com/ },
@@ -317,10 +248,11 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www\.)?linkedin.com/ },
   { type: SocialLinkType.MEETUP, regexp: /^(https:\/\/)?meetup.com/ },
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
+  { type: SocialLinkType.THREADS, regexp: /^(https:\/\/)?(www\.)?threads.net/ },
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
   { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
-  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
+  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?(twitter|x)\.com/ },
   { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];
 

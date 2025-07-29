@@ -5,13 +5,11 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import type {
-  Currency,
-  PaymentMethodType,
-  TransactionsTableQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
+import { i18nHasDebt } from '../../../../lib/i18n/has-debt';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -52,6 +50,8 @@ export const schema = z.object({
   searchTerm: searchFilter.schema,
   kind: isMulti(z.nativeEnum(TransactionKind)).optional(),
   type: z.nativeEnum(TransactionType).optional(),
+  paymentMethodId: isMulti(z.string()).optional(),
+  payoutMethodId: z.string().optional(),
   paymentMethod: paymentMethodFilter.schema,
   virtualCard: isMulti(z.string()).optional(),
   expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
@@ -61,6 +61,7 @@ export const schema = z.object({
   openTransactionId: z.coerce.string().optional(),
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
+  hasDebt: boolean.optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -81,6 +82,8 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
   expenseId: id => ({ expense: { legacyId: id } }),
   orderId: id => ({ order: { legacyId: id } }),
   paymentMethod: paymentMethodFilter.toVariables,
+  paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
+  payoutMethodId: id => ({ payoutMethod: { id } }),
 };
 
 // The filters config is used to populate the Filters component.
@@ -128,13 +131,24 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,
   },
-
   isRefund: {
     labelMsg: defineMessage({ defaultMessage: 'Is Refund', id: 'o+jEZR' }),
     Component: ({ intl, ...props }) => {
       const options = React.useMemo(() => {
         return [true, false].map(value => ({
           label: i18nIsRefund(intl, value),
+          value,
+        }));
+      }, [intl]);
+      return <ComboSelectFilter options={options} {...props} />;
+    },
+  },
+  hasDebt: {
+    labelMsg: defineMessage({ defaultMessage: 'Has Debt', id: 'ihvDCr' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(() => {
+        return [true, false].map(value => ({
+          label: i18nHasDebt(intl, value),
           value,
         }));
       }, [intl]);
@@ -205,5 +219,13 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ defaultMessage: 'Group ID', id: 'nBKj/i' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
     Component: props => <ComboSelectFilter isMulti creatable {...props} valueRenderer={undefined} />, // undefined valueRenderer to show full group ID in select filter
+  },
+  payoutMethodId: {
+    labelMsg: defineMessage({ defaultMessage: 'Payout Method', id: 'PayoutMethod' }),
+    valueRenderer: ({ value }) => value.split('-')[0],
+  },
+  paymentMethodId: {
+    labelMsg: defineMessage({ defaultMessage: 'Payment Method', id: 'paymentmethod.label' }),
+    valueRenderer: ({ value }) => value.split('-')[0],
   },
 };

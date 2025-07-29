@@ -1,19 +1,20 @@
 const debug = require('debug')('duplicateHandler');
 
-function duplicateHandler({ keyGenerator, skip, timeout } = {}) {
+function duplicateHandler({ skip, timeout } = {}) {
   timeout = Number(timeout) || 30;
 
-  const requests = {};
+  const requests = new Map();
 
   // Garbage collection (not necessary under normal operation)
   const gc = () => {
-    const ids = Object.keys(requests);
+    const ids = Array.from(requests.keys());
     if (ids.length > 0) {
       debug(`${ids.length} current registered requests`);
     }
     for (const id of ids) {
-      if (requests[id].registeredAt < new Date().getTime() - timeout * 1000) {
-        delete requests[id];
+      const request = requests.get(id);
+      if (request.registeredAt < new Date().getTime() - timeout * 1000) {
+        requests.delete(id);
       }
     }
   };
@@ -26,16 +27,15 @@ function duplicateHandler({ keyGenerator, skip, timeout } = {}) {
       return;
     }
 
-    const id = keyGenerator ? keyGenerator(req) : req.url;
-
-    if (requests[id]) {
+    const id = req.url;
+    if (requests.has(id)) {
       debug(`Duplicate request detected '${id}'`);
-      const origin = requests[id].origin;
+      const origin = requests.get(id).origin;
 
       // Prepare for duplicates
       // We're lazily doing it only when the first duplicate arrives
-      if (!requests[id].duplicates) {
-        requests[id].duplicates = [];
+      if (!requests.get(id).duplicates) {
+        requests.get(id).duplicates = [];
 
         const originResMethods = {};
         for (const method of ['setHeader', 'end']) {
@@ -47,9 +47,10 @@ function duplicateHandler({ keyGenerator, skip, timeout } = {}) {
             originResMethods[method].apply(origin.res, arguments);
 
             // Apply on duplicates method
-            if (requests[id]) {
-              for (const duplicate of requests[id].duplicates) {
-                // Copy properties because we don't listen when their set
+            const request = requests.get(id);
+            if (request) {
+              for (const duplicate of request.duplicates) {
+                // Copy properties because we don't listen when they're set
                 if (method === 'send') {
                   duplicate.res.statusCode = origin.res.statusCode;
                   duplicate.res.statusMessage = origin.res.statusMessage;
@@ -68,22 +69,22 @@ function duplicateHandler({ keyGenerator, skip, timeout } = {}) {
       }
 
       // Registering duplicate
-      requests[id].duplicates.push({ req, res, next });
+      requests.get(id).duplicates.push({ req, res, next });
 
       // That's all, wait on origin response to complete
       return;
     }
 
     // Registering origin request
-    requests[id] = {
+    requests.set(id, {
       registeredAt: new Date().getTime(),
       origin: { req, res, next },
-    };
+    });
 
     // Release origin request
-    req.on('close', () => delete requests[id]);
-    res.on('end', () => delete requests[id]);
-    res.on('finish', () => delete requests[id]);
+    req.on('close', () => requests.delete(id));
+    res.on('end', () => requests.delete(id));
+    res.on('finish', () => requests.delete(id));
 
     return next();
   };

@@ -9,12 +9,11 @@ export function ThemeColor({ color = undefined }) {
   const hsl = parseToHsl(color);
 
   return (
-    // eslint-disable-next-line react/no-unknown-property
     <style jsx global>
       {`
         :root {
-          --primary: ${hsl.hue} ${hsl.saturation * 100}% ${hsl.lightness * 100}%;
-          --primary-foreground: ${hsl.hue} ${(hsl.saturation * 100) / 2}% ${98}%;
+          --primary: hsl(${hsl.hue}, ${hsl.saturation * 100}%, ${hsl.lightness * 100}%);
+          --primary-foreground: hsl(${hsl.hue}, ${(hsl.saturation * 100) / 2}%, ${98}%);
         }
       `}
     </style>

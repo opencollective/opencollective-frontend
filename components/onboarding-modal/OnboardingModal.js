@@ -4,13 +4,13 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
 import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 
@@ -405,4 +405,4 @@ const addGraphql = compose(
   addMemberInvitationQuery,
 );
 
-export default injectIntl(addGraphql(withRouter(OnboardingModal)));
+export default addGraphql(withRouter(OnboardingModal));

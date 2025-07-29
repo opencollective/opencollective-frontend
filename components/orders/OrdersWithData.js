@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
@@ -194,7 +193,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   return (
     <Box maxWidth={1000} width="100%" m="0 auto">
       <div className="flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
+        <h1 className="text-2xl leading-10 font-bold tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </h1>
         <div className="w-[276px]">
@@ -287,16 +286,6 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
       )}
     </Box>
   );
-};
-
-OrdersWithData.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
-  /** If provided, only orders matching this status will be fetched */
-  status: PropTypes.string,
-  /** An optional title to be used instead of "Financial contributions" */
-  title: PropTypes.node,
-  showPlatformTip: PropTypes.bool,
-  canCreatePendingOrder: PropTypes.bool,
 };
 
 export default OrdersWithData;

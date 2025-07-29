@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
@@ -70,7 +70,7 @@ export default function LegalDocumentDrawer({
   getActions,
 }: Readonly<LegalDocumentDrawerProps>) {
   const intl = useIntl();
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     context: API_V2_CONTEXT,
     variables: { hostId: host.id, accountId: get(document, 'account.id') },
@@ -113,7 +113,7 @@ export default function LegalDocumentDrawer({
               />
               <DataListItem
                 label={intl.formatMessage({ defaultMessage: 'Status', id: 'LegalDocument.Status' })}
-                value={<LegalDocumentStatusBadge status={document.status} isExpired={document.isExpired} />}
+                value={<LegalDocumentStatusBadge status={document.status} />}
               />
               <DataListItem
                 label={intl.formatMessage({ defaultMessage: 'Year', id: 'IFo1oo' })}
@@ -159,7 +159,6 @@ export default function LegalDocumentDrawer({
                               <FormattedMoneyAmount
                                 amount={expense.amountV2.valueInCents}
                                 currency={expense.amountV2.currency}
-                                amountStyles={null}
                               />
                             ),
                             expenseType: i18nExpenseType(intl, expense.type),

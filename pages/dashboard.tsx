@@ -1,17 +1,17 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount, isIndividualAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import useLocalStorage from '../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { require2FAForAdmins } from '../lib/policies';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import type { Context } from '@/lib/apollo-client';
+import { loadGoogleMaps } from '@/lib/google-maps';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
   ALL_SECTIONS,
@@ -19,12 +19,11 @@ import {
   ROOT_PROFILE_KEY,
   ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
+  SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS,
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
 import { getMenuItems } from '../components/dashboard/Menu';
-import DashboardTopBar from '../components/dashboard/preview/DashboardTopBar';
-import SubMenu from '../components/dashboard/preview/SubMenu';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
@@ -34,6 +33,7 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import { useWorkspace } from '../components/WorkspaceProvider';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -61,7 +61,8 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (
     isIndividualAccount(account) ||
-    (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
+    !isHostAccount(account) ||
+    (isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_OVERVIEW))
   ) {
     return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
@@ -115,6 +116,15 @@ function getBlocker(LoggedInUser, account, section) {
         />
       );
     }
+  } else if (SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS.includes(section)) {
+    if (!isAdmin && !LoggedInUser.hasRole(roles.COMMUNITY_MANAGER, account)) {
+      return (
+        <FormattedMessage
+          defaultMessage="You need to be logged in as a community manager to view this page"
+          id="dnkxQ8"
+        />
+      );
+    }
   } else if (!isAdmin) {
     return <FormattedMessage defaultMessage="You need to be logged in as an admin" id="AQNF/n" />;
   }
@@ -136,16 +146,30 @@ const parseQuery = query => {
   };
 };
 
+// ts-unused-exports:disable-next-line
+export const getServerSideProps = async (context: Context) => {
+  const whitelabel = getWhitelabelProps(context);
+  // Dashboard should always be opened on the platform domain
+  if (whitelabel.isWhitelabelDomain) {
+    return {
+      redirect: {
+        destination: process.env.WEBSITE_URL + (whitelabel.path || '/dashboard'),
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
+};
+
 const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const { slug, section, subpath } = parseQuery(router.query);
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
-    slug: LoggedInUser?.collective.slug,
-  });
+  const { workspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
-  const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
+  const defaultSlug = workspace.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
@@ -157,18 +181,15 @@ const DashboardPage = () => {
   const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
-  const useDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);
-
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
-      if (LoggedInUser && !useDynamicTopBar) {
-        // this is instead configured as "default" account in NewAccountSwitcher
-        setLastWorkspaceVisit({ slug: activeSlug });
+    if (activeSlug && activeSlug !== workspace.slug) {
+      if (LoggedInUser) {
+        setWorkspace({ slug: activeSlug });
       }
     }
     // If there is no slug set (that means /dashboard)
-    // And if there is an activeSlug (this means lastWorkspaceVisit OR LoggedInUser)
+    // And if there is an activeSlug (this means workspace OR LoggedInUser)
     // And a LoggedInUser
     // And if activeSlug is different than LoggedInUser slug
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
@@ -178,10 +199,14 @@ const DashboardPage = () => {
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
-    if (account && !LoggedInUser.isAdminOfCollective(account)) {
-      setLastWorkspaceVisit({ slug: null });
+    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
+      setWorkspace({ slug: undefined });
     }
   }, [account]);
+
+  React.useEffect(() => {
+    loadGoogleMaps();
+  }, []);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
@@ -190,14 +215,6 @@ const DashboardPage = () => {
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
-
-  let subMenu = null;
-  const parentMenuItem = menuItems.find(
-    item => 'subMenu' in item && item.subMenu?.find(item => item.section === selectedSection),
-  );
-  if (parentMenuItem && 'subMenu' in parentMenuItem) {
-    subMenu = parentMenuItem.subMenu;
-  }
 
   return (
     <DashboardContext.Provider
@@ -209,7 +226,7 @@ const DashboardPage = () => {
         account,
         activeSlug,
         defaultSlug,
-        setDefaultSlug: slug => setLastWorkspaceVisit({ slug }),
+        setDefaultSlug: slug => setWorkspace({ slug }),
       }}
     >
       <div className="flex min-h-screen flex-col justify-between">
@@ -233,53 +250,19 @@ const DashboardPage = () => {
               </MessageBox>
               {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
             </div>
-          ) : !useDynamicTopBar ? (
+          ) : (
             <div
               className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
               data-cy="admin-panel-container"
             >
               <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-              {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
+              {LoggedInUser &&
+              require2FAForAdmins(account) &&
+              !LoggedInUser.hasTwoFactorAuth &&
+              selectedSection !== 'user-security' ? (
                 <TwoFactorAuthRequiredMessage className="lg:mt-16" />
               ) : (
-                <div className="min-w-0 max-w-screen-xl flex-1">
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className={'flex min-h-[600px] flex-col items-stretch gap-6 pb-10'} data-cy="admin-panel-container">
-              <DashboardTopBar isLoading={isLoading} account={account} menuItems={menuItems} />
-
-              {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
-                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-              ) : (
-                <div
-                  className={clsx(
-                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 xl:px-6',
-                    ['host-transactions', 'transactions', 'overview'].includes(selectedSection)
-                      ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1536px)_minmax(0,1fr)]'
-                      : subMenu
-                        ? 'lg:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
-                        : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
-                  )}
-                >
-                  {subMenu ? (
-                    <SubMenu
-                      className="mb-4 lg:mr-4"
-                      subMenu={subMenu}
-                      account={account}
-                      selectedSection={selectedSection}
-                    />
-                  ) : (
-                    <div />
-                  )}
-
+                <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
                   <DashboardSection
                     section={selectedSection}
                     isLoading={isLoading}
@@ -295,12 +278,6 @@ const DashboardPage = () => {
       </div>
     </DashboardContext.Provider>
   );
-};
-
-DashboardPage.getInitialProps = () => {
-  return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
-  };
 };
 
 // next.js export

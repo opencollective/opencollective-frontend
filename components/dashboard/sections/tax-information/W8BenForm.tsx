@@ -5,10 +5,10 @@ import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import dayjs from '../../../../lib/dayjs';
-import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
+import type { CountryIso } from '../../../../lib/graphql/types/v2/schema';
 import { i18nCountryName } from '../../../../lib/i18n';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { cn } from '../../../../lib/utils';
 
 import { generateInitialValuesFromSchema } from '../../../FormikZod';
@@ -238,21 +238,21 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         <React.Fragment>
           <StyledInputFormikField name="certifiesResidentCountry">
             {({ field }) => (
-              <label className="cursor-pointer text-sm font-normal leading-normal">
+              <label className="cursor-pointer text-sm leading-normal font-normal">
                 <Checkbox
                   className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
                   name={field.name}
                   checked={field.value}
                   onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                  disabled={!values.countryOfCitizenship}
+                  disabled={!values.residenceAddress?.country}
                 />
                 <div className="inline align-text-bottom">
                   Within the meaning of the income tax treaty between the United States and this country, I certify that
                   the beneficial owner is a resident of the country defined above
                   <span className="italic">
                     {' ('}
-                    {values.countryOfCitizenship
-                      ? i18nCountryName(intl, values.countryOfCitizenship)
+                    {values.residenceAddress?.country
+                      ? i18nCountryName(intl, values.residenceAddress?.country)
                       : 'please select one'}
                     {').'}
                   </span>
@@ -332,7 +332,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
 
       <StyledInputFormikField name="hasConfirmedTOS">
         {({ field }) => (
-          <label className="cursor-pointer text-sm font-normal leading-normal">
+          <label className="cursor-pointer text-sm leading-normal font-normal">
             <Checkbox
               className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
               name={field.name}

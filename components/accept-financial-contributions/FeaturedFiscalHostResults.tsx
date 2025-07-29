@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/schema';
 
 import { Flex, Grid } from '../Grid';
 import StyledCard from '../StyledCard';

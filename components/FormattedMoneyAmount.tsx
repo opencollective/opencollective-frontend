@@ -5,20 +5,10 @@ import { FormattedMessage } from 'react-intl';
 import { CurrencyPrecision } from '../lib/constants/currency-precision';
 import INTERVALS from '../lib/constants/intervals';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
-import type { Currency as GraphQLCurrency, TierFrequency } from '../lib/graphql/types/v2/graphql';
+import type { Currency as GraphQLCurrency, TierFrequency } from '../lib/graphql/types/v2/schema';
+import { cn } from '../lib/utils';
 
 import Currency from './Currency';
-import type { TextProps } from './Text';
-import { Span } from './Text';
-
-/** Default styles for the amount (not including currency) */
-export const DEFAULT_AMOUNT_STYLES: Omit<TextProps, 'color'> & {
-  color?: string;
-} = {
-  letterSpacing: 0,
-  fontWeight: 'bold',
-  color: 'black.900',
-};
 
 const EMPTY_AMOUNT_PLACEHOLDER = '--.--';
 
@@ -37,12 +27,16 @@ interface FormattedMoneyAmountProps {
   interval?: (typeof INTERVALS)[keyof typeof INTERVALS];
   /** ContributionFrequency from GQLV2 */
   frequency?: TierFrequency;
-  /** Style for the amount (eg. `$10`). Doesn't apply on interval */
-  amountStyles?: object;
-  currencyCodeStyles?: object;
   formatWithSeparators?: boolean;
+  /** Classnames for the amount (eg. `$10`). Doesn't apply on interval */
+  amountClassName?: string;
+  /** Classnames for the currency code (eg. `USD`). Doesn't apply on interval */
+  currencyCodeClassName?: string;
+  /** Whether the amount is approximate, if true amount is prefixed by ~ */
+  isApproximate?: boolean;
 }
 
+const DEFAULT_AMOUNT_CLASSES = '';
 /**
  * A practical component to format amounts and their intervals with proper
  * internationalization support.
@@ -55,24 +49,26 @@ const FormattedMoneyAmount = ({
   amount,
   interval,
   frequency,
-  amountStyles = DEFAULT_AMOUNT_STYLES,
+  amountClassName,
   showCurrencyCode = true,
-  currencyCodeStyles,
+  currencyCodeClassName,
+  isApproximate,
 }: FormattedMoneyAmountProps) => {
   if (!currency) {
-    return <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>;
+    return <span className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>{EMPTY_AMOUNT_PLACEHOLDER}</span>;
   }
 
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>
+      <span className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>{EMPTY_AMOUNT_PLACEHOLDER}</span>
     ) : (
       <Currency
         value={amount}
         currency={currency as GraphQLCurrency}
         precision={precision}
         formatWithSeparators={formatWithSeparators}
-        {...amountStyles}
+        className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}
+        isApproximate={isApproximate}
       />
     );
 
@@ -80,7 +76,7 @@ const FormattedMoneyAmount = ({
     interval = getIntervalFromContributionFrequency(frequency);
   }
 
-  const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
+  const currencyCode = showCurrencyCode ? <span className={currencyCodeClassName}>{currency}</span> : '';
   if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
     return showCurrencyCode ? (
       <FormattedMessage

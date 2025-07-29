@@ -9,7 +9,7 @@ export function InfoList({ children, className }: { children: React.ReactNode; c
 }
 
 export function InfoListItemTitle({ children }: { children: React.ReactNode }) {
-  return <dt className="font-medium leading-6 text-slate-900">{children}</dt>;
+  return <dt className="leading-6 font-medium text-slate-900">{children}</dt>;
 }
 
 // ts-unused-exports:disable-next-line

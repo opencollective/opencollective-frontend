@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { isEmptyCollectiveLocation } from '../../../lib/collective';
@@ -26,7 +25,7 @@ const Location = ({ collective: event, refetch }) => {
       refetch();
       prevLoggedInUser.current = LoggedInUser;
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, refetch]);
 
   if (isEmptyCollectiveLocation(event) || isEmptyOnlineLocation(event)) {
     return null;
@@ -56,13 +55,6 @@ const Location = ({ collective: event, refetch }) => {
       </ContainerSectionContent>
     </Box>
   );
-};
-Location.propTypes = {
-  refetch: PropTypes.func.isRequired,
-  collective: PropTypes.shape({
-    location: PropTypes.object,
-    privateInstructions: PropTypes.string,
-  }).isRequired,
 };
 
 export default Location;

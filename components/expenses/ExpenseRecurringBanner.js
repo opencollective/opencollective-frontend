@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
@@ -21,12 +20,6 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { useToast } from '../ui/useToast';
-
-const recurringExpensePropType = PropTypes.shape({
-  id: PropTypes.string,
-  interval: PropTypes.string,
-  endsAt: PropTypes.string,
-}).isRequired;
 
 const deleteExpenseMutation = gql`
   mutation DeleteExpense($expense: ExpenseReferenceInput!) {
@@ -58,8 +51,10 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   };
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose} padding="auto" px={4} py="20px" trapFocus>
-      <ModalHeader onClose={onClose}>Recurring Expense Setting</ModalHeader>
+    <StyledModal role="alertdialog" onClose={onClose} padding="auto" px={4} py="20px">
+      <ModalHeader onClose={onClose}>
+        <FormattedMessage defaultMessage="Recurring Expense Settings" id="L/TmUV" />
+      </ModalHeader>
       <ModalBody pt={2}>
         <Flex flexDirection={'column'}>
           <P color="black.700" fontWeight="400" fontSize="14px" lineHeight="20px" mt={0} mb={2}>
@@ -118,18 +113,6 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   );
 };
 
-ExpenseRecurringEditModal.propTypes = {
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    account: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }),
-    recurringExpense: recurringExpensePropType,
-  }).isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
 const ExpenseRecurringBanner = ({ expense }) => {
   const { recurringExpense } = expense;
   const [isEditModalOpen, setEditModal] = React.useState(false);
@@ -167,17 +150,6 @@ const ExpenseRecurringBanner = ({ expense }) => {
       {isEditModalOpen && <ExpenseRecurringEditModal onClose={() => setEditModal(false)} expense={expense} />}
     </React.Fragment>
   );
-};
-
-ExpenseRecurringBanner.propTypes = {
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    account: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }),
-    recurringExpense: recurringExpensePropType,
-  }).isRequired,
 };
 
 export default ExpenseRecurringBanner;

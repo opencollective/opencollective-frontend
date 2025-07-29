@@ -39,7 +39,7 @@ const leaveHostMutation = gql`
   }
 `;
 
-const leaveHostQuery = gql`
+export const leaveHostQuery = gql`
   query AccountInfoForLeaveHost($slug: String) {
     account(slug: $slug, throwIfMissing: true) {
       id
@@ -71,7 +71,7 @@ const LeaveHostFormSchemaWithRecurringContributions = LeaveHostFormSchema.merge(
   }),
 );
 
-const getPortabilitySummary = (
+export const getPortabilitySummary = (
   account,
 ): {
   totalCount: number;
@@ -102,7 +102,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
   const [removeHost, { loading: submitting }] = useMutation(leaveHostMutation, { context: API_V2_CONTEXT });
   const portabilitySummary = getPortabilitySummary(data?.account);
   return (
-    <StyledModal width="570px" onClose={onClose}>
+    <StyledModal onClose={onClose}>
       <ModalHeader onClose={onClose} mb={3}>
         <FormattedMessage id="collective.editHost.leave" values={{ name: host.name }} defaultMessage="Leave {name}" />
       </ModalHeader>
@@ -170,7 +170,6 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             count: portabilitySummary.totalCount,
                             yearlyAmount: (
                               <FormattedMoneyAmount
-                                amountStyles={null}
                                 amount={portabilitySummary.yearlyAmount}
                                 interval="year"
                                 currency={account.currency}

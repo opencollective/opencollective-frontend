@@ -186,7 +186,7 @@ class InputTypeLocation extends React.Component {
   }
 
   isAutocompleteServiceAvailable() {
-    return window && Boolean(get(window, 'google.maps.places.AutocompleteService'));
+    return typeof window !== 'undefined' && Boolean(get(window, 'google.maps.places.AutocompleteService'));
   }
 
   render() {
@@ -206,7 +206,6 @@ class InputTypeLocation extends React.Component {
           <Fragment>
             <Container position="relative">
               <GeoSuggestItem
-                ref={this.geoSuggestRef}
                 onSuggestSelect={event => this.handleChange(event)}
                 placeholder={this.props.placeholder}
                 initialValue={this.props.value?.name}
@@ -218,6 +217,7 @@ class InputTypeLocation extends React.Component {
                   },
                 ]}
                 {...options}
+                ref={this.geoSuggestRef}
               />
               <Container position="absolute" top="0.5em" right="1em">
                 <ClearIcon

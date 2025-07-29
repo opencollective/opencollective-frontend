@@ -10,17 +10,17 @@ import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Account, Agreement } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Agreement } from '../../lib/graphql/types/v2/schema';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { useDrawerActionsContainer } from '../Drawer';
 import { Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { H4 } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
@@ -84,16 +84,13 @@ const EDIT_AGREEMENT_MUTATION = gql`
   ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
-const ActionButtons = ({ formik, onCancel }) => (
-  <Flex justifyContent="flex-end" width="100%">
-    <StyledButton type="button" minWidth={120} mr={2} onClick={onCancel}>
+const ActionButtons = ({ formik, onCancel, ...props }) => (
+  <Flex justifyContent="flex-end" width="100%" {...props}>
+    <Button type="button" variant="outline" className="mr-2" onClick={onCancel}>
       <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-    </StyledButton>
-    <StyledButton
+    </Button>
+    <Button
       type="submit"
-      minWidth={120}
-      whiteSpace="nowrap"
-      buttonStyle="primary"
       loading={formik.isSubmitting}
       onClick={e => {
         e.preventDefault();
@@ -105,7 +102,7 @@ const ActionButtons = ({ formik, onCancel }) => (
       ) : (
         <FormattedMessage defaultMessage="Create Agreement" id="LSsYSm" />
       )}
-    </StyledButton>
+    </Button>
   </Flex>
 );
 
@@ -273,7 +270,7 @@ const AgreementForm = ({
               {drawerActionsContainer && !disableDrawerActions ? (
                 createPortal(<ActionButtons formik={formik} onCancel={onCancel} />, drawerActionsContainer)
               ) : (
-                <ActionButtons formik={formik} onCancel={onCancel} />
+                <ActionButtons formik={formik} onCancel={onCancel} mt={3} />
               )}
             </Form>
           );

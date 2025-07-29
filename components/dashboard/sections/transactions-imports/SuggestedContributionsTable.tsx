@@ -2,13 +2,14 @@ import React from 'react';
 import { Banknote } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import { DataTable } from '../../../table/DataTable';
+import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { EmptyResults } from '../../EmptyResults';
@@ -31,22 +32,17 @@ export const SuggestedContributionsTable = ({
         data={contributions}
         getRowClassName={({ original }) =>
           selectedContribution?.id === original.id
-            ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 !border-l-2 border-l-blue-500'
+            ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 border-l-2! border-l-blue-500'
             : ''
         }
         emptyMessage={() => (
           <EmptyResults
             hasFilters={queryFilter.hasFilters}
             entityType="CONTRIBUTIONS"
-            onResetFilters={() => queryFilter.resetFilters({})}
+            onResetFilters={() => queryFilter.resetFilters({ expectedFundsFilter: null })}
+            imageSize={120}
             otherActions={
-              <Button
-                data-cy="reset-filters"
-                size="lg"
-                variant="outline"
-                className="gap-2 rounded-full"
-                onClick={onAddFundsClick}
-              >
+              <Button data-cy="reset-filters" variant="outline" onClick={onAddFundsClick}>
                 <Banknote size={16} />
                 <span>
                   <FormattedMessage defaultMessage="Manually add funds" id="OrmUye" />
@@ -60,6 +56,12 @@ export const SuggestedContributionsTable = ({
             id: 'select',
             cell: ({ row }) => <RadioGroupItem value={row.original.id} />,
             meta: { className: 'w-[20px]' },
+          },
+          {
+            id: 'id',
+            header: () => <FormattedMessage id="Fields.id" defaultMessage="ID" />,
+            accessorKey: 'legacyId',
+            cell: ({ cell }) => <Badge size="xs">#{cell.getValue() as number}</Badge>,
           },
           {
             id: 'date',
@@ -126,9 +128,9 @@ export const SuggestedContributionsTable = ({
           totalContributions > contributions.length && (
             <div className="flex justify-center border-t border-neutral-200 p-3 text-center">
               <FormattedMessage
-                id="/zSZjG"
-                defaultMessage="{totalContributions, plural, one {# contribution} other {# contributions}} also match your filters. Narrow down your search to see them."
-                values={{ totalContributions }}
+                defaultMessage="{nbContributions, plural, one {# contribution} other {# contributions}} also match your filters. Narrow down your search to see {nbContributions, plural, one {it} other {them}}."
+                id="wC4Ydk"
+                values={{ nbContributions: totalContributions - contributions.length }}
               />
             </div>
           )

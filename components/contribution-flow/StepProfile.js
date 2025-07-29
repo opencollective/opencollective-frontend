@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
@@ -25,6 +24,7 @@ const StepProfile = ({ collective, tier, stepDetails, profiles, onChange, data, 
         <StepProfileGuestForm
           stepDetails={stepDetails}
           data={data}
+          collective={collective}
           onChange={onChange}
           onSignInClick={onSignInClick}
           isEmbed={isEmbed}
@@ -33,20 +33,6 @@ const StepProfile = ({ collective, tier, stepDetails, profiles, onChange, data, 
       )}
     </Box>
   );
-};
-
-StepProfile.propTypes = {
-  collective: PropTypes.object,
-  tier: PropTypes.object,
-  stepDetails: PropTypes.shape({
-    amount: PropTypes.number,
-    interval: PropTypes.string,
-  }),
-  data: PropTypes.object,
-  onChange: PropTypes.func,
-  onSignInClick: PropTypes.func,
-  profiles: PropTypes.arrayOf(PropTypes.object),
-  isEmbed: PropTypes.bool,
 };
 
 export default StepProfile;

@@ -116,8 +116,7 @@ const EmbedContributionFlowUrlParametersConfig = {
    */
   useTheme: { type: 'boolean', static: true },
   /**
-   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have
-   * its `sandbox` property set to `allow-top-navigation` for this to work.
+   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have its `sandbox` property set to `allow-top-navigation` for this to work.
    */
   shouldRedirectParent: { type: 'boolean', static: true },
 };

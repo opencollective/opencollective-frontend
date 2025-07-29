@@ -1,4 +1,4 @@
-import { gql } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 
@@ -13,6 +13,7 @@ export const commentFieldsFragment = gql`
     account {
       id
       slug
+      type
       ... on AccountWithHost {
         host {
           id
@@ -83,3 +84,15 @@ export const isUserFollowingConversationQuery = gql`
     }
   }
 `;
+
+export const editCommentMutation = gql`
+  mutation EditComment($comment: CommentUpdateInput!) {
+    editComment(comment: $comment) {
+      id
+      ...CommentFields
+    }
+  }
+  ${commentFieldsFragment}
+`;
+
+export const mutationOptions = { context: API_V2_CONTEXT };

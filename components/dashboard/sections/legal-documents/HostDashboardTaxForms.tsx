@@ -7,7 +7,7 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { HostTaxFormsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -143,7 +143,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
   const getActions = useLegalDocumentActions(data?.host, refetch);
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
 
       <Filterbar {...queryFilter} />

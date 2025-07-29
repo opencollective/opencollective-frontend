@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -190,10 +189,6 @@ const PotentialUser = ({ id }) => {
   );
 };
 
-PotentialUser.propTypes = {
-  id: PropTypes.string,
-};
-
 const PotentialUsers = ({ users }) => {
   return (
     <Wrapper
@@ -206,10 +201,6 @@ const PotentialUsers = ({ users }) => {
       ))}
     </Wrapper>
   );
-};
-
-PotentialUsers.propTypes = {
-  users: PropTypes.array,
 };
 
 const WhoIsFiscalHosting = () => {

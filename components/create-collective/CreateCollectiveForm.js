@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -85,8 +84,6 @@ class CreateCollectiveForm extends React.Component {
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    router: PropTypes.object.isRequired,
     loggedInUser: PropTypes.object,
     popularTags: PropTypes.arrayOf(PropTypes.string),
   };
@@ -137,7 +134,7 @@ class CreateCollectiveForm extends React.Component {
 
     const submit = values => {
       const { description, name, slug, message, tags, location, inviteMembers } = values;
-      this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
+      return this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
     };
 
     return (
@@ -522,4 +519,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default injectIntl(withData(withRouter(CreateCollectiveForm)));
+export default injectIntl(withData(CreateCollectiveForm));

@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
@@ -14,6 +13,8 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
+
+import { AccountTrustBadge } from '@/components/AccountTrustBadge';
 
 import CodeRepositoryIcon from '../../CodeRepositoryIcon';
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';
@@ -94,7 +95,7 @@ const HiddenTagItem = styled(StyledLink)`
   font-weight: 500;
   font-size: 14px;
   @media (hover: hover) {
-    :hover {
+    &:hover {
       text-decoration: underline;
     }
   }
@@ -180,6 +181,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               wordBreak="normal"
             >
               {collective.name || collective.slug}
+              <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
             </H1>
           </Box>
           <Flex>
@@ -443,61 +445,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
       </Container>
     </Fragment>
   );
-};
-
-Hero.propTypes = {
-  /** The collective to display */
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    type: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    company: PropTypes.string,
-    isApproved: PropTypes.bool,
-    backgroundImage: PropTypes.string,
-    backgroundImageUrl: PropTypes.string,
-    canContact: PropTypes.bool,
-    twitterHandle: PropTypes.string,
-    repositoryUrl: PropTypes.string,
-    website: PropTypes.string,
-    socialLinks: PropTypes.arrayOf(PropTypes.object),
-    description: PropTypes.string,
-    isHost: PropTypes.bool,
-    hostFeePercent: PropTypes.number,
-    platformFeePercent: PropTypes.number,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    settings: PropTypes.shape({
-      tos: PropTypes.string,
-    }).isRequired,
-    connectedTo: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        collective: PropTypes.shape({
-          id: PropTypes.number,
-          name: PropTypes.string.isRequired,
-          slug: PropTypes.string.isRequired,
-        }),
-      }),
-    ),
-    parentCollective: PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-    }),
-  }).isRequired,
-
-  /** Collective's host */
-  host: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-  }),
-
-  /** Show the color picker input */
-  onPrimaryColorChange: PropTypes.func.isRequired,
-
-  /** Define if we need to display special actions like the "Edit collective" button */
-  isAdmin: PropTypes.bool,
 };
 
 export default React.memo(Hero);

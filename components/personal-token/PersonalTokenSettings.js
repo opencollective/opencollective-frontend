@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
@@ -83,10 +82,6 @@ const ObfuscatedClientSecret = ({ secret }) => {
       </StyledLink>
     </P>
   );
-};
-
-ObfuscatedClientSecret.propTypes = {
-  secret: PropTypes.string,
 };
 
 const LABEL_STYLES = { fontWeight: 700, fontSize: '16px', lineHeight: '24px' };
@@ -254,7 +249,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                           checked={field.value}
                           onCheckedChange={value => form.setFieldValue(field.name, value)}
                         />
-                        <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
+                        <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs leading-none font-normal">
                           <FormattedMessage
                             defaultMessage="Allow this token to directly use operations that would normally require 2FA"
                             id="JClbMN"
@@ -315,11 +310,6 @@ const PersonalTokenSettings = ({ backPath, id }) => {
       )}
     </div>
   );
-};
-
-PersonalTokenSettings.propTypes = {
-  id: PropTypes.string.isRequired,
-  backPath: PropTypes.string.isRequired,
 };
 
 export default PersonalTokenSettings;

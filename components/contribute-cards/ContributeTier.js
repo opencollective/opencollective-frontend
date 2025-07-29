@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -78,24 +77,11 @@ const TierTitle = ({ collective, tier }) => {
   }
 };
 
-TierTitle.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  tier: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    useStandalonePage: PropTypes.bool,
-  }),
-};
-
 const canContribute = (collective, LoggedInUser) => {
   if (!collective.isActive) {
     return false;
   } else if (collective.type === 'EVENT') {
-    return !isPastEvent(collective) || Boolean(LoggedInUser.isAdminOfCollectiveOrHost(collective));
+    return !isPastEvent(collective) || Boolean(LoggedInUser?.isAdminOfCollectiveOrHost(collective));
   } else {
     return true;
   }
@@ -183,7 +169,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   values={{
                     amount: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(amountRaised)}
                         currency={currency}
                         precision={getPrecisionFromAmount(graphqlAmountValueInCents(amountRaised))}
@@ -191,7 +177,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                     ),
                     goalWithInterval: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(tier.goal)}
                         currency={currency}
                         interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
@@ -222,7 +208,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   amount={graphqlAmountValueInCents(minAmount)}
                   interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
                   currency={currency}
-                  amountStyles={{ fontSize: '24px', lineHeight: '22px', fontWeight: 'bold', color: 'black.900' }}
+                  amountClassName="text-2xl font-bold text-foreground"
                   precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
                 />
                 {taxes.length > 0 && ' *'}
@@ -247,47 +233,6 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
       </Flex>
     </Contribute>
   );
-};
-
-ContributeTier.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isActive: PropTypes.bool,
-    host: PropTypes.object,
-    parentCollective: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
-  tier: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    legacyId: PropTypes.number,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    currency: PropTypes.string,
-    useStandalonePage: PropTypes.bool,
-    interval: PropTypes.string,
-    amountType: PropTypes.string,
-    endsAt: PropTypes.string,
-    button: PropTypes.string,
-    goal: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
-    maxQuantity: PropTypes.number,
-    availableQuantity: PropTypes.number,
-    stats: PropTypes.shape({
-      totalRecurringDonations: PropTypes.number,
-      totalDonated: PropTypes.number,
-      contributors: PropTypes.object,
-      availableQuantity: PropTypes.number,
-    }),
-    contributors: PropTypes.arrayOf(PropTypes.object),
-  }),
-  /** @ignore */
-  intl: PropTypes.object.isRequired,
-  isPreview: PropTypes.bool,
 };
 
 export default injectIntl(ContributeTier);

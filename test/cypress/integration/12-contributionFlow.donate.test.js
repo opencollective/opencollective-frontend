@@ -10,13 +10,12 @@ describe('Contribution Flow: Donate', () => {
   it('Can donate as new user', () => {
     const userParams = { name: 'Donate Tester' };
     cy.signup({ user: userParams, redirect: donateRoute, visitParams });
-
-    // Mock clock so we can check next contribution date in a consistent way
-    cy.clock(Date.parse('2042/05/25'));
-
     // ---- Step Details ----
     // Has default amount selected
     cy.get('#amount button.selected').should('exist');
+
+    // Mock clock so we can check next contribution date in a consistent way
+    cy.clock(Date.parse('2042/05/25'));
 
     // Change amount
     cy.getByDataCy('amount-picker-btn-other').click();
@@ -52,6 +51,8 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('[data-cy="select-option"]:first', userName);
     cy.contains('[data-cy="select-option"]:first', 'Personal');
     cy.get('body').type('{esc}');
+    cy.getByDataCy('input-legalName').type('Very Legal Name');
+    cy.get('button[data-cy="cf-next-step"]').click();
 
     // User profile is shown on step, all other steps must be disabled
     cy.getByDataCy(`progress-step-profile`).contains(userName);
@@ -121,9 +122,10 @@ describe('Contribution Flow: Donate', () => {
 
   it('Forces params if given in URL', () => {
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams });
-
+    // Setting up clock can prevent the page from loading, so we wait for the component to be loaded first
+    cy.getByDataCy('contribution-summary');
     cy.clock(Date.parse('2042/05/25'));
-    cy.contains('the next charge will be on May 1, 2043');
+    cy.getByDataCy('contribution-summary').contains('the next charge will be on May 1, 2043');
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile'] });
     cy.get('button[data-cy="cf-next-step"]').click();

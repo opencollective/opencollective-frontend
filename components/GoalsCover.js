@@ -148,10 +148,6 @@ class GoalsCover extends React.Component {
     intl: PropTypes.object.isRequired,
   };
 
-  static defaultProps = {
-    interpolation: 'auto',
-  };
-
   constructor(props) {
     super(props);
     this.renderGoal = this.renderGoal.bind(this);
@@ -172,9 +168,6 @@ class GoalsCover extends React.Component {
       },
     });
 
-    const maxGoal = maxBy(get(props.collective, 'settings.goals', []), g => (g.title ? g.amount : 0));
-    this.currentProgress = maxGoal ? this.getMaxCurrentAchievement() / maxGoal.amount : 1.0;
-    this.interpolation = props.interpolation || get(props.collective, 'settings.goalsInterpolation', 'auto');
     this.state = { ...this.populateGoals(true, true) };
   }
 
@@ -197,10 +190,19 @@ class GoalsCover extends React.Component {
     this.setState({ ...this.populateGoals(), firstMount });
   }
 
+  getCurrentProgress = () => {
+    const maxGoal = maxBy(get(this.props.collective, 'settings.goals', []), g => (g.title ? g.amount : 0));
+    return maxGoal ? this.getMaxCurrentAchievement() / maxGoal.amount : 1.0;
+  };
+
+  getInterpolation = () => {
+    return this.props.interpolation || get(this.props.collective, 'settings.goalsInterpolation') || 'auto';
+  };
+
   /** Returns a percentage (0.0-1.0) that represent X position */
   getTranslatedPercentage(x) {
-    const interpolation = this.props.interpolation || this.interpolation;
-    if (interpolation === 'logarithm' || (interpolation === 'auto' && this.currentProgress <= 0.3)) {
+    const interpolation = this.getInterpolation();
+    if (interpolation === 'logarithm' || (interpolation === 'auto' && this.getCurrentProgress() <= 0.3)) {
       // See https://www.desmos.com/calculator/30pua5xx7q
       return -1 * Math.pow(x - 1, 2) + 1;
     }

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -47,7 +46,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
   });
 
   return (
-    <StyledModal width="576px" onClose={onClose} data-cy="create-oauth-app-modal" {...props}>
+    <StyledModal onClose={onClose} data-cy="create-oauth-app-modal" {...props}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Create OAuth app" id="m6BfW0" />
       </ModalHeader>
@@ -152,12 +151,6 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
       </Formik>
     </StyledModal>
   );
-};
-
-CreateOauthApplicationModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-  account: PropTypes.object.isRequired,
 };
 
 export default CreateOauthApplicationModal;

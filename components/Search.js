@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { Dialog, DialogContent } from './ui/Dialog';
@@ -30,11 +29,6 @@ const SearchModal = ({ open, setOpen }) => {
       </DialogContent>
     </Dialog>
   );
-};
-
-SearchModal.propTypes = {
-  setOpen: PropTypes.func,
-  open: PropTypes.bool,
 };
 
 export default SearchModal;

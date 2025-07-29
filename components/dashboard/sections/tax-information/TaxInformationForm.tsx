@@ -8,10 +8,10 @@ import { useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import { mergeName } from '../../../../lib/collective';
-import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
 
 import { FocusFirstFormikError } from '../../../FocusFirstFormikError';
 import { FormikZod, getAllFieldsFromZodSchema } from '../../../FormikZod';
@@ -125,7 +125,7 @@ export const TaxInformationForm = ({
   }
 
   return (
-    <FormikZod
+    <FormikZod<typeof schema._output>
       schema={schema}
       initialValues={initialValues}
       config={FORM_CONFIG}
@@ -209,7 +209,7 @@ export const TaxInformationForm = ({
                               />
                             )}
                           </StyledInputFormikField>
-                          <p className="mb-4 mt-3 text-sm text-neutral-700">
+                          <p className="mt-3 mb-4 text-sm text-neutral-700">
                             {
                               'I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
                             }

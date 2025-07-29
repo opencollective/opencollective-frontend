@@ -3,12 +3,10 @@ import { useIntl } from 'react-intl';
 
 import { ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
-import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
+import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/schema';
+import { cn } from '../lib/utils';
 
-import type { TextProps } from './Text';
-import { Span } from './Text';
-
-type CurrencyProps = TextProps & {
+type CurrencyProps = {
   /** The amount to display, in cents */
   value: number;
   /** The currency (eg. `USD`, `EUR`...etc) */
@@ -17,6 +15,9 @@ type CurrencyProps = TextProps & {
   formatWithSeparators?: boolean;
   /** How many numbers should we display after the comma. When `auto` is given, decimals are only displayed if necessary. */
   precision?: number | 'auto';
+  className?: string;
+  /** Whether the amount is approximate, if true amount is prefixed by ~ */
+  isApproximate?: boolean;
 };
 
 /**
@@ -24,7 +25,14 @@ type CurrencyProps = TextProps & {
  *
  * ⚠️ Abbreviated mode is only for English at the moment. Abbreviated amount will not be internationalized.
  */
-const Currency = ({ value, currency, formatWithSeparators = false, precision = 0, ...props }: CurrencyProps) => {
+const Currency = ({
+  value,
+  currency,
+  formatWithSeparators = false,
+  precision = 0,
+  isApproximate = false,
+  className,
+}: CurrencyProps) => {
   const { locale } = useIntl();
   if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
@@ -39,16 +47,18 @@ const Currency = ({ value, currency, formatWithSeparators = false, precision = 0
     // TODO: This approach is not great because the position of the currency depends on the locale
     const floatAmount = value / 100;
     return (
-      <Span whiteSpace="nowrap" {...props} as={undefined}>
+      <span className={cn('whitespace-nowrap', className)}>
+        {isApproximate ? `~` : ''}
         {getCurrencySymbol(currency)}
         {floatAmount.toLocaleString(locale)}
-      </Span>
+      </span>
     );
   } else {
     return (
-      <Span whiteSpace="nowrap" {...props} as={undefined}>
+      <span className={cn('whitespace-nowrap', className)}>
+        {isApproximate ? `~` : ''}
         {formatCurrency(value, currency, { precision, locale })}
-      </Span>
+      </span>
     );
   }
 };

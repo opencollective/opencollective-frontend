@@ -16,8 +16,8 @@ export const accountExpensesQuery = gql`
     $type: ExpenseType
     $tags: [String]
     $status: [ExpenseStatusFilter]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
+    $payoutMethod: PayoutMethodReferenceInput
     $payoutMethodType: PayoutMethodType
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -30,6 +30,7 @@ export const accountExpensesQuery = gql`
     $fetchHostForExpenses: Boolean!
     $hasAmountInCreatedByAccountCurrency: Boolean!
     $accountingCategory: [String]
+    $fetchGrantHistory: Boolean!
   ) {
     expenses(
       account: $account
@@ -39,8 +40,8 @@ export const accountExpensesQuery = gql`
       type: $type
       tag: $tags
       status: $status
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
+      payoutMethod: $payoutMethod
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
       dateTo: $dateTo
@@ -75,6 +76,19 @@ export const accountExpensesQuery = gql`
         host @include(if: $fetchHostForExpenses) {
           id
           ...ExpenseHostFields
+        }
+
+        payee {
+          grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, account: $account)
+            @include(if: $fetchGrantHistory) {
+            totalAmount {
+              amount {
+                currency
+                valueInCents
+              }
+            }
+            totalCount
+          }
         }
       }
     }
@@ -141,8 +155,7 @@ export const hostDashboardExpensesQuery = gql`
     $type: ExpenseType
     $tags: [String]
     $status: [ExpenseStatusFilter]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $payoutMethodType: PayoutMethodType
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -151,19 +164,21 @@ export const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
+    $fetchGrantHistory: Boolean!
   ) {
     expenses(
       host: { slug: $hostSlug }
       account: $account
+      fromAccount: $fromAccount
       limit: $limit
       offset: $offset
       type: $type
       tag: $tags
       status: $status
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
       dateTo: $dateTo
@@ -181,6 +196,19 @@ export const hostDashboardExpensesQuery = gql`
         id
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
+
+        payee {
+          grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })
+            @include(if: $fetchGrantHistory) {
+            totalAmount {
+              amount {
+                currency
+                valueInCents
+              }
+            }
+            totalCount
+          }
+        }
       }
     }
     host(slug: $hostSlug) {
@@ -193,7 +221,7 @@ export const hostDashboardExpensesQuery = gql`
   ${expenseHostFields}
 `;
 
-const hostInfoCardFields = gql`
+export const hostInfoCardFields = gql`
   fragment HostInfoCardFields on Host {
     id
     legacyId
@@ -250,10 +278,11 @@ export const hostDashboardMetadataQuery = gql`
         }
       }
     }
-    all: expenses(host: { slug: $hostSlug }) {
-      totalCount
-    }
-    unreplied: expenses(host: { slug: $hostSlug }, status: [APPROVED, ERROR, INCOMPLETE], lastCommentBy: [USER]) {
+    unreplied: expenses(
+      host: { slug: $hostSlug }
+      status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
+      lastCommentBy: [NON_HOST_ADMIN]
+    ) {
       totalCount
     }
     ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
@@ -269,9 +298,6 @@ export const hostDashboardMetadataQuery = gql`
       totalCount
     }
     error: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
-      totalCount
-    }
-    paid: expenses(host: { slug: $hostSlug }, status: [PAID]) {
       totalCount
     }
 

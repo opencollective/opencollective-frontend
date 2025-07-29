@@ -15,13 +15,14 @@ import {
   User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
+import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
@@ -32,6 +33,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Separator } from '../ui/Separator';
 
 import { DrawerMenu } from './DrawerMenu';
+import { ProfileMenuIconsMap } from './Icons';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 
 const memberInvitationsCountQuery = gql`
@@ -45,32 +47,35 @@ const memberInvitationsCountQuery = gql`
 const MenuItem = ({
   Icon,
   appending,
-  children,
   href,
   onClick,
   className,
   external,
+  label,
   ...props
 }: {
-  Icon: LucideIcon;
+  Icon: LucideIcon | string;
   appending?: React.ReactNode;
-  children: React.ReactNode;
   href?: string;
+  label?: string;
   onClick?: () => void;
   className?: string;
   external?: boolean;
 }) => {
+  if (typeof Icon === 'string') {
+    Icon = ProfileMenuIconsMap[Icon as keyof typeof ProfileMenuIconsMap];
+  }
   const classes = cn(
-    'group mx-2 flex h-9 items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-primary-foreground',
+    'group mx-2 flex h-9 items-center justify-between gap-2 overflow-hidden rounded-md px-2 text-left text-sm hover:bg-primary-foreground',
     className,
   );
   const content = (
     <React.Fragment>
-      <div className="flex items-center gap-2">
-        <Icon className="text-muted-foreground transition-colors group-hover:text-foreground" size={16} />
-        <span className="truncate">{children}</span>
+      <div className="flex w-full items-center gap-2" title={label}>
+        <Icon className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" size={16} />
+        <div className="shrink overflow-hidden text-nowrap text-ellipsis">{label}</div>
+        {appending}
       </div>
-      {appending}
     </React.Fragment>
   );
   if (onClick) {
@@ -97,7 +102,9 @@ const MenuItem = ({
 };
 
 const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
+  const whitelabel = useWhitelabelProvider();
   const router = useRouter();
+  const intl = useIntl();
   const { LoggedInUser, logout } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const [showPreviewFeaturesModal, setShowPreviewFeaturesModal] = React.useState(false);
@@ -121,10 +128,11 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   }, []);
 
   if (!LoggedInUser) {
-    return <LoginBtn />;
+    return <LoginBtn whitelabel={whitelabel} />;
   }
 
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
+  const menuLinks = whitelabel?.links?.filter(link => !!link.icon);
 
   const content = (
     <React.Fragment>
@@ -138,15 +146,20 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 <div className="truncate text-xs text-muted-foreground">{LoggedInUser.email}</div>
               </div>
             </div>
-
             <Separator className="my-1" />
-
-            <MenuItem Icon={User} href={`/${LoggedInUser.collective.slug}`}>
-              <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-            </MenuItem>
-            <MenuItem Icon={LayoutDashboard} href={`/dashboard/${LoggedInUser.collective.slug}`}>
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-            </MenuItem>
+            <MenuItem
+              Icon={User}
+              href={`/${LoggedInUser.collective.slug}`}
+              label={intl.formatMessage({ id: 'menu.profile', defaultMessage: 'Profile' })}
+            />
+            <MenuItem
+              Icon={LayoutDashboard}
+              href={`/dashboard/${LoggedInUser.collective.slug}`}
+              label={intl.formatMessage({
+                id: 'Dashboard',
+                defaultMessage: 'Dashboard',
+              })}
+            />
             {pendingInvitations && (
               <MenuItem
                 Icon={Mailbox}
@@ -156,11 +169,12 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                     {pendingInvitations}
                   </Badge>
                 }
-              >
-                <FormattedMessage defaultMessage="Member Invitations" id="iW16Sa" />
-              </MenuItem>
+                label={intl.formatMessage({
+                  id: 'iW16Sa',
+                  defaultMessage: 'Member Invitations',
+                })}
+              />
             )}
-
             {hasAvailablePreviewFeatures && (
               <MenuItem
                 Icon={FlaskConical}
@@ -170,38 +184,59 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                     <FormattedMessage defaultMessage="New!" id="RlOKwP" />
                   </Badge>
                 }
-              >
-                <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-              </MenuItem>
+                label={intl.formatMessage({
+                  id: 'PreviewFeatures',
+                  defaultMessage: 'Preview Features',
+                })}
+              />
             )}
-            <MenuItem Icon={Settings} href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
-              <FormattedMessage id="Settings" defaultMessage="Settings" />
-            </MenuItem>
-
+            <MenuItem
+              Icon={Settings}
+              href={`/dashboard/${LoggedInUser.collective.slug}/info`}
+              label={intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' })}
+            />
             <Separator className="my-1" />
-
-            <MenuItem Icon={Home} href="/home">
-              <FormattedMessage defaultMessage="Open Collective Home" id="qFt6F7" />
-            </MenuItem>
-
-            <MenuItem Icon={LifeBuoy} href="/help">
-              <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
-            </MenuItem>
-
-            <MenuItem Icon={BookOpen} href="https://docs.opencollective.com" external={true}>
-              <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
-            </MenuItem>
-
-            <Separator className="my-1" />
-
-            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)} data-cy="logout">
-              <FormattedMessage id="menu.logout" defaultMessage="Log out" />
-            </MenuItem>
+            {!whitelabel ? ( // <div className="min-h-10" />
+              <React.Fragment>
+                <MenuItem
+                  Icon={Home}
+                  href="/home"
+                  label={intl.formatMessage({ id: 'qFt6F7', defaultMessage: 'Open Collective Home' })}
+                />
+                <MenuItem
+                  Icon={LifeBuoy}
+                  href="/help"
+                  label={intl.formatMessage({ id: 'Uf3+S6', defaultMessage: 'Help & Support' })}
+                />
+                <MenuItem
+                  Icon={BookOpen}
+                  href="https://documentation.opencollective.com"
+                  external={true}
+                  label={intl.formatMessage({ id: 'menu.documentation', defaultMessage: 'Documentation' })}
+                />
+                <Separator className="my-1" />
+              </React.Fragment>
+            ) : (
+              menuLinks?.length > 0 && (
+                <React.Fragment>
+                  {menuLinks.map(({ label, href, icon }) => (
+                    <MenuItem key={href} Icon={icon} href={href} label={label} external />
+                  ))}
+                  <Separator className="my-1" />
+                </React.Fragment>
+              )
+            )}
+            <MenuItem
+              Icon={LogOut}
+              onClick={() => logout(logoutParameters)}
+              data-cy="logout"
+              label={intl.formatMessage({ id: 'menu.logout', defaultMessage: 'Log out' })}
+            />
           </div>
         </div>
         <Separator className="sm:hidden" />
         <div className="flex flex-col sm:w-[256px]">
-          <div className="flex-grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
+          <div className="grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
             <ProfileMenuMemberships user={LoggedInUser} closeDrawer={() => setMenuOpen(false)} />
           </div>
         </div>
@@ -214,7 +249,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
       <Popover open={isMenuOpen} onOpenChange={open => setMenuOpen(open)}>
         <PopoverTrigger asChild>
           <button
-            className="rounded-full ring-black ring-offset-1 focus:outline-none focus:ring-2"
+            className="rounded-full ring-black ring-offset-1 focus:ring-2 focus:outline-hidden"
             data-cy="user-menu-trigger"
           >
             <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />

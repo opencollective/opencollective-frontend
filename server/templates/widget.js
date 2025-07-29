@@ -43,6 +43,7 @@
   }
 
   const style =
+    // eslint-disable-next-line no-constant-binary-expression
     '{{style}}' ||
     JSON.stringify({
       body: {

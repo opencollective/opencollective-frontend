@@ -15,7 +15,7 @@ type LoggedInUserInfo = {
 
 interface PageProps {
   data?: {
-    error?: {};
+    error?: object;
   };
   children?: React.ReactNode | ((info: LoggedInUserInfo) => React.ReactNode);
   description?: string;
@@ -26,7 +26,6 @@ interface PageProps {
   showSearch?: boolean;
   noRobots?: boolean;
   title?: string;
-  navTitle?: string;
   metaTitle?: string;
   twitterHandle?: string;
   collective?: object;
@@ -35,6 +34,7 @@ interface PageProps {
   showProfileAndChangelogMenu?: boolean;
   loading?: boolean;
   withTopBar?: boolean;
+  updatesRss?: boolean;
 }
 
 const Page = ({
@@ -45,7 +45,6 @@ const Page = ({
   loadingLoggedInUser,
   LoggedInUser,
   title,
-  navTitle,
   metaTitle,
   noRobots,
   twitterHandle,
@@ -57,6 +56,7 @@ const Page = ({
   showFooter = true,
   showProfileAndChangelogMenu = true,
   loading,
+  updatesRss,
 }: PageProps) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -68,7 +68,6 @@ const Page = ({
       <Header
         showSearch={showSearch}
         title={title}
-        navTitle={navTitle}
         noRobots={noRobots}
         twitterHandle={twitterHandle}
         description={description}
@@ -81,6 +80,7 @@ const Page = ({
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
         loading={loading}
         withTopBar={withTopBar}
+        updatesRss={updatesRss}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}

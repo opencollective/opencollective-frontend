@@ -50,6 +50,7 @@ export type StyledInputProps = BackgroundProps &
  * styled-component input tag using styled-system
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
+ * @deprecated Use `ui/Input` instead
  */
 const StyledInput = styled.input.attrs<StyledInputProps>(props => ({
   border: props.border ?? '1px solid',

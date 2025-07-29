@@ -6,9 +6,10 @@ import StyledLink from './StyledLink';
 
 // utility library
 
-// eslint-disable-next-line react/display-name
 export const getI18nLink = linkProps => chunks => (
-  <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>
+  <StyledLink color="var(--color-primary)" {...linkProps}>
+    {linkProps?.children || chunks}
+  </StyledLink>
 );
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
@@ -50,7 +51,7 @@ export const I18nPrivacyLink = msg => (
   </StyledLink>
 );
 
-export const I18nWithColumn = item => <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item }} />;
+export const i18nWithColon = item => <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item }} />;
 
 export const WebsiteName = 'Open Collective';
 
@@ -67,6 +68,7 @@ const I18nFormatters = {
   ol: I18nOrderedList,
   ul: I18nUnorderedList,
   li: I18nListItem,
+  newLine: <br />,
 };
 
 export default I18nFormatters;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -11,7 +10,7 @@ import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
-export const JoinUsWrapper = styled(Container)`
+const JoinUsWrapper = styled(Container)`
   background: ${props =>
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
@@ -66,7 +65,7 @@ const Wrapper = styled(Container)`
   }
 `;
 
-export const JoinUsActionContainer = ({ title, description, link }) => {
+const JoinUsActionContainer = ({ title, description, link }) => {
   return (
     <Link href={link}>
       <Wrapper
@@ -97,12 +96,6 @@ export const JoinUsActionContainer = ({ title, description, link }) => {
       </Wrapper>
     </Link>
   );
-};
-
-JoinUsActionContainer.propTypes = {
-  title: PropTypes.node,
-  description: PropTypes.node,
-  link: PropTypes.string,
 };
 
 const JoinUs = ({ page }) => (
@@ -151,12 +144,12 @@ const JoinUs = ({ page }) => (
 
       <Container ml={[null, null, null, 3, 6]}>
         <JoinUsActionContainer
-          link={page === 'becomeAHost' ? '/organizations/new' : '/create'}
+          link={page === 'becomeAHost' ? '/signup/organization' : '/create'}
           title={
             page === 'becomeAHost' ? (
               <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
             ) : (
-              <FormattedMessage defaultMessage="Get started now free!" id="uw0ZU2" />
+              <FormattedMessage defaultMessage="Get started now for free!" id="KOBC7Z" />
             )
           }
           description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}
@@ -201,9 +194,5 @@ const JoinUs = ({ page }) => (
     </Flex>
   </JoinUsWrapper>
 );
-
-JoinUs.propTypes = {
-  page: PropTypes.string,
-};
 
 export default JoinUs;

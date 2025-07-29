@@ -2,7 +2,7 @@ import type { FormikProps } from 'formik';
 import { omit } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
-import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 
 import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 
@@ -51,7 +51,7 @@ export const newExpenseItem = (attrs = {}, expenseCurrency: string): ExpenseItem
 /** Helper to add a new item to the form */
 export const addNewExpenseItem = (
   formik: FormikProps<ExpenseFormValues>,
-  defaultValues: ExpenseItemFormValues,
+  defaultValues: Partial<ExpenseItemFormValues> = {},
 ): void => {
   formik.setFieldValue('items', [
     ...(formik.values.items || []),

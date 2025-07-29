@@ -23,13 +23,37 @@ const dashboardAccountsQueryFields = gql`
         valueInCents
         currency
       }
-      totalAmountSpent {
-        valueInCents
-        currency
+    }
+    paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {
+      id
+      service
+      name
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        legacyId
+        imageUrl(height: 96)
+        name
+        slug
+        settings
+        isHost
       }
-      totalAmountReceived {
-        valueInCents
-        currency
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        legacyId
+        slug
+        policies {
+          id
+          REQUIRE_2FA_FOR_ADMINS
+        }
+      }
+    }
+    permissions {
+      addFunds {
+        allowed
       }
     }
   }
@@ -57,7 +81,7 @@ export const accountsMetadataQuery = gql`
 // TODO: This query is using `legacyId` for host and member.account to interface with the
 // legacy `AddFundsForm`. Once the new add funds form will be implemented, we can remove these fields.
 export const accountsQuery = gql`
-  query AccountsDashboard($accountSlug: String!, $limit: Int!, $offset: Int!, $isActive: Boolean) {
+  query AccountsDashboard($accountSlug: String!, $limit: Int, $offset: Int, $isActive: Boolean) {
     account(slug: $accountSlug) {
       id
       legacyId

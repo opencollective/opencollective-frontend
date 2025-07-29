@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
-const transactionsTableQueryCollectionFragment = gql`
+export const transactionsTableQueryCollectionFragment = gql`
   fragment TransactionsTableQueryCollectionFragment on TransactionCollection {
     totalCount
     offset
@@ -33,6 +33,13 @@ const transactionsTableQueryCollectionFragment = gql`
       refundTransaction {
         id
         group
+      }
+      refundKind
+      host {
+        id
+        slug
+        legacyId
+        type
       }
       account {
         id
@@ -66,6 +73,10 @@ const transactionsTableQueryCollectionFragment = gql`
         canDownloadInvoice
         canReject
       }
+      paymentMethod {
+        id
+        service
+      }
     }
   }
   ${accountHoverCardFields}
@@ -81,6 +92,7 @@ export const transactionsTableQuery = gql`
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
     $paymentMethodService: [PaymentMethodService]
+    $amount: AmountRangeInput
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: DateTime
@@ -100,8 +112,11 @@ export const transactionsTableQuery = gql`
     $expense: ExpenseReferenceInput
     $order: OrderReferenceInput
     $isRefund: Boolean
+    $hasDebt: Boolean
     $merchantId: [String]
     $accountingCategory: [String]
+    $paymentMethod: [PaymentMethodReferenceInput]
+    $payoutMethod: PayoutMethodReferenceInput
   ) {
     transactions(
       host: $hostAccount
@@ -112,6 +127,7 @@ export const transactionsTableQuery = gql`
       type: $type
       paymentMethodType: $paymentMethodType
       paymentMethodService: $paymentMethodService
+      amount: $amount
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom
@@ -132,8 +148,11 @@ export const transactionsTableQuery = gql`
       expense: $expense
       order: $order
       isRefund: $isRefund
+      hasDebt: $hasDebt
       merchantId: $merchantId
       accountingCategory: $accountingCategory
+      paymentMethod: $paymentMethod
+      payoutMethod: $payoutMethod
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

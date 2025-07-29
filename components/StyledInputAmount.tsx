@@ -1,11 +1,12 @@
+// Deprecated, use components/InputAmount.tsx instead
 import React from 'react';
-import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 
-import { Currency, ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
+import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '../lib/currency-utils';
 import { cn } from '../lib/utils';
+import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 
 import { Separator } from './ui/Separator';
 import { StyledCurrencyPicker } from './StyledCurrencyPicker';
@@ -66,7 +67,26 @@ const useAmountInputMinWidth = (value, max = 1000000000) => {
   return result;
 };
 
-const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, minFxRate, maxFxRate }) => {
+interface ConvertedAmountInputProps {
+  exchangeRate?: {
+    toCurrency: CurrencyEnum;
+    value: number;
+  };
+  onChange?(...args: unknown[]): unknown;
+  baseAmount?: number;
+  minFxRate?: number;
+  maxFxRate?: number;
+  inputId: string;
+}
+
+const ConvertedAmountInput = ({
+  inputId,
+  exchangeRate,
+  onChange,
+  baseAmount,
+  minFxRate,
+  maxFxRate,
+}: ConvertedAmountInputProps) => {
   const precision = getDefaultCurrencyPrecision(exchangeRate.toCurrency);
   const targetAmount = round((baseAmount || 0) * exchangeRate.value, precision);
   const [isEditing, setEditing] = React.useState(false);
@@ -80,10 +100,10 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   };
 
   return (
-    <div className="flex flex-auto whitespace-nowrap px-2 text-sm text-neutral-500">
+    <div className="flex flex-auto px-2 text-sm whitespace-nowrap text-neutral-500">
       <span className="mr-1 align-middle">= {exchangeRate.toCurrency} </span>
       <input
-        className="w-full flex-auto rounded px-[2px] [appearance:textfield] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-full flex-auto [appearance:textfield] rounded px-[2px] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         style={{ minWidth }}
         name={inputId}
         id={inputId}
@@ -123,14 +143,6 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   );
 };
 
-ConvertedAmountInput.propTypes = {
-  exchangeRate: PropTypes.object,
-  onChange: PropTypes.func,
-  baseAmount: PropTypes.number,
-  minFxRate: PropTypes.number,
-  maxFxRate: PropTypes.number,
-};
-
 /** Some custom styles to integrate the currency picker nicely */
 const CURRENCY_PICKER_STYLES = {
   control: {
@@ -161,8 +173,8 @@ const StyledInputAmount = ({
   currencyDisplay = 'SYMBOL',
   name = 'amount',
   min = 0,
-  max = 1000000000,
-  precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
+  max = 100000000000,
+  precision = getDefaultCurrencyPrecision(currency),
   defaultValue = undefined,
   value,
   onBlur = undefined,
@@ -178,12 +190,13 @@ const StyledInputAmount = ({
   maxFxRate = undefined,
   showErrorIfEmpty = true,
   className = null,
+  suffix = null,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
   const isControlled = !isUndefined(value);
   const curValue = isControlled ? getValue(value, rawValue, isEmpty) : undefined;
-  const minAmount = min / 10 ** precision;
+  const minAmount = precision !== 0 ? min / 10 ** precision : min / 100;
   const disabled = props.disabled || loadingExchangeRate;
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);
@@ -216,7 +229,7 @@ const StyledInputAmount = ({
     >
       <div className="flex flex-auto basis-1/2">
         {!hasCurrencyPicker ? (
-          <div className="flex items-center whitespace-nowrap bg-neutral-50 p-2 text-sm text-neutral-800">
+          <div className="flex items-center bg-neutral-50 p-2 text-sm whitespace-nowrap text-neutral-800">
             {formatCurrencyName(currency, currencyDisplay)}
           </div>
         ) : (
@@ -294,6 +307,11 @@ const StyledInputAmount = ({
         </div>
       )}
       {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
+      {suffix && (
+        <div className="pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs text-muted-foreground">
+          {suffix}
+        </div>
+      )}
     </div>
   );
 };

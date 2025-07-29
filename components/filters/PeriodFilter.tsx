@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { has } from 'lodash';
@@ -27,7 +26,7 @@ const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
  * Get a date range as stored internally from a `value` prop, that can be either an object
  * like { from, to } or a stringified value (see `encodeDateInterval`).
  */
-export const getIntervalFromValue = value => {
+const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
   const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateInterval(value);
   if (intervalFromValue.timezoneType === 'UTC') {
@@ -93,7 +92,7 @@ type PeriodFilterFormProps = {
   disabled?: boolean;
 };
 
-export const PeriodFilterForm = ({
+const PeriodFilterForm = ({
   onChange,
   onValidate,
   value,
@@ -232,7 +231,21 @@ export const PeriodFilterForm = ({
   );
 };
 
-const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) => {
+interface PeriodFilterProps {
+  onChange(...args: unknown[]): unknown;
+  /** The value, either as a string with the `dateFrom→dateTo` format or an object like { from, to }*/
+  value?:
+    | string
+    | {
+        from?: string;
+        to?: string;
+        timezoneType?: string;
+      };
+  inputId?: string;
+  minDate?: string;
+}
+
+const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }: PeriodFilterProps) => {
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
 
@@ -285,21 +298,6 @@ const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) =>
       )}
     </PopupMenu>
   );
-};
-
-PeriodFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  /** The value, either as a string with the `dateFrom→dateTo` format or an object like { from, to }*/
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      from: PropTypes.string,
-      to: PropTypes.string,
-      timezoneType: PropTypes.string,
-    }),
-  ]),
-  inputId: PropTypes.string,
-  minDate: PropTypes.string,
 };
 
 export default PeriodFilter;

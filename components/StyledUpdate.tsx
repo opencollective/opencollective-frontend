@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Markup } from 'interweave';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -11,6 +11,7 @@ import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';
 import CommentReactions from './conversations/EmojiReactions';
@@ -26,7 +27,6 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
-import { H5 } from './Text';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
@@ -62,29 +62,19 @@ type StyledUpdateProps = {
   collective: any;
   update: any;
   compact?: boolean;
-  LoggedInUser?: any;
+  LoggedInUser?: LoggedInUser;
   isReloadingData?: boolean;
   deleteUpdate?: ({ variables }: { variables: { id: string } }) => void;
   intl: any;
-  router: any;
+  router: Router;
   /** Reactions associated with this update **/
   reactions?: any;
 };
 
-class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified: boolean; update: any }> {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    update: PropTypes.object.isRequired,
-    compact: PropTypes.bool, // if compact true, only show the summary
-    LoggedInUser: PropTypes.object,
-    isReloadingData: PropTypes.bool,
-    deleteUpdate: PropTypes.func.isRequired,
-    intl: PropTypes.object.isRequired,
-    router: PropTypes.object,
-    /** Reactions associated with this update **/
-    reactions: PropTypes.object,
-  };
-
+class StyledUpdate extends Component<
+  StyledUpdateProps,
+  { mode: 'summary' | 'details' | 'edit'; modified: boolean; update: object }
+> {
   constructor(props: StyledUpdateProps) {
     super(props);
     this.state = {
@@ -126,7 +116,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
-      <div data-cy="meta" className="flex items-baseline gap-2">
+      <div data-cy="meta" className="flex flex-wrap items-baseline gap-2">
         {isAdmin && <UpdateStatus update={update} />}
         {update.publishedAt ? (
           <Box as="span" fontSize="12px">
@@ -189,14 +179,16 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     if (mode === 'summary') {
       return (
         <Link href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}>
-          <H5 data-cy="updateTitle">{update.title}</H5>
+          <h5 className="text-lg font-medium" data-cy="updateTitle">
+            {update.title}
+          </h5>
         </Link>
       );
     } else {
       return (
-        <H5 data-cy="updateTitle" mb={2}>
+        <h5 className="mb-2 text-lg font-medium" data-cy="updateTitle">
           {update.title}
-        </H5>
+        </h5>
       );
     }
   }

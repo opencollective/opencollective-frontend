@@ -16,9 +16,11 @@ env:
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   API_URL: http://localhost:3060
-  PDF_SERVICE_URL: http://localhost:3002
+  PDF_SERVICE_V2_URL: http://localhost:3002
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
+  DISABLE_MOCK_UPLOADS: 1
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
   lint:
@@ -130,6 +132,12 @@ jobs:
       - name: Build
         run: PRESERVE_NEXT_CACHE=true npm run build
 
+      - name: Save NextJS build
+        uses: actions/cache@v4
+        with:
+          path: .next
+          key: ${{ runner.os }}-next-build-${{ github.sha }}
+
   test:
     runs-on: ubuntu-latest
 
@@ -144,7 +152,20 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run test:jest
+      - run: npm run test:coverage
+
+      - name: Report coverage
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: GraphQL
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   typescript:
     runs-on: ubuntu-latest

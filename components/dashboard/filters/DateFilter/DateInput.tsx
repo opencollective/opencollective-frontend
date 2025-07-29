@@ -40,7 +40,7 @@ export function DateInput({
           <div className="relative w-full">
             <CalendarIcon
               size={16}
-              className={'pointer-events-none absolute bottom-0 left-3 top-0 h-full text-muted-foreground'}
+              className={'pointer-events-none absolute top-0 bottom-0 left-3 h-full text-muted-foreground'}
             />
             <Input
               ref={inputRef}

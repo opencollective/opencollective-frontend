@@ -12,11 +12,8 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type {
-  AccountWithHost,
-  HostedCollectiveFieldsFragment,
-  HostedCollectivesQuery,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { HostedCollectiveFieldsFragment, HostedCollectivesQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
@@ -39,6 +36,7 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { InputGroup } from '../../../ui/Input';
 import { Popover, PopoverContent } from '../../../ui/Popover';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
+import { Switch } from '../../../ui/Switch';
 import { useToast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
 import ActivityDescription from '../ActivityLog/ActivityDescription';
@@ -118,7 +116,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
       <PopoverTrigger asChild>
         <Button variant="outline">
           {formatHostFeeStructure(intl, collective.hostFeesStructure)}
-          <ChevronDown className="ml-4 h-4 w-4 flex-shrink-0 opacity-50" />
+          <ChevronDown className="ml-4 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start">
@@ -147,7 +145,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
                 {formatHostFeeStructure(intl, HOST_FEE_STRUCTURE.CUSTOM_FEE)}
               </label>
             </div>
-            <div className="ml-6 mt-1 text-xs text-slate-700">
+            <div className="mt-1 ml-6 text-xs text-slate-700">
               <InputGroup
                 disabled={loading}
                 tabIndex={-1}
@@ -182,6 +180,43 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
   );
 };
 
+const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetailsProps>) => {
+  const { toast } = useToast();
+  const [submitSetPolicy, { loading }] = useMutation(
+    gql`
+      mutation UpdateCollectiveAdminsCanSeePayoutMethodPolicy($account: AccountReferenceInput!, $value: Boolean!) {
+        setPolicies(account: $account, policies: { COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: $value }) {
+          id
+          policies {
+            id
+            COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+          }
+        }
+      }
+    `,
+    { context: API_V2_CONTEXT },
+  );
+  const handleUpdate = async value => {
+    try {
+      await submitSetPolicy({ variables: { account: { id: collective.id }, value } });
+      toast({
+        variant: 'success',
+        message: <FormattedMessage defaultMessage="Payout method policy updated" id="payoutMethodPolicyUpdated" />,
+      });
+    } catch (e) {
+      toast({ variant: 'error', message: e.message });
+    }
+  };
+
+  return (
+    <Switch
+      checked={Boolean(collective.policies.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS)}
+      disabled={loading}
+      onCheckedChange={handleUpdate}
+    />
+  );
+};
+
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
@@ -190,6 +225,7 @@ const editAccountSettingsMutation = gql`
     }
   }
 `;
+
 const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXPENSE_TYPE.GRANT];
 
 const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => {
@@ -236,7 +272,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
               .map(expenseType => i18nExpenseType(intl, expenseType))
               .join(', ') || <FormattedMessage defaultMessage="Custom" id="Sjo1P4" />
           )}
-          <ChevronDown className="ml-4 h-4 w-4 flex-shrink-0 opacity-50" />
+          <ChevronDown className="ml-4 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start">
@@ -268,7 +304,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
                 <FormattedMessage defaultMessage="Customize" id="TXpOBi" />
               </label>
             </div>
-            <div className="ml-6 mt-1 flex flex-col gap-1 text-slate-700">
+            <div className="mt-1 ml-6 flex flex-col gap-1 text-slate-700">
               {DISPLAYED_EXPENSE_TYPES.map(expenseType => (
                 <div key={expenseType}>
                   <label className="flex items-center gap-2 text-sm font-normal">
@@ -405,7 +441,6 @@ const transactionsTableColumns = [
             amount={netAmount.valueInCents}
             currency={netAmount.currency}
             precision={2}
-            amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />
         </div>
@@ -481,7 +516,11 @@ const CollectiveDetails = ({
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
+        {collective?.type === CollectiveType.FUND ? (
+          <FormattedMessage defaultMessage="Fund's overview" id="IYoPSx" />
+        ) : (
+          <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
+        )}
       </H4>
       {isLoading ? (
         <React.Fragment>
@@ -551,7 +590,7 @@ const CollectiveDetails = ({
             </div>
           </SectionTitle>
 
-          <InfoList className="sm:grid-cols-2">
+          <InfoList className="flex flex-col sm:grid sm:grid-cols-2">
             <InfoListItem
               title={<FormattedMessage id="HostedSince" defaultMessage="Hosted since" />}
               value={
@@ -573,6 +612,27 @@ const CollectiveDetails = ({
                   title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
                   value={<ExpenseTypesPicker host={host} collective={collective} />}
                 />
+                <div className="col-span-2 mb-8 flex items-center justify-between gap-2 rounded-lg border border-gray-200 p-4">
+                  <div className="text-sm">
+                    <p className="font-semibold text-slate-800">
+                      <FormattedMessage defaultMessage="Show payout method details" id="3P4Al8" />
+                    </p>
+                    <p className="mt-2 text-slate-700">
+                      {collective.type === CollectiveType.FUND ? (
+                        <FormattedMessage
+                          defaultMessage="Allow Fund Admins to view sensitive payout method details of payees"
+                          id="om2juz"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          defaultMessage="Allow Collective Admins to view sensitive payout method details of payees"
+                          id="N+kkx3"
+                        />
+                      )}
+                    </p>
+                  </div>
+                  <AdminsCanSeePayoutMethodsSwitch collective={collective} />
+                </div>
               </React.Fragment>
             )}
             <InfoListItem
@@ -696,7 +756,7 @@ const CollectiveDetails = ({
           {drawerActionsContainer &&
             isHostedCollective &&
             createPortal(
-              <div className="flex flex-grow justify-end gap-2">
+              <div className="flex grow justify-end gap-2">
                 <MoreActionsMenu collective={collective} onEdit={onEdit}>
                   <Button className="rounded-full" variant="outline">
                     <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />

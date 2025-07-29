@@ -12,7 +12,12 @@ type PaymentData = {
 
 type ConfirmParams = PaymentIntentConfirmParams | { payment_method?: string };
 
-export async function confirmPayment(stripe: Stripe, clientSecret: string, paymentData: PaymentData) {
+export async function confirmPayment(
+  stripe: Stripe,
+  clientSecret: string,
+  paymentData: PaymentData,
+  { redirect }: { redirect?: 'if_required' } = {},
+) {
   const confirmParams: ConfirmParams = paymentData?.paymentMethodId
     ? {
         payment_method: paymentData.paymentMethodId,
@@ -35,7 +40,12 @@ export async function confirmPayment(stripe: Stripe, clientSecret: string, payme
         confirmParams: {
           return_url: paymentData.returnUrl,
         },
+        redirect,
       });
+      break;
+    }
+    case PAYMENT_METHOD_TYPE.CREDITCARD: {
+      paymentIntentResult = await stripe.confirmCardPayment(clientSecret, confirmParams);
       break;
     }
     default: {

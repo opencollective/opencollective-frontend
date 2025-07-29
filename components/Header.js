@@ -27,12 +27,12 @@ class Header extends React.Component {
     css: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
-    navTitle: PropTypes.string,
     metaTitle: PropTypes.string,
     showSearch: PropTypes.bool,
     showProfileAndChangelogMenu: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
+    updatesRss: PropTypes.bool,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
@@ -71,7 +71,7 @@ class Header extends React.Component {
   }
 
   getMetas() {
-    const { noRobots, collective } = this.props;
+    const { intl, noRobots, collective, updatesRss } = this.props;
     const title = this.props.title || (collective && collective.name);
     const image = this.props.image || (collective && getCollectiveImage(collective));
     const description = this.props.description || collective?.description || collective?.longDescription;
@@ -93,6 +93,15 @@ class Header extends React.Component {
 
     if (noRobots || (collective && collective.isIncognito)) {
       metas.push({ name: 'robots', content: 'none' });
+    }
+
+    if (updatesRss) {
+      metas.push({
+        rel: 'alternate',
+        type: 'application/rss+xml',
+        title: intl.formatMessage({ id: 'updates', defaultMessage: 'Updates' }),
+        href: `https://rss.opencollective.com/${collective.slug}/updates.rss`,
+      });
     }
 
     return metas;
@@ -126,7 +135,6 @@ class Header extends React.Component {
             showSearch={this.props.showSearch}
             menuItems={this.props.menuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
-            navTitle={this.props.navTitle}
             loading={this.props.loading}
           />
         )}

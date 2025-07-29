@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { Field, useFormikContext } from 'formik';
@@ -7,15 +6,14 @@ import { escape, get, isEmpty, omit, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { isURL } from 'validator';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { formatValueAsCurrency } from '../../lib/currency-utils';
+import { formatCurrency, formatValueAsCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { cn } from '../../lib/utils';
+import { cn, isValidUrl } from '../../lib/utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
@@ -23,12 +21,12 @@ import { FX_RATE_ERROR_THRESHOLD, getExpenseExchangeRateWarningOrError } from '.
 
 import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import Container from '../Container';
+import Dropzone from '../Dropzone';
 import { ExchangeRate } from '../ExchangeRate';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
-import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
@@ -47,6 +45,10 @@ const msg = defineMessages({
   descriptionLabel: {
     id: 'Fields.description',
     defaultMessage: 'Description',
+  },
+  grossAmountLabel: {
+    id: 'bwZInO',
+    defaultMessage: 'Gross Amount',
   },
   amountLabel: {
     id: 'Fields.amount',
@@ -92,7 +94,7 @@ export const validateExpenseItem = (expense, item) => {
   if (expenseItemsMustHaveFiles(expense.type)) {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
-    } else if (!isURL(item.url)) {
+    } else if (!isValidUrl(item.url)) {
       errors.url = createError(ERROR.FORM_FIELD_PATTERN);
     } else if (item.__isUploading) {
       errors.url = createError(ERROR.FORM_FILE_UPLOADING);
@@ -138,7 +140,7 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
   <div className="relative flex grow">
     {children}
     {Boolean(comparison?.hasMismatch) && (
-      <div className={cn('absolute right-0 top-0 mt-[9px]', mrClass)} data-cy="mismatch-warning">
+      <div className={cn('absolute top-0 right-0 mt-[9px]', mrClass)} data-cy="mismatch-warning">
         <Tooltip>
           <TooltipTrigger>
             <AlertTriangle size={16} color="#CB9C03" />
@@ -170,18 +172,6 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
   </div>
 );
 
-WithOCRComparisonWarning.propTypes = {
-  children: PropTypes.node,
-  mrClass: PropTypes.string,
-  formatValue: PropTypes.func,
-  comparison: PropTypes.shape({
-    hasMismatch: PropTypes.bool,
-    ocrValue: PropTypes.any,
-    hasCurrencyMismatch: PropTypes.bool,
-    hasAmountMismatch: PropTypes.bool,
-  }),
-};
-
 const currencyExchangeRateQuery = gql`
   query ExpenseFormCurrencyExchangeRate($requests: [CurrencyExchangeRateRequest!]!) {
     currencyExchangeRate(requests: $requests) {
@@ -195,84 +185,116 @@ const currencyExchangeRateQuery = gql`
   }
 `;
 
+const getDefaultExchangeRate = (itemCurrency, expenseCurrency) => ({
+  value: null,
+  source: 'USER',
+  fromCurrency: itemCurrency,
+  toCurrency: expenseCurrency,
+  date: null,
+});
+
+const isValidExchangeRate = (exchangeRate, itemCurrency, expenseCurrency) => {
+  return Boolean(
+    exchangeRate &&
+      exchangeRate.source === 'USER' &&
+      exchangeRate.fromCurrency === itemCurrency &&
+      exchangeRate.toCurrency === expenseCurrency &&
+      exchangeRate.value,
+  );
+};
+
+const extractFormValues = (form, itemPath) => ({
+  expenseCurrency: get(form.values, 'currency'),
+  item: get(form.values, itemPath) || {},
+});
+
 /**
  * A hook that queries the exchange rate if needed and updates the form with the result.
  */
 const useExpenseItemExchangeRate = (form, itemPath) => {
-  const expenseCurrency = get(form.values, 'currency');
-  const itemValues = get(form.values, itemPath);
-  const itemCurrency = itemValues?.amountV2?.currency || expenseCurrency;
-  const incurredAt = standardizeExpenseItemIncurredAt(get(itemValues, 'incurredAt'));
-  const existingExchangeRate = get(itemValues, 'amountV2.exchangeRate');
-  const defaultExchangeRate = {
-    value: null,
-    source: 'USER', // User has to submit an exchange rate manually
-    fromCurrency: itemCurrency,
-    toCurrency: expenseCurrency,
-    date: null,
-  };
+  // We use a ref as `useQuery` callbacks are not guaranteed to be called with the latest values
+  const formValues = React.useRef(extractFormValues(form, itemPath));
+  React.useEffect(() => {
+    formValues.current = extractFormValues(form, itemPath);
+  });
 
   // Do not query exchange rate...
   const shouldSkipExchangeRateQuery = () => {
-    const itemCurrency = get(itemValues, 'amountV2.currency') || expenseCurrency;
-    // if expense currency is not set or if item currency is the same as expense currency
+    const { expenseCurrency, item } = formValues.current;
+    const itemCurrency = get(item, 'amountV2.currency') || expenseCurrency;
+    // ...if expense currency is not set or if item currency is the same as expense currency
     if (!expenseCurrency || !itemCurrency || expenseCurrency === itemCurrency) {
       return true;
     }
 
-    // if we already have a valid exchange rate from Open Collective
+    // ...if we already have a valid exchange rate from Open Collective
+    const existingExchangeRate = get(item, 'amountV2.exchangeRate');
     return Boolean(
       existingExchangeRate &&
         existingExchangeRate.source === 'OPENCOLLECTIVE' &&
         existingExchangeRate.fromCurrency === itemCurrency &&
         existingExchangeRate.toCurrency === expenseCurrency &&
         existingExchangeRate.value &&
-        dayjs(existingExchangeRate?.date).isSame(dayjs(incurredAt)),
-    );
-  };
-
-  const hasValidUserProvidedExchangeRate = () => {
-    return Boolean(
-      existingExchangeRate &&
-        existingExchangeRate.source === 'USER' &&
-        existingExchangeRate.fromCurrency === itemCurrency &&
-        existingExchangeRate.toCurrency === expenseCurrency &&
-        existingExchangeRate.value,
+        dayjs(existingExchangeRate?.date).isSame(dayjs(standardizeExpenseItemIncurredAt(get(item, 'incurredAt')))),
     );
   };
 
   // If the item exchange rate isn't valid anymore, let's make sure we invalidate it
   React.useEffect(() => {
+    const newItemValues = {};
+    const { expenseCurrency, item } = formValues.current;
+    const existingExchangeRate = get(item, 'amountV2.exchangeRate');
     if (existingExchangeRate && existingExchangeRate.toCurrency !== expenseCurrency) {
-      form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, null);
+      newItemValues.amountV2 = { ...item.amountV2, exchangeRate: null };
     }
-  }, [itemCurrency, expenseCurrency]);
+    if (item.referenceExchangeRate && item.referenceExchangeRate.toCurrency !== expenseCurrency) {
+      newItemValues.referenceExchangeRate = null;
+    }
+
+    if (!isEmpty(newItemValues)) {
+      form.setFieldValue(itemPath, { ...item, ...newItemValues });
+    }
+  }, [form, itemPath]);
 
   const { loading } = useQuery(currencyExchangeRateQuery, {
     skip: shouldSkipExchangeRateQuery(),
     context: API_V2_CONTEXT,
     variables: {
-      requests: [{ fromCurrency: itemCurrency, toCurrency: expenseCurrency, date: incurredAt }],
+      requests: [
+        {
+          fromCurrency: formValues.current.item.amountV2?.currency,
+          toCurrency: formValues.current.expenseCurrency,
+          date: standardizeExpenseItemIncurredAt(formValues.current.item.incurredAt),
+        },
+      ],
     },
     onCompleted: data => {
       // Re-check condition in case it changed since triggering the query
-      if (!shouldSkipExchangeRateQuery() && !hasValidUserProvidedExchangeRate()) {
+      const { expenseCurrency, item } = formValues.current;
+      const itemCurrency = get(item, 'amountV2.currency') || expenseCurrency;
+      const existingExchangeRate = get(item, 'amountV2.exchangeRate');
+      if (!shouldSkipExchangeRateQuery() && !isValidExchangeRate(existingExchangeRate, itemCurrency, expenseCurrency)) {
         const exchangeRate = get(data, 'currencyExchangeRate[0]');
         if (exchangeRate && exchangeRate.fromCurrency === itemCurrency && exchangeRate.toCurrency === expenseCurrency) {
           form.setFieldValue(itemPath, {
-            ...itemValues,
-            amountV2: { ...itemValues?.amountV2, exchangeRate },
+            ...item,
+            amountV2: { ...item.amountV2, exchangeRate },
             referenceExchangeRate: exchangeRate,
           });
         } else {
           // If we're not able to find an exchange rate, we'll ask the user to provide one manually
-          form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, defaultExchangeRate);
+          form.setFieldValue(itemPath, {
+            ...item,
+            amountV2: { ...item.amountV2, exchangeRate: getDefaultExchangeRate(itemCurrency, expenseCurrency) },
+            referenceExchangeRate: null,
+          });
         }
       }
     },
     onError: () => {
       // If the API fails (e.g. network error), we'll ask the user to provide an exchange rate manually
-      form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, defaultExchangeRate);
+      const { expenseCurrency, item } = formValues.current;
+      form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, getDefaultExchangeRate(item.currency, expenseCurrency));
     },
   });
 
@@ -301,6 +323,8 @@ const ExpenseItemForm = ({
   hasOCRFeature,
   ocrComparison,
   hasCurrencyPicker,
+  amountIsLocked,
+  isSubjectToTax = false,
 }) => {
   const intl = useIntl();
   const form = useFormikContext();
@@ -327,7 +351,7 @@ const ExpenseItemForm = ({
         {requireFile && (
           <Field name={getFieldName('url')}>
             {({ field, meta }) => {
-              const hasValidUrl = field.value && isURL(field.value);
+              const hasValidUrl = field.value && isValidUrl(field.value);
               return (
                 <StyledInputField
                   flex="0 0 112px"
@@ -337,7 +361,7 @@ const ExpenseItemForm = ({
                   required={!isOptional}
                   error={meta.error?.type !== ERROR.FORM_FIELD_REQUIRED && formatFormErrorMessage(intl, meta.error)}
                 >
-                  <StyledDropzone
+                  <Dropzone
                     {...attachmentDropzoneParams}
                     kind="EXPENSE_ITEM"
                     data-cy={`${field.name}-dropzone`}
@@ -350,8 +374,7 @@ const ExpenseItemForm = ({
                       formRef.current.setFieldValue(itemPath, { ...attachment, url, __isUploading: false })
                     }
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
-                    fontSize="13px"
-                    size={[84, 112]}
+                    className="size-20 sm:size-28"
                     value={hasValidUrl && field.value}
                     onReject={(...args) => {
                       formRef.current.setFieldValue(itemPath, { ...attachment, __isUploading: false });
@@ -445,14 +468,14 @@ const ExpenseItemForm = ({
                 name={getFieldName('amountV2')}
                 error={getError('amountV2')}
                 htmlFor={`${getFieldName('amountV2')}-amount`}
-                label={formatMessage(msg.amountLabel)}
+                label={formatMessage(isSubjectToTax ? msg.grossAmountLabel : msg.amountLabel)}
                 required
                 labelFontSize="13px"
                 inputType="number"
                 flexGrow={1}
                 minWidth={200}
                 mt={3}
-                disabled={editOnlyDescriptiveInfo}
+                disabled={editOnlyDescriptiveInfo || amountIsLocked}
               >
                 {inputProps => (
                   <Field name={inputProps.name}>
@@ -471,9 +494,9 @@ const ExpenseItemForm = ({
                           value={field.value?.valueInCents}
                           currency={itemCurrency}
                           currencyDisplay="CODE"
-                          min={isOptional ? undefined : 1}
+                          min={isOptional ? undefined : 10 ** (2 - getDefaultCurrencyPrecision(itemCurrency))} // Precision is 2 for USD, 0 for JPY, so min is 0.01 for USD, 1 for JPY
                           maxWidth="100%"
-                          placeholder="0.00"
+                          placeholder={formatCurrency(0, itemCurrency, { style: 'decimal' })}
                           hasCurrencyPicker={hasCurrencyPicker}
                           loadingExchangeRate={loadingExchangeRate}
                           exchangeRate={field.value?.exchangeRate}
@@ -511,6 +534,7 @@ const ExpenseItemForm = ({
                 <ExchangeRate
                   data-cy={`${getFieldName('amountV2')}-exchange-rate`}
                   className="mt-2 text-neutral-600"
+                  loading={loadingExchangeRate}
                   {...getExpenseExchangeRateWarningOrError(intl, exchangeRate, referenceExchangeRate)}
                   exchangeRate={
                     exchangeRate || {
@@ -546,7 +570,7 @@ const ExpenseItemForm = ({
         </Box>
       </Flex>
       <Flex alignItems="center" mt={3}>
-        {onRemove && !editOnlyDescriptiveInfo && (
+        {onRemove && !editOnlyDescriptiveInfo && !amountIsLocked && (
           <StyledButton
             type="button"
             buttonStyle="dangerSecondary"
@@ -563,43 +587,5 @@ const ExpenseItemForm = ({
     </Box>
   );
 };
-
-ExpenseItemForm.propTypes = {
-  collective: PropTypes.object,
-  /** Called when clicking on remove */
-  onRemove: PropTypes.func,
-  /** A map of errors for this object */
-  errors: PropTypes.object,
-  /** Whether a file is required for this attachment type */
-  requireFile: PropTypes.bool,
-  /** Whether a date is required for this expense type */
-  requireDate: PropTypes.bool,
-  /** Whether this whole item is optional */
-  isOptional: PropTypes.bool,
-  /** Whether the OCR feature is enabled */
-  hasOCRFeature: PropTypes.bool,
-  /** True if description is HTML */
-  isRichText: PropTypes.bool,
-  /** Called when an attachment upload fails */
-  onUploadError: PropTypes.func.isRequired,
-  /** Is it an invoice */
-  isInvoice: PropTypes.bool,
-  /** the item data. TODO: Rename to "item" */
-  attachment: PropTypes.shape({
-    id: PropTypes.string,
-    url: PropTypes.string,
-    description: PropTypes.string,
-    incurredAt: PropTypes.string,
-    amount: PropTypes.number,
-    __parsingResult: PropTypes.object,
-    __isUploading: PropTypes.bool,
-  }).isRequired,
-  editOnlyDescriptiveInfo: PropTypes.bool,
-  itemIdx: PropTypes.number.isRequired,
-  ocrComparison: PropTypes.object,
-  hasCurrencyPicker: PropTypes.bool,
-};
-
-ExpenseItemForm.whyDidYouRender = true;
 
 export default React.memo(ExpenseItemForm);

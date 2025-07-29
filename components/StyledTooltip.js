@@ -21,6 +21,10 @@ const StyledTooltipContainer = styled(`div`)`
   color: white;
   background: #141414;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
+
+  a {
+    text-decoration: underline;
+  }
 `;
 
 const Arrow = styled('div')`
@@ -145,6 +149,8 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
  *
  * Relies on [react-tooltip](https://react-tooltip.netlify.com/) and accepts any
  * of its properties.
+ *
+ * @deprecated Use `ui/Tooltip` instead
  */
 class StyledTooltip extends React.Component {
   static propTypes = {
@@ -223,7 +229,7 @@ class StyledTooltip extends React.Component {
         onMouseLeave={this.onMouseLeave}
         verticalAlign={this.props.containerVerticalAlign}
         lineHeight={this.props.containerLineHeight}
-        cursor={this.props.containerCursor}
+        cursor={this.props.noTooltip ? undefined : this.props.containerCursor}
         data-cy="tooltip-trigger"
       >
         {this.props.children}

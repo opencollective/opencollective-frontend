@@ -9,14 +9,25 @@ env:
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   IMAGES_URL: http://localhost:3001
-  PDF_SERVICE_URL: http://localhost:3002
+  PDF_SERVICE_V2_URL: http://localhost:3002
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
 
+  AWS_KEY: user
+  AWS_SECRET: password
+  AWS_S3_BUCKET: opencollective-e2e
+  AWS_S3_REGION: us-east-1
+  AWS_S3_API_VERSION: latest
+  AWS_S3_ENDPOINT: http://localhost:9000
+  AWS_S3_SSL_ENABLED: false
+  AWS_S3_FORCE_PATH_STYLE: true
+  GRAPHQL_ERROR_DETAILED: true
+  DISABLE_MOCK_UPLOADS: 1
   E2E_TEST: 1
   PGHOST: localhost
   PGUSER: postgres
+  CYPRESS_COVERAGE: false
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
@@ -30,21 +41,19 @@ env:
   TERM: xterm
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
-  AWS_KEY: ${{ secrets.AWS_KEY }}
-  AWS_SECRET: ${{ secrets.AWS_SECRET }}
 
 jobs:
   e2e:
     if: github.ref_name != 'i18n/crowdin'
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
-        files: ['0*.js', '1*.js', '2*.js', '3*.js']
+        files: ['0*.(js|ts)', '1*.(js|ts)', '2*.(js|ts)', '3*.(js|ts)', '4*.(js|ts)']
 
     services:
       redis:
@@ -53,7 +62,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:13.15
+        image: postgres:16.9
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -62,25 +71,44 @@ jobs:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      minio:
+        image: minio/minio:edge-cicd
+        ports:
+          - 9000:9000
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
+        env:
+          MINIO_ROOT_USER: user
+          MINIO_ROOT_PASSWORD: password
 
     steps:
+      # man-db trigger on apt install is taking some time
+      - name: Disable man-db update
+        run: sudo rm -f /var/lib/man-db/auto-update
       - name: Update apt
         run: sudo apt-get update || exit 0
 
-      - name: Install Cypress dependencies
-        run: sudo apt-get install --no-install-recommends -y libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb fonts-arphic-bkai00mp fonts-arphic-bsmi00lp fonts-arphic-gbsn00lp fonts-arphic-gkai00mp fonts-arphic-ukai fonts-arphic-uming ttf-wqy-zenhei ttf-wqy-microhei xfonts-wqy
-
-      - name: Install postgresql-client
-        run: sudo apt-get install -y postgresql-client
-
-      - name: Install graphicsmagick
-        run: sudo apt-get install -y graphicsmagick
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+          `# Cypress dependencies - see https://docs.cypress.io/app/get-started/install-cypress#UbuntuDebian` \
+          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb \
+          `# Postgres client` \
+          postgresql-client-16 \
+          `# GraphicsMagick (not sure if needed)` \
+          graphicsmagick
 
       - name: Install stripe-cli
         run: |
           sudo apt-get install -y wget
           wget https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz -O /tmp/stripe_1.13.9_linux_x86_64.tar.gz
           sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
+
+      - name: Setup minio bucket
+        run: |
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x ./mc
+          ./mc alias set minio http://127.0.0.1:9000 user password
+          ./mc mb --ignore-existing minio/opencollective-e2e
 
       - name: Checkout (frontend)
         uses: actions/checkout@v4
@@ -221,16 +249,6 @@ jobs:
           path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
 
-      - name: Restore .next cache (frontend)
-        if: steps.next-build.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-next-cache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-next-cache-${{ github.sha }}
-            ${{ runner.os }}-next-cache-
-
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'
         run: npm run build
@@ -248,22 +266,23 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: cypress-recordings
+          name: cypress-recordings-${{ github.run_id }}-${{ strategy.job-index }}
           path: |
             test/cypress/screenshots
             test/cypress/videos
         if: ${{ failure() }}
 
       - name: Archive download folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: downloads
+          name: downloads-${{ github.run_id }}-${{ strategy.job-index }}
           path: test/cypress/downloads
         if: ${{ failure() }}
 
-      - name: Report coverage
-        uses: codecov/codecov-action@v4
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

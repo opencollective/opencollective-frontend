@@ -2,10 +2,11 @@ import React from 'react';
 import clsx from 'clsx';
 import { includes } from 'lodash';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import useClipboard from '../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
@@ -43,7 +44,14 @@ const I18nMessages = defineMessages({
 
 export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
   const { LoggedInUser } = useLoggedInUser();
-  const hasNewSubmitExpenseFlow = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+  const router = useRouter();
+  const hasNewSubmitExpenseFlow =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
+
+  const canDuplicateExpense =
+    hasNewSubmitExpenseFlow &&
+    [ExpenseType.INVOICE, ExpenseType.RECEIPT].includes(props.expense.type) &&
+    props.expense.status !== ExpenseStatus.DRAFT;
 
   const clipboard = useClipboard();
   const intl = useIntl();
@@ -71,7 +79,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
       }}
     >
       <div>
-        <div className="mb-1 max-w-[250px] overflow-hidden text-ellipsis text-sm font-medium text-slate-800 sm:max-w-[400px]">
+        <div className="mb-1 max-w-[250px] overflow-hidden text-sm font-medium text-ellipsis text-slate-800 sm:max-w-[400px]">
           {props.expense.description}
         </div>
         <div className="text-xs text-slate-700">
@@ -82,7 +90,14 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
                 : I18nMessages.DESCRIPTION_LINE_NO_PAYOUT_METHOD)}
               values={{
                 submittedAt: <DateTime value={props.expense.createdAt} />,
-                payoutMethod: <PayoutMethodLabel showIcon payoutMethod={props.expense.payoutMethod} />,
+                payoutMethod: (
+                  <PayoutMethodLabel
+                    iconSize={14}
+                    className="inline-flex min-h-0 items-baseline"
+                    showIcon
+                    payoutMethod={props.expense.payoutMethod}
+                  />
+                ),
                 submitter: (
                   <AccountHoverCard
                     account={props.expense.payee}
@@ -141,7 +156,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
           )}
         </div>
         <div className="flex flex-wrap items-end justify-end gap-2">
-          <span className="rounded-xl rounded-ee-none rounded-se-none bg-slate-100 px-3 py-1 text-xs text-slate-800">
+          <span className="rounded-xl rounded-se-none rounded-ee-none bg-slate-100 px-3 py-1 text-xs text-slate-800">
             {i18nExpenseType(intl, props.expense.type)} #{props.expense.legacyId}
           </span>
 
@@ -155,7 +170,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
       </div>
       <div className="flex items-center">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()} asChild>
             <Button size="icon-xs" variant="outline">
               <Ellipsis className="h-4 w-4" />
             </Button>
@@ -174,7 +189,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </DropdownMenuItem>
-            {props.expense.status !== ExpenseStatus.DRAFT && hasNewSubmitExpenseFlow && (
+            {canDuplicateExpense && (
               <DropdownMenuItem onClick={onDuplicateClick}>
                 <Copy className="h-4 w-4" />
                 <FormattedMessage defaultMessage="Duplicate Expense" id="MXaO+R" />

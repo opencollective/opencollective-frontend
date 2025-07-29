@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -9,10 +8,10 @@ import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
-import StyledButton from '../../../StyledButton';
 import StyledHr from '../../../StyledHr';
 import StyledTag from '../../../StyledTag';
 import { P, Span } from '../../../Text';
+import { Button } from '../../../ui/Button';
 
 import ActivitySwitch from './ActivitySwitch';
 
@@ -65,12 +64,10 @@ const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxP
         </Flex>
         <Flex>
           {advancedSettings && (
-            <StyledButton
-              buttonStyle="secondary"
-              buttonSize="tiny"
-              isBorderless
-              mr={2}
-              display={['none', 'block']}
+            <Button
+              className="hidden sm:block"
+              variant="link"
+              size="xs"
               onClick={() => setDisplayAdvancedSettings(!displayAdvancedSettings)}
             >
               {displayAdvancedSettings ? (
@@ -79,18 +76,16 @@ const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxP
                 <FormattedMessage id="AdvancedSettings.Show" defaultMessage="Show advanced settings" />
               )}
               {displayAdvancedSettings ? <ChevronUp size="1em" /> : <ChevronDown size="1em" />}
-            </StyledButton>
+            </Button>
           )}
           <ActivitySwitch account={account} activityType="ACTIVITY_ALL" />
         </Flex>
       </Flex>
       {advancedSettings && (
-        <StyledButton
-          buttonStyle="secondary"
-          buttonSize="tiny"
-          isBorderless
-          mt={2}
-          display={['block', 'none']}
+        <Button
+          className="mt-4 block sm:hidden"
+          variant="link"
+          size="xs"
           onClick={() => setDisplayAdvancedSettings(!displayAdvancedSettings)}
         >
           {displayAdvancedSettings ? (
@@ -99,7 +94,7 @@ const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxP
             <FormattedMessage id="AdvancedSettings.Show" defaultMessage="Show advanced settings" />
           )}
           {displayAdvancedSettings ? <ChevronUp size="1em" /> : <ChevronDown size="1em" />}
-        </StyledButton>
+        </Button>
       )}
       {big && displayAdvancedSettings && <StyledHr width="100%" my={3} />}
       {advancedSettings &&
@@ -120,28 +115,6 @@ const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxP
       {advancedSettings && !big && <StyledHr width="100%" mt={displayAdvancedSettings ? 4 : 3} borderStyle="dashed" />}
     </Box>
   );
-};
-
-CollectiveSettings.propTypes = {
-  account: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    imageUrl: PropTypes.string,
-    activitySubscriptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.string,
-        active: PropTypes.bool,
-      }),
-    ),
-    host: PropTypes.shape({
-      totalHostedCollectives: PropTypes.number,
-    }),
-  }),
-  advancedSettings: PropTypes.bool,
-  big: PropTypes.bool,
-  roleLabel: PropTypes.node,
 };
 
 export default CollectiveSettings;

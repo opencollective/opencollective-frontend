@@ -29,6 +29,7 @@ describe('apply to host', () => {
     cy.url().then(currentUrl => {
       const collectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-applications#application-${collectiveId}` });
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();

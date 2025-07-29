@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
@@ -13,6 +12,7 @@ import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { ExpenseLockableFields } from '../../lib/graphql/types/v2/schema';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
@@ -113,7 +113,7 @@ const RadioOptionContainer = styled.label`
   padding: 6px 16px;
   cursor: pointer;
 
-  :not(:last-child) {
+  &:not(:last-child) {
     @media (max-width: ${themeGet('breakpoints.0')}) {
       border-bottom: 1px solid #dcdee0;
     }
@@ -127,7 +127,7 @@ const throttledSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) => {
+const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expense }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, touched, errors } = formik;
@@ -293,6 +293,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
                 labelFontSize="13px"
                 error={errors.payee?.email}
                 mt={3}
+                disabled={expense?.lockedFields?.includes(ExpenseLockableFields.PAYEE)}
               >
                 {inputProps => <StyledInput {...inputProps} {...field} type="email" />}
               </StyledInputField>
@@ -463,22 +464,6 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
       )}
     </Fragment>
   );
-};
-
-ExpenseFormPayeeSignUpStep.propTypes = {
-  formik: PropTypes.object,
-  onCancel: PropTypes.func,
-  onNext: PropTypes.func,
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-    }),
-    settings: PropTypes.object,
-  }).isRequired,
 };
 
 export default ExpenseFormPayeeSignUpStep;

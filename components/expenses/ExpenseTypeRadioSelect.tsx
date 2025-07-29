@@ -101,16 +101,17 @@ interface ExpenseTypeOptionProps {
   type: (typeof expenseTypes)[keyof typeof expenseTypes];
   isChecked?: boolean;
   onChange?: (...args: unknown[]) => unknown;
+  disabled?: boolean;
 }
 
-const ExpenseTypeOption = ({ name, type, isChecked, onChange }: ExpenseTypeOptionProps) => {
+const ExpenseTypeOption = ({ name, type, isChecked, onChange, disabled }: ExpenseTypeOptionProps) => {
   const { formatMessage } = useIntl();
   const illustrationSrc = illustrations[type] || receiptIllustration;
   const staticIllustrationSrc = staticIllustrations[type] || receiptIllustrationStatic;
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
       <Box alignSelf={['center', 'baseline', null, 'center']}>
-        <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
+        <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} disabled={disabled} />
       </Box>
       <Box flexShrink={0} mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
         <StaticTypeIllustration src={staticIllustrationSrc} />
@@ -151,6 +152,7 @@ interface ExpenseTypeRadioSelectProps {
   onChange?: (...args: unknown[]) => unknown;
   /** Supported expense types */
   supportedExpenseTypes: string[];
+  disabled?: boolean;
 }
 
 /**
@@ -165,13 +167,21 @@ const ExpenseTypeRadioSelect = ({
   onChange,
   value,
   supportedExpenseTypes,
+  disabled,
 }: ExpenseTypeRadioSelectProps) => {
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
         <Flex flexDirection={['column', 'row']} overflow="hidden">
           {BASE_EXPENSE_TYPES.filter(type => supportedExpenseTypes.includes(type)).map(type => (
-            <ExpenseTypeOption key={type} name={name} type={type} isChecked={value === type} onChange={onChange} />
+            <ExpenseTypeOption
+              key={type}
+              name={name}
+              type={type}
+              isChecked={value === type}
+              onChange={onChange}
+              disabled={disabled}
+            />
           ))}
         </Flex>
       </Fieldset>

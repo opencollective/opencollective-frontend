@@ -5,15 +5,16 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import type { Account, AccountHoverCardFieldsFragment, AccountQuery } from '../../../lib/graphql/types/v2/graphql';
+import type { AccountFilterQuery, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../lib/graphql/types/v2/schema';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-const accountQuery = gql`
-  query Account($slug: String!) {
+export const accountFilterQuery = gql`
+  query AccountFilter($slug: String!) {
     account(slug: $slug) {
       id
       ...AccountHoverCardFields
@@ -43,7 +44,7 @@ const AccountRenderer = ({
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
-  const { data } = useQuery<AccountQuery>(accountQuery, {
+  const { data } = useQuery<AccountFilterQuery>(accountFilterQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
     context: API_V2_CONTEXT,
@@ -51,20 +52,25 @@ const AccountRenderer = ({
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
     skip: !!account.description && !!account.type,
   });
-  account = data?.account || account;
+
+  const trigger = (
+    <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
+      <Avatar collective={account} radius={20} />
+      <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
+        <span className="truncate">{account.name ?? account.slug}</span>
+      </div>
+    </div>
+  );
+
+  if (!data?.account) {
+    return trigger;
+  }
 
   return (
     <AccountHoverCard
-      account={account}
+      account={data.account}
       {...(inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
-      trigger={
-        <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
-          <Avatar collective={account} radius={20} />
-          <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
-            <span className="truncate">{account.name ?? account.slug}</span>
-          </div>
-        </div>
-      }
+      trigger={trigger}
     />
   );
 };

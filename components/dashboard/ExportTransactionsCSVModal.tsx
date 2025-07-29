@@ -9,7 +9,9 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
-import type { CSVField } from '../../lib/csv';
+import { setRestAuthorizationCookie } from '../../lib/auth';
+import { getEnvVar } from '../../lib/env-utils';
+import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
   FIELD_OPTIONS,
@@ -20,14 +22,10 @@ import {
   GROUPS,
   HOST_OMITTED_FIELDS,
   PLATFORM_PRESETS,
-} from '../../lib/csv';
-import { getEnvVar } from '../../lib/env-utils';
+} from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type {
-  Account,
-  HostReportsPageQueryVariables,
-  TransactionsPageQueryVariables,
-} from '../../lib/graphql/types/v2/graphql';
+import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -44,8 +42,6 @@ import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
 
-const env = process.env.OC_ENV;
-
 const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
 
 const TABS = Object.keys(GROUP_FIELDS).map(group => ({
@@ -54,7 +50,14 @@ const TABS = Object.keys(GROUP_FIELDS).map(group => ({
   count: GROUP_FIELDS[group].length,
 }));
 
-const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }) => {
+const makeUrl = ({
+  account,
+  isHostReport,
+  queryFilter,
+  flattenTaxesAndPaymentProcessorFees,
+  useFieldNames,
+  fields,
+}) => {
   const url = isHostReport
     ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
     : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
@@ -74,6 +77,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
   url.searchParams.set('includeGiftCardTransactions', '1');
   url.searchParams.set('includeIncognitoTransactions', '1');
   url.searchParams.set('includeChildrenTransactions', '1');
+
+  if (queryFilter.values.expenseType) {
+    url.searchParams.set('expenseType', queryFilter.values.expenseType.join(','));
+  }
 
   if (queryFilter.values.kind) {
     url.searchParams.set('kind', queryFilter.values.kind.join(','));
@@ -109,8 +116,21 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     }
   }
 
+  if (queryFilter.values.clearedAt) {
+    if (queryFilter.variables.clearedFrom) {
+      url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
+    }
+    if (queryFilter.variables.clearedTo) {
+      url.searchParams.set('clearedTo', queryFilter.variables.clearedTo);
+    }
+  }
+
   if (!isNil(queryFilter.values.isRefund)) {
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  }
+
+  if (!isNil(queryFilter.values.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
   }
 
   if (queryFilter.values.orderId) {
@@ -136,6 +156,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
   if (flattenTaxesAndPaymentProcessorFees) {
     url.searchParams.set('flattenPaymentProcessorFee', '1');
     url.searchParams.set('flattenTax', '1');
+  }
+
+  if (useFieldNames) {
+    url.searchParams.set('useFieldNames', '1');
   }
 
   if (!isEmpty(fields)) {
@@ -206,10 +230,11 @@ const editAccountSettingsMutation = gql`
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
+  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
+  canCreatePreset?: boolean;
 };
 
 const ExportTransactionsCSVModal = ({
@@ -219,12 +244,14 @@ const ExportTransactionsCSVModal = ({
   trigger,
   queryFilter,
   isHostReport,
+  canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
+  const [useFieldNames, setUseFieldNames] = React.useState(false);
   const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
@@ -237,10 +264,12 @@ const ExportTransactionsCSVModal = ({
 
   const customFields = React.useMemo(
     () =>
-      updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
-      account?.settings?.exportedTransactionsFieldSets ||
-      {},
-    [updateSettingsData, account],
+      !canCreatePreset
+        ? []
+        : updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
+          account?.settings?.exportedTransactionsFieldSets ||
+          {},
+    [updateSettingsData, account, canCreatePreset],
   );
 
   const {
@@ -250,7 +279,14 @@ const ExportTransactionsCSVModal = ({
   } = useAsyncCall(async () => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (accessToken) {
-      const url = makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields });
+      const url = makeUrl({
+        account,
+        isHostReport,
+        queryFilter,
+        flattenTaxesAndPaymentProcessorFees,
+        useFieldNames,
+        fields,
+      });
       const response = await fetch(url, {
         method: 'HEAD',
         headers: {
@@ -258,7 +294,7 @@ const ExportTransactionsCSVModal = ({
         },
       });
       const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-      return rows;
+      return isNaN(rows) ? null : rows;
     }
   });
 
@@ -267,17 +303,23 @@ const ExportTransactionsCSVModal = ({
     label: string;
     fields?: Array<CSVField>;
     flattenTaxesAndPaymentProcessorFees?: boolean;
+    useFieldNames?: boolean;
   }> = React.useMemo(() => {
     return [
-      ...Object.keys(customFields).map(key => ({
-        value: key,
-        label: customFields[key].name,
-        fields: customFields[key].fields,
-        flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
+      ...(canCreatePreset
+        ? Object.keys(customFields).map(key => ({
+            value: key,
+            label: customFields[key].name,
+            fields: customFields[key].fields,
+            flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
+          }))
+        : []),
+      ...Object.keys(canCreatePreset ? FIELD_OPTIONS : omit(FIELD_OPTIONS, [FIELD_OPTIONS.NEW_PRESET])).map(value => ({
+        value,
+        label: FieldOptionsLabels[value],
       })),
-      ...Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] })),
     ];
-  }, [customFields]);
+  }, [customFields, canCreatePreset]);
 
   React.useEffect(() => {
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
@@ -295,27 +337,30 @@ const ExportTransactionsCSVModal = ({
       } else {
         setFlattenTaxesAndPaymentProcessorFees(false);
       }
+
+      if (!isNil(selectedSet.useFieldNames)) {
+        setUseFieldNames(selectedSet.useFieldNames);
+      } else {
+        setUseFieldNames(false);
+      }
+    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+      setUseFieldNames(true);
+      handleTaxAndPaymentProcessorFeeSwitch(false);
     }
   }, [presetOptions, preset]);
 
   React.useEffect(() => {
-    if (open) {
+    if (open && account) {
       fetchRows();
     }
   }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (typeof document !== 'undefined' && accessToken) {
-      document.cookie =
-        env === 'development' || env === 'e2e'
-          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
-          : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSite and Domain in production to prevent CSRF.
-            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
-    }
-    setDownloadUrl(makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }));
-  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl]);
+    setRestAuthorizationCookie();
+    setDownloadUrl(
+      makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, useFieldNames, fields }),
+    );
+  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl, useFieldNames]);
 
   const handleFieldSwitch = React.useCallback(
     ({ name, checked }) => {
@@ -336,6 +381,8 @@ const ExportTransactionsCSVModal = ({
     setFlattenTaxesAndPaymentProcessorFees(checked);
     if (checked) {
       setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
+    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+      setFields(without(fields, 'paymentProcessorFee', 'taxAmount'));
     } else {
       const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
       setFields(selectedSet?.fields || []);
@@ -388,7 +435,7 @@ const ExportTransactionsCSVModal = ({
       variables: {
         account: { slug: account?.slug },
         key: `exportedTransactionsFieldSets.${key}`,
-        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees },
+        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees, useFieldNames },
       },
     });
     setIsEditingPreset(false);
@@ -415,7 +462,7 @@ const ExportTransactionsCSVModal = ({
 
   const isAboveRowLimit = exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
-  const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
+  const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 
@@ -429,7 +476,7 @@ const ExportTransactionsCSVModal = ({
               <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4 pt-6 sm:px-8">
+          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-4 sm:px-8">
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex flex-1 flex-col gap-2">
                 <h1 className="font-bold">
@@ -502,7 +549,7 @@ const ExportTransactionsCSVModal = ({
                         />
                         <label
                           htmlFor={tab}
-                          className="cursor-pointer text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          className="cursor-pointer text-sm leading-none font-bold! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           <FormattedMessage id="ExportTransactionsCSVModal.SelectAll" defaultMessage="Select all" />
                         </label>
@@ -524,7 +571,7 @@ const ExportTransactionsCSVModal = ({
                                   />
                                   <label
                                     htmlFor={fieldId}
-                                    className="ml-1 cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    className="ml-1 cursor-pointer text-sm leading-none font-normal! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                   >
                                     {field?.label || fieldId}
                                   </label>
@@ -599,23 +646,43 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
             </div>
-            {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+            <div className="flex flex-col gap-2">
+              <h1 className="font-bold">
+                <FormattedMessage defaultMessage="Export options" id="b7Sq18" />
+              </h1>
               <div className="flex flex-row items-center gap-2">
-                <Switch
-                  checked={flattenTaxesAndPaymentProcessorFees}
-                  onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
-                />
+                <Switch checked={!useFieldNames} onCheckedChange={checked => setUseFieldNames(!checked)} />
                 <p className="text-sm">
-                  <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
+                  <FormattedMessage
+                    defaultMessage="Use field IDs as column headers instead of field names."
+                    id="Xq0DWl"
+                  />
                 </p>
                 <InfoTooltipIcon>
                   <FormattedMessage
-                    defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
-                    id="frVonU"
+                    defaultMessage="Select this option to export a backward-compatible CSV header using field IDs (effectiveDate, legacyId) instead of field names (Effective Date & Time, Transaction ID)."
+                    id="ArRZh5"
                   />
                 </InfoTooltipIcon>
               </div>
-            )}
+              {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+                <div className="flex flex-row items-center gap-2">
+                  <Switch
+                    checked={flattenTaxesAndPaymentProcessorFees}
+                    onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
+                  />
+                  <p className="text-sm">
+                    <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
+                  </p>
+                  <InfoTooltipIcon>
+                    <FormattedMessage
+                      defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
+                      id="frVonU"
+                    />
+                  </InfoTooltipIcon>
+                </div>
+              )}
+            </div>
             {isAboveRowLimit && (
               <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">
@@ -632,9 +699,16 @@ const ExportTransactionsCSVModal = ({
           </div>
 
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div>
-              {!isAboveRowLimit && (
-                <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
+            <div className="font-bold text-slate-700 sm:text-sm">
+              {isFetchingRows ? (
+                <React.Fragment>
+                  <FormattedMessage
+                    id="ExportTransactionsCSVModal.FetchingRows"
+                    defaultMessage="Checking number of exported rows..."
+                  />
+                </React.Fragment>
+              ) : !isAboveRowLimit && exportedRows ? (
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <FormattedMessage
                     id="ExportTransactionsCSVModal.ExportRows"
                     defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
@@ -654,7 +728,7 @@ const ExportTransactionsCSVModal = ({
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
               {canEditFields && (

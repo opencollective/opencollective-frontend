@@ -11,7 +11,16 @@ import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
+import {
+  A,
+  ARROW_DOWN_KEY,
+  ARROW_LEFT_KEY,
+  ARROW_RIGHT_KEY,
+  ARROW_UP_KEY,
+  B,
+  useKeyboardSequence,
+} from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -87,6 +96,25 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
 
+  // Konami Code
+  useKeyboardSequence({
+    sequence: [
+      ARROW_UP_KEY,
+      ARROW_UP_KEY,
+      ARROW_DOWN_KEY,
+      ARROW_DOWN_KEY,
+      ARROW_LEFT_KEY,
+      ARROW_RIGHT_KEY,
+      ARROW_LEFT_KEY,
+      ARROW_RIGHT_KEY,
+      B,
+      A,
+    ],
+    callback: () => {
+      new Audio('/static/sounds/super.mp3').play();
+    },
+  });
+
   const {
     data: metaData,
     error: errorMetaData,
@@ -101,7 +129,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
-      count: metaData?.all?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
@@ -112,7 +139,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     {
       label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
       filter: {
-        lastCommentBy: [LastCommentBy.USER],
+        lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
         status: [
           ExpenseStatusFilter.APPROVED,
           ExpenseStatusFilter.ERROR,
@@ -133,7 +160,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metaData?.scheduled_for_payment?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'On hold', id: '0Hhe6f' }),
+      label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
       filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'on_hold',
       count: metaData?.on_hold?.totalCount,
@@ -154,7 +181,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
       filter: { status: [ExpenseStatusFilter.PAID] },
       id: 'paid',
-      count: metaData?.paid?.totalCount,
     },
   ];
 
@@ -178,6 +204,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const variables = {
     hostSlug,
     ...queryFilter.variables,
+    fetchGrantHistory: false,
   };
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
@@ -200,7 +227,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   };
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>
@@ -281,11 +308,11 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
-            setOpenExpenseLegacyId={legacyId => {
+            setOpenExpenseLegacyId={(legacyId, attachmentUrl) => {
               router.push(
                 {
                   pathname: pageRoute,
-                  query: getQueryParams({ ...query, openExpenseId: legacyId }),
+                  query: getQueryParams({ ...query, openExpenseId: legacyId, attachmentUrl }),
                 },
                 undefined,
                 { shallow: true },

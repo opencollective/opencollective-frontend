@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import { FastField, Field, useFormikContext } from 'formik';
 import { has, pickBy } from 'lodash';
 import { useIntl } from 'react-intl';
@@ -110,32 +109,6 @@ const StyledInputFormikField = ({
       }}
     </FieldComponent>
   );
-};
-
-StyledInputFormikField.propTypes = {
-  name: PropTypes.string.isRequired,
-  validate: PropTypes.func,
-  isFastField: PropTypes.func,
-  children: PropTypes.func,
-  /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
-  htmlFor: PropTypes.string,
-  id: PropTypes.string,
-  /** Passed to input as `type`. Adapts layout for checkboxes */
-  inputType: PropTypes.string,
-  placeholder: PropTypes.string,
-  /** Show disabled state for field */
-  disabled: PropTypes.bool,
-  /** If set to false, the field will be marked as optional */
-  required: PropTypes.bool,
-  flex: PropTypes.any,
-  display: PropTypes.any,
-  width: PropTypes.any,
-  flexGrow: PropTypes.any,
-  showError: PropTypes.bool,
-  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  formatValue: PropTypes.func,
-  autoFocus: PropTypes.bool,
 };
 
 export default StyledInputFormikField;

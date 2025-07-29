@@ -1,13 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../../../Grid';
-import StyledButton from '../../../StyledButton';
 import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
+import { Button } from '../../../ui/Button';
 
 import CollectiveSettings from './CollectiveSettings';
 
@@ -44,33 +43,11 @@ const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
           </CollectiveContainer>
         ))}
       </Flex>
-      <StyledButton onClick={handleBack}>Back</StyledButton>
+      <Button variant="outline" onClick={handleBack}>
+        Back
+      </Button>
     </Box>
   );
-};
-
-GroupView.propTypes = {
-  accounts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-      imageUrl: PropTypes.string,
-      activitySubscriptions: PropTypes.arrayOf(
-        PropTypes.shape({
-          type: PropTypes.string,
-          active: PropTypes.bool,
-        }),
-      ),
-      host: PropTypes.shape({
-        totalHostedCollectives: PropTypes.number,
-      }),
-    }),
-  ),
-  title: PropTypes.node,
-  roleLabel: PropTypes.node,
-  advancedSettings: PropTypes.bool,
 };
 
 export default GroupView;

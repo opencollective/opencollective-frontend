@@ -149,7 +149,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
       </div>
       {drawerActionsContainer &&
         createPortal(
-          <div className="flex flex-grow justify-between gap-2">
+          <div className="flex grow justify-between gap-2">
             <Button onClick={onCancel} variant="outline" className="rounded-full">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>

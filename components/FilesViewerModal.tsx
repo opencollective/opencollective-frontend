@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { themeGet } from '@styled-system/theme-get';
 import clsx from 'clsx';
+import { unescape } from 'lodash';
 import { ChevronLeft, ChevronRight, Download, ExternalLink, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
-import { imagePreview } from '../lib/image-utils';
-import { getFileExtensionFromUrl } from '../lib/url-helpers';
+import { generateDownloadUrlForFileUrl } from '../lib/image-utils';
 
 import { Dialog, DialogOverlay } from './ui/Dialog';
 import { Box, Flex } from './Grid';
@@ -128,12 +128,15 @@ type FilesViewerModalProps = {
   files?: {
     url: string;
     name?: string;
-    info?: { width: number };
+    info?: { width: number; type: string };
+    type?: string;
   }[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
   canDownload?: boolean;
   canOpenInNewWindow?: boolean;
+  hideCloseButton?: boolean;
+  setOpenFileUrl?: (url: string) => void;
 };
 
 export default function FilesViewerModal({
@@ -144,6 +147,8 @@ export default function FilesViewerModal({
   openFileUrl,
   canDownload = true,
   canOpenInNewWindow = true,
+  hideCloseButton = false,
+  setOpenFileUrl,
 }: FilesViewerModalProps) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
@@ -156,39 +161,48 @@ export default function FilesViewerModal({
     }
   }, [openFileUrl, files]);
 
-  const onArrowLeft = React.useCallback(() => setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)), []);
-  const onArrowRight = React.useCallback(
-    () => setSelectedIndex(selectedIndex => Math.min(selectedIndex + 1, (files?.length || 1) - 1)),
-    [files],
+  const onArrowLeft = React.useCallback(
+    () =>
+      setSelectedIndex(selectedIndex => {
+        const newIndex = Math.max(selectedIndex - 1, 0);
+        setOpenFileUrl?.(files?.[newIndex]?.url || '');
+        return newIndex;
+      }),
+    [files, setOpenFileUrl],
   );
+
+  const onArrowRight = React.useCallback(
+    () =>
+      setSelectedIndex(selectedIndex => {
+        const newIndex = Math.min(selectedIndex + 1, (files?.length || 1) - 1);
+        setOpenFileUrl?.(files?.[newIndex]?.url || '');
+        return newIndex;
+      }),
+    [files, setOpenFileUrl],
+  );
+
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files?.[selectedIndex] : null;
+  const selectedItemContentType = selectedItem?.info?.type || selectedItem?.type;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = (
-    { url, info, name }: { url: string; name?: string; info?: { width: number } },
-    contentWrapperRef,
-  ) => {
+  const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
     let content = null;
-    const fileExtension = getFileExtensionFromUrl(url);
 
-    const isText = ['csv', 'txt'].includes(fileExtension);
-    const isPdf = fileExtension === 'pdf';
+    const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
+    const isPdf = 'application/pdf' === selectedItemContentType;
 
     if (isText) {
       content = <UploadedFilePreview size={288} url={url} alt={name} showFileName fileName={name} color="black.200" />;
     } else if (isPdf) {
       content = <PDFViewer pdfUrl={url} contentWrapperRef={contentWrapperRef} />;
     } else {
-      const { width: imageWidth } = info || {};
-      const maxWidth = 1200;
-      const resizeWidth = Math.min(maxWidth, imageWidth ?? maxWidth);
-      content = <StyledImg src={imagePreview(url, null, { width: resizeWidth })} alt={name} />;
+      content = <StyledImg src={url} alt={name} />;
     }
 
     return <Content>{content}</Content>;
@@ -205,7 +219,7 @@ export default function FilesViewerModal({
       }}
     >
       <DialogPrimitive.Content
-        className="fixed left-0 top-0 z-[3000] flex h-screen w-screen items-center justify-center xl:w-[calc(100vw-var(--drawer-width,0px))]"
+        className="fixed top-0 left-0 z-3000 flex h-screen w-screen items-center justify-center xl:w-[calc(100vw-var(--drawer-width,0px))]"
         onInteractOutside={e => {
           if (allowOutsideInteraction) {
             e.preventDefault();
@@ -217,13 +231,13 @@ export default function FilesViewerModal({
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
             className={clsx(
-              'absolute inset-0 z-[1500] bg-foreground/25 backdrop-blur-sm',
+              'absolute inset-0 z-1500 backdrop-blur-xs',
               open ? 'animate-in fade-in-0' : 'animate-out fade-out-0',
             )}
             onClick={onClose}
           />
         ) : (
-          <DialogOverlay onClick={onClose} className="absolute z-[1500] backdrop-blur-sm" />
+          <DialogOverlay onClick={onClose} className="absolute z-1500 backdrop-blur-xs" />
         )}
 
         <Header>
@@ -245,7 +259,8 @@ export default function FilesViewerModal({
                 </Span>
               ) : null}
 
-              <Span>{selectedItem?.name}</Span>
+              {/* Items descriptions can contain HTML entities from the rich text editor, we need to decode them */}
+              <Span>{selectedItem?.name ? unescape(selectedItem.name) : ''}</Span>
             </Span>
           </Box>
           <Flex alignItems="center" gridGap={2}>
@@ -256,13 +271,7 @@ export default function FilesViewerModal({
                 content={intl.formatMessage({ id: 'Download', defaultMessage: 'Download' })}
                 delayHide={0}
               >
-                <ButtonLink
-                  /* To enable downloading files from S3 directly we're using a /api/download-file endpoint
-                 to stream the file and set the correct headers. */
-                  href={`/api/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
-                  download
-                  target="_blank"
-                >
+                <ButtonLink href={generateDownloadUrlForFileUrl(selectedItem?.url)} download target="_blank">
                   <Download size={24} />
                 </ButtonLink>
               </StyledTooltip>
@@ -279,16 +288,18 @@ export default function FilesViewerModal({
                 </ButtonLink>
               </StyledTooltip>
             )}
-            <StyledTooltip
-              containerCursor="pointer"
-              noArrow
-              content={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
-              delayHide={0}
-            >
-              <Button onClick={onClose}>
-                <X size="24" aria-hidden="true" />
-              </Button>
-            </StyledTooltip>
+            {!hideCloseButton && (
+              <StyledTooltip
+                containerCursor="pointer"
+                noArrow
+                content={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
+                delayHide={0}
+              >
+                <Button onClick={onClose}>
+                  <X size="24" aria-hidden="true" />
+                </Button>
+              </StyledTooltip>
+            )}
           </Flex>
         </Header>
         {hasMultipleFiles && (
@@ -309,7 +320,7 @@ export default function FilesViewerModal({
 
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
-          className="z-[3000] flex max-h-screen w-full justify-center overflow-y-auto px-4 py-16"
+          className="z-3000 flex max-h-screen w-full justify-center overflow-y-auto px-4 py-16"
           onClick={e => {
             if (e.target === e.currentTarget) {
               onClose();

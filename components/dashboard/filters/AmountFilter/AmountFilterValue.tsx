@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency } from '@/lib/graphql/types/v2/schema';
 
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 
 import type { AmountFilterValueType } from './schema';
 import { AmountFilterType } from './schema';
@@ -12,15 +12,7 @@ const Amount = ({ amount, currency }: { amount: number; currency?: Currency }) =
   if (!currency) {
     return amount ? amount / 100 : '';
   }
-  return (
-    <FormattedMoneyAmount
-      amount={amount}
-      currency={currency}
-      precision="auto"
-      amountStyles={{ fontWeight: 'normal' }}
-      showCurrencyCode={false}
-    />
-  );
+  return <FormattedMoneyAmount amount={amount} currency={currency} precision="auto" showCurrencyCode={false} />;
 };
 
 const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueType; currency: Currency }) => {

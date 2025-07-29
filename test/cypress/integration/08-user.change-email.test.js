@@ -1,3 +1,5 @@
+import * as cheerio from 'cheerio';
+
 import { defaultTestUserEmail } from '../support/data';
 import { randomEmail } from '../support/faker';
 
@@ -7,7 +9,7 @@ describe('Users can change their email address', () => {
 
   before(() => {
     cy.signup({ redirect: '/tos' }).then(u => (user = u));
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     newEmail = randomEmail();
   });
 
@@ -35,15 +37,20 @@ describe('Users can change their email address', () => {
   });
 
   it('sends a confirmation email to confirm the change', () => {
-    cy.openEmail(({ subject }) => subject.includes(`Confirm your email ${newEmail} on Open Collective`));
-    cy.contains(`We need to verify that ${newEmail} is correct by clicking this button:`);
-    cy.contains('a', 'Confirm Email').click();
+    const subject = `Confirm your email ${newEmail} on Open Collective`;
 
-    // Show loading state
-    cy.contains('Validating your email address...');
-
-    // Then ensure we validate the change
-    cy.contains('Your email has been changed');
+    cy.openEmail(({ Subject }) => Subject.includes(subject)).then(email => {
+      const $html = cheerio.load(email.HTML);
+      expect($html('body').text()).to.contain(`We need to verify that ${newEmail} is correct by clicking this button:`);
+      const confirmLink = $html('a:contains("Confirm Email")');
+      const parsedLink = new URL(confirmLink.attr('href'));
+      cy.visit(parsedLink.pathname + parsedLink.search);
+      cy.contains('Validating your email address...');
+      // Show loading state
+      cy.contains('Validating your email address...');
+      // Then ensure we validate the change
+      cy.contains('Your email has been changed');
+    });
   });
 
   it('shows an error if validation link is invalid/expired', () => {
@@ -59,11 +66,9 @@ describe('Users can change their email address', () => {
     cy.contains('[data-cy=EditUserEmailForm] button', 'Confirm new email').click();
     cy.contains('[data-cy=EditUserEmailForm] button', 'Re-send confirmation').click();
     cy.wait(1000);
-    cy.getInbox().then(emails => {
-      const confirmationEmails = emails.filter(({ subject }) =>
-        subject.includes(`Confirm your email ${emailForDoubleConfirmation} on Open Collective`),
-      );
-      expect(confirmationEmails).to.have.length(2);
+    cy.mailpitGetEmailsBySubject(`Confirm your email ${emailForDoubleConfirmation} on Open Collective`).then(result => {
+      expect(result).to.have.property('messages');
+      expect(result.messages).to.have.length(2);
     });
   });
 });

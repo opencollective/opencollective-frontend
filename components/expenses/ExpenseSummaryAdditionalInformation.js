@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -7,10 +6,12 @@ import styled from 'styled-components';
 import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { INVITE, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -26,22 +27,9 @@ import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 
+import EditExpenseDialog from './EditExpenseDialog';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
-
-const CreatedByUserLink = ({ account }) => {
-  return (
-    <LinkCollective collective={account}>
-      <Span color="black.800" fontWeight={500} textDecoration="none">
-        {account ? account.name : <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
-      </Span>
-    </LinkCollective>
-  );
-};
-
-CreatedByUserLink.propTypes = {
-  account: PropTypes.object,
-};
 
 const PrivateInfoColumn = styled(Box).attrs({ flexBasis: [0, '185px'] })`
   background: #f9fafb;
@@ -75,7 +63,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidInvoices.valueInCents}
                 currency={stats.totalPaidInvoices.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             totalPaidReceipts: (
@@ -83,7 +70,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidReceipts.valueInCents}
                 currency={stats.totalPaidReceipts.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             totalPaidGrants: (
@@ -91,7 +77,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidGrants.valueInCents}
                 currency={stats.totalPaidGrants.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             currentYear: <span>{currentYear}</span>,
@@ -107,9 +92,9 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
 const ExpenseSummaryAdditionalInformation = ({
   expense,
   host,
-  isLoading,
-  isLoadingLoggedInUser,
-  isDraft,
+  isLoading = false,
+  isLoadingLoggedInUser = false,
+  isDraft = false,
   collective,
 }) => {
   const intl = useIntl();
@@ -119,6 +104,12 @@ const ExpenseSummaryAdditionalInformation = ({
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === ExpenseStatus.PAID;
+  const { LoggedInUser } = useLoggedInUser();
+  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
+  )
+    ? expense?.permissions || {}
+    : {};
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -137,7 +128,22 @@ const ExpenseSummaryAdditionalInformation = ({
     >
       {collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
-          <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+          <div className="flex justify-between gap-2">
+            <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+
+            {canEditPaidBy && (
+              <EditExpenseDialog
+                field={'paidBy'}
+                expense={expense}
+                title={intl.formatMessage({ defaultMessage: 'Edit paid by', id: 'expense.editPaidBy' })}
+                description={intl.formatMessage({
+                  defaultMessage: 'You can move the expense within the Collective',
+                  id: 'expense.editPaidBy.description',
+                })}
+                dialogContentClassName="sm:max-w-xl"
+              />
+            )}
+          </div>
           <AccountHoverCard
             account={collective}
             trigger={
@@ -172,7 +178,6 @@ const ExpenseSummaryAdditionalInformation = ({
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
-                  amountStyles={null}
                 />
               </Box>
             </Container>
@@ -201,13 +206,24 @@ const ExpenseSummaryAdditionalInformation = ({
         </PrivateInfoColumn>
       )}
       <PrivateInfoColumn data-cy="expense-summary-payee">
-        <PrivateInfoColumnHeader>
-          {isPaid ? (
-            <FormattedMessage id="Expense.PaidTo" defaultMessage="Paid to" />
-          ) : (
-            <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+        <div className="flex justify-between gap-2">
+          <PrivateInfoColumnHeader>
+            {isPaid ? (
+              <FormattedMessage id="Expense.PaidTo" defaultMessage="Paid to" />
+            ) : (
+              <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+            )}
+          </PrivateInfoColumnHeader>
+          {canEditPayee && (
+            <EditExpenseDialog
+              field={'payee'}
+              expense={expense}
+              title={intl.formatMessage({ defaultMessage: 'Edit payee', id: 'expense.editPayee' })}
+              dialogContentClassName="sm:max-w-xl"
+            />
           )}
-        </PrivateInfoColumnHeader>
+        </div>
+
         <AccountHoverCard
           account={payee}
           includeAdminMembership={{
@@ -262,9 +278,20 @@ const ExpenseSummaryAdditionalInformation = ({
         )}
       </PrivateInfoColumn>
       <PrivateInfoColumn mr={0}>
-        <PrivateInfoColumnHeader>
-          <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-        </PrivateInfoColumnHeader>
+        <div className="flex justify-between gap-2">
+          <PrivateInfoColumnHeader>
+            <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+          </PrivateInfoColumnHeader>
+          {canEditPayoutMethod && (
+            <EditExpenseDialog
+              field={'payoutMethod'}
+              expense={expense}
+              title={intl.formatMessage({ defaultMessage: 'Edit payout method', id: 'EditPayoutMethod' })}
+              dialogContentClassName="sm:max-w-xl"
+            />
+          )}
+        </div>
+
         <Container fontSize="14px" color="black.700">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
             <PayoutMethodTypeWithIcon
@@ -275,7 +302,7 @@ const ExpenseSummaryAdditionalInformation = ({
                     ? VIRTUAL_CARD
                     : expense.payoutMethod?.type
               }
-              name={expense?.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
+              name={expense.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
             />
           </Box>
           <Container data-cy="expense-summary-payout-method-data" wordBreak="break-word">
@@ -300,110 +327,6 @@ const ExpenseSummaryAdditionalInformation = ({
       </PrivateInfoColumn>
     </Flex>
   );
-};
-
-PayeeTotalPayoutSumTooltip.propTypes = {
-  stats: PropTypes.shape({
-    totalPaidInvoices: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }).isRequired,
-    totalPaidReceipts: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }).isRequired,
-    totalPaidGrants: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }).isRequired,
-  }),
-};
-
-ExpenseSummaryAdditionalInformation.propTypes = {
-  /** Set this to true if the expense is not loaded yet */
-  isLoading: PropTypes.bool,
-  /** Set this to true if this shoud use information from expense.draft property */
-  isDraft: PropTypes.bool,
-  /** Set this to true if the logged in user is currenltly loading */
-  isLoadingLoggedInUser: PropTypes.bool,
-  host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  /** Must be provided if isLoading is false */
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    description: PropTypes.string,
-    longDescription: PropTypes.string,
-    currency: PropTypes.string,
-    invoiceInfo: PropTypes.string,
-    createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    tags: PropTypes.arrayOf(PropTypes.string),
-    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
-    draft: PropTypes.shape({
-      payee: PropTypes.object,
-      payeeLocation: PropTypes.object,
-      payoutMethod: PropTypes.object,
-    }),
-    payee: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-      isAdmin: PropTypes.bool,
-      isInvite: PropTypes.bool,
-      stats: PropTypes.shape({
-        totalPaidInvoices: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }).isRequired,
-        totalPaidReceipts: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }).isRequired,
-        totalPaidGrants: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }).isRequired,
-      }),
-    }),
-    payeeLocation: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-    createdByAccount: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-    }),
-    payoutMethod: PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-      data: PropTypes.object,
-    }),
-    virtualCard: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      last4: PropTypes.string,
-    }),
-  }),
-  collective: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    isActive: PropTypes.bool,
-    type: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    legalName: PropTypes.string,
-    stats: PropTypes.shape({
-      balanceWithBlockedFunds: PropTypes.object,
-    }),
-    hostAgreements: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
 };
 
 export default ExpenseSummaryAdditionalInformation;

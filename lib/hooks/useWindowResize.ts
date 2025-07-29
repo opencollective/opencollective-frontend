@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { throttle } from 'lodash';
 
-import { BREAKPOINTS, getViewportFromWidth, VIEWPORTS } from '../withViewport';
+import { BREAKPOINTS, getViewportFromMaxWidth, getViewportFromMinWidth, VIEWPORTS } from '../withViewport';
 
 export { BREAKPOINTS, VIEWPORTS };
 
-export const useWindowResize = (onResizeCallback?) => {
+export const useWindowResize = (onResizeCallback?, options?: { useMinWidth?: boolean }) => {
   const [viewport, setViewport] = useState<VIEWPORTS>(VIEWPORTS.UNKNOWN);
   const callback = (...args) => {
-    const newViewport = getViewportFromWidth(window.innerWidth);
+    const newViewport = (options?.useMinWidth ? getViewportFromMinWidth : getViewportFromMaxWidth)(window.innerWidth);
     setViewport(newViewport);
     onResizeCallback?.(...args);
   };

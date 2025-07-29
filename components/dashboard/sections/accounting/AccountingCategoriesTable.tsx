@@ -1,15 +1,16 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { Edit, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
-  AccountingCategory,
   AccountingCategoryTableQuery,
   AccountingCategoryTableQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { I18nItalic } from '../../../I18nFormatters';
@@ -25,6 +26,7 @@ import { AccountingCategoryAppliesToI18n, AccountingCategoryKindI18n } from './A
 type AccountingCategoriesTableMeta = {
   disabled?: boolean;
   onDelete: (category: AccountingCategory) => void;
+  onRowEdit: (category: AccountingCategory) => void;
 };
 
 const columns = [
@@ -49,7 +51,7 @@ const columns = [
         <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
           {cell.getValue()}
           {row.original.friendlyName && (
-            <span className="font-normal italic text-slate-700">&nbsp;·&nbsp;{row.original.friendlyName}</span>
+            <span className="font-normal text-slate-700 italic">&nbsp;·&nbsp;{row.original.friendlyName}</span>
           )}
         </div>
       );
@@ -77,7 +79,8 @@ const columns = [
     accessorKey: 'appliesTo',
     header: () => <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />,
     cell: ({ cell }) => {
-      return <FormattedMessage {...AccountingCategoryAppliesToI18n[cell.getValue()]} />;
+      const value = cell.getValue();
+      return <FormattedMessage {...AccountingCategoryAppliesToI18n[value || 'ALL']} />;
     },
   },
   {
@@ -116,9 +119,23 @@ const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              className="cursor-pointer text-red-500"
-              onClick={() => (table.options.meta as AccountingCategoriesTableMeta).onDelete(row.original)}
+              className="cursor-pointer"
+              onClick={e => {
+                (table.options.meta as AccountingCategoriesTableMeta).onRowEdit(row.original);
+                e.stopPropagation();
+              }}
             >
+              <Edit size={16} />
+              <FormattedMessage id="Edit" defaultMessage="Edit" />
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer text-red-500"
+              onClick={e => {
+                (table.options.meta as AccountingCategoriesTableMeta).onDelete(row.original);
+                e.stopPropagation();
+              }}
+            >
+              <Trash2 size={16} />
               <FormattedMessage id="actions.delete" defaultMessage="Delete" />
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -140,6 +157,7 @@ type AccountingCategoriesTableProps = {
 
 export function AccountingCategoriesTable(props: AccountingCategoriesTableProps) {
   const [selectedCategoryId, setSelectedCategoryId] = React.useState(null);
+  const [isInitiallyEditing, setIsInitiallyEditing] = React.useState(false);
 
   const selectedCategory = React.useMemo(
     () => selectedCategoryId && props.accountingCategories.find(c => c.id === selectedCategoryId),
@@ -190,6 +208,10 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
           {
             disabled: !props.isAdmin,
             onDelete: props.onDelete,
+            onRowEdit: category => {
+              setSelectedCategoryId(category.id);
+              setIsInitiallyEditing(true);
+            },
           } as AccountingCategoriesTableMeta
         }
         onClickRow={row => setSelectedCategoryId(row.original.id)}
@@ -201,6 +223,7 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
         onClose={() => setSelectedCategoryId(null)}
         onEdit={props.onEdit}
         onDelete={props.onDelete}
+        isInitiallyEditing={isInitiallyEditing}
       />
     </React.Fragment>
   );

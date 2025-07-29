@@ -8,7 +8,7 @@ import { Button } from '../ui/Button';
 
 export function CrowdfundingPreviewBanner({ account }) {
   return (
-    <div className="z-10 flex h-14 w-full items-center justify-center bg-blue-100 px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+    <div className="z-10 flex min-h-14 w-full items-center justify-center bg-blue-100 px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">
       <div className="flex items-center gap-4">
         <FlaskConical className="h-4 w-4" />
         <span>

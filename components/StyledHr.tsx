@@ -1,4 +1,3 @@
-import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import type React from 'react';
 import styled from 'styled-components';
@@ -15,6 +14,8 @@ type StyledHrProps = SpaceProps &
 
 /**
  * An horizontal line. Control the color and size using border properties.
+ *
+ * @deprecated Use `ui/Separator` instead
  */
 const StyledHr = styled.hr<StyledHrProps>`
   border: 0;
@@ -29,15 +30,6 @@ const StyledHr = styled.hr<StyledHrProps>`
   ${border}
   ${display}
 `;
-
-StyledHr.propTypes = {
-  ...propTypes.space,
-  ...propTypes.flex,
-  ...propTypes.layout,
-  ...propTypes.shadow,
-  ...propTypes.border,
-  ...propTypes.display,
-};
 
 /** @component */
 export default StyledHr;

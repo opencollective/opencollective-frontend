@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { AlertTriangle } from 'lucide-react';
@@ -55,7 +54,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
   });
 
   return (
-    <StyledModal width="576px" onClose={onClose} data-cy="create-personal-token-modal" {...props}>
+    <StyledModal onClose={onClose} data-cy="create-personal-token-modal" {...props}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
       </ModalHeader>
@@ -159,7 +158,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                         id="preAuthorize2FA-checkbox"
                         onCheckedChange={value => form.setFieldValue(field.name, value)}
                       />
-                      <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
+                      <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs leading-none font-normal">
                         <FormattedMessage
                           defaultMessage="Allow this token to directly use operations that would normally require 2FA"
                           id="JClbMN"
@@ -211,12 +210,6 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
       </Formik>
     </StyledModal>
   );
-};
-
-CreatePersonalTokenModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
-  account: PropTypes.object.isRequired,
 };
 
 export default CreatePersonalTokenModal;

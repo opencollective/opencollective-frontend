@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { omitBy } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 
@@ -66,7 +65,8 @@ const ActivityCategories = {
       'ORDER_PROCESSING',
       'ORDER_PROCESSING_CRYPTO',
       'ORDER_PENDING_CONTRIBUTION_NEW',
-      'ORDER_THANKYOU',
+      'ORDER_PROCESSED',
+      'ORDER_PENDING_CREATED',
       'ORDERS_SUSPICIOUS',
       'PAYMENT_FAILED',
     ],
@@ -174,12 +174,6 @@ const ActivityTypeFilter = ({ account, onChange, value, ...props }) => {
       {...props}
     />
   );
-};
-
-ActivityTypeFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-  account: PropTypes.shape({ type: PropTypes.string }),
 };
 
 export default ActivityTypeFilter;

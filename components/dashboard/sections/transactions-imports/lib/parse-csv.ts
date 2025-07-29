@@ -3,7 +3,7 @@ import { deburr, uniq, words } from 'lodash';
 import type { IntlShape } from 'react-intl';
 
 import dayjs from '../../../../../lib/dayjs';
-import type { Currency, TransactionsImportRowCreateInput } from '../../../../../lib/graphql/types/v2/graphql';
+import type { Currency, TransactionsImportRowCreateInput } from '../../../../../lib/graphql/types/v2/schema';
 import { toNegative } from '../../../../../lib/math';
 
 import type { CSVConfig } from './types';
@@ -131,7 +131,7 @@ export const parseTransactionsCSVFile = async (
           const parsedCSV = parseCSV(csvData, { columns: true, skip_empty_lines: true, delimiter });
           resolve({ delimiter, parsedCSV });
           return;
-        } catch (e) {
+        } catch {
           continue;
         }
       }

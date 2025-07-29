@@ -3,7 +3,7 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterConfig } from '../../../lib/filters/filter-types';
-import { PaymentMethodService, PaymentMethodType } from '../../../lib/graphql/types/v2/graphql';
+import { PaymentMethodService, PaymentMethodType } from '../../../lib/graphql/types/v2/schema';
 import { i18nPaymentMethodService } from '../../../lib/i18n/payment-method-service';
 import { i18nPaymentMethodType } from '../../../lib/i18n/payment-method-type';
 

@@ -1,101 +1,362 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { isNil, omit, omitBy, pick } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import React, { useEffect } from 'react';
+import { gql, useQuery } from '@apollo/client';
+import type { NextRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../../lib/collective';
 import roles from '../../lib/constants/roles';
-import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
-import { parseDateInterval } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../lib/url-helpers';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import type { Account, PaymentMethod, PaymentMethodType, Transaction } from '@/lib/graphql/types/v2/schema';
+import { TransactionKind } from '@/lib/graphql/types/v2/schema';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import type LoggedInUser from '@/lib/LoggedInUser';
+import { cn } from '@/lib/utils';
 
-import { parseAmountRange } from '../budget/filters/AmountFilter';
+import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
+import { childAccountFilter } from '@/components/dashboard/filters/ChildAccountFilter';
+import { Filterbar } from '@/components/dashboard/filters/Filterbar';
+import { Pagination } from '@/components/dashboard/filters/Pagination';
+import {
+  filters as commonFilters,
+  schema as commonSchema,
+  toVariables as commonToVariables,
+} from '@/components/dashboard/sections/transactions/filters';
+import { transactionsQueryCollectionFragment } from '@/components/transactions/graphql/fragments';
+import TransactionsList from '@/components/transactions/TransactionsList';
+
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
+import ExportTransactionsCSVModal from '../dashboard/ExportTransactionsCSVModal';
 import Link from '../Link';
-import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import Pagination from '../Pagination';
-import SearchBar from '../SearchBar';
-import StyledButton from '../StyledButton';
-import StyledCheckbox from '../StyledCheckbox';
-import StyledSpinner from '../StyledSpinner';
+import { Button } from '../ui/Button';
 
-import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
-import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
-import TransactionsDownloadCSV from './TransactionsDownloadCSV';
-import TransactionsFilters from './TransactionsFilters';
-import TransactionsList from './TransactionsList';
+const processingOrderFragment = gql`
+  fragment ProcessingOrderFields on Order {
+    id
+    legacyId
+    nextChargeDate
+    paymentMethod {
+      id
+      service
+      name
+      type
+      expiryDate
+      data
+      balance {
+        value
+        valueInCents
+        currency
+      }
+    }
+    amount {
+      value
+      valueInCents
+      currency
+    }
+    totalAmount {
+      value
+      valueInCents
+      currency
+    }
+    status
+    description
+    createdAt
+    frequency
+    tier {
+      id
+      name
+    }
+    totalDonations {
+      value
+      valueInCents
+      currency
+    }
+    fromAccount {
+      id
+      name
+      slug
+      isIncognito
+      type
+      ... on Individual {
+        isGuest
+      }
+    }
+    toAccount {
+      id
+      slug
+      name
+      type
+      description
+      tags
+      imageUrl
+      settings
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          paypalClientId
+          supportedPaymentMethods
+        }
+      }
+      ... on Organization {
+        host {
+          id
+          slug
+          paypalClientId
+          supportedPaymentMethods
+        }
+      }
+    }
+    platformTipAmount {
+      value
+      valueInCents
+    }
+  }
+`;
 
-const EXPENSES_PER_PAGE = 15;
+export const transactionsPageQuery = gql`
+  query TransactionsPage(
+    $slug: String!
+    $excludeAccount: [AccountReferenceInput!]
+    $limit: Int!
+    $offset: Int!
+    $type: TransactionType
+    $paymentMethodType: [PaymentMethodType]
+    $paymentMethodService: [PaymentMethodService]
+    $amount: AmountRangeInput
+    $minAmount: Int
+    $maxAmount: Int
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $clearedFrom: DateTime
+    $clearedTo: DateTime
+    $searchTerm: String
+    $kind: [TransactionKind]
+    $includeIncognitoTransactions: Boolean
+    $includeGiftCardTransactions: Boolean
+    $includeChildrenTransactions: Boolean
+    $virtualCard: [VirtualCardReferenceInput]
+    $sort: ChronologicalOrderInput
+    $group: [String]
+    $includeHost: Boolean
+    $expenseType: [ExpenseType]
+    $expense: ExpenseReferenceInput
+    $order: OrderReferenceInput
+    $isRefund: Boolean
+    $hasDebt: Boolean
+    $merchantId: [String]
+    $accountingCategory: [String]
+    $paymentMethod: [PaymentMethodReferenceInput]
+    $payoutMethod: PayoutMethodReferenceInput
+  ) {
+    account(slug: $slug) {
+      id
+      legacyId
+      slug
+      name
+      type
+      createdAt
+      isActive
+      imageUrl(height: 256)
+      currency
+      settings
+      features {
+        id
+        ...NavbarFields
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          name
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
+      processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {
+        totalCount
+        nodes {
+          id
+          ...ProcessingOrderFields
+        }
+      }
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+        }
+      }
+    }
 
-export function getVariablesFromQuery(query) {
-  const amountRange = parseAmountRange(query.amount);
-  const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
+    transactions(
+      account: { slug: $slug }
+      excludeAccount: $excludeAccount
+      limit: $limit
+      offset: $offset
+      type: $type
+      paymentMethodType: $paymentMethodType
+      paymentMethodService: $paymentMethodService
+      amount: $amount
+      minAmount: $minAmount
+      maxAmount: $maxAmount
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      clearedFrom: $clearedFrom
+      clearedTo: $clearedTo
+      searchTerm: $searchTerm
+      kind: $kind
+      includeIncognitoTransactions: $includeIncognitoTransactions
+      includeGiftCardTransactions: $includeGiftCardTransactions
+      includeChildrenTransactions: $includeChildrenTransactions
+      includeDebts: true
+      virtualCard: $virtualCard
+      orderBy: $sort
+      group: $group
+      includeHost: $includeHost
+      expenseType: $expenseType
+      expense: $expense
+      order: $order
+      isRefund: $isRefund
+      hasDebt: $hasDebt
+      merchantId: $merchantId
+      accountingCategory: $accountingCategory
+      paymentMethod: $paymentMethod
+      payoutMethod: $payoutMethod
+    ) {
+      ...TransactionsQueryCollectionFragment
+      kinds
+      paymentMethodTypes
+      totalCount
+    }
+  }
+  ${transactionsQueryCollectionFragment}
+  ${accountNavbarFieldsFragment}
+  ${processingOrderFragment}
+`;
 
-  const virtualCardIds = query.virtualCard
-    ? typeof query.virtualCard === 'string'
-      ? [query.virtualCard]
-      : query.virtualCard
-    : null;
-
-  return {
-    offset: parseInt(query.offset) || 0,
-    limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
-    type: query.type,
-    paymentMethodType: parseTransactionPaymentMethodTypes(query.paymentMethodType),
-    status: query.status,
-    tags: query.tag ? [query.tag] : undefined,
-    minAmount: amountRange[0] && amountRange[0] * 100,
-    maxAmount: amountRange[1] && amountRange[1] * 100,
-    payoutMethodType: query.payout,
-    dateFrom,
-    dateTo,
-    searchTerm: query.searchTerm,
-    kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
-    includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
-    includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
-    includeChildrenTransactions: !query.ignoreChildrenTransactions,
-    displayPendingContributions: query.displayPendingContributions !== 'false',
-    virtualCard: virtualCardIds ? virtualCardIds.map(id => ({ id })) : null,
-  };
-}
-
-const convertProcessingOrderIntoTransactionItem = order => ({
-  order,
-  // Since we're filtering for OUTGOING orders, we can assume that the order is from the collective
-  type: TransactionTypes.DEBIT,
-  kind: TransactionKind.CONTRIBUTION,
-  ...pick(order, ['id', 'amount', 'toAccount', 'fromAccount', 'description', 'createdAt', 'paymentMethod']),
+export const schema = commonSchema.extend({
+  account: childAccountFilter.schema,
 });
 
-const Transactions = ({
-  LoggedInUser,
-  transactions,
-  error,
-  account,
-  loading,
-  refetch,
-  variables,
-  router,
-  isDashboard,
-}) => {
-  const intl = useIntl();
+interface TransactionsProps {
+  account?: Pick<Account, 'id' | 'slug' | 'type' | 'settings' | 'currency'> & {
+    childrenAccounts?: {
+      nodes?: unknown[];
+    };
+    processingOrders?: {
+      nodes?: unknown[];
+      totalCount?: number;
+    };
+    parent?: Pick<Account, 'id' | 'slug' | 'name'>;
+    host?: Pick<Account, 'id' | 'slug'>;
+  };
+  transactions?: {
+    totalCount?: number;
+    paymentMethodTypes?: string[];
+    kinds?: string[];
+    nodes?: Array<
+      Pick<Transaction, 'id' | 'createdAt' | 'amount' | 'kind' | 'type'> & {
+        giftCardEmitterAccount?: Pick<Account, 'id' | 'slug' | 'name'>;
+        fromAccount?: Pick<Account, 'id' | 'slug' | 'name'> & {
+          parent?: Pick<Account, 'id' | 'slug' | 'name'>;
+          host?: Pick<Account, 'id' | 'slug'>;
+        };
+        toAccount?: Pick<Account, 'id' | 'slug' | 'name'> & {
+          parent?: Pick<Account, 'id' | 'slug' | 'name'>;
+          host?: Pick<Account, 'id' | 'slug'>;
+        };
+        paymentMethod?: Pick<PaymentMethod, 'id' | 'service' | 'name' | 'type' | 'expiryDate' | 'data'>;
+      }
+    >;
+  };
+  variables?: {
+    offset: number;
+    limit: number;
+    displayPendingContributions: boolean;
+  };
+  loading?: boolean;
+  refetch?(...args: unknown[]): unknown;
+  error?: any;
+  LoggedInUser?: LoggedInUser;
+  query?: {
+    searchTerm?: string;
+    offset?: string;
+    ignoreIncognitoTransactions?: string;
+    ignoreGiftCardsTransactions?: string;
+    ignoreChildrenTransactions?: string;
+    displayPendingContributions?: string;
+  };
+  router?: NextRouter;
+  isDashboard?: boolean;
+}
+
+export const toVariables /* : FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta>*/ = {
+  ...commonToVariables,
+  account: (value, key, meta) => {
+    if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
+      return { includeChildrenTransactions: false };
+    } else if (!value) {
+      return { includeChildrenTransactions: true };
+    } else {
+      return {
+        account: { slug: value },
+        includeChildrenTransactions: false,
+      };
+    }
+  },
+};
+
+const filters /* : FilterComponentConfigs<FilterValues, FilterMeta>*/ = {
+  ...commonFilters,
+  account: childAccountFilter.filter,
+};
+
+export const defaultFilterValues = {
+  kind: [
+    TransactionKind.ADDED_FUNDS,
+    TransactionKind.CONTRIBUTION,
+    TransactionKind.EXPENSE,
+    TransactionKind.BALANCE_TRANSFER,
+  ] as TransactionKind[],
+};
+
+const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) => {
   const prevLoggedInUser = usePrevious(LoggedInUser);
-  const [state, setState] = useState({
-    hasChildren: null,
-    hasGiftCards: null,
-    hasIncognito: null,
-    hasProcessingOrders: null,
+  const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
+
+  const queryFilter = useQueryFilter({
+    schema,
+    toVariables,
+    filters: filters as typeof filters & {},
+    meta: {
+      currency: account.currency,
+      paymentMethodTypes: props.transactions?.paymentMethodTypes as PaymentMethodType[],
+      kinds: props.transactions?.kinds as TransactionKind[],
+      accountSlug: account.slug,
+      childrenAccounts: account.childrenAccounts?.nodes ?? [],
+    },
+    defaultFilterValues,
+    shallow: true,
   });
 
-  const transactionsRoute = isDashboard
-    ? `/dashboard/${account?.slug}/transactions`
-    : `${getCollectivePageCanonicalURL(account)}/transactions`;
+  const { data, error, loading, refetch, previousData } = useQuery(transactionsPageQuery, {
+    variables: {
+      slug: account.slug,
+      includeIncognitoTransactions: true,
+      includeChildrenTransactions: true,
+      ...queryFilter.variables,
+    },
+    fetchPolicy: 'cache-first',
+    context: API_V2_CONTEXT,
+  });
+
+  const transactions = data?.transactions || previousData?.transactions || props.transactions;
 
   // Refetch data when user logs in or out
   useEffect(() => {
@@ -104,42 +365,7 @@ const Transactions = ({
     }
   }, [LoggedInUser]);
 
-  useEffect(() => {
-    const queryParameters = {
-      ...omit(router.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
-    };
-    addParentToURLIfMissing(router, account, `/transactions`, queryParameters);
-    let newState = { ...state };
-    const hasChildren =
-      (transactions?.nodes || []).some(
-        el => el.fromAccount?.parent?.id === account.id || el.toAccount?.parent?.id === account?.id,
-      ) || router.query.ignoreChildrenTransactions;
-    if (isNil(state.hasChildren) && hasChildren) {
-      newState = { ...newState, hasChildren };
-    }
-
-    const hasGiftCards =
-      (transactions?.nodes || []).some(
-        el => el.giftCardEmitterAccount?.id && el.giftCardEmitterAccount?.id === account?.id,
-      ) || router.query.ignoreGiftCardsTransactions;
-    if (isNil(state.hasGiftCards) && hasGiftCards) {
-      newState = { ...newState, hasChildren };
-    }
-
-    const hasIncognito =
-      (transactions?.nodes || []).some(el => el.account?.isIncognito) || router.query.ignoreIncognitoTransactions;
-    if (isNil(state.hasIncognito) && hasIncognito) {
-      newState = { ...newState, hasChildren };
-    }
-
-    const hasProcessingOrders = account?.processingOrders?.totalCount > 0 || router.query.displayPendingContributions;
-    if (isNil(state.hasProcessingOrders) && hasProcessingOrders) {
-      newState = { ...newState, hasChildren };
-    }
-    setState(newState);
-  }, [transactions, account, router.query]);
-
-  function checkCanDownloadInvoices() {
+  const canDownloadInvoice = React.useMemo(() => {
     if (!account || !LoggedInUser) {
       return false;
     } else if (account.type !== 'ORGANIZATION' && !isIndividualAccount(account)) {
@@ -151,155 +377,55 @@ const Transactions = ({
         LoggedInUser.hasRole(roles.ACCOUNTANT, account.host)
       );
     }
-  }
-
-  function buildFilterLinkParams(params) {
-    const queryParameters = omit({ ...router.query, ...params }, [
-      'offset',
-      'collectiveSlug',
-      'slug',
-      'section',
-      'parentCollectiveSlug',
-    ]);
-
-    return { ...omitBy(queryParameters, value => !value), ...pick(queryParameters, ['displayPendingContributions']) };
-  }
-
-  function updateFilters(queryParams) {
-    return router.push({
-      pathname: transactionsRoute,
-      query: buildFilterLinkParams({ ...queryParams, offset: null }),
-    });
-  }
-
-  const hasFilters = Object.entries(router.query).some(([key, value]) => {
-    return !['view', 'offset', 'limit', 'slug'].includes(key) && value;
-  });
-  const canDownloadInvoices = checkCanDownloadInvoices();
-
-  if (!account && loading) {
-    return <Loading />;
-  } else if (!account) {
-    return <MessageBoxGraphqlError error={error} />;
-  }
-
-  const transactionsAndProcessingOrders =
-    state.hasProcessingOrders && variables.displayPendingContributions && !variables.offset
-      ? [
-          ...(account?.processingOrders?.nodes || []).map(convertProcessingOrderIntoTransactionItem),
-          ...(transactions?.nodes || []),
-        ]
-      : transactions?.nodes || [];
+  }, [LoggedInUser, account]);
 
   return (
     <Container>
-      <div className="flex flex-wrap justify-between gap-4">
-        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
-          <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </h1>
-        <div className="w-[276px] flex-grow sm:flex-grow-0">
-          <SearchBar
-            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…', id: 'tTmMmK' })}
-            defaultValue={router.query.searchTerm}
-            height="40px"
-            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
-          />
-        </div>
-      </div>
-      <div className="mx-2 my-2 flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-end">
-        <TransactionsFilters
-          filters={router.query}
-          kinds={transactions?.kinds}
-          paymentMethodTypes={transactions?.paymentMethodTypes}
-          collective={account}
-          onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
-        />
-        <div className="flex justify-evenly">
-          {canDownloadInvoices && (
-            <Link href={`/dashboard/${account.slug}/payment-receipts`}>
-              <StyledButton
-                buttonSize="small"
-                minWidth={140}
-                height={38}
-                width="100%"
-                p="6px 10px"
-                isBorderless
-                whiteSpace="nowrap"
+      <div className="mb-4 flex items-center gap-2">
+        <Filterbar hideSeparator className="grow" {...queryFilter} />
+        <div className="flex shrink items-center gap-2">
+          <ExportTransactionsCSVModal
+            open={displayExportCSVModal}
+            setOpen={setDisplayExportCSVModal}
+            queryFilter={queryFilter}
+            account={account}
+            canCreatePreset={false}
+            trigger={
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full whitespace-nowrap"
+                onClick={() => setDisplayExportCSVModal(true)}
+                data-cy="download-csv"
               >
+                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+              </Button>
+            }
+          />
+          {canDownloadInvoice && (
+            <Button size="sm" variant="outline" className="rounded-full" asChild>
+              <Link href={`/dashboard/${account.slug}/payment-receipts`}>
                 <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
-                <IconDownload size="13px" style={{ marginLeft: '8px' }} />
-              </StyledButton>
-            </Link>
+              </Link>
+            </Button>
           )}
-          <TransactionsDownloadCSV collective={account} query={router.query} width="100%" />
         </div>
       </div>
-
-      <Flex
-        mx="8px"
-        justifyContent="space-between"
-        flexDirection={['column', 'row']}
-        alignItems={['stretch', 'flex-end']}
-      >
-        {state.hasProcessingOrders && (
-          <StyledCheckbox
-            checked={router.query.displayPendingContributions !== 'false' ? true : false}
-            onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
-            label={
-              <FormattedMessage id="transactions.displayPendingContributions" defaultMessage="Display expected funds" />
-            }
-          />
-        )}
-        {state.hasChildren && (
-          <StyledCheckbox
-            name="ignoreChildrenTransactions"
-            checked={router.query.ignoreChildrenTransactions ? true : false}
-            onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked })}
-            label={
-              <FormattedMessage
-                id="transactions.excludeChildren"
-                defaultMessage="Exclude transactions from Projects and Events"
-              />
-            }
-          />
-        )}
-        {state.hasGiftCards && (
-          <StyledCheckbox
-            name="ignoreGiftCardsTransactions"
-            checked={router.query.ignoreGiftCardsTransactions ? true : false}
-            onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked })}
-            label={
-              <FormattedMessage id="transactions.excludeGiftCards" defaultMessage="Exclude Gift Card transactions" />
-            }
-          />
-        )}
-        {state.hasIncognito && (
-          <StyledCheckbox
-            name="ignoreIncognitoTransactions"
-            checked={router.query.ignoreIncognitoTransactions ? true : false}
-            onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked })}
-            label={
-              <FormattedMessage id="transactions.excludeIncognito" defaultMessage="Exclude Incognito transactions" />
-            }
-          />
-        )}
-      </Flex>
-
-      <Box mt={['8px', '23px']}>
+      <div className="mt-4">
         {error ? (
           <MessageBox type="error" withIcon>
             {getErrorFromGraphqlException(error).message}
           </MessageBox>
-        ) : !loading && !transactions?.nodes?.length ? (
+        ) : !loading && !transactions.nodes?.length ? (
           <MessageBox type="info" withIcon data-cy="zero-transactions-message">
-            {hasFilters ? (
+            {queryFilter.hasFilters ? (
               <FormattedMessage
                 id="TransactionsList.Empty"
                 defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
                 values={{
                   ResetLink(text) {
                     return (
-                      <Link data-cy="reset-transactions-filters" href={transactionsRoute}>
+                      <Link data-cy="reset-transactions-filters" href={`/${account.slug}/transactions`}>
                         <span>{text}</span>
                       </Link>
                     );
@@ -310,57 +436,22 @@ const Transactions = ({
               <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
             )}
           </MessageBox>
-        ) : loading ? (
-          <Flex p="16px" justifyContent="center">
-            <StyledSpinner />
-          </Flex>
         ) : (
-          <React.Fragment>
-            <TransactionsList
-              collective={account}
-              transactions={transactionsAndProcessingOrders}
-              displayActions
-              onMutationSuccess={() => refetch()}
-            />
-            <Flex mt={5} justifyContent="center">
-              <Pagination
-                route={`/${account.slug}/transactions`}
-                total={transactions?.totalCount}
-                limit={variables.limit}
-                offset={variables.offset}
-                ignoredQueryParams={['collectiveSlug']}
+          <div className="flex flex-col gap-4">
+            <div className={cn(loading && 'animate-pulse')}>
+              <TransactionsList
+                collective={account}
+                transactions={transactions.nodes}
+                displayActions
+                onMutationSuccess={() => refetch()}
               />
-            </Flex>
-          </React.Fragment>
+            </div>
+            <Pagination queryFilter={queryFilter} total={transactions.totalCount} />
+          </div>
         )}
-      </Box>
+      </div>
     </Container>
   );
-};
-
-Transactions.propTypes = {
-  account: PropTypes.object,
-  transactions: PropTypes.shape({
-    nodes: PropTypes.array,
-    totalCount: PropTypes.number,
-    paymentMethodTypes: PropTypes.array,
-    kinds: PropTypes.array,
-  }),
-  variables: PropTypes.object,
-  loading: PropTypes.bool,
-  refetch: PropTypes.func,
-  error: PropTypes.any,
-  LoggedInUser: PropTypes.object,
-  query: PropTypes.shape({
-    searchTerm: PropTypes.string,
-    offset: PropTypes.string,
-    ignoreIncognitoTransactions: PropTypes.string,
-    ignoreGiftCardsTransactions: PropTypes.string,
-    ignoreChildrenTransactions: PropTypes.string,
-    displayPendingContributions: PropTypes.string,
-  }),
-  router: PropTypes.object,
-  isDashboard: PropTypes.bool,
 };
 
 export default Transactions;

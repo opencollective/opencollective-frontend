@@ -1,111 +1,56 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
-import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
-import { cn } from '../../../../lib/utils';
+import formatAccountType from '@/lib/i18n/account-type';
+
+import type { BaseModalProps } from '@/components/ModalContext';
+import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
-import { Label } from '../../../ui/Label';
-
-export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
-  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
-}
-
-const DEFAULT_LABEL_STYLE = 'rounded px-1 py-0.5 text-xs';
+import AddFundsModal from '../collectives/AddFundsModal';
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      const { intl } = table.options.meta as {
+        intl: IntlShape;
+      };
       const account = row.original;
       return (
-        <div className="flex items-center">
-          <Avatar collective={account} className="mr-4" radius={48} />
-          {account.isFrozen && (
-            <Badge type="info" size="xs" className="mr-2">
-              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Avatar collective={account} className="" radius={32} />
+            <p className="truncate text-sm text-foreground">{account.name}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge type="outline" size="sm">
+              {formatAccountType(intl, account.type)}
             </Badge>
-          )}
-          <div className="flex flex-col items-start">
-            <div className="flex items-center text-sm">{account.name}</div>
+            {account.isFrozen && (
+              <Badge type="info" size="sm" className="">
+                <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+              </Badge>
+            )}
+            {!account.isActive && (
+              <Badge size="sm">
+                <FormattedMessage id="Archived" defaultMessage="Archived" />
+              </Badge>
+            )}
           </div>
         </div>
       );
     },
   },
-  status: {
-    accessorKey: 'status',
-    header: () => '',
-    cell: ({ row, table }) => {
-      const { intl } = table.options.meta as {
-        intl: IntlShape;
-      };
-
-      const account = row.original;
-      return (
-        <div className="flex items-center gap-2">
-          <Label className={cn(DEFAULT_LABEL_STYLE, 'border border-slate-500 text-slate-500')}>
-            {formatCollectiveType(intl, account.type)}
-          </Label>
-          <Label
-            className={cn(
-              DEFAULT_LABEL_STYLE,
-              account.isActive ? 'bg-green-200 text-green-600' : 'bg-slate-200 text-slate-600',
-            )}
-          >
-            {account.isActive ? (
-              <FormattedMessage id="Subscriptions.Active" defaultMessage="Active" />
-            ) : (
-              <FormattedMessage id="Archived" defaultMessage="Archived" />
-            )}
-          </Label>
-        </div>
-      );
-    },
-  },
-  raised: {
-    accessorKey: 'raised',
-    header: () => <FormattedMessage id="Raised" defaultMessage="Raised" />,
-    cell: ({ row }) => {
-      const account = row.original;
-      const amount = account.stats.totalAmountReceived;
-      return (
-        <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            showCurrencyCode={false}
-            amountStyles={{}}
-          />
-        </div>
-      );
-    },
-  },
-  spent: {
-    accessorKey: 'spent',
-    header: () => <FormattedMessage defaultMessage="Spent" id="111qQK" />,
-    cell: ({ row }) => {
-      const account = row.original;
-      const amount = account.stats.totalAmountSpent;
-      return (
-        <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            showCurrencyCode={false}
-            amountStyles={{}}
-          />
-        </div>
-      );
-    },
-  },
   balance: {
+    meta: {
+      align: 'right',
+    },
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
@@ -113,14 +58,33 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const balance = account.stats.balance;
       return (
         <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={balance.valueInCents}
-            currency={balance.currency}
-            showCurrencyCode={false}
-            amountStyles={{}}
-          />
+          <FormattedMoneyAmount amount={balance.valueInCents} currency={balance.currency} showCurrencyCode={false} />
         </div>
       );
     },
   },
 };
+
+export function AddFundsModalAccount({
+  collective,
+  host,
+  open,
+  setOpen,
+}: {
+  collective?: React.ComponentProps<typeof AddFundsModal>['collective'];
+  host?: React.ComponentProps<typeof AddFundsModal>['host'];
+} & BaseModalProps) {
+  if (!open) {
+    return null;
+  }
+
+  return <AddFundsModal onClose={() => setOpen(false)} host={host} collective={collective} />;
+}
+
+export function ExpenseFlowModal({ collective, open, setOpen }) {
+  if (!open) {
+    return null;
+  }
+
+  return <SubmitExpenseFlow submitExpenseTo={collective.slug} onClose={() => setOpen(false)} />;
+}

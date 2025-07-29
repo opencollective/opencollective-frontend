@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
@@ -13,19 +12,22 @@ import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { get } from 'lodash';
 import { ArrowRightLeft, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
+import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
+import { useToast } from '../ui/useToast';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
@@ -45,11 +47,11 @@ const Action = styled.button`
 
   color: ${props => props.theme.colors.black[900]};
 
-  :hover {
+  &:hover {
     color: ${props => props.theme.colors.black[700]};
   }
 
-  :focus {
+  &:focus {
     color: ${props => props.theme.colors.black[700]};
     text-decoration: underline;
   }
@@ -86,12 +88,16 @@ const ExpenseMoreActionsButton = ({
   onModalToggle,
   onDelete,
   isViewingExpenseInHostContext = false,
+  enableKeyboardShortcuts,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
   const { account } = React.useContext(DashboardContext);
+  const { toast } = useToast();
+  const intl = useIntl();
+
   const router = useRouter();
   const permissions = expense?.permissions;
 
@@ -99,12 +105,32 @@ const ExpenseMoreActionsButton = ({
     expense,
   });
 
+  useKeyboardKey({
+    keyMatch: H,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('HOLD');
+      }
+    },
+  });
+  useKeyboardKey({
+    keyMatch: I,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('MARK_AS_INCOMPLETE');
+      }
+    },
+  });
+  const { LoggedInUser } = useLoggedInUser();
+
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
     onModalToggle?.(isOpen);
   };
 
-  const viewTransactionsUrl = getTransactionsUrl(account, expense);
+  const viewTransactionsUrl = expense && getTransactionsUrl(account, expense);
 
   if (!permissions) {
     return null;
@@ -137,6 +163,20 @@ const ExpenseMoreActionsButton = ({
                 buttonStyle="dangerSecondary"
                 data-cy="spam-button"
                 onClick={async () => {
+                  const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+
+                  if (isSubmitter) {
+                    toast({
+                      variant: 'error',
+                      message: intl.formatMessage({
+                        id: 'expense.spam.notAllowed',
+                        defaultMessage: "You can't mark your own expenses as spam",
+                      }),
+                    });
+
+                    return;
+                  }
+
                   setProcessModal('MARK_AS_SPAM');
                   setOpen(false);
                 }}
@@ -217,13 +257,14 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
-            {permissions.canEdit && (
+            {onEdit && permissions.canEdit && (
               <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
                 <IconEdit size="16px" />
                 <FormattedMessage id="Edit" defaultMessage="Edit" />
               </Action>
             )}
-            {permissions.canSeeInvoiceInfo &&
+            {!props.hasAttachedInvoiceFile &&
+              permissions.canSeeInvoiceInfo &&
               [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
                 <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
                   {({ isLoading, downloadInvoice }) => (
@@ -300,36 +341,6 @@ const ExpenseMoreActionsButton = ({
       )}
     </React.Fragment>
   );
-};
-
-ExpenseMoreActionsButton.propTypes = {
-  isDisabled: PropTypes.bool,
-  expense: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    legacyId: PropTypes.number.isRequired,
-    type: PropTypes.oneOf(Object.values(expenseTypes)),
-    payee: PropTypes.shape({ id: PropTypes.string.isRequired }),
-    receivedTaxForms: PropTypes.shape({ nodes: PropTypes.array }),
-    permissions: PropTypes.shape({
-      canEdit: PropTypes.bool,
-      canSeeInvoiceInfo: PropTypes.bool,
-      canMarkAsIncomplete: PropTypes.bool,
-    }),
-    account: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      parent: PropTypes.shape({
-        slug: PropTypes.string.isRequired,
-      }),
-    }),
-  }),
-  /** Called with an error if anything wrong happens */
-  onError: PropTypes.func,
-  onDelete: PropTypes.func,
-  onModalToggle: PropTypes.func,
-  onEdit: PropTypes.func,
-  linkAction: PropTypes.oneOf(['link', 'copy']),
-  isViewingExpenseInHostContext: PropTypes.bool,
 };
 
 export default ExpenseMoreActionsButton;

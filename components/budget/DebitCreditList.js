@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { fadeIn } from '../StyledKeyframes';
@@ -8,21 +7,6 @@ import { fadeIn } from '../StyledKeyframes';
 const DebitCreditItem = styled.div`
   position: relative;
   animation: ${fadeIn} 0.15s;
-`;
-
-/**
- * A list to display CREDIT/DEBIT items, like transactions or expenses. This is
- * built in a generic way so we can use it for either displaying only orders,
- * or only expenses, or both.
- *
- * Please make your children big enough, otherwise the gradient won't show.
- */
-const DebitCreditList = styled.div`
-  border: 1px solid #e6e8eb;
-  border-radius: 8px 8px 0 0;
-  & > ${DebitCreditItem}:not(:last-child) {
-    border-bottom: 1px solid #e6e8eb;
-  }
 `;
 
 /** A colored gradient to show the type of the transaction */
@@ -58,8 +42,6 @@ export const DebitItem = ({ children, ...props }) => {
   );
 };
 
-DebitItem.propTypes = { children: PropTypes.node };
-
 /** Displays a credit entry in the list */
 export const CreditItem = ({ children, ...props }) => {
   return (
@@ -69,9 +51,3 @@ export const CreditItem = ({ children, ...props }) => {
     </DebitCreditItem>
   );
 };
-
-CreditItem.propTypes = { children: PropTypes.node };
-
-// used in Stories mdx
-// ts-unused-exports:disable-next-line
-export default DebitCreditList;

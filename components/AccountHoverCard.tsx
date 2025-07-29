@@ -9,12 +9,14 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
+import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
+import type { Amount } from '@/lib/graphql/types/v2/schema';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
+import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';
 import FollowButton from './FollowButton';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
@@ -31,15 +33,32 @@ export const accountHoverCardFields = gql`
     imageUrl
     isHost
     isArchived
+    isVerified
     ... on Individual {
+      id
       isGuest
     }
     ... on AccountWithHost {
       host {
         id
         slug
+        type
+        isTrustedHost
+        isFirstPartyHost
+        isVerified
       }
       approvedAt
+    }
+
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        isTrustedHost
+        isFirstPartyHost
+        isVerified
+      }
     }
 
     ... on AccountWithParent {
@@ -53,26 +72,10 @@ export const accountHoverCardFields = gql`
 
 type AccountHoverCardProps = {
   trigger: React.ReactNode;
-  account: {
-    slug: Account['slug'];
-    name?: Account['name'];
-    type?: Account['type'];
-    imageUrl?: Account['imageUrl'];
-    description?: Account['description'];
-    emails?: Account['emails'];
-    parent?: {
-      slug: Account['slug'];
-    };
-    host?: {
-      slug: Account['slug'];
-    };
-    approvedAt?: AccountWithHost['approvedAt'];
-    hostAgreements?: {
-      totalCount?: AccountWithHost['hostAgreements']['totalCount'];
-    };
+  account: AccountHoverCardFieldsFragment & {
     stats?: {
-      balanceWithBlockedFunds?: Account['stats']['balanceWithBlockedFunds'];
-      totalPaidExpenses?: Account['stats']['totalPaidExpenses'];
+      balanceWithBlockedFunds?: Amount;
+      totalPaidExpenses?: Amount;
     };
   };
   includeAdminMembership?: {
@@ -188,7 +191,6 @@ const getInfoItems = (account): InfoItemProps[] => {
                 <FormattedMoneyAmount
                   amount={get(account, 'stats.balanceWithBlockedFunds.valueInCents', 0)}
                   currency={account.stats.balanceWithBlockedFunds.currency}
-                  amountStyles={{ letterSpacing: 0 }}
                 />
               </span>
             ),
@@ -209,7 +211,6 @@ const getInfoItems = (account): InfoItemProps[] => {
                   amount={account?.stats.totalPaidExpenses.valueInCents}
                   currency={account?.stats.totalPaidExpenses.currency}
                   precision={2}
-                  amountStyles={{ letterSpacing: 0 }}
                 />
               </span>
             ),
@@ -260,7 +261,7 @@ type InfoItemProps = {
 const InfoItem = ({ Icon, info }: InfoItemProps) => (
   <div className="flex items-start gap-2 overflow-hidden text-xs text-muted-foreground">
     <Icon size={14} className="shrink-0" />
-    <span className="[&>a:hover]:text-primary [&>a]:text-foreground [&>a]:underline">{info}</span>
+    <span className="[&>a]:text-foreground [&>a]:underline [&>a:hover]:text-primary">{info}</span>
   </div>
 );
 
@@ -316,7 +317,6 @@ export const AccountHoverCard = ({
 
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
-
   return (
     // HoverCard currently disabled for Vendors (need to fix styling, appropriate links, etc)
     <HoverCard open={open && !isVendor} onOpenChange={setOpen}>
@@ -339,15 +339,18 @@ export const AccountHoverCard = ({
             </div>
 
             <div className="overflow-hidden">
-              <Link href={getCollectivePageRoute(account)}>
-                <span className="block truncate font-medium hover:underline">{account.name}</span>
-              </Link>
+              <div className="flex items-center gap-1">
+                <Link href={getCollectivePageRoute(account)}>
+                  <span className="block truncate font-medium hover:underline">{account.name}</span>
+                </Link>
+                <AccountTrustBadge account={account} />
+              </div>
               <span className="truncate text-muted-foreground">@{account.slug}</span>
             </div>
           </div>
 
           {account.description && (
-            <div className="line-clamp-1 whitespace-pre-wrap text-sm text-foreground">{account.description}</div>
+            <div className="line-clamp-1 text-sm whitespace-pre-wrap text-foreground">{account.description}</div>
           )}
 
           {(infoItems.length > 0 || asyncInfoItems.length > 0 || loading) && (
@@ -373,7 +376,7 @@ export const AccountHoverCard = ({
             </div>
           )}
 
-          {loading && <StyledSpinner className="absolute right-0 top-0 text-muted-foreground" />}
+          {loading && <StyledSpinner className="absolute top-0 right-0 text-muted-foreground" />}
         </div>
       </HoverCardContent>
     </HoverCard>

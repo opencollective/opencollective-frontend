@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import type { OCError } from '../../lib/errors';
 import { createError, ERROR } from '../../lib/errors';
 import { verifyValueInRange } from '../../lib/form-utils';
-import type { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/graphql';
+import type { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 
 import { Flex } from '../Grid';

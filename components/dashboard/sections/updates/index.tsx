@@ -7,15 +7,16 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
-import { StackedAvatars } from '../../../Avatar';
 import EmojiReactions from '../../../conversations/EmojiReactions';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import StackedAvatars from '../../../StackedAvatars';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
 import { DashboardContext } from '../../DashboardContext';
@@ -57,7 +58,7 @@ const UpdatePost = ({ update, account }) => {
         </div>
       </div>
       {update.summary && <HTMLContent content={update.summary} />}
-      <div className="flex flex-grow justify-between">
+      <div className="flex grow justify-between">
         <div>
           <EmojiReactions reactions={update.reactions} />
         </div>
@@ -151,7 +152,7 @@ const UpdatesList = () => {
   const updates = data?.account?.updates;
 
   return (
-    <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
+    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-6">
         <DashboardHeader
           title={<FormattedMessage id="updates" defaultMessage="Updates" />}
@@ -185,7 +186,9 @@ const UpdatesList = () => {
             />
           ) : (
             <React.Fragment>
-              {updates?.nodes?.map(update => <UpdatePost key={update.id} update={update} account={account} />)}
+              {updates?.nodes?.map(update => (
+                <UpdatePost key={update.id} update={update} account={account} />
+              ))}
               <Pagination total={(data || previousData)?.account?.updates?.totalCount} queryFilter={queryFilter} />
             </React.Fragment>
           )}
@@ -200,11 +203,11 @@ enum UpdateDashboardAction {
   NEW = 'new',
 }
 
-const Updates = ({ subpath }: DashboardSectionProps) => {
+const Updates = ({ subpath, accountSlug }: DashboardSectionProps) => {
   const [action, id] = subpath;
 
   if (Object.values(UpdateDashboardAction).includes(action as UpdateDashboardAction)) {
-    return <UpdateFormView updateId={action === UpdateDashboardAction.EDIT ? id : null} />;
+    return <UpdateFormView updateId={action === UpdateDashboardAction.EDIT ? id : null} accountSlug={accountSlug} />;
   } else if (action) {
     return <SingleUpdateView updateId={action} />;
   } else {

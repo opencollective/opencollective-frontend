@@ -1,4 +1,5 @@
 import React from 'react';
+import { partition } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import type { FilterComponentConfigs, resetFilters, SetFilter, Views } from '../../../lib/filters/filter-types';
@@ -33,77 +34,114 @@ function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   return { displayedFilters, remainingFilters };
 }
 
+const renderFilter = ({ filters, values, key, activeViewId, intl, meta, setFilter }) => {
+  const filter = filters[key];
+
+  if (!filter) {
+    return null;
+  } else if (filter.StandaloneComponent) {
+    return (
+      <filter.StandaloneComponent
+        key={key}
+        value={values[key]}
+        labelMsg={filter.labelMsg}
+        onChange={val => setFilter(key, val)}
+        isViewActive={!!activeViewId}
+        intl={intl}
+        meta={meta}
+      />
+    );
+  } else {
+    return (
+      <FilterDropdown
+        key={key}
+        filterKey={key}
+        values={values}
+        filters={filters}
+        setFilter={setFilter}
+        isViewActive={!!activeViewId}
+        meta={meta}
+      />
+    );
+  }
+};
+
 export function Filterbar<FV extends Record<string, any>, FM>({
   values,
   filters,
   views,
   setFilter,
   resetFilters,
+  onViewChange,
   meta,
   activeViewId,
   defaultSchemaValues,
   className,
   hideSeparator,
+  primaryFilters,
+  primaryFilterClassName,
 }: {
   values: FV;
   filters: FilterComponentConfigs<FV, FM>;
   views?: Views<FV>;
   resetFilters?: resetFilters<FV>;
+  onViewChange?: (view: Views<FV>[number]) => void;
   setFilter: SetFilter<FV>;
   meta?: FM;
   activeViewId?: string;
   defaultSchemaValues?: Partial<FV>;
   className?: string;
   hideSeparator?: boolean;
+  primaryFilters?: string[];
+  primaryFilterClassName?: string;
 }) {
   const intl = useIntl();
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
   const sortFilterKey = filters.sort ? 'sort' : filters.orderBy ? 'orderBy' : null;
-  const sortFilter = filters.sort || filters.orderBy;
+  const sortFilter = filters[sortFilterKey];
+  const [filtersOnTop, regularFilters] = React.useMemo(() => {
+    if (!primaryFilters) {
+      return [[], displayedFilters];
+    } else {
+      return partition(displayedFilters, filterKey => primaryFilters.includes(filterKey));
+    }
+  }, [displayedFilters, primaryFilters]);
+
+  const onTabChange = React.useCallback(
+    id => {
+      const view = views.find(v => v.id === id);
+      if (view) {
+        if (onViewChange) {
+          onViewChange(view);
+        } else {
+          resetFilters(view.filter);
+        }
+      }
+    },
+    [views, onViewChange, resetFilters],
+  );
+
   return (
     <div className={cn('flex flex-col gap-4', className)}>
-      {views ? (
-        <Tabs
-          tabs={views}
-          selectedId={activeViewId}
-          onChange={id => {
-            const view = views.find(v => v.id === id);
-            if (view) {
-              resetFilters(view.filter);
-            }
-          }}
-        />
-      ) : (
-        !hideSeparator && <Separator />
+      {views ? <Tabs tabs={views} selectedId={activeViewId} onChange={onTabChange} /> : !hideSeparator && <Separator />}
+      {Boolean(filtersOnTop.length) && (
+        <div className={cn('repeat(auto-fit, minmax(200px, 1fr)) grid gap-2 [&_input]:w-full', primaryFilterClassName)}>
+          {filtersOnTop.map(key => {
+            return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter });
+          })}
+          {primaryFilters.includes(sortFilterKey) && (
+            <sortFilter.StandaloneComponent
+              onChange={value => setFilter(sortFilterKey, value)}
+              value={values[sortFilterKey]}
+              intl={intl}
+            />
+          )}
+        </div>
       )}
       <div className="flex flex-wrap justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          {displayedFilters.map(key => {
-            const filter = filters[key];
-            if (filter.StandaloneComponent) {
-              return (
-                <filter.StandaloneComponent
-                  key={key}
-                  value={values[key]}
-                  labelMsg={filter.labelMsg}
-                  onChange={val => setFilter(key, val)}
-                  isViewActive={!!activeViewId}
-                  intl={intl}
-                  meta={meta}
-                />
-              );
-            }
-            return (
-              <FilterDropdown
-                key={key}
-                filterKey={key}
-                values={values}
-                filters={filters}
-                setFilter={setFilter}
-                isViewActive={!!activeViewId}
-                meta={meta}
-              />
-            );
+          {regularFilters.map(key => {
+            return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter });
           })}
 
           {remainingFilters.length > 0 && (
@@ -120,7 +158,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
             />
           )}
         </div>
-        {sortFilterKey && (
+        {sortFilterKey && !primaryFilters?.includes(sortFilterKey) && (
           <div className="flex w-full flex-1 justify-end">
             <sortFilter.StandaloneComponent
               onChange={value => setFilter(sortFilterKey, value)}

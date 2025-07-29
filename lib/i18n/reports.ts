@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { ReportSection } from '../../components/dashboard/sections/reports/preview/types';
+import { ReportSection } from '../../components/dashboard/sections/reports/types';
 
 const MESSAGES = defineMessages({
   [ReportSection.CONTRIBUTIONS]: {

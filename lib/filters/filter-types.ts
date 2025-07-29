@@ -52,15 +52,18 @@ type FilterComponentConfig<FilterValue, Meta = any> = {
   labelMsg?: MessageDescriptor;
   static?: boolean;
   hide?: ({ meta }: { meta: Meta }) => boolean;
+  getDisallowEmpty?: ({ meta }: { meta: Meta }) => boolean;
 } & (DropdownFilter<FilterValue, Meta> | StandaloneFilter<FilterValue, Meta>);
 
 export type FilterComponentConfigs<FilterValues = Record<string, any>, Meta = any> = Partial<{
   [K in keyof FilterValues]: FilterComponentConfig<FilterValues[K], Meta>;
 }>;
 
-export type Views<FV> = {
+export type View<FV> = {
   label: string;
   filter: Partial<FV>;
   id: string;
   count?: number;
-}[];
+};
+
+export type Views<FV> = readonly View<FV>[];

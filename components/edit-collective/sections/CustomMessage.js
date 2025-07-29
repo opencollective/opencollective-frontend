@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
@@ -11,9 +10,9 @@ import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import PreviewModal from '../../PreviewModal';
 import RichTextEditor from '../../RichTextEditor';
-import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
-import { P, Span } from '../../Text';
+import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 
 const updateCustomMessageMutation = gql`
@@ -29,7 +28,7 @@ const updateCustomMessageMutation = gql`
 
 const CustomMessage = ({ collective }) => {
   const thankYouMessage =
-    collective?.settings?.customEmailMessage || collective?.parentCollective?.settings?.customEmailMessage;
+    collective.settings?.customEmailMessage || collective.parentCollective?.settings?.customEmailMessage;
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
   const [isModified, setIsModified] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -89,21 +88,9 @@ const CustomMessage = ({ collective }) => {
           <Box mb={2} fontSize="18px" fontWeight={700} lineHeight="26px">
             <FormattedMessage defaultMessage="Custom Message" id="+jDZdn" />
           </Box>
-          <StyledButton
-            buttonStyle="secondary"
-            buttonSize="tiny"
-            maxWidth="78px"
-            pt="4px"
-            pb="4px"
-            pl="14px"
-            pr="14px"
-            height="24px"
-            onClick={() => setShowPreview(true)}
-          >
-            <Span fontSize="13px" fontWeight={500} lineHeight="16px">
-              <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
-            </Span>
-          </StyledButton>
+          <Button variant="outline" size="xs" className="h-6 max-w-20" onClick={() => setShowPreview(true)}>
+            <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
+          </Button>
         </Flex>
         <RichTextEditor
           kind="ACCOUNT_CUSTOM_EMAIL"
@@ -135,17 +122,16 @@ const CustomMessage = ({ collective }) => {
           </P>
         </MessageBox>
       )}
-      <Flex justifyContent={['center', 'left']}>
-        <StyledButton
+      <div className="mt-4 flex">
+        <Button
+          className="w-full"
           disabled={loading || !isModified}
-          mt="35px"
-          buttonStyle="primary"
           width="157px"
           onClick={() => handleSubmit(customMessage)}
         >
           <FormattedMessage id="save" defaultMessage="Save" />
-        </StyledButton>
-      </Flex>
+        </Button>
+      </div>
       {showPreview && (
         <PreviewModal
           heading={<FormattedMessage defaultMessage="Preview Notification" id="XvKF/A" />}
@@ -163,22 +149,6 @@ const CustomMessage = ({ collective }) => {
       )}
     </Container>
   );
-};
-
-CustomMessage.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    type: PropTypes.string,
-    settings: PropTypes.shape({
-      customEmailMessage: PropTypes.string,
-    }),
-    parentCollective: PropTypes.shape({
-      settings: PropTypes.shape({
-        customEmailMessage: PropTypes.string,
-      }),
-    }),
-  }),
-  isInheritSettings: PropTypes.bool,
 };
 
 export default CustomMessage;

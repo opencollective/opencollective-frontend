@@ -25,7 +25,7 @@ function CollapsibleAccountsList({ accounts, label }) {
   return (
     <div className="rounded-xl border bg-background">
       <Collapsible>
-        <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between p-3 text-sm [&_svg]:data-[state=open]:rotate-180">
+        <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between p-3 text-sm data-[state=open]:[&_svg]:rotate-180">
           <div className="flex w-full flex-1 justify-between">
             <div className="flex items-center gap-2">
               <div className="font-medium">{label}</div>
@@ -39,7 +39,6 @@ function CollapsibleAccountsList({ accounts, label }) {
               <FormattedMoneyAmount
                 amount={totalBalance}
                 currency={accounts[0].stats.balance.currency}
-                amountStyles={{ letterSpacing: 0 }}
                 showCurrencyCode={false}
               />
             </span>
@@ -110,7 +109,7 @@ export function Accounts({ accountSlug }) {
         <div className="space-y-2 rounded-xl border bg-background p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">
-              <FormattedMessage defaultMessage="Main account" id="pE0V//" />
+              <FormattedMessage defaultMessage="Main account" id="AccountType.MainAccount" />
             </span>
           </div>
           {loading ? (
@@ -158,7 +157,6 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
           <FormattedMoneyAmount
             amount={account.stats.balance?.valueInCents}
             currency={account.stats.balance?.currency}
-            amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />
         </span>

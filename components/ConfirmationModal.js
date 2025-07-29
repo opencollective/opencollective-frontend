@@ -1,7 +1,6 @@
 // @deprecated: Use `NewConfirmationModal` instead
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
 import Container from './Container';
@@ -41,6 +40,7 @@ export const CONFIRMATION_MODAL_TERMINATE = { __CONFIRMATION_MODAL_TERMINATE: tr
 /**
  * ConfirmationModal component. Uses `StyledModal` to create a reusable modal mainly for
  * confirmation purpose.
+ * @deprecated: Use `NewConfirmationModal` instead
  */
 const ConfirmationModal = ({
   header = undefined,
@@ -104,31 +104,6 @@ const ConfirmationModal = ({
       </ModalFooter>
     </StyledModal>
   );
-};
-
-ConfirmationModal.propTypes = {
-  /** header of the confirmation modal */
-  header: PropTypes.node.isRequired,
-  /** body of the confirmation modal */
-  children: PropTypes.node,
-  /** Body of the confirmation modal, used in a paragraph if there's no children */
-  body: PropTypes.node,
-  /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
-  /** handles onClick continue button */
-  continueHandler: PropTypes.func.isRequired,
-  /** You can pass a type here to auto-set labels to remove/delete/confirm...etc */
-  type: PropTypes.oneOf(['confirm', 'delete', 'remove']),
-  /** If true, a danger style button will be used for the main button */
-  isDanger: PropTypes.bool,
-  isSuccess: PropTypes.bool,
-  disableSubmit: PropTypes.bool,
-  /** handles onClick cancel button. Defaults to `onClose` prop. */
-  cancelHandler: PropTypes.func,
-  /** continue button label of the confirmation modal. Defaults to `Confirm`. */
-  continueLabel: PropTypes.node,
-  /** cancel button label of the confirmation modal. Defaults to `Cancel`. */
-  cancelLabel: PropTypes.node,
 };
 
 /** @component */

@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 describe('passwords', () => {
@@ -5,6 +6,7 @@ describe('passwords', () => {
 
   before(() => {
     cy.signup({ user: { name: 'Mr Bungle' } }).then(u => (user = u));
+    cy.logout();
   });
 
   it('can be set from the settings page', () => {
@@ -60,7 +62,7 @@ describe('passwords', () => {
     // Passwords must not be the same
     cy.get('input#new-password').type('nope');
     cy.contains('button', 'Update Password').click();
-    cy.contains('[data-cy="password-error"]', "Password can't be the same as current password");
+    cy.contains('[data-cy="password-error"]', "New password can't be the same as current password");
 
     // Password must be strong
     cy.get('input#new-password').type('{selectall}{backspace}12345678');
@@ -119,8 +121,16 @@ describe('passwords', () => {
 
     // Email
     const expectedEmailPart = user.email.split('@')[0]; // On CI, email is replaced by email+bcc. We verify only the first part to have a consistent behavior between local and CI
-    cy.openEmail(({ subject, to }) => to[0].address.includes(expectedEmailPart) && subject.includes('Reset Password'));
-    cy.contains('a', 'Reset your password now').click();
+
+    cy.openEmail(
+      ({ Subject, To }) => To[0].Address.includes(expectedEmailPart) && Subject.includes('Reset Password'),
+    ).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const resetLink = $html('a:contains("Reset your password now")');
+      const href = resetLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname);
+    });
 
     // Reset password page
     // Should have user info displayed
@@ -147,7 +157,7 @@ describe('passwords', () => {
     cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.collective.slug, secret: secret.base32 });
 
     // Sign-in flow
-    cy.visit(`/signin`);
+    cy.visit(`/signin?next=/dashboard/${user.collective.slug}/info`);
     cy.get('input[name="email"]').type(user.email);
     cy.getByDataCy('signin-btn').click();
     cy.get('input[name="password"]:visible').type('strongNewP@ssword<>?');
@@ -158,6 +168,11 @@ describe('passwords', () => {
     cy.contains('Two-factor authentication code failed. Please try again').should.exist;
     const code = speakeasy.totp({ algorithm: 'SHA1', encoding: 'base32', secret: secret.base32 });
     cy.complete2FAPrompt(code);
+
+    // Wait for redirect
+    cy.get('input[name="name"]').should('have.value', 'Mr Bungle');
+
+    // Assert logged in
     cy.assertLoggedIn(user);
   });
 });

@@ -10,6 +10,9 @@ export const LOCAL_STORAGE_KEYS = {
   DASHBOARD_NAVIGATION_STATE: 'DashboardNavigationState',
   PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
   UPDATES_FORM_STATE: 'updatesFormState',
+  RECENTLY_VISITED: 'recentlyVisited',
+  PLAID_LINK_TOKEN: 'plaidLinkToken',
+  GOCARDLESS_DATA: 'gocardlessData',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:
@@ -30,7 +33,7 @@ export const LOCAL_STORAGE_KEYS = {
 export const getFromLocalStorage = (key: string): string => {
   try {
     return window.localStorage.getItem(key);
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -42,7 +45,7 @@ export const getFromLocalStorage = (key: string): string => {
 export const setLocalStorage = (key: string, value: string): void => {
   try {
     window.localStorage.setItem(key, value);
-  } catch (e) {
+  } catch {
     // Ignore errors
   }
 };
@@ -54,41 +57,7 @@ export const setLocalStorage = (key: string, value: string): void => {
 export const removeFromLocalStorage = (key: string): void => {
   try {
     window.localStorage.removeItem(key);
-  } catch (e) {
+  } catch {
     // Ignore errors
-  }
-};
-
-/**
- * Store a value in localStorage with a time-to-live (TTL).
- */
-export const setLocalStorageWithTTL = (key: string, value: object | string | number, ttl = 1000 * 60 * 60) => {
-  if (!value) {
-    return removeFromLocalStorage(key);
-  }
-  const expire = new Date(Date.now() + ttl).getTime();
-  setLocalStorage(key, JSON.stringify({ timestamp: new Date().getTime(), expire, value }));
-};
-
-/**
- * Retrieve a value from localStorage with a time-to-live (TTL).
- */
-export const getFromLocalStorageWithTTL = (key: string) => {
-  const entry = getFromLocalStorage(key);
-  if (!entry) {
-    return;
-  }
-  try {
-    const obj = JSON.parse(entry);
-    if (Number(obj.expire) < Date.now()) {
-      // eslint-disable-next-line no-console
-      console.error('>>> entry for ', key, 'has expired');
-      return;
-    }
-    return obj.value;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('>>> unable to parse entry for ', key, 'entry: ', entry);
-    return;
   }
 };

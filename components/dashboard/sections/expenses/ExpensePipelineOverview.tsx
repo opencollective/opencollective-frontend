@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../../../../lib/api';
 import { createError, ERROR } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/graphql';
+import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../../lib/stripe/dashboard';
 
@@ -187,7 +187,7 @@ function WiseStatus(props: WiseStatusProps) {
         </div>
         <TransferwiseIcon size={16} />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
+      <div className="mt-2 grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={mainBalance?.currency}
@@ -208,7 +208,6 @@ function WiseStatus(props: WiseStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.readyToPayAmount?.valueInCents}
-              amountStyles={null}
             />
 
             {props.readyToPayAmountByCurrency?.length > 0 && (
@@ -229,7 +228,6 @@ function WiseStatus(props: WiseStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.host?.transferwise?.amountBatched?.valueInCents}
-              amountStyles={null}
             />
 
             {props.scheduledForPaymentAmountByCurrency?.length > 0 && (
@@ -307,7 +305,7 @@ function PayPalStatus(props: PayPalStatusProps) {
         />
         <Paypal size={16} />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
+      <div className="mt-2 grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={props.host?.paypalPreApproval?.balance?.currency}
@@ -327,7 +325,6 @@ function PayPalStatus(props: PayPalStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.readyToPayAmount?.valueInCents}
-              amountStyles={null}
             />
 
             {props.readyToPayAmountByCurrency?.length > 0 && (
@@ -348,7 +345,6 @@ function PayPalStatus(props: PayPalStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.scheduledForPaymentAmount?.valueInCents}
-              amountStyles={null}
             />
 
             {props.scheduledForPaymentAmountByCurrency?.length > 0 && (
@@ -384,7 +380,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
         />
         <CcStripe />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
+      <div className="mt-2 grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={props.host?.stripe?.issuingBalance?.currency}

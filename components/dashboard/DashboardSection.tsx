@@ -1,17 +1,16 @@
 import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
-import { OCFBannerWithData } from '../OCFBanner';
 import AccountSettingsForm from '../root-actions/AccountSettings';
 import AccountType from '../root-actions/AccountType';
+import { AnonymizeAccount } from '../root-actions/AnonymizeAccount';
 import BanAccount from '../root-actions/BanAccounts';
 import BanAccountsWithSearch from '../root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../root-actions/ClearCacheForAccountForm';
@@ -38,6 +37,11 @@ import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
+import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
+import { Grants } from './sections/funds-and-grants/Grants';
+import { HostedFunds } from './sections/funds-and-grants/HostedFunds';
+import { HostedGrants } from './sections/funds-and-grants/HostedGrants';
+import { SubmittedGrants } from './sections/funds-and-grants/SubmittedGrants';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
@@ -45,13 +49,15 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
-import HostDashboardReports from './sections/reports/HostDashboardReports';
-import PreviewReports from './sections/reports/preview/Reports';
+import Reports from './sections/reports/Reports';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import AllTransactions from './sections/transactions/AllTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
+import { CSVTransactionsImports } from './sections/transactions-imports/CSVTransactionsImports';
+import { OffPlatformConnections } from './sections/transactions-imports/OffPlatformConnections';
+import { OffPlatformTransactions } from './sections/transactions-imports/OffPlatformTransactions';
 import Updates from './sections/updates';
 import Vendors from './sections/Vendors';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
@@ -71,17 +77,25 @@ import DashboardHeader from './DashboardHeader';
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
+  [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
+  [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
+  [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
-  [SECTIONS.REPORTS]: HostDashboardReports,
+  [SECTIONS.REPORTS]: Reports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.HOSTED_FUNDS]: HostedFunds,
+  [SECTIONS.HOSTED_GRANTS]: HostedGrants,
+  [SECTIONS.GRANTS]: Grants,
+  [SECTIONS.APPROVE_GRANT_REQUESTS]: ApproveGrantRequests,
+  [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
@@ -106,6 +120,7 @@ const ROOT_COMPONENTS = {
   [ALL_SECTIONS.ACTIVITY_LOG]: RootActivityLog,
   [ROOT_SECTIONS.ALL_COLLECTIVES]: AllCollectives,
   [ROOT_SECTIONS.BAN_ACCOUNTS]: BanAccount,
+  [ROOT_SECTIONS.ANONYMIZE_ACCOUNT]: AnonymizeAccount,
   [ROOT_SECTIONS.SEARCH_AND_BAN]: BanAccountsWithSearch,
   [ROOT_SECTIONS.MOVE_AUTHORED_CONTRIBUTIONS]: MoveAuthoredContributions,
   [ROOT_SECTIONS.MOVE_RECEIVED_CONTRIBUTIONS]: MoveReceivedContributions,
@@ -119,7 +134,15 @@ const ROOT_COMPONENTS = {
   [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
 };
 
-const DashboardSection = ({ account, isLoading, section, subpath }) => {
+interface DashboardSectionProps {
+  isLoading?: boolean;
+  section?: string;
+  subpath?: string[];
+  /** The account. Can be null if isLoading is true */
+  account?: DashboardQuery['account'];
+}
+
+const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const { activeSlug } = useContext(DashboardContext);
 
@@ -128,7 +151,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (isLoading) {
     return (
       <div className="w-full pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
       </div>
@@ -144,26 +166,21 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     );
   }
 
-  let DashboardComponent = DASHBOARD_COMPONENTS[section];
+  const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
-    if (section === SECTIONS.REPORTS) {
-      if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)) {
-        DashboardComponent = PreviewReports;
-      }
-    }
     return (
       <div className="w-full pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
+        <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
       </div>
     );
   }
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-screen-lg pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
+      <div className="w-full max-w-(--breakpoint-lg) pb-6">
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
 
         <AccountSettings account={account} section={section} />
       </div>
@@ -174,9 +191,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1 pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
+      // <div className="flex max-w-(--breakpoint-lg) justify-center">
+      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
@@ -184,10 +200,11 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1 pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
+      // <div className="flex max-w-(--breakpoint-lg) justify-center">
+      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
 
         <AccountSettings account={account} section={section} />
       </div>
@@ -200,18 +217,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
       <NotFound />
     </Container>
   );
-};
-
-DashboardSection.propTypes = {
-  isLoading: PropTypes.bool,
-  section: PropTypes.string,
-  subpath: PropTypes.arrayOf(PropTypes.string),
-  /** The account. Can be null if isLoading is true */
-  account: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
 };
 
 export default DashboardSection;

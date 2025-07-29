@@ -1,53 +1,51 @@
 import React from 'react';
-import { isEmpty, startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImport } from '@/lib/graphql/types/v2/graphql';
+
+import { i18nWithColon } from '@/components/I18nFormatters';
 
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../ui/Accordion';
 
-export const TransactionsImportRowDetailsAccordion = ({
+import { ImportedTransactionDataList } from './ImportedTransactionDataList';
+
+export const TransactionsImportRowDetails = ({
   transactionsImportRow,
   className,
 }: {
-  transactionsImportRow: TransactionsImportRow;
+  transactionsImportRow: React.ComponentProps<typeof ImportedTransactionDataList>['row'] & {
+    transactionsImport: Pick<TransactionsImport, 'id' | 'source'>;
+  };
   className?: string;
 }) => {
   return (
-    <Accordion type="single" collapsible className={className}>
-      <AccordionItem value="item-1">
-        <AccordionTrigger>
-          <div className="text-base font-medium text-slate-700">
-            <FormattedMessage
-              defaultMessage="Based on a {amount} {type, select, DEBIT {debit} other {credit}} from {date}"
-              id="basedOnImportRow"
-              values={{
-                amount: (
-                  <FormattedMoneyAmount
-                    amount={Math.abs(transactionsImportRow.amount.valueInCents)}
-                    currency={transactionsImportRow.amount.currency}
-                  />
-                ),
-                type: transactionsImportRow.amount.valueInCents < 0 ? 'DEBIT' : 'CREDIT',
-                date: <DateTime value={transactionsImportRow.date} />,
-              }}
-            />
-          </div>
-        </AccordionTrigger>
-        <AccordionContent>
-          <ul className="list-inside list-disc pl-1 text-xs">
-            {Object.entries(transactionsImportRow.rawValue as Record<string, string>)
-              .filter(entry => !isEmpty(entry[1]))
-              .map(([key, value]) => (
-                <li key={key}>
-                  <strong>{startCase(key)}</strong>: {value.toString()}{' '}
-                </li>
-              ))}
-          </ul>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <div className={className}>
+      <div className="mb-2 text-base font-medium text-slate-700">
+        {i18nWithColon(
+          <FormattedMessage
+            defaultMessage="Based on a {amount} {type, select, DEBIT {debit} other {credit}} from {date}"
+            id="basedOnImportRow"
+            values={{
+              amount: (
+                <FormattedMoneyAmount
+                  amount={Math.abs(transactionsImportRow.amount.valueInCents)}
+                  currency={transactionsImportRow.amount.currency}
+                />
+              ),
+              type: transactionsImportRow.amount.valueInCents < 0 ? 'DEBIT' : 'CREDIT',
+              date: <DateTime value={transactionsImportRow.date} />,
+            }}
+          />,
+        )}
+      </div>
+      <div className="text-sm">
+        <ImportedTransactionDataList
+          row={transactionsImportRow}
+          transactionsImport={transactionsImportRow.transactionsImport}
+          collapsible
+        />
+      </div>
+    </div>
   );
 };

@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
+import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Document, Page, pdfjs } from 'react-pdf';
 import styled from 'styled-components';
@@ -9,7 +11,7 @@ import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import Loading from './Loading';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = '/static/scripts/pdf.worker.min.mjs';
 
 const DocumentContainer = styled.div`
   .pdf-page {
@@ -17,12 +19,29 @@ const DocumentContainer = styled.div`
   }
 `;
 
-const options = {
+const options: ComponentProps<typeof Document>['options'] = {
   cMapUrl: `/static/cmaps/`,
   cMapPacked: true,
+  isEvalSupported: false,
 };
 
-const PDFViewer = ({ pdfUrl, contentWrapperRef, errorTextColor = 'white.full', limitToPageWidth = true, ...props }) => {
+interface PDFViewerProps {
+  pdfUrl: string;
+  contentWrapperRef: React.RefObject<HTMLDivElement>;
+  loading?: React.ReactNode;
+  limitToPageWidth?: boolean;
+  errorTextColor?: string;
+  onLoadSuccess?: (pdfDetails: { numPages: number }) => void;
+  onLoadError?: (error: Error) => void;
+}
+
+const PDFViewer = ({
+  pdfUrl,
+  contentWrapperRef,
+  errorTextColor = 'white.full',
+  limitToPageWidth = true,
+  ...props
+}: PDFViewerProps) => {
   const [numPages, setNumPages] = useState(null);
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [pageWidth, setPageWidth] = useState(0);
@@ -90,13 +109,6 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef, errorTextColor = 'white.full', l
       </Document>
     </DocumentContainer>
   );
-};
-
-PDFViewer.propTypes = {
-  pdfUrl: PropTypes.string.isRequired,
-  contentWrapperRef: PropTypes.object.isRequired,
-  loading: PropTypes.node,
-  limitToPageWidth: PropTypes.bool,
 };
 
 export default PDFViewer;

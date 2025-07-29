@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
 import { Scrollchor } from 'react-scrollchor';
@@ -14,8 +13,6 @@ import Link from '../Link';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
-
-import { NAVBAR_CATEGORIES } from './constants';
 
 const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
   display: block;
@@ -165,19 +162,8 @@ export const NavBarCategory = ({ category, collective }) => {
   );
 };
 
-NavBarCategory.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
-  collective: PropTypes.object.isRequired,
-};
-
 const NavBarScrollContainer = ({ useAnchor, category, children }) =>
   useAnchor ? <Scrollchor to={`#category-${category}`}>{children}</Scrollchor> : children;
-
-NavBarScrollContainer.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
-  useAnchor: PropTypes.bool,
-  children: PropTypes.node,
-};
 
 const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
   const displayedLinks = links.filter(link => !link.hide);
@@ -219,23 +205,6 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
       )}
     </CategoryDropdown>
   );
-};
-
-NavBarCategoryDropdown.propTypes = {
-  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-  }).isRequired,
-  isSelected: PropTypes.bool,
-  useAnchor: PropTypes.bool,
-  links: PropTypes.arrayOf(
-    PropTypes.shape({
-      route: PropTypes.string,
-      title: PropTypes.node,
-      hide: PropTypes.bool,
-    }),
-  ),
 };
 
 export default NavBarCategoryDropdown;

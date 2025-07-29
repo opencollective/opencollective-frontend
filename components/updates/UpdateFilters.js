@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Box, Flex } from '../Grid';
 
@@ -25,11 +24,6 @@ const UpdateFilters = ({ values, onChange }) => {
       </Box>
     </Flex>
   );
-};
-
-UpdateFilters.propTypes = {
-  values: PropTypes.object,
-  onChange: PropTypes.func,
 };
 
 export default React.memo(UpdateFilters);

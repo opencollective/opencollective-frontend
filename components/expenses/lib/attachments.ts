@@ -1,6 +1,6 @@
-import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 
-import { DROPZONE_ACCEPT_ALL } from '../../StyledDropzone';
+import { DROPZONE_ACCEPT_ALL } from '../../Dropzone';
 
 export const attachmentDropzoneParams = {
   accept: DROPZONE_ACCEPT_ALL,
@@ -10,5 +10,10 @@ export const attachmentDropzoneParams = {
 };
 
 export const expenseTypeSupportsAttachments = (type: ExpenseType) => {
-  return type === ExpenseType.INVOICE || type === ExpenseType.GRANT || type === ExpenseType.SETTLEMENT;
+  return (
+    type === ExpenseType.INVOICE ||
+    type === ExpenseType.GRANT ||
+    type === ExpenseType.SETTLEMENT ||
+    type === ExpenseType.RECEIPT
+  );
 };

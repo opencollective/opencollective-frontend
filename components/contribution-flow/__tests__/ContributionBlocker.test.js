@@ -1,8 +1,8 @@
 import { cloneDeep, set } from 'lodash';
 
 import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../../lib/constants/payment-methods';
+import { webpackCollective } from '../../../test/mocks/collectives';
 
-import { webpackCollective } from '../../../stories/mocks/collectives';
 import { getContributionBlocker } from '../ContributionBlocker';
 
 const testAccountData = {

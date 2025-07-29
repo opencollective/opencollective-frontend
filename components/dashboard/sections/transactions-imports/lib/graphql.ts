@@ -1,5 +1,34 @@
 import { gql } from '@apollo/client';
 
+export const TransactionsImportStatsFragment = gql`
+  fragment TransactionsImportStats on TransactionsImportStats {
+    total
+    ignored
+    onHold
+    expenses
+    orders
+    processed
+    pending
+    imported
+  }
+`;
+
+export const TransactionsImportAssignmentFieldsFragment = gql`
+  fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
+    importedAccountId
+    accounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
+    }
+  }
+`;
+
 export const TransactionImportListFieldsFragment = gql`
   fragment TransactionImportListFields on TransactionsImport {
     id
@@ -8,33 +37,57 @@ export const TransactionImportListFieldsFragment = gql`
     type
     createdAt
     updatedAt
+    lastSyncAt
+    isSyncing
+    institutionId
+    institutionAccounts {
+      id
+      name
+      type
+      subtype
+      mask
+    }
+    assignments {
+      ...TransactionsImportAssignmentFields
+    }
     stats {
-      total
-      ignored
-      expenses
-      orders
-      processed
+      ...TransactionsImportStats
     }
     account {
-      ... on Host {
-        id
-        transactionsImportsSources
-      }
+      id
+      legacyId
+    }
+    connectedAccount {
+      id
     }
   }
+  ${TransactionsImportStatsFragment}
+  ${TransactionsImportAssignmentFieldsFragment}
 `;
 
 export const TransactionsImportRowFieldsFragment = gql`
   fragment TransactionsImportRowFields on TransactionsImportRow {
     id
     sourceId
-    isDismissed
+    status
     description
     date
     rawValue
+    note
+    accountId
     amount {
       valueInCents
       currency
+    }
+    assignedAccounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
     }
     expense {
       id
@@ -62,26 +115,23 @@ export const TransactionsImportRowFieldsFragment = gql`
 `;
 
 export const updateTransactionsImportRows = gql`
-  mutation UpdateTransactionsImportRow($importId: NonEmptyString!, $rows: [TransactionsImportRowUpdateInput!]!) {
-    updateTransactionsImportRows(id: $importId, rows: $rows) {
-      id
-      stats {
-        total
-        ignored
-        expenses
-        orders
-        processed
+  mutation UpdateTransactionsImportRow(
+    $rows: [TransactionsImportRowUpdateInput!]!
+    $action: TransactionsImportRowAction!
+  ) {
+    updateTransactionsImportRows(rows: $rows, action: $action) {
+      host {
+        id
+        offPlatformTransactionsStats {
+          ...TransactionsImportStats
+        }
       }
       rows {
-        totalCount
-        offset
-        limit
-        nodes {
-          id
-          ...TransactionsImportRowFields
-        }
+        id
+        ...TransactionsImportRowFields
       }
     }
   }
   ${TransactionsImportRowFieldsFragment}
+  ${TransactionsImportStatsFragment}
 `;

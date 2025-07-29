@@ -10,7 +10,7 @@ import type { z } from 'zod';
 import { getDayjsIsoUnit, getDayjsOpUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
-import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
+import { TimeUnit } from '../../../../lib/graphql/types/v2/schema';
 import {
   i18nPeriodFilterCompare,
   i18nPeriodFilterType,
@@ -92,7 +92,7 @@ export function formatPeriod({ from, to }): string {
 }
 
 const dateToSimpleDateString = (date: Date) => {
-  return dayjs.utc(date).format('YYYY-MM-DD');
+  return dayjs(date).format('YYYY-MM-DD');
 };
 
 function getPeriodDates(value: PeriodCompareFilterValueType): {
@@ -321,7 +321,6 @@ function RangeSelector({
     lte: dateVariables.dateTo.format('YYYY-MM-DD'),
   };
   const [tmpValue, setTmpValue] = React.useState(initialValues);
-
   const hasChanged = !isEqual(tmpValue, initialValues);
   const { success } = schema.safeParse(tmpValue);
   const canApply = hasChanged && success;
@@ -360,14 +359,15 @@ function RangeSelector({
             from: dateRange.from.isValid() ? dateRange.from.toDate() : undefined,
             to: dateRange.to.isValid() ? dateRange.to.toDate() : undefined,
           }}
-          onSelect={({ from, to }) => {
+          onSelect={range => {
             setTmpValue({
               type: PeriodFilterType.CUSTOM,
-              gte: from ? dateToSimpleDateString(from) : undefined,
-              lte: to ? dateToSimpleDateString(to) : undefined,
+              gte: range?.from ? dateToSimpleDateString(range.from) : undefined,
+              lte: range?.to ? dateToSimpleDateString(range.to) : undefined,
             });
           }}
           numberOfMonths={1}
+          timeZone="UTC"
         />
       </div>
       <div className="border-t p-3">

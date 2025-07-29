@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
@@ -16,7 +15,6 @@ const PrivateIconWithSpace = () => (
   </React.Fragment>
 );
 
-// eslint-disable-next-line react/prop-types
 const QuestionMarkIconWithSpace = ({ helpText, labelFontSize, labelColor }) => (
   <StyledTooltip content={helpText}>
     &nbsp;
@@ -143,46 +141,6 @@ const StyledInputField = ({
       {hint && hintPosition === 'below' && <div className="mt-1 text-xs font-light text-gray-600">{hint}</div>}
     </Box>
   );
-};
-
-StyledInputField.propTypes = {
-  /** React component to wrap with the label and errors */
-  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
-  /** Show disabled state for field */
-  disabled: PropTypes.bool,
-  /** If true, a "Private" lock icon will be displayed next to the label */
-  isPrivate: PropTypes.bool,
-  /** text to display below the input or error status */
-  error: PropTypes.any,
-  /** text to display below the input when there's no error */
-  hint: PropTypes.any,
-  /** Whether hints should appear above or below the input. Defaults to below. */
-  hintPosition: PropTypes.oneOf(['above', 'below']),
-  /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
-  htmlFor: PropTypes.string,
-  /** By default name is equal to htmlFor, but you can use this prop to override it */
-  name: PropTypes.string,
-  /** text to display above the input */
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  /** Passed to input as `type`. Adapts layout for checkboxes */
-  inputType: PropTypes.string,
-  /** Show success state for field */
-  success: PropTypes.bool,
-  /** If set to false, the field will be marked as optional */
-  required: PropTypes.bool,
-  /** If set to true, will hide the (optional) label tag even if required is false and display "*" if required */
-  useRequiredLabel: PropTypes.bool,
-  /** Font size for the label */
-  labelFontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** Font weight for the label */
-  labelFontWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  labelColor: PropTypes.string,
-  /** Anything here will be passed down to label */
-  labelProps: PropTypes.object,
-  /** Help text that will appear next to the label (a small question mark with help text shown when hovered) */
-  helpText: PropTypes.node,
-  /** All props from `Box` */
-  ...Box.propTypes,
 };
 
 export default StyledInputField;

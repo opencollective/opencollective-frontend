@@ -7,11 +7,8 @@ import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type {
-  AccountMetricsFragment,
-  Currency,
-  OverviewMetricsQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountMetricsFragment, OverviewMetricsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../../../lib/graphql/types/v2/schema';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -130,7 +127,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
                   <Link
                     href={getCollectivePageRoute(account)}
                     className={clsx(
-                      'truncate hover:underline group-hover/row:text-foreground',
+                      'truncate group-hover/row:text-foreground hover:underline',
                       isSelected ? 'text-foreground' : 'text-muted-foreground',
                     )}
                   >
@@ -177,7 +174,6 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
                 amount={comparison}
                 currency={meta.currency}
                 precision={2}
-                amountStyles={{ letterSpacing: 0 }}
                 showCurrencyCode={false}
               />
             ) : (
@@ -216,13 +212,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
       return (
         <span className="font-medium">
           {meta.isAmount ? (
-            <FormattedMoneyAmount
-              amount={current}
-              currency={meta.currency}
-              precision={2}
-              amountStyles={{ letterSpacing: 0 }}
-              showCurrencyCode={false}
-            />
+            <FormattedMoneyAmount amount={current} currency={meta.currency} precision={2} showCurrencyCode={false} />
           ) : (
             current.toLocaleString()
           )}

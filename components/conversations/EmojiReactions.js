@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Span } from '../Text';
@@ -27,11 +26,6 @@ const EmojiReactions = ({ reactions }) => {
         </EmojiLabel>
       );
     });
-};
-
-EmojiReactions.propTypes = {
-  /** Reactions associated with this comment */
-  reactions: PropTypes.object,
 };
 
 export default React.memo(EmojiReactions);

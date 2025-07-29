@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -193,11 +192,6 @@ const WebhookActivityInfoModal = ({ activity, ...props }) => {
       </ModalBody>
     </StyledModal>
   );
-};
-
-WebhookActivityInfoModal.propTypes = {
-  activity: PropTypes.oneOf(Object.values(WebhookEvents)).isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default WebhookActivityInfoModal;

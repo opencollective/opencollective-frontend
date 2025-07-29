@@ -4,6 +4,8 @@ import StyledButton from './StyledButton';
 
 /**
  * A round button with content centered. Accepts all props from `StyledButton`
+ *
+ * @deprecated Use `ui/Button` with size="icon"
  */
 const StyledRoundButton = styled(StyledButton).attrs(props => ({
   p: 0,

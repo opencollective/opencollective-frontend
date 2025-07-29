@@ -1,44 +1,54 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Currency currency format with separators 1`] = `
-<span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
->
-  $
-  42
-</span>
+<div>
+  <span
+    class="whitespace-nowrap"
+  >
+    $
+    42
+  </span>
+</div>
 `;
 
 exports[`Currency currency format with separators 2`] = `
-<span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
->
-  $
-  19 000
-</span>
+<div>
+  <span
+    class="whitespace-nowrap"
+  >
+    $
+    19 000
+  </span>
+</div>
 `;
 
 exports[`Currency currency format with separators 3`] = `
-<span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
->
-  $
-  19,000
-</span>
+<div>
+  <span
+    class="whitespace-nowrap"
+  >
+    $
+    19,000
+  </span>
+</div>
 `;
 
 exports[`Currency renders default options 1`] = `
-<span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
->
-  $42
-</span>
+<div>
+  <span
+    class="whitespace-nowrap"
+  >
+    $42
+  </span>
+</div>
 `;
 
 exports[`Currency renders default options 2`] = `
-<span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
->
-  19 000 $
-</span>
+<div>
+  <span
+    class="whitespace-nowrap"
+  >
+    19 000 $
+  </span>
+</div>
 `;

@@ -6,14 +6,12 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { DateTimeField } from '../../../../lib/graphql/types/v2/graphql';
+import { DateTimeField } from '../../../../lib/graphql/types/v2/schema';
 import { useDrawer } from '../../../../lib/hooks/useDrawer';
 import useLocalStorage from '../../../../lib/hooks/useLocalStorage';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -31,7 +29,68 @@ import type { TransactionsTableQueryNode } from './types';
 
 const columnHelper = createColumnHelper<TransactionsTableQueryNode>();
 
-const columns: ColumnDef<TransactionsTableQueryNode>[] = [
+const RefundLabel = ({ transaction }) => {
+  const { isRefund, isOrderRejected, refundKind, paymentMethod } = transaction;
+  const wasActuallyRefunded = ['STRIPE', 'PAYPAL'].includes(paymentMethod?.service);
+
+  if (isRefund) {
+    return wasActuallyRefunded ? (
+      <FormattedMessage defaultMessage="Refund" id="Refund" />
+    ) : (
+      <FormattedMessage defaultMessage="Reverse" id="Reverse" />
+    );
+  } else {
+    if (isOrderRejected) {
+      return <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />;
+    } else if (!refundKind && wasActuallyRefunded) {
+      return <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />;
+    }
+
+    switch (refundKind) {
+      case 'REJECT':
+        return <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />;
+      case 'DISPUTE':
+        return <FormattedMessage defaultMessage="Disputed" id="X1pwhF" />;
+      case 'REFUND':
+        return <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />;
+      default:
+        return <FormattedMessage defaultMessage="Reverted" id="transaction.reverted" />;
+    }
+  }
+};
+
+const RefundBadge = ({ transaction }) => {
+  const { isRefund, isRefunded, isDisputed, isOrderRejected } = transaction;
+  return (
+    <React.Fragment>
+      {isRefunded && !isOrderRejected && (
+        <Badge size="xs" type={'warning'} className="items-center gap-1">
+          <Undo size={12} />
+          <RefundLabel transaction={transaction} />{' '}
+        </Badge>
+      )}
+      {isRefund && (
+        <Badge size="xs" type={'success'} className="items-center gap-1">
+          <RefundLabel transaction={transaction} />{' '}
+        </Badge>
+      )}
+      {isDisputed && (
+        <Badge size="xs" type={'error'} className="items-center gap-1">
+          <AlertTriangle size={12} />
+          <RefundLabel transaction={transaction} />{' '}
+        </Badge>
+      )}
+      {isOrderRejected && isRefunded && (
+        <Badge size="xs" type={'error'} className="items-center gap-1">
+          <AlertTriangle size={12} />
+          <RefundLabel transaction={transaction} />{' '}
+        </Badge>
+      )}{' '}
+    </React.Fragment>
+  );
+};
+
+export const columns: ColumnDef<TransactionsTableQueryNode>[] = [
   columnHelper.accessor('createdAt', {
     id: 'date',
     meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
@@ -117,7 +176,7 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
       const kind = cell.getValue();
       const kindLabel = i18nTransactionKind(intl, kind);
       const isExpense = kind === 'EXPENSE';
-      const { isRefund, isRefunded, isInReview, isDisputed, expense, isOrderRejected } = row.original;
+      const { isInReview, expense } = row.original;
 
       return (
         <div className="flex justify-between">
@@ -126,29 +185,7 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
             {isExpense && expense?.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
           </div>
           <div>
-            {isRefunded && !isOrderRejected && (
-              <Badge size="xs" type={'warning'} className="items-center gap-1">
-                <Undo size={12} />
-                <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />
-              </Badge>
-            )}
-            {isRefund && (
-              <Badge size="xs" type={'success'} className="items-center gap-1">
-                <FormattedMessage id="Refund" defaultMessage="Refund" />
-              </Badge>
-            )}
-            {isDisputed && (
-              <Badge size="xs" type={'error'} className="items-center gap-1">
-                <AlertTriangle size={12} />
-                <FormattedMessage defaultMessage="Disputed" id="X1pwhF" />
-              </Badge>
-            )}
-            {isOrderRejected && isRefunded && (
-              <Badge size="xs" type={'error'} className="items-center gap-1">
-                <AlertTriangle size={12} />
-                <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />
-              </Badge>
-            )}
+            <RefundBadge transaction={row.original} />
             {isInReview && (
               <Badge size="xs" type={'warning'} className="items-center gap-1">
                 <AlertTriangle size={12} />
@@ -177,7 +214,6 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
               amount={Math.abs(amount.valueInCents)}
               currency={amount.currency}
               precision={2}
-              amountStyles={{}}
               showCurrencyCode={false}
             />
           </div>
@@ -203,7 +239,6 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
               amount={Math.abs(amount.valueInCents)}
               currency={amount.currency}
               precision={2}
-              amountStyles={{}}
               showCurrencyCode={false}
             />
           </div>
@@ -234,7 +269,6 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
             amount={netAmount.valueInCents}
             currency={netAmount.currency}
             precision={2}
-            amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />
         </div>
@@ -272,8 +306,6 @@ export default function TransactionsTable({
   refetchList,
 }: TransactionsTableProps) {
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
-  const { LoggedInUser } = useLoggedInUser();
-  const hasDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);
 
   const defaultColumnVisibility = {
     clearedAt: false,
@@ -307,7 +339,6 @@ export default function TransactionsTable({
         }}
         onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
         rowHasIndicator={row => row.original.group === hoveredGroup}
-        fullWidth={hasDynamicTopBar}
         mobileTableView
         columnVisibility={columnVisibility}
         setColumnVisibility={setColumnVisibility}

@@ -58,7 +58,7 @@ export const MenuLink = ({
   }
 
   const classNames = cn(
-    'group flex w-full gap-x-3 rounded-full px-3 py-1.5 text-sm font-medium leading-6 transition-colors',
+    'group flex w-full gap-x-3 rounded-full px-3 py-1.5 text-sm leading-6 font-medium transition-colors',
     isSelected ? 'bg-blue-50/50 text-blue-700' : 'text-slate-700 hover:bg-blue-50/50 hover:text-blue-700',
     className,
   );
@@ -86,7 +86,7 @@ export const MenuLink = ({
           {subMenu ? (
             <button
               className={clsx(
-                'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors',
+                'flex h-6 w-6 shrink-0 items-center justify-center rounded transition-colors',
                 !sectionExpanded && 'hover:bg-blue-100',
               )}
               disabled={sectionExpanded}
@@ -106,7 +106,7 @@ export const MenuLink = ({
 
       {subMenu && (
         <ReactAnimateHeight duration={150} height={subMenuExpanded ? 'auto' : 0}>
-          <div className="ml-5 mt-2 flex flex-col space-y-1 border-l pl-4">
+          <div className="mt-2 ml-5 flex flex-col space-y-1 border-l pl-4">
             {subMenu.map(item => (
               <MenuLink key={item.section} {...item} />
             ))}

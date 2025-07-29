@@ -1,12 +1,11 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
   VirtualCardLimitIntervalI18n,
@@ -115,7 +114,7 @@ const RequestVirtualCardModal = props => {
   const currency = props.host?.currency || props.collective?.currency;
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...props}>
+    <StyledModal onClose={handleClose} {...props}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={props.onClose}>
           <FormattedMessage id="Collective.VirtualCards.RequestCard" defaultMessage="Request a Card" />
@@ -303,35 +302,6 @@ const RequestVirtualCardModal = props => {
       </form>
     </StyledModal>
   );
-};
-
-RequestVirtualCardModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  host: PropTypes.shape({
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    currency: PropTypes.string,
-    imageUrl: PropTypes.string,
-    settings: PropTypes.shape({
-      virtualcards: PropTypes.shape({
-        autopause: PropTypes.bool,
-        requestcard: PropTypes.bool,
-        policy: PropTypes.string,
-      }),
-    }),
-  }).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    currency: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }),
 };
 
 /** @component */

@@ -1,6 +1,7 @@
+import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
-import { LegalDocumentRequestStatus } from '../graphql/types/v2/graphql';
+import { LegalDocumentRequestStatus } from '../graphql/types/v2/schema';
 
 const LEGAL_DOCUMENT_STATUSES = defineMessages({
   [LegalDocumentRequestStatus.ERROR]: {
@@ -23,12 +24,14 @@ const LEGAL_DOCUMENT_STATUSES = defineMessages({
     id: 'LegalDocument.Invalid',
     defaultMessage: 'Invalid',
   },
+  [LegalDocumentRequestStatus.EXPIRED]: {
+    id: 'LegalDocument.Expired',
+    defaultMessage: 'Expired',
+  },
 });
 
-export const i18nLegalDocumentStatus = (intl, status, isExpired = undefined) => {
-  if (isExpired) {
-    return intl.formatMessage({ defaultMessage: 'Expired', id: 'LegalDocument.Expired' });
-  } else if (LEGAL_DOCUMENT_STATUSES[status]) {
+export const i18nLegalDocumentStatus = (intl: IntlShape, status: LegalDocumentRequestStatus) => {
+  if (LEGAL_DOCUMENT_STATUSES[status]) {
     return intl.formatMessage(LEGAL_DOCUMENT_STATUSES[status]);
   } else {
     return status;

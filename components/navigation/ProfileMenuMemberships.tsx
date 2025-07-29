@@ -1,13 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import type { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
@@ -69,7 +69,15 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-const MembershipLine = ({ user, membership, closeDrawer }) => {
+interface MembershipLineProps {
+  user?: LoggedInUser;
+  closeDrawer?(...args: unknown[]): unknown;
+  membership?: {
+    collective: GraphQLV1Collective;
+  };
+}
+
+const MembershipLine = ({ user, membership, closeDrawer }: MembershipLineProps) => {
   return (
     <CollectiveListItem className="group h-9">
       <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
@@ -87,11 +95,11 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
       </MenuLink>
 
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
-        <div className="absolute bottom-1 right-1 top-1">
+        <div className="absolute top-1 right-1 bottom-1">
           <Tooltip>
             <TooltipTrigger>
               <Link
-                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all hover:border-white hover:bg-slate-900 hover:text-white group-hover:opacity-100"
+                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all group-hover:opacity-100 hover:border-white hover:bg-slate-900 hover:text-white"
                 href={getDashboardRoute(membership.collective)}
                 onClick={closeDrawer}
               >
@@ -106,12 +114,6 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
       )}
     </CollectiveListItem>
   );
-};
-
-MembershipLine.propTypes = {
-  user: PropTypes.object,
-  membership: PropTypes.object,
-  closeDrawer: PropTypes.func,
 };
 
 const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
@@ -143,7 +145,13 @@ const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   return uniqBy(filteredMemberships, m => m.collective.id);
 };
 
-const MembershipsList = ({ user, memberships, closeDrawer }) => {
+interface MembershipsListProps {
+  user?: LoggedInUser;
+  memberships?: LoggedInUser['memberOf'];
+  closeDrawer?(...args: unknown[]): unknown;
+}
+
+const MembershipsList = ({ user, memberships, closeDrawer }: MembershipsListProps) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(member => (
@@ -151,12 +159,6 @@ const MembershipsList = ({ user, memberships, closeDrawer }) => {
       ))}
     </Box>
   );
-};
-
-MembershipsList.propTypes = {
-  user: PropTypes.object,
-  memberships: PropTypes.array,
-  closeDrawer: PropTypes.func,
 };
 
 /**
@@ -197,7 +199,7 @@ const MENU_SECTIONS = {
     }),
     plusButton: {
       text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),
-      href: '/organizations/new',
+      href: '/signup/organization',
     },
   },
   ARCHIVED: {
@@ -311,13 +313,6 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
         })}
     </React.Fragment>
   );
-};
-
-ProfileMenuMemberships.propTypes = {
-  user: PropTypes.shape({
-    memberOf: PropTypes.arrayOf(PropTypes.object),
-  }),
-  closeDrawer: PropTypes.func,
 };
 
 export default React.memo(ProfileMenuMemberships);

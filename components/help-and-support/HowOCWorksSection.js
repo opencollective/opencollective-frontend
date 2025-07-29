@@ -47,7 +47,12 @@ const HowOCWorks = () => (
         height={441}
       />
     </Box>
-    <Flex flexDirection={['column', null, 'row']} alignItems="center" my={['56px', null, '127px']}>
+    <Flex
+      flexDirection={['column', null, 'row']}
+      alignItems="center"
+      my={['56px', null, '127px']}
+      width={['100%', '568px', '754px', null, '1020px']}
+    >
       <Box order={[null, 1]} display={[null, null, 'none']}>
         <SectionTitle mb={3}>
           <FormattedMessage id="helpAndSupport.getToKnowUs" defaultMessage="Get to know us!" />

@@ -12,15 +12,9 @@ import clsx from 'clsx';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type {
-  Account,
-  Host,
-  Order,
-  PaymentMethod,
-  PaymentMethodPickerQuery,
-  PaymentMethodType,
-} from '../../lib/graphql/types/v2/graphql';
-import { PaymentMethodLegacyType, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
+import type { PaymentMethodPickerQuery } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host, Order, PaymentMethod, PaymentMethodType } from '../../lib/graphql/types/v2/schema';
+import { PaymentMethodLegacyType, PaymentMethodService } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -185,9 +179,9 @@ export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
                   />
                   <div className="mr-3 w-7 text-center">{getPaymentMethodIcon(pm, pm.account, 24)}</div>
                   <div>
-                    <p className="text-xs font-semibold leading-5 text-black">{getPaymentMethodName(pm as any)}</p>
+                    <p className="text-xs leading-5 font-semibold text-black">{getPaymentMethodName(pm as any)}</p>
                     {getPaymentMethodMetadata(pm, props.order?.totalAmount?.valueInCents) && (
-                      <p className="text-xs font-normal leading-4 text-gray-400">
+                      <p className="text-xs leading-4 font-normal text-gray-400">
                         {getPaymentMethodMetadata(pm, props.order?.totalAmount?.valueInCents)}
                       </p>
                     )}
@@ -216,8 +210,8 @@ type StripeSetupPaymentMethodOptionProps = {
 };
 
 function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionProps) {
-  const elementContainer = React.useRef<HTMLDivElement>();
-  const inputRef = React.useRef<HTMLInputElement>();
+  const elementContainer = React.useRef<HTMLDivElement>(undefined);
+  const inputRef = React.useRef<HTMLInputElement>(undefined);
   const intl = useIntl();
   const [paymentMethodType, setPaymentMethodType] = React.useState<string>();
   const { LoggedInUser } = useLoggedInUser();
@@ -351,10 +345,10 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
           <CreditCard color="#c9ced4" size={24} />
         </div>
         <div>
-          <p className="text-xs font-semibold leading-5 text-black">
+          <p className="text-xs leading-5 font-semibold text-black">
             <FormattedMessage defaultMessage="New payment method" id="L3WVIm" />
           </p>
-          <p className="text-xs font-normal leading-4 text-gray-400">
+          <p className="text-xs leading-4 font-normal text-gray-400">
             {availableMethodLabels && availableMethodLabels.length > 0 ? (
               availableMethodLabels.join(', ')
             ) : (
@@ -393,7 +387,7 @@ function PayPalSetupOption(props: PayPalSetupOptionProps) {
           <PayPal size={24} />
         </div>
         <div>
-          <p className="text-xs font-semibold leading-5 text-black">
+          <p className="text-xs leading-5 font-semibold text-black">
             <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
           </p>
         </div>
@@ -415,7 +409,11 @@ function paymentMethodFilter(options: PaymentMethodFilterOptions): (pm: PaymentM
     const limitedToHosts = sourcePaymentMethod.limitedToHosts || [];
     const disabledMethodTypes = options.disabledMethodTypes || [];
 
-    if (options.host && limitedToHosts.length > 0 && !pm.limitedToHosts.some(host => host.id === options.host.id)) {
+    if (
+      options.host &&
+      limitedToHosts.length > 0 &&
+      !limitedToHosts.some(host => host && host.id === options.host.id)
+    ) {
       return false;
     }
 

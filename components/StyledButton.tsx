@@ -1,6 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import StyledSystemPropTypes from '@styled-system/prop-types';
 import type { ForwardRefExoticComponent } from 'react';
 import styled, { css } from 'styled-components';
 import type {
@@ -17,7 +15,6 @@ import { background, border, color, flexbox, layout, space, typography } from 's
 import { mergeRefs } from '../lib/react-utils';
 import type { TextTransformProps, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
-import theme from '../lib/theme';
 import type { ButtonSize, ButtonStyle } from '../lib/theme/variants/button';
 import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
@@ -123,6 +120,9 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
     `}
 `;
 
+/**
+ * @deprecated Use `ui/Button` instead
+ */
 const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
   HTMLButtonElement,
   StyledButtonProps
@@ -159,45 +159,6 @@ const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forward
 });
 
 StyledButton.displayName = 'StyledButton';
-
-StyledButton.propTypes = {
-  ...StyledSystemPropTypes.background,
-  ...StyledSystemPropTypes.border,
-  ...StyledSystemPropTypes.color,
-  ...StyledSystemPropTypes.flexbox,
-  ...StyledSystemPropTypes.layout,
-  ...StyledSystemPropTypes.space,
-  ...StyledSystemPropTypes.typography,
-  /**
-   * Based on the design system theme
-   */
-  buttonSize: PropTypes.oneOfType([
-    PropTypes.oneOf(Object.keys(theme.buttonSizes)),
-    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttonSizes))),
-  ]),
-  /**
-   * Based on the design system theme
-   */
-  buttonStyle: PropTypes.oneOfType([
-    PropTypes.oneOf(Object.keys(theme.buttons)),
-    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttons))),
-  ]),
-  /**
-   * Show a loading spinner on button
-   */
-  loading: PropTypes.bool,
-  /**
-   * @deprecated Please use `isBorderless`
-   * If true, will display a link instead of a button
-   */
-  asLink: PropTypes.bool,
-  /**
-   * If true, will display a link instead of a button
-   */
-  isBorderless: PropTypes.bool,
-  truncateOverflow: PropTypes.bool,
-  children: PropTypes.node,
-};
 
 /** @component */
 export default StyledButton;

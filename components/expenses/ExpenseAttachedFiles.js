@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDefaultFileName } from '../../lib/expenses';
@@ -9,7 +8,7 @@ import LocalFilePreview from '../LocalFilePreview';
 import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
+const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer = undefined }) => {
   const intl = useIntl();
 
   return (
@@ -46,18 +45,6 @@ const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
       })}
     </Flex>
   );
-};
-
-ExpenseAttachedFiles.propTypes = {
-  files: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      url: PropTypes.string.isRequired,
-    }).isRequired,
-  ),
-  /** If provided, a link to remove the file will be displayed */
-  onRemove: PropTypes.func,
-  openFileViewer: PropTypes.func,
 };
 
 export default ExpenseAttachedFiles;

@@ -1,9 +1,11 @@
 import * as fs from 'fs';
 
-import { difference, has, invertBy, mapValues, orderBy } from 'lodash';
+import lodash from 'lodash';
 import { sync as mkdirpSync } from 'mkdirp';
 
 import locales from '../lib/constants/locales';
+
+const { difference, has, invertBy, mapValues, orderBy } = lodash;
 
 const MESSAGES_FILE = './dist/messages/messages.json';
 const LANG_DIR = './lang/';
@@ -29,6 +31,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'none', // Can have different masculine/feminine for some languages based on the context
   'add new', // Can have different masculine/feminine for some languages based on the context
   'created on', // Can have different masculine/feminine for some languages based on the context
+  'on hold',
 ]);
 
 /**

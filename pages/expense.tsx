@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -37,7 +36,7 @@ export const getVariablesFromQuery = query => {
 const getPropsFromQuery = query => {
   return {
     legacyExpenseId: parseInt(query.ExpenseId),
-    draftKey: query.key,
+    draftKey: query.key || null,
     collectiveSlug: query.collectiveSlug,
     edit: query.edit,
   };
@@ -78,6 +77,10 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
   }
 };
 
+const isValidCollectiveSlug = (collectiveSlug: string, expense) => {
+  return [expense.account.slug, expense.account.parent?.slug].filter(Boolean).includes(collectiveSlug);
+};
+
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -89,10 +92,10 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
 
   // Refetch data when logging in
   useEffect(() => {
-    if (LoggedInUser) {
+    if (LoggedInUser && !queryResult.data?.loggedInAccount) {
       queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, queryResult.data?.loggedInAccount]);
 
   useEffect(() => {
     addParentToURLIfMissing(router, queryResult.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
@@ -107,17 +110,18 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
       return <ErrorPage data={data} />;
     } else if (!data.expense) {
       return <ErrorPage error={generateNotFoundError(null)} log={false} />;
-    } else if (!data.expense.account || props.collectiveSlug !== data.expense.account.slug) {
+    } else if (!data.expense.account || !isValidCollectiveSlug(collectiveSlug, data.expense)) {
       return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
     }
   }
 
-  const expense = cloneDeep(data?.expense);
-  if (expense && data.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const collective = expense?.account;
   const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
+
+  if (draftKey && !metadata.noRobots) {
+    metadata.noRobots = true;
+  }
 
   return (
     <Page collective={collective} canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`} {...metadata}>

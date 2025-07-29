@@ -6,6 +6,7 @@ Sentry.configureScope(scope => {
   scope.setTag('runtimeEngine', typeof window !== 'undefined' ? 'browser' : 'server');
 });
 
+/** @type {import('@sentry/browser/types/client').BrowserClientOptions} */
 export default {
   dsn: process.env.SENTRY_DSN,
   environment: process.env.OC_ENV,
@@ -30,6 +31,6 @@ export default {
     /^chrome:\/\//i,
     /^chrome-extension:\/\//i,
   ],
-
   tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE ? parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) : 0.01,
+  release: process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
 };

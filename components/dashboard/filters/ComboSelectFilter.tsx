@@ -30,7 +30,7 @@ const SelectItem = ({
 }: {
   isSelected: boolean;
   value: any;
-  label?: React.ReactNode;
+  label?: React.ReactNode | string;
   onSelect: (value: any) => void;
   valueRenderer?: ({
     intl,
@@ -52,6 +52,7 @@ const SelectItem = ({
   if (typeof label === 'string' && !keywords) {
     keywords = [label];
   }
+
   return (
     <CommandItem
       onSelect={() => onSelect(value)}
@@ -69,7 +70,9 @@ const SelectItem = ({
         <CheckIcon className={'h-4 w-4'} />
       </div>
 
-      <div className="truncate">{label ?? String(value)}</div>
+      <div className="truncate" title={typeof label === 'string' ? label : undefined}>
+        {label ?? String(value)}
+      </div>
     </CommandItem>
   );
 };

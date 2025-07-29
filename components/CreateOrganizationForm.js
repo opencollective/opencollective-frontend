@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
 import { trim } from 'lodash';
 import { withRouter } from 'next/router';
@@ -344,21 +343,20 @@ const CreateOrganizationForm = props => {
                           <StyledHr flex="1" borderStyle="solid" borderColor="black.300" width={[100, 110, 120]} />
                         </Flex>
                         <Flex data-cy="org-profile-card" mt={2}>
-                          {admins.length > 0 && (
-                            <Flex width="100%" flexWrap="wrap">
-                              <OnboardingProfileCard
-                                key={LoggedInUser.collective.id}
-                                collective={LoggedInUser.collective}
-                              />
-                              {admins.map(admin => (
+                          <Flex width="100%" flexWrap="wrap">
+                            <OnboardingProfileCard
+                              key={LoggedInUser.collective.id}
+                              collective={LoggedInUser.collective}
+                            />
+                            {admins.length > 0 &&
+                              admins.map(admin => (
                                 <OnboardingProfileCard
                                   key={admin.member.id}
                                   collective={admin.member}
                                   removeAdmin={removeAdmin}
                                 />
                               ))}
-                            </Flex>
-                          )}
+                          </Flex>
                         </Flex>
                         <Flex flexDirection="row" alignItems="center" justifyContent="space-around" mt={4}>
                           <Flex mr={2}>
@@ -435,13 +433,4 @@ const CreateOrganizationForm = props => {
   );
 };
 
-CreateOrganizationForm.propTypes = {
-  collective: PropTypes.object,
-  LoggedInUser: PropTypes.object,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  onSubmit: PropTypes.func,
-  updateAdmins: PropTypes.func,
-  intl: PropTypes.object.isRequired,
-};
 export default injectIntl(withRouter(withUser(CreateOrganizationForm)));

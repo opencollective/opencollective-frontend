@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/graphql';
+import type { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/schema';
 import type { UserContextProps } from '../lib/hooks/useLoggedInUser';
 
 import Container from '../components/Container';

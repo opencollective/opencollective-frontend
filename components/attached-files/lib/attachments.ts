@@ -1,4 +1,4 @@
-import { DROPZONE_ACCEPT_ALL } from '../../StyledDropzone';
+import { DROPZONE_ACCEPT_ALL } from '../../Dropzone';
 
 export const attachmentDropzoneParams = {
   accept: DROPZONE_ACCEPT_ALL,

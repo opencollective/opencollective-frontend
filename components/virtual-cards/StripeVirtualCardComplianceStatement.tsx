@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 export function StripeVirtualCardComplianceStatement() {
   return (
-    <p className="text-sm italic text-muted-foreground">
+    <p className="text-sm text-muted-foreground italic">
       <FormattedMessage
         defaultMessage="{virtualCardProgramName} Visa® Commercial Credit cards are issued by Celtic Bank."
         id="l+tve8"

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
@@ -233,15 +232,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
   );
 };
 
-ConfirmButtons.propTypes = {
-  onClose: PropTypes.func,
-  onBack: PropTypes.func,
-  onSubmit: PropTypes.func,
-  isSubmitting: PropTypes.bool,
-  canSubmit: PropTypes.bool,
-  isOSCHost: PropTypes.bool,
-};
-
 /**
  * A modal to apply to a given host
  * This modal triggers a query when mounted
@@ -257,7 +247,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const intl = useIntl();
   const { toast } = useToast();
   const [step, setStep] = React.useState(STEPS.INFORMATION);
-  const contentRef = React.useRef();
+  const contentRef = React.useRef(undefined);
   const canApply = Boolean(data?.host?.isOpenToApplications);
   const collectives = map(get(data, 'loggedInAccount.memberOf.nodes'), 'account');
   const selectedCollective = collective
@@ -276,7 +266,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   }, [useTwoSteps]);
 
   return (
-    <StyledModal onClose={onClose} width="570px" {...props}>
+    <StyledModal onClose={onClose} {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -663,16 +653,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
       )}
     </StyledModal>
   );
-};
-
-ApplyToHostModal.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  /** If not provided, the default is to ad a success toast and to call onClose */
-  onSuccess: PropTypes.func,
-  /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
-  collective: PropTypes.object,
-  router: PropTypes.object,
 };
 
 export default withRouter(ApplyToHostModal);

@@ -2,10 +2,11 @@ import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
-export const tierPageQuery = gqlV1/* GraphQL */ `
+export const tierPageQuery = gqlV1 /* GraphQL */ `
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
+      idV2
       name
       slug
       description
@@ -46,15 +47,6 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
         path
         host {
           id
-        }
-        stats {
-          id
-          updates
-          balance
-          transactions {
-            id
-            all
-          }
         }
         features {
           id

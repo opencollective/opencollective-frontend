@@ -3,23 +3,26 @@ import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
 import { cloneDeep, kebabCase, omit, round } from 'lodash';
+import { CircleHelp } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import type { BorderProps, SpaceProps } from 'styled-system';
 import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
-import { EXPENSE_PAYMENT_METHOD_SERVICES } from '../../lib/constants/payment-methods';
+import { EXPENSE_PAYMENT_METHOD_SERVICES, PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
+import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -34,7 +37,9 @@ import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
+import { PayExpenseWithStripe } from './PayExpenseWithStripe';
 import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
@@ -44,6 +49,7 @@ const quoteExpenseQuery = gql`
     expense(expense: { id: $id }) {
       id
       currency
+      reference
       amountInHostCurrency: amountV2(currencySource: HOST) {
         exchangeRate {
           value
@@ -111,11 +117,22 @@ const validateTransferRequirementsQuery = gql`
 
 type TransferDetailsFieldsProps = {
   setDisabled: (disabled: boolean) => void;
-  expense: any;
+} & Pick<PayExpenseModalProps, 'expense' | 'host'>;
+
+const generateDefaultReference = (expense, limit) => {
+  const id = expense.legacyId.toString();
+  return [
+    expense.account.name
+      .replace(/ /g, '')
+      .toUpperCase()
+      .slice(0, limit - 1 - id.length),
+    id,
+  ].join(' ');
 };
 
-const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsProps) => {
-  const formik = useFormikContext();
+const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFieldsProps) => {
+  const formik = useFormikContext<any>();
+  const generateReference = host.settings?.transferwise?.generateReference !== false;
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
@@ -124,6 +141,27 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
   useEffect(() => {
     setDisabled(loading);
   }, [loading, setDisabled]);
+
+  useEffect(() => {
+    let referenceField;
+    data?.expense?.validateTransferRequirements?.find(requirement => {
+      return requirement.fields.find(field => {
+        const r = field?.group?.find(group => group.key === 'reference');
+        if (r) {
+          referenceField = r;
+        }
+        return;
+      });
+    });
+    if (referenceField) {
+      const reference =
+        expense.reference ||
+        (generateReference ? generateDefaultReference(expense, referenceField.maxLength) : undefined);
+      if (reference) {
+        formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
+      }
+    }
+  }, [data]);
 
   if (error) {
     return (
@@ -278,15 +316,13 @@ const getInitialValues = (expense, host) => {
     ...DEFAULT_VALUES,
     ...getPayoutOptionValue(expense.payoutMethod, true, host),
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
-    expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
+    expenseAmountInHostCurrency:
+      expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
   };
 };
 
 const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
-  const expenseAmountInHostCurrency = {
-    valueInCents: values.expenseAmountInHostCurrency,
-    currency: host.currency,
-  };
+  const expenseAmountInHostCurrency = expense.amountInHostCurrency;
 
   if (values.forceManual) {
     const totalAmount = {
@@ -317,7 +353,14 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
       expenseAmountInHostCurrency,
     };
   } else {
-    return { expenseAmountInHostCurrency, totalAmount: expenseAmountInHostCurrency, paymentProcessorFee: null };
+    const isMultiCurrency = expense.currency !== host.currency;
+    return {
+      amountInExpenseCurrency: { valueInCents: expense.amount, currency: expense.currency },
+      expenseAmountInHostCurrency,
+      totalAmount: expenseAmountInHostCurrency,
+      paymentProcessorFee: null,
+      isMultiCurrency,
+    };
   }
 };
 
@@ -328,7 +371,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
   if (
     values.forceManual &&
     values.paymentProcessorFeeInHostCurrency &&
-    values.paymentProcessorFeeInHostCurrency > values.totalAmountPaidInHostCurrency / 2 &&
+    values.paymentProcessorFeeInHostCurrency > totalAmountPaidInHostCurrency / 2 &&
     !confirm(
       intl.formatMessage(
         {
@@ -351,7 +394,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
 };
 
 type PayExpenseModalProps = {
-  expense: Expense;
+  expense: Expense & { amountInHostCurrency?: { valueInCents: number; currency?: string } };
   collective: Pick<Account, 'currency'>;
   host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings'>;
   onClose: () => void;
@@ -368,16 +411,17 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = getInitialValues(expense, host);
   const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
-  const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
+  const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
-  const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
-    payoutMethodType,
-  );
-  const [disabled, setDisabled] = React.useState(false);
+  const hasAutomaticManualPicker = ![
+    PayoutMethodType.OTHER,
+    PayoutMethodType.ACCOUNT_BALANCE,
+    PayoutMethodType.STRIPE,
+  ].includes(payoutMethodType);
+  const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
 
-  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
@@ -414,8 +458,17 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     amountBatched &&
     amountInBalance.valueInCents >= amountBatched.valueInCents + amounts.totalAmount?.valueInCents;
 
+  const isStripePayment = payoutMethodType === PayoutMethodType.STRIPE;
+
+  const onPayWithStripeSuccess = React.useCallback(async () => {
+    await onSubmit({
+      action: 'MARK_AS_PAID_WITH_STRIPE',
+      paymentMethodService: PAYMENT_METHOD_SERVICE.STRIPE,
+    });
+  }, [onSubmit]);
+
   return (
-    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal" trapFocus>
+    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal">
       <ModalHeader>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />
@@ -444,8 +497,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     ...formik.values,
                     ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                     paymentProcessorFeeInHostCurrency: null,
-                    expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
-                    feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null)
+                    expenseAmountInHostCurrency:
+                      expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
+                    feesPayer: !getCanCustomizeFeesPayer(expense, collective, isManualPayment, null)
                       ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                       : formik.values.feesPayer,
                   });
@@ -460,7 +514,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 }
               </StyledButtonSet>
             )}
-            {hasManualPayment && (
+            {isManualPayment && (
               <React.Fragment>
                 <StyledInputField
                   name="expenseAmountInHostCurrency"
@@ -583,15 +637,15 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </StyledInputField>
               </React.Fragment>
             )}
-            {canQuote && canAddTransferDetails && !hasManualPayment && (
+            {canQuote && !isManualPayment && (
               <div className="mt-3">
-                <TransferDetailFields expense={expense} setDisabled={setDisabled} />
+                <TransferDetailFields host={host} expense={expense} setDisabled={setTransferDetailsLoadingState} />
               </div>
             )}
             {getCanCustomizeFeesPayer(
               expense,
               collective,
-              hasManualPayment,
+              isManualPayment,
               formik.values.paymentProcessorFeeInHostCurrency,
             ) && (
               <Flex mt={16}>
@@ -625,12 +679,21 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   <FormattedMessage id="ExpenseAmount" defaultMessage="Expense amount" />
                 </Label>
                 <Amount>
-                  <FormattedMoneyAmount
-                    amountStyles={{ fontWeight: 500 }}
-                    amount={amounts.expenseAmountInHostCurrency?.valueInCents}
-                    currency={amounts.expenseAmountInHostCurrency?.currency}
-                    currencyCodeStyles={{ color: 'black.500' }}
-                  />
+                  {amounts.isMultiCurrency ? (
+                    <FormattedMoneyAmount
+                      amount={amounts.amountInExpenseCurrency?.valueInCents}
+                      currency={amounts.amountInExpenseCurrency?.currency}
+                      amountClassName="font-medium"
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  ) : (
+                    <FormattedMoneyAmount
+                      amount={formik.values.expenseAmountInHostCurrency}
+                      currency={amounts.expenseAmountInHostCurrency?.currency}
+                      amountClassName="font-medium"
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  )}
                 </Amount>
               </AmountLine>
               {expense.taxes?.map(tax => (
@@ -644,7 +707,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       amount={getTaxAmount(amountWithoutTaxes, tax)}
                       precision={2}
                       currency={expense.currency}
-                      amountStyles={{ fontWeight: 500 }}
+                      amountClassName="font-medium"
                       showCurrencyCode={false}
                     />
                   </Amount>
@@ -662,11 +725,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       <FormattedMoneyAmount
                         amount={amounts.paymentProcessorFee.valueInCents}
                         currency={amounts.paymentProcessorFee.currency}
-                        currencyCodeStyles={{ color: 'black.500' }}
-                        amountStyles={{
-                          fontWeight: 500,
-                          color: 'black.900',
-                        }}
+                        currencyCodeClassName="text-muted-foreground"
+                        amountClassName="text-foreground font-medium"
                       />
                     )}
                   </Amount>
@@ -677,17 +737,34 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   {amounts.paymentProcessorFee !== null ? (
                     <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
                   ) : (
-                    <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-1">
+                        <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                        <CircleHelp size={16} className="text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="This payment provider doesn’t offer a way to calculate the fees in advance."
+                          id="EC5IZi"
+                        />
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </Label>
                 <Amount>
                   {quoteQuery.loading ? (
                     <LoadingPlaceholder height="16px" />
+                  ) : amounts.isMultiCurrency ? (
+                    <AmountWithExchangeRateInfo
+                      amount={amounts.expenseAmountInHostCurrency}
+                      currencyCodeClassName="text-muted-foreground"
+                      amountWrapperClassName="flex flex-row-reverse gap-1"
+                    />
                   ) : (
                     <FormattedMoneyAmount
                       amount={amounts.totalAmount?.valueInCents}
                       currency={amounts.totalAmount?.currency}
-                      currencyCodeStyles={{ color: 'black.500' }}
+                      currencyCodeClassName="text-muted-foreground"
                     />
                   )}
                 </Amount>
@@ -740,38 +817,45 @@ Please add funds to your Wise {currency} account."
                 </P>
               </MessageBox>
             )}
-            <Flex flexWrap="wrap" justifyContent="space-evenly">
-              <StyledButton
-                buttonStyle="success"
-                width="100%"
-                m={1}
-                type="submit"
-                loading={formik.isSubmitting}
-                data-cy="mark-as-paid-button"
-                disabled={disabled || quoteQuery.loading || (canQuote && hasFunds === false)}
-              >
-                {hasManualPayment ? (
-                  <React.Fragment>
-                    <Check size="1.5em" />
-                    <Span css={{ verticalAlign: 'middle' }} ml={1}>
-                      <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
-                    </Span>
-                  </React.Fragment>
-                ) : isScheduling ? (
-                  <FormattedMessage
-                    id="expense.schedule.btn"
-                    defaultMessage="Schedule to Pay with {paymentMethod}"
-                    values={{ paymentMethod: payoutMethodLabel }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="expense.pay.btn"
-                    defaultMessage="Pay with {paymentMethod}"
-                    values={{ paymentMethod: payoutMethodLabel }}
-                  />
-                )}
-              </StyledButton>
-            </Flex>
+            {isStripePayment && <PayExpenseWithStripe onSuccess={onPayWithStripeSuccess} expense={expense} />}
+            {!isStripePayment && (
+              <Flex flexWrap="wrap" justifyContent="space-evenly">
+                <StyledButton
+                  buttonStyle="success"
+                  width="100%"
+                  m={1}
+                  type="submit"
+                  loading={formik.isSubmitting}
+                  data-cy="mark-as-paid-button"
+                  disabled={
+                    canQuote &&
+                    !isManualPayment &&
+                    (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)
+                  }
+                >
+                  {isManualPayment ? (
+                    <React.Fragment>
+                      <Check size="1.5em" />
+                      <Span css={{ verticalAlign: 'middle' }} ml={1}>
+                        <FormattedMessage id="expense.markAsPaid" defaultMessage="Mark as paid" />
+                      </Span>
+                    </React.Fragment>
+                  ) : isScheduling ? (
+                    <FormattedMessage
+                      id="expense.schedule.btn"
+                      defaultMessage="Schedule to Pay with {paymentMethod}"
+                      values={{ paymentMethod: payoutMethodLabel }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="expense.pay.btn"
+                      defaultMessage="Pay with {paymentMethod}"
+                      values={{ paymentMethod: payoutMethodLabel }}
+                    />
+                  )}
+                </StyledButton>
+              </Flex>
+            )}
           </FormikProvider>
         </form>
       </ModalBody>

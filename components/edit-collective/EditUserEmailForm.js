@@ -7,12 +7,12 @@ import { isEmail } from 'validator';
 
 import { gqlV1 } from '../../lib/graphql/helpers';
 
-import { Box, Flex } from '../Grid';
+import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 import SettingsSectionTitle from './sections/SettingsSectionTitle';
 
@@ -78,13 +78,12 @@ class EditUserEmailForm extends React.Component {
           <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
         </SettingsSectionTitle>
         {LoggedInUser ? (
-          <Flex flexWrap="wrap">
+          <div className="flex flex-col gap-2 md:flex-row">
             <StyledInput
               name="email"
               type="email"
+              className="w-full md:w-1/2"
               value={isNil(newEmail) ? LoggedInUser.email : newEmail}
-              mr={3}
-              my={2}
               disabled={!data.LoggedInUser || loading}
               onChange={e => {
                 this.setState({ step: 'form', error: null, newEmail: e.target.value, isTouched: true });
@@ -97,51 +96,47 @@ class EditUserEmailForm extends React.Component {
                 }
               }}
             />
-            <Flex my={2}>
-              <StyledButton
+            <Button
+              disabled={!isTouched || !newEmail || !isValid || isDone}
+              loading={isSubmitting}
+              variant="outline"
+              onClick={async () => {
+                this.setState({ isSubmitting: true });
+                try {
+                  const { data } = await updateUserEmail({ variables: { email: newEmail } });
+                  this.setState({
+                    step: LoggedInUser.email === newEmail ? 'initial' : 'success',
+                    error: null,
+                    newEmail: data.updateUserEmail.emailWaitingForValidation || LoggedInUser.email,
+                    isSubmitting: false,
+                    isTouched: false,
+                  });
+                } catch (e) {
+                  this.setState({ error: e.message, isSubmitting: false });
+                }
+              }}
+            >
+              <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
+            </Button>
+            {!isDone && (
+              <Button
                 minWidth={180}
-                disabled={!isTouched || !newEmail || !isValid || isDone}
-                loading={isSubmitting}
-                mr={2}
+                disabled={step === 'already-sent'}
+                loading={isResendingConfirmation}
                 onClick={async () => {
-                  this.setState({ isSubmitting: true });
+                  this.setState({ isResendingConfirmation: true });
                   try {
-                    const { data } = await updateUserEmail({ variables: { email: newEmail } });
-                    this.setState({
-                      step: LoggedInUser.email === newEmail ? 'initial' : 'success',
-                      error: null,
-                      newEmail: data.updateUserEmail.emailWaitingForValidation || LoggedInUser.email,
-                      isSubmitting: false,
-                      isTouched: false,
-                    });
+                    await updateUserEmail({ variables: { email: newEmail } });
+                    this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
                   } catch (e) {
-                    this.setState({ error: e.message, isSubmitting: false });
+                    this.setState({ error: e.message, isResendingConfirmation: false });
                   }
                 }}
               >
-                <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
-              </StyledButton>
-
-              {isDone && (
-                <StyledButton
-                  minWidth={180}
-                  disabled={step === 'already-sent'}
-                  loading={isResendingConfirmation}
-                  onClick={async () => {
-                    this.setState({ isResendingConfirmation: true });
-                    try {
-                      await updateUserEmail({ variables: { email: newEmail } });
-                      this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
-                    } catch (e) {
-                      this.setState({ error: e.message, isResendingConfirmation: false });
-                    }
-                  }}
-                >
-                  <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
-                </StyledButton>
-              )}
-            </Flex>
-          </Flex>
+                <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
+              </Button>
+            )}
+          </div>
         ) : (
           <LoadingPlaceholder height={63} />
         )}
@@ -166,7 +161,7 @@ class EditUserEmailForm extends React.Component {
   }
 }
 
-const loggedInUserEmailQuery = gqlV1/* GraphQL */ `
+const loggedInUserEmailQuery = gqlV1 /* GraphQL */ `
   query LoggedInUserEmail {
     LoggedInUser {
       id
@@ -182,7 +177,7 @@ const addLoggedInUserEmailData = graphql(loggedInUserEmailQuery, {
   },
 });
 
-const updateUserEmailMutation = gqlV1/* GraphQL */ `
+const updateUserEmailMutation = gqlV1 /* GraphQL */ `
   mutation UpdateUserEmail($email: String!) {
     updateUserEmail(email: $email) {
       id

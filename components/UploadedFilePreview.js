@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { max } from 'lodash';
@@ -134,10 +133,10 @@ const UploadedFilePreview = ({
   }
 
   const getContainerAttributes = () => {
-    if (isPrivate) {
+    if (isPrivate || !url) {
       return { as: 'div' };
     } else if (isText || !openFileViewer) {
-      return { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink };
+      return { href: url, target: '_blank', rel: 'noopener noreferrer', as: url.startsWith('/') ? Link : StyledLink };
     } else {
       return {
         as: 'div',
@@ -176,22 +175,6 @@ const UploadedFilePreview = ({
       )}
     </MainContainer>
   );
-};
-
-UploadedFilePreview.propTypes = {
-  url: PropTypes.string,
-  isPrivate: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  isDownloading: PropTypes.bool,
-  showFileName: PropTypes.bool,
-  alt: PropTypes.string,
-  fileName: PropTypes.string,
-  onClick: PropTypes.func,
-  fileSize: PropTypes.number,
-  border: PropTypes.string,
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  openFileViewer: PropTypes.func,
 };
 
 export default UploadedFilePreview;

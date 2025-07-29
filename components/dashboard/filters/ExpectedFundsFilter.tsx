@@ -3,7 +3,7 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterConfig } from '../../../lib/filters/filter-types';
-import { ExpectedFundsFilter } from '../../../lib/graphql/types/v2/graphql';
+import { ExpectedFundsFilter } from '../../../lib/graphql/types/v2/schema';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
@@ -22,11 +22,11 @@ export const expectedFundsFilter: FilterConfig<z.infer<typeof schema>> = {
     },
     valueRenderer: ({ value }) =>
       value === ExpectedFundsFilter.ALL_EXPECTED_FUNDS ? (
-        <FormattedMessage defaultMessage="All" id="zQvVDJ" />
+        <FormattedMessage defaultMessage="All" id="All" />
       ) : value === ExpectedFundsFilter.ONLY_PENDING ? (
-        <FormattedMessage defaultMessage="Created by host admin" id="See4A8" />
+        <FormattedMessage defaultMessage="Only Pending" id="Filter.OnlyPending" />
       ) : (
-        <FormattedMessage defaultMessage="Created by contributors" id="wa5frV" />
+        <FormattedMessage defaultMessage="Only Confirmed" id="Filter.OnlyConfirmed" />
       ),
   },
 };

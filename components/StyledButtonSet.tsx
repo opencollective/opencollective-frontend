@@ -175,4 +175,7 @@ const StyledButtonSet = ({
   </Container>
 );
 
+/**
+ * @deprecated Use `ui/ButtonSet` instead
+ */
 export default StyledButtonSet;

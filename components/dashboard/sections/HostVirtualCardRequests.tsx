@@ -6,13 +6,9 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
 import { isMulti, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import type {
-  Account,
-  Host,
-  HostVirtualCardRequestsQueryVariables,
-  VirtualCardRequestCollection,
-} from '../../../lib/graphql/types/v2/graphql';
-import { VirtualCardRequestStatus } from '../../../lib/graphql/types/v2/graphql';
+import type { HostVirtualCardRequestsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/schema';
+import { VirtualCardRequestStatus } from '../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nVirtualCardRequestStatus } from '../../../lib/i18n/virtual-card-request';
 import { sortSelectOptions } from '../../../lib/utils';
@@ -204,7 +200,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
   const loading = query.loading;
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />}
         description={
@@ -235,7 +231,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
       ) : (
         <React.Fragment>
           <VirtualCardRequestsTable
-            onSelectedVirtualCardRequest={vcr => queryFilter.setFilter('virtualCardRequest', vcr.legacyId)}
+            onSelectedVirtualCardRequest={vcr => queryFilter.setFilter('virtualCardRequest', vcr.legacyId, false)}
             loading={query.loading}
             virtualCardRequests={query.data?.virtualCardRequests.nodes}
           />
@@ -243,7 +239,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
 
           <VirtualCardRequestDrawer
             open={!!queryFilter.values.virtualCardRequest}
-            onClose={() => queryFilter.setFilter('virtualCardRequest', null)}
+            onClose={() => queryFilter.setFilter('virtualCardRequest', null, false)}
             virtualCardRequestId={queryFilter.values.virtualCardRequest}
           />
         </React.Fragment>

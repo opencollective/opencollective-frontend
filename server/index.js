@@ -5,6 +5,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
+const { isEmpty } = require('lodash');
 const throng = require('throng');
 
 const logger = require('./logger');
@@ -68,8 +69,12 @@ const start = id =>
       app.use(
         duplicateHandler({
           skip: req =>
+            !isEmpty(req.cookies) ||
+            req.headers.authorization ||
+            req.headers.cookie ||
             req.url.match(/^\/_/) ||
             req.url.match(/^\/static/) ||
+            req.url.match(/^\/dashboard/) ||
             req.url.match(/^\/api/) ||
             req.url.match(/^\/favicon\.ico/),
         }),

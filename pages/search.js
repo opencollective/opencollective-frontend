@@ -7,11 +7,13 @@ import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
+import { padding } from 'styled-system';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
+import { textTransform } from '@/lib/styled-system-custom-properties';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -33,6 +35,7 @@ import StyledLink from '../components/StyledLink';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
+import { Switch } from '../components/ui/Switch';
 import { toast } from '../components/ui/useToast';
 
 const CollectiveCardContainer = styled.div`
@@ -99,6 +102,8 @@ const FilterLabel = styled.label`
   text-transform: uppercase;
   padding-bottom: 8px;
   color: #4d4f51;
+  ${padding}
+  ${textTransform}
 `;
 
 const constructSortByQuery = sortByValue => {
@@ -147,6 +152,7 @@ class SearchPage extends React.Component {
       term: query.q || '',
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      onlyOpenToApplications: isNil(query.onlyOpenToApplications) ? true : parseToBoolean(query.onlyOpenToApplications),
       country: query.country || null,
       sortBy: query.sortBy || (query.q ? 'RANK' : 'ACTIVITY'),
       tag: query.tag?.length > 0 ? query.tag.split(',') : [],
@@ -167,6 +173,7 @@ class SearchPage extends React.Component {
     intl: PropTypes.object,
     isHost: PropTypes.bool,
     type: PropTypes.array,
+    onlyOpenToApplications: PropTypes.bool,
   };
 
   constructor(props) {
@@ -304,9 +311,10 @@ class SearchPage extends React.Component {
       getSortOption('CREATED_AT.ASC'),
     ];
     const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
+    const showonlyOpenToApplicationsFilter = selectedTypeFilter === 'HOST';
 
     return (
-      <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })} showSearch={false}>
+      <Page showSearch={false}>
         <Container
           backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
           style={{ transform: 'rotate(180deg)' }}
@@ -370,8 +378,30 @@ class SearchPage extends React.Component {
               />
             </Hide>
           </Flex>
+          {showonlyOpenToApplicationsFilter && (
+            <div className="mb-4 flex items-center justify-center gap-2">
+              <FilterLabel htmlFor="open-to-applications-filter" pb={0} textTransform="none">
+                <FormattedMessage defaultMessage="Only show hosts open to applications" id="FoQ3K3" />
+              </FilterLabel>
+              <Switch
+                id="open-to-applications-filter"
+                checked={this.props.onlyOpenToApplications}
+                onCheckedChange={checked => {
+                  const { router } = this.props;
+                  const query = {
+                    ...router.query,
+                    onlyOpenToApplications: checked,
+                  };
+                  router.push({
+                    pathname: router.pathname,
+                    query: pickBy(query, value => !isNil(value)),
+                  });
+                }}
+              />
+            </div>
+          )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
-          <Flex flexDirection={['column', 'row']}>
+          <Flex flexDirection={['column', 'row']} mb={3}>
             <Container pr={[0, '19px']}>
               <FilterLabel htmlFor="sort-filter-type">
                 <FormattedMessage defaultMessage="Sort" id="25oM9Q" />
@@ -568,6 +598,7 @@ const searchPageQuery = gql`
     $isHost: Boolean
     $limit: Int
     $offset: Int
+    $onlyOpenToApplications: Boolean
   ) {
     accounts(
       searchTerm: $term
@@ -579,6 +610,7 @@ const searchPageQuery = gql`
       country: $country
       orderBy: $sortBy
       tag: $tag
+      onlyOpenToApplications: $onlyOpenToApplications
     ) {
       nodes {
         id
@@ -592,6 +624,7 @@ const searchPageQuery = gql`
         }
         tags
         isHost
+        isVerified
         imageUrl(height: 96)
         backgroundImageUrl(height: 208)
         description
@@ -599,7 +632,6 @@ const searchPageQuery = gql`
         currency
         stats {
           id
-          contributorsCount
           totalAmountReceived(useCache: true) {
             currency
             valueInCents
@@ -614,8 +646,21 @@ const searchPageQuery = gql`
             id
             hostFeePercent
             totalHostedCollectives
+            isTrustedHost
+            isFirstPartyHost
           }
         }
+
+        ... on AccountWithHost {
+          host {
+            id
+            hostFeePercent
+            totalHostedCollectives
+            isTrustedHost
+            isFirstPartyHost
+          }
+        }
+
         ... on AccountWithParent {
           parent {
             id
@@ -653,6 +698,7 @@ const addSearchPageData = graphql(searchPageQuery, {
       offset: props.offset,
       country: props.country,
       tag: props.tag,
+      onlyOpenToApplications: !props.isHost ? undefined : props.onlyOpenToApplications,
       sortBy: constructSortByQuery(props.sortBy),
     },
   }),

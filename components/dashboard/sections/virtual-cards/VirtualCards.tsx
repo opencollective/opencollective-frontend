@@ -9,7 +9,7 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { AccountVirtualCardsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
 import { VirtualCardStatusI18n } from '../../../../lib/virtual-cards/constants';

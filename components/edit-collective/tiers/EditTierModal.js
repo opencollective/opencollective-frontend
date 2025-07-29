@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
@@ -67,14 +66,17 @@ function getTierTypeOptions(intl, collectiveType) {
   return [...simplifiedTierTypes, membershipTierType];
 }
 
-function getReceiptTemplates(host) {
+function getReceiptTemplates(intl, host) {
   const receiptTemplates = host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default) {
     receiptTemplateTitles.push({
       value: 'default',
-      label: receiptTemplates.default.title,
+      label: intl.formatMessage(
+        { defaultMessage: '{value} (default)', id: 'OgbGHX' },
+        { value: receiptTemplates.default.title },
+      ),
     });
   }
   if (receiptTemplates?.alternative) {
@@ -83,26 +85,38 @@ function getReceiptTemplates(host) {
   return receiptTemplateTitles;
 }
 
+const collectiveSupportsInterval = collective => {
+  return collective.type !== CollectiveType.EVENT;
+};
+
 function FormFields({ collective, values, hideTypeSelect }) {
   const intl = useIntl();
+  const tierTypeOptions = React.useMemo(() => getTierTypeOptions(intl, collective.type), [intl, collective.type]);
+  const intervalOptions = React.useMemo(() => {
+    if (!collectiveSupportsInterval(collective)) {
+      return [{ value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) }];
+    } else {
+      return [
+        { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
+        { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+        { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
+        { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
+      ];
+    }
+  }, [collective.type, intl]);
 
-  const tierTypeOptions = getTierTypeOptions(intl, collective.type);
-  const intervalOptions = [
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
-    { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
-    { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
-    { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
-  ];
+  const amountTypeOptions = React.useMemo(
+    () => [
+      { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
+      {
+        value: FLEXIBLE,
+        label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
+      },
+    ],
+    [intl],
+  );
 
-  const amountTypeOptions = [
-    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
-    {
-      value: FLEXIBLE,
-      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
-    },
-  ];
-
-  const receiptTemplateOptions = getReceiptTemplates(collective.host);
+  const receiptTemplateOptions = getReceiptTemplates(intl, collective.host);
 
   const taxes = getApplicableTaxes(collective, collective.host, values.type);
 
@@ -186,7 +200,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
       >
         {({ field }) => <StyledTextarea data-cy={field.name} maxLength={510} width="100%" showCount {...field} />}
       </StyledInputFormikField>
-      {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
+      {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && intervalOptions.length > 1 && (
         <StyledInputFormikField
           name="interval"
           label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
@@ -275,6 +289,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           {({ field, form }) => (
             <InputFieldPresets
               {...field}
+              min={values.minimumAmount?.valueInCents || 0}
               defaultValue={field.value}
               onChange={value => form.setFieldValue(field.name, value)}
             />
@@ -519,7 +534,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
                 isLoading={loading}
                 options={receiptTemplateOptions}
-                value={receiptTemplateOptions.find(option => option.value === field.value)}
+                value={receiptTemplateOptions.find(option => option.value === (field.value ?? 'default'))}
               />
             )}
           </StyledInputFormikField>
@@ -534,27 +549,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
     </React.Fragment>
   );
 }
-
-FormFields.propTypes = {
-  collective: PropTypes.shape({
-    host: PropTypes.object,
-    currency: PropTypes.string,
-    type: PropTypes.string,
-  }),
-  values: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    amountType: PropTypes.string,
-    interval: PropTypes.string,
-  }),
-  hideTypeSelect: PropTypes.bool,
-  tier: PropTypes.shape({
-    type: PropTypes.string,
-    singleTicket: PropTypes.bool,
-  }),
-};
 
 const EditSectionContainer = styled(Flex)`
   overflow-y: scroll;
@@ -640,14 +634,6 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
   );
 }
 
-EditTierModal.propTypes = {
-  tier: PropTypes.object,
-  collective: PropTypes.object,
-  onClose: PropTypes.func,
-  onUpdate: PropTypes.func,
-  forcedType: PropTypes.string,
-};
-
 function ContributeCardPreview({ tier, collective }) {
   const intl = useIntl();
 
@@ -667,14 +653,6 @@ function ContributeCardPreview({ tier, collective }) {
     </ContributeCardPreviewContainer>
   );
 }
-
-ContributeCardPreview.propTypes = {
-  tier: PropTypes.shape({
-    legacyId: PropTypes.number,
-    maxQuantity: PropTypes.number,
-  }),
-  collective: PropTypes.object,
-};
 
 const editTiersFieldsFragment = gql`
   fragment EditTiersFields on Tier {
@@ -788,7 +766,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
       return {
         ...omit(tier, ['__typename', 'endsAt', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
-        interval: getIntervalFromContributionFrequency(tier.frequency),
+        interval: collectiveSupportsInterval(collective) ? getIntervalFromContributionFrequency(tier.frequency) : null,
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
@@ -802,7 +780,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         amountType: AmountTypes.FIXED,
         amount: null,
         minimumAmount: null,
-        interval: INTERVALS.month,
+        interval: collectiveSupportsInterval(collective) ? INTERVALS.month : null,
         description: '',
         presets: [1000],
       };
@@ -994,11 +972,3 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
     </React.Fragment>
   );
 }
-
-EditTierForm.propTypes = {
-  collective: PropTypes.object,
-  tier: PropTypes.object,
-  onClose: PropTypes.func,
-  onUpdate: PropTypes.func,
-  forcedType: PropTypes.string,
-};

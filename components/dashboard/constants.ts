@@ -26,10 +26,18 @@ export const SECTIONS = {
   TRANSACTIONS: 'transactions',
   UPDATES: 'updates',
   HOST_TRANSACTIONS: 'host-transactions',
+  OFF_PLATFORM_TRANSACTIONS: 'off-platform-transactions',
+  LEDGER_CSV_IMPORTS: 'ledger-csv-imports',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
   ACCOUNTS: 'accounts',
+  OFF_PLATFORM_CONNECTIONS: 'off-platform-connections',
+  HOSTED_FUNDS: 'hosted-funds',
+  HOSTED_GRANTS: 'hosted-grants',
+  GRANTS: 'grants',
+  SUBMITTED_GRANTS: 'submitted-grants',
+  APPROVE_GRANT_REQUESTS: 'approve-grant-requests',
 };
 
 export const ROOT_SECTIONS = {
@@ -45,6 +53,7 @@ export const ROOT_SECTIONS = {
   UNHOST_ACCOUNTS: 'unhost-accounts',
   ACCOUNT_SETTINGS: 'account-settings',
   ACCOUNT_TYPE: 'account-type',
+  ANONYMIZE_ACCOUNT: 'anonymize-account',
   RECURRING_CONTRIBUTIONS: 'recurring-contributions',
 };
 
@@ -73,11 +82,11 @@ export const LEGACY_SETTINGS_SECTIONS = {
   POLICIES: 'policies',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
+  OFF_PLATFORM_CONNECTIONS: 'off-platform-connections',
   WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
-  CONNECTED_ACCOUNTS: 'connected-accounts',
   EXPORT: 'export',
   FOR_DEVELOPERS: 'for-developers',
   USER_SECURITY: 'user-security',
@@ -110,7 +119,12 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
   ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
   ALL_SECTIONS.CONTRIBUTORS,
+  ALL_SECTIONS.GRANTS,
+  ALL_SECTIONS.HOSTED_GRANTS,
+  ALL_SECTIONS.HOSTED_FUNDS,
 ];
+
+export const SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS = [ALL_SECTIONS.OVERVIEW, ALL_SECTIONS.UPDATES];
 
 export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.EXPENSES]: {
@@ -153,10 +167,6 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.collectivePage',
     defaultMessage: 'Profile Sections',
   },
-  [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
-    id: 'H/VkpN',
-    defaultMessage: 'Social Accounts',
-  },
   [ALL_SECTIONS.EXPORT]: {
     id: 'editCollective.menu.export',
     defaultMessage: 'Export',
@@ -188,6 +198,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.sendingMoney',
     defaultMessage: 'Sending Money',
+  },
+  [ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS]: {
+    defaultMessage: 'Connected Bank Accounts',
+    id: 'qPhmMo',
   },
   [ALL_SECTIONS.FISCAL_HOSTING]: {
     id: 'editCollective.fiscalHosting',
@@ -292,5 +306,25 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.ACCOUNTS]: {
     defaultMessage: 'Accounts',
     id: 'FvanT6',
+  },
+  [ALL_SECTIONS.HOSTED_FUNDS]: {
+    defaultMessage: 'Hosted Funds',
+    id: 'HostedFunds',
+  },
+  [ALL_SECTIONS.GRANTS]: {
+    defaultMessage: 'Grant Requests',
+    id: 'fng2Fr',
+  },
+  [ALL_SECTIONS.HOSTED_GRANTS]: {
+    defaultMessage: 'Hosted Grants Requests',
+    id: 'CQ/VM3',
+  },
+  [ALL_SECTIONS.APPROVE_GRANT_REQUESTS]: {
+    defaultMessage: 'Approve Grant Requests',
+    id: 'RyfEp8',
+  },
+  [ALL_SECTIONS.SUBMITTED_GRANTS]: {
+    defaultMessage: 'Issued Grant Requests',
+    id: 'qKKz2G',
   },
 });

@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { VirtualCardRequestStatus } from '../graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../graphql/types/v2/schema';
 
 const VirtualCardRequestStatusI18n = defineMessages({
   [VirtualCardRequestStatus.APPROVED]: {

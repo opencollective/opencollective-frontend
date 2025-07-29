@@ -4,7 +4,7 @@ import type {
   ExpenseType,
   PayoutMethodType,
   UploadFileResult,
-} from '../../../lib/graphql/types/v2/graphql';
+} from '../../../lib/graphql/types/v2/schema';
 
 export interface ExpenseItemFormValues {
   id?: string;

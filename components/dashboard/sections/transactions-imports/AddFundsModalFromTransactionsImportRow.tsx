@@ -6,7 +6,7 @@ import type {
   TransactionsImport,
   TransactionsImportRow,
   TransactionsImportStats,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 
 import type { BaseModalProps } from '../../../ModalContext';
 import AddFundsModal from '../collectives/AddFundsModal';
@@ -14,17 +14,21 @@ import AddFundsModal from '../collectives/AddFundsModal';
 const prettyPrintRawValues = (rawValue: Record<string, string>) => {
   return Object.entries(rawValue)
     .filter(([, value]) => !isEmpty(value))
-    .map(([key, value]) => `- ${startCase(key)}: ${value}`)
+    .map(([key, value]) => `- ${startCase(key)}: ${JSON.stringify(value)}`)
     .join('\n');
 };
 
 export const AddFundsModalFromImportRow = ({
+  collective,
+  host,
   transactionsImport,
   row,
   open,
   setOpen,
 }: {
-  transactionsImport: TransactionsImport;
+  collective?: React.ComponentProps<typeof AddFundsModal>['collective'];
+  transactionsImport: Pick<TransactionsImport, 'source' | 'name'>;
+  host: React.ComponentProps<typeof AddFundsModal>['host'];
   row: TransactionsImportRow;
 } & BaseModalProps) => {
   const client = useApolloClient();
@@ -34,13 +38,12 @@ export const AddFundsModalFromImportRow = ({
 
   return (
     <AddFundsModal
-      open={open}
       onClose={() => setOpen(false)}
-      host={transactionsImport.account}
+      host={host}
       transactionsImportRow={row}
+      collective={collective}
       initialValues={{
         amount: row.amount.valueInCents,
-        currency: row.amount.currency,
         description: row.description,
         processedAt: row.date.split('T')[0],
         memo: `Imported from "${transactionsImport.source} - ${transactionsImport.name}". Row values:\n${prettyPrintRawValues(row.rawValue)}`,
@@ -58,7 +61,12 @@ export const AddFundsModalFromImportRow = ({
           id: client.cache.identify(transactionsImport),
           fields: {
             stats: (stats: TransactionsImportStats): TransactionsImportStats => {
-              return { ...stats, processed: stats.processed + 1, orders: stats.orders + 1 };
+              return {
+                ...stats,
+                imported: stats.imported + 1,
+                processed: stats.processed + 1,
+                orders: stats.orders + 1,
+              };
             },
           },
         });

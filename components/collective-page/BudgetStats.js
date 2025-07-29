@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { ShowChart } from '@styled-icons/material/ShowChart';
 import { Expand } from 'lucide-react';
@@ -10,7 +9,6 @@ import { border } from 'styled-system';
 import { isIndividualAccount } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
-import { AmountPropTypeShape } from '../../lib/prop-types';
 
 import Container from '../Container';
 import DefinedTerm, { Terms } from '../DefinedTerm';
@@ -34,13 +32,9 @@ const StatTitle = styled(Container).attrs(props => ({
 const StatAmount = ({ amount, ...props }) => (
   <P fontSize="16px" lineHeight="24px" color="black.700">
     {/* Pass null instead of 0 to make sure we display `--.--` */}
-    <FormattedMoneyAmount amount={amount || null} {...props} />
+    <FormattedMoneyAmount amountClassName="font-bold" amount={amount || null} {...props} />
   </P>
 );
-
-StatAmount.propTypes = {
-  amount: PropTypes.number,
-};
 
 const StatContainer = styled.div`
   flex: 1;
@@ -141,9 +135,13 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         id="budgetSection-raised-total"
                         defaultMessage="Total contributed before fees: {amount}"
                         values={{
-                          amount: formatCurrency(stats.totalAmountRaised.valueInCents || 0, collective.currency, {
-                            locale,
-                          }),
+                          amount: formatCurrency(
+                            stats.totalAmountRaised.valueInCents || 0,
+                            stats.totalAmountRaised.currency,
+                            {
+                              locale,
+                            },
+                          ),
                         }}
                       />
                     </Box>
@@ -151,7 +149,10 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                 />
               )}
             </StatTitle>
-            <StatAmount amount={stats.totalNetAmountRaised.valueInCents} currency={collective.currency} />
+            <StatAmount
+              amount={stats.totalNetAmountRaised.valueInCents}
+              currency={stats.totalNetAmountRaised.currency}
+            />
           </StatContainer>
           <StatContainer borderTop={borderTop}>
             <StatTitle>
@@ -229,36 +230,6 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
       )}
     </StyledCard>
   );
-};
-
-BudgetStats.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.object,
-    isHost: PropTypes.bool,
-  }).isRequired,
-
-  /** Stats */
-  stats: PropTypes.shape({
-    balance: AmountPropTypeShape,
-    consolidatedBalance: AmountPropTypeShape,
-    yearlyBudget: AmountPropTypeShape,
-    activeRecurringContributions: PropTypes.object,
-    totalAmountReceived: AmountPropTypeShape,
-    totalAmountRaised: AmountPropTypeShape,
-    totalNetAmountRaised: AmountPropTypeShape,
-    totalAmountSpent: AmountPropTypeShape,
-    totalPaidExpenses: AmountPropTypeShape,
-  }),
-
-  horizontal: PropTypes.bool,
-  isLoading: PropTypes.bool,
 };
 
 export default React.memo(BudgetStats);

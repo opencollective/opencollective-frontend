@@ -1,41 +1,27 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Lock } from '@styled-icons/material/Lock';
+import { NotepadText } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 
-import commentTypes from '../../lib/constants/commentTypes';
+import { CommentType } from '../../lib/graphql/types/v2/schema';
+import { cn } from '../../lib/utils';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import CommentIconLib from '../icons/CommentIcon';
 import StyledButton from '../StyledButton';
+import { Separator } from '../ui/Separator';
 import { withUser } from '../UserProvider';
 
+import { getActivityIcon, isSupportedActivity } from './activity-helpers';
 import Comment from './Comment';
-import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadActivity';
+import SmallThread from './SmallThread';
+import ThreadActivity from './ThreadActivity';
 
 const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
   color: '#9a9a9a',
 })``;
-
-const NoteIcon = styled(Lock).attrs(props => ({
-  size: 16,
-  color: props.theme.colors.blue[400],
-}))``;
-
-const ItemContainer = styled.div`
-  width: 100%;
-
-  ${props =>
-    !props.isLast &&
-    css`
-      padding-bottom: 16px;
-      margin-bottom: 16px;
-      border-bottom: 1px dashed #d3d6da;
-    `}
-`;
 
 /**
  * A thread is meant to display comments and activities in a chronological order.
@@ -66,55 +52,51 @@ const Thread = ({
 
   return (
     <div data-cy="thread">
-      {items.map((item, idx) => {
-        switch (item.__typename) {
-          case 'Comment': {
-            const isPrivateNote = item.type === commentTypes.PRIVATE_NOTE;
-            return (
-              <Box key={`comment-${item.id}`}>
-                <Flex>
-                  <Flex flexDirection="column" alignItems="center" width="40px">
-                    <Box my={2}>{isPrivateNote ? <NoteIcon /> : <CommentIcon />}</Box>
-                    <Container
-                      width="1px"
-                      height="100%"
-                      background={isPrivateNote ? theme.colors.blue[400] : '#E8E9EB'}
-                    />
-                  </Flex>
-                  <ItemContainer isLast={idx + 1 === items.length}>
-                    <Comment
-                      comment={item}
-                      canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
-                      canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
-                      canReply={Boolean(LoggedInUser)}
-                      onDelete={onCommentDeleted}
-                      reactions={item.reactions}
-                      onReplyClick={getClickedComment}
-                    />
-                  </ItemContainer>
+      {items.map(item =>
+        item.__typename === 'Comment' ? (
+          <React.Fragment key={`${item.__typename}-${item.id}`}>
+            <div className={cn('flex', item.type === CommentType.PRIVATE_NOTE && 'bg-amber-50')}>
+              <Flex flexDirection="column" alignItems="center" flex="0 0 40px">
+                <Box my={2}>
+                  {item.type === CommentType.PRIVATE_NOTE ? (
+                    <NotepadText className="text-amber-500" size={20} />
+                  ) : (
+                    <CommentIcon />
+                  )}
+                </Box>
+                <Container width="1px" height="100%" background="#E8E9EB" />
+              </Flex>
+              <div className="grow p-4 pl-0">
+                <Comment
+                  comment={item}
+                  canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                  canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                  canReply={Boolean(LoggedInUser)}
+                  onDelete={onCommentDeleted}
+                  reactions={item.reactions}
+                  onReplyClick={getClickedComment}
+                />
+              </div>
+            </div>
+            <Separator />
+          </React.Fragment>
+        ) : item.__typename === 'Activity' ? (
+          !isSupportedActivity(item) ? null : (
+            <React.Fragment key={`${item.__typename}-${item.id}`}>
+              <Flex>
+                <Flex flexDirection="column" alignItems="center" width="40px">
+                  <Box my={2}>{getActivityIcon(item, theme)}</Box>
+                  <Container width="1px" height="100%" background="#E8E9EB" />
                 </Flex>
-              </Box>
-            );
-          }
-          case 'Activity':
-            return !isSupportedActivity(item) ? null : (
-              <Box key={`activity-${item.id}`}>
-                <Flex>
-                  <Flex flexDirection="column" alignItems="center" width="40px">
-                    <Box my={2}>{getActivityIcon(item, theme)}</Box>
-                    <Container width="1px" height="100%" background="#E8E9EB" />
-                  </Flex>
-                  <ItemContainer isLast={idx + 1 === items.length}>
-                    <ThreadActivity key={item.id} activity={item} />
-                  </ItemContainer>
-                </Flex>
-              </Box>
-            );
-          default:
-            return null;
-        }
-      })}
-      <hr className="my-5" />
+                <div className="p-4 pl-0">
+                  <ThreadActivity key={item.id} activity={item} />
+                </div>
+              </Flex>
+              <Separator />
+            </React.Fragment>
+          )
+        ) : null,
+      )}
       {hasMore && fetchMore && (
         <Container margin="0.65rem">
           <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">
@@ -126,29 +108,16 @@ const Thread = ({
   );
 };
 
-Thread.propTypes = {
-  /** The list of items to display, sorted by chronoligal order */
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      __typename: PropTypes.oneOf(['Comment', 'Activity']),
-      id: PropTypes.string.isRequired,
-    }),
-  ),
-  /** Called when a comment get deleted */
-  onCommentDeleted: PropTypes.func,
-  /** Collective where the thread is created */
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }).isRequired,
-  /** Indicate whether there are more comments to fetch */
-  hasMore: PropTypes.bool,
-  /** function to fetch more comments */
-  fetchMore: PropTypes.func,
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.object,
-  /** @ignore from withTheme */
-  theme: PropTypes.object,
-  getClickedComment: PropTypes.func,
-};
+const DefaultThreadVariant = React.memo(withUser(withTheme(Thread)));
 
-export default React.memo(withUser(withTheme(Thread)));
+/**
+ *
+ * @param {import('./types').ThreadPropsWithVariant} props
+ */
+export default function ThreadComponent(props) {
+  if (props.variant === 'small') {
+    return <SmallThread {...props} />;
+  }
+
+  return <DefaultThreadVariant {...props} />;
+}

@@ -6,8 +6,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import type { Account } from '../lib/graphql/types/v2/graphql';
-import { MemberRole } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/schema';
+import { MemberRole } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { cn } from '../lib/utils';
 
@@ -90,7 +90,9 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
     !LoggedInUser ||
     LoggedInUser.collective.slug === account.slug ||
     !account.type ||
-    [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.VENDOR, CollectiveType.BOT].includes(account.type)
+    ([CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.VENDOR, CollectiveType.BOT] as string[]).includes(
+      account.type,
+    )
   ) {
     return null;
   }

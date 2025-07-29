@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
@@ -31,7 +30,7 @@ class SignInLinkSent extends Component {
     const isValidEmail = email && isEmail(email);
     return (
       <Page title="Login Link Sent" noRobots showFooter={false}>
-        <div className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16">
+        <div className="flex flex-col items-center px-4 pt-8 pb-32 text-center sm:pt-16">
           <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
           <P fontSize="32px" lineHeight="40px" fontWeight={700} color="black.900">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
@@ -68,10 +67,6 @@ class SignInLinkSent extends Component {
     );
   }
 }
-
-SignInLinkSent.propTypes = {
-  email: PropTypes.string.isRequired,
-};
 
 // next.js export
 // ts-unused-exports:disable-next-line

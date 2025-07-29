@@ -8,8 +8,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Account, VirtualCard, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
-import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import type { Account, VirtualCard, VirtualCardRequest } from '../../lib/graphql/types/v2/schema';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -337,7 +337,7 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (

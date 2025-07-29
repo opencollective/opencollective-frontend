@@ -54,7 +54,7 @@ const ActivityContent = ({
             fontSize="14px"
             lineHeight="16px"
             href={href}
-            className="font-medium !text-slate-900 hover:underline"
+            className="font-medium text-slate-900! hover:underline"
           >
             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
           </StyledLink>
@@ -90,7 +90,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
   const contentKey = i18nMsg?.content;
 
   return (
-    <div className="rounded-2xl border p-4 text-sm">
+    <div className="pb-3 text-sm">
       <div className="flex flex-1 items-start gap-3">
         {isLoading ? (
           <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
@@ -101,9 +101,8 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
           <Skeleton className="h-4 w-80" />
         ) : (
           <div className="flex min-w-0 flex-1 flex-col justify-between sm:flex-row sm:gap-1.5 sm:pt-1">
-            <div className="leading-6 text-foreground">{description}</div>
-
-            <div className="flex items-center self-start whitespace-nowrap leading-6 text-muted-foreground">
+            <div className="align-baseline leading-6 text-foreground *:align-bottom">{description}</div>
+            <div className="flex items-center self-start leading-6 whitespace-nowrap text-muted-foreground">
               {isLastWeek ? (
                 dayjs(activity.createdAt).fromNow()
               ) : (

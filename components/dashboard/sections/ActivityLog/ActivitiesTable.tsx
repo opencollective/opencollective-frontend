@@ -2,7 +2,7 @@ import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/schema';
 import { BREAKPOINTS, useWindowResize } from '../../../../lib/hooks/useWindowResize';
 
 import DateTime from '../../../DateTime';

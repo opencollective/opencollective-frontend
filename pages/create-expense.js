@@ -7,7 +7,12 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { itemHasOCR } from '../components/expenses/lib/ocr';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective';
+import {
+  expenseSubmissionAllowed,
+  getCollectivePageMetadata,
+  getCollectiveTypeForUrl,
+  isHiddenAccount,
+} from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
@@ -219,7 +224,11 @@ class CreateExpensePage extends React.Component {
         const result = await this.props.draftExpenseAndInviteUser({
           variables: {
             account: { id: this.props.data.account.id },
-            expense: { ...prepareExpenseForSubmit(expense), customData: this.props.customData },
+            expense: {
+              ...prepareExpenseForSubmit(expense),
+              customData: this.props.customData,
+              recipientNote: expense.recipientNote?.trim(),
+            },
           },
         });
         if (this.state.formPersister) {
@@ -304,9 +313,9 @@ class CreateExpensePage extends React.Component {
     const { step } = this.state;
 
     if (!data.loading) {
-      if (!data || data.error) {
+      if (data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.account) {
+      } else if (!data.account || isHiddenAccount(data.account)) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (
         !hasFeature(data.account, FEATURES.RECEIVE_EXPENSES) ||
@@ -318,9 +327,9 @@ class CreateExpensePage extends React.Component {
       }
     }
 
-    const collective = data && data.account;
+    const collective = data.account;
     const host = collective && collective.host;
-    const loggedInAccount = data && data.loggedInAccount;
+    const loggedInAccount = data.loggedInAccount;
     const payoutProfiles = getPayoutProfiles(loggedInAccount);
     const hasItemsWithOCR = Boolean(this.state.expense?.items?.some(itemHasOCR));
     const mustConfirmOCR = hasItemsWithOCR && !this.state.hasConfirmedOCR;
@@ -397,6 +406,7 @@ class CreateExpensePage extends React.Component {
                             shouldLoadValuesFromPersister={this.state.isInitialForm}
                             defaultStep={step}
                             autoFocusTitle
+                            canEditPayoutMethod
                           />
                         ) : (
                           <div>
@@ -456,7 +466,7 @@ class CreateExpensePage extends React.Component {
                                   disabled={mustConfirmOCR}
                                   minWidth={175}
                                 >
-                                  {this.state.expense?.type === expenseTypes.GRANT ? (
+                                  {this.state.expense.type === expenseTypes.GRANT ? (
                                     <FormattedMessage id="ExpenseForm.SubmitRequest" defaultMessage="Submit request" />
                                   ) : (
                                     <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -542,6 +552,7 @@ const createExpensePageQuery = gql`
       currency
       isArchived
       isActive
+      isSuspended
       expensePolicy
       supportedExpenseTypes
       features {

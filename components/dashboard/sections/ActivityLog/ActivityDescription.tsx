@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -89,7 +88,6 @@ export const getActivityVariables = (
         amount={activity.expense.amountV2.valueInCents}
         currency={activity.expense.amountV2.currency}
         precision={2}
-        amountStyles={{ letterSpacing: 0 }}
       />
     );
   },
@@ -189,7 +187,13 @@ export const getActivityVariables = (
   },
 });
 
-const ActivityDescription = ({ activity }) => {
+interface ActivityDescriptionProps {
+  activity: {
+    type: string;
+  };
+}
+
+const ActivityDescription = ({ activity }: ActivityDescriptionProps) => {
   const intl = useIntl();
 
   if (!ActivityDescriptionI18n[activity.type]) {
@@ -197,12 +201,6 @@ const ActivityDescription = ({ activity }) => {
   }
 
   return intl.formatMessage(ActivityDescriptionI18n[activity.type], getActivityVariables(intl, activity));
-};
-
-ActivityDescription.propTypes = {
-  activity: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default ActivityDescription;

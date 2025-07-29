@@ -48,14 +48,14 @@ const FiscalSponsorship = () => {
               defaultMessage="Open Collective is purpose-built to streamline your processes, reduce overhead, increase transparency, and enable your organization to hold and manage funds for more projects in less time. <learnMoreLink>Learn more</learnMoreLink>."
               values={{
                 learnMoreLink: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host',
+                  href: 'https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host',
                   openInNewTab: true,
                 }),
               }}
             />
           </MainDescription>
         </Box>
-        <Link href="/organizations/new">
+        <Link href="/signup/organization">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="marketing" whiteSpace="nowrap">
             <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
           </StyledButton>

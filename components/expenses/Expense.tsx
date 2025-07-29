@@ -1,11 +1,11 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
+import type { ApolloClient } from '@apollo/client';
 import { useMutation } from '@apollo/client';
+import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
-import { FilePenLine } from 'lucide-react';
+import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lodash';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -17,22 +17,26 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import type { Account } from '../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { parseToBoolean } from '../../lib/utils';
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
-import { TaxInformationFormDialog } from '../dashboard/sections/tax-information/TaxInformationFormDialog';
 import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
-import { getI18nLink, I18nSupportLink, WebsiteName } from '../I18nFormatters';
+import { WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
@@ -42,6 +46,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
+import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { H1, H5, Span } from '../Text';
 
 import { editExpenseMutation } from './graphql/mutations';
@@ -49,11 +54,13 @@ import { expensePageQuery } from './graphql/queries';
 import { ConfirmOCRValues } from './ConfirmOCRValues';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
+import ExpenseInviteWelcome from './ExpenseInviteWelcome';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from './ExpenseNotesForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
+import TaxFormMessage from './TaxFormMessage';
 
 const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
@@ -61,7 +68,7 @@ const getVariableFromProps = props => {
     .toISOString();
   return {
     legacyExpenseId: props.legacyExpenseId,
-    draftKey: props.draftKey,
+    draftKey: props.draftKey || null,
     totalPaidExpensesDateFrom: firstOfCurrentYear,
   };
 };
@@ -85,7 +92,7 @@ const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }
@@ -103,7 +110,53 @@ const PrivateNoteLabel = () => {
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
-function Expense(props) {
+interface ExpenseProps {
+  collectiveSlug?: string;
+  parentCollectiveSlug?: string;
+  legacyExpenseId?: number;
+  draftKey?: string;
+  edit?: string;
+  client?: ApolloClient<object>;
+  loading?: boolean;
+  error?: any;
+  refetch?: () => void;
+  fetchMore?: FetchMoreFunction<unknown, unknown>;
+  startPolling?: (number) => void;
+  stopPolling?: () => void;
+  onClose?: () => void;
+  isRefetchingDataForUser?: boolean;
+  drawerActionsContainer?: object;
+  isDrawer?: boolean;
+  enableKeyboardShortcuts?: boolean;
+  data?: {
+    loggedInAccount: Pick<Account, 'id' | 'slug' | 'type'>;
+    expense: React.ComponentProps<typeof ExpenseInviteWelcome> &
+      React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
+      React.ComponentProps<typeof ExpenseInviteWelcome> &
+      React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
+      Pick<
+        ExpenseType,
+        | 'id'
+        | 'legacyId'
+        | 'type'
+        | 'account'
+        | 'status'
+        | 'permissions'
+        | 'items'
+        | 'comments'
+        | 'activities'
+        | 'privateMessage'
+        | 'onHold'
+        | 'recurringExpense'
+        | 'requiredLegalDocuments'
+        | 'draft'
+      > & {
+        account: Pick<AccountWithHost, 'host'>;
+      };
+  };
+}
+
+function Expense(props: ExpenseProps) {
   const {
     data,
     loading,
@@ -115,13 +168,46 @@ function Expense(props) {
     isRefetchingDataForUser,
     legacyExpenseId,
     isDrawer,
+    enableKeyboardShortcuts,
+    onClose,
   } = props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+
+  const isNewExpenseSubmissionFlow =
+    (([expenseTypes.INVOICE, expenseTypes.RECEIPT] as string[]).includes(data?.expense?.type) &&
+      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
+        router.query.newExpenseFlowEnabled)) ||
+    (([expenseTypes.GRANT] as string[]).includes(data?.expense?.type) &&
+      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
+        router.query.newGrantFlowEnabled));
+
+  const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
+
+  const onContinueSubmissionClick = React.useCallback(() => {
+    if (([expenseTypes.GRANT] as string[]).includes(data?.expense?.type)) {
+      router.push({
+        pathname: `${getCollectivePageRoute(data?.expense?.account)}/grants/new`,
+        query: {
+          expenseId: data?.expense?.legacyId,
+          draftKey,
+        },
+      });
+      return;
+    }
+
+    setIsSubmissionFlowOpen(true);
+  }, [data?.expense?.account, data?.expense?.legacyId, data?.expense?.type, draftKey, router]);
+
   const [state, setState] = useState({
     error: error || null,
-    status: draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+    status:
+      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
+        ? isNewExpenseSubmissionFlow
+          ? PAGE_STATUS.VIEW
+          : PAGE_STATUS.EDIT
+        : PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
     isPollingEnabled: true,
@@ -130,10 +216,9 @@ function Expense(props) {
     createdUser: null,
     showFilesViewerModal: false,
   });
-  const [openUrl, setOpenUrl] = useState(null);
+  const [openUrl, setOpenUrl] = useState(router.query.attachmentUrl as string);
   const [replyingToComment, setReplyingToComment] = useState(null);
   const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
-  const [hasTaxInformationForm, setHasTaxInformationForm] = React.useState(false);
   const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
   const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
   const pollingInterval = 60;
@@ -143,7 +228,9 @@ function Expense(props) {
   const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
-    const shouldEditDraft = data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
+    const shouldEditDraft = isNewExpenseSubmissionFlow
+      ? false
+      : data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
     if (shouldEditDraft) {
       setState(state => ({
         ...state,
@@ -191,11 +278,16 @@ function Expense(props) {
 
   // Update status when data or draftKey changes
   useEffect(() => {
-    const status = draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    const status =
+      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
+        ? isNewExpenseSubmissionFlow
+          ? PAGE_STATUS.VIEW
+          : PAGE_STATUS.EDIT
+        : PAGE_STATUS.VIEW;
     if (status !== state.status) {
       setState(state => ({ ...state, status }));
     }
-  }, [props.data, draftKey]);
+  }, [props.data, draftKey, isNewExpenseSubmissionFlow]);
 
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
@@ -211,17 +303,36 @@ function Expense(props) {
     setState(state => ({ ...state, error }));
   }, [error]);
 
+  useKeyboardKey({
+    keyMatch: E,
+    callback: e => {
+      if (props.enableKeyboardShortcuts && state.status !== PAGE_STATUS.EDIT) {
+        e.preventDefault();
+        onEditBtnClick();
+      }
+    },
+  });
+
+  useKeyboardKey({
+    keyMatch: ESCAPE_KEY,
+    callback: e => {
+      if (props.isDrawer && state.status !== PAGE_STATUS.EDIT) {
+        e.preventDefault();
+        onClose?.();
+      }
+    },
+  });
+
   const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
   });
 
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;
+  const { viewport } = useWindowResize(null, { useMinWidth: true });
+  const isDesktop = viewport === VIEWPORTS.LARGE;
 
-  const expense = cloneDeep(data?.expense);
-  if (expense && data?.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = expense?.host ?? collective?.host;
@@ -235,17 +346,19 @@ function Expense(props) {
   const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
   const [showResetModal, setShowResetModal] = useState(false);
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
+  const canEditPayoutMethod = !expense || isDraft || expense.permissions.canSeePayoutMethodPrivateDetails;
+
+  const inDrawer = Boolean(drawerActionsContainer);
 
   const threadItems = React.useMemo(() => {
     const comments = expense?.comments?.nodes || [];
     const activities = expense?.activities || [];
-    return sortBy([...comments, ...activities], 'createdAt');
-  }, [expense]);
+    return orderBy([...comments, ...activities], 'createdAt', 'asc');
+  }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
-  const inDrawer = Boolean(drawerActionsContainer);
 
   const handlePolling = debounce(() => {
     if (state.isPollingEnabled) {
@@ -278,10 +391,14 @@ function Expense(props) {
   };
 
   const onEditBtnClick = async () => {
+    props.stopPolling?.();
     return setState(state => ({ ...state, status: PAGE_STATUS.EDIT, editedExpense: data?.expense }));
   };
 
-  const onCancel = () => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
+  const onCancel = () => {
+    props.startPolling?.(pollingInterval * 1000);
+    return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
+  };
 
   const onDelete = async expense => {
     const collective = expense.account;
@@ -298,9 +415,13 @@ function Expense(props) {
       if (!editedExpense.payee.id && state.newsletterOptIn) {
         editedExpense.payee.newsletterOptIn = state.newsletterOptIn;
       }
+      const preparedValues = prepareExpenseForSubmit(editedExpense);
+      if (!canEditPayoutMethod) {
+        delete preparedValues.payoutMethod;
+      }
       await editExpense({
         variables: {
-          expense: prepareExpenseForSubmit(editedExpense),
+          expense: preparedValues,
           draftKey: data?.expense?.status === ExpenseStatus.DRAFT ? draftKey : null,
         },
       });
@@ -308,6 +429,7 @@ function Expense(props) {
         await refetch();
       }
       const createdUser = editedExpense.payee;
+      props.startPolling?.(pollingInterval * 1000);
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
@@ -359,12 +481,14 @@ function Expense(props) {
         if (!fetchMoreResult) {
           return prev;
         }
+
+        const resultExpense = fetchMoreResult['expense'] as { comments: { nodes: Comment[] } };
         const newValues = {
           expense: {
             ...prev.expense,
             comments: {
-              ...fetchMoreResult.expense.comments,
-              nodes: [...prev.expense.comments.nodes, ...fetchMoreResult.expense.comments.nodes],
+              ...resultExpense.comments,
+              nodes: [...prev.expense.comments.nodes, ...resultExpense.comments.nodes],
             },
           },
         };
@@ -378,7 +502,13 @@ function Expense(props) {
     setState({ ...state, showFilesViewerModal: true });
   };
 
-  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense, intl]);
+
+  useEffect(() => {
+    const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
+    setState(state => ({ ...state, showFilesViewerModal }));
+    setOpenUrl(files?.[0]?.url || null);
+  }, [files, isDesktop, isDrawer]);
 
   const confirmSaveButtons = (
     <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>
@@ -482,88 +612,33 @@ function Expense(props) {
           {formatErrorMessage(intl, state.error)}
         </MessageBox>
       )}
-      {showTaxFormMsg && (
-        <MessageBox type="warning" withIcon={true} mb={4}>
-          <div>
-            {parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) ? (
-              <FormattedMessage
-                id="expenseNeedsTaxFormMessage.msg"
-                defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
-                values={{
-                  I18nSupportLink,
-                  Link: getI18nLink({
-                    href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
-                    openInNewTab: true,
-                  }),
-                }}
-              />
-            ) : LoggedInUser?.isAdminOfCollective(expense.payee) ? (
-              <div>
-                <strong>
-                  <FormattedMessage defaultMessage="We need your tax information before we can pay you." id="a6tGTW" />
-                </strong>
-                <p className="my-2">
-                  <FormattedMessage
-                    defaultMessage="United States regulations require US entities to collect certain information from payees for tax reporting purposes, even if the payee is outside the US."
-                    id="H/ROIG"
-                  />
-                </p>
-                <StyledButton
-                  buttonSize="tiny"
-                  buttonStyle="primary"
-                  className="mt-2"
-                  onClick={() => setHasTaxInformationForm(true)}
-                >
-                  <FilePenLine className="mr-1 inline-block" size={14} />
-                  <span>
-                    <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
-                  </span>
-                </StyledButton>
-                <TaxInformationFormDialog
-                  account={expense.payee}
-                  open={hasTaxInformationForm}
-                  onOpenChange={setHasTaxInformationForm}
-                  onSuccess={refetch}
-                />
-              </div>
-            ) : (
-              <div>
-                <strong>
-                  <FormattedMessage
-                    defaultMessage="This expense requires the payee to provide their tax information before it can be paid."
-                    id="XNW4Sq"
-                  />
-                </strong>
-                <p className="my-2">
-                  <FormattedMessage
-                    defaultMessage="United States regulations require US entities to collect certain information from payees for tax reporting purposes, even if the payee is outside the US."
-                    id="H/ROIG"
-                  />{' '}
-                  <FormattedMessage
-                    defaultMessage="See <HelpDocsLink>help docs</HelpDocsLink> for more information."
-                    id="f2Ypkz"
-                    values={{
-                      HelpDocsLink: getI18nLink({
-                        href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
-                        openInNewTab: true,
-                      }),
-                    }}
-                  />
-                </p>
-              </div>
-            )}
-          </div>
-        </MessageBox>
-      )}
+      {showTaxFormMsg && <TaxFormMessage expense={expense} refetch={refetch} />}
       {status === PAGE_STATUS.VIEW &&
-        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) || (isDraft && !isRecurring)) && (
+        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) ||
+          (isDraft && !isRecurring && !draftKey)) && (
           <ExpenseInviteNotificationBanner expense={expense} createdUser={state.createdUser} />
         )}
       {isMissingReceipt && (
-        <ExpenseMissingReceiptNotificationBanner onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick} />
+        <ExpenseMissingReceiptNotificationBanner
+          onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick}
+          expense={expense}
+        />
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
+          {isNewExpenseSubmissionFlow &&
+            (expense?.permissions?.canDeclineExpenseInvite ||
+              (expense?.status === ExpenseStatus.DRAFT &&
+                !isRecurring &&
+                draftKey &&
+                expense?.draft?.recipientNote)) && (
+              <ExpenseInviteWelcome
+                onContinueSubmissionClick={onContinueSubmissionClick}
+                className="mb-6"
+                expense={expense}
+                draftKey={draftKey}
+              />
+            )}
           <ExpenseSummary
             expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
             host={host}
@@ -577,6 +652,8 @@ function Expense(props) {
             showProcessButtons
             drawerActionsContainer={drawerActionsContainer}
             openFileViewer={openFileViewer}
+            enableKeyboardShortcuts={enableKeyboardShortcuts}
+            openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
@@ -680,6 +757,7 @@ function Expense(props) {
               payoutProfiles={payoutProfiles}
               loggedInAccount={loggedInAccount}
               onCancel={() => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }))}
+              canEditPayoutMethod={canEditPayoutMethod}
               onSubmit={editedExpense => {
                 if (skipSummary) {
                   setState(state => ({
@@ -705,84 +783,108 @@ function Expense(props) {
         <Fragment>
           <Box my={4}>
             <PrivateCommentsMessage
+              expenseType={expense?.type}
               isAllowed={expense?.permissions.canComment}
               isLoading={loadingLoggedInUser || isRefetchingDataForUser}
             />
           </Box>
 
-          <Box mb={3} pt={3}>
-            {loading ? (
-              <LoadingPlaceholder width="100%" height="44px" />
-            ) : expense ? (
-              <Thread
-                collective={collective}
-                hasMore={expense.comments?.totalCount > threadItems.length}
-                items={threadItems}
-                fetchMore={fetchMoreComments}
-                onCommentDeleted={onCommentDeleted}
-                loading={loading}
-                getClickedComment={setReplyingToComment}
-              />
-            ) : null}
-          </Box>
+          {!inDrawer ? (
+            <React.Fragment>
+              <Box mb={3} pt={3}>
+                {loading ? (
+                  <LoadingPlaceholder width="100%" height="44px" />
+                ) : expense ? (
+                  <Thread
+                    collective={collective}
+                    hasMore={expense.comments?.totalCount > threadItems.length}
+                    items={threadItems}
+                    fetchMore={fetchMoreComments}
+                    onCommentDeleted={onCommentDeleted}
+                    loading={loading}
+                    getClickedComment={setReplyingToComment}
+                  />
+                ) : null}
+              </Box>
 
-          {expense?.permissions.canComment && (
-            <Flex mt="40px">
-              <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                <CommentIcon size={24} color="lightgrey" />
-              </Box>
-              <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                <CommentForm
-                  replyingToComment={replyingToComment}
-                  id="new-comment-on-expense"
-                  ExpenseId={expense && expense.id}
-                  disabled={!expense}
-                  onSuccess={onCommentAdded}
-                  canUsePrivateNote={expense.permissions.canUsePrivateNote}
-                  defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
-                />
-              </Box>
-            </Flex>
+              {expense?.permissions.canComment && (
+                <Flex mt="40px">
+                  <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                    <CommentIcon size={24} color="lightgrey" />
+                  </Box>
+                  <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                    <CommentForm
+                      replyingToComment={replyingToComment}
+                      id="new-comment-on-expense"
+                      ExpenseId={expense && expense.id}
+                      disabled={!expense}
+                      onSuccess={onCommentAdded}
+                      canUsePrivateNote={expense.permissions.canUsePrivateNote}
+                      defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
+                    />
+                  </Box>
+                </Flex>
+              )}
+            </React.Fragment>
+          ) : (
+            <Thread
+              variant="small"
+              items={threadItems}
+              collective={host}
+              hasMore={expense?.comments?.totalCount > threadItems.length}
+              fetchMore={fetchMoreComments}
+              onCommentDeleted={onCommentDeleted}
+              loading={loading}
+              CommentEntity={{
+                ExpenseId: expense && expense.id,
+              }}
+              onCommentCreated={onCommentAdded}
+              canComment={expense?.permissions.canComment}
+              canUsePrivateNote={expense?.permissions?.canUsePrivateNote}
+              defaultType={expense?.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
+            />
           )}
         </Fragment>
       )}
 
-      {state.showFilesViewerModal && (
-        <FilesViewerModal
-          allowOutsideInteraction={isDrawer}
-          files={files}
-          parentTitle={intl.formatMessage(
-            {
-              defaultMessage: 'Expense #{expenseId} attachment',
-              id: 'At2m8o',
-            },
-            { expenseId: expense.legacyId },
-          )}
-          openFileUrl={openUrl}
-          onClose={() => setState(state => ({ ...state, showFilesViewerModal: false }))}
+      {isSubmissionFlowOpen && (
+        <SubmitExpenseFlow
+          onClose={submitted => {
+            setIsSubmissionFlowOpen(false);
+            if (submitted) {
+              refetch();
+            }
+          }}
+          expenseId={legacyExpenseId}
+          draftKey={draftKey}
+          submitExpenseTo={collective?.slug}
+          endFlowButtonLabel={<FormattedMessage defaultMessage="View expense" id="CaE5Oi" />}
         />
       )}
+
+      {state.showFilesViewerModal &&
+        createPortal(
+          <FilesViewerModal
+            allowOutsideInteraction={isDrawer}
+            files={files}
+            parentTitle={intl.formatMessage(
+              {
+                defaultMessage: 'Expense #{expenseId} attachment',
+                id: 'At2m8o',
+              },
+              { expenseId: expense.legacyId },
+            )}
+            openFileUrl={openUrl}
+            setOpenFileUrl={setOpenUrl}
+            onClose={
+              isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
+            }
+            hideCloseButton={isDrawer && isDesktop}
+          />,
+          document.body,
+        )}
     </Box>
   );
 }
-
-Expense.propTypes = {
-  collectiveSlug: PropTypes.string,
-  parentCollectiveSlug: PropTypes.string,
-  legacyExpenseId: PropTypes.number,
-  draftKey: PropTypes.string,
-  edit: PropTypes.string,
-  client: PropTypes.object,
-  data: PropTypes.object,
-  loading: PropTypes.bool,
-  error: PropTypes.any,
-  refetch: PropTypes.func,
-  fetchMore: PropTypes.func,
-  startPolling: PropTypes.func,
-  stopPolling: PropTypes.func,
-  isRefetchingDataForUser: PropTypes.bool,
-  drawerActionsContainer: PropTypes.object,
-  isDrawer: PropTypes.bool,
-};
 
 export default Expense;

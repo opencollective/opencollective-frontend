@@ -112,7 +112,6 @@ const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
     </ReactSelectComponents.ValueContainer>
   );
 };
-/* eslint-enable react/prop-types */
 
 const STYLES_DISPLAY_NONE = { display: 'none' };
 
@@ -343,6 +342,10 @@ export type StyledSelectProps = LayoutProps &
 
 export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
+// @ts-expect-error theme is not properly typed. No time to spend on this as StyledSelect & styled-components are being deprecated.
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
+/**
+ * @deprecated Use `ui/Select` instead
+ */
 export default injectIntl(StyledSelect) as undefined as StyledSelectCustomComponent;

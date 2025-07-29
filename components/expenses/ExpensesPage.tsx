@@ -1,158 +1,272 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { omit, omitBy } from 'lodash';
+import React from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
+import type { z } from 'zod';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
+import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import type { ExpensesPageQuery, HostDashboardExpensesQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
-import Container from '../Container';
+import { accountNavbarFieldsFragment } from '@/components/collective-navbar/fragments';
+import { expenseTagFilter } from '@/components/dashboard/filters/ExpenseTagsFilter';
+import { Pagination } from '@/components/dashboard/filters/Pagination';
+import type { FilterMeta as CommonFilterMeta } from '@/components/dashboard/sections/expenses/filters';
+import {
+  filters as commonFilters,
+  schema as commonSchema,
+  toVariables as commonToVariables,
+} from '@/components/dashboard/sections/expenses/filters';
+import { expenseHostFields, expensesListFieldsFragment } from '@/components/expenses/graphql/fragments';
+
+import { Filterbar } from '../dashboard/filters/Filterbar';
 import ScheduledExpensesBanner from '../dashboard/sections/expenses/ScheduledExpensesBanner';
-import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import Pagination from '../Pagination';
-import SearchBar from '../SearchBar';
 import Tags from '../Tags';
 import { H5 } from '../Text';
 
-import { ExpensesDirection } from './filters/ExpensesDirection';
-import ExpensesOrder from './filters/ExpensesOrder';
+import { EXPENSE_DIRECTION, expenseDirectionFilter } from './filters/DirectionFilter';
 import ExpenseInfoSidebar from './ExpenseInfoSidebar';
-import ExpensesFilters from './ExpensesFilters';
 import ExpensesList from './ExpensesList';
 
-const ORDER_SELECT_STYLE = { control: { background: 'white' } };
+export const expensesPageQuery = gql`
+  query ExpensesPage(
+    $account: AccountReferenceInput
+    $accountSlug: String
+    $fromAccount: AccountReferenceInput
+    $limit: Int!
+    $offset: Int!
+    $type: ExpenseType
+    $tags: [String]
+    $status: [ExpenseStatusFilter]
+    $amount: AmountRangeInput
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $sort: ChronologicalOrderInput
+    $chargeHasReceipts: Boolean
+    $virtualCards: [VirtualCardReferenceInput]
+  ) {
+    account(slug: $accountSlug) {
+      id
+      legacyId
+      slug
+      type
+      imageUrl
+      backgroundImageUrl
+      twitterHandle
+      name
+      currency
+      isArchived
+      isActive
+      settings
+      createdAt
+      supportedExpenseTypes
+      expensesTags {
+        id
+        tag
+      }
+      features {
+        id
+        ...NavbarFields
+      }
 
-const Expenses = props => {
-  const router = useRouter();
-  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
+      stats {
+        id
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
+      }
 
-  const expensesRoute = isDashboard
-    ? query.direction === 'SUBMITTED'
-      ? `/dashboard/${variables.collectiveSlug}/submitted-expenses`
-      : `/dashboard/${variables.collectiveSlug}/expenses`
-    : `${getCollectivePageRoute(data?.account)}/expenses`;
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
 
-  useEffect(() => {
-    const queryParameters = {
-      ...omit(query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
-    };
-    if (!isDashboard) {
-      addParentToURLIfMissing(router, data?.account, `/expenses`, queryParameters);
-    }
-  }, []);
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
 
-  const [oldLoggedInUser, setOldLoggedInUser] = useState(null);
+      ... on Organization {
+        # We add that for hasFeature
+        isHost
+        isActive
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
 
-  useEffect(() => {
-    if (!oldLoggedInUser && LoggedInUser) {
-      if (LoggedInUser.isAdminOfCollectiveOrHost(data?.account)) {
-        refetch();
+      ... on Event {
+        parent {
+          id
+          name
+          slug
+          type
+        }
+      }
+
+      ... on Project {
+        parent {
+          id
+          name
+          slug
+          type
+        }
       }
     }
-    setOldLoggedInUser(LoggedInUser);
-  }, [oldLoggedInUser, LoggedInUser, data]);
-
-  const hasFilters = React.useMemo(() => {
-    return Object.entries(query).some(([key, value]) => key !== 'offset' && key !== 'limit' && value);
-  }, [query]);
-
-  function buildFilterLinkParams(params) {
-    const queryParameters = {
-      ...omit(query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
-      ...params,
-    };
-
-    return omitBy(queryParameters, value => !value);
-  }
-
-  function updateFilters(queryParams) {
-    return router.push({
-      pathname: expensesRoute,
-      query: buildFilterLinkParams({ ...queryParams, offset: null }),
-    });
-  }
-
-  function handleSearch(searchTerm) {
-    const params = buildFilterLinkParams({ searchTerm, offset: null });
-    router.push({ pathname: expensesRoute, query: params });
-  }
-
-  function getTagProps(tag) {
-    if (tag === query.tag) {
-      return { type: 'info', closeButtonProps: true };
+    expenses(
+      account: $account
+      fromAccount: $fromAccount
+      limit: $limit
+      offset: $offset
+      type: $type
+      tag: $tags
+      status: $status
+      amount: $amount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $sort
+      chargeHasReceipts: $chargeHasReceipts
+      virtualCards: $virtualCards
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...ExpensesListFieldsFragment
+      }
+    }
+    # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+    # TODO: We don't need to try and fetch this field on non-host accounts (should use a ... on Host)
+    scheduledExpenses: expenses(
+      host: $account
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+      limit: 1
+    ) {
+      totalCount
     }
   }
 
-  const isSelfHosted = data?.account?.id === data?.account?.host?.id;
+  ${expensesListFieldsFragment}
+  ${accountNavbarFieldsFragment}
+  ${expenseHostFields}
+`;
+
+export const schema = commonSchema.extend({ direction: expenseDirectionFilter.schema });
+
+type FilterValues = z.infer<typeof schema>;
+
+type FilterMeta = CommonFilterMeta & {
+  expenseTags?: string[];
+  includeUncategorized?: boolean;
+};
+
+export const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
+  ...commonToVariables,
+};
+
+const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
+  ...pick(commonFilters, ['searchTerm']),
+  direction: expenseDirectionFilter.filter,
+  ...omit(commonFilters, ['searchTerm', 'status']),
+  status: { ...commonFilters.status, static: false } as typeof commonFilters.status,
+  tag: expenseTagFilter.filter,
+};
+
+type ExpensesProps = {
+  account: ExpensesPageQuery['account'];
+  expenses: ExpensesPageQuery['expenses'];
+  direction: EXPENSE_DIRECTION;
+};
+
+const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) => {
+  const router = useRouter();
+  const isSubmitted = direction === EXPENSE_DIRECTION.SUBMITTED;
+  const { LoggedInUser } = useLoggedInUser();
+  const meta: FilterMeta = {
+    currency: account?.currency,
+    expenseTags: account?.expensesTags?.map(tag => tag.tag) || [],
+  };
+
+  const queryFilter = useQueryFilter({
+    schema,
+    toVariables,
+    filters: isSubmitted ? omit(filters, ['direction']) : filters,
+    defaultFilterValues: { direction: direction || EXPENSE_DIRECTION.RECEIVED },
+    meta,
+    shallow: true,
+  });
+
+  const variables = {
+    ...{
+      [queryFilter.values.direction === EXPENSE_DIRECTION.RECEIVED ? 'account' : 'fromAccount']: {
+        legacyId: account?.legacyId,
+      },
+    },
+    accountSlug: account?.slug,
+    ...queryFilter.variables,
+  };
+
+  const { data, loading, refetch } = useQuery(expensesPageQuery, {
+    variables,
+    context: API_V2_CONTEXT,
+  });
+
+  React.useEffect(() => {
+    if (LoggedInUser) {
+      refetch();
+    }
+  }, [LoggedInUser, refetch]);
+
+  const isSelfHosted = account && 'host' in account && account.id === account.host?.id;
+  const expenses = data?.expenses || _expenses;
 
   return (
-    <Container>
-      {!isDashboard && (
-        <React.Fragment>
-          <h1 className={'mb-6 text-[32px] leading-10'}>
-            {onlySubmittedExpenses ? (
-              <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
-            ) : (
-              <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-            )}
-          </h1>
-        </React.Fragment>
+    <React.Fragment>
+      <React.Fragment>
+        <h1 className={'mb-6 text-[32px] leading-10'}>
+          {isSubmitted ? (
+            <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
+          ) : (
+            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          )}
+        </h1>
+      </React.Fragment>
+      {isSelfHosted && LoggedInUser?.isHostAdmin(account) && data?.scheduledExpenses?.totalCount > 0 && (
+        <ScheduledExpensesBanner hostSlug={account.slug} />
       )}
-
-      <Flex alignItems={[null, null, 'center']} mb="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!isDashboard && !onlySubmittedExpenses && (
-          <Box flex="0 1" flexBasis={['100%', null, '380px']}>
-            <ExpensesDirection
-              value={query.direction || 'RECEIVED'}
-              onChange={direction => {
-                const newFilters = { ...query, direction };
-                updateFilters(newFilters);
-              }}
-            />
-          </Box>
-        )}
-        <Box flex="12 1 160px" width="276px">
-          <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
-        </Box>
-        <Box flex="0 1 160px">
-          <ExpensesOrder
-            value={query.orderBy}
-            onChange={orderBy => updateFilters({ ...query, orderBy })}
-            styles={ORDER_SELECT_STYLE}
-          />
-        </Box>
-      </Flex>
-      <Box mx="8px">
-        {data?.account ? (
-          <ExpensesFilters
-            collective={data.account}
-            filters={query}
-            onChange={queryParams => updateFilters(queryParams)}
-            wrap={false}
-            showOrderFilter={false} // On this page, the order filter is displayed at the top
-          />
-        ) : (
-          <LoadingPlaceholder height={70} />
-        )}
-      </Box>
-      {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
-        <ScheduledExpensesBanner hostSlug={data.account.slug} />
-      )}
-      <Flex justifyContent="space-between" flexWrap="wrap" gridGap={[0, 3, 5]}>
-        <Box flex="1 1 500px" minWidth={300} mb={5} mt={['16px', '46px']}>
-          {!loading && !data.expenses?.nodes.length ? (
+      <div className="mx-5 flex flex-col justify-between gap-16 lg:mx-0 lg:flex-row">
+        <div className="w-full">
+          <Filterbar hideSeparator className="mb-4" {...queryFilter} />
+          {!loading && !data?.expenses?.nodes.length ? (
             <MessageBox type="info" withIcon data-cy="zero-expense-message">
-              {hasFilters ? (
+              {queryFilter.hasFilters ? (
                 <FormattedMessage
                   id="ExpensesList.Empty"
                   defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                   values={{
                     ResetLink: text => (
-                      <Link data-cy="reset-expenses-filters" href={expensesRoute}>
+                      <Link data-cy="reset-expenses-filters" href={`/${account.slug}/expenses`}>
                         <span>{text}</span>
                       </Link>
                     ),
@@ -163,123 +277,55 @@ const Expenses = props => {
               )}
             </MessageBox>
           ) : (
-            <React.Fragment>
+            <div className="flex flex-col gap-4">
               <ExpensesList
                 isLoading={loading}
                 collective={data?.account}
                 host={data?.account?.host ?? (data?.account?.isHost ? data?.account : null)}
-                expenses={data?.expenses?.nodes}
-                nbPlaceholders={variables.limit}
-                isInverted={query.direction === 'SUBMITTED'}
-                view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
-                useDrawer={isDashboard}
+                expenses={expenses?.nodes}
+                nbPlaceholders={queryFilter.values.limit}
+                isInverted={direction === 'SUBMITTED'}
+                view={direction === 'SUBMITTED' ? 'submitter' : undefined}
+                useDrawer={false}
                 openExpenseLegacyId={Number(router.query.openExpenseId)}
-                setOpenExpenseLegacyId={legacyId => {
-                  router.push(
-                    {
-                      pathname: expensesRoute,
-                      query: buildFilterLinkParams({ ...query, openExpenseId: legacyId }),
-                    },
-                    undefined,
-                    { shallow: true },
-                  );
-                }}
               />
-              <Flex mt={5} justifyContent="center">
-                <Pagination
-                  route={expensesRoute}
-                  total={data?.expenses?.totalCount}
-                  limit={variables.limit}
-                  offset={variables.offset}
-                  ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
-                />
-              </Flex>
-            </React.Fragment>
+
+              <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
+            </div>
           )}
-        </Box>
-        {!isDashboard && (
-          <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 48]}>
+        </div>
+        {!isSubmitted && (
+          <div className="min-w-64 lg:max-w-72">
             <ExpenseInfoSidebar isLoading={loading} collective={data?.account} host={data?.account?.host}>
               {data?.account?.expensesTags.length > 0 && (
                 <React.Fragment>
                   <H5 mb={3}>
                     <FormattedMessage id="Tags" defaultMessage="Tags" />
                   </H5>
-                  <Tags
-                    isLoading={loading}
-                    expense={{
-                      tags: data?.account?.expensesTags.map(({ tag }) => tag),
-                    }}
-                    limit={30}
-                    getTagProps={getTagProps}
-                    data-cy="expense-tags-title"
-                    showUntagged
-                  >
-                    {({ key, tag, renderedTag, props: { closeButtonProps } }) => (
-                      <Link
-                        key={key}
-                        href={{
-                          pathname: expensesRoute,
-                          query: buildFilterLinkParams({ tag: closeButtonProps ? null : tag }),
-                        }}
-                        data-cy="expense-tags-link"
-                      >
-                        {renderedTag}
-                      </Link>
-                    )}
-                  </Tags>
+                  <div className="!text-sm">
+                    <Tags
+                      expense={{
+                        tags: data?.account?.expensesTags.map(({ tag }) => tag),
+                      }}
+                      limit={30}
+                      data-cy="expense-tags-title"
+                      showUntagged
+                    >
+                      {({ key, tag, renderedTag }) => (
+                        <button key={key} onClick={() => queryFilter.setFilter('tag', tag)} data-cy="expense-tags-link">
+                          {renderedTag}
+                        </button>
+                      )}
+                    </Tags>
+                  </div>
                 </React.Fragment>
               )}
             </ExpenseInfoSidebar>
-          </Box>
+          </div>
         )}
-      </Flex>
-    </Container>
+      </div>
+    </React.Fragment>
   );
-};
-
-Expenses.propTypes = {
-  LoggedInUser: PropTypes.object,
-  query: PropTypes.shape({
-    type: PropTypes.string,
-    tag: PropTypes.string,
-    searchTerm: PropTypes.string,
-    direction: PropTypes.string,
-    orderBy: PropTypes.string,
-  }),
-  loading: PropTypes.bool,
-  error: PropTypes.any,
-  refetch: PropTypes.func,
-  variables: PropTypes.shape({
-    offset: PropTypes.number.isRequired,
-    limit: PropTypes.number.isRequired,
-    account: PropTypes.object,
-    collectiveSlug: PropTypes.string,
-  }),
-  data: PropTypes.shape({
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string,
-      isArchived: PropTypes.bool,
-      isHost: PropTypes.bool,
-      host: PropTypes.object,
-      expensesTags: PropTypes.array,
-      type: PropTypes.oneOf(Object.keys(CollectiveType)),
-    }),
-    expenses: PropTypes.shape({
-      nodes: PropTypes.array,
-      totalCount: PropTypes.number,
-      offset: PropTypes.number,
-      limit: PropTypes.number,
-    }),
-    scheduledExpenses: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
-  isDashboard: PropTypes.bool,
-  onlySubmittedExpenses: PropTypes.bool,
 };
 
 export default Expenses;

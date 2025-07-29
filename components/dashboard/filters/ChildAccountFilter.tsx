@@ -3,7 +3,7 @@ import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import type { Account } from '../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../lib/graphql/types/v2/schema';
 
 import ComboSelectFilter from './ComboSelectFilter';
 import { AccountRenderer } from './HostedAccountFilter';
@@ -18,7 +18,7 @@ function ChildAccountFilter({
   const groupedOptions = React.useMemo(
     () => [
       {
-        label: intl.formatMessage({ defaultMessage: 'Main account', id: 'pE0V//' }),
+        label: intl.formatMessage({ defaultMessage: 'Main account', id: 'AccountType.MainAccount' }),
         options: [
           {
             value: meta.accountSlug,

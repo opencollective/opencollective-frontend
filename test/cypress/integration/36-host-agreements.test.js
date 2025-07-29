@@ -44,7 +44,10 @@ describe('Host agreements', () => {
     cy.get('@agreementForm').find('#input-expiresAt').clear().type('2062-11-07');
     cy.contains('button', 'Save Changes').click();
     cy.checkToast({ variant: 'success', message: 'Agreement updated' });
-    cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
+    cy.getByDataCy('agreement-drawer').contains('Unlimited potatoes (updated)');
+    cy.getByDataCy('agreement-drawer').contains('November 7, 2062');
+    cy.getByDataCy('close-drawer-btn').click();
+    cy.getByDataCy('agreement-drawer').should('not.exist');
     cy.get('@firstRow').contains('Unlimited potatoes (updated)');
     cy.get('@firstRow').contains('Nov 7, 2062');
 
@@ -61,9 +64,6 @@ describe('Host agreements', () => {
     // ---- Agreement count should be displayed in the expenses list ----
     cy.getByDataCy('menu-item-Expenses').click(); // opening the Expenses menu group (that opens the 'Host expenses' page by default)
     cy.contains('[data-cy="expense-container-2340"]', 'Vegan Dining Week Client Dinner').as('expense');
-    cy.get('@expense')
-      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
-      .contains('1 agreement');
 
     // ---- Agreement count should be displayed on the expense ----
     cy.get('@expense').find('[data-cy="expense-title"]').click();
@@ -76,8 +76,7 @@ describe('Host agreements', () => {
     // ---- Delete the agreements ----
     cy.contains('[data-cy="agreements-table"] tbody tr', 'Unlimited potatoes (updated)').first().as('firstRow');
     cy.get('@firstRow').find('td:nth-child(2)').click();
-    cy.getByDataCy('agreement-drawer').find('button[data-cy="more-actions"]').click();
-    cy.getByDataCy('more-actions-delete-expense-btn').click();
+    cy.getByDataCy('agreement-drawer').find('button[data-cy="more-actions-delete-expense-btn"]').click();
     cy.contains('This will permanently delete the agreement and all its attachments').should('be.visible');
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.checkToast({ variant: 'success', message: 'Agreement deleted successfully' });

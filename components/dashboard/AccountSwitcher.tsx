@@ -10,6 +10,8 @@ import { space } from 'styled-system';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -36,6 +38,7 @@ const StyledMenuEntry = styled(Link)`
   max-width: 100%;
   text-align: left;
   border-radius: 8px;
+  margin-left: 16px;
   font-size: 13px;
   font-weight: 500;
   grid-gap: 4px;
@@ -47,7 +50,7 @@ const StyledMenuEntry = styled(Link)`
           backgroundColor: '#f3f4f6',
         })
       : css({
-          ':hover': {
+          '&:hover': {
             backgroundColor: '#f3f4f6',
           },
         })}
@@ -68,8 +71,8 @@ const DropdownButton = styled.button`
   cursor: pointer;
   overflow: hidden;
   &:hover,
-  :active,
-  :focus {
+  &:active,
+  &:focus {
     background: #f8fafc;
   }
 
@@ -80,7 +83,7 @@ const DropdownButton = styled.button`
   }
 
   svg {
-    flex-shrink: 0;
+    shrink: 0;
     color: #4b5563;
   }
 `;
@@ -96,7 +99,7 @@ const StyledDropdownContent = styled(DropdownContent)`
 `;
 
 const CREATE_NEW_LINKS = {
-  ORGANIZATION: '/organizations/new',
+  ORGANIZATION: '/signup/organization',
   FUND: '/fund/create',
   COLLECTIVE: '/create',
 };
@@ -120,12 +123,15 @@ const EMPTY_GROUP_STATE = {
 };
 
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
-  const isAdministratedAccount = m => ['ADMIN', 'ACCOUNTANT'].includes(m.role) && !m.collective.isIncognito;
+  const isAdministratedAccount = m =>
+    ['ADMIN', 'ACCOUNTANT', 'COMMUNITY_MANAGER'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
   const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
-  administratedAccounts = administratedAccounts.filter(a => !childAccountIds.includes(a.id));
+  administratedAccounts = administratedAccounts
+    .filter(a => !childAccountIds.includes(a.id))
+    .filter(a => a.type !== 'VENDOR');
   administratedAccounts = uniqBy([...administratedAccounts], a => a.id).filter(Boolean);
 
   // Filter out Archived accounts and group it separately
@@ -138,10 +144,28 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
     ...groupBy(activeAccounts, a => a.type),
   };
   if (archivedAccounts?.length > 0) {
-    groupedAccounts.ARCHIVED = archivedAccounts;
+    groupedAccounts['ARCHIVED'] = archivedAccounts;
   }
   return groupedAccounts;
 });
+
+const generateOptionDescription = (collective: GraphQLV1Collective, LoggedInUser: LoggedInUser) => {
+  if (LoggedInUser && !LoggedInUser.isAdminOfCollective(collective)) {
+    if (LoggedInUser.isAccountantOnly(collective)) {
+      return <FormattedMessage id="Member.Role.ACCOUNTANT" defaultMessage="Accountant" />;
+    } else if (LoggedInUser.isCommunityManagerOnly(collective)) {
+      return <FormattedMessage id="Member.Role.COMMUNITY_MANAGER" defaultMessage="Community Manager" />;
+    }
+  }
+
+  return (
+    <FormattedMessage
+      id="AccountSwitcher.Description"
+      defaultMessage="{type, select, USER {Personal profile} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
+      values={{ type: collective?.type }}
+    />
+  );
+};
 
 const Option = ({
   collective,
@@ -153,17 +177,12 @@ const Option = ({
   description?: string | ReactElement;
   isChild?: boolean;
 }) => {
-  description = description || (
-    <FormattedMessage
-      id="AccountSwitcher.Description"
-      defaultMessage="{type, select, USER {Personal profile} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
-      values={{ type: collective?.type }}
-    />
-  );
+  const { LoggedInUser } = useLoggedInUser();
+  description = description || generateOptionDescription(collective, LoggedInUser);
   return (
     <Flex alignItems="center" gridGap="12px" overflow="hidden" {...props}>
       <Avatar collective={collective} size={isChild ? 20 : 32} useIcon={isChild} />
-      <Flex flexDirection="column" overflow="hidden">
+      <Flex flexDirection="column" overflow="hidden" gap="2px">
         <P color="black.800" fontSize="14px" letterSpacing="0" fontWeight="500" truncateOverflow>
           {collective?.name}
         </P>
@@ -230,7 +249,6 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               href={`/dashboard/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
-              ml={3}
             >
               <Option collective={child} isChild />
             </StyledMenuEntry>
@@ -250,7 +268,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click" className="flex-grow">
+    <Dropdown trigger="click" className="grow">
       {({ triggerProps, dropdownProps }) => (
         <React.Fragment>
           <Flex alignItems="center" flex={0}>
@@ -321,7 +339,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                             {EMPTY_GROUP_STATE[collectiveType].emptyMessage}
                           </p>
                           <Link
-                            className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                            className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-xs transition-colors hover:bg-gray-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                             href="/create"
                           >
                             <div className="mr-3 rounded-full border bg-white p-2 text-muted-foreground">
@@ -333,7 +351,9 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                       )}
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map(account => <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />)}
+                        .map(account => (
+                          <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
+                        ))}
                     </div>
                   );
                 })}

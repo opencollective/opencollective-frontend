@@ -1,11 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
-import { AmountPropTypeShape } from '../lib/prop-types';
 import { cn } from '../lib/utils';
 
 import DateTime from './DateTime';
@@ -77,17 +74,15 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
   );
 };
 
-const ContentContainer = styled.div`
-  white-space: nowrap;
-`;
-
 const AmountWithExchangeRateInfo = ({
   amount: { exchangeRate, currency, value, valueInCents },
-  amountStyles,
-  showCurrencyCode,
-  invertIconPosition,
-  warning,
-  error,
+  amountClassName = null,
+  showCurrencyCode = undefined,
+  invertIconPosition = false,
+  warning = null,
+  error = null,
+  amountWrapperClassName = undefined,
+  currencyCodeClassName = undefined,
 }) => {
   const intl = useIntl();
   return (
@@ -98,29 +93,23 @@ const AmountWithExchangeRateInfo = ({
       content={() => formatFxRateInfo(intl, exchangeRate, { warning, error })}
     >
       <Flex flexWrap="noWrap" alignItems="center" flexDirection={invertIconPosition ? 'row-reverse' : 'row'} gap="4px">
-        <ContentContainer>
-          {exchangeRate?.isApproximate && `~ `}
+        <div className={cn('flex flex-row gap-1 whitespace-nowrap', amountWrapperClassName)}>
           <FormattedMoneyAmount
             amount={valueInCents ?? Math.round(value * 100)}
             currency={currency}
             precision={2}
-            amountStyles={amountStyles || null}
+            amountClassName={amountClassName || null}
             showCurrencyCode={showCurrencyCode}
+            isApproximate={exchangeRate?.isApproximate}
+            currencyCodeClassName={currencyCodeClassName}
           />
-        </ContentContainer>
-        <InfoCircle size="1em" className={cn({ 'text-yellow-600': warning, 'text-red-600': error })} />
+        </div>
+        {exchangeRate && (
+          <InfoCircle size="1em" className={cn({ 'text-yellow-600': warning, 'text-red-600': error })} />
+        )}
       </Flex>
     </StyledTooltip>
   );
-};
-
-AmountWithExchangeRateInfo.propTypes = {
-  amount: AmountPropTypeShape,
-  showCurrencyCode: PropTypes.bool,
-  invertIconPosition: PropTypes.bool,
-  amountStyles: PropTypes.object,
-  warning: PropTypes.node,
-  error: PropTypes.node,
 };
 
 export default AmountWithExchangeRateInfo;

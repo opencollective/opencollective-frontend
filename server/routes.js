@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
@@ -22,8 +23,12 @@ module.exports = expressApp => {
 
   app.get('/static/*', maxAge(86400));
 
+  // Load the favicon file into memory
+  const faviconPath = path.join(__dirname, '../public/static/images/favicon.ico.png');
+  const favicon = fs.readFileSync(faviconPath);
   app.get('/favicon.*', maxAge(300000), (req, res) => {
-    return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
+    res.type('image/png');
+    return res.send(favicon);
   });
 
   /* Helper to enable downloading files that are on S3 since Chrome and Firefox does

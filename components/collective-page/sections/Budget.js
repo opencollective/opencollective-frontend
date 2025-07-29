@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -74,7 +73,7 @@ const budgetSectionAccountFieldsFragment = gql`
         valueInCents
         currency
       }
-      consolidatedBalance @skip(if: $heavyAccount) {
+      consolidatedBalance: balance(includeChildren: true) @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
@@ -91,7 +90,7 @@ const budgetSectionAccountFieldsFragment = gql`
         valueInCents
         currency
       }
-      totalNetAmountRaised: totalNetAmountReceived {
+      totalNetAmountRaised: totalAmountReceived(net: true) {
         valueInCents
         currency
       }
@@ -178,9 +177,16 @@ const budgetSectionForIndividualQuery = gql`
 `;
 
 const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
+  query BudgetSectionWithHost(
+    $slug: String!
+    $host: AccountReferenceInput
+    $limit: Int!
+    $kind: [TransactionKind]
+    $heavyAccount: Boolean!
+  ) {
     transactions(
       account: { slug: $slug }
+      host: $host
       limit: $limit
       kind: $kind
       includeIncognitoTransactions: true
@@ -223,12 +229,13 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   }
 };
 
-export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => {
+export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual, host) => {
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
     return {
       slug: collectiveSlug,
+      host: host ? { slug: host.slug } : null,
       limit: 3,
       kind: getDefaultKinds(),
       heavyAccount: isHeavyAccount(collectiveSlug),
@@ -301,7 +308,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
     return isIndividual ? (
       <Link
-        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS,CONTRIBUTION,PLATFORM_TIP`}
+        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION&kind=PLATFORM_TIP`}
         data-cy="view-all-transactions-link"
       >
         <FormattedMessage
@@ -320,14 +327,6 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
   }
 };
 
-ViewAllLink.propTypes = {
-  collective: PropTypes.object,
-  hasExpenses: PropTypes.bool,
-  isIndividual: PropTypes.bool,
-  hasTransactions: PropTypes.bool,
-  filter: PropTypes.oneOf(FILTERS),
-};
-
 /**
  * The budget section. Shows the expenses, the latest transactions and some statistics
  * abut the global budget of the collective.
@@ -336,7 +335,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const isIndividual = isIndividualAccount(collective) && !collective.isHost;
   const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
-    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual),
+    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual, collective.host),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
@@ -403,26 +402,16 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
               allItems.map((item, idx) => {
                 return (
                   <BudgetItemContainer
-                    key={`${item.__typename}-${item?.id || idx}`}
+                    key={`${item.__typename}-${item.id || idx}`}
                     $isFirst={!idx}
                     data-cy="single-budget-item"
                   >
                     {item.__typename === 'Expense' ? (
                       <DebitItem>
-                        <ExpenseBudgetItem
-                          expense={item}
-                          host={item.host || data.account.host}
-                          showAmountSign
-                          showProcessActions
-                        />
+                        <ExpenseBudgetItem expense={item} host={item.host || data.account.host} showAmountSign />
                       </DebitItem>
                     ) : (
-                      <TransactionItem
-                        transaction={item}
-                        collective={collective}
-                        displayActions
-                        onMutationSuccess={refetch}
-                      />
+                      <TransactionItem transaction={item} collective={collective} />
                     )}
                   </BudgetItemContainer>
                 );
@@ -441,22 +430,6 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
       </Flex>
     </ContainerSectionContent>
   );
-};
-
-SectionBudget.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool,
-    isHost: PropTypes.bool,
-    settings: PropTypes.object,
-    host: PropTypes.object,
-  }),
-
-  LoggedInUser: PropTypes.object,
 };
 
 export default React.memo(withUser(SectionBudget));

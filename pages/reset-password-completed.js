@@ -1,18 +1,20 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import { LayoutDashboard } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
+import Link from '../components/Link';
 import Page from '../components/Page';
 import { P } from '../components/Text';
+import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
 const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
   return (
     <Page noRobots showFooter={false}>
       <div
-        className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16"
+        className="flex flex-col items-center px-4 pt-8 pb-32 text-center sm:pt-16"
         data-cy="reset-password-success-page"
       >
         <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
@@ -47,14 +49,18 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
             </P>
           </Fragment>
         )}
+
+        {LoggedInUser && (
+          <Link href="/dashboard">
+            <Button variant="outline" className="mt-6">
+              <LayoutDashboard />
+              <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+            </Button>
+          </Link>
+        )}
       </div>
     </Page>
   );
-};
-
-ResetPasswordCompleted.propTypes = {
-  loadingLoggedInUser: PropTypes.bool.isRequired,
-  LoggedInUser: PropTypes.object,
 };
 
 // next.js export

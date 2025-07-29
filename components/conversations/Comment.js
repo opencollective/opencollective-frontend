@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { CommentType } from '../../lib/graphql/types/v2/schema';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -13,19 +12,8 @@ import CommentActions from './CommentActions';
 import { CommentMetadata } from './CommentMetadata';
 import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
-import { commentFieldsFragment } from './graphql';
-
-const editCommentMutation = gql`
-  mutation EditComment($comment: CommentUpdateInput!) {
-    editComment(comment: $comment) {
-      id
-      ...CommentFields
-    }
-  }
-  ${commentFieldsFragment}
-`;
-
-const mutationOptions = { context: API_V2_CONTEXT };
+import { editCommentMutation, mutationOptions } from './graphql';
+import SmallComment from './SmallComment';
 
 /**
  * Render a comment.
@@ -46,6 +34,7 @@ const Comment = ({
   const [isEditing, setEditing] = React.useState(false);
   const hasActions = !isEditing;
   const anchorHash = `comment-${new Date(comment.createdAt).getTime()}`;
+  const isPrivateNote = comment.type === CommentType.PRIVATE_NOTE;
 
   return (
     <Container width="100%" data-cy="comment" id={anchorHash}>
@@ -62,7 +51,7 @@ const Comment = ({
             onDelete={onDelete}
             onEditClick={() => setEditing(true)}
             onReplyClick={() => {
-              onReplyClick(comment);
+              onReplyClick?.(comment);
             }}
           />
         )}
@@ -94,6 +83,7 @@ const Comment = ({
                 fontSize="13px"
                 autoFocus
                 setUploading={setUploading}
+                toolbarBackgroundColor={isPrivateNote ? '#fffbeb' : '#ffffff'}
               />
             )
           }
@@ -109,33 +99,14 @@ const Comment = ({
   );
 };
 
-Comment.propTypes = {
-  comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-    fromAccount: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  }).isRequired,
-  /** Reactions associated with this comment? */
-  reactions: PropTypes.object,
-  /** Can current user edit this comment? */
-  canEdit: PropTypes.bool,
-  /** Can current user delete this comment? */
-  canDelete: PropTypes.bool,
-  canReply: PropTypes.bool,
-  /** Set this to true if the comment is the root comment of a conversation */
-  isConversationRoot: PropTypes.bool,
-  /** Set this to true to disable actions */
-  withoutActions: PropTypes.bool,
-  /** If set, comment will be scrollable over this height */
-  maxCommentHeight: PropTypes.number,
-  /** Called when comment gets deleted */
-  onDelete: PropTypes.func,
-  /** Called when comment gets selected*/
-  onReplyClick: PropTypes.func,
-};
+/**
+ *
+ * @param {import('./types').CommentPropsWithVariant} props
+ */
+export default function CommentComponent(props) {
+  if (props.variant === 'small') {
+    return <SmallComment {...props} />;
+  }
 
-export default Comment;
+  return <Comment {...props} />;
+}

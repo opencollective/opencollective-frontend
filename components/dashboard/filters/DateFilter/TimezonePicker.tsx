@@ -30,7 +30,7 @@ export function Timezonepicker({ value = 'local', onChange }) {
           type="button"
           className={clsx(
             'rounded-md py-1',
-            value === 'local' ? 'bg-white text-foreground shadow-sm' : 'bg-transparent text-muted-foreground',
+            value === 'local' ? 'bg-white text-foreground shadow-xs' : 'bg-transparent text-muted-foreground',
           )}
           onClick={() => onChange('local')}
         >
@@ -40,7 +40,7 @@ export function Timezonepicker({ value = 'local', onChange }) {
           type="button"
           className={clsx(
             'rounded-md py-1',
-            value === 'UTC' ? 'bg-white text-foreground shadow-sm' : 'bg-transparent text-muted-foreground',
+            value === 'UTC' ? 'bg-white text-foreground shadow-xs' : 'bg-transparent text-muted-foreground',
           )}
           onClick={() => onChange('UTC')}
         >

@@ -73,7 +73,7 @@ export const SignatureInput = ({ isSigned, signerName, onChange, values, error }
       ) : (
         <div className={cn(containerClassName, 'p-2')}>
           <SignatureWithCustomFont signerName={signerName} maxSize={Math.min(width, height)} />
-          <div className="absolute right-3 top-3">
+          <div className="absolute top-3 right-3">
             <Button variant="outline" size="sm" onClick={() => onChange(false)}>
               <FormattedMessage defaultMessage="Clear" id="/GCoTA" />
             </Button>

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Undo } from '@styled-icons/boxicons-regular/Undo';
 import { FormattedMessage } from 'react-intl';
@@ -9,7 +8,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import StyledButton from '../StyledButton';
+import { Button } from '../ui/Button';
 
 const refundTransactionMutation = gql`
   mutation RefundTransaction($transaction: TransactionReferenceInput!) {
@@ -45,19 +44,10 @@ const TransactionRefundButton = props => {
   return (
     <Flex flexDirection="column">
       <Box>
-        <StyledButton
-          buttonSize="small"
-          buttonStyle="secondary"
-          minWidth={140}
-          background="transparent"
-          textTransform="capitalize"
-          onClick={() => setEnabled(true)}
-        >
-          <Flex alignItems="center" justifyContent="space-evenly">
-            <Undo size={16} />
-            <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
-          </Flex>
-        </StyledButton>
+        <Button className="flex gap-1 capitalize" onClick={() => setEnabled(true)}>
+          <Undo size={16} />
+          <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
+        </Button>
         {isEnabled && (
           <ConfirmationModal
             onClose={closeModal}
@@ -85,11 +75,6 @@ const TransactionRefundButton = props => {
       </Box>
     </Flex>
   );
-};
-
-TransactionRefundButton.propTypes = {
-  id: PropTypes.string.isRequired,
-  onMutationSuccess: PropTypes.func,
 };
 
 export default TransactionRefundButton;

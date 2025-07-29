@@ -8,12 +8,15 @@ import styled, { css } from 'styled-components';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import Link from '../Link';
 import SearchModal from '../Search';
+import { SearchCommand } from '../search/SearchCommand';
 import SearchTrigger from '../SearchTrigger';
 
 import ProfileMenu from './ProfileMenu';
@@ -82,7 +85,7 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
     props.href &&
     css`
       @media (hover: hover) {
-        :hover {
+        &:hover {
           color: #0f172a !important;
           background-color: #f1f5f9;
         }
@@ -99,12 +102,6 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
   `}
   font-weight: 500;
   ${props => props.$isActive && `background-color: #f1f5f9;`}
-
-  span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 `;
 
 const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
@@ -147,14 +144,14 @@ type TopBarProps = {
     name: string;
     slug: string;
   };
-  navTitle?: string;
   loading?: boolean;
 };
 
 const TopBar = ({ account }: TopBarProps) => {
+  const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
-  const ref = useRef();
+  const ref = useRef(undefined);
   const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -167,8 +164,8 @@ const TopBar = ({ account }: TopBarProps) => {
   const onDashboardRoute = isRouteActive('/dashboard');
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
-  const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
-
+  const ocLogoRoute = LoggedInUser ? '/dashboard' : whitelabel ? `/${whitelabel.slug}` : '/home';
+  const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <Fragment>
       <div className="border-b bg-white px-4 xl:px-6" ref={ref}>
@@ -194,16 +191,18 @@ const TopBar = ({ account }: TopBarProps) => {
 
           <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
             <SearchTrigger setShowSearchModal={setShowSearchModal} />
-            <div className="hidden sm:block">
-              <ChangelogTrigger />
-            </div>
+            <div className="hidden sm:block">{!whitelabel && <ChangelogTrigger />}</div>
             <ProfileMenu
               logoutParameters={{ skipQueryRefetch: onDashboardRoute, redirect: onDashboardRoute ? '/' : undefined }}
             />
           </Flex>
         </div>
       </div>
-      <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+      {useSearchCommandMenu ? (
+        <SearchCommand open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+      ) : (
+        <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+      )}
       {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
     </Fragment>
   );

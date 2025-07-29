@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { get } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -60,75 +59,61 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
-    <Container>
-      {stepDetails && (
-        <React.Fragment>
-          {showQuantity && (
-            <AmountLine color="black.700">
-              <Label>
-                <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
-              </Label>
-              <Amount>{stepDetails.quantity}</Amount>
-            </AmountLine>
-          )}
+    <Container data-cy="contribution-summary">
+      <React.Fragment>
+        {showQuantity && (
           <AmountLine color="black.700">
             <Label>
-              <FormattedMessage
-                id="ContributionToProject"
-                defaultMessage="Contribution to {projectName}"
-                values={{ projectName: contributionName }}
-              />
+              <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
             </Label>
-            <Amount>
-              <FormattedMoneyAmount
-                amount={amount || 0}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
-            </Amount>
+            <Amount>{stepDetails.quantity}</Amount>
           </AmountLine>
-          {Boolean(stepSummary?.taxType) &&
-            (renderTax ? (
-              renderTax({ AmountLine, Amount, Label })
-            ) : (
-              <AmountLine color="black.700">
-                <Label>
-                  {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
-                </Label>
-                <Amount>
-                  <FormattedMoneyAmount
-                    amount={stepSummary.amount}
-                    currency={currency}
-                    amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                  />
-                </Amount>
-              </AmountLine>
-            ))}
-
-          {Boolean(platformTip) && (
+        )}
+        <AmountLine color="black.700">
+          <Label>
+            <FormattedMessage
+              id="ContributionToProject"
+              defaultMessage="Contribution to {projectName}"
+              values={{ projectName: contributionName }}
+            />
+          </Label>
+          <Amount>
+            <FormattedMoneyAmount amount={amount || 0} currency={currency} />
+          </Amount>
+        </AmountLine>
+        {Boolean(stepSummary?.taxType) &&
+          (renderTax ? (
+            renderTax({ AmountLine, Amount, Label })
+          ) : (
             <AmountLine color="black.700">
               <Label>
-                {stepDetails.isNewPlatformTip ? (
-                  <FormattedMessage defaultMessage="Optional tip to the platform" id="JVRAzE" />
-                ) : (
-                  <FormattedMessage
-                    id="SupportProject"
-                    defaultMessage="Support {projectName}"
-                    values={{ projectName: 'Open Collective' }}
-                  />
-                )}
+                {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
               </Label>
-              <Amount data-cy="ContributionSummary-Tip">
-                <FormattedMoneyAmount
-                  amount={platformTip}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
+              <Amount>
+                <FormattedMoneyAmount amount={stepSummary.amount} currency={currency} />
               </Amount>
             </AmountLine>
-          )}
-        </React.Fragment>
-      )}
+          ))}
+
+        {Boolean(platformTip) && (
+          <AmountLine color="black.700">
+            <Label>
+              {stepDetails.isNewPlatformTip ? (
+                <FormattedMessage defaultMessage="Optional tip to the platform" id="JVRAzE" />
+              ) : (
+                <FormattedMessage
+                  id="SupportProject"
+                  defaultMessage="Support {projectName}"
+                  values={{ projectName: 'Open Collective' }}
+                />
+              )}
+            </Label>
+            <Amount data-cy="ContributionSummary-Tip">
+              <FormattedMoneyAmount amount={platformTip} currency={currency} />
+            </Amount>
+          </AmountLine>
+        )}
+      </React.Fragment>
 
       <StyledHr borderColor="black.500" my={1} />
       <AmountLine color="black.800" fontWeight="500">
@@ -136,7 +121,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && (
@@ -184,11 +169,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={pmFeeInfo.fee || null}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={pmFeeInfo.fee || null} currency={currency} />
             </Amount>
           </AmountLine>
           <AmountLine color="black.700">
@@ -215,17 +196,13 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={totalAmount - pmFeeInfo.fee - platformTip}
-                currency={currency}
-                amountStyles={null}
-              />
+              <FormattedMoneyAmount amount={totalAmount - pmFeeInfo.fee - platformTip} currency={currency} />
             </Amount>
           </AmountLine>
         </React.Fragment>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.oneTime && (
+      {stepDetails.interval && stepDetails.interval !== INTERVALS.oneTime && (
         <P color="black.800" fontSize="12px" mt={3}>
           {!stepPayment || stepPayment.isKeyOnly ? (
             <FormattedMessage
@@ -286,16 +263,6 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
       )}
     </Container>
   );
-};
-
-ContributionSummary.propTypes = {
-  collective: PropTypes.object,
-  tier: PropTypes.object,
-  stepDetails: PropTypes.object,
-  stepSummary: PropTypes.object,
-  stepPayment: PropTypes.object,
-  currency: PropTypes.string,
-  renderTax: PropTypes.func,
 };
 
 export default ContributionSummary;

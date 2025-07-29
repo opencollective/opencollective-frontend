@@ -1,3 +1,5 @@
+import 'cypress-mailpit';
+
 import { API_V2_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
@@ -57,22 +59,6 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
 });
 
 /**
- * Open a link not covered by `baseUrl`.
- * See https://github.com/cypress-io/cypress/issues/1777
- */
-Cypress.Commands.add('openExternalLink', url => {
-  cy.visit('/signin').then(window => {
-    const linkIdentifier = '__TMP_CY_EXTERNAL_LINK__';
-    const link = window.document.createElement('a');
-    link.innerHTML = linkIdentifier;
-    link.setAttribute('href', url);
-    link.setAttribute('id', linkIdentifier);
-    window.document.body.appendChild(link);
-    cy.get(`#${linkIdentifier}`).click();
-  });
-});
-
-/**
  * Returns all the email sent by the API
  */
 Cypress.Commands.add('getInbox', () => {
@@ -87,7 +73,7 @@ Cypress.Commands.add('getInbox', () => {
 });
 
 /**
- * Navigate to an email in maildev.
+ * Open an email on Mailpit. Resolves the email message.
  *
  * API must be configured to use maildev
  * - configured by default in development, e2e and ci environments
@@ -96,35 +82,8 @@ Cypress.Commands.add('getInbox', () => {
  * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
  *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
  */
-Cypress.Commands.add('openEmail', emailMatcher => {
-  return loopOpenEmail(emailMatcher);
-});
-
-/**
- * Gets an email in maildev.
- *
- * API must be configured to use maildev
- * - configured by default in development, e2e and ci environments
- * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
- *
- * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
- *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
- */
-Cypress.Commands.add('getEmail', emailMatcher => {
-  return getEmail(emailMatcher);
-});
-
-/**
- * Clear maildev inbox.
- */
-Cypress.Commands.add('clearInbox', () => {
-  return cy.request({
-    url: `${Cypress.env('MAILDEV_URL')}/email/all`,
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
+Cypress.Commands.add('openEmail', (emailMatcher, timeout = 8000) => {
+  return getEmail(emailMatcher, timeout);
 });
 
 /**
@@ -137,7 +96,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollective',
-      query: gqlV1/* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation CreateCollective($collective: CollectiveInputType!) {
           createCollective(collective: $collective) {
             id
@@ -151,7 +110,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
           }
         }
       `,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
+      variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
     });
@@ -165,7 +124,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
     return graphqlQuery(token, {
       operationName: 'EditCollective',
-      query: gqlV1/* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation EditCollective($collective: CollectiveInputType!) {
           editCollective(collective: $collective) {
             id
@@ -192,7 +151,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  */
 Cypress.Commands.add(
   'createHostedCollectiveV2',
-  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, ...attributes } = {}) => {
+  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, collective, ...attributes } = {}) => {
     return cy.createCollectiveV2({
       ...attributes,
       email,
@@ -200,6 +159,7 @@ Cypress.Commands.add(
       host: { slug: hostSlug },
       collective: {
         repositoryUrl: 'https://github.com/opencollective',
+        ...collective,
       },
       applicationData: {
         useGithubValidation: true,
@@ -247,7 +207,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
 /**
  * Create a collective hosted by the open source collective.
- * TODO: Migrate this to GQLV2 -> `createCollective` with `automateApprovalWithGithub` set to true
+ * TODO: Migrate this to GQLV2 -> `createCollective` with `__skipApprovalTestOnly` set to true
  */
 Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
   const collective = {
@@ -261,7 +221,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollectiveWithHost',
-      query: gqlV1/* GraphQL */ `
+      query: gqlV1 /* GraphQL */ `
         mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
           createCollectiveFromGithub(collective: $collective) {
             id
@@ -309,17 +269,64 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   });
 });
 
+Cypress.Commands.add('createHostOrganization', (userEmail, variables) => {
+  return signinRequest({ email: userEmail }, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQueryV2(token, {
+      operationName: 'CreateOrganization',
+      query: gql`
+        mutation CreateOrganization($organization: OrganizationCreateInput!, $inviteMembers: [InviteMemberInput!]) {
+          createOrganization(organization: $organization, inviteMembers: $inviteMembers) {
+            id
+            legacyId
+            slug
+          }
+        }
+      `,
+      variables: {
+        ...variables,
+        organization: {
+          slug: randomSlug(),
+          description: 'Test Host',
+          name: 'Test Host',
+          ...variables?.organization,
+        },
+      },
+    }).then(({ body }) => {
+      const host = body.data.createOrganization;
+      return graphqlQuery(token, {
+        operationName: 'ActivateCollectiveAsHost',
+        query: gqlV1`
+          mutation ActivateCollectiveAsHost($id: Int!) {
+            activateCollectiveAsHost(id: $id) {
+              id
+            }
+          }
+        `,
+        variables: { id: host.legacyId },
+      }).then(() => host);
+    });
+  });
+});
+
+Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } = {}) => {
+  return graphqlQueryV2(token, { query, variables }).then(({ body }) => {
+    return body.data;
+  });
+});
+
 /**
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
-  cy.contains('button', 'Add a credit card').click();
+  cy.getByDataCy('add-credit-card-button').click();
   cy.wait(2000);
   fillStripeInput();
   cy.wait(1000);
-  cy.contains('button[type="submit"]', 'Save').click();
-  cy.wait(2000);
+  cy.getByDataCy('save-credit-card-button').click();
+  cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('exist');
+  cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('not.exist', { timeout: 30_000 });
 });
 
 /**
@@ -569,7 +576,7 @@ Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
 Cypress.Commands.add(
   'createCollectiveV2',
-  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData } = {}) => {
+  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData, skipApproval = false } = {}) => {
     const user = { email, newsletterOptIn: false };
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
@@ -581,12 +588,14 @@ Cypress.Commands.add(
             $host: AccountReferenceInput!
             $testPayload: JSON
             $applicationData: JSON
+            $skipApproval: Boolean
           ) {
             createCollective(
               collective: $collective
               host: $host
               testPayload: $testPayload
               applicationData: $applicationData
+              skipApprovalTestOnly: $skipApproval
             ) {
               id
               slug
@@ -606,6 +615,7 @@ Cypress.Commands.add(
             ...collective,
           },
           applicationData,
+          skipApproval,
         },
       }).then(({ body }) => {
         return body.data.createCollective;
@@ -622,6 +632,43 @@ Cypress.Commands.add('getDownloadedPDFContent', (filename, options) => {
   cy.readFile(`${downloadFolder}/${filename}`, null, options).then(pdfFileContent => {
     cy.task('getTextFromPdfContent', pdfFileContent);
   });
+});
+
+Cypress.Commands.add('waitOrderStatus', (orderId, status) => {
+  return cy.retryChain(
+    () =>
+      cy
+        .graphqlQueryV2(
+          gql`
+            query OrderStatus($orderId: Int!) {
+              order(order: { legacyId: $orderId }) {
+                status
+              }
+            }
+          `,
+          { variables: { orderId } },
+        )
+        .then(data => data.order.status),
+    apiStatus => {
+      if (!apiStatus.match(status)) {
+        throw new Error(`Order did not transition to ${status} before timeout, current value: ${apiStatus}.`);
+      }
+    },
+    {
+      maxAttempts: 50,
+      wait: 1000,
+    },
+  );
+});
+
+Cypress.Commands.add('getOrderIdFromContributionSuccessPage', () => {
+  return cy
+    .get('[data-cy^="contribution-id-"]')
+    .invoke('attr', 'data-cy')
+    .then(contributionIdStr => {
+      const contributionId = parseInt(contributionIdStr.replace('contribution-id-', ''));
+      return contributionId;
+    });
 });
 
 // ---- Private ----
@@ -649,7 +696,7 @@ function getTokenFromRedirectUrl(url) {
 /**
  * @param {object} user - should have `email` and `id` set
  */
-function signinRequestAndReturnToken(user, redirect) {
+export function signinRequestAndReturnToken(user, redirect) {
   return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
@@ -666,7 +713,7 @@ function graphqlQuery(token, body) {
   });
 }
 
-function graphqlQueryV2(token, body) {
+export function graphqlQueryV2(token, body) {
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',
@@ -717,21 +764,15 @@ function fillStripeInput(params) {
   });
 }
 
-function loopOpenEmail(emailMatcher, timeout = 8000) {
-  return getEmail(emailMatcher, timeout).then(email => {
-    return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
-  });
-}
-
 function getEmail(emailMatcher, timeout = 8000) {
   if (timeout < 0) {
     return assert.fail('Could not find email: getEmail timed out');
   }
 
-  return cy.getInbox().then(inbox => {
-    const email = inbox.find(emailMatcher);
+  return cy.mailpitGetAllMails().then(result => {
+    const email = result.messages.find(emailMatcher);
     if (email) {
-      return cy.wrap(email);
+      return cy.mailpitGetMail(email.ID);
     }
     cy.wait(100);
     return getEmail(emailMatcher, timeout - 100);

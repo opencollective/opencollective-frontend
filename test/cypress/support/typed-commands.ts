@@ -1,5 +1,12 @@
 // eslint-disable-next-line spaced-comment
 /// <reference types="cypress" />
+
+import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
+
+import { fakeTag as gql } from '../../../lib/graphql/helpers';
+
+import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -10,6 +17,65 @@ declare global {
         options?: { maxAttempts?: number; wait?: number },
         attempts?: number,
       ): Chainable<T>;
+
+      login(params: {
+        email: string;
+        redirect?: string;
+        visitParams?: Partial<Cypress.VisitOptions>;
+        sendLink?: boolean;
+      }): Chainable<{ email: string; newsletterOptIn: false }>;
+
+      createCollective(params: {
+        email?: string;
+        slug?: string;
+        name?: string;
+        type?: string;
+      }): Chainable<{ slug: string }>;
+
+      createCollectiveV2(params: {
+        email?: string;
+        skipApproval?: boolean;
+        host?: { slug: string };
+        collective?: {
+          slug?: string;
+          name?: string;
+          type?: string;
+          location?: { country: string };
+          settings?: Record<string, unknown>;
+        };
+      }): Chainable<{ id: string; slug: string; name; description: string; settings: Record<string, unknown> }>;
+
+      signup(params?: {
+        user?: { email?: string; name?: string };
+        redirect?: string;
+        visitParams?: Partial<Cypress.VisitOptions>;
+      }): Chainable<{ email: string }>;
+
+      getByDataCy: Chainable['get'];
+
+      createExpense(params: {
+        userEmail?: string;
+        account: { slug: string };
+        payee: { slug: string };
+        payoutMethod: {
+          type: string;
+          name: string;
+          data: Record<string, unknown>;
+        };
+      }): Chainable<{ legacyId: number }>;
+
+      openEmail(matcher: (summary: MessageSummary) => boolean): Chainable<Message>;
+
+      logout();
+
+      createHostOrganization(
+        email: string,
+        options?: unknown,
+      ): Chainable<{ id: string; legacyId: number; slug: string }>;
+
+      createVendor: typeof createVendor;
+
+      getAccount: typeof getAccount;
     }
   }
 }
@@ -30,5 +96,62 @@ Cypress.Commands.add('retryChain', function <
     }
   });
 });
+
+Cypress.Commands.add('createVendor', createVendor);
+function createVendor(
+  hostSlug: string,
+  vendor: { name: string; payoutMethod?: unknown },
+  userEmail: string,
+): Cypress.Chainable<{ name: string }> {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'CreateVendor',
+      query: gql`
+        mutation CreateVendor($hostSlug: String!, $vendor: VendorCreateInput!) {
+          createVendor(host: { slug: $hostSlug }, vendor: $vendor) {
+            id
+            name
+            slug
+            hasPayoutMethod
+            __typename
+          }
+        }
+      `,
+      variables: { hostSlug, vendor },
+    }).then(({ body }) => {
+      return body.data.createVendor;
+    });
+  });
+}
+
+Cypress.Commands.add('getAccount', getAccount);
+function getAccount(
+  accountSlug: string,
+  userEmail: string,
+): Cypress.Chainable<{ name: string; payoutMethods: { id: string; type: string }[] }> {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'GetAccount',
+      query: gql`
+        query GetAccount($accountSlug: String!) {
+          account(slug: $accountSlug) {
+            id
+            legacyId
+            name
+            slug
+            __typename
+            payoutMethods {
+              id
+              type
+            }
+          }
+        }
+      `,
+      variables: { accountSlug },
+    }).then(({ body }) => {
+      return body.data.account;
+    });
+  });
+}
 
 export {};

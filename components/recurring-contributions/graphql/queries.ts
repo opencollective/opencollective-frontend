@@ -42,13 +42,21 @@ export const managedOrderFragment = gql`
     }
     status
     description
+    memo
     createdAt
     processedAt
+    lastChargedAt
     hostFeePercent
     frequency
     tier {
       id
       name
+    }
+    tax {
+      id
+      type
+      rate
+      idNumber
     }
     permissions {
       id
@@ -61,11 +69,6 @@ export const managedOrderFragment = gql`
       canSetTags
       canUpdateAccountingCategory
     }
-    totalDonations {
-      value
-      valueInCents
-      currency
-    }
     fromAccount {
       id
       name
@@ -75,6 +78,13 @@ export const managedOrderFragment = gql`
       ... on Individual {
         isGuest
       }
+      ...AccountHoverCardFields
+    }
+    createdByAccount {
+      id
+      name
+      slug
+      type
       ...AccountHoverCardFields
     }
     toAccount {
@@ -87,6 +97,15 @@ export const managedOrderFragment = gql`
       imageUrl
       backgroundImageUrl(height: 256)
       settings
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          name
+          type
+          imageUrl
+        }
+      }
       ... on AccountWithHost {
         host {
           id
@@ -109,6 +128,10 @@ export const managedOrderFragment = gql`
       value
       valueInCents
     }
+    paymentProcessorFee {
+      valueInCents
+      currency
+    }
     pendingContributionData {
       expectedAt
       paymentMethod
@@ -118,6 +141,12 @@ export const managedOrderFragment = gql`
         name
         email
       }
+    }
+    accountingCategory {
+      id
+      name
+      kind
+      code
     }
   }
   ${accountHoverCardFields}
@@ -149,6 +178,11 @@ export const manageContributionsQuery = gql`
         nodes {
           id
           ...ManagedOrderFields
+          totalDonations {
+            value
+            valueInCents
+            currency
+          }
         }
       }
     }

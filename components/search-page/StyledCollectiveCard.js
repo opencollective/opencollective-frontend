@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -8,6 +7,7 @@ import { getCollectiveMainTag } from '../../lib/collective';
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { getCountryDisplayName, getFlagEmoji } from '../../lib/i18n/countries';
 
+import { AccountTrustBadge } from '../AccountTrustBadge';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import I18nCollectiveTags from '../I18nCollectiveTags';
@@ -124,16 +124,14 @@ const getBackground = collective => {
 
 const CollectiveContainer = ({ useLink, collective, children }) => {
   if (useLink) {
-    return <LinkCollective collective={collective}>{children}</LinkCollective>;
+    return (
+      <LinkCollective className="max-w-[85%]" collective={collective}>
+        {children}
+      </LinkCollective>
+    );
   } else {
     return children;
   }
-};
-
-CollectiveContainer.propTypes = {
-  useLink: PropTypes.bool,
-  collective: PropTypes.object.isRequired,
-  children: PropTypes.node.isRequired,
 };
 
 /**
@@ -178,11 +176,14 @@ const StyledCollectiveCard = ({
         </Container>
         <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
           <div className="flex flex-col space-y-3 p-4 pb-0">
-            <CollectiveContainer useLink={useLink} collective={collective}>
-              <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
-                {collective.name}
-              </P>
-            </CollectiveContainer>
+            <div className="mt-4 flex items-center gap-2">
+              <CollectiveContainer useLink={useLink} collective={collective}>
+                <P fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
+                  {collective.name}
+                </P>
+              </CollectiveContainer>
+              <AccountTrustBadge account={collective} />
+            </div>
             {showWebsite && collective.website && (
               <P fontSize="11px" fontWeight="400" title={collective.website} truncateOverflow mt={1}>
                 <StyledLink color="black.600" href={collective.website} openInNewTabNoFollow>
@@ -221,41 +222,6 @@ const StyledCollectiveCard = ({
       </Container>
     </StyledCard>
   );
-};
-
-StyledCollectiveCard.propTypes = {
-  /** Displayed below the top header of the card */
-  children: PropTypes.node,
-  /** To replace the default tag. Set to `null` to hide tag */
-  tag: PropTypes.node,
-  /** A fixed height for the content */
-  bodyHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  /** The collective to display */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    backgroundImageUrl: PropTypes.string,
-    website: PropTypes.string,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    location: PropTypes.shape({ country: PropTypes.string }),
-    settings: PropTypes.object,
-    host: PropTypes.shape({
-      // TODO: getCollectiveMainTag should be based on slug
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      location: PropTypes.shape({ country: PropTypes.string }),
-    }),
-    parentCollective: PropTypes.shape({
-      backgroundImageUrl: PropTypes.string,
-    }),
-    parent: PropTypes.shape({
-      backgroundImageUrl: PropTypes.string,
-      location: PropTypes.shape({ country: PropTypes.string }),
-    }),
-  }).isRequired,
-  borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  showWebsite: PropTypes.bool,
-  useLink: PropTypes.bool,
 };
 
 export default StyledCollectiveCard;

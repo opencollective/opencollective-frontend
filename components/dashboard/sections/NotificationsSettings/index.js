@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, flatten } from 'lodash';
 import { useRouter } from 'next/router';
@@ -12,11 +11,11 @@ import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import StyledButton from '../../../StyledButton';
 import StyledCard from '../../../StyledCard';
 import StyledHr from '../../../StyledHr';
 import StyledTag from '../../../StyledTag';
 import { P, Span } from '../../../Text';
+import { Button } from '../../../ui/Button';
 import { Switch } from '../../../ui/Switch';
 
 import CollectiveSettings from './CollectiveSettings';
@@ -134,9 +133,9 @@ const GroupSettings = ({ accounts, group, title, ...boxProps }) => {
               </P>
             )}
           </Flex>
-          <StyledButton buttonStyle="primary" buttonSize="tiny" onClick={handleGroupSettings}>
+          <Button size="xs" variant="outline" onClick={handleGroupSettings}>
             <FormattedMessage id="GroupSettings.Show" defaultMessage="Show group settings" />
-          </StyledButton>
+          </Button>
         </Flex>
         <Box display={['block', 'none']} mt={2}>
           <P fontSize="12px" lineHeight="18px" color="black.700">
@@ -156,26 +155,6 @@ const GroupSettings = ({ accounts, group, title, ...boxProps }) => {
       </Box>
     </Box>
   );
-};
-
-GroupSettings.propTypes = {
-  accounts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-      type: PropTypes.string,
-      imageUrl: PropTypes.string,
-      activitySubscriptions: PropTypes.arrayOf(
-        PropTypes.shape({
-          type: PropTypes.string,
-          active: PropTypes.bool,
-        }),
-      ),
-    }),
-  ),
-  group: PropTypes.string,
-  title: PropTypes.node,
 };
 
 const NotificationsSettings = ({ accountSlug, subpath }) => {
@@ -445,11 +424,6 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
       )}
     </Box>
   );
-};
-
-NotificationsSettings.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
-  subpath: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default NotificationsSettings;

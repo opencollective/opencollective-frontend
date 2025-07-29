@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
@@ -67,7 +66,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     <Box mt={2} pl={2}>
       <StyledLink
         as={StyledLink}
-        href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
+        href="https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses"
         openInNewTab
         fontSize="12px"
         color="black.700"
@@ -78,9 +77,5 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     </Box>
   </FAQ>
 );
-
-CreateExpenseFAQ.propTypes = {
-  defaultOpen: PropTypes.bool,
-};
 
 export default CreateExpenseFAQ;

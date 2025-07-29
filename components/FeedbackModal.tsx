@@ -45,7 +45,7 @@ export function FeedbackModal({
     variables: {
       score: -1, // the sendSurveyResponse mutation requires a score, but we don't use it here
       surveyKey: feedbackKey,
-      responseId: self.crypto.randomUUID(), // the Survey component uses this to send multiple responses and have it update the same row in Coda, but here we only send one response
+      responseId: typeof self !== 'undefined' ? self.crypto?.randomUUID?.() : null, // the Survey component uses this to send multiple responses and have it update the same row in Coda, but here we only send one response
     },
   });
 
@@ -92,7 +92,7 @@ export function FeedbackModal({
                     />
                     <label
                       htmlFor="okToContact"
-                      className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm leading-none font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       <FormattedMessage defaultMessage="It's OK to contact me for follow up questions." id="OSMRoO" />
                     </label>

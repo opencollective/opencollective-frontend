@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
@@ -23,6 +22,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { CommentMetadata } from './CommentMetadata';
@@ -123,21 +123,6 @@ const ReplyButton = ({ onReplyClick }) => {
   );
 };
 
-ReplyButton.propTypes = {
-  onReplyClick: PropTypes.func,
-};
-
-AdminActionButtons.propTypes = {
-  comment: PropTypes.object.isRequired,
-  openDeleteConfirmation: PropTypes.func,
-  onEdit: PropTypes.func,
-  closePopup: PropTypes.func,
-  isConversationRoot: PropTypes.bool,
-  canEdit: PropTypes.bool,
-  canDelete: PropTypes.bool,
-  copyLinkToClipboard: PropTypes.func,
-};
-
 const deleteCommentMutation = gql`
   mutation DeleteComment($id: String!) {
     deleteComment(id: $id) {
@@ -197,14 +182,15 @@ const CommentActions = ({
   return (
     <React.Fragment>
       <div>
-        <StyledButton
+        <Button
           ref={setRefElement}
-          buttonSize="tiny"
+          variant="outline"
+          size="xs"
           data-cy="commnent-actions-trigger"
           onClick={() => setShowAdminActions(!showAdminActions)}
         >
           <DotsHorizontalRounded size="16" />
-        </StyledButton>
+        </Button>
       </div>
 
       {showAdminActions && (
@@ -286,30 +272,6 @@ const CommentActions = ({
       )}
     </React.Fragment>
   );
-};
-
-CommentActions.propTypes = {
-  comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    html: PropTypes.string,
-    createdAt: PropTypes.string,
-  }).isRequired,
-  /** needed to copy the comment link */
-  anchorHash: PropTypes.string.isRequired,
-  /** Can current user edit this comment? */
-  canEdit: PropTypes.bool,
-  /** Can current user delete this comment? */
-  canDelete: PropTypes.bool,
-  /** Can current user reply this comment? */
-  canReply: PropTypes.bool,
-  /** Set this to true if the comment is the root comment of a conversation */
-  isConversationRoot: PropTypes.bool,
-  /** Called when comment gets deleted */
-  onDelete: PropTypes.func,
-  /** Called when comment gets deleted */
-  onEditClick: PropTypes.func,
-  /** Called when comment is getting a reply */
-  onReplyClick: PropTypes.func,
 };
 
 export default CommentActions;

@@ -3,15 +3,16 @@ import { isNil, round } from 'lodash';
 
 import { ZERO_DECIMAL_CURRENCIES } from './constants/currency';
 import { CurrencyPrecision } from './constants/currency-precision';
-import type { Amount, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/graphql';
-import { Currency } from './graphql/types/v2/graphql';
+import type { Amount, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/schema';
+import { Currency } from './graphql/types/v2/schema';
 
 export type Options = {
   locale?: string;
   minimumFractionDigits?: number;
   precision?: number;
   style?: 'currency' | 'decimal';
-  currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
+  currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
+  absolute?: boolean;
 };
 
 function getCurrencySymbolFallback(currency: Currency): string {
@@ -71,6 +72,10 @@ export function formatCurrency(
     }
   }
 
+  if (options.absolute) {
+    amount = Math.abs(amount);
+  }
+
   amount = amount / 100;
   const defaultPrecision = getDefaultCurrencyPrecision(currency);
   let minimumFractionDigits = defaultPrecision;
@@ -85,7 +90,7 @@ export function formatCurrency(
     maximumFractionDigits = 0;
   }
 
-  const formatAmount = (currencyDisplay: string): string => {
+  const formatAmount = (currencyDisplay: Options['currencyDisplay']): string => {
     return amount.toLocaleString(options.locale, {
       style: options.style || 'currency',
       currency,
@@ -99,7 +104,7 @@ export function formatCurrency(
     // We manually add the exact currency (e.g. "$10 USD") in many places. This is to prevent
     // showing the currency twice is some locales ($US10 USD)
     return formatAmount(options.currencyDisplay ?? 'narrowSymbol');
-  } catch (e) {
+  } catch {
     // ... unfortunately, some old versions of Safari doesn't support it, so we need a fallback
     return formatAmount('symbol');
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw } from 'lucide-react';
+import { ListX } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import Image from '../Image';
@@ -10,8 +10,9 @@ export function EmptyResults({
   hasFilters,
   entityType,
   otherActions,
+  imageSize = 160,
 }: {
-  onResetFilters: (e) => void;
+  onResetFilters?: (e) => void;
   hasFilters: boolean;
   otherActions?: React.ReactNode;
   entityType?:
@@ -24,7 +25,12 @@ export function EmptyResults({
     | 'VIRTUAL_CARD_REQUESTS'
     | 'TAX_FORM'
     | 'UPDATES'
-    | 'TRANSACTIONS';
+    | 'PROJECTS'
+    | 'TRANSACTIONS'
+    | 'FUNDS'
+    | 'GRANTS'
+    | 'PAYMENT_METHODS';
+  imageSize?: number;
 }) {
   return (
     <div className="flex flex-col items-center gap-6 py-6 sm:py-12" data-cy="zero-results-message">
@@ -32,10 +38,11 @@ export function EmptyResults({
         <div className={'absolute inset-0 m-2 rounded-full bg-slate-50'} />
         <Image
           alt="No results found illustration with a magnifying glass."
-          className="z-10 h-32 w-32 sm:h-40 sm:w-40"
+          className="z-10 sm:h-40 sm:w-40"
           src="/static/images/no-results.png"
-          height={160}
-          width={160}
+          height={imageSize}
+          width={imageSize}
+          style={{ height: imageSize, width: imageSize }}
         />
       </div>
       <h3 className="text-2xl text-foreground">
@@ -56,24 +63,18 @@ export function EmptyResults({
 
       {hasFilters && (
         <React.Fragment>
-          <p className="text-balance text-center text-muted-foreground">
+          <p className="text-center text-balance text-muted-foreground">
             <FormattedMessage
               id="filter.NoMatchingResults.subtitle"
               defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."
               values={{ type: entityType }}
             />
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {otherActions}
             {onResetFilters && (
-              <Button
-                data-cy="reset-filters"
-                size="lg"
-                variant="outline"
-                className="gap-2 rounded-full"
-                onClick={onResetFilters}
-              >
-                <RotateCcw size={16} />
+              <Button data-cy="reset-filters" variant="outline" className="gap-2" onClick={onResetFilters}>
+                <ListX size={16} />
                 <span>
                   <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
                 </span>

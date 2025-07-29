@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
@@ -17,10 +16,10 @@ import { getAvatarBorderRadius } from '../../../lib/image-utils';
 import Avatar from '../../Avatar';
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
+import { DROPZONE_ACCEPT_IMAGES } from '../../Dropzone';
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
-import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { P, Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
 
@@ -30,7 +29,7 @@ const AVATAR_SIZE = 128;
 const DropzoneLoadingPlaceholder = () => (
   <LoadingPlaceholder height={AVATAR_SIZE} width={AVATAR_SIZE} color="primary.500" borderRadius="25%" />
 );
-const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), {
+const ReactDropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), {
   loading: DropzoneLoadingPlaceholder,
   ssr: false,
 });
@@ -146,7 +145,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     const imgType = isIndividualAccount(collective) ? 'AVATAR' : 'LOGO';
     return (
       <Fragment>
-        <Dropzone
+        <ReactDropzone
           style={{}}
           multiple={false}
           accept={DROPZONE_ACCEPT_IMAGES}
@@ -206,7 +205,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
               </EditableAvatarContainer>
             </div>
           )}
-        </Dropzone>
+        </ReactDropzone>
         {showModal && (
           <ConfirmationModal
             width="100%"
@@ -313,17 +312,6 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
       <Avatar collective={collective} radius={AVATAR_SIZE} />
     );
   }
-};
-
-HeroAvatar.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    type: PropTypes.string,
-    image: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }).isRequired,
-  isAdmin: PropTypes.bool,
-  intl: PropTypes.object,
 };
 
 export default injectIntl(HeroAvatar);

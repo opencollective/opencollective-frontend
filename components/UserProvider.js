@@ -6,6 +6,7 @@ import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
+import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
@@ -22,29 +23,23 @@ export const UserContext = React.createContext({
   logout: async () => null,
   login: async () => null,
   async refetchLoggedInUser() {},
+  updateLoggedInUserFromCache: () => {},
 });
 
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
-    toast: PropTypes.func,
     twoFactorAuthPrompt: PropTypes.object,
     router: PropTypes.object,
-    token: PropTypes.string,
     client: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
     children: PropTypes.node,
     intl: PropTypes.object,
-    /**
-     * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
-     * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
-     */
-    skipRouteCheck: PropTypes.bool,
+    initialLoggedInUser: PropTypes.object,
   };
 
   state = {
-    loadingLoggedInUser: true,
-    LoggedInUser: null,
+    loadingLoggedInUser: this.props.initialLoggedInUser ? false : true,
+    LoggedInUser: this.props.initialLoggedInUser,
     errorLoggedInUser: null,
   };
 
@@ -52,7 +47,7 @@ class UserProvider extends React.Component {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
-    if (this.props.skipRouteCheck || Router.pathname !== '/signin') {
+    if (Router.pathname !== '/signin') {
       await this.login();
     }
   }
@@ -81,10 +76,8 @@ class UserProvider extends React.Component {
   };
 
   logout = async ({ redirect, skipQueryRefetch } = {}) => {
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
+    auth.logout();
+
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
     // Clear the Apollo store without automatically refetching queries
     await this.props.client.clearStore();
@@ -134,7 +127,6 @@ class UserProvider extends React.Component {
       }
 
       if (error.message.includes('Two-factor authentication is enabled')) {
-        // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
             const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
@@ -145,6 +137,13 @@ class UserProvider extends React.Component {
               authenticationOptions: decodedToken.authenticationOptions,
               allowRecovery: true,
             });
+
+            // An empty result means the prompt is already open elsewhere. This could either be due to
+            // React strict mode calling lifecycle methods twice or a developer mistake. The safest option is to early
+            // return and let the other prompt handle the result.
+            if (!result) {
+              return;
+            }
 
             const LoggedInUser = await getLoggedInUser({
               token: getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN),
@@ -214,10 +213,25 @@ class UserProvider extends React.Component {
     return true;
   };
 
+  /**
+   * Reloads the logged in user from the Apollo cache
+   */
+  updateLoggedInUserFromCache = () => {
+    const { getLoggedInUserFromCache } = this.props;
+    const LoggedInUser = getLoggedInUserFromCache();
+    this.setState({ LoggedInUser });
+  };
+
   render() {
     return (
       <UserContext.Provider
-        value={{ ...this.state, logout: this.logout, login: this.login, refetchLoggedInUser: this.refetchLoggedInUser }}
+        value={{
+          ...this.state,
+          logout: this.logout,
+          login: this.login,
+          refetchLoggedInUser: this.refetchLoggedInUser,
+          updateLoggedInUserFromCache: this.updateLoggedInUserFromCache,
+        }}
       >
         {this.props.children}
       </UserContext.Provider>

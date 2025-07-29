@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -68,13 +67,6 @@ const SectionEmpty = props => {
       </ContainerSectionContent>
     </Box>
   );
-};
-
-SectionEmpty.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default SectionEmpty;

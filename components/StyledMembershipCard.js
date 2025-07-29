@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedDate, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
@@ -38,7 +37,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </Span>
             </P>
           )}
-          {role === roles.BACKER ? (
+          {role === roles.BACKER && membership.totalDonations?.valueInCents ? (
             <P mt={3} data-cy="amount-contributed">
               <Span fontSize="12px" lineHeight="18px">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
@@ -76,29 +75,6 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
       </Container>
     </StyledCollectiveCard>
   );
-};
-
-StyledMembershipCard.propTypes = {
-  membership: PropTypes.shape({
-    account: PropTypes.shape({
-      id: PropTypes.string,
-      imageUrl: PropTypes.string,
-      isAdmin: PropTypes.bool,
-      isHost: PropTypes.bool,
-      isIncognito: PropTypes.bool,
-      name: PropTypes.string,
-      stats: PropTypes.shape({
-        contributorsCount: PropTypes.number,
-      }),
-    }),
-    description: PropTypes.string,
-    id: PropTypes.string,
-    publicMessage: PropTypes.string,
-    role: PropTypes.string,
-    since: PropTypes.string,
-    totalDonations: PropTypes.shape({ currency: PropTypes.string, valueInCents: PropTypes.number }),
-  }),
-  intl: PropTypes.object,
 };
 
 export default injectIntl(StyledMembershipCard);

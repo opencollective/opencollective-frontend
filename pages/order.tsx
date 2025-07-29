@@ -9,7 +9,7 @@ import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';
@@ -42,7 +42,7 @@ import StyledLink from '../components/StyledLink';
 import StyledTag from '../components/StyledTag';
 import StyledTooltip from '../components/StyledTooltip';
 import Tags from '../components/Tags';
-import { H1, H4, H5, P, Span } from '../components/Text';
+import { H1, H5, P, Span } from '../components/Text';
 import { getDisplayedAmount } from '../components/transactions/TransactionItem';
 
 import Custom404 from './404';
@@ -212,7 +212,9 @@ const messages = defineMessages({
   },
 });
 
-const ButtonsContainer = styled(Flex).attrs({ 'data-cy': 'order-actions' })`
+const ButtonsContainer = styled(Flex).attrs<{
+  'data-cy'?: string;
+}>({ 'data-cy': 'order-actions' })`
   flex-wrap: wrap;
   transition: opacity 0.05s;
   justify-content: flex-end;
@@ -246,7 +248,7 @@ const OrderDetails = ({ children: [field, value] }: { children: [React.ReactNode
 
 const TransactionDetailsWrapper = styled(Flex)`
   padding-bottom: 16px;
-  :not(:last-child) {
+  &:not(:last-child) {
     border-bottom: 1px dotted #e6e8eb;
     margin-bottom: 24px;
   }
@@ -291,7 +293,7 @@ const SummaryHeader = styled(H1)`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }
@@ -409,9 +411,9 @@ export default function OrderPage(props) {
                   mb={1}
                 >
                   <Box mr={[0, 2]}>
-                    <H4 fontWeight="500" data-cy="contribution-description">
+                    <h4 className="text-xl font-medium" data-cy="contribution-description">
                       {order.description}
-                    </H4>
+                    </h4>
                   </Box>
                   <Box mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
                     <OrderStatusTag status={order.status} />
@@ -624,7 +626,6 @@ export default function OrderPage(props) {
                                   currency={transaction.taxAmount.currency}
                                   precision={2}
                                   amount={transaction.taxAmount.valueInCents}
-                                  amountStyles={null}
                                 />{' '}
                                 ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
                                 {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
@@ -640,7 +641,6 @@ export default function OrderPage(props) {
                                       <FormattedMoneyAmount
                                         currency={transaction.paymentProcessorFee.currency}
                                         amount={transaction.paymentProcessorFee.valueInCents}
-                                        amountStyles={null}
                                       />
                                     ),
                                   }}
@@ -752,7 +752,7 @@ export default function OrderPage(props) {
                       <FormattedMoneyAmount
                         currency={account.stats.balanceWithBlockedFunds.currency}
                         amount={account.stats.balanceWithBlockedFunds.valueInCents}
-                        amountStyles={{ color: 'black.800' }}
+                        amountClassName="text-foreground"
                       />
                       {account.host && (
                         <P fontSize="11px" color="black.600" mt={2}>

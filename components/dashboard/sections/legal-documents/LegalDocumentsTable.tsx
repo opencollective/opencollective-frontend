@@ -4,7 +4,7 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -65,7 +65,7 @@ const columns: ColumnDef<LegalDocument>[] = [
           <DateTime value={requestedAt} dateStyle="medium" />
         </span>
       ) : (
-        <span className="italic text-slate-500">
+        <span className="text-slate-500 italic">
           <FormattedMessage defaultMessage="Never" id="du1laW" />
         </span>
       );
@@ -86,7 +86,7 @@ const columns: ColumnDef<LegalDocument>[] = [
     meta: { className: 'w-32' },
     cell: ({ row }) => {
       const legalDocument = row.original;
-      return <LegalDocumentStatusBadge status={legalDocument.status} isExpired={legalDocument.isExpired} />;
+      return <LegalDocumentStatusBadge status={legalDocument.status} />;
     },
   },
   actionsColumn,

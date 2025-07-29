@@ -1,5 +1,4 @@
 import React, { Fragment, useRef } from 'react';
-import { PropTypes } from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
@@ -23,8 +22,10 @@ import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
@@ -40,10 +41,10 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
+import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
-import { NAVBAR_CATEGORIES } from './constants';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
 
@@ -241,8 +242,8 @@ const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   color: ${themeGet('colors.primary.600')};
 
   &:hover {
-    background: radial-gradient(transparent 14px, white 3px),
-      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    background:
+      radial-gradient(transparent 14px, white 3px), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   }
 
@@ -263,8 +264,8 @@ const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   color: ${themeGet('colors.primary.600')};
 
   &:hover {
-    background: radial-gradient(transparent 14px, white 3px),
-      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    background:
+      radial-gradient(transparent 14px, white 3px), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   }
 
@@ -292,20 +293,12 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (
-  collective,
-  sections,
-  isAdmin,
-  isAccountant,
-  isHostAdmin,
-  LoggedInUser,
-  isAllowedAddFunds,
-) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds) => {
   if (!collective) {
     return {};
   }
 
-  const { features, host } = collective;
+  const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
@@ -317,9 +310,6 @@ const getDefaultCallsToActions = (
     hasRequestGrant:
       isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
-    createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
-    assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
-    requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
     hasSettings: isAdmin || isAccountant,
   };
 };
@@ -327,7 +317,14 @@ const getDefaultCallsToActions = (
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (collective, callsToAction, LoggedInUser) => {
+const getMainAction = (
+  collective,
+  callsToAction,
+  LoggedInUser,
+  isNewExpenseFlowEnabled = false,
+  isNewGrantFlowEnabled = false,
+  onOpenSubmitExpenseModalClick = () => {},
+) => {
   if (!collective || !callsToAction) {
     return null;
   }
@@ -370,7 +367,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/${isNewGrantFlowEnabled ? 'grants' : 'expenses'}/new`}>
           <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -383,7 +380,14 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
   } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
-      component: (
+      component: isNewExpenseFlowEnabled ? (
+        <ActionButton tabIndex="-1" onClick={onOpenSubmitExpenseModalClick}>
+          <Receipt size="1em" />
+          <Span ml={2}>
+            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+          </Span>
+        </ActionButton>
+      ) : (
         <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
@@ -452,17 +456,17 @@ export const NAVBAR_HEIGHT = [56, 64];
  */
 const CollectiveNavbar = ({
   collective,
-  isAdmin,
-  isLoading,
-  sections: sectionsFromParent,
+  isAdmin = undefined,
+  isLoading = false,
+  sections: sectionsFromParent = undefined,
   selectedCategory,
   callsToAction = {},
-  onCollectiveClick,
+  onCollectiveClick = undefined,
   isInHero = false,
   onlyInfos = false,
   showBackButton = true,
-  useAnchorsForCategories,
-  showSelectedCategoryOnMobile,
+  useAnchorsForCategories = false,
+  showSelectedCategoryOnMobile = false,
 }) => {
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
@@ -476,30 +480,45 @@ const CollectiveNavbar = ({
     skip: !collective?.slug || !LoggedInUser,
   });
 
+  const [isSubmitExpenseModalOpen, setIsSubmitExpenseModalOpen] = React.useState(false);
+
   const loading = isLoading || dataLoading;
+
+  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+
+  const isNewExpenseFlowEnabled =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
   const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(
-      collective,
-      sections,
-      isAdmin,
-      isAccountant,
-      isHostAdmin,
-      LoggedInUser,
-      isAllowedAddFunds,
-    ),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
+  const mainAction = getMainAction(
+    collective,
+    actionsArray,
+    LoggedInUser,
+    isNewExpenseFlowEnabled,
+    isNewGrantFlowEnabled,
+    () => setIsSubmitExpenseModalOpen(true),
+  );
   const secondAction =
-    actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser);
-  const navbarRef = useRef();
-  const mainContainerRef = useRef();
+    actionsArray.length === 2 &&
+    getMainAction(
+      collective,
+      without(actionsArray, mainAction?.type),
+      LoggedInUser,
+      isNewExpenseFlowEnabled,
+      isNewGrantFlowEnabled,
+      () => setIsSubmitExpenseModalOpen(true),
+    );
+  const navbarRef = useRef(undefined);
+  const mainContainerRef = useRef(undefined);
 
   /** This is to close the navbar dropdown menus (desktop)/slide-out menu (tablet)/non-collapsible menu (mobile)
    * when we click a category header to scroll down to (i.e. Connect) or sub-section page to open (i.e. Updates) */
@@ -631,6 +650,7 @@ const CollectiveNavbar = ({
                 )}
                 {!loading && (
                   <CollectiveNavbarActionsMenu
+                    onOpenSubmitExpenseModalClick={() => setIsSubmitExpenseModalOpen(true)}
                     collective={collective}
                     callsToAction={callsToAction}
                     hiddenActionForNonMobile={mainAction?.type}
@@ -654,60 +674,16 @@ const CollectiveNavbar = ({
           )}
         </NavbarContentContainer>
       </NavBarContainer>
+      {isSubmitExpenseModalOpen && (
+        <SubmitExpenseFlow
+          onClose={() => {
+            setIsSubmitExpenseModalOpen(false);
+          }}
+          submitExpenseTo={collective?.slug}
+        />
+      )}
     </Fragment>
   );
-};
-
-CollectiveNavbar.propTypes = {
-  /** Collective to show info about */
-  collective: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    path: PropTypes.string,
-    isArchived: PropTypes.bool,
-    canContact: PropTypes.bool,
-    canApply: PropTypes.bool,
-    host: PropTypes.object,
-    plan: PropTypes.object,
-    parentCollective: PropTypes.object,
-  }),
-  /** Defines the calls to action displayed next to the NavBar items. Match PropTypes of `CollectiveCallsToAction` */
-  callsToAction: PropTypes.shape({
-    hasContact: PropTypes.bool,
-    hasSubmitExpense: PropTypes.bool,
-    hasApply: PropTypes.bool,
-    hasDashboard: PropTypes.bool,
-    hasManageSubscriptions: PropTypes.bool,
-    hasSettings: PropTypes.bool,
-  }),
-  /** Used to check what sections can be used */
-  isAdmin: PropTypes.bool,
-  /** Will show loading state */
-  isLoading: PropTypes.bool,
-  /** The list of sections to be displayed by the NavBar. If not provided, will show all the sections available to this collective type. */
-  sections: PropTypes.arrayOf(
-    PropTypes.shape({
-      type: PropTypes.oneOf(['CATEGORY', 'SECTION']),
-      name: PropTypes.string,
-    }),
-  ),
-  /** Called when users click the collective logo or name */
-  onCollectiveClick: PropTypes.func,
-  /** Currently selected category */
-  selectedCategory: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
-  /** The behavior of the navbar is slightly different when integrated in a hero (in the collective page) */
-  isInHero: PropTypes.bool,
-  /** If true, the CTAs will be hidden on mobile */
-  hideButtonsOnMobile: PropTypes.bool,
-  /** If true, the Navbar items and buttons will be skipped  */
-  onlyInfos: PropTypes.bool,
-  /** Set this to true to make the component smaller in height */
-  isSmall: PropTypes.bool,
-  showBackButton: PropTypes.bool,
-  showSelectedCategoryOnMobile: PropTypes.bool,
-  /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
-  useAnchorsForCategories: PropTypes.bool,
 };
 
 export default React.memo(CollectiveNavbar);

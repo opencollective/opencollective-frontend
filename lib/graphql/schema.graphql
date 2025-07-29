@@ -42,12 +42,20 @@ interface CollectiveInterface {
   slug: String
   path: String
   isHost: Boolean
+  isTrustedHost: Boolean!
+  isFirstPartyHost: Boolean!
+  isVerified: Boolean!
   isIncognito: Boolean
 
   """
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
   isGuest: Boolean
   canApply: Boolean
   canContact: Boolean
@@ -132,6 +140,7 @@ interface CollectiveInterface {
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -287,6 +296,11 @@ type Member {
   tier: Tier
   stats: StatsMemberType
   since: DateString
+
+  """
+  Whether the membership is active. Warning: this definition is subject to change.
+  """
+  isActive: Boolean!
 }
 
 scalar DateString
@@ -369,16 +383,6 @@ type OrderType {
   updatedAt: DateString
 
   """
-  Whether this subscription is past due or not
-  """
-  isPastDue: Boolean
-
-  """
-  If there is a subscription, is it active?
-  """
-  isSubscriptionActive: Boolean
-
-  """
   Current status for an order
   """
   status: OrderStatus
@@ -424,6 +428,7 @@ This represents an Tier
 """
 type Tier {
   id: Int
+  idV2: String!
   slug: String
   type: String
   name: String
@@ -580,6 +585,7 @@ enum ContributorRole {
   HOST
   ADMIN
   MEMBER
+  COMMUNITY_MANAGER
   CONTRIBUTOR
   BACKER
   ATTENDEE
@@ -894,9 +900,9 @@ type ExpenseType {
   tags: [String]
   status: String
   type: String
-  PayoutMethod: PayoutMethod
+  PayoutMethod: PayoutMethod @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
   privateMessage: String
-  items: [ExpenseItem]
+  items: [ExpenseItem] @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
   attachedFiles: [ExpenseAttachedFile!]
   user: UserDetails
   fromCollective: CollectiveInterface
@@ -925,6 +931,7 @@ enum PayoutMethodTypeEnum {
   BANK_ACCOUNT
   ACCOUNT_BALANCE
   CREDIT_CARD
+  STRIPE
 }
 
 """
@@ -966,27 +973,29 @@ type SocialLink {
 The type of social link
 """
 enum SocialLinkType {
-  TWITTER
-  TUMBLR
-  MASTODON
-  MATTERMOST
-  SLACK
-  LINKEDIN
-  MEETUP
-  FACEBOOK
-  INSTAGRAM
+  BLUESKY
   DISCORD
-  YOUTUBE
+  DISCOURSE
+  FACEBOOK
+  GHOST
+  GIT
   GITHUB
   GITLAB
-  GIT
-  WEBSITE
-  DISCOURSE
-  PIXELFED
-  GHOST
+  INSTAGRAM
+  LINKEDIN
+  MASTODON
+  MATTERMOST
+  MEETUP
   PEERTUBE
+  PIXELFED
+  SLACK
+  THREADS
   TIKTOK
+  TUMBLR
   TWITCH
+  TWITTER
+  WEBSITE
+  YOUTUBE
 }
 
 """
@@ -1041,9 +1050,15 @@ type ConnectedAccountType {
   id: Int
   service: String
   username: String
+  hash: String
   settings: JSON
   createdAt: DateString
   updatedAt: DateString
+
+  """
+  The account who connected this account
+  """
+  createdByUser: UserDetails
 }
 
 """
@@ -1074,7 +1089,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
@@ -1087,6 +1101,7 @@ type CollectiveFeatures {
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
+  OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -1134,6 +1149,7 @@ type PlanType {
 
 type Policies {
   id: String
+  EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
@@ -1141,6 +1157,19 @@ type Policies {
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
+  COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+
+  """
+  Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
+  """
+  CONTRIBUTOR_INFO_THRESHOLDS: CONTRIBUTOR_INFO_THRESHOLDS
+}
+
+type EXPENSE_POLICIES {
+  invoicePolicy: String
+  receiptPolicy: String
+  titlePolicy: String
+  grantPolicy: String
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -1919,6 +1948,11 @@ type EXPENSE_CATEGORIZATION {
   requiredForCollectiveAdmins: Boolean
 }
 
+type CONTRIBUTOR_INFO_THRESHOLDS {
+  legalName: Int
+  address: Int
+}
+
 """
 The results from searching for collectives with pagination info
 """
@@ -1953,36 +1987,6 @@ type CollectiveStatsType {
   Breakdown of all backers of this collective
   """
   backers: BackersStatsType
-
-  """
-  Number of collectives under this collective
-  """
-  collectives: CollectivesStatsType
-
-  """
-  Number of updates published by this collective
-  """
-  updates: Int
-
-  """
-  Number of events under this collective
-  """
-  events: Int
-
-  """
-  Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)
-  """
-  expenses: ExpensesStatsType
-
-  """
-  Number of transactions
-  """
-  transactions: TransactionsStatsType
-
-  """
-  Average amount spent per month based on the last 90 days
-  """
-  monthlySpending: Float
 
   """
   Total amount spent
@@ -2035,75 +2039,6 @@ type BackersStatsType {
   Number of collectives that have given money to this collective
   """
   collectives: Int
-}
-
-"""
-Breakdown of collectives under this collective by role (all/hosted/memberOf/events)
-"""
-type CollectivesStatsType {
-  id: Int
-  all: Int
-
-  """
-  Returns the collectives hosted by this collective
-  """
-  hosted: Int
-
-  """
-  Returns the number of collectives that have this collective has parent
-  """
-  memberOf: Int
-
-  """
-  Returns the number of events that have this collective has parent
-  """
-  events: Int
-}
-
-"""
-Breakdown of expenses per status (ALL/PENDING/APPROVED/PAID/REJECTED)
-"""
-type ExpensesStatsType {
-  id: Int
-  all: Int
-
-  """
-  Returns the number of expenses that are pending
-  """
-  pending: Int
-
-  """
-  Returns the number of expenses that are approved
-  """
-  approved: Int
-
-  """
-  Returns the number of expenses that are rejected
-  """
-  rejected: Int
-
-  """
-  Returns the number of expenses that are paid
-  """
-  paid: Int
-}
-
-"""
-Breakdown of transactions per type (ALL/CREDIT/DEBIT)
-"""
-type TransactionsStatsType {
-  id: Int
-  all: Int
-
-  """
-  Returns the number of CREDIT transactions
-  """
-  credit: Int
-
-  """
-  Returns the number of DEBIT transactions
-  """
-  debit: Int
 }
 
 """
@@ -2161,6 +2096,16 @@ type Collective implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -2189,6 +2134,11 @@ type Collective implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2285,6 +2235,7 @@ type Collective implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2359,7 +2310,7 @@ type Collective implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -2430,6 +2381,16 @@ type Event implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -2458,6 +2419,11 @@ type Event implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2554,6 +2520,7 @@ type Event implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2628,7 +2595,7 @@ type Event implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -2699,6 +2666,16 @@ type Fund implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -2727,6 +2704,11 @@ type Fund implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2823,6 +2805,7 @@ type Fund implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2897,7 +2880,7 @@ type Fund implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -2968,6 +2951,16 @@ type Organization implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -2996,6 +2989,11 @@ type Organization implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -3092,6 +3090,7 @@ type Organization implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3166,7 +3165,7 @@ type Organization implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -3237,6 +3236,16 @@ type Project implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -3265,6 +3274,11 @@ type Project implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -3361,6 +3375,7 @@ type Project implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3435,7 +3450,7 @@ type Project implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -3541,7 +3556,7 @@ type Expense implements Transaction {
   paymentMethod: PaymentMethodType
   invoiceTemplate: String
   description: String
-  expense: ExpenseType
+  expense: ExpenseType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 }
 
 """
@@ -3556,7 +3571,7 @@ type TaxInfo {
   """
   Identifier for this tax (GST, VAT, etc)
   """
-  type: OrderTaxType!
+  type: TaxType!
 
   """
   Percentage applied, between 0-100
@@ -3577,7 +3592,7 @@ type TaxInfo {
 """
 The type of a tax like GST, VAT, etc
 """
-enum OrderTaxType {
+enum TaxType {
   """
   European Value Added Tax
   """
@@ -3801,6 +3816,16 @@ type User implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -3829,6 +3854,11 @@ type User implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -3925,6 +3955,7 @@ type User implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3999,7 +4030,7 @@ type User implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -4072,6 +4103,16 @@ type Vendor implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
+  Whether the account is verified
+  """
+  isVerified: Boolean!
+
+  """
   Returns whether this user has two factor authentication enabled
   """
   isTwoFactorAuthEnabled: Boolean
@@ -4100,6 +4141,11 @@ type Vendor implements CollectiveInterface {
   Whether this account is frozen
   """
   isFrozen: Boolean!
+
+  """
+  Whether this account is suspended
+  """
+  isSuspended: Boolean!
 
   """
   Returns whether this collective is archived
@@ -4196,6 +4242,7 @@ type Vendor implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -4270,7 +4317,7 @@ type Vendor implements CollectiveInterface {
   """
   features: CollectiveFeatures!
   plan: PlanType
-  stats: CollectiveStatsType
+  stats: CollectiveStatsType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
@@ -4289,6 +4336,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this account has any payout methods saved
   """
   hasPayoutMethod: Boolean
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [CollectiveInterface]
 }
 
 """
@@ -4303,10 +4355,10 @@ type Query {
     If false, will return null instead of an error if collective is not found
     """
     throwIfMissing: Boolean = true
-  ): CollectiveInterface
+  ): CollectiveInterface @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   Tier(id: Int!): Tier @deprecated(reason: "2023-05-04: Please use GraphQL V2")
-  LoggedInUser: UserDetails
-  allInvoices(fromCollectiveSlug: String!): [InvoiceType]
+  LoggedInUser: UserDetails @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  allInvoices(fromCollectiveSlug: String!): [InvoiceType] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
   allTransactions(
@@ -4324,8 +4376,8 @@ type Query {
     """
     includeExpenseTransactions: Boolean
     includeHostedCollectivesTransactions: Boolean
-  ): [Transaction]
-  Transaction(id: Int, uuid: String): Transaction
+  ): [Transaction] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  Transaction(id: Int, uuid: String): Transaction @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   Returns all public hosts that are open for applications
@@ -4346,7 +4398,7 @@ type Query {
     offset: Int = 0
     onlyOpenHosts: Boolean = true
     minNbCollectivesHosted: Int! = 0
-  ): CollectiveSearchResults
+  ): CollectiveSearchResults @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4364,8 +4416,8 @@ type Query {
     orderDirection: String
     limit: Int
     offset: Int
-  ): [Member]
-  PaymentMethod(id: Int, code: String): PaymentMethodType
+  ): [Member] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
+  PaymentMethod(id: Int, code: String): PaymentMethodType @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 
   """
   Search for collectives. Results are returned with best matches first.
@@ -4407,6 +4459,11 @@ type Query {
     includeVendorsForHostId: Int
 
     """
+    Only return vendors visible to given account ids
+    """
+    vendorVisibleToAccountIds: [Int]
+
+    """
     Whether to skip recent accounts (48h)
     """
     skipRecentAccounts: Boolean = false
@@ -4421,7 +4478,7 @@ type Query {
     """
     limit: Int = 20
     offset: Int = 0
-  ): CollectiveSearchResults
+  ): CollectiveSearchResults @deprecated(reason: "2025-07-10: Please use GraphQL V2")
 }
 
 """
@@ -4544,6 +4601,11 @@ type Mutation {
     If true, a signIn link will be sent to the user
     """
     sendSignInLink: Boolean = true
+
+    """
+    Captcha verification data
+    """
+    captcha: CaptchaInputType
   ): CreateUserResult
 
   """
@@ -4556,18 +4618,6 @@ type Mutation {
     email: String!
   ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
-
-  """
-  Update a single tier
-  """
-  editTier(
-    """
-    The tier to update
-    """
-    tier: TierInputType!
-  ): Tier @deprecated(reason: "2024-07-16: Please use editTiers mutation from GraphQLV2")
-  editTiers(id: Int!, tiers: [TierInputType]): [Tier]
-    @deprecated(reason: "2024-07-16: Please use editTiers mutation from GraphQLV2")
 
   """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
@@ -4653,7 +4703,7 @@ type Mutation {
     customMessage: String
     expiryDate: String
   ): [PaymentMethodType]
-  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
+  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType!
 
   """
   Removes the payment method
@@ -4772,7 +4822,6 @@ input CollectiveInputType {
   image: String
   backgroundImage: String
   tags: [String]
-  tiers: [TierInputType]
   settings: JSON
   data: JSON @deprecated(reason: "2020-10-08: data cannot be edited. This field will be ignored.")
 
@@ -4830,90 +4879,6 @@ input LocationInputType {
   Structured JSON address
   """
   structured: JSON
-}
-
-"""
-Input type for TierType
-"""
-input TierInputType {
-  id: Int
-  type: String
-  name: String
-  description: String
-
-  """
-  A long, html-formatted description.
-  """
-  longDescription: String
-
-  """
-  Whether this tier has a standalone page
-  """
-  useStandalonePage: Boolean
-
-  """
-  Link to a video (YouTube, Vimeo).
-  """
-  videoUrl: String
-
-  """
-  amount in the lowest unit of the currency of the host (ie. in cents)
-  """
-  amount: Int
-
-  """
-  Button text
-  """
-  button: String
-  currency: String
-  presets: [Int]
-  interval: String
-  maxQuantity: Int
-  minimumAmount: Int
-  amountType: String
-
-  """
-  amount that you are trying to raise with this tier
-  """
-  goal: Int
-  customFields: [CustomFieldsInputType]
-
-  """
-  Start of the campaign
-  """
-  startsAt: String
-
-  """
-  End of the campaign
-  """
-  endsAt: String
-
-  """
-  Invoice receipt template
-  """
-  invoiceTemplate: String
-}
-
-"""
-Input for custom fields for order
-"""
-input CustomFieldsInputType {
-  type: CustomFieldType
-  name: String
-  label: String
-  required: Boolean
-}
-
-"""
-Type of custom field
-"""
-enum CustomFieldType {
-  number
-  text
-  email
-  date
-  radio
-  url
 }
 
 """
@@ -4990,6 +4955,21 @@ input UserInputType {
 }
 
 scalar Email
+
+"""
+Input type for captcha verification
+"""
+input CaptchaInputType {
+  """
+  The captcha token to verify
+  """
+  token: String!
+
+  """
+  The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
+  """
+  provider: String!
+}
 
 """
 Input type for ConnectedAccountInputType

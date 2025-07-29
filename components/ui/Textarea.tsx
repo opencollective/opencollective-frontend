@@ -3,9 +3,11 @@ import * as React from 'react';
 import { cn } from '../../lib/utils';
 
 import { Badge } from './Badge';
+import { BASE_INPUT_CLASS, BASE_INPUT_ERROR_CLASS } from './Input';
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   showCount?: boolean;
+  error?: boolean;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -14,10 +16,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const input = (
       <textarea
-        className={cn(
-          'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          className,
-        )}
+        className={cn(BASE_INPUT_CLASS, props.error && BASE_INPUT_ERROR_CLASS, className)}
         ref={ref}
         {...props}
       />
@@ -28,7 +27,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     ) : (
       <div className="relative">
         {input}
-        <div className="absolute bottom-1.5 right-1.5">
+        <div className="absolute right-1.5 bottom-1.5">
           <Badge size="sm">
             <span>{value.length}</span>
             {props.maxLength && <span className="text-muted-foreground">/{props.maxLength}</span>}

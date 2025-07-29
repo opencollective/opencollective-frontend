@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { get, startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -16,7 +15,7 @@ const renderObject = object =>
     }
     return [
       ...acc,
-      <p className="text-ellipsis text-sm leading-5" key={key}>
+      <p className="text-sm leading-5 text-ellipsis" key={key}>
         <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
       </p>,
     ];
@@ -53,7 +52,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
               <PrivateInfoIcon />
             </Container>
           )}
-          <div className="overflow-hidden text-ellipsis text-sm text-slate-700">
+          <div className="overflow-hidden text-sm text-ellipsis text-slate-700">
             {getPmData(payoutMethod, 'email', isLoading)}
           </div>
         </div>
@@ -112,17 +111,6 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
     default:
       return null;
   }
-};
-
-PayoutMethodData.propTypes = {
-  /** If false, only the raw data will be displayed */
-  showLabel: PropTypes.bool,
-  isLoading: PropTypes.bool,
-  payoutMethod: PropTypes.shape({
-    id: PropTypes.string,
-    type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-    data: PropTypes.object,
-  }),
 };
 
 // @component

@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';
-import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
+import { compact, first, get, groupBy, isEmpty, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -21,9 +20,10 @@ import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
 
-import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
+import { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -218,19 +218,21 @@ const hostVendorsQuery = gql`
   }
 `;
 
-const checkStepOneCompleted = (values, isOnBehalf, isMissing2FA) => {
+export const checkStepOneCompleted = (values, isOnBehalf, isMissing2FA, canEditPayoutMethod) => {
   if (isMissing2FA) {
     return false;
   } else if (isOnBehalf || values.payee?.type === VENDOR) {
     return Boolean(values.payee);
-  } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
-    return false; // There are some errors in the form
-  } else if (checkRequiresAddress(values)) {
-    // Require an address for non-receipt expenses
-    return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
-  } else {
-    return true;
+  } else if (canEditPayoutMethod) {
+    if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
+      return false; // There are some errors in the form
+    } else if (checkRequiresAddress(values)) {
+      // Require an address for non-receipt expenses
+      return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
+    }
   }
+
+  return true;
 };
 
 const ExpenseFormPayeeStep = ({
@@ -242,6 +244,7 @@ const ExpenseFormPayeeStep = ({
   onInvite,
   onChange,
   isOnBehalf,
+  canEditPayoutMethod,
   loggedInAccount,
   editingExpense,
   handleClearPayeeStep,
@@ -257,7 +260,7 @@ const ExpenseFormPayeeStep = ({
     skip: !collective.host?.id,
   });
   const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
-  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
+  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA, canEditPayoutMethod);
   const allPayoutMethods = React.useMemo(
     () => getPayoutMethodsFromPayee(values.payee),
     [values.payee, loggedInAccount],
@@ -273,79 +276,6 @@ const ExpenseFormPayeeStep = ({
   );
   const requiresAddress = checkRequiresAddress(values);
   const requiresPayoutMethod = !isOnBehalf && values.payee?.type !== VENDOR;
-  const canInvite = !values.status;
-
-  const collectivePick = canInvite
-    ? ({ id }) => (
-        <CollectivePickerAsync
-          inputId={id}
-          data-cy="select-expense-payee"
-          isSearchable
-          collective={values.payee}
-          onChange={({ value }) => {
-            if (value) {
-              const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
-              const isVendor = value.type === VENDOR;
-              const isNewlyCreatedProfile = value.members?.some(
-                m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
-              );
-
-              const payee = existingProfile || {
-                ...pick(value, ['id', 'name', 'slug', 'email', 'type', 'payoutMethods']),
-                isInvite: !isNewlyCreatedProfile && !isVendor,
-              };
-
-              if (isNewlyCreatedProfile && !isVendor) {
-                payee.payoutMethods = [];
-              }
-
-              formik.setFieldValue('payee', payee);
-              formik.setFieldValue('payoutMethod', isVendor ? first(payee.payoutMethods) || null : null);
-              setLocationFromPayee(formik, payee);
-              onChange(payee);
-            }
-          }}
-          styles={{
-            menu: {
-              borderRadius: '16px',
-            },
-            menuList: {
-              padding: '8px',
-            },
-          }}
-          emptyCustomOptions={payeeOptions}
-          customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
-          getDefaultOptions={build => values.payee && build(values.payee)}
-          disabled={disablePayee}
-          invitable
-          onInvite={onInvite}
-          LoggedInUser={loggedInAccount}
-          includeVendorsForHostId={collective.host?.legacyId || undefined}
-          addLoggedInUserAsAdmin
-          excludeAdminFields
-          searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
-          filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
-          loading={loading}
-        />
-      )
-    : ({ id }) => (
-        <CollectivePicker
-          inputId={id}
-          customOptions={payeeOptions}
-          getDefaultOptions={build => values.payee && build(values.payee)}
-          data-cy="select-expense-payee"
-          isSearchable
-          disabled={disablePayee}
-          collective={values.payee}
-          onChange={({ value }) => {
-            formik.setFieldValue('payee', value);
-            formik.setFieldValue('payoutMethod', null);
-            setLocationFromPayee(formik, value);
-            onChange(value);
-          }}
-          loading={loading}
-        />
-      );
 
   const actionButtons = (
     <Flex flex={1} gridGap={[2, 3]} flexWrap="wrap">
@@ -418,7 +348,67 @@ const ExpenseFormPayeeStep = ({
                 flex="1"
                 mt={3}
               >
-                {collectivePick}
+                {({ id }) => (
+                  <CollectivePickerAsync
+                    inputId={id}
+                    data-cy="select-expense-payee"
+                    isSearchable
+                    collective={values.payee}
+                    onChange={({ value }) => {
+                      if (value) {
+                        const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
+                        const isVendor = value.type === VENDOR;
+                        const isNewlyCreatedProfile = value.members?.some(
+                          m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
+                        );
+
+                        const payee = existingProfile || {
+                          ...pick(value, ['id', 'name', 'slug', 'email', 'type', 'payoutMethods']),
+                          isInvite: !isNewlyCreatedProfile && !isVendor,
+                        };
+
+                        if (isNewlyCreatedProfile && !isVendor) {
+                          payee.payoutMethods = [];
+                        }
+
+                        formik.setFieldValue('payee', payee);
+                        formik.setFieldValue('payoutMethod', isVendor ? first(payee.payoutMethods) || null : null);
+                        setLocationFromPayee(formik, payee);
+                        onChange(payee);
+                      }
+                    }}
+                    styles={{
+                      menu: {
+                        borderRadius: '16px',
+                      },
+                      menuList: {
+                        padding: '8px',
+                      },
+                    }}
+                    emptyCustomOptions={payeeOptions}
+                    customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
+                    getDefaultOptions={build => values.payee && build(values.payee)}
+                    disabled={disablePayee}
+                    invitable={!editingExpense}
+                    onInvite={onInvite}
+                    LoggedInUser={loggedInAccount}
+                    includeVendorsForHostId={collective.host?.legacyId || undefined}
+                    vendorVisibleToAccountIds={[collective.legacyId]}
+                    addLoggedInUserAsAdmin
+                    excludeAdminFields
+                    searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
+                    filterResults={collectives => {
+                      if (editingExpense) {
+                        return collectives.filter(c => {
+                          const slugs = compact([c.slug, c.host?.slug]);
+                          return loggedInAccount.adminMemberships?.nodes.some(m => slugs.includes(m.account.slug));
+                        });
+                      }
+                      return collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod);
+                    }}
+                    loading={loading}
+                  />
+                )}
               </StyledInputField>
             )}
           </Field>
@@ -504,51 +494,82 @@ const ExpenseFormPayeeStep = ({
         </Box>
         {requiresPayoutMethod && (
           <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
-            <Field name="payoutMethod">
-              {({ field }) => (
-                <StyledInputField
-                  name={field.name}
-                  htmlFor="payout-method"
-                  flex="1"
-                  mt={3}
-                  label={formatMessage(msg.payoutOptionLabel)}
-                  labelFontSize="13px"
-                  error={
-                    isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                      ? formatFormErrorMessage(intl, errors.payoutMethod)
-                      : null
-                  }
-                >
-                  {({ id, error }) => (
-                    <PayoutMethodSelect
-                      inputId={id}
-                      error={error}
-                      onChange={setPayoutMethod}
-                      onRemove={onPayoutMethodRemove}
-                      payoutMethod={values.payoutMethod}
-                      payoutMethods={allPayoutMethods}
-                      payee={values.payee}
-                      disabled={!values.payee || isMissing2FA}
-                      collective={collective}
-                    />
+            {canEditPayoutMethod ? (
+              <React.Fragment>
+                <Field name="payoutMethod">
+                  {({ field }) => (
+                    <StyledInputField
+                      name={field.name}
+                      htmlFor="payout-method"
+                      flex="1"
+                      mt={3}
+                      label={formatMessage(msg.payoutOptionLabel)}
+                      labelFontSize="13px"
+                      error={
+                        isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                          ? formatFormErrorMessage(intl, errors.payoutMethod)
+                          : null
+                      }
+                    >
+                      {({ id, error }) => (
+                        <PayoutMethodSelect
+                          inputId={id}
+                          error={error}
+                          onChange={setPayoutMethod}
+                          onRemove={onPayoutMethodRemove}
+                          payoutMethod={values.payoutMethod}
+                          payoutMethods={allPayoutMethods}
+                          payee={values.payee}
+                          disabled={!values.payee || isMissing2FA}
+                          collective={collective}
+                        />
+                      )}
+                    </StyledInputField>
                   )}
-                </StyledInputField>
-              )}
-            </Field>
+                </Field>
 
-            {values.payoutMethod && (
-              <Field name="payoutMethod">
-                {({ field, meta }) => (
-                  <Box mt={3} flex="1">
-                    <PayoutMethodForm
-                      fieldsPrefix="payoutMethod"
-                      payoutMethod={field.value}
-                      host={collective.host}
-                      errors={meta.error}
-                    />
-                  </Box>
+                {values.payoutMethod && (
+                  <Field name="payoutMethod">
+                    {({ field, meta }) => (
+                      <Box mt={3} flex="1">
+                        <PayoutMethodForm
+                          fieldsPrefix="payoutMethod"
+                          payoutMethod={field.value}
+                          host={collective.host}
+                          errors={meta.error}
+                        />
+                      </Box>
+                    )}
+                  </Field>
                 )}
-              </Field>
+              </React.Fragment>
+            ) : (
+              <div className="mt-3">
+                <p className="mb-2 text-xs font-bold">
+                  <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+                </p>
+                <MessageBox type="info">
+                  <Flex>
+                    <div className="mr-2 min-w-[32px] pt-1">
+                      <Image alt="" src="/static/images/PrivateLockIcon.png" width={32} height={32} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold">
+                        <FormattedMessage
+                          defaultMessage="This information is private"
+                          id="ExpenseFormPayeeStep.PrivateInfo"
+                        />
+                      </p>
+                      <p className="mt-2 text-xs">
+                        <FormattedMessage
+                          defaultMessage="The payout method details are private and can only be viewed by the Payee and the Host admins."
+                          id="ExpenseFormPayeeStep.PrivateInfoDetails"
+                        />
+                      </p>
+                    </div>
+                  </Flex>
+                </MessageBox>
+              </div>
             )}
           </Box>
         )}
@@ -568,33 +589,6 @@ const ExpenseFormPayeeStep = ({
         ))}
     </Fragment>
   );
-};
-
-ExpenseFormPayeeStep.propTypes = {
-  formik: PropTypes.object,
-  editingExpense: PropTypes.bool,
-  payoutProfiles: PropTypes.array,
-  onCancel: PropTypes.func,
-  handleClearPayeeStep: PropTypes.func,
-  onNext: PropTypes.func,
-  onInvite: PropTypes.func,
-  onChange: PropTypes.func,
-  isOnBehalf: PropTypes.bool,
-  disablePayee: PropTypes.bool,
-  loggedInAccount: PropTypes.object,
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      legacyId: PropTypes.number,
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-    }),
-    settings: PropTypes.object,
-  }).isRequired,
-  drawerActionsContainer: PropTypes.object,
 };
 
 export default ExpenseFormPayeeStep;

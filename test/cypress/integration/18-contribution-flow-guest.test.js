@@ -1,9 +1,11 @@
+import * as cheerio from 'cheerio';
+
 import { defaultTestUserEmail } from '../support/data';
 import { randomEmail } from '../support/faker';
 
 describe('Contribution Flow: Guest contributions', () => {
   before(() => {
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
   });
 
   it('Makes a contribution as an existing user', () => {
@@ -14,7 +16,8 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Contribute as a guest');
     cy.get('input[name=email]').type(defaultTestUserEmail);
-    cy.get('input[name=name]').type('Jack London');
+    cy.getByDataCy('input-name').type('Jack London');
+    cy.getByDataCy('input-legalName').type('Very Legal Organization');
     cy.wait(200);
     cy.get('button[data-cy="cf-next-step"]').click();
 
@@ -26,11 +29,14 @@ describe('Contribution Flow: Guest contributions', () => {
 
     // Open email
     const expectedEmailSubject = 'Thank you for your contribution to APEX';
-    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('If you need help, contact');
+    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+      expect(email.HTML).to.include('If you need help, contact');
+    });
   });
 
   it('Joins after a single contribution', () => {
+    cy.mailpitDeleteAllEmails();
+
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', '$10').click();
     cy.get('button[data-cy="cf-next-step"]').click();
@@ -60,8 +66,13 @@ describe('Contribution Flow: Guest contributions', () => {
 
     // Open email
     const expectedEmailSubject = 'Open Collective: Verify your email';
-    cy.openEmail(({ subject, html }) => html.includes(email) && subject.includes(expectedEmailSubject));
-    cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
+    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const verifyLink = $html('a[href*="/confirm/guest"]:contains("Verify")');
+      const href = verifyLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname + parsedUrl.search);
+    });
 
     // Redirected from email
     cy.location('pathname').should('include', '/confirm/guest');
@@ -126,10 +137,12 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=legalName]:invalid').should('have.length', 1); // Legal name is not (contrib > $500)
       cy.get('input[name=email]:invalid').should('have.length', 1); // Empty
 
-      cy.get('input[name=name]').type('Rick Astley');
-      cy.get('input[name=legalName]:invalid').should('not.exist'); // Legal name is optional if name is provided
+      cy.getByDataCy('input-name').type('Rick Astley');
+      cy.getByDataCy('input-legalName').type('Very Legal Organization');
+
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
+
       cy.useAnyPaymentMethod();
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
 
@@ -187,6 +200,7 @@ describe('Contribution Flow: Guest contributions', () => {
      * persisted between them.
      */
     it('Join Open Collective', () => {
+      cy.mailpitDeleteAllEmails();
       cy.visit('/create-account/guest');
       cy.contains('We found 2 emails that you used to contribute');
       cy.contains(firstEmail);
@@ -200,8 +214,14 @@ describe('Contribution Flow: Guest contributions', () => {
 
       // Open email
       const expectedEmailSubject = 'Open Collective: Verify your email';
-      cy.openEmail(({ subject, html }) => html.includes(firstEmail) && subject.includes(expectedEmailSubject));
-      cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
+
+      cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+        const $html = cheerio.load(email.HTML);
+        const verifyLink = $html('a[href*="/confirm/guest"]:contains("Verify")');
+        const href = verifyLink.attr('href');
+        const parsedUrl = new URL(href);
+        cy.visit(parsedUrl.pathname + parsedUrl.search);
+      });
 
       // Redirected from email
       cy.location('pathname').should('include', '/confirm/guest');

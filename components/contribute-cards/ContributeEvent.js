@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Clock } from '@styled-icons/feather/Clock';
 import { truncate } from 'lodash';
@@ -46,13 +45,13 @@ const ContributeEvent = ({ collective, event, ...props }) => {
             <Calendar size="1.3em" color="#4E5052" />
             <Span ml={2} color="black.700">
               {startsAt && (
-                <time dateTime={startsAt}>
+                <time suppressHydrationWarning dateTime={startsAt}>
                   <FormattedDate value={startsAt} month="short" day="numeric" year={showYearOnStartDate} />
                 </time>
               )}
               {takesMultipleDays && ' → '}
               {(takesMultipleDays || (!startsAt && endsAt)) && (
-                <time dateTime={endsAt}>
+                <time suppressHydrationWarning dateTime={endsAt}>
                   <FormattedDate value={endsAt} month="short" day="numeric" year="numeric" />
                 </time>
               )}
@@ -64,16 +63,22 @@ const ContributeEvent = ({ collective, event, ...props }) => {
               <Span ml={2} color="black.700">
                 {!takesMultipleDays ? (
                   <React.Fragment>
-                    <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" />
+                    <span suppressHydrationWarning>
+                      <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" />
+                    </span>
                     {endsAt && (
                       <React.Fragment>
                         {`-`}
-                        <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                        <span suppressHydrationWarning>
+                          <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                        </span>
                       </React.Fragment>
                     )}
                   </React.Fragment>
                 ) : (
-                  <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                  <span suppressHydrationWarning>
+                    <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                  </span>
                 )}
               </Span>
             </Container>
@@ -90,25 +95,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       )}
     </Contribute>
   );
-};
-
-ContributeEvent.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-  }),
-  event: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    backgroundImageUrl: PropTypes.string,
-    startsAt: PropTypes.string,
-    endsAt: PropTypes.string,
-    description: PropTypes.string,
-    contributors: PropTypes.arrayOf(PropTypes.object),
-    stats: PropTypes.shape({
-      backers: PropTypes.object,
-    }).isRequired,
-  }),
 };
 
 export default ContributeEvent;

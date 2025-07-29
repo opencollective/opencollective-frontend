@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -23,14 +22,14 @@ import Container from '../../Container';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
+import { Button } from '../../ui/Button';
+import { Skeleton } from '../../ui/Skeleton';
 import { editAccountSettingsMutation } from '../mutations';
 import SettingsSubtitle from '../SettingsSubtitle';
 
@@ -62,6 +61,16 @@ export const getSettingsQuery = gql`
           requiredForCollectiveAdmins
         }
         EXPENSE_PUBLIC_VENDORS
+        EXPENSE_POLICIES {
+          invoicePolicy
+          receiptPolicy
+          titlePolicy
+          grantPolicy
+        }
+        CONTRIBUTOR_INFO_THRESHOLDS {
+          legalName
+          address
+        }
       }
       ... on AccountWithHost {
         host {
@@ -227,25 +236,6 @@ const CollectiveSectionEntry = ({
   );
 };
 
-CollectiveSectionEntry.propTypes = {
-  isEnabled: PropTypes.bool,
-  restrictedTo: PropTypes.array,
-  section: PropTypes.oneOf(Object.values(Sections)),
-  index: PropTypes.number,
-  version: PropTypes.number,
-  onMove: PropTypes.func,
-  onDrop: PropTypes.func,
-  onSectionToggle: PropTypes.func,
-  collectiveType: PropTypes.string,
-  fontWeight: PropTypes.string,
-  hasData: PropTypes.bool,
-  showMissingDataWarning: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-  parentItem: PropTypes.object,
-  dragHandleProps: PropTypes.object,
-  isSubSection: PropTypes.bool,
-};
-
 const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragHandleProps }) => {
   const intl = useIntl();
 
@@ -311,18 +301,6 @@ const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragH
   );
 };
 
-MenuCategory.propTypes = {
-  item: PropTypes.object,
-  index: PropTypes.number,
-  collective: PropTypes.object,
-  onMove: PropTypes.func,
-  onDrop: PropTypes.func,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isDragOverlay: PropTypes.bool,
-  dragHandleProps: PropTypes.object,
-};
-
 const Item = React.forwardRef(
   (
     {
@@ -373,19 +351,6 @@ const Item = React.forwardRef(
   },
 );
 
-Item.propTypes = {
-  dragHandleProps: PropTypes.object,
-  isDragging: PropTypes.bool,
-  isDragOverlay: PropTypes.bool,
-  style: PropTypes.object,
-  item: PropTypes.object,
-  collective: PropTypes.object,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isSubSection: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-};
-
 Item.displayName = 'Item';
 
 const MemoizedItem = memo(Item);
@@ -407,16 +372,6 @@ const DraggableItem = props => {
       {...props}
     />
   );
-};
-
-DraggableItem.propTypes = {
-  item: PropTypes.object,
-  collective: PropTypes.object,
-  onSectionToggle: PropTypes.func,
-  setSubSections: PropTypes.func,
-  isSubSection: PropTypes.bool,
-  showDragIcon: PropTypes.bool,
-  id: PropTypes.string,
 };
 
 const EditCollectivePage = ({ collective }) => {
@@ -478,14 +433,14 @@ const EditCollectivePage = ({ collective }) => {
           defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
         />
       </SettingsSubtitle>
-      <Flex flexWrap="wrap" mt={4}>
-        <Box width="100%" maxWidth={436}>
-          {loading || !sections ? (
-            <LoadingPlaceholder height={400} />
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:gap-8">
+        <div className="max-w-md grow">
+          {loading ? (
+            <Skeleton className="h-[400px] w-full" />
           ) : (
             <div>
               <StyledCard mb={4} overflowX={'visible'} overflowY="visible" position="relative">
-                <SortableContext items={sections?.map(item => item.name)} strategy={verticalListSortingStrategy}>
+                <SortableContext items={sections.map(item => item.name)} strategy={verticalListSortingStrategy}>
                   {sections.map((item, index) => {
                     return (
                       <React.Fragment key={item.name}>
@@ -523,57 +478,46 @@ const EditCollectivePage = ({ collective }) => {
                   {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
                 </MessageBox>
               )}
-              <Flex flexWrap="wrap" alignItems="center" justifyContent={['center', 'flex-start']}>
-                <StyledButton
-                  buttonStyle="primary"
-                  m={2}
-                  minWidth={150}
-                  loading={isSubmitting}
-                  disabled={!isDirty}
-                  onClick={async () => {
-                    await submitSetting({
-                      variables: {
-                        account: { id: data.account.id },
-                        key: 'collectivePage',
-                        value: {
-                          ...data.account.settings.collectivePage,
-                          sections,
-                          showGoals: flatten(sections, item => item.sections || item).some(
-                            ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
-                          ),
-                        },
-                      },
-                    });
-
-                    setDirty(false);
-                  }}
-                >
-                  <FormattedMessage id="save" defaultMessage="Save" />
-                </StyledButton>
-                <Box m={2}>
-                  <Link href={`/${collective.slug}`}>
-                    <Span fontSize="14px">
-                      <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
-                    </Span>
-                  </Link>
-                </Box>
-              </Flex>
             </div>
           )}
-        </Box>
-        <Box ml={[0, null, null, 42]} maxWidth={400} width="100%">
+        </div>
+        <div className="mb-8 grow">
           <EditCollectivePageFAQ withNewButtons withBorderLeft />
-        </Box>
-      </Flex>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 sm:justify-stretch">
+        <Button
+          className="grow"
+          loading={isSubmitting}
+          disabled={!isDirty}
+          onClick={async () => {
+            await submitSetting({
+              variables: {
+                account: { id: data?.account?.id },
+                key: 'collectivePage',
+                value: {
+                  ...data?.account?.settings.collectivePage,
+                  sections,
+                  showGoals: flatten(sections, item => item.sections || item).some(
+                    ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
+                  ),
+                },
+              },
+            });
+
+            setDirty(false);
+          }}
+        >
+          <FormattedMessage id="save" defaultMessage="Save" />
+        </Button>
+        <Button className="grow" variant="link" asChild>
+          <Link href={`/${collective.slug}`}>
+            <FormattedMessage id="ViewPublicProfile" defaultMessage="View Public Profile" />
+          </Link>
+        </Button>
+      </div>
     </DndContext>
   );
-};
-
-EditCollectivePage.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-  }),
 };
 
 export default EditCollectivePage;

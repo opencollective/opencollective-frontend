@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpDown, ArrowUpZA, CheckIcon, EyeOff, Filter } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { OrderDirection } from '../../lib/graphql/types/v2/graphql';
+import { OrderDirection } from '../../lib/graphql/types/v2/schema';
 
 import { SetFilter } from '../dashboard/filters/FilterDropdown';
 import { Button } from '../ui/Button';
@@ -36,14 +36,21 @@ export function ColumnHeader<TData, TValue>({
   const { queryFilter } = table.options.meta;
   const { labelMsg, align } = column.columnDef.meta;
   filterKey = filterKey ?? column.id;
+  const [addingFilter, setAddingFilter] = React.useState(false);
+  const [tmpFilterValue, setTmpFilterValue] = React.useState(queryFilter?.values[filterKey]);
 
+  if (!queryFilter) {
+    return (
+      <div className={clsx('flex items-center', align === 'right' && 'justify-end')}>
+        <span className={clsx(align === 'right' && 'order-1')}>{labelMsg && intl.formatMessage(labelMsg)}</span>
+      </div>
+    );
+  }
   const canSort = Boolean(sortField);
   const canHide = column.getCanHide();
   const canFilter = Boolean(queryFilter.filters[filterKey]);
 
   const hasFilterValue = queryFilter.values[filterKey] !== undefined;
-  const [addingFilter, setAddingFilter] = React.useState(false);
-  const [tmpFilterValue, setTmpFilterValue] = React.useState(queryFilter.values[filterKey]);
 
   const isSorted = queryFilter.values.sort?.field === sortField;
   const isSortedDesc = isSorted && queryFilter.values.sort.direction === OrderDirection.DESC;
@@ -75,7 +82,7 @@ export function ColumnHeader<TData, TValue>({
             variant="ghost"
             size="xs"
             className={clsx(
-              'group/btn -m-2.5 gap-2 data-[state=open]:bg-accent data-[state=open]:text-foreground [&>svg]:data-[state=open]:!text-muted-foreground',
+              'group/btn -m-2.5 gap-2 data-[state=open]:bg-accent data-[state=open]:text-foreground data-[state=open]:[&>svg]:text-muted-foreground!',
               isSorted && 'text-foreground',
             )}
           >

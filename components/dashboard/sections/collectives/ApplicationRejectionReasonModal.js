@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/feather/Lock';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -29,7 +28,7 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
   const totalAdminCount = collective.admins?.totalCount || admins.length;
 
   return (
-    <StyledModal onClose={onClose} width="576px" {...modalProps}>
+    <StyledModal onClose={onClose} {...modalProps}>
       <ModalHeader hideCloseIcon>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} width="100%">
           <Flex>
@@ -129,12 +128,6 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
       </ModalFooter>
     </StyledModal>
   );
-};
-
-ApplicationRejectionReasonModal.propTypes = {
-  collective: PropTypes.object.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default ApplicationRejectionReasonModal;

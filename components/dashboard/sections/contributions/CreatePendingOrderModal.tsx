@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
@@ -70,7 +69,14 @@ const CreatePendingContributionModalContainer = styled(StyledModal)`
   padding: 24px 30px;
 `;
 
-const AmountDetailsLine = ({ label, value, currency, isLargeAmount }) => (
+interface AmountDetailsLineProps {
+  label?: React.ReactNode;
+  currency: string;
+  value?: number;
+  isLargeAmount?: boolean;
+}
+
+const AmountDetailsLine = ({ label, value, currency, isLargeAmount }: AmountDetailsLineProps) => (
   <Flex justifyContent="space-between" alignItems="center">
     <Span fontSize="12px" lineHeight="18px" fontWeight="500">
       <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: label }} />
@@ -80,13 +86,6 @@ const AmountDetailsLine = ({ label, value, currency, isLargeAmount }) => (
     </Span>
   </Flex>
 );
-
-AmountDetailsLine.propTypes = {
-  label: PropTypes.node,
-  currency: PropTypes.string.isRequired,
-  value: PropTypes.number,
-  isLargeAmount: PropTypes.bool,
-};
 
 const createPendingContributionModalQuery = gql`
   query CreatePendingContributionModal($slug: String!) {
@@ -319,18 +318,20 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     if (values.fromAccount?.type === 'VENDOR') {
       const vendorInfo = host?.vendors?.nodes?.find(vendor => vendor.id === formik.values?.fromAccount?.id)?.vendorInfo;
       if (vendorInfo?.contact) {
-        formik.touched.fromAccountInfo?.['name'] !== true &&
+        if (formik.touched.fromAccountInfo?.['name'] !== true) {
           setFieldValue('fromAccountInfo.name', vendorInfo.contact.name);
-        formik.touched.fromAccountInfo?.['email'] !== true &&
+        }
+        if (formik.touched.fromAccountInfo?.['email'] !== true) {
           setFieldValue('fromAccountInfo.email', vendorInfo.contact.email);
+        }
       }
     } else {
-      formik.touched.fromAccountInfo?.['name'] !== true &&
-        formik.values?.fromAccountInfo?.name &&
+      if (formik.touched.fromAccountInfo?.['name'] !== true && formik.values?.fromAccountInfo?.name) {
         setFieldValue('fromAccountInfo.name', '');
-      formik.touched.fromAccountInfo?.['email'] !== true &&
-        formik.values?.fromAccountInfo?.email &&
+      }
+      if (formik.touched.fromAccountInfo?.['email'] !== true && formik.values?.fromAccountInfo?.email) {
         setFieldValue('fromAccountInfo.email', '');
+      }
     }
   }, [values.fromAccount]);
 
@@ -404,7 +405,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const amounts = getAmountsFromValues(values);
   return (
     <Form data-cy="create-pending-contribution-form" className="flex h-full flex-col overflow-y-hidden">
-      <div className="w-full flex-grow overflow-y-auto py-4">
+      <div className="w-full grow overflow-y-auto py-4">
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
@@ -548,6 +549,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           >
             {({ form, field }) => (
               <AccountingCategorySelect
+                showCode
                 disabled={!collective}
                 id={field.id}
                 kind="CONTRIBUTION"
@@ -556,7 +558,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 account={collective}
                 selectedCategory={field.value}
                 allowNone={true}
-                borderRadiusClass="rounded"
               />
             )}
           </Field>
@@ -825,7 +826,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
         {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
       </div>
-      <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+      <div className="flex justify-center gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
         <Button onClick={onClose} variant="outline" type="button">
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         </Button>
@@ -891,7 +892,6 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     <CreatePendingContributionModalContainer
       className="overflow-y-hidden sm:max-h-[90vh]"
       {...props}
-      trapFocus
       onClose={handleClose}
     >
       <ModalHeader>

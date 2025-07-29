@@ -4,7 +4,7 @@ import { take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/schema';
 
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
@@ -61,6 +61,8 @@ const FindAFiscalHostQuery = gql`
         totalHostedCollectives
         hostFeePercent
         isTrustedHost
+        isFirstPartyHost
+        isVerified
         location {
           id
           country
@@ -81,7 +83,7 @@ export default function FindAHostSearch(props: {
   collective: Account;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
-  const scrollRef = React.useRef<HTMLDivElement>();
+  const scrollRef = React.useRef<HTMLDivElement>(undefined);
   const [queryPage, setQueryPage] = React.useState(1);
 
   // Return to first page when filters change.

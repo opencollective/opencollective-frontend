@@ -24,6 +24,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { AccountType } from '../../lib/graphql/types/v2/schema';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -64,7 +65,6 @@ import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganiza
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import {
-  getContributeProfiles,
   getGQLV2AmountInput,
   getGuestInfoFromStepProfile,
   getTotalAmount,
@@ -136,6 +136,7 @@ class ContributionFlow extends React.Component {
         slug: PropTypes.string,
       }),
     }).isRequired,
+    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
     host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
@@ -150,6 +151,8 @@ class ContributionFlow extends React.Component {
     LoggedInUser: PropTypes.object,
     createCollective: PropTypes.func.isRequired, // from mutation
     router: PropTypes.object,
+    onStepChange: PropTypes.func,
+    onSuccess: PropTypes.func,
   };
 
   constructor(props) {
@@ -220,7 +223,10 @@ class ContributionFlow extends React.Component {
       // User has logged out, reset the state
       this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
       this.pushStepRoute(STEPS.PROFILE);
-    } else if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
+    } else if (
+      (!oldProps.LoggedInUser && this.props.LoggedInUser) ||
+      (oldProps.contributorProfiles.length === 0 && this.props.contributorProfiles.length > 0)
+    ) {
       // User has logged in, reload the step profile
       this.setState({ stepProfile: this.getDefaultStepProfile() });
 
@@ -389,13 +395,17 @@ class ContributionFlow extends React.Component {
         await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
           returnUrl: returnUrl.href,
           elements: stripeData?.elements,
-          type: stepPayment?.paymentMethod?.type,
-          paymentMethodId: stepPayment?.paymentMethod?.data?.stripePaymentMethodId,
+          type: stepPayment.paymentMethod?.type,
+          paymentMethodId: stepPayment.paymentMethod?.data?.stripePaymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
         return this.handleSuccess(order);
       } catch (e) {
-        this.setState({ isSubmitting: false, error: e.message });
+        this.setState({
+          isSubmitting: false,
+          error: e.message,
+          stepPayment: { ...this.state.stepPayment, chargeAttempt: (this.state.stepPayment?.chargeAttempt || 0) + 1 },
+        });
       }
     } else if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
@@ -440,6 +450,7 @@ class ContributionFlow extends React.Component {
     this.setState({ isSubmitted: true, isSubmitting: false });
     this.props.refetchLoggedInUser(); // to update memberships
     const queryParams = this.getQueryParams();
+    this.props.onSuccess?.(order);
     if (isValidExternalRedirect(queryParams.redirect)) {
       followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
         shouldRedirectParent: queryParams.shouldRedirectParent,
@@ -456,34 +467,28 @@ class ContributionFlow extends React.Component {
   };
 
   // ---- Getters ----
-
-  getContributeProfiles = memoizeOne(getContributeProfiles);
-
   getDefaultStepProfile() {
-    const { LoggedInUser, loadingLoggedInUser, collective, tier } = this.props;
-    const profiles = this.getContributeProfiles(LoggedInUser, collective, tier);
+    const { contributorProfiles } = this.props;
+    const profiles = contributorProfiles || [];
     const queryParams = this.getQueryParams();
-
-    // We want to wait for the user to be logged in before matching the profile
-    if (loadingLoggedInUser) {
-      return { slug: queryParams.contributeAs };
-    }
 
     // If there's a default profile set in contributeAs, use it
     let contributorProfile;
     if (queryParams.contributeAs && queryParams.contributeAs !== PERSONAL_PROFILE_ALIAS) {
       if (queryParams.contributeAs === INCOGNITO_PROFILE_ALIAS) {
-        contributorProfile = profiles.find(({ isIncognito }) => isIncognito);
+        contributorProfile = profiles.find(({ account: { isIncognito } }) => isIncognito);
+      } else if (queryParams.contributeAs === 'me') {
+        contributorProfile = profiles.find(({ account: { type } }) => type === AccountType.INDIVIDUAL);
       } else {
-        contributorProfile = profiles.find(({ slug }) => slug === queryParams.contributeAs);
+        contributorProfile = profiles.find(({ account: { slug } }) => slug === queryParams.contributeAs);
       }
     }
 
     if (contributorProfile) {
-      return contributorProfile;
-    } else if (profiles[0]) {
+      return contributorProfile.account;
+    } else if (profiles[0]?.account) {
       // Otherwise to the logged-in user personal profile, if any
-      return profiles[0];
+      return profiles[0].account;
     }
 
     // Otherwise, it's a guest contribution
@@ -592,7 +597,7 @@ class ContributionFlow extends React.Component {
         window.scrollTo(0, 0);
         return false;
       }
-      return validateGuestProfile(stepProfile, stepDetails, this.props.tier);
+      return validateGuestProfile(stepProfile, stepDetails, this.props.tier, this.props.collective);
     }
 
     // Check if we're creating a new profile
@@ -604,7 +609,8 @@ class ContributionFlow extends React.Component {
       this.setState({ isSubmitting: true });
 
       try {
-        const { data: result } = await this.props.createCollective(stepProfile);
+        const collectiveData = { ...stepProfile, type: stepProfile.type === 'INDIVIDUAL' ? 'USER' : stepProfile.type };
+        const { data: result } = await this.props.createCollective(collectiveData);
         const createdProfile = result.createCollective;
         await this.props.refetchLoggedInUser();
         this.setState({ stepProfile: createdProfile, isSubmitting: false });
@@ -654,6 +660,7 @@ class ContributionFlow extends React.Component {
 
     if (!this.state.error) {
       await this.pushStepRoute(step.name);
+      this.props.onStepChange?.(step.name);
     }
   };
 
@@ -762,7 +769,8 @@ class ContributionFlow extends React.Component {
     const minAmount = this.getTierMinAmount(tier, currency);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean(
-      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier)),
+      (stepProfile && LoggedInUser) ||
+        (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier, collective)),
     );
 
     const steps = [
@@ -994,7 +1002,14 @@ class ContributionFlow extends React.Component {
                     collective={collective}
                     tier={tier}
                     mainState={this.state}
-                    onChange={data => this.setState(data, this.updateRouteFromState)}
+                    onChange={data => {
+                      // Clear error when payment method changes
+                      if (data.stepPayment && data.stepPayment.key !== this.state.stepPayment?.key) {
+                        this.setState({ ...data, error: null }, this.updateRouteFromState);
+                      } else {
+                        this.setState(data, this.updateRouteFromState);
+                      }
+                    }}
                     step={currentStep}
                     showPlatformTip={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
@@ -1004,7 +1019,7 @@ class ContributionFlow extends React.Component {
                     isSubmitting={isValidating || isLoading}
                     disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
-                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
+                    contributorProfiles={this.props.contributorProfiles}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons

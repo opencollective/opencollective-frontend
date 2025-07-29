@@ -1,21 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { Delete } from '@styled-icons/material/Delete';
 import { get } from 'lodash';
+import { Trash } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { getAccountReferenceInput } from '../../../../lib/collective';
 import roles from '../../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
 import Container from '../../../Container';
-import { Flex } from '../../../Grid';
-import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 import StyledTooltip from '../../../StyledTooltip';
+import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
@@ -169,10 +168,8 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     try {
       await editMemberInvitationAccount({
         variables: {
-          memberAccount: {
-            slug: get(member, 'memberAccount.slug'),
-          },
-          account: { slug: get(collective, 'slug') },
+          memberAccount: getAccountReferenceInput(member.account), // There is an alias on invitation.memberAccount, we should get rid of it https://github.com/opencollective/opencollective-frontend/blob/c7418dd99aa44da387c9c2a0e48525c415cc8566/components/edit-collective/sections/team/queries.ts#L87
+          account: getAccountReferenceInput(collective),
           description,
           role,
           since,
@@ -275,7 +272,7 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
 
   return (
     <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
+      <StyledModal onClose={cancelHandler}>
         <ModalHeader>
           <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
         </ModalHeader>
@@ -287,78 +284,58 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
             bindSubmitForm={bindSubmitForm}
             triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
           />
-          <Flex justifyContent="flex-end">
-            {isLastAdmin && member.role === roles.ADMIN ? (
-              <StyledTooltip place="bottom" content={() => intl.formatMessage(messages.cantRemoveLast)}>
-                <StyledButton
-                  mt={4}
-                  disabled={true}
-                  buttonSize="tiny"
-                  buttonStyle="dangerSecondary"
-                  data-cy="remove-member"
-                  onClick={handleRemoveMemberMutation}
-                >
-                  <Flex alignItems="center">
-                    <Delete height={25} />
-                    <FormattedMessage id="Remove" defaultMessage="Remove" />
-                  </Flex>
-                </StyledButton>
-              </StyledTooltip>
-            ) : (
-              <StyledButton
-                mt={4}
-                disabled={!canRemove}
-                buttonSize="tiny"
-                buttonStyle="dangerSecondary"
-                data-cy="remove-member"
-                onClick={handleRemoveMemberMutation}
-                loading={isRemovingMember}
-              >
-                <Flex alignItems="center">
-                  <Delete height={25} />
-                  <FormattedMessage id="Remove" defaultMessage="Remove" />
-                </Flex>
-              </StyledButton>
-            )}
-          </Flex>
         </ModalBody>
-        <ModalFooter mt={5}>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-            <StyledButton
-              mx={20}
-              my={1}
+        <ModalFooter showDivider={false}>
+          <div className="flex justify-between gap-2">
+            <Button
               autoFocus
               onClick={cancelHandler}
               disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember}
               data-cy="confirmation-modal-cancel"
+              variant="outline"
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-            <StyledButton
-              my={1}
-              buttonStyle="primary"
-              data-cy="confirmation-modal-continue"
-              loading={isEditingMember || isEditingMemberInvitation}
-              disabled={isRemovingMember}
-              onClick={handleSubmitForm}
-            >
-              <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
-          </Container>
+            </Button>
+            <div className="flex gap-2">
+              {isLastAdmin && member.role === roles.ADMIN ? (
+                <StyledTooltip place="bottom" content={() => intl.formatMessage(messages.cantRemoveLast)}>
+                  <Button
+                    disabled={true}
+                    data-cy="remove-member"
+                    variant="outlineDestructive"
+                    onClick={handleRemoveMemberMutation}
+                  >
+                    <Trash size="18px" />
+                    <FormattedMessage id="Remove" defaultMessage="Remove" />
+                  </Button>
+                </StyledTooltip>
+              ) : (
+                <Button
+                  variant="outlineDestructive"
+                  disabled={!canRemove}
+                  data-cy="remove-member"
+                  onClick={handleRemoveMemberMutation}
+                  loading={isRemovingMember}
+                >
+                  <Trash size="18px" />
+                  <FormattedMessage id="Remove" defaultMessage="Remove" />
+                </Button>
+              )}
+              <Button
+                data-cy="confirmation-modal-continue"
+                loading={isEditingMember || isEditingMemberInvitation}
+                disabled={isRemovingMember}
+                onClick={handleSubmitForm}
+                className="w-32"
+              >
+                <FormattedMessage id="save" defaultMessage="Save" />
+              </Button>
+            </div>
+          </div>
         </ModalFooter>
       </StyledModal>
     </Container>
   );
-};
-
-EditMemberModal.propTypes = {
-  collective: PropTypes.object,
-  cancelHandler: PropTypes.func,
-  onEdit: PropTypes.func,
-  intl: PropTypes.object.isRequired,
-  isLastAdmin: PropTypes.bool,
-  member: PropTypes.object,
-  canRemove: PropTypes.bool,
 };
 
 export default EditMemberModal;

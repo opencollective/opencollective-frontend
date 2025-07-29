@@ -1,4 +1,4 @@
-import { TierFrequency } from '../graphql/types/v2/graphql';
+import { TierFrequency } from '../graphql/types/v2/schema';
 
 const INTERVALS = {
   oneTime: 'oneTime',

@@ -49,7 +49,11 @@ describe('Expense flow', () => {
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
+      cy.wait(100);
       cy.getByDataCy('expense-next').click();
 
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
@@ -121,6 +125,9 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-back').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-currency-picker').click();
@@ -150,6 +157,9 @@ describe('Expense flow', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type('An Expense with OCR enabled');
@@ -229,6 +239,9 @@ describe('Expense flow', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type('An Expense with multi-currencies on items + OCR');
@@ -312,7 +325,7 @@ describe('Expense flow', () => {
       // Check what happens when we change the currency to USD
       cy.getByDataCy('items[1].amountV2-amount-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
-      cy.get('[data-cy="mismatch-warning"] button').realHover();
+      cy.get('[data-cy="mismatch-warning"] button').realHover({ position: 'center' });
       cy.get('[data-cy="mismatch-warning-tooltip"]').should(
         'contain',
         'The amount does not match the one scanned from the document (USD $65.00)',
@@ -377,6 +390,9 @@ describe('Expense flow', () => {
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
@@ -489,6 +505,9 @@ describe('Expense flow', () => {
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+        cy.getByDataCy('currency-picker').click();
+        cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+        cy.getByDataCy('select-content').should('not.exist');
         cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
 
         cy.getByDataCy('expense-next').click();
@@ -502,7 +521,10 @@ describe('Expense flow', () => {
         cy.getByDataCy('save-expense-btn').click();
         cy.wait(500);
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
+        cy.getByDataCy('expense-author').should('contain', 'Submitted by');
+        cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
+        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
+        cy.getByDataCy('expense-summary-payout-method-data').should('contain', '********');
 
         cy.get('@createdExpense').then(createdExpense => {
           cy.login({
@@ -511,10 +533,6 @@ describe('Expense flow', () => {
           });
         });
 
-        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-author').should('contain', 'Submitted by');
-        cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
-        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
 
@@ -571,6 +589,10 @@ describe('Expense flow', () => {
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+        cy.getByDataCy('currency-picker').click();
+        cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+        cy.getByDataCy('select-content').should('not.exist');
+
         cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
 
         cy.getByDataCy('expense-next').click();
@@ -584,13 +606,14 @@ describe('Expense flow', () => {
         cy.getByDataCy('save-expense-btn').click();
         cy.wait(500);
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
+
         cy.get('@createdExpense').then(createdExpense => {
           cy.login({
             email: inviteeEmail,
             redirect: `/${createdExpense.collective}/expenses/${createdExpense.expenseId}`,
           });
         });
+
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Submitted by');
         cy.getByDataCy('expense-summary-payee').should('contain', slug);
@@ -623,11 +646,15 @@ describe('Expense flow', () => {
       // Fill payee / payout method
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="address-city"]').type('Citycitycity');
+      cy.wait(100);
       cy.getByDataCy('expense-next').click();
 
       // Fill details
@@ -748,13 +775,12 @@ describe('Expense flow', () => {
 
     it('Downloads PDF', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
-      cy.getByDataCy('more-actions').click();
       cy.getByDataCy('download-expense-invoice-btn').click({ force: true });
       const date = new Date(expense.createdAt).toISOString().split('T')[0];
       const filename = `Expense-${expense.legacyId}-${collective.slug}-invoice-${date}.pdf`;
       cy.getDownloadedPDFContent(filename)
-        .should('contain', `Expense	#${expense.legacyId}:	Expense	for	E2E	tests`)
-        .should('contain', 'Collective:	Test	Collective')
+        .should('contain', `Expense #${expense.legacyId}: Expense for E2E tests`)
+        .should('contain', 'Collective: Test Collective')
         .should('contain', '$10.00');
     });
 
@@ -803,7 +829,8 @@ describe('Expense flow', () => {
       cy.get('[data-cy="edit-collective-btn"]:visible').click();
       cy.getByDataCy('menu-item-Settings').click();
       cy.getByDataCy('menu-item-policies').click();
-      cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
+      cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.visit(expenseUrl);
       cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
@@ -813,7 +840,8 @@ describe('Expense flow', () => {
 
     it('Projects inherit and display expense policy from parent collective', () => {
       cy.login({ email: user.email, redirect: `/dashboard/${collective.slug}/policies` });
-      cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
+      cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.createProject({ userEmail: user.email, collective }).then(project => {
         cy.visit(`/${project.slug}/expenses/new`);

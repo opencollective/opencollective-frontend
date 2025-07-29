@@ -1,4 +1,3 @@
-// eslint-disable-next-line n/no-unpublished-require
 const { defineConfig } = require('cypress');
 const fs = require('fs');
 const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
@@ -15,7 +14,7 @@ module.exports = defineConfig({
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   env: {
-    MAILDEV_URL: 'http://localhost:1080',
+    MAILPIT_URL: 'http://localhost:1080',
     codeCoverage: {
       url: '/__coverage__',
     },
@@ -24,10 +23,19 @@ module.exports = defineConfig({
   screenshotsFolder: 'test/cypress/screenshots',
   videosFolder: 'test/cypress/videos',
   downloadsFolder: 'test/cypress/downloads',
+  hosts: {
+    'local.opencollective': '127.0.0.1',
+    'local.crooked': '127.0.0.1',
+  },
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    configFile: 'test/cypress/reporter-config.json',
+  },
   e2e: {
     setupNodeEvents(on, config) {
-      // eslint-disable-next-line n/no-unpublished-require
-      require('@cypress/code-coverage/task')(on, config);
+      require('cypress-terminal-report/src/installLogsPrinter')(on, {
+        printLogsToConsole: 'onFail',
+      });
 
       on('before:browser:launch', (browser, launchOptions) => {
         if (browser.name === 'chrome') {

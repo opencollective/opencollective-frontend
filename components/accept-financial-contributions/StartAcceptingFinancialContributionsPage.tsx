@@ -3,7 +3,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { Currency } from '../../lib/constants/currency';
-import type { Collective } from '../../lib/graphql/types/v2/graphql';
+import type { Collective } from '../../lib/graphql/types/v2/schema';
 import useDebounced from '../../lib/hooks/useDebounced';
 
 import Container from '../Container';

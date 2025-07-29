@@ -31,5 +31,7 @@ const LoadingPlaceholder = styled.div.attrs<LoadingPlaceholderProps>(props => ({
   ${space}
 `;
 
-/** @component */
+/**
+ * @deprecated Use `ui/Skeleton` instead
+ */
 export default LoadingPlaceholder;

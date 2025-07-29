@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -7,7 +8,7 @@ import styled from 'styled-components';
 
 // Open Collective Frontend imports
 import INTERVALS from '../../lib/constants/intervals';
-import { gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
@@ -80,8 +81,14 @@ const ProgressInfoContainer = styled.div`
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
-const editTierMutation = gqlV1/* GraphQL */ `
-  mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
+const editTierMutation = gql`
+  mutation EditTierPage(
+    $id: String!
+    $name: NonEmptyString
+    $description: String
+    $longDescription: String
+    $videoUrl: URL
+  ) {
     editTier(
       tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
     ) {
@@ -115,6 +122,7 @@ class TierPage extends Component {
     /** The actual tier */
     tier: PropTypes.shape({
       id: PropTypes.number.isRequired,
+      idV2: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
@@ -162,6 +170,26 @@ class TierPage extends Component {
         <ShareButtons pageUrl={pageUrl} collective={this.props.collective} />
       </div>
     );
+  }
+
+  /**
+   * Helper to plug the `InlineEditField` with the GraphQL V2 API. Fields take a GraphQLV1 tier as input,
+   * use the GraphQLV2 API to update the tier, and update the cache for GraphQLV1 with the result.
+   */
+  getGraphQLV2Bindings(graphqlV1FieldName, graphqlV2FieldName = graphqlV1FieldName) {
+    const graphQLV1Tier = this.props.tier;
+    return {
+      prepareVariables: (tier, newValue) => ({ id: tier.idV2, [graphqlV2FieldName]: newValue }),
+      mutationOptions: {
+        context: API_V2_CONTEXT,
+        update: (cache, { data: { editTier } }) => {
+          cache.modify({
+            id: cache.identify(graphQLV1Tier),
+            fields: { [graphqlV1FieldName]: () => editTier[graphqlV2FieldName] },
+          });
+        },
+      },
+    };
   }
 
   render() {
@@ -212,6 +240,7 @@ class TierPage extends Component {
                     maxLength={255}
                     placeholder={<FormattedMessage id="TierPage.AddTitle" defaultMessage="Add a title" />}
                     required
+                    {...this.getGraphQLV2Bindings('name')}
                   />
                 </H1>
                 <H2
@@ -232,16 +261,29 @@ class TierPage extends Component {
                     placeholder={
                       <FormattedMessage id="TierPage.AddDescription" defaultMessage="Add a short description" />
                     }
+                    {...this.getGraphQLV2Bindings('description')}
                   />
                 </H2>
                 <Hide lg>
                   <Box my={24}>
-                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+                    <TierVideo
+                      tier={tier}
+                      editMutation={editTierMutation}
+                      canEdit={canEdit}
+                      field="videoUrl"
+                      {...this.getGraphQLV2Bindings('videoUrl')}
+                    />
                   </Box>
                 </Hide>
                 <Container display="flex" flexDirection="column-reverse" position="relative" flexWrap="wrap">
                   <div>
-                    <TierLongDescription tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+                    <TierLongDescription
+                      tier={tier}
+                      editMutation={editTierMutation}
+                      canEdit={canEdit}
+                      field="longDescription"
+                      {...this.getGraphQLV2Bindings('longDescription')}
+                    />
                   </div>
                 </Container>
                 <Container display={['block', null, null, 'none']} mt={4} maxWidth={275}>
@@ -276,7 +318,6 @@ class TierPage extends Component {
                                   interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                                   formatWithSeparators={tier.goal > 1000000}
                                   abbreviateInterval
-                                  amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                                   precision={0}
                                 />
                               ),
@@ -300,7 +341,6 @@ class TierPage extends Component {
                                 amount={amountRaised}
                                 currency={tier.currency}
                                 interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                                amountStyles={null}
                               />
                             </P>
                           </Box>
@@ -321,7 +361,6 @@ class TierPage extends Component {
                                   amount={tier.goal - amountRaised}
                                   currency={tier.currency}
                                   interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                                  amountStyles={null}
                                 />
                               </P>
                             </Box>
@@ -377,7 +416,13 @@ class TierPage extends Component {
                   </Flex>
                   {/** Video */}
                   <Box my={24}>
-                    <TierVideo tier={tier} editMutation={editTierMutation} canEdit={canEdit} />
+                    <TierVideo
+                      tier={tier}
+                      editMutation={editTierMutation}
+                      canEdit={canEdit}
+                      field="videoUrl"
+                      {...this.getGraphQLV2Bindings('videoUrl')}
+                    />
                   </Box>
                   {/** Share buttons (desktop only) */}
                   <Container display={['none', null, null, 'block']}>{shareBlock}</Container>
@@ -431,7 +476,7 @@ class TierPage extends Component {
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                           formatWithSeparators={tier.goal > 1000000}
                           abbreviateInterval
-                          amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                          amountClassName="font-bold text-foreground"
                           precision={0}
                         />
                       ),
@@ -457,7 +502,7 @@ class TierPage extends Component {
                           amount={amountRaised}
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                          amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                          amountClassName="font-bold text-muted-foreground"
                           formatWithSeparators={amountRaised > 1000000}
                           precision={0}
                           abbreviateInterval

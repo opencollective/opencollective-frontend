@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Image as ImageIcon } from '@styled-icons/boxicons-regular/Image';
 import { AngleDoubleDown } from '@styled-icons/fa-solid/AngleDoubleDown';
 import { cloneDeep, get, set } from 'lodash';
-import Dropzone from 'react-dropzone';
+import ReactDropzone from 'react-dropzone';
 import Cropper from 'react-easy-crop';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -17,9 +16,9 @@ import { mergeRefs } from '../../../lib/react-utils';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
+import { DROPZONE_ACCEPT_IMAGES } from '../../Dropzone';
 import { Box, Flex } from '../../Grid';
 import StyledButton from '../../StyledButton';
-import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import StyledInputSlider from '../../StyledInputSlider';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { Span } from '../../Text';
@@ -93,7 +92,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
         </Span>
       </ModalHeader>
 
-      <Dropzone onDrop={onDrop} multiple={false} accept={DROPZONE_ACCEPT_IMAGES}>
+      <ReactDropzone onDrop={onDrop} multiple={false} accept={DROPZONE_ACCEPT_IMAGES}>
         {({ isDragActive, isDragAccept, getRootProps, getInputProps, open }) => {
           const rootProps = getRootProps();
           return (
@@ -286,19 +285,9 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
             </React.Fragment>
           );
         }}
-      </Dropzone>
+      </ReactDropzone>
     </StyledModal>
   );
-};
-
-HeroBackgroundCropperModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    backgroundImage: PropTypes.string.isRequired,
-    backgroundImageUrl: PropTypes.string.isRequired,
-    settings: PropTypes.object,
-  }).isRequired,
 };
 
 export default HeroBackgroundCropperModal;

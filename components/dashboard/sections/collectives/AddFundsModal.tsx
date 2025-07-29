@@ -3,8 +3,8 @@ import { useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { get, groupBy, isEmpty, map } from 'lodash';
-import { ArrowLeft } from 'lucide-react';
+import { compact, get, groupBy, isEmpty, map } from 'lodash';
+import { ArrowLeft, Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -13,31 +13,26 @@ import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type {
-  Account,
-  AccountWithHost,
-  Amount,
-  Order,
-  Tier,
-  TransactionReferenceInput,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
+import type { TierReferenceInput } from '@/lib/graphql/types/v2/graphql';
+
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../../../collective-page/sections/Budget';
-import { DefaultCollectiveLabel } from '../../../CollectivePicker';
+import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledHr from '../../../StyledHr';
@@ -54,9 +49,9 @@ import { TaxesFormikFields, validateTaxInput } from '../../../taxes/TaxesFormikF
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
 import { Button } from '../../../ui/Button';
-import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
+import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
-const AddFundsModalContainer = styled(StyledModal)`
+const AddFundsModalContainer = styled(StyledModal)<{ $showSuccessModal: boolean }>`
   width: 100%;
   max-width: 576px;
   padding: 24px 24px 16px 32px;
@@ -91,6 +86,61 @@ const AmountDetailsLine = ({
   </Flex>
 );
 
+const addFundsOrderFieldsFragment = gql`
+  fragment AddFundsOrderFields on Order {
+    id
+    description
+    memo
+    processedAt
+    hostFeePercent
+    totalAmount {
+      valueInCents
+    }
+    paymentProcessorFee {
+      valueInCents
+    }
+    taxAmount {
+      valueInCents
+    }
+    transactions {
+      id
+      type
+      kind
+      amount {
+        valueInCents
+      }
+    }
+    fromAccount {
+      id
+      slug
+      name
+    }
+    toAccount {
+      id
+      slug
+      name
+      stats {
+        id
+        balance {
+          valueInCents
+        }
+      }
+    }
+    accountingCategory {
+      id
+      code
+      name
+      kind
+    }
+    tier {
+      id
+      legacyId
+      slug
+      name
+    }
+  }
+`;
+
 const addFundsMutation = gql`
   mutation AddFunds(
     $fromAccount: AccountReferenceInput!
@@ -123,55 +173,48 @@ const addFundsMutation = gql`
       transactionsImportRow: $transactionsImportRow
     ) {
       id
-      description
-      memo
-      processedAt
-      hostFeePercent
-      taxAmount {
-        valueInCents
-      }
-      taxes {
-        type
-        percentage
-      }
-      transactions {
-        id
-        type
-        kind
-        amount {
-          valueInCents
-        }
-      }
-      fromAccount {
-        id
-        slug
-        name
-      }
-      toAccount {
-        id
-        slug
-        name
-        stats {
-          id
-          balance {
-            valueInCents
-          }
-        }
-      }
-      accountingCategory {
-        id
-        code
-        name
-        kind
-      }
-      tier {
-        id
-        legacyId
-        slug
-        name
-      }
+      ...AddFundsOrderFields
     }
   }
+  ${addFundsOrderFieldsFragment}
+`;
+
+const editAddedFundsMutation = gql`
+  mutation EditAddedFunds(
+    $order: OrderReferenceInput!
+    $fromAccount: AccountReferenceInput!
+    $account: AccountReferenceInput!
+    $tier: TierReferenceInput
+    $amount: AmountInput!
+    $paymentProcessorFee: AmountInput
+    $description: String!
+    $memo: String
+    $processedAt: DateTime
+    $hostFeePercent: Float!
+    $invoiceTemplate: String
+    $tax: TaxInput
+    $accountingCategory: AccountingCategoryReferenceInput
+  ) {
+    editAddedFunds(
+      order: $order
+      account: $account
+      fromAccount: $fromAccount
+      amount: $amount
+      paymentProcessorFee: $paymentProcessorFee
+      description: $description
+      memo: $memo
+      processedAt: $processedAt
+      hostFeePercent: $hostFeePercent
+      tier: $tier
+      invoiceTemplate: $invoiceTemplate
+      tax: $tax
+      accountingCategory: $accountingCategory
+    ) {
+      id
+      ...AddFundsOrderFields
+    }
+  }
+  ${addFundsOrderFieldsFragment}
 `;
 
 const addFundsTierFieldsFragment = gql`
@@ -247,6 +290,20 @@ const addFundsAccountQuery = gql`
       ... on AccountWithParent {
         parent {
           id
+          slug
+          name
+          imageUrl
+          type
+          settings
+        }
+      }
+      childrenAccounts {
+        nodes {
+          id
+          slug
+          name
+          imageUrl
+          type
         }
       }
       ... on Host {
@@ -295,7 +352,7 @@ type AddFundsFormValues = {
   paymentProcessorFee?: number;
   hostFeePercent?: number;
   memo?: string;
-  tier?: Tier;
+  tier?: TierReferenceInput;
   tax?: any;
   transactionsImportRow?: TransactionReferenceInput | null;
   invoiceTemplate?: { value: string };
@@ -326,7 +383,9 @@ const validate = (intl, values) => {
 };
 
 const getApplicableTaxType = (collective, host) => {
-  if (accountHasVAT(collective, host || collective.host)) {
+  if (!collective) {
+    return null;
+  } else if (accountHasVAT(collective, host || collective.host)) {
     return TaxType.VAT;
   } else if (accountHasGST(host || collective.host || collective)) {
     return TaxType.GST;
@@ -383,37 +442,48 @@ const AddFundsModalContentWithCollective = ({
   onSelectOtherAccount,
   initialValues,
   onSuccess,
+  editOrderId,
 }: {
-  collective: Account & AccountWithHost;
+  collective: Pick<Account, 'slug'>;
   fundDetails: FundDetails;
   setFundDetails: React.Dispatch<React.SetStateAction<FundDetails>>;
   handleClose: () => void;
   onSelectOtherAccount?: () => void;
   initialValues?: Partial<AddFundsFormValues>;
   onSuccess?: (order: Order) => void;
+  editOrderId?: string;
 }) => {
   const intl = useIntl();
-  const { data, loading } = useQuery(addFundsAccountQuery, {
+  const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(initialValues?.amount));
+  const {
+    data,
+    loading,
+    error: fetchAccountError,
+  } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
   });
   const account = data?.account;
   const currency = account?.currency;
   const host = account?.isHost && !account.host ? account : account?.host;
-  const applicableTax = getApplicableTaxType(collective, host);
+  const applicableTax = getApplicableTaxType(account, host);
+  const isEdit = Boolean(editOrderId);
 
-  const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(addFundsMutation, {
-    context: API_V2_CONTEXT,
-    refetchQueries: [
-      {
-        context: API_V2_CONTEXT,
-        query: getBudgetSectionQuery(true, false),
-        variables: getBudgetSectionQueryVariables(collective.slug, false),
-      },
-      { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
-    ],
-    awaitRefetchQueries: true,
-  });
+  const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
+    isEdit ? editAddedFundsMutation : addFundsMutation,
+    {
+      context: API_V2_CONTEXT,
+      refetchQueries: [
+        {
+          context: API_V2_CONTEXT,
+          query: getBudgetSectionQuery(true, false),
+          variables: getBudgetSectionQueryVariables(collective.slug, false, host),
+        },
+        { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
 
   const tiersNodes = get(data, 'account.tiers.nodes');
   const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [intl, tiersNodes]);
@@ -421,7 +491,7 @@ const AddFundsModalContentWithCollective = ({
   // From the Collective page we pass collective as API v1 objects
   // From the Host dashboard we pass collective as API v2 objects
   const canAddHostFee = checkCanAddHostFee(account);
-  const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
+  const hostFeePercent = account?.addedFundsHostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
   const recommendedVendors = host?.vendors?.nodes || [];
@@ -436,6 +506,11 @@ const AddFundsModalContentWithCollective = ({
     };
   });
 
+  const receivingCollectiveOptions = React.useMemo(
+    () => compact([account, account?.parent, ...(account?.childrenAccounts?.nodes || [])]),
+    [account],
+  );
+
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
     receiptTemplateTitles.push({
@@ -448,12 +523,20 @@ const AddFundsModalContentWithCollective = ({
   }
 
   if (loading) {
-    return <LoadingPlaceholder mt={2} height={200} />;
+    return (
+      <div className="space-y-8 py-8">
+        <Skeleton className="h-16" />
+        <Skeleton className="h-16" />
+        <Skeleton className="h-16" />
+      </div>
+    );
+  } else if (fetchAccountError) {
+    return <MessageBoxGraphqlError my={2} error={fetchAccountError} />;
   }
 
   return (
     <Formik
-      initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective, ...initialValues })}
+      initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account, ...initialValues })}
       enableReinitialize={true}
       validate={values => validate(intl, values)}
       onSubmit={async (values, formik) => {
@@ -474,38 +557,45 @@ const AddFundsModalContentWithCollective = ({
               processedAt: values.processedAt ? new Date(values.processedAt) : null,
               tax: values.tax,
               accountingCategory: values.accountingCategory ? { id: values.accountingCategory.id } : null,
+              ...(isEdit && { order: { id: editOrderId } }),
             },
           });
 
-          const resultOrder = result.data.addFunds;
-          setFundDetails({
-            showSuccessModal: true,
-            fundAmount: values.amount,
-            taxAmount: resultOrder.taxAmount,
-            hostFeePercent: resultOrder.hostFeePercent,
-            paymentProcessorFee: resultOrder.transactions.find(
-              t => t.kind === 'PAYMENT_PROCESSOR_FEE' && t.type === 'DEBIT',
-            )?.amount,
-            taxes: resultOrder.taxes,
-            description: resultOrder.description,
-            memo: resultOrder.memo,
-            processedAt: resultOrder.processedAt,
-            source: resultOrder.fromAccount,
-            tier: resultOrder.tier,
-          });
-          /*
-           * Since `enableReinitialize` is used in this form, during the second step (platform tip step)
-           * the form values will be reset. The validate function in this form
-           * requires `amount`, `fromAccount` and `description` so we should
-           * set them as otherwise the form will not be submittable.
-           */
-          formik.setValues({
-            amount: values.amount,
-            fromAccount: resultOrder.fromAccount,
-            description: resultOrder.description,
-            processedAt: resultOrder.processedAt,
-          });
+          const resultOrder = result.data.addFunds || result.data.editAddedFunds;
+
+          if (!isEdit) {
+            setFundDetails({
+              showSuccessModal: true,
+              fundAmount: values.amount,
+              taxAmount: resultOrder.taxAmount,
+              hostFeePercent: resultOrder.hostFeePercent,
+              paymentProcessorFee: resultOrder.transactions.find(
+                t => t.kind === 'PAYMENT_PROCESSOR_FEE' && t.type === 'DEBIT',
+              )?.amount,
+              taxes: resultOrder.taxes,
+              description: resultOrder.description,
+              memo: resultOrder.memo,
+              processedAt: resultOrder.processedAt,
+              source: resultOrder.fromAccount,
+              tier: resultOrder.tier,
+            });
+            /*
+             * Since `enableReinitialize` is used in this form, during the second step (platform tip step)
+             * the form values will be reset. The validate function in this form
+             * requires `amount`, `fromAccount` and `description` so we should
+             * set them as otherwise the form will not be submittable.
+             */
+            formik.setValues({
+              amount: values.amount,
+              fromAccount: resultOrder.fromAccount,
+              description: resultOrder.description,
+              processedAt: resultOrder.processedAt,
+            });
+          }
           onSuccess?.(resultOrder);
+          if (isEdit) {
+            handleClose();
+          }
         } else {
           handleClose();
         }
@@ -536,11 +626,20 @@ const AddFundsModalContentWithCollective = ({
                   </Button>
                 </div>
               )}
-              <div className="w-full flex-grow overflow-y-auto pb-4">
+              <Field
+                name="description"
+                htmlFor="addFunds-description"
+                label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+                mt={3}
+              >
+                {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+              </Field>
+              <div className="w-full grow overflow-y-auto pb-4">
                 <Field
                   name="fromAccount"
                   htmlFor="addFunds-fromAccount"
                   label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
+                  mt={3}
                 >
                   {({ form, field }) => (
                     <CollectivePickerAsync
@@ -551,6 +650,7 @@ const AddFundsModalContentWithCollective = ({
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       customOptions={defaultSourcesOptions}
                       onChange={({ value }) => form.setFieldValue(field.name, value)}
+                      collective={values.fromAccount}
                       menuPortalTarget={null}
                       includeVendorsForHostId={host?.legacyId || undefined}
                       creatable={['USER', 'VENDOR']}
@@ -559,10 +659,31 @@ const AddFundsModalContentWithCollective = ({
                   )}
                 </Field>
                 <Field
+                  name="account"
+                  htmlFor="addFunds-account"
+                  label={<FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />}
+                  mt={3}
+                >
+                  {({ form, field }) => (
+                    <CollectivePicker
+                      inputId={field.id}
+                      data-cy="add-funds-recipient"
+                      error={field.error}
+                      onBlur={() => form.setFieldTouched(field.name, true)}
+                      onChange={({ value }) => form.setFieldValue(field.name, value)}
+                      collective={values.account}
+                      collectives={receivingCollectiveOptions}
+                      menuPortalTarget={null}
+                      disabled={receivingCollectiveOptions.length === 1}
+                    />
+                  )}
+                </Field>
+                <Field
                   name="tier"
                   htmlFor="addFunds-tier"
                   label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
                   mt={3}
+                  required={false}
                 >
                   {({ form, field }) => (
                     <StyledSelect
@@ -579,14 +700,6 @@ const AddFundsModalContentWithCollective = ({
                       )}
                     />
                   )}
-                </Field>
-                <Field
-                  name="description"
-                  htmlFor="addFunds-description"
-                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                  mt={3}
-                >
-                  {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
                 </Field>
                 <Field
                   name="processedAt"
@@ -631,7 +744,6 @@ const AddFundsModalContentWithCollective = ({
                         account={account}
                         selectedCategory={field.value}
                         allowNone={true}
-                        borderRadiusClass="rounded"
                       />
                     )}
                   </Field>
@@ -639,19 +751,14 @@ const AddFundsModalContentWithCollective = ({
                 <Field
                   name="memo"
                   htmlFor="addFunds-memo"
-                  hint={
-                    <FormattedMessage
-                      defaultMessage="This is a private note that will only be visible to the host."
-                      id="znqf9S"
-                    />
-                  }
+                  isPrivate
                   label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
                   required={false}
                   mt={3}
                 >
                   {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
                 </Field>
-                <Flex mt={3} flexWrap="wrap">
+                <Flex mt={3} flexWrap="wrap" alignItems="flex-end">
                   <Field
                     name="amount"
                     htmlFor="addFunds-amount"
@@ -660,19 +767,68 @@ const AddFundsModalContentWithCollective = ({
                     flex="1 1"
                   >
                     {({ form, field }) => (
-                      <StyledInputAmount
-                        id={field.id}
-                        data-cy="add-funds-amount"
-                        currency={currency}
-                        placeholder="0.00"
-                        error={field.error}
-                        value={field.value}
-                        maxWidth="100%"
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
-                      />
+                      <div>
+                        <div className="flex justify-between gap-2 [&>div]:w-full">
+                          <StyledInputAmount
+                            id={field.id}
+                            data-cy="add-funds-amount"
+                            currency={currency}
+                            placeholder="0.00"
+                            error={field.error}
+                            value={field.value}
+                            maxWidth="100%"
+                            onChange={value => form.setFieldValue(field.name, value)}
+                            onBlur={() => form.setFieldTouched(field.name, true)}
+                            disabled={isAmountLocked}
+                          />
+                          {Boolean(initialValues?.amount) && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-[38px]"
+                              onClick={() => setIsAmountLocked(locked => !locked)}
+                              disabled={initialValues.amount !== values.amount}
+                              aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
+                            >
+                              {isAmountLocked ? <Unlock size={18} /> : <Lock size={18} />}
+                            </Button>
+                          )}
+                        </div>
+                        {Boolean(initialValues?.amount) &&
+                          (isAmountLocked ? (
+                            <span className="mt-1 text-xs text-gray-500">
+                              <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
+                            </span>
+                          ) : (
+                            initialValues.amount !== values.amount && (
+                              <span className="mt-1 text-xs text-gray-500">
+                                <FormattedMessage
+                                  defaultMessage="The initial amount was {amount}."
+                                  id="6hEUR9"
+                                  values={{
+                                    amount: formatCurrency(initialValues.amount, currency, { locale: intl.locale }),
+                                  }}
+                                />
+                                {' - '}
+                                <Button
+                                  variant="link"
+                                  size="xs"
+                                  className="p-0 text-xs"
+                                  onClick={() => {
+                                    formik.setFieldValue('amount', initialValues.amount);
+                                    setIsAmountLocked(true);
+                                  }}
+                                >
+                                  <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
+                                </Button>
+                              </span>
+                            )
+                          ))}
+                      </div>
                     )}
                   </Field>
+
                   {canAddHostFee && (
                     <Field
                       name="hostFeePercent"
@@ -829,20 +985,31 @@ const AddFundsModalContentWithCollective = ({
                   isLargeAmount
                 />
                 <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
-                  <FormattedMessage
-                    id="AddFundsModal.disclaimer"
-                    defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                    values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
-                  />
+                  {isEdit ? (
+                    <FormattedMessage
+                      id="AddFundsModal.editDisclaimer"
+                      defaultMessage="By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="AddFundsModal.disclaimer"
+                      defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
+                      values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
+                    />
+                  )}
                 </P>
                 {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
               </div>
-              <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+              <div className="flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
                 <Button onClick={handleClose} type="button" variant="outline">
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>
                 <Button data-cy="add-funds-submit-btn" type="submit" loading={loading}>
-                  <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                  {isEdit ? (
+                    <FormattedMessage id="menu.editFunds" defaultMessage="Edit Funds" />
+                  ) : (
+                    <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                  )}{' '}
                 </Button>
               </div>
             </Form>
@@ -857,7 +1024,7 @@ const AddFundsModalContentWithCollective = ({
                   </h3>
                   <Container pb={2} mt={3}>
                     <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
-                    <ul className="mt-2 list-inside list-disc pl-3">
+                    <ul className="mt-2 list-inside list-disc pl-3 break-words">
                       <li>
                         <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                       </li>
@@ -947,7 +1114,7 @@ const AddFundsModalContentWithCollective = ({
                           <StyledLink
                             as={Link}
                             openInNewTab
-                            href={`${getCollectivePageRoute(collective)}/contribute/${fundDetails.tier.slug}-${
+                            href={`${getCollectivePageRoute(account)}/contribute/${fundDetails.tier.slug}-${
                               fundDetails.tier.legacyId
                             }`}
                           >
@@ -963,7 +1130,7 @@ const AddFundsModalContentWithCollective = ({
                             values={{ item: <FormattedMessage defaultMessage="Memo" id="D5NqQO" /> }}
                           />
                           <p
-                            className="text-black-600 border-black-200 mt-1 max-h-32 overflow-y-auto whitespace-pre-wrap break-words rounded border bg-neutral-50 p-2 text-xs"
+                            className="text-black-600 border-black-200 mt-1 max-h-32 overflow-y-auto rounded border bg-neutral-50 p-2 text-xs break-words whitespace-pre-wrap"
                             data-cy="add-funds-memo"
                           >
                             {fundDetails.memo}
@@ -998,6 +1165,14 @@ const AddFundsModalContentWithCollective = ({
   );
 };
 
+function getDefaultSelectedCollective<T>(collective: Array<T> | T): T | null {
+  if (Array.isArray(collective)) {
+    return collective.length === 1 ? collective[0] : null;
+  } else {
+    return collective;
+  }
+}
+
 const AddFundsModal = ({
   collective = null,
   host = null,
@@ -1005,10 +1180,19 @@ const AddFundsModal = ({
   onSuccess = null,
   transactionsImportRow = null,
   ...props
+}: {
+  collective: Pick<Account, 'slug' | 'name'> | Pick<Account, 'slug' | 'name'>[] | null;
+  host?: Pick<Account, 'id' | 'legacyId' | 'slug' | 'policies'> | null;
+  initialValues?: Partial<AddFundsFormValues>;
+  onSuccess?: (order: Order) => void;
+  transactionsImportRow?: TransactionReferenceInput &
+    React.ComponentProps<typeof TransactionsImportRowDetails>['transactionsImportRow'];
+  editOrderId?: string;
+  onClose: () => void;
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-  const [selectedCollective, setSelectedCollective] = useState(collective);
+  const [selectedCollective, setSelectedCollective] = useState(() => getDefaultSelectedCollective(collective));
   const [hasConfirmedCollective, setHasConfirmedCollective] = useState(Boolean(selectedCollective));
   const [fundDetails, setFundDetails] = useState<FundDetails>({});
   const handleClose = () => {
@@ -1020,11 +1204,10 @@ const AddFundsModal = ({
     <AddFundsModalContainer
       key="add-funds-modal"
       {...props}
-      trapFocus
       onClose={handleClose}
       $showSuccessModal={fundDetails.showSuccessModal}
     >
-      {selectedCollective ? (
+      {selectedCollective && !props.editOrderId ? (
         <CollectiveModalHeader
           className="mb-4"
           onClose={handleClose}
@@ -1039,12 +1222,16 @@ const AddFundsModal = ({
         />
       ) : (
         <ModalHeader onClose={handleClose} mb={3}>
-          <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+          {props.editOrderId ? (
+            <FormattedMessage id="menu.editFunds" defaultMessage="Edit Funds" />
+          ) : (
+            <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+          )}
         </ModalHeader>
       )}
 
       {transactionsImportRow && (
-        <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
+        <TransactionsImportRowDetails transactionsImportRow={transactionsImportRow} className="mb-4" />
       )}
 
       {!LoggedInUser ? (
@@ -1070,29 +1257,42 @@ const AddFundsModal = ({
         </MessageBox>
       ) : (
         <div>
-          <label htmlFor="add-funds-collective-picker" className="my-2 text-sm font-normal">
+          <label htmlFor="add-funds-collective-picker" className="mt-2 text-base font-bold">
             <FormattedMessage defaultMessage="Select an account to add funds to:" id="addFunds.selectCollective" />
           </label>
-          <CollectivePickerAsync
-            inputId="add-funds-collective-picker"
-            customOptions={[
-              {
-                label: intl.formatMessage({ defaultMessage: 'Fiscal Host', id: 'Fiscalhost' }),
-                options: [{ value: host, label: <DefaultCollectiveLabel value={host} /> }],
-              },
-            ]}
-            hostCollectiveIds={getLegacyIdForCollective(host)}
-            types={['COLLECTIVE', 'PROJECT', 'EVENT', 'FUND']}
-            getDefaultOptions={buildOption => buildOption(selectedCollective)}
-            onChange={({ value }) => {
-              setSelectedCollective(value);
-            }}
-          />
+          {collective ? (
+            <CollectivePicker
+              inputId="add-funds-collective-picker"
+              collectives={collective}
+              collective={selectedCollective}
+              mt={2}
+              onChange={({ value }) => {
+                setSelectedCollective(value);
+              }}
+            />
+          ) : (
+            <CollectivePickerAsync
+              inputId="add-funds-collective-picker"
+              customOptions={[
+                {
+                  label: intl.formatMessage({ defaultMessage: 'Fiscal Host', id: 'Fiscalhost' }),
+                  options: [{ value: host, label: <DefaultCollectiveLabel value={host} /> }],
+                },
+              ]}
+              mt={2}
+              hostCollectiveIds={getLegacyIdForCollective(host)}
+              types={['COLLECTIVE', 'PROJECT', 'EVENT', 'FUND']}
+              getDefaultOptions={buildOption => buildOption(selectedCollective)}
+              onChange={({ value }) => {
+                setSelectedCollective(value);
+              }}
+            />
+          )}
           <div className="mt-8 flex justify-center gap-4">
             <Button onClick={handleClose} variant="outline" type="button">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button onClick={() => setHasConfirmedCollective(true)}>
+            <Button onClick={() => setHasConfirmedCollective(true)} disabled={!selectedCollective}>
               <FormattedMessage defaultMessage="Continue" id="actions.continue" />
             </Button>
           </div>

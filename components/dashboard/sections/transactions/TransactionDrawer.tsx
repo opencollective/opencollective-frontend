@@ -251,7 +251,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   });
   const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };
-  const dropdownTriggerRef = React.useRef();
+  const dropdownTriggerRef = React.useRef(undefined);
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
 
@@ -277,19 +277,15 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
               <Skeleton className="h-8 w-48" />
             ) : (
               transaction?.netAmount && (
-                <div className="text-2xl">
-                  <span className={'font-bold text-foreground'}>
-                    <FormattedMoneyAmount
-                      amount={transaction?.netAmount.valueInCents}
-                      currency={transaction?.netAmount.currency}
-                      precision={2}
-                      amountStyles={{ letterSpacing: 0 }}
-                      showCurrencyCode={false}
-                    />
-                  </span>
-
-                  <span className="text-muted-foreground">{transaction?.netAmount.currency}</span>
-                </div>
+                <span className={'text-2xl font-bold text-foreground'}>
+                  <FormattedMoneyAmount
+                    amount={transaction?.netAmount.valueInCents}
+                    currency={transaction?.netAmount.currency}
+                    precision={2}
+                    currencyCodeClassName="text-muted-foreground font-normal"
+                    showCurrencyCode={true}
+                  />
+                </span>
               )
             )}
             {transaction?.isRefunded && !transaction?.isOrderRejected && (
@@ -358,7 +354,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
               <React.Fragment>
                 <InfoList className="mb-6 sm:grid-cols-2">
                   <InfoListItem
-                    className="border-b border-t-0"
+                    className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                     value={
                       <AccountHoverCard
@@ -377,7 +373,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                   />
 
                   <InfoListItem
-                    className="border-b border-t-0"
+                    className="border-t-0 border-b"
                     title={
                       transaction.type === 'CREDIT' ? (
                         <FormattedMessage defaultMessage="Sender" id="nbwXXN" />
@@ -464,7 +460,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                         amount={transaction.amount.valueInCents}
                         currency={transaction.amount.currency}
                         precision={2}
-                        amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
                     }
@@ -478,7 +473,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                             amount={transaction?.paymentProcessorFee.valueInCents}
                             currency={transaction?.paymentProcessorFee.currency}
                             precision={2}
-                            amountStyles={{ letterSpacing: 0 }}
                             showCurrencyCode={false}
                           />
                         }
@@ -492,7 +486,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                           amount={transaction?.hostFee.valueInCents}
                           currency={transaction?.hostFee.currency}
                           precision={2}
-                          amountStyles={{ letterSpacing: 0 }}
                           showCurrencyCode={false}
                         />
                       }
@@ -506,7 +499,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                           amount={transaction?.taxAmount.valueInCents}
                           currency={transaction?.taxAmount.currency}
                           precision={2}
-                          amountStyles={{ letterSpacing: 0 }}
                           showCurrencyCode={false}
                         />
                       }
@@ -520,7 +512,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                           amount={transaction?.netAmount.valueInCents}
                           currency={transaction?.netAmount.currency}
                           precision={2}
-                          amountStyles={{ letterSpacing: 0 }}
                           showCurrencyCode={false}
                         />
                       }

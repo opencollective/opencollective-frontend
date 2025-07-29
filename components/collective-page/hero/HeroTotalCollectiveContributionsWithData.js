@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -10,7 +9,7 @@ import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box } from '../../Grid';
 import { P } from '../../Text';
 
-export const totalCollectiveContributionsQuery = gqlV1/* GraphQL */ `
+export const totalCollectiveContributionsQuery = gqlV1 /* GraphQL */ `
   query HeroTotalCollectiveContributions($slug: String!) {
     Collective(slug: $slug) {
       id
@@ -26,8 +25,6 @@ export const totalCollectiveContributionsQuery = gqlV1/* GraphQL */ `
 export const getTotalCollectiveContributionsQueryVariables = slug => {
   return { slug };
 };
-
-const amountStyles = { fontSize: '20px', fontWeight: 'bold' };
 
 /**
  * This component fetches its own data because we don't want to query these fields
@@ -48,15 +45,9 @@ const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
       <P fontSize="10px" textTransform="uppercase">
         <FormattedMessage id="membership.totalDonations" defaultMessage="Total amount contributed" />
       </P>
-      <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountStyles={amountStyles} />
+      <FormattedMoneyAmount amount={stats.totalAmountSpent} currency={currency} amountClassName="font-bold text-xl" />
     </Box>
   );
-};
-
-HeroTotalCollectiveContributionsWithData.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
 };
 
 export default HeroTotalCollectiveContributionsWithData;

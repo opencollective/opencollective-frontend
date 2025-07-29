@@ -1,15 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
-import Container from '../Container';
-import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 const deleteVirtualCardMutation = gql`
@@ -67,7 +65,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
   };
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} maxWidth={450} {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage defaultMessage="Delete virtual card" id="7nrRJ/" />
@@ -81,33 +79,24 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
           </P>
         </ModalBody>
         <ModalFooter isFullWidth>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-            <StyledButton
-              my={1}
-              minWidth={140}
-              buttonStyle="primary"
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button className="min-w-36" variant="outline" onClick={handleClose} type="button">
+              <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
+            </Button>
+            <Button
+              variant="destructive"
+              className="min-w-36"
               data-cy="confirmation-modal-continue"
               loading={isBusy}
               type="submit"
-              textTransform="capitalize"
             >
               <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-            </StyledButton>
-          </Container>
+            </Button>
+          </div>
         </ModalFooter>
       </form>
     </StyledModal>
   );
-};
-
-DeleteVirtualCardModal.propTypes = {
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
-  onDeleteRefetchQuery: PropTypes.string,
-  virtualCard: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-  }),
 };
 
 /** @component */

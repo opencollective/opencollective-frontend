@@ -6,7 +6,7 @@ import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/schema';
 import useDebouncedSearch from '../lib/hooks/useDebouncedSearch';
 
 import { Button } from './ui/Button';
@@ -107,6 +107,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
       <Popover>
         <PopoverTrigger asChild>
           <Button
+            disabled={disabled}
             size="xs"
             variant="outline"
             className="h-6 gap-1 border-dashed text-xs text-muted-foreground"
@@ -121,6 +122,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
         <PopoverContent className="max-w-48 p-0">
           <Command>
             <CommandInput
+              disabled={disabled}
               customIcon={!hasSearch ? TagsIcon : Search}
               placeholder={intl.formatMessage({ defaultMessage: 'Add tag', id: 'Un1mxZ' })}
               value={inputValue}

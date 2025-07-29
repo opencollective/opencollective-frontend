@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
@@ -18,7 +17,7 @@ import ExpandableExpensePolicies from './ExpandableExpensePolicies';
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, children }) => {
+const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, children = undefined }) => {
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
   return (
     <Box width="100%">
@@ -48,7 +47,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
               <FormattedMoneyAmount
                 currency={balanceWithBlockedFunds.currency}
                 amount={balanceWithBlockedFunds.valueInCents}
-                amountStyles={{ color: 'black.800' }}
+                amountClassName="text-foreground"
                 precision={CurrencyPrecision.DEFAULT}
               />
               {host && (
@@ -104,37 +103,6 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
       </Box>
     </Box>
   );
-};
-
-ExpenseInfoSidebar.propTypes = {
-  isLoading: PropTypes.bool,
-
-  /** To render custom content inside the sidebar */
-  children: PropTypes.node,
-
-  /** Must be provided if isLoading is false */
-  collective: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    type: PropTypes.string,
-    parent: PropTypes.object,
-    isActive: PropTypes.bool,
-    stats: PropTypes.shape({
-      balanceWithBlockedFunds: PropTypes.shape({
-        valueInCents: PropTypes.number.isRequired,
-        currency: PropTypes.string.isRequired,
-      }),
-    }),
-  }),
-  host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }),
-  /** If different than `host` */
-  expenseHost: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-  }),
 };
 
 export default React.memo(ExpenseInfoSidebar);

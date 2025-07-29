@@ -1,21 +1,23 @@
 import React from 'react';
-import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
+import { get, isNull, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/graphql';
-import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/schema';
+import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
 import { cn } from '../lib/utils';
 import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
+import { isSameAccount } from '@/lib/collective';
 
+import { Button } from './ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
-type RequiredHostFields = Pick<Host, 'id' | 'slug'> & {
+type RequiredHostFields = Pick<Host, 'id' | 'slug' | 'type'> & {
   [K in (typeof ACCOUNTING_CATEGORY_HOST_FIELDS)[number]]?: { nodes: RequiredAccountingCategoryFields[] };
 };
 
@@ -24,24 +26,29 @@ type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' |
 type AccountingCategorySelectProps = {
   host: RequiredHostFields;
   /** The account holding the expense. Only used when using the prediction service */
-  account?: Pick<Account, 'id' | 'slug'>;
+  account?: { id: Account['id']; slug: Account['slug']; parent?: { id: Account['id'] } };
   kind: AccountingCategoryKind | `${AccountingCategoryKind}`;
   /** If `kind` is `EXPENSE`, the (optional) expense type is used to filter the categories */
   expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
-  expenseValues?: Partial<Expense>;
+  expenseValues?: {
+    type?: Expense['type'];
+    description?: Expense['description'];
+    items?: Array<{ description?: string }>;
+  };
   predictionStyle?: 'full' | 'inline-preload';
   selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
-  onChange: (category: AccountingCategory) => void;
+  onChange: (category: AccountingCategory | null) => void;
   onBlur?: () => void;
   allowNone?: boolean;
   showCode?: boolean;
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
-  borderRadiusClass?: string;
+  buttonClassName?: string;
   disabled?: boolean;
+  selectFirstOptionIfSingle?: boolean;
 };
 
 type AccountingCategoryOption = {
@@ -94,7 +101,7 @@ const getSelectionInfoForLabel = (
   if (rolesHaveSelectedCategory.some(Boolean)) {
     const rolesToDisplay = roles.filter((_, index) => rolesHaveSelectedCategory[index]);
     return (
-      <span className="text-xs font-normal italic text-muted-foreground">
+      <span className="text-xs font-normal text-muted-foreground italic">
         <FormattedMessage
           id="accountingCategory.selectedBy"
           defaultMessage="Selected by {nbRoles, select, 1 {{role1}} 2 {{role1} and {role2}} other {{role1}, {role2} and {role3}}}."
@@ -185,11 +192,21 @@ const getOptions = (
   }
 
   const expectedAppliesTo =
-    host.id === account?.id || host.id === account?.parent?.id
+    isSameAccount(host, account) || isSameAccount(host, account?.parent)
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
-  remove(categories, category => category.appliesTo !== expectedAppliesTo);
+  // Allow categories that either match the expected appliesTo or have no appliesTo (meaning they apply to both)
+  remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
+
+  if (allowNone) {
+    options.push({
+      key: null,
+      value: null,
+      label: getCategoryLabel(intl, null, false, valuesByRole),
+      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
+    });
+  }
 
   categories.forEach(category => {
     options.push({
@@ -200,21 +217,11 @@ const getOptions = (
     });
   });
 
-  if (allowNone) {
-    const label = getCategoryLabel(intl, null, false, valuesByRole);
-    options.push({
-      key: null,
-      value: null,
-      label,
-      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
-    });
-  }
-
   return options;
 };
 
 const getCleanInputData = (
-  expenseValues: Partial<Expense>,
+  expenseValues: AccountingCategorySelectProps['expenseValues'],
 ): {
   description: string;
   items: string;
@@ -242,7 +249,7 @@ const useExpenseCategoryPredictionService = (
   enabled: boolean,
   host: RequiredHostFields,
   account: Pick<Account, 'slug'>,
-  expenseValues?: Partial<Expense>,
+  expenseValues?: AccountingCategorySelectProps['expenseValues'],
 ) => {
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
   const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), []);
@@ -290,7 +297,7 @@ const useExpenseCategoryPredictionService = (
   return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
 };
 
-const hostSupportsPredictions = (host: RequiredHostFields) => ['foundation', 'opensource'].includes(host?.slug);
+const hostSupportsPredictions = (host: RequiredHostFields) => ['opensource'].includes(host?.slug);
 
 const shouldUsePredictions = (
   host: RequiredHostFields,
@@ -304,7 +311,7 @@ const shouldUsePredictions = (
   } else if (predictionStyle === 'full') {
     return true;
   } else if (predictionStyle === 'inline-preload') {
-    return !selectedCategory || isOpen; // Only preload suggestions if no category is selected
+    return isUndefined(selectedCategory) || isOpen; // Only preload suggestions if no category is selected
   } else if (predictionStyle === 'inline') {
     return isOpen;
   }
@@ -325,8 +332,9 @@ const AccountingCategorySelect = ({
   allowNone = false,
   showCode = false,
   expenseValues = undefined,
-  borderRadiusClass = 'rounded-lg',
+  buttonClassName = '',
   children = null,
+  selectFirstOptionIfSingle,
   disabled,
 }: AccountingCategorySelectProps) => {
   const intl = useIntl();
@@ -338,14 +346,28 @@ const AccountingCategorySelect = ({
   const hasPredictions = Boolean(predictions?.length);
 
   const triggerChange = newCategory => {
-    if (selectedCategory?.id !== newCategory?.id) {
+    // Allow setting `null` that represents "I don't know"
+    if (selectedCategory?.id !== newCategory?.id || (isNull(newCategory) && !isNull(selectedCategory))) {
       onChange(newCategory);
     }
   };
+
   const options = React.useMemo(
     () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin, account),
     [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin, account],
   );
+
+  React.useEffect(() => {
+    if (
+      selectFirstOptionIfSingle &&
+      selectedCategory === undefined &&
+      options.length === 1 &&
+      options[0].value !== undefined
+    ) {
+      onChange(options[0].value);
+    }
+  }, [options, selectFirstOptionIfSingle, selectedCategory, onChange]);
+
   const suggestedOptions = React.useMemo(() => {
     return !predictions.length
       ? []
@@ -359,33 +381,33 @@ const AccountingCategorySelect = ({
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger asChild onBlur={onBlur} disabled={disabled}>
           {children || (
-            <button
+            <Button
               id={id}
+              variant="outline"
               className={cn(
-                'flex w-full max-w-[300px] items-center justify-between border px-3 py-2',
-                borderRadiusClass,
+                'w-full max-w-[300px] font-normal',
                 {
-                  'border-red-500': error,
-                  'border-gray-300': !error,
-                  'bg-[hsl(0,0%,95%)] text-[hsl(0,0%,60%)]': disabled,
+                  'ring-2 ring-destructive ring-offset-2': error,
                 },
+                buttonClassName,
               )}
               disabled={disabled}
             >
               <span
-                className={cn('mr-3 max-w-[280px] truncate text-sm', {
-                  'text-gray-400': isUndefined(selectedCategory),
+                className={cn('mr-3 grow truncate text-start text-sm', {
+                  'text-muted-foreground': isUndefined(selectedCategory),
                 })}
               >
-                {getCategoryLabel(intl, selectedCategory, false, valuesByRole) ||
-                  intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
+                {!isUndefined(selectedCategory)
+                  ? getCategoryLabel(intl, selectedCategory, false, valuesByRole)
+                  : intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
               </span>
-              <ChevronDown size="1em" className={cn({ 'text-[hsl(0,0%,80%)]': disabled })} />
-            </button>
+              <ChevronDown size="1em" />
+            </Button>
           )}
         </PopoverTrigger>
         <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
-          <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
+          <Command>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
 
             <CommandList>
@@ -394,10 +416,11 @@ const AccountingCategorySelect = ({
               </CommandEmpty>
               {useSeparatePredictionsCommandGroup && (
                 <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Suggested categories', id: 'ydZSPT' })}>
-                  {suggestedOptions.map(({ key, label, value }) => (
+                  {suggestedOptions.map(({ key, label, value, searchText }) => (
                     <CommandItem
-                      key={key || 'none'}
-                      value={key || 'none'}
+                      key={key}
+                      value={key}
+                      keywords={[searchText]}
                       onSelect={() => {
                         triggerChange(value);
                         setOpen(false);
@@ -406,7 +429,7 @@ const AccountingCategorySelect = ({
                       <div className="flex flex-1 items-center justify-between">
                         <span>{label}</span>
                         <span
-                          className="text-right text-xs text-gray-500"
+                          className="text-right text-xs text-muted-foreground"
                           title={intl.formatMessage({ defaultMessage: 'Suggested', id: 'a0lFbM' })}
                         >
                           <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
@@ -423,13 +446,16 @@ const AccountingCategorySelect = ({
                     : intl.formatMessage({ defaultMessage: 'All Categories', id: '1X6HtI' })
                 }
               >
-                {options.map(({ label, key, value }) => {
-                  const isSelected = selectedCategory?.id === key;
+                {options.map(({ label, key, value, searchText }) => {
+                  const isSelected =
+                    (isNull(selectedCategory) && isNull(value)) ||
+                    (selectedCategory && value && selectedCategory?.id === value?.id);
                   const isPrediction = suggestedOptions.some(option => option.key === key);
                   return (
                     <CommandItem
-                      key={key || 'none'} // `CommandItem` doesn't like nil key/value
+                      key={key || 'none'}
                       value={key || 'none'}
+                      keywords={[searchText]}
                       onSelect={() => {
                         triggerChange(value);
                         setOpen(false);
@@ -483,7 +509,7 @@ const AccountingCategorySelect = ({
                         role="button"
                         onKeyDown={e => e.key === 'Enter' && triggerChange(option.value)}
                         onClick={() => triggerChange(option.value)}
-                        className="cursor-pointer text-[--primary-color-600] underline hover:opacity-80"
+                        className="cursor-pointer text-(--primary-color-600) underline hover:opacity-80"
                         aria-label={intl.formatMessage(
                           { defaultMessage: 'Select {name}', id: 'G65XME' },
                           { name: option.value.name },
@@ -505,3 +531,4 @@ const AccountingCategorySelect = ({
 };
 
 export default AccountingCategorySelect;
+export const MemoizedAccountingCategorySelect = React.memo(AccountingCategorySelect);

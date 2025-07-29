@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 import { randomEmail, randomSlug } from '../support/faker';
@@ -11,7 +12,7 @@ describe('edit collective', () => {
     });
     // Give it a few ms to actually receive the email before we clean the inbox
     cy.wait(200);
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
   });
 
   beforeEach(() => {
@@ -37,15 +38,20 @@ describe('edit collective', () => {
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
-    cy.getEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
+    cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').should('eq', 1);
 
     // Re-send the invitation email
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
 
     // Check invitation email
-    cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
-    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
+    cy.openEmail(({ Subject }) => Subject.includes('Invitation to join CollectiveToEdit')).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const emailBody = $html('body').text();
+      expect(emailBody).to.include(
+        'Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective',
+      );
+    });
 
     // Accept invitation as new user
     cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });
@@ -62,8 +68,8 @@ describe('edit collective', () => {
   });
 
   it('edit info', () => {
-    cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
-    cy.get('.description.inputField input').type(' edited');
+    cy.get('input[name="name"]', { timeout: 10000 }).type(' edited');
+    cy.get('input[name="description"]').type(' edited');
     cy.contains('Add social link').click();
     cy.focused().type('https://opencollective.com/');
     cy.contains('Add social link').click();
@@ -71,8 +77,8 @@ describe('edit collective', () => {
     cy.contains('Add social link').click();
     cy.focused().type('https://github.com/opencollective');
     cy.wait(500);
-    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
-    cy.get('.backToProfile a').click(); // back to profile
+    cy.get('[data-cy="save"]').click(); // save changes
+    cy.getByDataCy('public-profile-link').click();
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
     cy.get('[data-cy="social-link-0"]').should('have.attr', 'href', 'https://opencollective.com/');
@@ -148,7 +154,6 @@ describe('edit collective', () => {
 
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
     cy.contains('button', 'Save').click();
-    cy.contains('Saved');
     cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
@@ -172,9 +177,7 @@ describe('edit user collective', () => {
     cy.getByDataCy('qr-code').should('exist');
     cy.getByDataCy('manual-entry-2fa-token')
       .invoke('text')
-      .then(text => {
-        expect(text.trim()).to.have.lengthOf(117);
-        const secret = text.split(':')[1].trim();
+      .then(secret => {
         // typing the wrong code fails
         cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();

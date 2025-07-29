@@ -42,7 +42,7 @@ export const TaxFormTypeSelectFields = ({
   return (
     <div>
       <div>
-        <label htmlFor="isUSPersonOrEntity" className="mb-2 text-sm font-bold leading-none">
+        <label htmlFor="isUSPersonOrEntity" className="mb-2 text-sm leading-none font-bold">
           Are you a US Person or Entity?
         </label>
         <HintText>US citizen, resident, green card holder, or US-incorporated entity.</HintText>
@@ -57,7 +57,7 @@ export const TaxFormTypeSelectFields = ({
       </div>
       {values.isUSPersonOrEntity !== null && (
         <div className="mt-4">
-          <label htmlFor="submitterType" className="text-sm font-bold leading-none">
+          <label htmlFor="submitterType" className="text-sm leading-none font-bold">
             Are you submitting this form as…
           </label>
           <ButtonSet

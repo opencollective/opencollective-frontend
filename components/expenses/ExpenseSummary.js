@@ -1,17 +1,17 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
-import { MessageSquare } from 'lucide-react';
+import { Download, MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { i18nGraphqlException } from '../../lib/errors';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { AmountPropTypeShape } from '../../lib/prop-types';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { cn } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
@@ -21,7 +21,7 @@ import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
-import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import LinkCollective from '../LinkCollective';
@@ -29,16 +29,21 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import Tags from '../Tags';
-import { H1, H4, P, Span } from '../Text';
-import { Separator } from '../ui/Separator';
+import { H1, P, Span } from '../Text';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 import UploadedFilePreview from '../UploadedFilePreview';
 
+import EditExpenseDialog from './EditExpenseDialog';
 import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
+import ExpenseTypeTag from './ExpenseTypeTag';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
 
 export const SummaryHeader = styled(H1)`
@@ -46,7 +51,7 @@ export const SummaryHeader = styled(H1)`
     color: inherit;
     text-decoration: underline;
 
-    :hover {
+    &:hover {
       color: ${themeGet('colors.black.600')};
     }
   }
@@ -60,10 +65,6 @@ const CreatedByUserLink = ({ account }) => {
       </span>
     </LinkCollective>
   );
-};
-
-CreatedByUserLink.propTypes = {
-  account: PropTypes.object,
 };
 
 const Spacer = () => <Span mx="6px">{'•'}</Span>;
@@ -98,13 +99,17 @@ const ExpenseSummary = ({
   onEdit,
   drawerActionsContainer,
   openFileViewer,
+  enableKeyboardShortcuts,
+  openedItemId,
   ...props
 }) => {
   const intl = useIntl();
+  const { toast } = useToast();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
+  const isPaid = expense?.status === ExpenseStatus.PAID;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount =
     (isDraft ? expense?.requestedByAccount || expense?.createdByAccount : expense?.createdByAccount) || {};
@@ -117,6 +122,19 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+  const { canEditTitle, canEditType, canEditItems } = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
+  )
+    ? expense?.permissions || {}
+    : {};
+  const invoiceFile = React.useMemo(
+    () => expense?.invoiceFile || expense?.draft?.invoiceFile,
+    [expense?.invoiceFile, expense?.draft?.invoiceFile],
+  );
+  const attachedFiles = React.useMemo(
+    () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
+    [expense?.attachedFiles, expense?.draft?.attachedFiles],
+  );
 
   const processButtons = (
     <Flex
@@ -128,10 +146,12 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={onEdit}
+        onEdit={LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? undefined : onEdit}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+        enableKeyboardShortcuts={enableKeyboardShortcuts}
         disabled={isLoading}
+        hasAttachedInvoiceFile={Boolean(invoiceFile)}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -151,12 +171,14 @@ const ExpenseSummary = ({
               onDelete?.(expense);
               onClose?.();
             }}
+            enableKeyboardShortcuts={enableKeyboardShortcuts}
             displayMarkAsIncomplete
           />
         </Flex>
       )}
     </Flex>
   );
+
   return (
     <StyledCard
       p={borderless ? 0 : [16, 24, 32]}
@@ -171,15 +193,22 @@ const ExpenseSummary = ({
         data-cy="expense-title"
         mb={3}
       >
-        <Flex mr={[0, 2]}>
-          <H4 fontWeight="500" data-cy="expense-description">
+        <div className="mr-0 flex items-center gap-4 sm:mr-2">
+          <h4 className="text-xl font-medium" data-cy="expense-description">
             {!expense?.description && isLoading ? (
               <LoadingPlaceholder height={32} minWidth={250} />
             ) : (
               expense.description
             )}
-          </H4>
-        </Flex>
+          </h4>
+          {canEditTitle && (
+            <EditExpenseDialog
+              expense={expense}
+              field="title"
+              title={intl.formatMessage({ defaultMessage: 'Edit expense title', id: 'expense.editTitle' })}
+            />
+          )}
+        </div>
         <Flex mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
           {expense?.status && (
             <Box>
@@ -196,7 +225,22 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <div className="flex gap-2 align-middle">
+      {expense?.type && (
+        <div className="mb-3 flex items-center gap-1">
+          <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />
+
+          {canEditType && (
+            <EditExpenseDialog
+              field="type"
+              title={intl.formatMessage({ defaultMessage: 'Edit expense type', id: 'expense.editType' })}
+              expense={expense}
+              dialogContentClassName="sm:max-w-2xl"
+            />
+          )}
+        </div>
+      )}
+
+      <div className="flex items-baseline gap-2">
         {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
           <React.Fragment>
             <ExpenseAccountingCategoryPill
@@ -207,10 +251,9 @@ const ExpenseSummary = ({
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
-            <Separator orientation="vertical" className="h-[24px] w-[2px]" />
           </React.Fragment>
         )}
-        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} />
+        <Tags expense={expense} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (
@@ -299,15 +342,7 @@ const ExpenseSummary = ({
         ) : (
           <P fontSize="14px" color="black.700" data-cy="expense-author">
             <FormattedDate value={expense.createdAt} dateStyle="medium" />
-            {expense?.comments && (
-              <React.Fragment>
-                <Spacer />
-                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
-                &nbsp;
-                {expense.comments.totalCount}
-              </React.Fragment>
-            )}
-            {expense?.merchantId && (
+            {expense.merchantId && (
               <React.Fragment>
                 <Spacer />
                 <FormattedMessage
@@ -315,6 +350,28 @@ const ExpenseSummary = ({
                   defaultMessage="Merchant ID: {id}"
                   values={{ id: expense.merchantId }}
                 />
+              </React.Fragment>
+            )}
+            {expense.reference && (
+              <React.Fragment>
+                <Spacer />
+                <FormattedMessage
+                  id="ReferenceValue"
+                  defaultMessage="Ref: {reference}"
+                  values={{
+                    reference: (
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    ),
+                  }}
+                />
+              </React.Fragment>
+            )}
+            {expense.comments && (
+              <React.Fragment>
+                <Spacer />
+                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
+                &nbsp;
+                {expense.comments.totalCount}
               </React.Fragment>
             )}
           </P>
@@ -332,160 +389,234 @@ const ExpenseSummary = ({
         </Fragment>
       )}
 
-      <Flex mt={4} mb={2} alignItems="center">
-        {!expense && isLoading ? (
-          <LoadingPlaceholder height={20} maxWidth={150} />
-        ) : (
-          <Span fontWeight="bold" fontSize="16px">
-            {isReceipt || isCreditCardCharge ? (
-              <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
-            ) : isGrant ? (
-              <FormattedMessage id="Expense.RequestDetails" defaultMessage="Request Details" />
-            ) : (
-              <FormattedMessage id="Expense.InvoiceItems" defaultMessage="Invoice items" />
-            )}
-          </Span>
-        )}
-        <StyledHr flex="1 1" borderColor="black.300" ml={2} />
-      </Flex>
-      {!expense && isLoading ? (
-        <LoadingPlaceholder height={68} mb={3} />
-      ) : (
-        <div data-cy="expense-summary-items">
-          {expenseItems.map((attachment, attachmentIdx) => (
-            <React.Fragment key={attachment.id || attachmentIdx}>
-              <Flex my={24} flexWrap="wrap" data-cy="expense-summary-item">
-                {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
-                  <Box mr={3} mb={3} width={['100%', 'auto']}>
-                    <UploadedFilePreview
-                      url={attachment.url}
-                      isLoading={isLoading || isLoadingLoggedInUser}
-                      isPrivate={!attachment.url && !isLoading}
-                      size={[640, 48]}
-                      maxHeight={48}
-                      openFileViewer={openFileViewer}
-                    />
-                  </Box>
-                )}
-                <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
-                  <Flex flexDirection="column" justifyContent="center" flexGrow="1">
-                    {attachment.description ? (
-                      <HTMLContent
-                        content={attachment.description}
-                        fontSize="14px"
-                        color="black.900"
-                        collapsable
-                        fontWeight="500"
-                        maxCollapsedHeight={100}
-                        collapsePadding={22}
-                      />
-                    ) : (
-                      <Span color="black.600" fontStyle="italic">
-                        <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
-                      </Span>
-                    )}
-                    {!isGrant && (
-                      <Span mt={1} fontSize="12px" color="black.700">
-                        <FormattedMessage
-                          id="withColon"
-                          defaultMessage="{item}:"
-                          values={{
-                            item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-                          }}
-                        />{' '}
-                        {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}
-                        <FormattedDate value={attachment.incurredAt} dateStyle="long" timeZone="UTC" />{' '}
-                      </Span>
-                    )}
-                  </Flex>
-                  <Container
-                    fontSize={15}
-                    color="black.600"
-                    mt={2}
-                    textAlign="right"
-                    ml={3}
-                    data-cy="expense-summary-item-amount"
-                  >
-                    {attachment.amountV2?.exchangeRate ? (
-                      <div>
-                        <FormattedMoneyAmount
-                          amount={Math.round(attachment.amountV2.valueInCents * attachment.amountV2.exchangeRate.value)}
-                          currency={expense.currency}
-                          amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
-                          precision={2}
-                        />
-                        <div className="mt-[2px] text-xs">
-                          <AmountWithExchangeRateInfo
-                            amount={attachment.amountV2}
-                            invertIconPosition
-                            amountStyles={{ letterSpacing: 0 }}
-                            {...getExpenseExchangeRateWarningOrError(
-                              intl,
-                              attachment.amountV2.exchangeRate,
-                              attachment.referenceExchangeRate,
-                            )}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <FormattedMoneyAmount
-                        amount={attachment.amountV2?.valueInCents || attachment.amount}
-                        currency={attachment.amountV2?.currency || expense.currency}
-                        amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
-                        precision={2}
-                      />
-                    )}
-                  </Container>
-                </Flex>
-              </Flex>
-              <StyledHr borderStyle="dotted" />
-            </React.Fragment>
-          ))}
-        </div>
-      )}
-      <Flex flexDirection="column" alignItems="flex-end" mt={4} mb={2}>
-        <Flex alignItems="center">
-          {!expense && isLoading ? (
-            <LoadingPlaceholder height={18} width={150} />
-          ) : (
-            <ExpenseAmountBreakdown
-              currency={expense.currency}
-              items={expenseItems}
-              taxes={expenseTaxes}
-              expenseTotalAmount={isEditing ? null : expense.amount}
+      <div className="my-8 rounded-lg border p-6">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-lg font-semibold">
+            <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
+          </h3>
+          {canEditItems && (
+            <EditExpenseDialog
+              expense={expense}
+              dialogContentClassName="sm:max-w-2xl"
+              field="expenseDetails"
+              title={intl.formatMessage({ defaultMessage: 'Edit expense details', id: 'expense.editDetails' })}
             />
           )}
+        </div>
+        <Flex mt={4} mb={2} alignItems="center" gridGap={2}>
+          {!expense && isLoading ? (
+            <LoadingPlaceholder height={20} maxWidth={150} />
+          ) : (
+            <Span fontWeight="bold" fontSize="16px">
+              {isReceipt || isCreditCardCharge ? (
+                <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
+              ) : isGrant ? (
+                <FormattedMessage id="Expense.RequestDetails" defaultMessage="Request Details" />
+              ) : (
+                <FormattedMessage id="Expense.InvoiceItems" defaultMessage="Invoice items" />
+              )}
+            </Span>
+          )}
+          <StyledHr flex="1 1" borderColor="black.300" />
         </Flex>
-        {isMultiCurrency && (
-          <Flex alignItems="center" mt={2}>
-            <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap" color="black.600">
-              <FormattedMessage
-                defaultMessage="Accounted as ({currency}):"
-                id="4Wdhe4"
-                values={{ currency: expense.amountInAccountCurrency.currency }}
-              />
-            </Container>
-            <Container color="black.600">
-              <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
-            </Container>
-          </Flex>
+        {!expense && isLoading ? (
+          <LoadingPlaceholder height={68} mb={3} />
+        ) : (
+          <div data-cy="expense-summary-items">
+            {expenseItems.map((attachment, attachmentIdx) => (
+              <React.Fragment key={attachment.id || attachmentIdx}>
+                <div
+                  data-cy="expense-summary-item"
+                  className={cn(
+                    'my-2 flex flex-wrap border-l-2 border-l-transparent py-4',
+                    openedItemId === attachment.id &&
+                      '-mr-2 -ml-6 rounded-r-lg border-l-blue-500 bg-blue-100 pr-2 pl-6',
+                  )}
+                >
+                  {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
+                    <Box mr={3} mb={3} width={['100%', 'auto']}>
+                      <UploadedFilePreview
+                        url={attachment.url}
+                        isLoading={isLoading || isLoadingLoggedInUser}
+                        isPrivate={!attachment.url && !isLoading}
+                        size={[64, 48]}
+                        maxHeight={48}
+                        openFileViewer={openFileViewer}
+                      />
+                    </Box>
+                  )}
+                  <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
+                    <Flex flexDirection="column" justifyContent="center" flexGrow="1">
+                      {attachment.description ? (
+                        <HTMLContent
+                          content={attachment.description}
+                          fontSize="14px"
+                          color="black.900"
+                          collapsable
+                          fontWeight="500"
+                          maxCollapsedHeight={100}
+                          collapsePadding={22}
+                        />
+                      ) : (
+                        <Span color="black.600" fontStyle="italic">
+                          <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                        </Span>
+                      )}
+                      {!isGrant && (
+                        <Span mt={1} fontSize="12px" color="black.700">
+                          <FormattedMessage
+                            id="withColon"
+                            defaultMessage="{item}:"
+                            values={{
+                              item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+                            }}
+                          />{' '}
+                          {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}
+                          <FormattedDate value={attachment.incurredAt} dateStyle="long" timeZone="UTC" />{' '}
+                        </Span>
+                      )}
+                    </Flex>
+                    <Container
+                      fontSize={15}
+                      color="black.600"
+                      mt={2}
+                      textAlign="right"
+                      ml={3}
+                      data-cy="expense-summary-item-amount"
+                    >
+                      {attachment.amountV2?.exchangeRate ? (
+                        <div>
+                          <FormattedMoneyAmount
+                            amount={Math.round(
+                              attachment.amountV2.valueInCents * attachment.amountV2.exchangeRate.value,
+                            )}
+                            currency={expense.currency}
+                            amountClassName="font-medium text-foreground"
+                            precision={2}
+                          />
+                          <div className="mt-[2px] text-xs">
+                            <AmountWithExchangeRateInfo
+                              amount={attachment.amountV2}
+                              invertIconPosition
+                              {...getExpenseExchangeRateWarningOrError(
+                                intl,
+                                attachment.amountV2.exchangeRate,
+                                attachment.referenceExchangeRate,
+                              )}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <FormattedMoneyAmount
+                          amount={attachment.amountV2?.valueInCents || attachment.amount}
+                          currency={attachment.amountV2?.currency || expense.currency}
+                          amountClassName="font-medium text-foreground"
+                          precision={2}
+                        />
+                      )}
+                    </Container>
+                  </Flex>
+                </div>
+                <StyledHr borderStyle="dotted" />
+              </React.Fragment>
+            ))}
+          </div>
         )}
-      </Flex>
-      {expenseTypeSupportsAttachments(expense?.type) && expense?.attachedFiles?.length > 0 && (
-        <React.Fragment>
-          <Flex my={4} alignItems="center">
+        <Flex flexDirection="column" alignItems="flex-end" mt={4} mb={2}>
+          <Flex alignItems="center">
             {!expense && isLoading ? (
-              <LoadingPlaceholder height={20} maxWidth={150} />
+              <LoadingPlaceholder height={18} width={150} />
             ) : (
-              <Span fontWeight="bold" fontSize="16px">
-                <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
-              </Span>
+              <ExpenseAmountBreakdown
+                currency={expense.currency}
+                items={expenseItems}
+                taxes={expenseTaxes}
+                expenseTotalAmount={isEditing ? null : expense.amount}
+              />
             )}
-            <StyledHr flex="1 1" borderColor="black.300" ml={2} />
           </Flex>
-          <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />
-        </React.Fragment>
-      )}
+          {isMultiCurrency && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+              <Container fontWeight="500" mr={3} whiteSpace="nowrap">
+                <FormattedMessage
+                  defaultMessage="Accounted as ({currency}):"
+                  id="4Wdhe4"
+                  values={{
+                    currency:
+                      isPaid && expense.amountInHostCurrency
+                        ? expense.amountInHostCurrency.currency
+                        : expense.amountInAccountCurrency.currency,
+                  }}
+                />
+              </Container>
+              <Container>
+                <AmountWithExchangeRateInfo
+                  amount={
+                    isPaid && expense.amountInHostCurrency
+                      ? expense.amountInHostCurrency
+                      : expense.amountInAccountCurrency
+                  }
+                />
+              </Container>
+            </div>
+          )}
+        </Flex>
+        {expense?.type === expenseTypes.INVOICE && expense.permissions?.canSeeInvoiceInfo && (
+          <React.Fragment>
+            <Flex my={4} alignItems="center" gridGap={2}>
+              {!expense && isLoading ? (
+                <LoadingPlaceholder height={20} maxWidth={150} />
+              ) : (
+                <Span fontWeight="bold" fontSize="16px">
+                  <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+                </Span>
+              )}
+              <StyledHr flex="1 1" borderColor="black.300" />
+            </Flex>
+            {invoiceFile ? (
+              <ExpenseAttachedFiles files={[invoiceFile]} openFileViewer={openFileViewer} />
+            ) : (
+              <ExpenseInvoiceDownloadHelper
+                expense={expense}
+                collective={expense.account}
+                onError={e =>
+                  toast({
+                    variant: 'error',
+                    message: i18nGraphqlException(intl, e),
+                  })
+                }
+              >
+                {({ isLoading, downloadInvoice }) => (
+                  <Button
+                    variant="outline"
+                    loading={isLoading}
+                    onClick={downloadInvoice}
+                    data-cy="download-expense-invoice-btn"
+                  >
+                    <Download size="16px" />
+                    <FormattedMessage defaultMessage="Download generated invoice" id="OBGGNj" />
+                  </Button>
+                )}
+              </ExpenseInvoiceDownloadHelper>
+            )}
+          </React.Fragment>
+        )}
+        {expenseTypeSupportsAttachments(expense?.type) && attachedFiles.length > 0 && (
+          <React.Fragment>
+            <Flex my={4} alignItems="center" gridGap={2}>
+              {!expense && isLoading ? (
+                <LoadingPlaceholder height={20} maxWidth={150} />
+              ) : (
+                <Span fontWeight="bold" fontSize="16px">
+                  <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+                </Span>
+              )}
+              <StyledHr flex="1 1" borderColor="black.300" />
+            </Flex>
+            <ExpenseAttachedFiles files={attachedFiles} openFileViewer={openFileViewer} />
+          </React.Fragment>
+        )}
+      </div>
 
       <Flex mt={4} mb={3} alignItems="center">
         <Span fontWeight="bold" fontSize="16px">
@@ -504,165 +635,14 @@ const ExpenseSummary = ({
       {!isEditing &&
         (drawerActionsContainer ? (
           createPortal(processButtons, drawerActionsContainer)
-        ) : (
+        ) : showProcessButtons ? (
           <Fragment>
             <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
             {processButtons}
           </Fragment>
-        ))}
+        ) : null)}
     </StyledCard>
   );
-};
-
-ExpenseSummary.propTypes = {
-  /** Set this to true if the expense is not loaded yet */
-  isLoading: PropTypes.bool,
-  /** Set this to true if the logged in user is currenltly loading */
-  isLoadingLoggedInUser: PropTypes.bool,
-  host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    website: PropTypes.string,
-    location: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-  }),
-  /** Must be provided if isLoading is false */
-  expense: PropTypes.shape({
-    id: PropTypes.string,
-    legacyId: PropTypes.number,
-    accountingCategory: PropTypes.object,
-    description: PropTypes.string.isRequired,
-    longDescription: PropTypes.string,
-    amount: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-    invoiceInfo: PropTypes.string,
-    merchantId: PropTypes.string,
-    createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
-    onHold: PropTypes.bool,
-    type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string),
-    requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
-    amountInAccountCurrency: AmountPropTypeShape,
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      host: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      }),
-      parent: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      }),
-    }).isRequired,
-    items: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        incurredAt: PropTypes.string,
-        description: PropTypes.string,
-        amount: PropTypes.number.isRequired,
-        url: PropTypes.string,
-      }).isRequired,
-    ),
-    attachedFiles: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        url: PropTypes.string.isRequired,
-      }).isRequired,
-    ),
-    taxes: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.string,
-        rate: PropTypes.number,
-      }).isRequired,
-    ),
-    payee: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      isAdmin: PropTypes.bool,
-    }).isRequired,
-    approvedBy: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        isAdmin: PropTypes.bool,
-      }),
-    ),
-    payeeLocation: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-    createdByAccount: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }),
-    requestedByAccount: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-    }),
-    payoutMethod: PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-      data: PropTypes.object,
-    }),
-    draft: PropTypes.shape({
-      items: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          incurredAt: PropTypes.string,
-          description: PropTypes.string,
-          amount: PropTypes.number,
-          amountV2: PropTypes.object,
-          url: PropTypes.string,
-        }),
-      ),
-      taxes: PropTypes.arrayOf(
-        PropTypes.shape({
-          type: PropTypes.string,
-          rate: PropTypes.number,
-        }).isRequired,
-      ),
-    }),
-    permissions: PropTypes.shape({
-      canSeeInvoiceInfo: PropTypes.bool,
-      canDelete: PropTypes.bool,
-      canEditAccountingCategory: PropTypes.bool,
-    }),
-    comments: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
-  /** Whether current user can edit the tags */
-  canEditTags: PropTypes.bool,
-  /** Whether or not this is being displayed for an edited Expense */
-  isEditing: PropTypes.bool,
-  /** Whether to show the process buttons (Approve, Pay, etc) */
-  showProcessButtons: PropTypes.bool,
-  /** The account where the expense has been submitted, required to display the process actions */
-  collective: PropTypes.object,
-  /** Disable border and paiding in styled card, usefull for modals */
-  borderless: PropTypes.bool,
-  /** Passed down from ExpenseModal */
-  onClose: PropTypes.func,
-  /** Passed down from Expense */
-  onEdit: PropTypes.func,
-  /** Passed down from either ExpenseModal or Expense */
-  onDelete: PropTypes.func,
-  /** Passwed down from Expense */
-  openFileViewer: PropTypes.func,
-  /** Reference to the actions container element in the Expense Drawer */
-  drawerActionsContainer: PropTypes.object,
 };
 
 export default ExpenseSummary;

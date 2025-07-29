@@ -4,6 +4,7 @@ import type {
   ColumnDef,
   OnChangeFn,
   Row,
+  RowSelectionState,
   SortingState,
   TableMeta,
   VisibilityState,
@@ -31,7 +32,11 @@ interface DataTableProps<TData, TValue> {
   hideHeader?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
-  onClickRow?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
+  onClickRow?: (
+    row: Row<TData>,
+    actionsMenuTriggerRef?: React.RefObject<HTMLElement>,
+    event?: React.MouseEvent,
+  ) => void;
   openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
   onHoverRow?: (row: Row<TData>) => void;
   rowHasIndicator?: (row: Row<TData>) => boolean;
@@ -51,6 +56,9 @@ interface DataTableProps<TData, TValue> {
   defaultColumnVisibility?: VisibilityState;
   queryFilter?: useQueryFilterReturnType<any, any>;
   getActions?: GetActions<TData>;
+  rowSelection?: Record<string, boolean>;
+  setRowSelection?: OnChangeFn<RowSelectionState>;
+  enableMultiRowSelection?: boolean;
 }
 
 const defaultGetRowId = (data: any) => data.id;
@@ -78,6 +86,9 @@ export function DataTable<TData, TValue>({
   setColumnVisibility,
   queryFilter,
   getActions,
+  rowSelection: rowSelectionFromProps,
+  setRowSelection: setRowSelectionFromProps,
+  enableMultiRowSelection,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
   ...tableProps
 }: DataTableProps<TData, TValue>) {
@@ -91,17 +102,18 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable<TData>({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: setRowSelectionFromProps ?? setRowSelection,
+    enableMultiRowSelection,
     getRowId,
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
-      rowSelection,
+      rowSelection: rowSelectionFromProps ?? rowSelection,
       columnVisibility,
     },
     meta: {
@@ -221,7 +233,7 @@ function DataTableRow({
       data-state={row.getIsSelected() && 'selected'}
       className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
       {...(onClickRow && {
-        onClick: () => onClickRow(row, actionsMenuTriggerRef),
+        onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
       })}
       {...(onHoverRow && {
         onMouseEnter: () => onHoverRow(row),

@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '../../lib/utils';
 
-const badgeVariants = cva('inline-flex gap-0.5 align-middle items-center font-medium', {
+const badgeVariants = cva('inline-flex items-center gap-0.5 align-middle font-medium', {
   variants: {
     type: {
       info: 'bg-blue-100 text-blue-700',

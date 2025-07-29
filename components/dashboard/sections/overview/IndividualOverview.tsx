@@ -14,7 +14,7 @@ import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
 import { Timeline } from './Timeline';
-import { TodoList } from './TodoList';
+import { AccountTodoList } from './TodoList';
 
 const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
@@ -22,7 +22,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
   const slug = router.query?.as || accountSlug;
 
   return (
-    <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
+    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
@@ -34,8 +34,13 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
           }
         />
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
-          <TodoList />
-          <Timeline accountSlug={slug} withFilter />
+          <AccountTodoList />
+          <div className="space-y-3">
+            <h3 className="text-lg font-bold">
+              <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+            </h3>
+            <Timeline accountSlug={slug} />
+          </div>
         </div>
       </div>
       <div className="xl:ml-8 xl:w-64">
@@ -78,7 +83,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
               </div>
 
               <button
-                className="absolute right-1 top-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                className="absolute top-1 right-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 onClick={dismiss}
               >
                 <X size={16} />

@@ -38,7 +38,7 @@ function EmailFilter({ value, labelMsg, onChange, isViewActive }: FilterComponen
       <AtSign
         size={16}
         className={clsx(
-          'pointer-events-none absolute bottom-0 left-3 top-0 h-full text-muted-foreground',
+          'pointer-events-none absolute top-0 bottom-0 left-3 h-full text-muted-foreground',
           !isViewActive && value && 'text-primary',
         )}
       />

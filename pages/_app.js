@@ -5,7 +5,7 @@ import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
-import { ThemeProvider } from 'styled-components';
+import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
@@ -18,11 +18,12 @@ import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
+import { WorkspaceProvider } from '../components/WorkspaceProvider';
 
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
-import 'trix/dist/trix.css';
+import '@opencollective/trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
@@ -36,12 +37,20 @@ Router.onRouteChangeComplete = () => NProgress.done();
 
 Router.onRouteChangeError = () => NProgress.done();
 
+import { getDataFromTree } from '@apollo/client/react/ssr';
+import { mergeDeep } from '@apollo/client/utilities';
 import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
+import { getTokenFromCookie } from '../lib/auth';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { loggedInUserQuery } from '../lib/graphql/v1/queries';
+import { WhitelabelProviderContext } from '../lib/hooks/useWhitelabel';
+import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import sentryLib from '../server/sentry';
+import { getWhitelabelProps } from '../lib/whitelabel';
+import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
+import sentryLib, { Sentry } from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import IntlProvider from '../components/intl/IntlProvider';
@@ -49,7 +58,9 @@ import { ModalProvider } from '../components/ModalContext';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
 
-PolyfillInterweaveSSR();
+if (typeof window === 'undefined') {
+  PolyfillInterweaveSSR();
+}
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -65,12 +76,24 @@ class OpenCollectiveFrontendApp extends App {
     this.state = { hasError: false, errorEventId: undefined };
   }
 
-  static async getInitialProps({ Component, ctx, client }) {
-    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...getIntlProps(ctx) };
+  static async getInitialProps({ AppTree, Component, ctx }) {
+    const apolloClient = initClient({
+      accessToken: getTokenFromCookie(ctx.req),
+    });
+
+    if (ctx.req) {
+      ctx.req.apolloClient = apolloClient;
+    }
+
+    const props = {
+      pageProps: { skipDataFromTree: true, whitelabel: getWhitelabelProps(ctx) },
+      scripts: {},
+      ...getIntlProps(ctx),
+    };
 
     try {
       if (Component.getInitialProps) {
-        props.pageProps = await Component.getInitialProps({ ...ctx, client });
+        props.pageProps = { ...(await Component.getInitialProps({ ...ctx })), whitelabel: props.pageProps.whitelabel };
       }
 
       if (props.pageProps.scripts) {
@@ -91,6 +114,23 @@ class OpenCollectiveFrontendApp extends App {
       return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
     }
 
+    if (typeof window === 'undefined' && ctx.req.cookies.enableAuthSsr) {
+      if (getTokenFromCookie(ctx.req)) {
+        try {
+          const result = await apolloClient.query({ query: loggedInUserQuery, fetchPolicy: 'network-only' });
+          props.LoggedInUserData = result.data.LoggedInUser;
+        } catch (err) {
+          Sentry.captureException(err);
+        }
+      }
+
+      try {
+        await getDataFromTree(<AppTree {...props} apolloClient={apolloClient} />);
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    }
+
     return props;
   }
 
@@ -104,9 +144,8 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   componentDidCatch(error, errorInfo) {
-    const errorEventId = sentryLib.captureException(error, { errorInfo });
+    const errorEventId = sentryLib.captureException(error, { extra: { errorInfo } });
     this.setState({ hasError: true, errorEventId });
-    sentryLib.captureException(error, { extra: { errorInfo } });
   }
 
   componentDidMount() {
@@ -120,38 +159,67 @@ class OpenCollectiveFrontendApp extends App {
         window._paq.push(['trackPageView']);
       }
     });
+
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('ssr apollo cache', window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME]);
+    }
   }
 
-  getApolloClient = memoizeOne(pageProps => {
+  getApolloClient = memoizeOne((ssrCache, pageServerSidePropsCache) => {
     return initClient({
-      initialState: pageProps[APOLLO_STATE_PROP_NAME],
+      initialState: mergeDeep(ssrCache || {}, pageServerSidePropsCache || {}),
       twoFactorAuthContext: this.props.twoFactorAuthContext,
     });
   });
 
   render() {
-    const { Component, pageProps, scripts, locale } = this.props;
+    const { Component, pageProps, scripts, locale, LoggedInUserData } = this.props;
+
+    if (
+      typeof window !== 'undefined' &&
+      process.env.NODE_ENV === 'development' &&
+      pageProps?.[APOLLO_STATE_PROP_NAME]
+    ) {
+      // eslint-disable-next-line no-console
+      console.log('pageProps apollo cache', pageProps?.[APOLLO_STATE_PROP_NAME]);
+    }
+
     return (
       <Fragment>
-        <ApolloProvider client={this.getApolloClient(pageProps)}>
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <IntlProvider locale={locale}>
-                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                  <UserProvider>
-                    <ModalProvider>
-                      <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <Toaster />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                      </NewsAndUpdatesProvider>
-                    </ModalProvider>
-                  </UserProvider>
-                </TooltipProvider>
-              </IntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
+        <ApolloProvider
+          client={
+            this.props.apolloClient ||
+            this.getApolloClient(
+              typeof window !== 'undefined' ? window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] : {},
+              pageProps?.[APOLLO_STATE_PROP_NAME],
+            )
+          }
+        >
+          <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
+            <ThemeProvider theme={theme}>
+              <StripeProviderSSR>
+                <IntlProvider locale={locale}>
+                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                    <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
+                      <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
+                        <WorkspaceProvider>
+                          <ModalProvider>
+                            <NewsAndUpdatesProvider>
+                              <Component {...pageProps} />
+                              <Toaster />
+                              <GlobalNewsAndUpdates />
+                              <TwoFactorAuthenticationModal />
+                            </NewsAndUpdatesProvider>
+                          </ModalProvider>
+                        </WorkspaceProvider>
+                      </WhitelabelProviderContext.Provider>
+                    </UserProvider>
+                  </TooltipProvider>
+                </IntlProvider>
+              </StripeProviderSSR>
+            </ThemeProvider>
+          </StyleSheetManager>
         </ApolloProvider>
         <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (

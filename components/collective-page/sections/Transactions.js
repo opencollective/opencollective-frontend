@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { isHeavyAccount } from '../../../lib/collective';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
@@ -44,6 +44,7 @@ export const transactionsSectionQuery = gql`
     $hasOrder: Boolean
     $hasExpense: Boolean
     $kind: [TransactionKind]
+    $includeGiftCardTransactions: Boolean
   ) {
     transactions(
       account: { slug: $slug }
@@ -52,7 +53,7 @@ export const transactionsSectionQuery = gql`
       hasExpense: $hasExpense
       kind: $kind
       includeIncognitoTransactions: true
-      includeGiftCardTransactions: true
+      includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -62,7 +63,7 @@ export const transactionsSectionQuery = gql`
 `;
 
 export const getTransactionsSectionQueryVariables = slug => {
-  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds() };
+  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds(), includeGiftCardTransactions: !isHeavyAccount(slug) };
 };
 
 const SectionTransactions = props => {
@@ -152,33 +153,6 @@ const SectionTransactions = props => {
       )}
     </Box>
   );
-};
-
-SectionTransactions.propTypes = {
-  /** Collective */
-  collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-    platformFeePercent: PropTypes.number,
-  }).isRequired,
-
-  /** Whether user is admin of `collective` */
-  isAdmin: PropTypes.bool,
-
-  /** Whether user is root user */
-  isRoot: PropTypes.bool,
-
-  /** @ignore from withData */
-  data: PropTypes.shape({
-    loading: PropTypes.bool,
-    refetch: PropTypes.func,
-    transactions: PropTypes.arrayOf(PropTypes.object),
-  }),
-
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
 };
 
 export default React.memo(injectIntl(SectionTransactions));

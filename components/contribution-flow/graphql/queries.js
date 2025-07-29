@@ -7,6 +7,47 @@ export const contributionFlowAccountQuery = gql`
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       ...ContributionFlowAccountFields
+      policies {
+        id
+        CONTRIBUTOR_INFO_THRESHOLDS {
+          legalName
+          address
+        }
+      }
+    }
+    me {
+      contributorProfiles(forAccount: { slug: $collectiveSlug }) {
+        account {
+          id
+          name
+          legalName
+          slug
+          type
+          imageUrl(height: 192)
+          isIncognito
+          ... on Individual {
+            email
+            isGuest
+          }
+          location {
+            address
+            country
+            structured
+          }
+          ... on AccountWithHost {
+            host {
+              id
+              slug
+              name
+              imageUrl(height: 64)
+            }
+          }
+        }
+        totalContributedToHost(inCollectiveCurrency: true) {
+          valueInCents
+          currency
+        }
+      }
     }
     tier(tier: { legacyId: $tierId }, throwIfMissing: false) @include(if: $includeTier) {
       id

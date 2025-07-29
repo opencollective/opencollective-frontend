@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { uniqWith } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -202,6 +201,7 @@ const contributionsSectionQuery = gql`
     $role: [MemberRole]
     $accountType: [AccountType]
     $orderBy: OrderByInput
+    $skipTotalDonations: Boolean!
   ) {
     account(slug: $slug) {
       id
@@ -234,7 +234,7 @@ const contributionsSectionQuery = gql`
             description
           }
           since
-          totalDonations {
+          totalDonations @skip(if: $skipTotalDonations) {
             currency
             valueInCents
           }
@@ -262,10 +262,6 @@ const contributionsSectionQuery = gql`
                 backgroundImageUrl(height: 200)
               }
             }
-            stats {
-              id
-              contributorsCount
-            }
           }
         }
       }
@@ -279,7 +275,13 @@ const SectionContributions = ({ collective }) => {
   const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
   const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.args },
+    variables: {
+      slug: collective.slug,
+      limit: PAGE_SIZE,
+      offset: 0,
+      skipTotalDonations: [FILTERS.HOSTED_COLLECTIVES, FILTERS.HOSTED_EVENTS, FILTERS.HOSTED_FUNDS].includes(filter),
+      ...selectedFilter.args,
+    },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
   });
@@ -426,38 +428,6 @@ const SectionContributions = ({ collective }) => {
       )}
     </Box>
   );
-};
-
-SectionContributions.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
-};
-
-const ContributionsGrid = ({ entries, children }) => {
-  return (
-    <Container
-      data-cy="Contributions"
-      maxWidth={Dimensions.MAX_SECTION_WIDTH}
-      px={Dimensions.PADDING_X}
-      mt={4}
-      mx="auto"
-    >
-      <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
-        {entries.map(entry => (
-          <MembershipCardContainer key={entry.id} data-cy="collective-contribution">
-            {children(entry)}
-          </MembershipCardContainer>
-        ))}
-      </Grid>
-    </Container>
-  );
-};
-
-ContributionsGrid.propTypes = {
-  entries: PropTypes.array.isRequired,
-  children: PropTypes.func.isRequired,
 };
 
 export default SectionContributions;

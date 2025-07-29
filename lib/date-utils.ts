@@ -3,8 +3,8 @@ import { padStart } from 'lodash';
 
 import INTERVALS from './constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from './constants/payment-methods';
-import type { TierFrequency } from './graphql/types/v2/graphql';
-import { TimeUnit } from './graphql/types/v2/graphql';
+import type { TierFrequency } from './graphql/types/v2/schema';
+import { TimeUnit } from './graphql/types/v2/schema';
 import dayjs from './dayjs';
 
 /**
@@ -100,7 +100,7 @@ export const getDateFromValue = (value): Date | null => {
 /**
  * From a simple date as '2020-01-01', returns a string like '2020-01-01T00:00:00Z'.
  */
-export const simpleDateToISOString = (date, isEndOfDay, timezoneType) => {
+const simpleDateToISOString = (date, isEndOfDay, timezoneType) => {
   if (!date) {
     return null;
   } else {

@@ -61,7 +61,7 @@ const PendingTaxFormView = ({
             values={{
               SupportLink: I18nSupportLink,
               HelpDocsLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
+                href: 'https://documentation.opencollective.com/expenses-and-getting-paid/understanding-tax-requirements',
                 openInNewTab: true,
               }),
             }}
@@ -106,7 +106,7 @@ const TaxFormSuccessView = () => {
             values={{
               SupportLink: I18nSupportLink,
               DocsLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
+                href: 'https://documentation.opencollective.com/expenses-and-getting-paid/understanding-tax-requirements',
                 openInNewTab: true,
               }),
             }}

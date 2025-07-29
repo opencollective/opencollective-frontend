@@ -7,10 +7,21 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  type Account,
+  ExpenseStatusFilter,
+  ExpenseType,
+  PayoutMethodType,
+} from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { i18nExpenseType } from '@/lib/i18n/expense';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
+import StyledButton from '../../../StyledButton';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -23,6 +34,7 @@ import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
+import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const schema = commonSchema.extend({
   account: z.string().nullable().default(null),
@@ -38,6 +50,7 @@ type FilterMeta = CommonFilterMeta & {
   expenseTags?: string[];
   hostSlug?: string;
   includeUncategorized: boolean;
+  omitExpenseTypesInFilter?: ExpenseType[];
 };
 const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
@@ -70,6 +83,18 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
+  type: {
+    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
+    Component: ({ meta, valueRenderer, intl, ...props }) => (
+      <ComboSelectFilter
+        options={Object.values(omit(ExpenseType, [ExpenseType.FUNDING_REQUEST, ...meta.omitExpenseTypesInFilter]))
+          .map(value => ({ label: valueRenderer({ value, intl }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
+  },
 };
 
 const filtersWithoutHost = omit(filters, 'accountingCategory');
@@ -79,12 +104,24 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
 
-  const { data: metadata, loading: loadingMetaData } = useQuery(accountExpensesMetadataQuery, {
+  const {
+    data: metadata,
+    loading: loadingMetaData,
+    refetch: refetchMetadata,
+  } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
     context: API_V2_CONTEXT,
   });
 
+  const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
+
+  const { LoggedInUser } = useLoggedInUser();
+  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
+  const omitExpenseTypesInFilter = hasGrantAndFundsReorgEnabled ? [ExpenseType.GRANT] : [];
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
@@ -95,21 +132,26 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     expenseTags: metadata?.expenseTagStats?.nodes?.map(({ tag }) => tag),
     hostSlug: hostSlug,
     includeUncategorized: true,
+    omitExpenseTypesInFilter,
   };
 
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, { type: ExpenseType }>({
     schema: hostSlug ? schema : schemaWithoutHost,
     toVariables,
     meta: filterMeta,
     filters: hostSlug ? filters : filtersWithoutHost,
   });
 
-  const { data, loading } = useQuery(accountExpensesQuery, {
+  const { data, loading, refetch } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
       hasAmountInCreatedByAccountCurrency: false,
+      fetchGrantHistory: false,
       ...queryFilter.variables,
+      ...(!queryFilter.variables.type
+        ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
+        : {}),
     },
     context: API_V2_CONTEXT,
   });
@@ -117,11 +159,39 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
         description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
       />
+      {isSelfHosted && (
+        <ScheduledExpensesBanner
+          hostSlug={hostSlug}
+          onSubmit={() => {
+            refetch();
+            refetchMetadata();
+          }}
+          secondButton={
+            !(
+              queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
+              queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
+            ) ? (
+              <StyledButton
+                buttonSize="tiny"
+                buttonStyle="successSecondary"
+                onClick={() =>
+                  queryFilter.resetFilters({
+                    status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+                    payout: PayoutMethodType.BANK_ACCOUNT,
+                  })
+                }
+              >
+                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+              </StyledButton>
+            ) : null
+          }
+        />
+      )}
       <Filterbar {...queryFilter} />
 
       {!loading && !data.expenses?.nodes.length ? (

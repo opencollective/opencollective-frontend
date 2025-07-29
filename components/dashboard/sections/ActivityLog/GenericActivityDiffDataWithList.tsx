@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { diffArrays, diffChars, diffJson } from 'diff';
 import { has, isEmpty, pickBy, startCase } from 'lodash';
 import { Pencil } from 'lucide-react';
@@ -93,7 +92,32 @@ const shouldUseInlineDiff = changes => {
 const DEFAULT_IGNORED_FIELDS = ['id', 'createdAt', 'updatedAt', 'deletedAt', 'CollectiveId'];
 const ALWAYS_DISPLAYED = ['code'];
 
-export const GenericActivityDiffDataWithList = ({ activity }) => {
+interface GenericActivityDiffDataWithListProps {
+  activity: {
+    type: string;
+    data?: {
+      added?: Array<{
+        id: string;
+        [key: string]: string;
+      }>;
+      removed?: Array<{
+        id: string;
+        [key: string]: string;
+      }>;
+      edited?: Array<{
+        id: string;
+        previousData: {
+          [key: string]: string;
+        };
+        newData: {
+          [key: string]: string;
+        };
+      }>;
+    };
+  };
+}
+
+export const GenericActivityDiffDataWithList = ({ activity }: GenericActivityDiffDataWithListProps) => {
   const { added, removed, edited } = activity.data ?? {};
   if (!added?.length && !removed?.length && !edited?.length) {
     return (
@@ -112,7 +136,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
           <div className="flex w-full flex-col space-y-2">
             {added.map(item => (
-              <div key={item.id} className="w-full flex-grow rounded bg-green-100 p-2">
+              <div key={item.id} className="w-full grow rounded bg-green-100 p-2">
                 {Object.keys(item)
                   .filter(key => item[key] && !DEFAULT_IGNORED_FIELDS.includes(key))
                   .map(key => (
@@ -132,7 +156,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
           <div className="flex w-full flex-col space-y-2">
             {removed.map(item => (
-              <div key={item.id} className="w-full flex-grow rounded bg-red-100 p-2">
+              <div key={item.id} className="w-full grow rounded bg-red-100 p-2">
                 {Object.keys(item)
                   .filter(key => item[key] && !DEFAULT_IGNORED_FIELDS.includes(key))
                   .map(key => (
@@ -152,7 +176,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
           <div className="flex w-full flex-col space-y-2">
             {edited.map(({ previousData, newData }) => (
-              <div key={previousData.id} className="w-full flex-grow rounded bg-blue-100 p-2">
+              <div key={previousData.id} className="w-full grow rounded bg-blue-100 p-2">
                 {ALWAYS_DISPLAYED.map(key => {
                   if (previousData[key] === newData[key]) {
                     return (
@@ -221,8 +245,4 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
       )}
     </div>
   );
-};
-
-GenericActivityDiffDataWithList.propTypes = {
-  activity: PropTypes.shape({ type: PropTypes.string.isRequired, data: PropTypes.object }).isRequired,
 };

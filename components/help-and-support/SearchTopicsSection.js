@@ -51,7 +51,7 @@ function getAllSections(items) {
   }, []);
 }
 
-const DOCS_BASE_URL = 'https://docs.opencollective.com';
+const DOCS_BASE_URL = 'https://documentation.opencollective.com';
 
 const REACT_POPPER_MODIFIERS = [
   {
@@ -74,7 +74,7 @@ const LoadingSearchResults = () => {
 
 const SearchTopics = () => {
   const intl = useIntl();
-  const innerRef = React.useRef();
+  const innerRef = React.useRef(undefined);
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
   const [showSearchResults, setShowSearchResults] = React.useState(false);
@@ -104,7 +104,7 @@ const SearchTopics = () => {
     try {
       const results = await searchDocs(query);
       setSearchResults(results.items);
-    } catch (error) {
+    } catch {
       toast({
         variant: 'error',
         title: intl.formatMessage({ defaultMessage: 'Error in fetching results', id: 'HqFOSM' }),

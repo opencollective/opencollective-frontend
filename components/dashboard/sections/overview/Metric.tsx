@@ -4,7 +4,7 @@ import { isNil } from 'lodash';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/schema';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
@@ -24,7 +24,7 @@ export function getPercentageDifference(current: number, previous?: number) {
   return Math.round(((current - previous) / previous) * 100);
 }
 
-interface BaseMetricProps {
+export interface BaseMetricProps {
   count?: {
     current: number;
     comparison?: number;
@@ -90,7 +90,7 @@ export function Metric({
       className={clsx(
         'group flex flex-col gap-1 rounded-xl border transition-all',
         isButton &&
-          'cursor-pointer text-left ring-ring ring-offset-2 hover:shadow-lg focus:outline-none focus-visible:ring-2',
+          'cursor-pointer text-left ring-ring ring-offset-2 hover:shadow-lg focus:outline-hidden focus-visible:ring-2',
         className,
       )}
       {...(isButton && { onClick: props.onClick })}
@@ -114,7 +114,6 @@ export function Metric({
                     amount={Math.abs(amount.current.valueInCents)}
                     currency={amount.current.currency}
                     precision={2}
-                    amountStyles={{ letterSpacing: 0 }}
                     showCurrencyCode={showCurrencyCode}
                   />
                 ) : (
@@ -139,7 +138,6 @@ export function Metric({
                         amount={Math.abs(amount.comparison.valueInCents)}
                         currency={amount.comparison.currency}
                         precision={2}
-                        amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
                     ) : (
@@ -157,7 +155,6 @@ export function Metric({
                         amount={Math.abs(amount.comparison.valueInCents)}
                         currency={amount.comparison.currency}
                         precision={2}
-                        amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
                     ) : (

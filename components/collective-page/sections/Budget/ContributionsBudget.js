@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
@@ -10,7 +9,7 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
-import { formatCurrency } from '../../../../lib/currency-utils';
+import { formatCurrency, formatValueAsCurrency } from '../../../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -41,7 +40,11 @@ export const budgetSectionContributionsQuery = gql`
       currency
       stats {
         id
-        contributionsAmount(dateFrom: $from, dateTo: $to, includeChildren: false) {
+        totalAmountReceived(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION, ADDED_FUNDS]) {
+          value
+          currency
+        }
+        contributionsAmount(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION, ADDED_FUNDS]) {
           label
           count
           amount {
@@ -50,7 +53,12 @@ export const budgetSectionContributionsQuery = gql`
             currency
           }
         }
-        contributionsAmountTimeSeries(dateFrom: $from, dateTo: $to, includeChildren: false) {
+        contributionsAmountTimeSeries(
+          dateFrom: $from
+          dateTo: $to
+          includeChildren: false
+          kind: [CONTRIBUTION, ADDED_FUNDS]
+        ) {
           timeUnit
           nodes {
             date
@@ -129,10 +137,7 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 <FormattedMessage id="Label.AmountCollected" defaultMessage="Amount collected" />
               </P>
               <P fontSize="16px" lineHeight="24px" fontWeight="500" mt="4px">
-                {formatCurrency(
-                  sumBy(data?.account?.stats.contributionsAmount, 'amount.valueInCents'),
-                  collective.currency,
-                )}
+                {formatValueAsCurrency(data?.account?.stats.totalAmountReceived)}
               </P>
             </Box>
           </StatsCardContent>
@@ -150,12 +155,7 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
               headers={[
                 <FormattedMessage key={1} id="Tiers" defaultMessage="Tiers" />,
                 <FormattedMessage key={2} id="Label.NumberOfContributions" defaultMessage="# of Contributions" />,
-                <FormattedMessage
-                  key={3}
-                  id="Label.AmountWithCurrency"
-                  defaultMessage="Amount ({currency})"
-                  values={{ currency: data?.account.currency }}
-                />,
+                <FormattedMessage key={3} id="Fields.amount" defaultMessage="Amount" />,
               ]}
               rows={data?.account?.stats.contributionsAmount.map((contribution, i) =>
                 makeBudgetTableRow(contribution.label + contribution.count, [
@@ -226,7 +226,7 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
       )}
       <P mt={3} textAlign="right">
         <Link
-          href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS%2CCONTRIBUTION`}
+          href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION`}
           data-cy="view-all-contributions-link"
         >
           <FormattedMessage
@@ -238,17 +238,6 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
       </P>
     </Flex>
   );
-};
-
-ContributionsBudget.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string.isRequired,
-  }),
-  defaultTimeInterval: PropTypes.shape({
-    from: PropTypes.object,
-    to: PropTypes.object,
-  }),
 };
 
 export default ContributionsBudget;

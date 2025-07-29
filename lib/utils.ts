@@ -1,7 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isObject, omit } from 'lodash';
+import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash';
 import { twMerge } from 'tailwind-merge';
+
+import * as whitelabel from './constants/whitelabel-providers';
 
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
@@ -19,11 +21,19 @@ export function truncate(str, length) {
   return `${subString.substr(0, subString.lastIndexOf(' '))} …`;
 }
 
+export function truncateMiddle(str, length, divider = '…') {
+  if (!str || typeof str !== 'string' || str.length <= length) {
+    return str;
+  }
+  const splitLength = Math.floor(length / 2);
+  return `${str.slice(0, splitLength - 1)}${divider}${str.slice(-splitLength)}`;
+}
+
 export const isValidUrl = url => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -51,7 +61,7 @@ export const isValidRelativeUrl = url => {
     // If we're able to construct a URL, it means it's an absolute URL.
     new URL(url);
     return false;
-  } catch (e) {
+  } catch {
     // Prevent URLs like //example.com or /\n/example.com or /\/example.com/
     if (url.match(/^[\s\\/]{2,}.+/)) {
       return false;
@@ -59,6 +69,16 @@ export const isValidRelativeUrl = url => {
       return true;
     }
   }
+};
+
+export const isTrustedSigninRedirectionUrl = (url: string) => {
+  if (!url) {
+    return false;
+  } else if (url.startsWith('http://') || url.startsWith('https://')) {
+    const parsedUrl = new URL(url);
+    return whitelabel.WHITELABEL_DOMAINS.includes(parsedUrl.origin);
+  }
+  return false;
 };
 
 export const isValidEmail = email => {
@@ -92,7 +112,6 @@ export function getQueryParams() {
     },
     query = window.location.search.substring(1);
 
-  // eslint-disable-next-line no-cond-assign
   while ((match = search.exec(query))) {
     urlParams[decode(match[1])] = decode(match[2]);
   }
@@ -253,9 +272,35 @@ export const flattenObjectDeep = obj =>
 
 export const omitDeep = (obj, keys) =>
   Object.keys(omit(obj, keys)).reduce(
-    (acc, next) => ({ ...acc, [next]: isObject(obj[next]) ? omitDeep(obj[next], keys) : obj[next] }),
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeep(obj[next], keys) : obj[next],
+    }),
     {},
   );
+export const omitDeepBy = (obj, predicate) =>
+  Object.keys(omitBy(obj, predicate)).reduce(
+    (acc, next) => ({
+      ...acc,
+      [next]: isObject(obj[next]) && !isArray(obj[next]) ? omitDeepBy(obj[next], predicate) : obj[next],
+    }),
+    {},
+  );
+
+/** Return all object keys paths */
+export function objectKeys(obj: object, filter = Boolean, parentPath = ''): string[] {
+  const keys = [];
+  Object.entries(obj).forEach(([childKey, child]) => {
+    const childPath = `${parentPath}${isEmpty(parentPath) ? '' : '.'}${childKey}`;
+    if (typeof child === 'object') {
+      keys.push(...objectKeys(child, filter, childPath /* parentPath */));
+    } else {
+      keys.push(childPath);
+    }
+  });
+
+  return keys;
+}
 
 /**
  * Sort options as: All, then by alphabetical order, then "No payment method" or "Other" at the end

@@ -141,7 +141,9 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           &nbsp;
           {newPayoutMethodMsg[payoutMethod.type]
             ? this.props.intl.formatMessage(newPayoutMethodMsg[payoutMethod.type])
-            : this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })}
+            : payoutMethod.type
+              ? this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })
+              : this.props.intl.formatMessage({ defaultMessage: 'New payout method', id: 'vJEJ0J' })}
         </React.Fragment>
       );
     }
@@ -242,7 +244,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const creatablePmTypes =
       payeeIsCollectiveFamilyType && !payeeIsSelfHosted
         ? []
-        : pmTypes.filter(pmType => pmType !== PayoutMethodType.ACCOUNT_BALANCE);
+        : pmTypes.filter(pmType => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(pmType));
 
     const groupedPms = groupBy(payoutMethods, 'type');
 
@@ -277,7 +279,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const { removingPayoutMethod } = this.state;
     const value = !isEmpty(payoutMethod) && this.getOptionFromPayoutMethod(payoutMethod);
 
-    const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
+    const payeeIsCollectiveFamilyType = payee && (AccountTypesWithHost as readonly string[]).includes(payee.type);
     const payeeIsSameHost = payee && payee.host?.id === collective.host?.id;
 
     const styledSelectOptions = this.getOptions(collective.host, payoutMethods, payee);
