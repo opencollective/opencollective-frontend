@@ -8,7 +8,6 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
-const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
@@ -133,13 +132,16 @@ const nextConfig = {
     );
 
     // Put the Codecov webpack plugin after all other plugins
-    config.plugins.push(
-      codecovWebpackPlugin({
-        enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-        bundleName: 'opencollective-frontend',
-        uploadToken: process.env.CODECOV_TOKEN,
-      }),
-    );
+    if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
+      const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
+      config.plugins.push(
+        codecovWebpackPlugin({
+          enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+          bundleName: 'opencollective-frontend',
+          uploadToken: process.env.CODECOV_TOKEN,
+        }),
+      );
+    }
 
     config.module.rules.push({
       test: /\.md$/,
