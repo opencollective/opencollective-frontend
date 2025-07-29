@@ -62,23 +62,26 @@ export function OrgOverview() {
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={
-          <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
-            {showSetupGuide ? (
-              <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-            ) : (
-              <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-            )}
-          </Button>
+          isHostAccount(account) && (
+            <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
+              {showSetupGuide ? (
+                <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
+              ) : (
+                <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
+              )}
+            </Button>
+          )
         }
       />
-      <Collapsible open={showSetupGuide}>
-        <CollapsibleContent>
-          <SetupGuideCard account={account} setOpen={handleSetupGuideToggle} />
-        </CollapsibleContent>
-      </Collapsible>
-
       {isHostAccount(account) ? (
-        <HostOverviewContent accountSlug={account.slug} />
+        <React.Fragment>
+          <Collapsible open={showSetupGuide}>
+            <CollapsibleContent>
+              <SetupGuideCard account={account} setOpen={handleSetupGuideToggle} />
+            </CollapsibleContent>
+          </Collapsible>
+          <HostOverviewContent accountSlug={account.slug} />
+        </React.Fragment>
       ) : (
         <OrgOverviewContent accountSlug={account.slug} />
       )}
