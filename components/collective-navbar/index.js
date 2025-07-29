@@ -81,6 +81,10 @@ const NavbarContentContainer = styled(Container)`
   display: flex;
   justify-content: space-between;
 
+  @media (min-width: 40em) {
+    align-items: center;
+  }
+
   @media (min-width: 64em) {
     justify-content: flex-start;
   }
@@ -89,13 +93,15 @@ const NavbarContentContainer = styled(Container)`
 const StyledContainer = styled.div`
   display: flex;
   width: auto;
-  justify-content: center;
   flex-direction: column;
+  overflow-y: auto;
+  justify-content: flex-start;
 
   @media (min-width: 64em) {
-    display: flex;
     flex-direction: row;
     width: 100%;
+    overflow-y: none;
+    justify-content: center;
   }
 `;
 
