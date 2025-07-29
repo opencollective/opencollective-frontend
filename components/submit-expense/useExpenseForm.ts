@@ -413,7 +413,6 @@ const formSchemaQuery = gql`
     }
 
     supportedPayoutMethods
-    isTrustedHost
 
     expensesTags {
       id

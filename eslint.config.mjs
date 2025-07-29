@@ -29,6 +29,7 @@ export default defineConfig([
   // Common config
   {
     files: ['**/*.js', '**/*.ts', '**/*.jsx', '**/*.tsx'],
+    processor: graphqlPlugin.processor,
     plugins: { formatjs },
     languageOptions: {
       globals: { ...globals.jest },

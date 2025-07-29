@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/Label';
 
 const setupGuideQuery = gql`
-  query SetupGuideQuery($accountSlug: String!) {
+  query SetupGuide($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
       slug

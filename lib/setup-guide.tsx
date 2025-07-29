@@ -3,7 +3,7 @@ import { isEmpty, isNil, orderBy } from 'lodash';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { SetupGuideQueryQuery } from '@/lib/graphql/types/v2/graphql';
+import type { SetupGuideQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getPolicy } from '@/lib/policies';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -34,7 +34,7 @@ export const runChecks = ({
   router,
   LoggedInUser,
 }: {
-  account: SetupGuideQueryQuery['account'];
+  account: SetupGuideQuery['account'];
   router: AppRouterInstance;
   LoggedInUser: LoggedInUser;
 }): Category[] => [
