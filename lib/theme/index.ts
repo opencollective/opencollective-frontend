@@ -3,11 +3,11 @@ import 'styled-components';
 
 import { transparentize } from 'polished';
 
-import { getButtonSizes, getButtonStyles } from './variants/button';
+import { getButtonSizes, getButtonStyles } from './variants/button.ts';
 // Import defaults
-import defaultBreakpoints from './breakpoints';
-import defaultColors from './colors';
-import defaultSpaces from './spaces';
+import defaultBreakpoints from './breakpoints.ts';
+import defaultColors from './colors.ts';
+import defaultSpaces from './spaces.ts';
 
 export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } = {}) => ({
   colors,

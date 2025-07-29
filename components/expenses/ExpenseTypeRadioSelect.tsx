@@ -53,6 +53,8 @@ const TypeIllustration = styled.img.attrs({ alt: '' })`
 const StaticTypeIllustration = styled(TypeIllustration)`
   position: absolute;
   background: white;
+  width: 48px;
+  height: 48px;
 `;
 
 const ExpenseTypeOptionContainer = styled.label`

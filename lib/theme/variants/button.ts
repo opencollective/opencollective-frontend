@@ -1,7 +1,7 @@
 import { desaturate, lighten, opacify } from 'polished';
 import { variant } from 'styled-system';
 
-import { getTopToBottomGradient } from '../helpers';
+import { getTopToBottomGradient } from '../helpers.ts';
 
 // Types
 export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xLarge';

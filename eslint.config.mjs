@@ -35,7 +35,6 @@ export default defineConfig([
       parser: tsParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
-      parserOptions: { project: ['tsconfig.json'] },
     },
     settings: {
       'import/resolver': {
@@ -144,6 +143,9 @@ export default defineConfig([
   // TS/TSX config
   {
     files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parserOptions: { project: ['tsconfig.json'] },
+    },
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-exports': 'warn',

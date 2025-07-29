@@ -274,7 +274,8 @@ describe('Expense flow', () => {
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}{backspace}');
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100').blur();
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').blur();
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '​100');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
