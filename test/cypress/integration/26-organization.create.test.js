@@ -1,31 +1,49 @@
+import mockRecaptcha from '../mocks/recaptcha';
+import { randomEmail, randomSlug } from '../support/faker';
+
 describe('create an organization', () => {
-  beforeEach(() => {
-    cy.login({ redirect: '/organizations/new' });
+  it('creates an organization successfully without co-admin', () => {
+    const slug = randomSlug();
+    const visitParams = { onBeforeLoad: mockRecaptcha, failOnStatusCode: false };
+    cy.login({ redirect: '/signup/organization', visitParams });
+    cy.contains('Create Organization');
+    cy.get('#input-organization\\.legalName').type('Test Organization Inc.');
+    cy.get('#input-organization\\.name').type('Test Organization');
+    cy.get('#input-organization\\.slug')
+      .should('have.value', 'test-organization')
+      .type(`{selectall}test-organization-${slug}`);
+
+    cy.get('#input-organization\\.description').type('short description for new org');
+    cy.get('#input-organization\\.website').type('https://www.test.com');
+    cy.get('button[type=submit]').click();
+    cy.wait(500);
+    cy.contains('Welcome, Test Organization!');
   });
 
-  it('Creates an organization successfully without co-admin', () => {
+  it('creates an organization and a new user', () => {
+    const slug = randomSlug();
+    const email = randomEmail();
+    const visitParams = { onBeforeLoad: mockRecaptcha, failOnStatusCode: false };
+    cy.visit('/signup/organization', visitParams);
     cy.contains('Create Organization');
-    cy.get('[data-cy="cof-form-name"]').type('testorganization12');
-    cy.getByDataCy('cof-form-slug')
-      .first()
-      .find('input')
-      .invoke('val')
-      .then(sometext => expect(sometext).to.equal('testorganization12'));
-    cy.get('[data-cy="cof-org-description"]').type('short description for new org');
-    cy.get('[data-cy="cof-org-website"]').type('ww.com');
-    cy.get('[data-cy="custom-checkbox"]').click();
-    cy.get('[data-cy="cof-form-submit"]').click();
-    cy.contains('Your Organization has been created.');
-    cy.wait(300);
-  });
 
-  it('Shows an Error if Authorization is not checked', () => {
-    cy.contains('Create Organization');
-    cy.wait(300);
-    cy.get('[data-cy="cof-form-name"]').type('testOrganization10');
-    cy.get('[data-cy="cof-org-description"]').type('short description for new org');
-    cy.get('[data-cy="cof-org-website"]').type('ww.com');
-    cy.get('[data-cy="cof-form-submit"]').click();
-    cy.get('[data-cy="cof-error-message"]').contains('Verify that you are an authorized organization representative');
+    cy.get('#input-individual\\.name').type('Willem Dafoe');
+    cy.get('#input-individual\\.email').type(email);
+    cy.getByDataCy('tos-agreement-button').click();
+
+    cy.get('#input-organization\\.legalName').type('Test Organization Inc.');
+    cy.get('#input-organization\\.name').type('Test Organization');
+    cy.get('#input-organization\\.slug')
+      .should('have.value', 'test-organization')
+      .type(`{selectall}test-organization-${slug}`);
+
+    cy.get('#input-organization\\.description').type('short description for new org');
+    cy.get('#input-organization\\.website').type('https://www.test.com');
+    cy.get('button[type=submit]').click();
+    cy.wait(500);
+    cy.contains('Welcome, Test Organization!');
+    cy.contains(
+      "Your organization has been successfully created. We've sent you a confirmation email, please proceed from there!",
+    );
   });
 });
