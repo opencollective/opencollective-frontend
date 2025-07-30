@@ -3,14 +3,16 @@ import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { isEmpty, max, min, omit, orderBy, pick, set } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { suggestSlug } from '@/lib/collective';
+import { getCurrencyForCountry } from '@/lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { OrganizationSignupMutation } from '@/lib/graphql/types/v2/graphql';
-import { CountryIso } from '@/lib/graphql/types/v2/graphql';
+import { CountryIso, Currency } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nCountryName } from '@/lib/i18n';
 import { getCountryCodeFromLocalBrowserLanguage, getFlagEmoji } from '@/lib/i18n/countries';
@@ -39,6 +41,7 @@ const createOrganizationMutation = gql`
     $inviteMembers: [InviteMemberInput]
     $captcha: CaptchaInputType
     $roleDescription: String
+    $financiallyActive: Boolean
   ) {
     createOrganization(
       individual: $individual
@@ -46,6 +49,7 @@ const createOrganizationMutation = gql`
       inviteMembers: $inviteMembers
       captcha: $captcha
       roleDescription: $roleDescription
+      financiallyActive: $financiallyActive
     ) {
       id
       name
@@ -65,6 +69,7 @@ const formSchema = z.object({
     legalName: z.string().min(5).max(255),
     description: z.string().min(10).max(255),
     website: z.string().url().optional(),
+    currency: z.string().length(3),
   }),
   individual: z.union([
     z.object({
@@ -89,11 +94,14 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
   const countryInputRef = useRef<HTMLInputElement>(null);
+  const currencyInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const [createOrganization, { loading }] = useMutation(createOrganizationMutation, { context: API_V2_CONTEXT });
   const [userForm, setUserForm] = useState<'LOGIN' | 'NEW_USER' | string>('NEW_USER');
   const [showSignInPopup, setShowSignInPopup] = useState(false);
   const [showCountrySelect, setShowCountrySelect] = useState(false);
+  const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
   const getCountryLabel = useCallback(
     (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
@@ -111,6 +119,14 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
       ),
     [getCountryLabel],
   );
+  const currencyOptions = useMemo(
+    () =>
+      Object.keys(Currency).map(code => ({
+        value: code,
+        label: code,
+      })),
+    [],
+  );
   const handleOpenCountrySelect = useCallback(
     open => {
       setShowCountrySelect(open);
@@ -121,6 +137,17 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
       }
     },
     [countryInputRef],
+  );
+  const openCurrencySelect = useCallback(
+    open => {
+      setShowCurrencySelect(open);
+      if (open) {
+        setTimeout(() => {
+          currencyInputRef.current?.focus();
+        }, 100);
+      }
+    },
+    [currencyInputRef],
   );
 
   useEffect(() => {
@@ -144,6 +171,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         const countryISO = countryCode && CountryIso[countryCode];
         if (countryISO) {
           formik.setFieldValue('organization.countryISO', countryISO);
+          formik.setFieldValue('organization.currency', getCurrencyForCountry(countryISO));
         }
       }
     }
@@ -179,6 +207,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
             : undefined,
           captcha: captchaResult,
           roleDescription,
+          financiallyActive: router.query?.active === 'true',
         },
       });
       onSuccess?.(result.data.createOrganization);
@@ -384,7 +413,71 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                                   data-cy={`organization-country-${value}`}
                                   onSelect={() => {
                                     setFieldValue(field.name, value as CountryIso);
+                                    if (!touched.organization?.currency) {
+                                      setFieldValue(
+                                        'organization.currency',
+                                        getCurrencyForCountry(value as CountryIso),
+                                      );
+                                    }
                                     setShowCountrySelect(false);
+                                  }}
+                                >
+                                  <span>{label}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </FormField>
+                <FormField
+                  name="organization.currency"
+                  label={<FormattedMessage id="Currency" defaultMessage="Currency" />}
+                  hint={
+                    <FormattedMessage
+                      defaultMessage="Select the main currency for your organization's financial transactions and reporting."
+                      id="currency.hint"
+                    />
+                  }
+                >
+                  {({ field }) => (
+                    <Select
+                      value={field.value}
+                      open={showCurrencySelect}
+                      onOpenChange={openCurrencySelect}
+                      disabled={field.disabled}
+                    >
+                      <SelectTrigger
+                        className={cn(!field.value && 'text-muted-foreground')}
+                        data-cy="organization-currency-trigger"
+                      >
+                        {field.value ? (
+                          field.value
+                        ) : (
+                          <FormattedMessage defaultMessage="Select currency" id="collective.curency.placeholder" />
+                        )}
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[50vh]">
+                        <Command>
+                          <CommandInput
+                            placeholder={intl.formatMessage({ defaultMessage: 'Search currencies...', id: 'fDMc8k' })}
+                            data-cy="organization-currency-search"
+                            ref={currencyInputRef}
+                          />
+                          <CommandList data-cy="organization-currency-list">
+                            <CommandEmpty>
+                              <FormattedMessage defaultMessage="No currency found." id="moOGSq" />
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {currencyOptions.map(({ value, label }) => (
+                                <CommandItem
+                                  key={value}
+                                  data-cy={`organization-country-${value}`}
+                                  onSelect={() => {
+                                    setFieldValue(field.name, value as Currency);
+                                    setShowCurrencySelect(false);
                                   }}
                                 >
                                   <span>{label}</span>
