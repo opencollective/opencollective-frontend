@@ -368,7 +368,7 @@ class OnboardingModal extends React.Component {
   }
 }
 
-export const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
+const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   name: 'editCollectiveMembers',
 });
 

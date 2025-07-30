@@ -52,7 +52,7 @@ exports.REWRITES = [
   },
   {
     source: '/organizations/new',
-    destination: '/createOrganization',
+    destination: '/signup/organization',
   },
   {
     source: '/dashboard',
