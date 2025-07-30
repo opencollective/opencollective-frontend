@@ -32,7 +32,7 @@ const parseValueFromEvent = (e, precision, ignoreComma = false) => {
   }
 };
 
-/** Formats value is valid, fallbacks on rawValue otherwise */
+/** Formats value if valid, fallbacks on rawValue otherwise */
 const getValue = (value, rawValue, isEmpty) => {
   if (isEmpty) {
     return '';
@@ -112,7 +112,7 @@ const ConvertedAmountInput = ({
         step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
         min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
         max={maxFxRate ? getLimitAmountFromFxRate(maxFxRate) : undefined}
-        value={isBaseAmountInvalid ? '' : isEditing ? value : value.toFixed(precision)}
+        value={isBaseAmountInvalid ? '' : isEditing ? rawValue : value.toFixed(precision)}
         onWheel={ignoreOnWheel}
         required
         placeholder={!precision ? '--' : `--.${'-'.repeat(precision)}`}
@@ -248,6 +248,7 @@ const StyledInputAmount = ({
         )}
         <StyledInput
           {...props}
+          placeholder={props.placeholder ?? (!precision ? '--' : `--.${'-'.repeat(precision)}`)}
           disabled={disabled}
           width="100%"
           type="number"

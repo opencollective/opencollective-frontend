@@ -430,12 +430,10 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   onChange={e => setFieldValue('longDescription', e.target.value)}
                   videoEmbedEnabled
                   withBorders
-                  placeholder={
-                    <FormattedMessage
-                      defaultMessage="Tell your story and explain your purpose."
-                      id="SectionAbout.Why"
-                    />
-                  }
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Tell your story and explain your purpose.',
+                    id: 'SectionAbout.Why',
+                  })}
                 />
               )}
             </FormField>

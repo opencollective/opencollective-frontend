@@ -12,7 +12,7 @@ import { border, color, space, typography } from 'styled-system';
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { EXPENSE_PAYMENT_METHOD_SERVICES, PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { formatCurrency } from '../../lib/currency-utils';
+import { formatCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
@@ -543,9 +543,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       currencyDisplay="FULL"
                       value={formik.values.expenseAmountInHostCurrency}
                       data-cy="expense-amount-paid"
-                      placeholder="0.00"
                       maxWidth="100%"
-                      min={1}
+                      min={10 ** (2 - getDefaultCurrencyPrecision(host.currency))}
                       onChange={value => formik.setFieldValue('expenseAmountInHostCurrency', value)}
                     />
                   )}
@@ -573,7 +572,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       currency={host.currency}
                       currencyDisplay="FULL"
                       value={formik.values.paymentProcessorFeeInHostCurrency}
-                      placeholder="0.00"
                       maxWidth="100%"
                       min={0}
                       max={formik.values.expenseAmountInHostCurrency || 100000000}

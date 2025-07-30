@@ -259,7 +259,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
               currencyDisplay="CODE"
-              placeholder="0.00"
               error={field.error}
               value={field.value?.valueInCents}
               maxWidth="100%"
@@ -309,7 +308,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
               currencyDisplay="CODE"
-              placeholder="0.00"
               error={field.error}
               value={field.value?.valueInCents}
               maxWidth="100%"
@@ -340,7 +338,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
               currencyDisplay="CODE"
-              placeholder="0.00"
               error={field.error}
               value={field.value?.valueInCents}
               maxWidth="100%"
@@ -410,7 +407,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
             data-cy={field.name}
             currency={field.value?.currency ?? collective.currency}
             currencyDisplay="CODE"
-            placeholder="0.00"
             error={field.error}
             value={field.value?.valueInCents}
             maxWidth="100%"
