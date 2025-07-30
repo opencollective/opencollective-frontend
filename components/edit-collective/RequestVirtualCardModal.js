@@ -231,7 +231,6 @@ const RequestVirtualCardModal = props => {
                 <StyledInputAmount
                   {...inputProps}
                   id="spendingLimitAmount"
-                  placeholder="0.00"
                   error={formik.touched.spendingLimitAmount && Boolean(formik.errors.spendingLimitAmount)}
                   currency={currency}
                   prepend={currency}

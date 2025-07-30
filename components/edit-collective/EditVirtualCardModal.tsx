@@ -518,7 +518,6 @@ export default function EditVirtualCardModal({
                       <StyledInputAmount
                         {...inputProps}
                         id="limitAmount"
-                        placeholder="0.00"
                         error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}
                         currency={currency}
                         prepend={currency}
