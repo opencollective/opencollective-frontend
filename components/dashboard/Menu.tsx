@@ -112,7 +112,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
-  const canHostAccounts = account.settings?.canHostAccounts !== false && isActiveHost;
+  const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
 
   const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
