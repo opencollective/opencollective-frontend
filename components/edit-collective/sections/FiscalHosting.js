@@ -3,11 +3,12 @@ import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
+import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
-import Container from '../../Container';
 import { adminPanelQuery } from '../../dashboard/queries';
+import { useModal } from '../../ModalContext';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import { Button } from '../../ui/Button';
@@ -64,80 +65,139 @@ const deactivateBudgetMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const getCollectiveType = type => {
-  switch (type) {
-    case 'ORGANIZATION':
-      return 'Organization';
-    case 'COLLECTIVE':
-      return 'Collective';
-    default:
-      return 'Account';
+const toggleHostAccountsSettingsQuery = gql`
+  mutation ToggleHostAccounts($account: AccountReferenceInput!, $key: AccountSettingsKey!, $enabled: JSON!) {
+    editAccountSetting(account: $account, key: $key, value: $enabled) {
+      id
+      name
+      settings
+    }
   }
-};
+`;
 
 const FiscalHosting = ({ collective }) => {
   const isHostAccount = collective.isHost;
   const isBudgetActive = collective.isActive;
+  const canHostAccounts = collective.settings?.canHostAccounts !== false && isHostAccount;
+  const { showConfirmationModal } = useModal();
 
-  const collectiveType = getCollectiveType(collective.type);
-  const [activateAsHostStatus, setActivateAsHostStatus] = useState({
-    processing: false,
-    error: null,
-  });
   const [activateBudgetStatus, setActivateBudgetStatus] = useState({
     processing: false,
     error: null,
   });
 
-  const [activateAsHostModal, setActivateAsHostModal] = useState({
-    type: isHostAccount ? 'Activate' : 'Deactivate',
-    show: false,
-  });
   const [activateBudgetModal, setActivateBudgetModal] = useState({
     type: collective.isActive ? 'Activate' : 'Deactivate',
     show: false,
   });
 
-  const adminPanelMutationParams = {
-    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT }],
+  const refetchAdminPanelMutationParams = {
+    refetchQueries: [
+      { query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT },
+      {
+        query: editCollectivePageQuery,
+        variables: {
+          slug: collective.slug,
+        },
+      },
+    ],
   };
-  const [activateCollectiveAsHost] = useMutation(activateCollectiveAsHostMutation, adminPanelMutationParams);
-  const [deactivateCollectiveAsHost] = useMutation(deactivateCollectiveAsHostMutation, adminPanelMutationParams);
-
+  const [activateAsFiscalEntity] = useMutation(activateCollectiveAsHostMutation);
+  const [deactivateAsFiscalEntity] = useMutation(deactivateCollectiveAsHostMutation, refetchAdminPanelMutationParams);
+  const [toggleHostAccountsSetting] = useMutation(toggleHostAccountsSettingsQuery, {
+    ...refetchAdminPanelMutationParams,
+    context: API_V2_CONTEXT,
+  });
   const [activateBudget] = useMutation(activateBudgetMutation);
   const [deactivateBudget] = useMutation(deactivateBudgetMutation);
 
-  const handleActivateAsHost = async ({ id }) => {
-    setActivateAsHostModal({ type: 'Activate', show: false });
-    try {
-      setActivateAsHostStatus({ ...activateAsHostStatus, processing: true });
-      await activateCollectiveAsHost({ variables: { id } });
-      setActivateAsHostStatus({
-        ...activateAsHostStatus,
-        processing: false,
-      });
-    } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err).message;
-      setActivateAsHostStatus({ ...activateAsHostStatus, processing: false, error: errorMsg });
-    }
+  const handleFundManagementUpdate = async ({ id, activate }) => {
+    showConfirmationModal({
+      title: activate ? (
+        <FormattedMessage id="FiscalHosting.manageFunds.activate" defaultMessage="Activate Fund Management" />
+      ) : (
+        <FormattedMessage id="FiscalHosting.manageFunds.deactivate" defaultMessage="Deactivate Fund Management" />
+      ),
+      description: (
+        <p className="my-4 text-sm">
+          {activate ? (
+            <FormattedMessage defaultMessage="Are you sure you want to activate Fund Management?" id="aEioKA" />
+          ) : (
+            <FormattedMessage defaultMessage="Are you sure you want to deactivate Fund Management?" id="b2BmIR" />
+          )}
+        </p>
+      ),
+      onConfirm: async () => {
+        if (activate) {
+          await activateAsFiscalEntity({ variables: { id } });
+          await toggleHostAccountsSetting({
+            variables: {
+              account: { legacyId: id },
+              key: 'canHostAccounts',
+              enabled: false,
+            },
+          });
+        } else {
+          await deactivateAsFiscalEntity({ variables: { id } });
+        }
+      },
+      confirmLabel: activate ? (
+        <FormattedMessage id="Activate" defaultMessage="Activate" />
+      ) : (
+        <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />
+      ),
+    });
   };
 
-  const handleDeactivateAsHost = async ({ id }) => {
-    setActivateAsHostModal({ type: 'Deactivate', show: false });
-    try {
-      setActivateAsHostStatus({ ...activateAsHostStatus, processing: true });
-      await deactivateCollectiveAsHost({ variables: { id } });
-      setActivateAsHostStatus({
-        ...activateAsHostStatus,
-        processing: false,
-      });
-    } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err).message;
-      setActivateAsHostStatus({ ...activateAsHostStatus, processing: false, error: errorMsg });
-    }
+  const handleFiscalHostUpdate = async ({ id, activate }) => {
+    showConfirmationModal({
+      title: activate ? (
+        <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
+      ) : (
+        <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
+      ),
+      description: (
+        <div className="my-4 flex flex-col gap-4">
+          <p className="text-sm">
+            <FormattedMessage
+              id="collective.hostAccount.modal.description"
+              defaultMessage="A Fiscal Host is a legal entity (company or individual) who holds Collective funds in their bank account, and can generate invoices and receipts for Financial Contributors.{br}Think of a Fiscal Host as an umbrella organization for its Collectives."
+              values={{
+                br: <br />,
+              }}
+            />
+          </p>
+          <p className="text-sm">
+            {activate ? (
+              <FormattedMessage
+                id="collective.hostAccount.modal.activate.body"
+                defaultMessage="Are you sure you want to activate this Fiscal Host?"
+              />
+            ) : (
+              <FormattedMessage
+                id="collective.hostAccount.modal.deactivate.body"
+                defaultMessage="Are you sure you want to deactivate this Fiscal Host?"
+              />
+            )}
+          </p>
+        </div>
+      ),
+      onConfirm: () => {
+        return toggleHostAccountsSetting({
+          variables: {
+            account: { legacyId: id },
+            key: 'canHostAccounts',
+            enabled: activate ? true : false,
+          },
+        });
+      },
+      confirmLabel: activate ? (
+        <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
+      ) : (
+        <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
+      ),
+    });
   };
-
-  const closeActivateAsHost = () => setActivateAsHostModal({ ...activateAsHostModal, show: false });
 
   const handleActivateBudget = async ({ id }) => {
     setActivateBudgetModal({ type: 'Activate', show: false });
@@ -182,211 +242,135 @@ const FiscalHosting = ({ collective }) => {
   useKeyboardShortcut({ callback: handlePrimaryBtnClick, keyMatch: ENTER_KEY });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
-      <SettingsSectionTitle>
-        <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-      </SettingsSectionTitle>
-
-      {!isHostAccount && (
-        <P>
+    <div className="mb-10 flex w-full flex-col gap-4">
+      <div className="mt-4 flex w-full flex-col gap-2">
+        <SettingsSectionTitle>
+          <FormattedMessage id="FiscalHosting.manageFunds" defaultMessage="Manage Funds" />
+        </SettingsSectionTitle>
+        <p className="text-sm">
           <FormattedMessage
-            id="collective.hostAccount.activate.description"
-            defaultMessage="A Fiscal Host is a legal entity who holds Collective funds in their bank account, manages payouts, and generates invoices and receipts."
+            id="FiscalHosting.manageFunds.description"
+            defaultMessage="Fund management gives you the ability to receive contributions and manage your organization's expenses."
           />
-        </P>
-      )}
+        </p>
 
-      {isHostAccount && (
-        <P mb={2}>
-          <FormattedMessage
-            values={{ type: collectiveType.toLowerCase() }}
-            id="collective.hostAccount.deactivate.description"
-            defaultMessage="After deactivating, you will not be able to act as a Host anymore. The profile will remain active as a {type}."
-          />
-        </P>
-      )}
-
-      {activateAsHostStatus.error && <P color="#ff5252">{activateAsHostStatus.error}</P>}
-
-      {isHostAccount ? (
         <Button
-          onClick={() => setActivateAsHostModal({ type: 'Deactivate', show: true })}
-          loading={activateAsHostStatus.processing}
-          disabled={collective.plan.hostedCollectives > 0}
+          onClick={() => handleFundManagementUpdate({ id: collective.id, activate: !isHostAccount })}
+          disabled={isHostAccount && collective.plan.hostedCollectives > 0}
           variant="outline"
-          className="my-2"
+          className="my-2 w-fit"
         >
-          <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
+          {isHostAccount ? (
+            <FormattedMessage id="FiscalHosting.manageFunds.deactivate" defaultMessage="Deactivate Fund Management" />
+          ) : (
+            <FormattedMessage id="FiscalHosting.manageFunds.activate" defaultMessage="Activate Fund Management" />
+          )}
         </Button>
-      ) : (
-        <Button
-          onClick={() => setActivateAsHostModal({ type: 'Activate', show: true })}
-          loading={activateAsHostStatus.processing}
-          disabled={false}
-          variant="outline"
-          className="my-2"
-        >
-          <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
-        </Button>
-      )}
 
-      {collective.plan.hostedCollectives > 0 && (
-        <P color="rgb(224, 183, 0)" my={1}>
-          <FormattedMessage
-            values={{ hostedCollectives: collective.plan.hostedCollectives }}
-            id="collective.hostAccount.deactivate.isHost"
-            defaultMessage="You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived."
-          />
-        </P>
-      )}
+        {collective.plan.hostedCollectives > 0 && (
+          <p className="text-sm">
+            <FormattedMessage
+              values={{ hostedCollectives: collective.plan.hostedCollectives }}
+              id="collective.hostAccount.deactivate.isHost"
+              defaultMessage="You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived."
+            />
+          </p>
+        )}
 
-      {activateAsHostModal.show && (
-        <StyledModal onClose={closeActivateAsHost}>
-          <ModalHeader onClose={closeActivateAsHost}>
-            {activateAsHostModal.type === 'Activate' && (
-              <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
-            )}
-            {activateAsHostModal.type === 'Deactivate' && (
-              <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
-            )}
-          </ModalHeader>
-          <ModalBody>
-            <P mb="0.65rem">
-              <FormattedMessage
-                id="collective.hostAccount.modal.description"
-                defaultMessage="A Fiscal Host is a legal entity (company or individual) who holds Collective funds in their bank account, and can generate invoices and receipts for Financial Contributors.{br}Think of a Fiscal Host as an umbrella organization for its Collectives."
-                values={{
-                  br: <br />,
-                }}
-              />
-            </P>
-            <P>
-              {activateAsHostModal.type === 'Activate' && (
-                <FormattedMessage
-                  id="collective.hostAccount.modal.activate.body"
-                  defaultMessage="Are you sure you want to activate this Fiscal Host?"
-                />
-              )}
-              {activateAsHostModal.type === 'Deactivate' && (
-                <FormattedMessage
-                  id="collective.hostAccount.modal.deactivate.body"
-                  defaultMessage="Are you sure you want to deactivate this Fiscal Host?"
-                />
-              )}
-            </P>
-          </ModalBody>
-          <ModalFooter showDivider={false}>
-            <div className="flex justify-between gap-2">
-              <Button variant="outline" onClick={() => setActivateAsHostModal({ ...activateAsHostModal, show: false })}>
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button
-                buttonStyle="primary"
-                data-cy="action"
-                onClick={() => {
-                  if (activateAsHostModal.type === 'Deactivate') {
-                    handleDeactivateAsHost({ id: collective.id });
-                  } else {
-                    handleActivateAsHost({ id: collective.id });
-                  }
-                }}
-              >
-                {activateAsHostModal.type === 'Activate' && (
-                  <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
-                )}
-                {activateAsHostModal.type === 'Deactivate' && (
-                  <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
-                )}
-              </Button>
-            </div>
-          </ModalFooter>
-        </StyledModal>
-      )}
-
-      {isHostAccount && (
-        <Fragment>
-          {!isBudgetActive && collective.type === 'ORGANIZATION' && (
+        {isHostAccount && collective.type === 'ORGANIZATION' && !isBudgetActive && (
+          <Fragment>
             <SettingsSectionTitle mt={4}>
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
             </SettingsSectionTitle>
-          )}
-
-          {isBudgetActive && (
-            <P mb={2}>
-              <FormattedMessage
-                id="FiscalHosting.budget.deactivate.description"
-                defaultMessage="Your Host Budget is activated. It can receive financial contributions and manage expenses."
-              />
-            </P>
-          )}
-
-          {!isBudgetActive && collective.type === 'ORGANIZATION' && (
-            <P mb={2}>
+            <p className="text-sm">
               <FormattedMessage
                 id="FiscalHosting.budget.activate.description"
                 defaultMessage="By activating the Host Budget, it will be able to receive financial contributions and manage expenses."
               />
-            </P>
-          )}
-
-          {activateBudgetStatus.error && <P color="#ff5252">{activateBudgetStatus.error}</P>}
-
-          {!isBudgetActive && collective.type === 'ORGANIZATION' && (
+            </p>
+            {activateBudgetStatus.error && <P color="#ff5252">{activateBudgetStatus.error}</P>}
             <Button
               onClick={() => setActivateBudgetModal({ type: 'Activate', show: true })}
               loading={activateBudgetStatus.processing}
-              className="mb-2"
+              className="mb-2 w-fit"
             >
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
             </Button>
-          )}
-        </Fragment>
-      )}
+          </Fragment>
+        )}
 
-      {activateBudgetModal.show && (
-        <StyledModal onClose={closeActivateBudget}>
-          <ModalHeader onClose={closeActivateBudget}>
-            {activateBudgetModal.type === 'Activate' && (
-              <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
-            )}
-            {activateBudgetModal.type === 'Deactivate' && (
-              <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage="Deactivate Host Budget" />
-            )}
-          </ModalHeader>
-          <ModalBody>
-            <P>
+        {activateBudgetModal.show && (
+          <StyledModal onClose={closeActivateBudget}>
+            <ModalHeader onClose={closeActivateBudget}>
               {activateBudgetModal.type === 'Activate' && (
-                <FormattedMessage
-                  id="FiscalHosting.budget.modal.activate.body"
-                  defaultMessage="Are you sure you want to activate the Host budget?"
-                />
+                <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
               )}
               {activateBudgetModal.type === 'Deactivate' && (
-                <FormattedMessage
-                  id="FiscalHosting.budget.modal.deactivate.body"
-                  defaultMessage="Are you sure you want to deactivate the Host budget?"
-                />
+                <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage="Deactivate Host Budget" />
               )}
-            </P>
-          </ModalBody>
-          <ModalFooter showDivider={false}>
-            <div className="flex justify-between gap-2">
-              <Button variant="outline" onClick={() => setActivateBudgetModal({ ...activateBudgetModal, show: false })}>
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button data-cy="action" onClick={() => handlePrimaryBtnClick()}>
+            </ModalHeader>
+            <ModalBody>
+              <p>
                 {activateBudgetModal.type === 'Activate' && (
-                  <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
+                  <FormattedMessage
+                    id="FiscalHosting.budget.modal.activate.body"
+                    defaultMessage="Are you sure you want to activate the Host budget?"
+                  />
                 )}
                 {activateBudgetModal.type === 'Deactivate' && (
-                  <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage="Deactivate Host Budget" />
+                  <FormattedMessage
+                    id="FiscalHosting.budget.modal.deactivate.body"
+                    defaultMessage="Are you sure you want to deactivate the Host budget?"
+                  />
                 )}
-              </Button>
-            </div>
-          </ModalFooter>
-        </StyledModal>
-      )}
-    </Container>
+              </p>
+            </ModalBody>
+            <ModalFooter showDivider={false}>
+              <div className="flex justify-between gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setActivateBudgetModal({ ...activateBudgetModal, show: false })}
+                >
+                  <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                </Button>
+                <Button data-cy="action" onClick={() => handlePrimaryBtnClick()}>
+                  {activateBudgetModal.type === 'Activate' && (
+                    <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
+                  )}
+                  {activateBudgetModal.type === 'Deactivate' && (
+                    <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage="Deactivate Host Budget" />
+                  )}
+                </Button>
+              </div>
+            </ModalFooter>
+          </StyledModal>
+        )}
+      </div>
+
+      <div className="mt-4 flex w-full flex-col gap-2">
+        <SettingsSectionTitle>
+          <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
+        </SettingsSectionTitle>
+        <p className="text-sm">
+          <FormattedMessage
+            id="collective.hostAccount.activate.description"
+            defaultMessage="A Fiscal Host is a legal entity who holds Collective funds in their bank account, manages payouts, and generates invoices and receipts."
+          />
+        </p>
+        <Button
+          onClick={() => handleFiscalHostUpdate({ id: collective.id, activate: !canHostAccounts })}
+          disabled={!isHostAccount || (isHostAccount && collective.plan.hostedCollectives > 0)}
+          variant="outline"
+          className="my-2 w-fit"
+        >
+          {canHostAccounts && isHostAccount ? (
+            <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
+          ) : (
+            <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };
 
