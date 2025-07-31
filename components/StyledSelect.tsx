@@ -50,7 +50,11 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   <ReactSelectComponents.SelectContainer
     {...props}
     innerProps={
-      { ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' } as React.HTMLProps<HTMLDivElement>
+      {
+        ...innerProps,
+        'data-cy': props.selectProps['data-cy'] || 'select',
+        'data-testid': props.selectProps['data-testid'] || 'select',
+      } as React.HTMLProps<HTMLDivElement>
     }
   />
 );

@@ -112,7 +112,15 @@ const ConvertedAmountInput = ({
         step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
         min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
         max={maxFxRate ? getLimitAmountFromFxRate(maxFxRate) : undefined}
-        value={isBaseAmountInvalid ? '' : isEditing ? rawValue : value.toFixed(precision)}
+        value={
+          isBaseAmountInvalid
+            ? ''
+            : isEditing
+              ? rawValue
+              : typeof value === 'number' && !isNaN(value)
+                ? value.toFixed(precision)
+                : value
+        }
         onWheel={ignoreOnWheel}
         required
         placeholder={!precision ? '--' : `--.${'-'.repeat(precision)}`}
@@ -176,7 +184,7 @@ const StyledInputAmount = ({
   max = 100000000000,
   precision = getDefaultCurrencyPrecision(currency),
   defaultValue = undefined,
-  value,
+  value = undefined,
   onBlur = undefined,
   onChange,
   isEmpty = false,
@@ -236,6 +244,7 @@ const StyledInputAmount = ({
           <div className="bg-neutral-50 text-neutral-800">
             <StyledCurrencyPicker
               data-cy={`${props.id}-currency-picker`}
+              data-testid={`${props.id}-currency-picker`}
               inputId={`${props.id}-currency-picker`}
               onChange={onCurrencyChange}
               value={currency}

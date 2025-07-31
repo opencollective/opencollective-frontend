@@ -218,8 +218,11 @@
     "@tailwindcss/postcss": "^4.1.10",
     "@tailwindcss/typography": "^0.5.13",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/apollo-upload-client": "17.0.5",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.14",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
@@ -306,6 +309,7 @@
   "@opencollective/depcheck": {
     "ignores": [
       "@types/webpack-env",
+      "@types/jest",
       "@tailwindcss/postcss",
       "@tailwindcss/typography",
       "esbuild",
@@ -321,7 +325,8 @@
       "jest-environment-jsdom",
       "jest-junit",
       "mocha-junit-reporter",
-      "cypress-multi-reporters"
+      "cypress-multi-reporters",
+      "@jest/globals"
     ]
   }
 }

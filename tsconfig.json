@@ -16,6 +16,7 @@
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
     "jsx": "preserve",
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "paths": {
       "@/components/*": ["./components/*"],
       "@/lib/*": ["./lib/*"]
