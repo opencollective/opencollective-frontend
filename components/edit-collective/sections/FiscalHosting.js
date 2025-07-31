@@ -111,19 +111,19 @@ const FiscalHosting = ({ collective }) => {
   const [activateBudget] = useMutation(activateBudgetMutation);
   const [deactivateBudget] = useMutation(deactivateBudgetMutation);
 
-  const handleFundManagementUpdate = async ({ id, activate }) => {
+  const handleMoneyManagementUpdate = async ({ id, activate }) => {
     showConfirmationModal({
       title: activate ? (
-        <FormattedMessage id="FiscalHosting.manageFunds.activate" defaultMessage="Activate Fund Management" />
+        <FormattedMessage id="FiscalHosting.moneyManagement.activate" defaultMessage="Activate Money Management" />
       ) : (
-        <FormattedMessage id="FiscalHosting.manageFunds.deactivate" defaultMessage="Deactivate Fund Management" />
+        <FormattedMessage id="FiscalHosting.moneyManagement.deactivate" defaultMessage="Deactivate Money Management" />
       ),
       description: (
         <p className="my-4 text-sm">
           {activate ? (
-            <FormattedMessage defaultMessage="Are you sure you want to activate Fund Management?" id="aEioKA" />
+            <FormattedMessage defaultMessage="Are you sure you want to activate money management?" id="gqr6ok" />
           ) : (
-            <FormattedMessage defaultMessage="Are you sure you want to deactivate Fund Management?" id="b2BmIR" />
+            <FormattedMessage defaultMessage="Are you sure you want to deactivate money management?" id="kAso3j" />
           )}
         </p>
       ),
@@ -245,25 +245,28 @@ const FiscalHosting = ({ collective }) => {
     <div className="mb-10 flex w-full flex-col gap-4">
       <div className="mt-4 flex w-full flex-col gap-2">
         <SettingsSectionTitle>
-          <FormattedMessage id="FiscalHosting.manageFunds" defaultMessage="Manage Funds" />
+          <FormattedMessage id="FiscalHosting.moneyManagement" defaultMessage="Money Management" />
         </SettingsSectionTitle>
         <p className="text-sm">
           <FormattedMessage
-            id="FiscalHosting.manageFunds.description"
-            defaultMessage="Fund management gives you the ability to receive contributions and manage your organization's expenses."
+            id="FiscalHosting.moneyManagement.description"
+            defaultMessage="Money management gives you the ability to receive contributions and pay expenses."
           />
         </p>
 
         <Button
-          onClick={() => handleFundManagementUpdate({ id: collective.id, activate: !isHostAccount })}
+          onClick={() => handleMoneyManagementUpdate({ id: collective.id, activate: !isHostAccount })}
           disabled={isHostAccount && collective.plan.hostedCollectives > 0}
           variant="outline"
           className="my-2 w-fit"
         >
           {isHostAccount ? (
-            <FormattedMessage id="FiscalHosting.manageFunds.deactivate" defaultMessage="Deactivate Fund Management" />
+            <FormattedMessage
+              id="FiscalHosting.moneyManagement.deactivate"
+              defaultMessage="Deactivate Money Management"
+            />
           ) : (
-            <FormattedMessage id="FiscalHosting.manageFunds.activate" defaultMessage="Activate Fund Management" />
+            <FormattedMessage id="FiscalHosting.moneyManagement.activate" defaultMessage="Activate Money Management" />
           )}
         </Button>
 
