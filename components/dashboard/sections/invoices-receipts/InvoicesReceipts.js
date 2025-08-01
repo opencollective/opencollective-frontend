@@ -14,7 +14,7 @@ import { Box, Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
 import StyledInputField from '../../../StyledInputField';
 import StyledSelect from '../../../StyledSelect';
-import { H2, P, Span } from '../../../Text';
+import { H2, Span } from '../../../Text';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
@@ -121,14 +121,14 @@ const InvoicesReceipts = ({ account }) => {
       <SettingsSectionTitle>
         <FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
-      <P pb="26px">
+      <p className="mb-6 text-sm">
         <FormattedMessage
           id="EditHostInvoice.Receipt.Instructions"
           defaultMessage="You can customize the title (and add custom text) on automatically generated receipts for financial contributions to your Collective(s), e.g., 'donation receipt' or 'tax receipt' or a phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
         />
         {/** Un-localized on purpose, because it's not localized in the actual invoice */}
         &nbsp;<i>{defaultReceipt.placeholders.title}</i>.
-      </P>
+      </p>
       {error && (
         <MessageBox type="error" fontSize="14px" withIcon mb={3}>
           {i18nGraphqlException(intl, error)}
@@ -140,12 +140,12 @@ const InvoicesReceipts = ({ account }) => {
           <SettingsSectionTitle>
             <FormattedMessage defaultMessage="Alternative receipt template" id="CJtvlX" />
           </SettingsSectionTitle>
-          <P>
+          <p className="text-sm">
             <FormattedMessage
               defaultMessage="You can create an additional receipt for you to use as a non-tax-deductible payments for cases like event tickets, merch, or services."
               id="MNi3fa"
             />
-          </P>
+          </p>
         </div>
         <div className="mt-5 mb-10">
           {!showAlternativeReceiptsSection && (

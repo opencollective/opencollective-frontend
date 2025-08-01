@@ -8247,6 +8247,7 @@ export type MutationCreateOrderArgs = {
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
   captcha?: InputMaybe<CaptchaInputType>;
+  financiallyActive?: InputMaybe<Scalars['Boolean']['input']>;
   individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;

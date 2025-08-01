@@ -112,6 +112,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
+  const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
 
   const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
@@ -147,7 +148,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
-          if: isHost,
+          if: isHost && canHostAccounts,
           section: ALL_SECTIONS.HOST_EXPENSES,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
         },
@@ -189,7 +190,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
       subMenu: [
         {
-          if: isHost,
+          if: isHost && canHostAccounts,
           section: ALL_SECTIONS.HOSTED_FUNDS,
         },
         {
@@ -230,7 +231,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Coins,
       subMenu: [
         {
-          if: isHost || isSelfHosted,
+          if: (isHost && canHostAccounts) || isSelfHosted,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
@@ -263,7 +264,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },
     {
-      if: isHost && !isAccountantOnly && !isCommunityManagerOnly,
+      if: isHost && !isAccountantOnly && !isCommunityManagerOnly && canHostAccounts,
       type: 'group',
       Icon: Building,
       label: intl.formatMessage({ defaultMessage: 'Hosting', id: 'DkzeEN' }),
@@ -279,7 +280,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       section: ALL_SECTIONS.HOST_AGREEMENTS,
-      if: isHost,
+      if: isHost && canHostAccounts,
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
@@ -422,7 +423,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           ? [
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
-                if: !isAccountantOnly && !isSelfHosted,
+                if: !isAccountantOnly && !isSelfHosted && canHostAccounts,
               },
               {
                 section: ALL_SECTIONS.POLICIES,

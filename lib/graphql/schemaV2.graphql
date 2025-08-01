@@ -22008,6 +22008,11 @@ type Mutation {
     """
     roleDescription: String
     captcha: CaptchaInputType
+
+    """
+    If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
+    """
+    financiallyActive: Boolean = false
   ): Organization
 
   """
