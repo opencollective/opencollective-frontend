@@ -214,7 +214,7 @@ function SocialLinkItem({ value, error, onChange, onRemoveItem, useLegacyInput }
         <GripVertical size="15px" style={{ cursor: 'grab' }} />
       </div>
       <div className="flex flex-grow flex-col items-center gap-2 sm:flex-row">
-        <div className="w-full sm:max-w-32">
+        <div className="w-full min-w-24 sm:max-w-32">
           <SocialLinkTypePicker
             value={value.type}
             onChange={type => onFieldChange('type', type)}
