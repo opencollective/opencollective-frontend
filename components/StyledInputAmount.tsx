@@ -227,6 +227,7 @@ const StyledInputAmount = ({
 
   return (
     <div
+      data-testid="styled-input-amount-container"
       className={cn(
         'flex flex-wrap items-center overflow-hidden rounded border border-neutral-200 focus-within:border-blue-500 focus-within:bg-blue-100 hover:border-blue-300',
         className,
