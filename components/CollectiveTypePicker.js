@@ -43,6 +43,7 @@ const CollectiveTypePicker = ({
           borderRadius="14px"
           onClick={() => onChange(type)}
           data-cy={`collective-type-picker-${type}`}
+          type="button"
         >
           <Flex alignItems="center" flexDirection={isSingleType ? 'row' : 'column'}>
             <PlusCircle size={24} />

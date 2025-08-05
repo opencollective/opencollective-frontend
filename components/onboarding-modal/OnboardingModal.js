@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
 import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 
@@ -301,15 +300,7 @@ class OnboardingModal extends React.Component {
                   validate={this.validateFormik}
                   validateOnBlur={true}
                   initialValues={{
-                    socialLinks:
-                      collective.socialLinks?.length !== 0
-                        ? map(collective.socialLinks, sl => omit(sl, '__typename'))
-                        : [
-                            {
-                              type: SocialLinkType.WEBSITE,
-                              url: '',
-                            },
-                          ],
+                    socialLinks: map(collective.socialLinks, sl => omit(sl, '__typename')),
                   }}
                   onSubmit={values => {
                     this.submitCollectiveInfo(values);

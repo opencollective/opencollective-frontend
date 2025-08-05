@@ -3,7 +3,6 @@ import { randomEmail, randomSlug } from '../support/faker';
 describe('Onboarding modal', () => {
   before(() => {
     cy.login({ redirect: '/create/community' });
-    cy.wait(100);
   });
   it('Edit collective using Onboarding modal', () => {
     const invitedUserEmail = randomEmail();
@@ -11,9 +10,7 @@ describe('Onboarding modal', () => {
     cy.get(`input[name="slug"]`).type(randomSlug());
     cy.get(`input[name="description"]`).type('short description for new collective');
     cy.get('[data-cy="custom-checkbox"]').click();
-    cy.wait(300);
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
     // check if there is Modal with New collective created message
     cy.get('[data-cy="onboarding-collective-created"]').contains('New collective has been created!');
     cy.get('[data-cy="step-forward-button"]').click();
@@ -21,11 +18,9 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
     cy.get('[data-cy="admin-picker"]').click();
     cy.getByDataCy('collective-type-picker-USER').click();
-    cy.getByDataCy('create-collective-mini-form').then($form => {
-      cy.wrap($form).find('input[name="email"]').type(invitedUserEmail);
-      cy.wrap($form).find('input[name="name"]').type('AmazingNewUser');
-      cy.wrap($form).find('button[type="submit"]').click();
-    });
+    cy.get('[data-cy="create-collective-mini-form"] input[name="email"]').type(invitedUserEmail);
+    cy.get('[data-cy="create-collective-mini-form"] input[name="name"]').type('AmazingNewUser');
+    cy.get('[data-cy="create-collective-mini-form"] button[type="submit"]').click();
     // Profile card should have length 2 since test user is added
     cy.get('[data-cy="profile-card"]').children().should('have.length', 2);
     cy.get('[data-cy="name-of-admins"]').contains('AmazingNewUser');
@@ -35,6 +30,7 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
     cy.get('[data-cy="step-forward-button"]').click();
     // Add Github, Twitter, and website links
+    cy.contains('Add social link').click();
     cy.getByDataCy('social-link-inputs');
     cy.focused().type('https://opencollective.com/testCollective');
     cy.contains('Add social link').click();
