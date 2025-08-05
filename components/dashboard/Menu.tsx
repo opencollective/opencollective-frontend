@@ -122,10 +122,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const items: MenuItem[] = [
     {
-      if:
-        isIndividual ||
-        !isHost ||
-        (isHost && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_OVERVIEW)),
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
