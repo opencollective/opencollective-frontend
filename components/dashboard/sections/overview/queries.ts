@@ -446,6 +446,7 @@ export const hostOverviewMetricsQuery = gql`
     $hostContext: HostContext
     $transactionsForAccount: [AccountReferenceInput!]
     $excludeTransactionsForAccount: [AccountReferenceInput!]
+    $includeComparison: Boolean!
   ) {
     host(slug: $slug) {
       id
@@ -456,7 +457,7 @@ export const hostOverviewMetricsQuery = gql`
           valueInCents
           currency
         }
-        comparisonBalance: balance(dateTo: $dateFrom) {
+        comparisonBalance: balance(dateTo: $dateFrom) @include(if: $includeComparison) {
           valueInCents
           currency
         }
