@@ -17,7 +17,6 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
-  HOST_OVERVIEW = 'HOST_OVERVIEW',
 }
 
 enum Categories {
@@ -141,20 +140,6 @@ export const previewFeatures: PreviewFeature[] = [
     ),
     alwaysEnableInDev: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-    publicBeta: false,
-    category: Categories.HOSTING,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.HOST_OVERVIEW,
-    title: <FormattedMessage defaultMessage="Host Dashboard Overview" id="PreviewFeatures.hostOverviewTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="A comprehensive dashboard landing page for Host accounts that provides an overview of your organization's activities, metrics, and key information at a glance."
-        id="PreviewFeatures.hostOverviewDescription"
-      />
-    ),
-    alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
     publicBeta: false,
     category: Categories.HOSTING,
   },

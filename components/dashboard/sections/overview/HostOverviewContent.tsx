@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { isHeavyAccount } from '@/lib/collective';
 import dayjs from '@/lib/dayjs';
 import { HostContext, type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
@@ -87,6 +88,7 @@ export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
   const { data, loading, error } = useQuery(hostOverviewMetricsQuery, {
     variables: {
       slug: accountSlug,
+      includeComparison: !isHeavyAccount(accountSlug),
       ...queryFilter.variables,
     },
     fetchPolicy: 'cache-and-network',

@@ -9,6 +9,30 @@ interface TimelineMessageDescriptor extends MessageDescriptor {
 }
 
 export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessageDescriptor>({
+  COLLECTIVE_APPROVED: {
+    defaultMessage: "<Individual></Individual> approved <Account></Account>'s application to be hosted",
+    id: 'tMbYww',
+  },
+  COLLECTIVE_CORE_MEMBER_ADDED: {
+    defaultMessage:
+      '<Individual></Individual> added <FromAccount></FromAccount> as an <MemberRole></MemberRole> for <Account></Account>',
+    id: '2FxRMv',
+  },
+  COLLECTIVE_CORE_MEMBER_REMOVED: {
+    defaultMessage:
+      '<Individual></Individual> removed <FromAccount></FromAccount> as an <MemberRole></MemberRole> for <Account></Account>',
+    id: '6J42kW',
+  },
+  COLLECTIVE_FROZEN: { defaultMessage: '<Individual></Individual> froze <Account></Account>', id: 'CU72pt' },
+  COLLECTIVE_UNFROZEN: { defaultMessage: '<Individual></Individual> unfreezed <Account></Account>', id: '468Qmg' },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: '<Individual></Individual> unhosted <Account></Account>',
+    id: 'F1HIGZ',
+  },
+  COLLECTIVE_APPLY: {
+    defaultMessage: '<Individual></Individual> submitted an application for <Account></Account> to be hosted',
+    id: 'D/dskn',
+  },
   COLLECTIVE_EXPENSE_CREATED: {
     defaultMessage:
       '<Individual></Individual> submitted expense <Expense>{expenseDescription}</Expense> to <Account></Account>',
