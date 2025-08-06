@@ -758,7 +758,7 @@ const AddFundsModalContentWithCollective = ({
                 >
                   {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
                 </Field>
-                <Flex mt={3} flexWrap="wrap" alignItems="flex-end">
+                <Flex mt={3} flexWrap="wrap" alignItems="flex-start">
                   <Field
                     name="amount"
                     htmlFor="addFunds-amount"
