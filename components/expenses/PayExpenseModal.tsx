@@ -346,11 +346,14 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
     if (feesPayer === 'PAYEE') {
       totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
     }
+    console.log({ quote });
     return {
+      amountInExpenseCurrency: { valueInCents: expense.amount, currency: expense.currency },
       paymentProcessorFee: quote.paymentProcessorFeeAmount,
       totalAmount,
       effectiveRate,
       expenseAmountInHostCurrency,
+      isMultiCurrency: expense.currency !== host.currency,
     };
   } else {
     const isMultiCurrency = expense.currency !== host.currency;
@@ -436,6 +439,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     host,
     feesPayer: formik.values.feesPayer,
   });
+
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
   const paymentServiceOptions = React.useMemo(
     () => [
@@ -678,12 +682,24 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </Label>
                 <Amount>
                   {amounts.isMultiCurrency ? (
-                    <FormattedMoneyAmount
-                      amount={amounts.amountInExpenseCurrency?.valueInCents}
-                      currency={amounts.amountInExpenseCurrency?.currency}
-                      amountClassName="font-medium"
-                      currencyCodeClassName="text-muted-foreground"
-                    />
+                    <div>
+                      <div className="flex flex-row-reverse gap-1">
+                        <FormattedMoneyAmount
+                          amount={formik.values.expenseAmountInHostCurrency}
+                          currency={amounts.expenseAmountInHostCurrency?.currency}
+                          amountClassName="font-medium"
+                          currencyCodeClassName="text-muted-foreground"
+                        />
+                      </div>
+                      <div className="flex flex-row-reverse gap-1 text-xs text-muted-foreground italic">
+                        <FormattedMoneyAmount
+                          amount={amounts.amountInExpenseCurrency?.valueInCents}
+                          currency={amounts.amountInExpenseCurrency?.currency}
+                          amountClassName="font-medium"
+                          currencyCodeClassName="text-muted-foreground"
+                        />
+                      </div>
+                    </div>
                   ) : (
                     <FormattedMoneyAmount
                       amount={formik.values.expenseAmountInHostCurrency}
@@ -733,11 +749,14 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               <AmountLine borderTop="1px solid #4E5052" pt={11}>
                 <Label color="black.900" fontWeight="600">
                   {amounts.paymentProcessorFee !== null ? (
-                    <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
+                    <FormattedMessage defaultMessage="Total amount to pay" id="D02MEK" />
                   ) : (
                     <Tooltip>
                       <TooltipTrigger className="flex items-center gap-1">
-                        <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                        <FormattedMessage
+                          id="TotalAmountWithoutFee"
+                          defaultMessage="Total amount to pay (without fees)"
+                        />
                         <CircleHelp size={16} className="text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent>
@@ -754,7 +773,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     <LoadingPlaceholder height="16px" />
                   ) : amounts.isMultiCurrency ? (
                     <AmountWithExchangeRateInfo
-                      amount={amounts.expenseAmountInHostCurrency}
+                      amount={amounts.totalAmount}
                       currencyCodeClassName="text-muted-foreground"
                       amountWrapperClassName="flex flex-row-reverse gap-1"
                     />
