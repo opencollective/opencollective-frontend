@@ -1,9 +1,9 @@
 /* eslint-disable prefer-arrow-callback */
 import React, { useId } from 'react';
-import { TaxType } from '@opencollective/taxes';
+import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useFormikContext } from 'formik';
-import { get, pick, round } from 'lodash';
+import { get, isNil, pick, round } from 'lodash';
 import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
@@ -584,17 +584,23 @@ const Taxes = React.memo(function Taxes(props: {
   const onHasTaxChange = React.useCallback(
     (checked: CheckedState) => {
       setFieldValue('hasTax', Boolean(checked));
+      if (props.taxType === TaxType.GST) {
+        setFieldValue('tax', { rate: GST_RATE_PERCENT, idNumber: '', ...props.tax });
+      } else if (props.taxType === TaxType.VAT) {
+        setFieldValue('tax', { rate: null, idNumber: '', ...props.tax });
+      }
     },
-    [setFieldValue],
+    [setFieldValue, props.taxType, props.tax],
   );
 
   return (
     <div>
       <FormField label={intl.formatMessage({ defaultMessage: 'Taxes', id: 'r+dgiv' })} name="hasTax">
         {() => (
-          <div className="items-top mt-1 flex space-x-2">
+          <div className="items-top mt-1 flex items-center space-x-2">
             <Checkbox
               id="hasTax"
+              name="hasTax"
               disabled={props.isSubmitting}
               checked={props.hasTax}
               onCheckedChange={onHasTaxChange}
@@ -629,12 +635,14 @@ const Taxes = React.memo(function Taxes(props: {
                 <StyledSelect
                   disabled={props.isSubmitting}
                   inputId={`input-${props.taxType}-rate`}
+                  required={true}
+                  minWidth={115}
                   value={{
                     value: round(field.value * 100, 2),
                     label: i18nTaxRate(intl, props.taxType, field.value),
                   }}
                   onChange={({ value }) => props.setFieldValue('tax.rate', value)}
-                  options={[0, 0.15].map(rate => ({
+                  options={[0, GST_RATE_PERCENT].map(rate => ({
                     value: rate,
                     label: i18nTaxRate(intl, props.taxType, rate),
                   }))}
@@ -657,7 +665,7 @@ const Taxes = React.memo(function Taxes(props: {
               {({ field }) => (
                 <InputGroup
                   {...field}
-                  value={field.value ? round(field.value * 100, 2) : 0}
+                  value={isNil(field.value) ? '' : round(field.value * 100, 2)}
                   onChange={e => props.setFieldValue('tax.rate', round((e.target.value as any) / 100, 4))}
                   minWidth={65}
                   append="%"
