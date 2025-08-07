@@ -1,11 +1,13 @@
 import React from 'react';
 import type { Path } from 'dot-path-value';
 import { useFormikContext } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, startCase } from 'lodash';
 import type { MessageDescriptor } from 'react-intl';
-import { defineMessage, FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { cn } from '../../lib/utils';
+
+import { useToast } from '../ui/useToast';
 
 import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
 
@@ -41,7 +43,7 @@ export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
     'invoiceNumber',
   ],
   [Step.EXPENSE_CATEGORY]: ['accountingCategoryId'],
-  [Step.EXPENSE_ITEMS]: ['expenseItems'],
+  [Step.EXPENSE_ITEMS]: ['expenseItems', 'tax'],
   [Step.EXPENSE_TITLE]: ['title', 'acknowledgedCollectiveTitleExpensePolicy', 'acknowledgedHostTitleExpensePolicy'],
   [Step.SUMMARY]: [],
   [Step.INVITE_WELCOME]: [],
@@ -132,6 +134,8 @@ function isExpenseFormStepTouched(form: ExpenseForm, step: Step): boolean {
 export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   const form = useFormikContext() as ExpenseForm;
   const hasErrors = Object.values(Step).some(step => expenseFormStepHasError(form, step));
+  const { toast } = useToast();
+  const intl = useIntl();
 
   const stepOrder = [
     Step.WHO_IS_PAYING,
@@ -154,9 +158,22 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   // Scroll to first step with error
   const firstIncompleteSection = stepOrder.find(s => !isExpenseFormStepCompleted(form, s));
   const submitCount = form.submitCount;
+
   React.useEffect(() => {
-    if (firstIncompleteSection && submitCount > 0) {
-      document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
+    if (submitCount > 0) {
+      if (firstIncompleteSection) {
+        document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
+      } else if (!hasErrors && !isEmpty(form.errors)) {
+        // If we can't scroll to the error (usually, because the fields are missing from StepValues), we add a toast instead
+        toast({
+          variant: 'error',
+          title: intl.formatMessage({ defaultMessage: 'Form validation failed', id: 'Wb0E1r' }),
+          message: intl.formatMessage(
+            { defaultMessage: 'The following fields are missing: {fields}.', id: '16YGxq' },
+            { fields: Object.keys(form.errors).map(key => startCase(key)) },
+          ),
+        });
+      }
     }
   }, [hasErrors, firstIncompleteSection, submitCount]);
 
