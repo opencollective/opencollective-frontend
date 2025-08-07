@@ -99,6 +99,7 @@
     "lottie-react": "2.4.1",
     "lucide-react": "0.525.0",
     "memoize-one": "6.0.0",
+    "motion": "^12.23.12",
     "next": "14.2.30",
     "node-fetch": "^2.7.0",
     "nprogress": "0.2.0",
