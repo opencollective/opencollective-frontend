@@ -220,7 +220,10 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
   );
 
   const hasFilters = React.useMemo(
-    () => !isEmpty(omitBy(opts.filters, (v, key) => values[key] === defaultSchemaValues[key] || key === 'orderBy')),
+    () =>
+      !isEmpty(
+        omitBy(opts.filters, (v, key) => values[key] === defaultSchemaValues[key] || ['orderBy', 'sort'].includes(key)),
+      ),
     [values, opts.filters, defaultSchemaValues],
   );
 
