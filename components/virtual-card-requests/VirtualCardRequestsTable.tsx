@@ -183,7 +183,7 @@ const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'createdAt',
     meta: { className: 'w-28' },
-    header: () => <FormattedMessage id="VirtualCards.CreatedAt" defaultMessage="Created At" />,
+    header: () => <FormattedMessage id="CreatedAt" defaultMessage="Created At" />,
     cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
       return (
         <div className="">
