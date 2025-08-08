@@ -10,6 +10,7 @@ import { MainDescription } from '../components/marketing/Text';
 import Page from '../components/Page';
 import { Button } from '@/components/ui/Button';
 import Features from '@/components/home/solutions/Features';
+import Testimonials from '@/components/home/solutions/Testimonials';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -209,6 +210,7 @@ export const Solutions = () => {
           <Features />
         </div>
       </div>
+      <Testimonials />
     </Page>
   );
 };
