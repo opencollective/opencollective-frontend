@@ -55,11 +55,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const { LoggedInUser } = useLoggedInUser();
 
-  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
-  const omitExpenseTypesInFilter = hasGrantAndFundsReorgEnabled ? [ExpenseType.GRANT] : [];
+  const omitExpenseTypesInFilter = [ExpenseType.GRANT];
 
   const queryFilter = useQueryFilter<typeof schema, { type: ExpenseType }>({
     schema,

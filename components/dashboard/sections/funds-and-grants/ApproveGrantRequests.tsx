@@ -16,6 +16,7 @@ import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { DataTable } from '@/components/table/DataTable';
 
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -91,6 +92,7 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
   const router = useRouter();
+  const { account } = React.useContext(DashboardContext);
 
   const { data: metadata } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
@@ -168,7 +170,13 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
       <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Approve Grants Requests" id="nsfRjl" />}
-          description={<FormattedMessage defaultMessage="Review Grant Requests submitted to your fund" id="+fA6C2" />}
+          description={
+            account?.type === 'FUND' ? (
+              <FormattedMessage defaultMessage="Review Grant Requests submitted to your fund" id="+fA6C2" />
+            ) : (
+              <FormattedMessage defaultMessage="Review Grant Requests submitted to a fund you host" id="KnELJS" />
+            )
+          }
         />
 
         <Filterbar {...queryFilter} />
