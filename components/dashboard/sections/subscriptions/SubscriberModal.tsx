@@ -229,7 +229,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
               {props.isLegacy ? (
                 <FormattedMessage id="UpgradeSubscription" defaultMessage="Upgrade Subscription" />
               ) : (
-                <FormattedMessage id="Save" defaultMessage="Save" />
+                <FormattedMessage id="save" defaultMessage="Save" />
               )}
             </Button>
           </div>
