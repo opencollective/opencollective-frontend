@@ -19,6 +19,10 @@ exports.REWRITES = [
     destination: '/welcome',
   },
   {
+    source: '/solutions',
+    destination: '/solutions',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
   },
