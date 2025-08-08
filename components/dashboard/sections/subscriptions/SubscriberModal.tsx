@@ -141,7 +141,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                   const plan = planOptions.find(option => option.value === value);
                   setFieldValue(field.name, plan.value);
                   const fields = keysDeep(plan.data, undefined, ['__typename', 'id']);
-                  fields.map(f => {
+                  fields.forEach(f => {
                     const value = get(plan.data, f);
                     setFieldValue(`plan.${f}`, value);
                   });

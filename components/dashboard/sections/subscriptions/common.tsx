@@ -1,12 +1,11 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { groupBy, mapValues, pick, toPairs } from 'lodash';
 import { ArrowUpRight } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedDate, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getCollectivePageCanonicalURL } from '../../../../lib/url-helpers';
 import { CollectiveType } from '@/lib/constants/collectives';
@@ -20,10 +19,6 @@ import { Badge } from '../../../ui/Badge';
 import { TableActionsButton } from '../../../ui/Table';
 import { buildAccountTypeFilter } from '../../filters/AccountTypeFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-
-export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
-  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
-}
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
