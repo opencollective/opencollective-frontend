@@ -47,6 +47,7 @@ import { Span } from '../Text';
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
+import { useRouter } from 'next/router';
 
 const DisableGlobalScrollOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
@@ -474,6 +475,7 @@ const CollectiveNavbar = ({
   useAnchorsForCategories = false,
   showSelectedCategoryOnMobile = false,
 }) => {
+  const router = useRouter();
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
@@ -682,8 +684,11 @@ const CollectiveNavbar = ({
       </NavBarContainer>
       {isSubmitExpenseModalOpen && (
         <SubmitExpenseFlow
-          onClose={() => {
+          onClose={(isSubmitted, hasSelectedViewAll) => {
             setIsSubmitExpenseModalOpen(false);
+            if (isSubmitted && hasSelectedViewAll) {
+              router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+            }
           }}
           submitExpenseTo={collective?.slug}
         />
