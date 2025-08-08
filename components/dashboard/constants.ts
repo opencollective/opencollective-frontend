@@ -55,6 +55,8 @@ export const ROOT_SECTIONS = {
   ACCOUNT_TYPE: 'account-type',
   ANONYMIZE_ACCOUNT: 'anonymize-account',
   RECURRING_CONTRIBUTIONS: 'recurring-contributions',
+  SUBSCRIBERS: 'subscribers',
+  LEGACY_SUBSCRIBERS: 'legacy-subscribers',
 };
 
 export const SETTINGS_SECTIONS = {
