@@ -251,6 +251,7 @@ function createInMemoryCache() {
       AccountWithHost: ['Collective', 'Event', 'Fund', 'Project'],
       AccountWithParent: ['Event', 'Project'],
       AccountWithContributions: ['Collective', 'Organization', 'Event', 'Fund', 'Project', 'Host'],
+      AccountWithPlatformSubscription: ['Organization', 'Collective'],
     },
     // Documentation:
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#merging-non-normalized-objects

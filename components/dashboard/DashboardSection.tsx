@@ -50,6 +50,7 @@ import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxFo
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import Reports from './sections/reports/Reports';
+import LegacySubscribers from './sections/subscriptions/LegacySubscribers';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
@@ -132,6 +133,7 @@ const ROOT_COMPONENTS = {
   [ROOT_SECTIONS.ACCOUNT_SETTINGS]: AccountSettingsForm,
   [ROOT_SECTIONS.ACCOUNT_TYPE]: AccountType,
   [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
+  [ROOT_SECTIONS.LEGACY_SUBSCRIBERS]: LegacySubscribers,
 };
 
 interface DashboardSectionProps {

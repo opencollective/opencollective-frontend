@@ -108,7 +108,7 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLA
       )}
       {...props}
     >
-      <MoreHorizontal size={20} />
+      {props.children || <MoreHorizontal size={20} />}
     </button>
   ),
 );

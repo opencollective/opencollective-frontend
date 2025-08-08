@@ -11,6 +11,7 @@ import {
   FileText,
   FlaskConical,
   Globe2,
+  HandCoins,
   HeartHandshake,
   LayoutDashboard,
   Megaphone,
@@ -72,6 +73,15 @@ const ROOT_MENU = [
       { label: 'Recurring Contributions', section: ROOT_SECTIONS.RECURRING_CONTRIBUTIONS },
       { label: 'Activity Log', section: ALL_SECTIONS.ACTIVITY_LOG },
       { label: 'Clear Cache', section: ROOT_SECTIONS.CLEAR_CACHE },
+    ],
+  },
+  {
+    type: 'group',
+    label: 'Subscriptions',
+    Icon: HandCoins,
+    subMenu: [
+      // { label: 'Manage Subscriptions', section: ROOT_SECTIONS.SUBSCRIBERS },
+      { label: 'Legacy Subscribers', section: ROOT_SECTIONS.LEGACY_SUBSCRIBERS },
     ],
   },
   {
