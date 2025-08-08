@@ -7,7 +7,7 @@ import { isMulti } from '@/lib/filters/schemas';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-export enum TRUST_LEVELS {
+enum TRUST_LEVELS {
   VERIFIED = 'VERIFIED',
   FIRST_PARTY = 'FIRST_PARTY',
 }

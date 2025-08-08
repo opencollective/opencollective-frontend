@@ -9,8 +9,6 @@ import formatCollectiveType from '@/lib/i18n/collective-type';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-export { CollectiveType };
-
 export const buildAccountTypeFilter = ({
   types = CollectiveType,
   defaultValue,
