@@ -11,6 +11,7 @@ import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
@@ -474,6 +475,7 @@ const CollectiveNavbar = ({
   useAnchorsForCategories = false,
   showSelectedCategoryOnMobile = false,
 }) => {
+  const router = useRouter();
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
@@ -682,8 +684,11 @@ const CollectiveNavbar = ({
       </NavBarContainer>
       {isSubmitExpenseModalOpen && (
         <SubmitExpenseFlow
-          onClose={() => {
+          onClose={(isSubmitted, hasSelectedViewAll) => {
             setIsSubmitExpenseModalOpen(false);
+            if (isSubmitted && hasSelectedViewAll) {
+              router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+            }
           }}
           submitExpenseTo={collective?.slug}
         />

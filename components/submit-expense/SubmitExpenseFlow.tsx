@@ -19,7 +19,7 @@ import { SubmittedExpense } from './SubmittedExpense';
 import { InviteeAccountType, RecurrenceFrequencyOption, useExpenseForm, YesNoOption } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
-  onClose: (submittedExpense: boolean) => void;
+  onClose: (submittedExpense: boolean, hasSelectedViewAll: boolean) => void;
   expenseId?: number;
   draftKey?: string;
   duplicateExpense?: boolean;
@@ -48,14 +48,17 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   });
 
   const { onClose } = props;
-  const handleOnClose = React.useCallback(() => {
-    if (confirmNavigation()) {
-      onClose(!!submittedExpenseId);
-    }
-  }, [confirmNavigation, onClose, submittedExpenseId]);
+  const handleOnClose = React.useCallback(
+    (hasSelectedViewAll = false) => {
+      if (confirmNavigation()) {
+        onClose(!!submittedExpenseId, hasSelectedViewAll);
+      }
+    },
+    [confirmNavigation, onClose, submittedExpenseId],
+  );
 
   const onExpenseInviteDeclined = React.useCallback(() => {
-    onClose(true);
+    onClose(true, false);
   }, [onClose]);
 
   const onSuccess = React.useCallback(
@@ -126,7 +129,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 />
               </span>
               <Button
-                onClick={handleOnClose}
+                onClick={() => handleOnClose()}
                 variant="ghost"
                 className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
                 asChild
@@ -137,7 +140,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 </span>
               </Button>
 
-              <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden">
+              <Button onClick={() => handleOnClose()} variant="ghost" className="cursor-pointer sm:hidden">
                 <X />
               </Button>
             </header>
@@ -149,7 +152,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </div>
             </main>
             <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
-              <Button onClick={handleOnClose}>
+              <Button onClick={() => handleOnClose(true)}>
                 {props.endFlowButtonLabel || (
                   <FormattedMessage
                     defaultMessage="View all expenses"
@@ -190,7 +193,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
             </span>
             <Button
-              onClick={handleOnClose}
+              onClick={() => handleOnClose()}
               variant="ghost"
               className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
               asChild
@@ -201,7 +204,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </span>
             </Button>
 
-            <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden">
+            <Button onClick={() => handleOnClose()} variant="ghost" className="cursor-pointer sm:hidden">
               <X />
             </Button>
           </header>
