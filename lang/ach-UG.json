@@ -3986,7 +3986,7 @@
   "VirtualCards.AssignedOnDateTo": "crwdns24098:0createdAt={createdAt}crwdnd24098:0assignedTo={assignedTo}crwdne24098:0",
   "VirtualCards.AvailableBalance": "crwdns25965:0crwdne25965:0",
   "VirtualCards.CardNumber": "crwdns20988:0crwdne20988:0",
-  "VirtualCards.CreatedAt": "crwdns26013:0crwdne26013:0",
+  "CreatedAt": "crwdns26013:0crwdne26013:0",
   "VirtualCards.CVV": "crwdns20990:0crwdne20990:0",
   "VirtualCards.Description": "crwdns21861:0crwdne21861:0",
   "virtualCards.description": "crwdns23824:0crwdne23824:0",

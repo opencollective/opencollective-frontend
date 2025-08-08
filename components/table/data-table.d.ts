@@ -31,5 +31,6 @@ declare module '@tanstack/react-table' {
     // AccountingCateriesTable
     disabled?: boolean;
     onDelete?: (v: any) => void;
+    [key: string]: any; // Allow additional properties for flexibility
   }
 }
