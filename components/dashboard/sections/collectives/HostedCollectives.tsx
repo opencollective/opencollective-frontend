@@ -15,8 +15,6 @@ import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Drawer } from '../../../Drawer';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -97,16 +95,16 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   },
   type: {
     labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
-    Component: ({ intl, meta, ...props }) => {
+    Component: ({ intl, ...props }) => {
       const options = useMemo(
         () =>
           Object.values(HostedCollectiveTypes)
-            .filter(type => (meta.hasGrantAndFundsReorgEnabled ? type !== HostedCollectiveTypes.FUND : true))
+            .filter(type => type !== HostedCollectiveTypes.FUND)
             .map(value => ({
               label: formatCollectiveType(intl, value),
               value,
             })),
-        [intl, meta.hasGrantAndFundsReorgEnabled],
+        [intl],
       );
       return <ComboSelectFilter options={options} isMulti {...props} />;
     },
@@ -122,15 +120,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const router = useRouter();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
-
-  const { LoggedInUser } = useLoggedInUser();
-  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
-  const accountTypes = hasGrantAndFundsReorgEnabled
-    ? [CollectiveType.COLLECTIVE]
-    : [CollectiveType.COLLECTIVE, CollectiveType.FUND];
+  const accountTypes = [CollectiveType.COLLECTIVE];
 
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
     variables: { hostSlug, accountTypes },
@@ -197,7 +187,6 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     meta: {
       currency: metadata?.host?.currency,
       currencies: metadata?.host?.all?.currencies,
-      hasGrantAndFundsReorgEnabled,
     },
   });
 

@@ -13,6 +13,7 @@ export const adminPanelQuery = gql`
       name
       isHost
       type
+      supportedExpenseTypes
       settings
       isArchived
       isActive
@@ -43,6 +44,9 @@ export const adminPanelQuery = gql`
         limit: 0
         type: GRANT
       ) {
+        totalCount
+      }
+      receivedGrantRequests: expenses(direction: RECEIVED, limit: 0, type: GRANT) {
         totalCount
       }
       issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
