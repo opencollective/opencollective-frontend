@@ -125,6 +125,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isChild = isChildAccount(account);
   const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
 
+  const hasPlatformBillingEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING);
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
@@ -432,6 +433,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         // Host sections
         ...(isHost || isSelfHosted
           ? [
+              {
+                section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
+                Icon: Wallet,
+                label: intl.formatMessage({ defaultMessage: 'Platform Subscription', id: '28toyD' }),
+                if: hasPlatformBillingEnabled,
+              },
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
                 if: !isAccountantOnly && !isSelfHosted && canHostAccounts,

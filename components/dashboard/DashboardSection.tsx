@@ -49,6 +49,7 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
+import { DashboardPlatformSubscription } from './sections/platform-subscription/DashboardPlatformSubscription';
 import Reports from './sections/reports/Reports';
 import LegacyPlatformSubscribers from './sections/subscriptions/LegacyPlatformSubscribers';
 import PlatformSubscribers from './sections/subscriptions/PlatformSubscribers';
@@ -109,6 +110,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
   [SECTIONS.ACCOUNTS]: Accounts,
+  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
 };
 
 const SETTINGS_COMPONENTS = {
