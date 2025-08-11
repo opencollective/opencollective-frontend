@@ -1078,7 +1078,6 @@ type CollectiveFeatures {
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
-  RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
   CONVERSATIONS: CollectiveFeatureStatus
@@ -1089,8 +1088,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  TRANSFERWISE: CollectiveFeatureStatus
-  PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
@@ -1102,6 +1099,20 @@ type CollectiveFeatures {
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
   OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
+  TRANSFERWISE: CollectiveFeatureStatus
+  PAYPAL_PAYOUTS: CollectiveFeatureStatus
+  RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  CHART_OF_ACCOUNTS: CollectiveFeatureStatus
+  EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
+  EXPECTED_FUNDS: CollectiveFeatureStatus
+  CHARGE_HOSTING_FEES: CollectiveFeatureStatus
+  RESTRICTED_FUNDS: CollectiveFeatureStatus
+  AGREEMENTS: CollectiveFeatureStatus
+  TAX_FORMS: CollectiveFeatureStatus
+  CONNECT_BANK_ACCOUNTS: CollectiveFeatureStatus
+  FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
+  VENDORS: CollectiveFeatureStatus
+  ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {

@@ -2812,7 +2812,7 @@ type AccountingCategory {
 """
 This represents an Host account
 """
-type Host implements Account & AccountWithContributions {
+type Host implements Account & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
 
@@ -3838,6 +3838,13 @@ type Host implements Account & AccountWithContributions {
   hasResumeContributionsProcessStarted: Boolean!
 
   """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
+
+  """
   List of accounting categories for this host
   """
   accountingCategories(
@@ -4559,6 +4566,224 @@ type AccountCollection implements Collection {
 }
 
 """
+An account that can be hosted by a Host
+"""
+interface AccountWithPlatformSubscription {
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
+}
+
+type PlatformSubscription {
+  """
+  Start date (inclusive)
+  """
+  startDate: DateTime!
+
+  """
+  End date (inclusive), null if not set
+  """
+  endDate: DateTime
+  isCurrent: Boolean!
+  plan: PlatformSubscriptionTier!
+}
+
+"""
+Type for Platform Subscription Tier
+"""
+type PlatformSubscriptionTier {
+  """
+  The title of the subscription tier
+  """
+  id: String!
+
+  """
+  The title of the subscription tier
+  """
+  title: String!
+
+  """
+  The type of the subscription tier (e.g., "basic", "premium")
+  """
+  type: String!
+  pricing: PlatformSubscriptionTierPricing!
+  features: PlatformSubscriptionFeatures!
+}
+
+type PlatformSubscriptionTierPricing {
+  """
+  The price of the subscription tier per month
+  """
+  pricePerMonth: Amount!
+
+  """
+  Price for each additional collective beyond the included limit
+  """
+  pricePerAdditionalCollective: Amount!
+
+  """
+  Price for each additional expense beyond the included limit
+  """
+  pricePerAdditionalExpense: Amount!
+
+  """
+  Number of collectives included in this subscription tier
+  """
+  includedCollectives: Int!
+
+  """
+  Number of expenses included in this subscription tier per month
+  """
+  includedExpensesPerMonth: Int!
+}
+
+type PlatformSubscriptionFeatures {
+  TRANSFERWISE: Boolean!
+  PAYPAL_PAYOUTS: Boolean!
+  RECEIVE_HOST_APPLICATIONS: Boolean!
+  CHART_OF_ACCOUNTS: Boolean!
+  EXPENSE_SECURITY_CHECKS: Boolean!
+  EXPECTED_FUNDS: Boolean!
+  CHARGE_HOSTING_FEES: Boolean!
+  RESTRICTED_FUNDS: Boolean!
+  AGREEMENTS: Boolean!
+  TAX_FORMS: Boolean!
+  CONNECT_BANK_ACCOUNTS: Boolean!
+  FUNDS_GRANTS_MANAGEMENT: Boolean!
+  VENDORS: Boolean!
+  USE_EXPENSES: Boolean!
+  UPDATES: Boolean!
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
+  RECEIVE_EXPENSES: Boolean!
+  ACCOUNT_MANAGEMENT: Boolean!
+}
+
+type PlatformBilling {
+  billingPeriod: PlatformBillingPeriod!
+  subscriptions: [PlatformSubscription!]!
+  utilization: PlatformSubscriptionUtilization!
+}
+
+type PlatformBillingPeriod {
+  year: Int!
+  month: PlatformBillingMonth!
+  startDate: DateTime!
+  endDate: DateTime!
+  isCurrent: Boolean!
+}
+
+enum PlatformBillingMonth {
+  JANUARY
+  FEBRUARY
+  MARCH
+  APRIL
+  MAY
+  JUNE
+  JULY
+  AUGUST
+  SEPTEMBER
+  OCTOBER
+  NOVEMBER
+  DECEMBER
+}
+
+type PlatformSubscriptionUtilization {
+  billingPeriod: PlatformBillingPeriod!
+  startDate: DateTime!
+  endDate: DateTime!
+  activeCollectives: Int!
+  expensesPaid: Int!
+}
+
+input PlatformBillingPeriodInput {
+  year: Int!
+  month: PlatformBillingMonth!
+}
+
+"""
+The name of the current plan and its characteristics.
+"""
+type HostPlan {
+  """
+  The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
+  """
+  id: String
+
+  """
+  The name of the plan
+  """
+  name: String
+
+  """
+  Number of collectives hosted
+  """
+  hostedCollectives: Int
+
+  """
+  Max number of collectives than can be hosted
+  """
+  hostedCollectivesLimit: Int
+
+  """
+  Whether this plan allows to use the added funds feature
+  """
+  addedFunds: Int
+
+  """
+  Amount limit for the added funds feature under this plan
+  """
+  addedFundsLimit: Int
+
+  """
+  Whether this plan allows to use the host dashboard
+  """
+  hostDashboard: Boolean
+
+  """
+  Whether this plan allows to use the manual payments feature
+  """
+  manualPayments: Boolean
+
+  """
+  Whether this plan allows to use the bank transfers feature
+  """
+  bankTransfers: Int
+
+  """
+  Amount limit for the bank transfers feature under this plan
+  """
+  bankTransfersLimit: Int
+
+  """
+  Whether this plan allows to use the transferwise payouts feature
+  """
+  transferwisePayouts: Int
+
+  """
+  Amount limit for the transferwise payouts feature under this plan
+  """
+  transferwisePayoutsLimit: Int
+
+  """
+  Ability to charge Host Fees.
+  """
+  hostFees: Boolean
+
+  """
+  Charge on revenues made through Host Fees.
+  """
+  hostFeeSharePercent: Float
+
+  """
+  Ability to collect Platform Tips.
+  """
+  platformTips: Boolean
+}
+
+"""
 A legal document (e.g. W9, W8BEN, W8BEN-E)
 """
 type LegalDocument {
@@ -4730,6 +4955,11 @@ enum OrderByFieldType {
   Order by the date the collective was unhosted
   """
   UNHOSTED_AT
+
+  """
+  Order by the total amount managed by the Organization on the platform
+  """
+  MONEY_MANAGED
 }
 
 """
@@ -6233,6 +6463,11 @@ type AccountStats {
     """
     kind: [TransactionKind]
   ): TimeSeriesAmount!
+
+  """
+  The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account.
+  """
+  managedAmount: Amount
 }
 
 """
@@ -6372,7 +6607,6 @@ type CollectiveFeatures {
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
-  RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
   CONVERSATIONS: CollectiveFeatureStatus
@@ -6383,8 +6617,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  TRANSFERWISE: CollectiveFeatureStatus
-  PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
@@ -6396,6 +6628,20 @@ type CollectiveFeatures {
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
   OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
+  TRANSFERWISE: CollectiveFeatureStatus
+  PAYPAL_PAYOUTS: CollectiveFeatureStatus
+  RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  CHART_OF_ACCOUNTS: CollectiveFeatureStatus
+  EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
+  EXPECTED_FUNDS: CollectiveFeatureStatus
+  CHARGE_HOSTING_FEES: CollectiveFeatureStatus
+  RESTRICTED_FUNDS: CollectiveFeatureStatus
+  AGREEMENTS: CollectiveFeatureStatus
+  TAX_FORMS: CollectiveFeatureStatus
+  CONNECT_BANK_ACCOUNTS: CollectiveFeatureStatus
+  FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
+  VENDORS: CollectiveFeatureStatus
+  ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -6935,86 +7181,6 @@ enum AccountingCategoryKind {
   ADDED_FUNDS
   CONTRIBUTION
   EXPENSE
-}
-
-"""
-The name of the current plan and its characteristics.
-"""
-type HostPlan {
-  """
-  The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
-  """
-  id: String
-
-  """
-  The name of the plan
-  """
-  name: String
-
-  """
-  Number of collectives hosted
-  """
-  hostedCollectives: Int
-
-  """
-  Max number of collectives than can be hosted
-  """
-  hostedCollectivesLimit: Int
-
-  """
-  Whether this plan allows to use the added funds feature
-  """
-  addedFunds: Int
-
-  """
-  Amount limit for the added funds feature under this plan
-  """
-  addedFundsLimit: Int
-
-  """
-  Whether this plan allows to use the host dashboard
-  """
-  hostDashboard: Boolean
-
-  """
-  Whether this plan allows to use the manual payments feature
-  """
-  manualPayments: Boolean
-
-  """
-  Whether this plan allows to use the bank transfers feature
-  """
-  bankTransfers: Int
-
-  """
-  Amount limit for the bank transfers feature under this plan
-  """
-  bankTransfersLimit: Int
-
-  """
-  Whether this plan allows to use the transferwise payouts feature
-  """
-  transferwisePayouts: Int
-
-  """
-  Amount limit for the transferwise payouts feature under this plan
-  """
-  transferwisePayoutsLimit: Int
-
-  """
-  Ability to charge Host Fees.
-  """
-  hostFees: Boolean
-
-  """
-  Charge on revenues made through Host Fees.
-  """
-  hostFeeSharePercent: Float
-
-  """
-  Ability to collect Platform Tips.
-  """
-  platformTips: Boolean
 }
 
 """
@@ -9468,7 +9634,7 @@ type Bot implements Account {
 """
 This represents a Collective account
 """
-type Collective implements Account & AccountWithHost & AccountWithContributions {
+type Collective implements Account & AccountWithHost & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
 
@@ -10553,6 +10719,13 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns true if the account has started the process to resume contributions
   """
   hasResumeContributionsProcessStarted: Boolean!
+
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
 }
 
 """
@@ -13404,7 +13577,7 @@ type MemberOf {
 """
 This represents an Organization account
 """
-type Organization implements Account & AccountWithContributions {
+type Organization implements Account & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
 
@@ -14426,6 +14599,13 @@ type Organization implements Account & AccountWithContributions {
   Returns true if the account has started the process to resume contributions
   """
   hasResumeContributionsProcessStarted: Boolean!
+
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
@@ -15753,6 +15933,26 @@ type Query {
     Filter by the balance of the account and its children accounts (events and projects)
     """
     consolidatedBalance: AmountRangeInput
+
+    """
+    Filter by the plan slug of the account
+    """
+    plan: [String]
+
+    """
+    Filter accounts that are subscribers to the platform
+    """
+    isSubscriber: Boolean
+
+    """
+    Filter accounts that are verified
+    """
+    isVerified: Boolean
+
+    """
+    Filter accounts that are first party hosts
+    """
+    isFirstPartyHost: Boolean
   ): AccountCollection!
   activities(
     """
@@ -16856,6 +17056,7 @@ type Query {
   ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
+  platformSubscriptionTiers: [PlatformSubscriptionTier]
 }
 
 """
@@ -22879,6 +23080,17 @@ type Mutation {
     """
     host: AccountReferenceInput!
   ): Vendor!
+  updateAccountPlatformSubscription(
+    """
+    Account to update the platform subscription for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The new platform subscription tier to apply to the account
+    """
+    subscription: PlatformSubscriptionInput!
+  ): Account!
 
   """
   Send In-App Survey response
@@ -24691,6 +24903,7 @@ input OrganizationCreateInput {
   Two-letters country code following ISO31661
   """
   countryISO: String
+  currency: Currency
 
   """
   The profile avatar image
@@ -25395,4 +25608,60 @@ input VendorEditInput {
   The profile background image, for the banner and social media sharing
   """
   backgroundImage: Upload
+}
+
+input PlatformSubscriptionInput {
+  """
+  The ID of the platform subscription to update
+  """
+  id: String
+
+  """
+  The new platform subscription plan to apply to the account
+  """
+  plan: PlatformSubscriptionPlanInput!
+}
+
+input PlatformSubscriptionPlanInput {
+  """
+  The title of the subscription plan
+  """
+  title: String!
+
+  """
+  The type of the subscription plan (e.g., "basic", "premium")
+  """
+  type: String!
+
+  """
+  Pricing details for the subscription plan
+  """
+  pricing: PlatformSubscriptionPlanPricing!
+}
+
+input PlatformSubscriptionPlanPricing {
+  """
+  The price of the subscription plan per month
+  """
+  pricePerMonth: AmountInput!
+
+  """
+  Price for each additional collective beyond the included limit
+  """
+  pricePerAdditionalCollective: AmountInput!
+
+  """
+  Price for each additional expense beyond the included limit
+  """
+  pricePerAdditionalExpense: AmountInput!
+
+  """
+  Number of collectives included in this subscription plan
+  """
+  includedCollectives: Int!
+
+  """
+  Number of expenses included in this subscription plan per month
+  """
+  includedExpensesPerMonth: Int!
 }

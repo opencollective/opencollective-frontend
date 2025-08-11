@@ -557,6 +557,8 @@ export type AccountStats = {
   /** History of the expense tags used by this collective. */
   expensesTagsTimeSeries: TimeSeriesAmount;
   id?: Maybe<Scalars['String']['output']>;
+  /** The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account. */
+  managedAmount?: Maybe<Amount>;
   /** Average amount spent per month based on the last 90 days */
   monthlySpending: Amount;
   /** Total amount received */
@@ -901,6 +903,20 @@ export type AccountWithHostSummaryArgs = {
 export type AccountWithParent = {
   /** The Account parenting this account */
   parent?: Maybe<Account>;
+};
+
+/** An account that can be hosted by a Host */
+export type AccountWithPlatformSubscription = {
+  legacyPlan: HostPlan;
+  platformBilling: PlatformBilling;
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
+};
+
+
+/** An account that can be hosted by a Host */
+export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
 
 /** Fields for an accounting category */
@@ -1989,7 +2005,7 @@ export type Collection = {
 };
 
 /** This represents a Collective account */
-export type Collective = Account & AccountWithContributions & AccountWithHost & {
+export type Collective = Account & AccountWithContributions & AccountWithHost & AccountWithPlatformSubscription & {
   __typename?: 'Collective';
   /** [!] Warning: this query is currently in beta and the API might change */
   activeContributors: AccountCollection;
@@ -2068,6 +2084,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -2095,10 +2112,13 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
   /** How much platform fees are charged for this account */
   platformFeePercent: Scalars['Float']['output'];
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
@@ -2392,6 +2412,12 @@ export type CollectivePayoutMethodsArgs = {
 
 
 /** This represents a Collective account */
+export type CollectivePlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
+};
+
+
+/** This represents a Collective account */
 export type CollectiveSummaryArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2550,10 +2576,15 @@ export enum CollectiveFeatureStatus {
 export type CollectiveFeatures = {
   __typename?: 'CollectiveFeatures';
   ABOUT?: Maybe<CollectiveFeatureStatus>;
+  ACCOUNT_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
+  AGREEMENTS?: Maybe<CollectiveFeatureStatus>;
   ALIPAY?: Maybe<CollectiveFeatureStatus>;
   ALL?: Maybe<CollectiveFeatureStatus>;
+  CHARGE_HOSTING_FEES?: Maybe<CollectiveFeatureStatus>;
+  CHART_OF_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   COLLECTIVE_GOALS?: Maybe<CollectiveFeatureStatus>;
   CONNECTED_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
+  CONNECT_BANK_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   CONTACT_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
   CONTACT_FORM?: Maybe<CollectiveFeatureStatus>;
   CONVERSATIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2561,6 +2592,9 @@ export type CollectiveFeatures = {
   EMAIL_NOTIFICATIONS_PANEL?: Maybe<CollectiveFeatureStatus>;
   EMIT_GIFT_CARDS?: Maybe<CollectiveFeatureStatus>;
   EVENTS?: Maybe<CollectiveFeatureStatus>;
+  EXPECTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
+  EXPENSE_SECURITY_CHECKS?: Maybe<CollectiveFeatureStatus>;
+  FUNDS_GRANTS_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2573,7 +2607,9 @@ export type CollectiveFeatures = {
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
+  RESTRICTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
   STRIPE_PAYMENT_INTENT?: Maybe<CollectiveFeatureStatus>;
+  TAX_FORMS?: Maybe<CollectiveFeatureStatus>;
   TEAM?: Maybe<CollectiveFeatureStatus>;
   TOP_FINANCIAL_CONTRIBUTORS?: Maybe<CollectiveFeatureStatus>;
   TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2581,6 +2617,7 @@ export type CollectiveFeatures = {
   UPDATES?: Maybe<CollectiveFeatureStatus>;
   USE_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   USE_PAYMENT_METHODS?: Maybe<CollectiveFeatureStatus>;
+  VENDORS?: Maybe<CollectiveFeatureStatus>;
   VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
   /** The id of the account */
   id: Scalars['String']['output'];
@@ -5883,7 +5920,7 @@ export type GuestInfoInput = {
 };
 
 /** This represents an Host account */
-export type Host = Account & AccountWithContributions & {
+export type Host = Account & AccountWithContributions & AccountWithPlatformSubscription & {
   __typename?: 'Host';
   /** List of accounting categories for this host */
   accountingCategories: AccountingCategoryCollection;
@@ -5982,6 +6019,7 @@ export type Host = Account & AccountWithContributions & {
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -6022,10 +6060,13 @@ export type Host = Account & AccountWithContributions & {
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
   plan: HostPlan;
+  platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
   /** How much platform fees are charged for this account */
   platformFeePercent: Scalars['Float']['output'];
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   /** Returns a list of organizations that only transacted with this host and all its admins are also admins of this host. */
@@ -6486,6 +6527,12 @@ export type HostPendingApplicationsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Host account */
+export type HostPlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
 
 
@@ -7985,6 +8032,7 @@ export type Mutation = {
   unfollowAccount: UnfollowAccountResult;
   /** Unpublish update. Scope: "updates". */
   unpublishUpdate: Update;
+  updateAccountPlatformSubscription: Account;
   updateApplication?: Maybe<Application>;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
@@ -8996,6 +9044,13 @@ export type MutationUnpublishUpdateArgs = {
 
 
 /** This is the root mutation */
+export type MutationUpdateAccountPlatformSubscriptionArgs = {
+  account: AccountReferenceInput;
+  subscription: PlatformSubscriptionInput;
+};
+
+
+/** This is the root mutation */
 export type MutationUpdateApplicationArgs = {
   application: ApplicationUpdateInput;
 };
@@ -9271,6 +9326,8 @@ export enum OrderByFieldType {
   HOST_RANK = 'HOST_RANK',
   LAST_CHARGED_AT = 'LAST_CHARGED_AT',
   MEMBER_COUNT = 'MEMBER_COUNT',
+  /** Order by the total amount managed by the Organization on the platform */
+  MONEY_MANAGED = 'MONEY_MANAGED',
   NAME = 'NAME',
   RANK = 'RANK',
   /** Order by start date */
@@ -9469,7 +9526,7 @@ export type OrderWithPayment = {
 };
 
 /** This represents an Organization account */
-export type Organization = Account & AccountWithContributions & {
+export type Organization = Account & AccountWithContributions & AccountWithPlatformSubscription & {
   __typename?: 'Organization';
   /** [!] Warning: this query is currently in beta and the API might change */
   activeContributors: AccountCollection;
@@ -9538,6 +9595,7 @@ export type Organization = Account & AccountWithContributions & {
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -9571,10 +9629,13 @@ export type Organization = Account & AccountWithContributions & {
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
   /** How much platform fees are charged for this account */
   platformFeePercent: Scalars['Float']['output'];
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
@@ -9851,6 +9912,12 @@ export type OrganizationPayoutMethodsArgs = {
 
 
 /** This represents an Organization account */
+export type OrganizationPlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
+};
+
+
+/** This represents an Organization account */
 export type OrganizationTiersArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -9975,6 +10042,7 @@ export type OrganizationCreateInput = {
   backgroundImage?: InputMaybe<Scalars['Upload']['input']>;
   /** Two-letters country code following ISO31661 */
   countryISO?: InputMaybe<Scalars['String']['input']>;
+  currency?: InputMaybe<Currency>;
   description: Scalars['String']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
@@ -10454,6 +10522,139 @@ export type PlaidLinkTokenCreateResponse = {
   linkToken: Scalars['String']['output'];
   /** A unique identifier for the request, which can be used for troubleshooting. */
   requestId: Scalars['String']['output'];
+};
+
+export type PlatformBilling = {
+  __typename?: 'PlatformBilling';
+  billingPeriod: PlatformBillingPeriod;
+  subscriptions: Array<PlatformSubscription>;
+  utilization: PlatformSubscriptionUtilization;
+};
+
+export enum PlatformBillingMonth {
+  APRIL = 'APRIL',
+  AUGUST = 'AUGUST',
+  DECEMBER = 'DECEMBER',
+  FEBRUARY = 'FEBRUARY',
+  JANUARY = 'JANUARY',
+  JULY = 'JULY',
+  JUNE = 'JUNE',
+  MARCH = 'MARCH',
+  MAY = 'MAY',
+  NOVEMBER = 'NOVEMBER',
+  OCTOBER = 'OCTOBER',
+  SEPTEMBER = 'SEPTEMBER'
+}
+
+export type PlatformBillingPeriod = {
+  __typename?: 'PlatformBillingPeriod';
+  endDate: Scalars['DateTime']['output'];
+  isCurrent: Scalars['Boolean']['output'];
+  month: PlatformBillingMonth;
+  startDate: Scalars['DateTime']['output'];
+  year: Scalars['Int']['output'];
+};
+
+export type PlatformBillingPeriodInput = {
+  month: PlatformBillingMonth;
+  year: Scalars['Int']['input'];
+};
+
+export type PlatformSubscription = {
+  __typename?: 'PlatformSubscription';
+  /** End date (inclusive), null if not set */
+  endDate?: Maybe<Scalars['DateTime']['output']>;
+  isCurrent: Scalars['Boolean']['output'];
+  plan: PlatformSubscriptionTier;
+  /** Start date (inclusive) */
+  startDate: Scalars['DateTime']['output'];
+};
+
+export type PlatformSubscriptionFeatures = {
+  __typename?: 'PlatformSubscriptionFeatures';
+  ACCOUNT_MANAGEMENT: Scalars['Boolean']['output'];
+  AGREEMENTS: Scalars['Boolean']['output'];
+  CHARGE_HOSTING_FEES: Scalars['Boolean']['output'];
+  CHART_OF_ACCOUNTS: Scalars['Boolean']['output'];
+  CONNECT_BANK_ACCOUNTS: Scalars['Boolean']['output'];
+  EXPECTED_FUNDS: Scalars['Boolean']['output'];
+  EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['output'];
+  FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['output'];
+  PAYPAL_PAYOUTS: Scalars['Boolean']['output'];
+  RECEIVE_EXPENSES: Scalars['Boolean']['output'];
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
+  RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['output'];
+  RESTRICTED_FUNDS: Scalars['Boolean']['output'];
+  TAX_FORMS: Scalars['Boolean']['output'];
+  TRANSFERWISE: Scalars['Boolean']['output'];
+  UPDATES: Scalars['Boolean']['output'];
+  USE_EXPENSES: Scalars['Boolean']['output'];
+  VENDORS: Scalars['Boolean']['output'];
+};
+
+export type PlatformSubscriptionInput = {
+  /** The ID of the platform subscription to update */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** The new platform subscription plan to apply to the account */
+  plan: PlatformSubscriptionPlanInput;
+};
+
+export type PlatformSubscriptionPlanInput = {
+  /** Pricing details for the subscription plan */
+  pricing: PlatformSubscriptionPlanPricing;
+  /** The title of the subscription plan */
+  title: Scalars['String']['input'];
+  /** The type of the subscription plan (e.g., "basic", "premium") */
+  type: Scalars['String']['input'];
+};
+
+export type PlatformSubscriptionPlanPricing = {
+  /** Number of collectives included in this subscription plan */
+  includedCollectives: Scalars['Int']['input'];
+  /** Number of expenses included in this subscription plan per month */
+  includedExpensesPerMonth: Scalars['Int']['input'];
+  /** Price for each additional collective beyond the included limit */
+  pricePerAdditionalCollective: AmountInput;
+  /** Price for each additional expense beyond the included limit */
+  pricePerAdditionalExpense: AmountInput;
+  /** The price of the subscription plan per month */
+  pricePerMonth: AmountInput;
+};
+
+/** Type for Platform Subscription Tier */
+export type PlatformSubscriptionTier = {
+  __typename?: 'PlatformSubscriptionTier';
+  features: PlatformSubscriptionFeatures;
+  /** The title of the subscription tier */
+  id: Scalars['String']['output'];
+  pricing: PlatformSubscriptionTierPricing;
+  /** The title of the subscription tier */
+  title: Scalars['String']['output'];
+  /** The type of the subscription tier (e.g., "basic", "premium") */
+  type: Scalars['String']['output'];
+};
+
+export type PlatformSubscriptionTierPricing = {
+  __typename?: 'PlatformSubscriptionTierPricing';
+  /** Number of collectives included in this subscription tier */
+  includedCollectives: Scalars['Int']['output'];
+  /** Number of expenses included in this subscription tier per month */
+  includedExpensesPerMonth: Scalars['Int']['output'];
+  /** Price for each additional collective beyond the included limit */
+  pricePerAdditionalCollective: Amount;
+  /** Price for each additional expense beyond the included limit */
+  pricePerAdditionalExpense: Amount;
+  /** The price of the subscription tier per month */
+  pricePerMonth: Amount;
+};
+
+export type PlatformSubscriptionUtilization = {
+  __typename?: 'PlatformSubscriptionUtilization';
+  activeCollectives: Scalars['Int']['output'];
+  billingPeriod: PlatformBillingPeriod;
+  endDate: Scalars['DateTime']['output'];
+  expensesPaid: Scalars['Int']['output'];
+  startDate: Scalars['DateTime']['output'];
 };
 
 export type Policies = {
@@ -11154,6 +11355,7 @@ export type Query = {
   paypalPlan: PaypalPlan;
   /** Get a personal token by reference */
   personalToken?: Maybe<PersonalToken>;
+  platformSubscriptionTiers?: Maybe<Array<Maybe<PlatformSubscriptionTier>>>;
   project?: Maybe<Project>;
   /** [!] Warning: this query is currently in beta and the API might change */
   search: SearchResponse;
@@ -11195,12 +11397,16 @@ export type QueryAccountsArgs = {
   includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
   includeVendorsForHost?: InputMaybe<AccountReferenceInput>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  isFirstPartyHost?: InputMaybe<Scalars['Boolean']['input']>;
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
+  isSubscriber?: InputMaybe<Scalars['Boolean']['input']>;
+  isVerified?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   onlyOpenToApplications?: InputMaybe<Scalars['Boolean']['input']>;
   orderBy?: InputMaybe<OrderByInput>;
   parent?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  plan?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   skipGuests?: InputMaybe<Scalars['Boolean']['input']>;
   skipRecentAccounts?: InputMaybe<Scalars['Boolean']['input']>;
