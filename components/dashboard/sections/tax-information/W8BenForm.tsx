@@ -279,7 +279,12 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           {values.hasTaxTreatySpecialRatesAndConditions && (
             <React.Fragment>
               <StyledInputFormikField name="claimsArticleAndParagraph" label="Article and paragraph" />
-              <StyledInputFormikField inputType="number" name="claimsRate" label="Rate">
+              <StyledInputFormikField
+                required={values.hasTaxTreatySpecialRatesAndConditions}
+                inputType="number"
+                name="claimsRate"
+                label="Rate"
+              >
                 {({ field }) => (
                   <StyledInputPercentage
                     {...field}
