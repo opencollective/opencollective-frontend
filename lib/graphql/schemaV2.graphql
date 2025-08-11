@@ -3842,12 +3842,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   """
   platformSubscription: PlatformSubscription
   platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
-
-  """
-  The total amount managed by the account, including all its children accounts (events and projects)
-  """
-  managedAmount: Amount
-  plan: HostPlan!
+  legacyPlan: HostPlan!
 
   """
   List of accounting categories for this host
@@ -3868,6 +3863,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   totalHostedAccounts: Int
   isOpenToApplications: Boolean
   termsUrl: URL
+  plan: HostPlan!
 
   """
   EXPERIMENTAL (this may change or be removed)
@@ -4578,12 +4574,7 @@ interface AccountWithPlatformSubscription {
   """
   platformSubscription: PlatformSubscription
   platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
-
-  """
-  The total amount managed by the account, including all its children accounts (events and projects)
-  """
-  managedAmount: Amount
-  plan: HostPlan!
+  legacyPlan: HostPlan!
 }
 
 type PlatformSubscription {
@@ -4598,7 +4589,6 @@ type PlatformSubscription {
   endDate: DateTime
   isCurrent: Boolean!
   plan: PlatformSubscriptionTier!
-  utilization(billingPeriod: PlatformBillingPeriodInput): PlatformSubscriptionUtilization!
 }
 
 """
@@ -4671,12 +4661,10 @@ type PlatformSubscriptionFeatures {
   ACCOUNT_MANAGEMENT: Boolean!
 }
 
-type PlatformSubscriptionUtilization {
+type PlatformBilling {
   billingPeriod: PlatformBillingPeriod!
-  startDate: DateTime!
-  endDate: DateTime!
-  activeCollectives: Int!
-  expensesPaid: Int!
+  subscriptions: [PlatformSubscription!]!
+  utilization: PlatformSubscriptionUtilization!
 }
 
 type PlatformBillingPeriod {
@@ -4702,14 +4690,17 @@ enum PlatformBillingMonth {
   DECEMBER
 }
 
+type PlatformSubscriptionUtilization {
+  billingPeriod: PlatformBillingPeriod!
+  startDate: DateTime!
+  endDate: DateTime!
+  activeCollectives: Int!
+  expensesPaid: Int!
+}
+
 input PlatformBillingPeriodInput {
   year: Int!
   month: PlatformBillingMonth!
-}
-
-type PlatformBilling {
-  billingPeriod: PlatformBillingPeriod!
-  subscriptions: [PlatformSubscription!]!
 }
 
 """
@@ -6472,6 +6463,11 @@ type AccountStats {
     """
     kind: [TransactionKind]
   ): TimeSeriesAmount!
+
+  """
+  The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account.
+  """
+  managedAmount: Amount
 }
 
 """
@@ -10729,12 +10725,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   platformSubscription: PlatformSubscription
   platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
-
-  """
-  The total amount managed by the account, including all its children accounts (events and projects)
-  """
-  managedAmount: Amount
-  plan: HostPlan!
+  legacyPlan: HostPlan!
 }
 
 """
@@ -14614,12 +14605,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   """
   platformSubscription: PlatformSubscription
   platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
-
-  """
-  The total amount managed by the account, including all its children accounts (events and projects)
-  """
-  managedAmount: Amount
-  plan: HostPlan!
+  legacyPlan: HostPlan!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """

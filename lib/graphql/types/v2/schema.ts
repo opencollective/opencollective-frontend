@@ -557,6 +557,8 @@ export type AccountStats = {
   /** History of the expense tags used by this collective. */
   expensesTagsTimeSeries: TimeSeriesAmount;
   id?: Maybe<Scalars['String']['output']>;
+  /** The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account. */
+  managedAmount?: Maybe<Amount>;
   /** Average amount spent per month based on the last 90 days */
   monthlySpending: Amount;
   /** Total amount received */
@@ -905,9 +907,7 @@ export type AccountWithParent = {
 
 /** An account that can be hosted by a Host */
 export type AccountWithPlatformSubscription = {
-  /** The total amount managed by the account, including all its children accounts (events and projects) */
-  managedAmount?: Maybe<Amount>;
-  plan: HostPlan;
+  legacyPlan: HostPlan;
   platformBilling: PlatformBilling;
   /** Returns the current platform subscription */
   platformSubscription?: Maybe<PlatformSubscription>;
@@ -2084,6 +2084,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -2091,8 +2092,6 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** The total amount managed by the account, including all its children accounts (events and projects) */
-  managedAmount?: Maybe<Amount>;
   /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
@@ -2113,7 +2112,6 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
-  plan: HostPlan;
   platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
@@ -6021,6 +6019,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -6028,8 +6027,6 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** The total amount managed by the account, including all its children accounts (events and projects) */
-  managedAmount?: Maybe<Amount>;
   /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
@@ -9598,6 +9595,7 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -9611,8 +9609,6 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** The total amount managed by the account, including all its children accounts (events and projects) */
-  managedAmount?: Maybe<Amount>;
   /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
@@ -9633,7 +9629,6 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
-  plan: HostPlan;
   platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
@@ -10533,6 +10528,7 @@ export type PlatformBilling = {
   __typename?: 'PlatformBilling';
   billingPeriod: PlatformBillingPeriod;
   subscriptions: Array<PlatformSubscription>;
+  utilization: PlatformSubscriptionUtilization;
 };
 
 export enum PlatformBillingMonth {
@@ -10572,12 +10568,6 @@ export type PlatformSubscription = {
   plan: PlatformSubscriptionTier;
   /** Start date (inclusive) */
   startDate: Scalars['DateTime']['output'];
-  utilization: PlatformSubscriptionUtilization;
-};
-
-
-export type PlatformSubscriptionUtilizationArgs = {
-  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
 
 export type PlatformSubscriptionFeatures = {
