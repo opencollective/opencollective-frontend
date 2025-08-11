@@ -46,6 +46,12 @@ const fields = gql`
         }
       }
     }
+    stats {
+      managedAmount {
+        valueInCents
+        currency
+      }
+    }
     ... on AccountWithParent {
       parent {
         id
@@ -55,11 +61,7 @@ const fields = gql`
       }
     }
     ... on AccountWithPlatformSubscription {
-      managedAmount {
-        valueInCents
-        currency
-      }
-      plan {
+      legacyPlan {
         name
       }
     }

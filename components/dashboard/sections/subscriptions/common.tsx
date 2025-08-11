@@ -101,7 +101,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage id="MoneyManaged" defaultMessage="Money Managed" />,
     cell: ({ row }) => {
       const account = row.original;
-      const amount = account.managedAmount;
+      const amount = account.stats?.managedAmount;
       if (amount) {
         return (
           <div className="font-medium text-foreground">
@@ -111,13 +111,13 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       }
     },
   },
-  plan: {
-    accessorKey: 'plan',
+  legacyPlan: {
+    accessorKey: 'legacyPlan',
     header: () => <FormattedMessage id="SubscriptionPlan" defaultMessage="Subscription Plan" />,
     cell: ({ row }) => {
       const account = row.original;
-      return account.plan ? (
-        <div className="text-sm font-medium text-foreground">{account.plan.name}</div>
+      return account.legacyPlan ? (
+        <div className="text-sm font-medium text-foreground">{account.legacyPlan.name}</div>
       ) : (
         <FormattedMessage id="NoPlan" defaultMessage="No plan" />
       );

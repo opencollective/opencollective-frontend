@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { compact, flatten, get, isPlainObject } from 'lodash';
+import { compact, flatten, get, isPlainObject, set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -103,6 +103,9 @@ const SubscriberForm = (props: SubscriberFormProps) => {
   }
 
   const handleSubmit = async (values: FormValuesSchema) => {
+    set(values, 'plan.pricing.pricePerMonth.currency', 'USD');
+    set(values, 'plan.pricing.pricePerAdditionalCollective.currency', 'USD');
+    set(values, 'plan.pricing.pricePerAdditionalExpense.currency', 'USD');
     await updateSubscription({
       variables: {
         account: values.account,

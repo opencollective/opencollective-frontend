@@ -81,7 +81,7 @@ const LegacySubscribers = () => {
         <React.Fragment>
           <DataTable
             innerClassName="text-muted-foreground"
-            columns={[cols.collective, cols.team, cols.moneyManaged, cols.plan, cols.createdAt, cols.actions]}
+            columns={[cols.collective, cols.team, cols.moneyManaged, cols.legacyPlan, cols.createdAt, cols.actions]}
             data={data?.accounts?.nodes || []}
             loading={loading}
             mobileTableView
