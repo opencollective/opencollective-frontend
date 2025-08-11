@@ -1476,7 +1476,10 @@ async function buildFormOptions(
 
     if (query.data?.loggedInAccount) {
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
-      if (payee && payee.type !== CollectiveType.VENDOR) {
+      options.isAdminOfPayee =
+        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
+        values.payeeSlug === '__findAccountIAdminister';
+      if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {
           options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
@@ -1519,10 +1522,6 @@ async function buildFormOptions(
       options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(
         t => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(t),
       );
-
-      options.isAdminOfPayee =
-        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        values.payeeSlug === '__findAccountIAdminister';
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
