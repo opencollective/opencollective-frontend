@@ -123,22 +123,20 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                {props.subscription.isCurrent && (
-                  <div className="text-sm text-muted-foreground">
-                    <FormattedMessage
-                      defaultMessage="{amount} / expense after that"
-                      id="F7fqJa"
-                      values={{
-                        amount: (
-                          <FormattedMoneyAmount
-                            amount={props.subscription.plan.pricing.pricePerAdditionalExpense.valueInCents}
-                            currency={props.subscription.plan.pricing.pricePerAdditionalExpense.currency}
-                          />
-                        ),
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="text-sm text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="{amount} / expense after that"
+                    id="F7fqJa"
+                    values={{
+                      amount: (
+                        <FormattedMoneyAmount
+                          amount={props.subscription.plan.pricing.pricePerAdditionalExpense.valueInCents}
+                          currency={props.subscription.plan.pricing.pricePerAdditionalExpense.currency}
+                        />
+                      ),
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

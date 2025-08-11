@@ -104,7 +104,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         <Skeleton className="mb-8 h-56 w-full" />
       ) : billing?.subscriptions?.length === 0 ? null : (
         <div className="flex flex-col gap-4">
-          {billing?.subscriptions?.length &&
+          {billing?.subscriptions?.length > 0 &&
             billing?.subscriptions.map(subscription => (
               <PlatformSubscriptionCard key={subscription.startDate} subscription={subscription} billing={billing} />
             ))}
