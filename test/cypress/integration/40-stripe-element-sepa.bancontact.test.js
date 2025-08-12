@@ -5,10 +5,16 @@ function contributeNewBancontact({ name } = {}) {
 
   cy.wait(2000);
   cy.getStripePaymentElement().within(() => {
+    // Wait for the Bancontact option to be available somewhere
+    cy.get(
+      '.p-PaymentMethodSelector #bancontact-tab, .p-PaymentMethodSelector .p-AdditionalPaymentMethods-menu select option[value="bancontact"]',
+    ).should('have.length.at.least', 1);
+
+    // Prefer clicking the main tab if Bancontact is available there; otherwise, use the additional payment methods menu
     cy.get('.p-PaymentMethodSelector').then($selector => {
-      if ($selector.find('#sbancontact-tab').length) {
+      if ($selector.find('#bancontact-tab').length) {
         cy.get('#bancontact-tab').click();
-      } else {
+      } else if ($selector.find('.p-AdditionalPaymentMethods-menu select option[value="bancontact"]').length) {
         cy.get('.p-AdditionalPaymentMethods-menu').select('bancontact');
       }
     });
@@ -40,17 +46,6 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       });
 
       cy.createCollectiveV2({ skipApproval: true, host: { slug: 'e2e-eur-host' } }).as('collective');
-
-      // Stripe recently introduced a JS snippet that has a syntax error, which breaks the tests.
-      // Feel free to remove that after some time, see if it's still needed.
-      // This event will automatically be unbound when this test ends because it's attached to the cy object.
-      cy.origin('https://stripe.com', () => {
-        cy.on('uncaught:exception', e => {
-          if (e.message.includes("> Unexpected token ')'")) {
-            return false;
-          }
-        });
-      });
     });
 
     it('Guest', testConfig, () => {
