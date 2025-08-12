@@ -90,8 +90,8 @@ describe('Grant Submission Flow', () => {
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
     cy.contains('has been submitted successfully!').should('be.visible');
 
-    // Verify we can see the "View All Expenses" button
-    cy.contains('View All Expenses').should('be.visible');
+    // Verify we can see the "View All Grants" button
+    cy.contains('View All Grants').should('be.visible');
   });
 
   it('should allow host admin to create beneficiary', function () {
@@ -144,8 +144,8 @@ describe('Grant Submission Flow', () => {
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
     cy.contains('has been submitted successfully!').should('be.visible');
 
-    // Verify we can see the "View All Expenses" button
-    cy.contains('View All Expenses').should('be.visible');
+    // Verify we can see the "View All Grants" button
+    cy.contains('View All Grants').should('be.visible');
   });
 
   it('should allow host admin submit grant existing beneficiary while adding payout method', function () {
@@ -201,8 +201,8 @@ describe('Grant Submission Flow', () => {
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
     cy.contains('has been submitted successfully!').should('be.visible');
 
-    // Verify we can see the "View All Expenses" button
-    cy.contains('View All Expenses').should('be.visible');
+    // Verify we can see the "View All Grants" button
+    cy.contains('View All Grants').should('be.visible');
   });
 
   it('should allow host admin submit grant to existing beneficiary', function () {
@@ -252,7 +252,7 @@ describe('Grant Submission Flow', () => {
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
     cy.contains('has been submitted successfully!').should('be.visible');
 
-    // Verify we can see the "View All Expenses" button
-    cy.contains('View All Expenses').should('be.visible');
+    // Verify we can see the "View All Grants" button
+    cy.contains('View All Grants').should('be.visible');
   });
 });

@@ -15,9 +15,7 @@ import {
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '@/lib/i18n/expense';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
@@ -116,12 +114,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
-  const { LoggedInUser } = useLoggedInUser();
-  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
-  const omitExpenseTypesInFilter = hasGrantAndFundsReorgEnabled ? [ExpenseType.GRANT] : [];
+  const omitExpenseTypesInFilter = [ExpenseType.GRANT];
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,

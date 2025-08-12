@@ -168,7 +168,7 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
       <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Approve Grants Requests" id="nsfRjl" />}
-          description={<FormattedMessage defaultMessage="Review Grant Requests submitted to your fund" id="+fA6C2" />}
+          description={<FormattedMessage defaultMessage="Review received Grant Requests" id="su6SvX" />}
         />
 
         <Filterbar {...queryFilter} />

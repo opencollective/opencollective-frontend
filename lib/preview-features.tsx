@@ -16,7 +16,6 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
-  GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
 }
 
 enum Categories {
@@ -126,22 +125,6 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-    title: (
-      <FormattedMessage defaultMessage="Funds & Grants Dashboard Tools" id="PreviewFeatures.grantAndFundsReorgTitle" />
-    ),
-    description: (
-      <FormattedMessage
-        defaultMessage="Access dedicated Dashboard sections for Grants and Funds management. Better organization and specialized tools for managing grant programs and fund allocations."
-        id="PreviewFeatures.grantAndFundsReorgDescription"
-      />
-    ),
-    alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-    publicBeta: false,
-    category: Categories.HOSTING,
   },
   {
     key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,

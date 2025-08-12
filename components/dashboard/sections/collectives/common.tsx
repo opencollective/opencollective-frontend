@@ -26,7 +26,6 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { CollectiveType } from '@/lib/constants/collectives';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { useModal } from '@/components/ModalContext';
 import { SubmitGrantFlowModal } from '@/components/submit-grant/SubmitGrantFlow';
@@ -434,9 +433,6 @@ export const MoreActionsMenu = ({
   >(null);
 
   const { LoggedInUser } = useLoggedInUser();
-  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
 
   const isCollectiveAdmin = LoggedInUser.isAdminOfCollective(collective);
 
@@ -470,7 +466,7 @@ export const MoreActionsMenu = ({
             <ReceiptText className="mr-2" size="16" />
             <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
           </DropdownMenuItem>
-          {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
+          {collective.type === CollectiveType.FUND && (
             <DropdownMenuItem
               className="cursor-pointer"
               data-cy="actions-view-disbursed-grants"
@@ -482,7 +478,7 @@ export const MoreActionsMenu = ({
               <FormattedMessage defaultMessage="View disbursed grants" id="P/PQ+i" />
             </DropdownMenuItem>
           )}
-          {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
+          {collective.type === CollectiveType.FUND && (
             <DropdownMenuItem
               className="cursor-pointer"
               data-cy="actions-view-grants-requests"

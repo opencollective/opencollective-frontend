@@ -32,6 +32,7 @@ import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-featur
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -124,12 +125,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isChild = isChildAccount(account);
   const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
 
-  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
-  const hasPendingGrants = account.pendingGrants?.totalCount > 0;
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
+  const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
+  const showReceivedGrantRequests =
+    hasReceivedGrantRequests ||
+    (!isIndividual &&
+      !(isHost || isSelfHosted) &&
+      Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
+
   const items: MenuItem[] = [
     {
       section: ALL_SECTIONS.OVERVIEW,
@@ -181,13 +184,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isIndividual && hasGrantAndFundsReorgEnabled,
+      if: isIndividual && hasIssuedGrantRequests,
       Icon: Receipt,
       label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,
     },
     {
-      if: !isIndividual && hasGrantAndFundsReorgEnabled,
+      if: !isIndividual,
       type: 'group',
       Icon: Receipt,
       label:
@@ -205,15 +208,16 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
         },
         {
-          if: !isIndividual && !(isHost || isSelfHosted),
+          if: showReceivedGrantRequests,
           section: ALL_SECTIONS.GRANTS,
         },
         {
-          if: isHost || isSelfHosted ? hasPendingGrants : !isIndividual,
+          if: showReceivedGrantRequests,
           section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
         },
         {
-          if: isHost || isSelfHosted ? hasIssuedGrantRequests : true,
+          // Issued grants visible when there is history
+          if: hasIssuedGrantRequests,
           section: ALL_SECTIONS.SUBMITTED_GRANTS,
         },
       ],

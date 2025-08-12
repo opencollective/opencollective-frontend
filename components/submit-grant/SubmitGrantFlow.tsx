@@ -15,10 +15,8 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { objectKeys } from '@/lib/utils';
 
-import { I18nBold } from '../I18nFormatters';
 import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
 import { SummarySectionContent } from '../submit-expense/form/SummarySection';
@@ -87,19 +85,13 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [submittedGrantId, setSubmittedGrantId] = React.useState(null);
 
-  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
   const onViewAllGrantRequestsClick = React.useCallback(() => {
     if (LoggedInUser) {
-      router.replace(
-        `/dashboard/${LoggedInUser.collective.slug}/${hasGrantAndFundsReorgEnabled ? 'submitted-grants' : 'submitted-expenses'}`,
-      );
+      router.replace(`/dashboard/${LoggedInUser.collective.slug}/submitted-grants`);
     } else {
       router.replace(`${props.account.slug}/expenses?type=GRANT`);
     }
-  }, [LoggedInUser, props.account.slug, router, hasGrantAndFundsReorgEnabled]);
+  }, [LoggedInUser, props.account.slug, router]);
 
   const { onGrantSubmitted: onGrantSubmittedCallback } = props;
   const onGrantSubmitted = React.useCallback(
@@ -195,49 +187,24 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           </main>
           {submittedGrantId && (
             <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
-              {hasGrantAndFundsReorgEnabled ? (
-                <FormattedMessage
-                  defaultMessage="To view your request,<link>View All Grants</link>"
-                  id="bPzQ2t"
-                  values={{
-                    link: c => {
-                      return (
-                        <Button
-                          className="h-5 px-0 leading-5"
-                          size="xs"
-                          variant="link"
-                          onClick={onViewAllGrantRequestsClick}
-                        >
-                          {c}
-                        </Button>
-                      );
-                    },
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="<b>Grants are processed as 'expenses'.</b> To view your application, <link>View All Expenses</link>"
-                  id="oAwTV8"
-                  values={{
-                    b: I18nBold,
-                    link: c => {
-                      return (
-                        <React.Fragment>
-                          &nbsp;
-                          <Button
-                            className="h-5 px-0 leading-5"
-                            size="xs"
-                            variant="link"
-                            onClick={onViewAllGrantRequestsClick}
-                          >
-                            {c}
-                          </Button>
-                        </React.Fragment>
-                      );
-                    },
-                  }}
-                />
-              )}
+              <FormattedMessage
+                defaultMessage="To view your requests: <link>View All Grants</link>"
+                id="aomx++"
+                values={{
+                  link: content => {
+                    return (
+                      <Button
+                        className="ml-1 h-5 px-0 leading-5"
+                        size="xs"
+                        variant="link"
+                        onClick={onViewAllGrantRequestsClick}
+                      >
+                        {content}
+                      </Button>
+                    );
+                  },
+                }}
+              />
             </DialogFooter>
           )}
         </div>

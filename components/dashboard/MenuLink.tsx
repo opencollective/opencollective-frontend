@@ -63,6 +63,11 @@ export const MenuLink = ({
     className,
   );
 
+  // Hide menu item if all it's submenu items are hidden
+  if (!href && !section && !subMenu?.length) {
+    return null;
+  }
+
   return (
     <div>
       <Link
