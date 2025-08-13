@@ -156,6 +156,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         >
           {PlatformSubscriptionTiers.map(tier => (
             <RadioGroupCard
+              key={tier}
               value={tier}
               className="flex w-min grow flex-col"
               indicatorClassName="self-start absolute top-4 left-4"
@@ -182,6 +183,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         >
           {plans.map(plan => (
             <RadioGroupCard
+              key={plan.id}
               value={plan.id}
               showSubcontent={plan.id === form.values.planId}
               subContent={<PlatformSubscriptionPlanCard plan={plan} />}
