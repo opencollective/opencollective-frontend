@@ -20,15 +20,15 @@ export const PlatformSubscriptionTiers: PlatformSubscriptionTierType[] = ['Disco
 export const PlatformSubscriptionTierTitles = defineMessages<(typeof PlatformSubscriptionTiers)[number]>({
   Discover: {
     defaultMessage: 'Discover',
-    id: 'cE4Hfw',
+    id: 'tier.Discover.title',
   },
   Basic: {
     defaultMessage: 'Basic',
-    id: 'fNCCY7',
+    id: 'tier.Basic.title',
   },
   Pro: {
     defaultMessage: 'Pro',
-    id: 'R/eOkj',
+    id: 'tier.Pro.title',
   },
 });
 

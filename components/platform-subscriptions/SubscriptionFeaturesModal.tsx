@@ -19,7 +19,7 @@ export function SubscriptionFeaturesModal(props: SubscriptionFeaturesModalProps)
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <FormattedMessage defaultMessage="Features" id="ZXp0z1" />
+            <FormattedMessage defaultMessage="Features" id="Features" />
           </DialogTitle>
         </DialogHeader>
         <PlatformSubscriptionFeatureList features={props.features} />
