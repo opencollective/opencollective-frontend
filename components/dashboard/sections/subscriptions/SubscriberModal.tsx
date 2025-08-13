@@ -1,12 +1,13 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { compact, flatten, get, isPlainObject, set } from 'lodash';
+import { compact, flatten, get, isNil, isPlainObject, omitBy, set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import { omitDeep } from '@/lib/utils';
 
 import Avatar from '@/components/Avatar';
 import { FormField } from '@/components/FormField';
@@ -14,10 +15,13 @@ import { FormikZod } from '@/components/FormikZod';
 import InputAmount from '@/components/InputAmount';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Label } from '@/components/ui/Label';
 import { DefaultSelect } from '@/components/ui/Select';
 
-import { updateAccountPlaformSubscriptionMutation } from './queries';
+import { AVAILABLE_FEATURES, AVAILABLE_FEATURES_LABELS } from './common';
+import { availablePlansQuery, updateAccountPlaformSubscriptionMutation } from './queries';
 
 type SubscriberFormProps = {
   account: SubscriberFieldsFragment;
@@ -40,35 +44,10 @@ const schema = z.object({
       includedCollectives: z.number().min(0),
       includedExpensesPerMonth: z.number().min(0),
     }),
-    features: z.array(z.string()).optional(),
+    features: z.record(z.enum(AVAILABLE_FEATURES), z.boolean()),
   }),
 });
 
-const plansQuery = gql`
-  query Plans {
-    platformSubscriptionTiers {
-      id
-      title
-      type
-      pricing {
-        pricePerMonth {
-          valueInCents
-          currency
-        }
-        pricePerAdditionalCollective {
-          valueInCents
-          currency
-        }
-        pricePerAdditionalExpense {
-          valueInCents
-          currency
-        }
-        includedCollectives
-        includedExpensesPerMonth
-      }
-    }
-  }
-`;
 type FormValuesSchema = z.infer<typeof schema>;
 
 const keysDeep = (obj: object, prefix?: string, omit?: string[]) =>
@@ -88,7 +67,7 @@ const keysDeep = (obj: object, prefix?: string, omit?: string[]) =>
   );
 
 const SubscriberForm = (props: SubscriberFormProps) => {
-  const { data, loading } = useQuery(plansQuery, { context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(availablePlansQuery, { context: API_V2_CONTEXT });
   const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlaformSubscriptionMutation, {
     context: API_V2_CONTEXT,
   });
@@ -97,6 +76,20 @@ const SubscriberForm = (props: SubscriberFormProps) => {
     label: plan.title,
     data: plan,
   }));
+  const initialValues = React.useMemo(
+    () =>
+      omitBy(
+        {
+          account: { id: props.account.id },
+          plan:
+            'platformSubscription' in props.account
+              ? omitDeep(props.account.platformSubscription?.plan, ['__typename'])
+              : undefined,
+        },
+        isNil,
+      ),
+    [props.account],
+  );
 
   if (loading || !data) {
     return <div>Loading...</div>;
@@ -115,25 +108,19 @@ const SubscriberForm = (props: SubscriberFormProps) => {
   };
 
   return (
-    <FormikZod<FormValuesSchema>
-      schema={schema}
-      onSubmit={handleSubmit}
-      initialValues={{
-        account: { id: props.account.id },
-      }}
-    >
+    <FormikZod<FormValuesSchema> schema={schema} onSubmit={handleSubmit} initialValues={initialValues}>
       {({ setFieldValue, submitForm }) => (
         <Form className="flex flex-col gap-2" onSubmit={submitForm}>
           <div className="flex flex-col gap-1">
             <label className="text-sm leading-normal font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Account
+              <FormattedMessage id="TwyMau" defaultMessage="Account" />
             </label>
             <div className="flex h-10 w-full flex-1 flex-row items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background outline-hidden">
               <Avatar collective={props.account} radius={20} />
               {props.account.name}
             </div>
           </div>
-          <FormField name="basePlanId" label={<FormattedMessage id="BaseTier" defaultMessage="Base Tier" />}>
+          <FormField name="plan.basePlanId" label={<FormattedMessage id="BaseTier" defaultMessage="Base Tier" />}>
             {({ field }) => (
               <DefaultSelect
                 name={field.name}
@@ -169,52 +156,75 @@ const SubscriberForm = (props: SubscriberFormProps) => {
               />
             )}
           </FormField>
-          <FormField
-            name="plan.pricing.includedCollectives"
-            label={<FormattedMessage id="IncludedCollectives" defaultMessage="Included Active Collectives" />}
-            type="number"
-          />
-          <FormField
-            name="plan.pricing.pricePerAdditionalCollective.valueInCents"
-            label={
-              <FormattedMessage
-                id="PricePerAdditionalActiveCollective"
-                defaultMessage="Price per additional active collective"
-              />
-            }
-            placeholder="Enter price"
-          >
-            {({ field }) => (
-              <InputAmount
-                name={field.name}
-                currency="USD"
-                value={field.value}
-                onChange={value => setFieldValue(field.name, value)}
-              />
-            )}
-          </FormField>
-          <FormField
-            name="plan.pricing.includedExpensesPerMonth"
-            label={<FormattedMessage id="IncludedExpenses" defaultMessage="Included Expenses" />}
-            type="number"
-            placeholder="Enter limit"
-          />
-          <FormField
-            name="plan.pricing.pricePerAdditionalExpense.valueInCents"
-            label={
-              <FormattedMessage id="PricePerAdditionalActiveExpense" defaultMessage="Price per additional Expense" />
-            }
-            placeholder="Enter price"
-          >
-            {({ field }) => (
-              <InputAmount
-                name={field.name}
-                currency="USD"
-                value={field.value}
-                onChange={value => setFieldValue(field.name, value)}
-              />
-            )}
-          </FormField>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <FormField
+              name="plan.pricing.includedCollectives"
+              label={<FormattedMessage id="IncludedCollectives" defaultMessage="Included Active Collectives" />}
+              type="number"
+            />
+            <FormField
+              name="plan.pricing.pricePerAdditionalCollective.valueInCents"
+              label={
+                <FormattedMessage
+                  id="PricePerAdditionalActiveCollective"
+                  defaultMessage="Price per additional active collective"
+                />
+              }
+              placeholder="Enter price"
+            >
+              {({ field }) => (
+                <InputAmount
+                  name={field.name}
+                  currency="USD"
+                  value={field.value}
+                  onChange={value => setFieldValue(field.name, value)}
+                />
+              )}
+            </FormField>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <FormField
+              name="plan.pricing.includedExpensesPerMonth"
+              label={<FormattedMessage id="IncludedExpenses" defaultMessage="Included Expenses" />}
+              type="number"
+              placeholder="Enter limit"
+            />
+            <FormField
+              name="plan.pricing.pricePerAdditionalExpense.valueInCents"
+              label={
+                <FormattedMessage id="PricePerAdditionalActiveExpense" defaultMessage="Price per additional Expense" />
+              }
+              placeholder="Enter price"
+            >
+              {({ field }) => (
+                <InputAmount
+                  name={field.name}
+                  currency="USD"
+                  value={field.value}
+                  onChange={value => setFieldValue(field.name, value)}
+                />
+              )}
+            </FormField>
+          </div>
+          <div>
+            <Label>
+              <FormattedMessage id="Features" defaultMessage="Features" />
+            </Label>
+            <div className="mt-2 grid grid-flow-row grid-cols-2 gap-2">
+              {AVAILABLE_FEATURES.map(feature => (
+                <div key={feature}>
+                  <FormField name={`plan.features.${feature}`} type="checkbox">
+                    {({ field }) => (
+                      <div className="flex items-center gap-2">
+                        <Checkbox checked={field.value} onCheckedChange={value => setFieldValue(field.name, value)} />
+                        <Label className="text-sm font-normal">{AVAILABLE_FEATURES_LABELS[feature]}</Label>
+                      </div>
+                    )}
+                  </FormField>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div className="mt-2 flex w-full flex-col justify-stretch gap-2">
             {props.isLegacy && (
@@ -223,8 +233,10 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                 variant="destructive"
               >
                 <AlertDescription>
-                  This account is currently subscribed to a legacy plan, upgrading it to a new subscription plan is
-                  irreversible.
+                  <FormattedMessage
+                    id="LegacyPlanWarning"
+                    defaultMessage="This account is currently subscribed to a legacy plan, upgrading it to a new subscription plan is irreversible."
+                  />
                 </AlertDescription>
               </Alert>
             )}
@@ -249,7 +261,7 @@ export default function SubscriberModal({
 }: { open: boolean; setOpen: (open: boolean) => void } & SubscriberFormProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FormattedMessage id="EditSubscription" defaultMessage="Edit Subscription" />

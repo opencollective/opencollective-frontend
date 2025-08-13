@@ -10600,6 +10600,8 @@ export type PlatformSubscriptionInput = {
 };
 
 export type PlatformSubscriptionPlanInput = {
+  /** The ID of the base plan for this subscription tier */
+  basePlanId: Scalars['String']['input'];
   /** Pricing details for the subscription plan */
   pricing: PlatformSubscriptionPlanPricing;
   /** The title of the subscription plan */
@@ -10624,9 +10626,11 @@ export type PlatformSubscriptionPlanPricing = {
 /** Type for Platform Subscription Tier */
 export type PlatformSubscriptionTier = {
   __typename?: 'PlatformSubscriptionTier';
+  /** The ID of the base plan for this subscription tier */
+  basePlanId?: Maybe<Scalars['String']['output']>;
   features: PlatformSubscriptionFeatures;
   /** The title of the subscription tier */
-  id: Scalars['String']['output'];
+  id?: Maybe<Scalars['String']['output']>;
   pricing: PlatformSubscriptionTierPricing;
   /** The title of the subscription tier */
   title: Scalars['String']['output'];
@@ -11399,7 +11403,7 @@ export type QueryAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isFirstPartyHost?: InputMaybe<Scalars['Boolean']['input']>;
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
-  isSubscriber?: InputMaybe<Scalars['Boolean']['input']>;
+  isPlatformSubscriber?: InputMaybe<Scalars['Boolean']['input']>;
   isVerified?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];

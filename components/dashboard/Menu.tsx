@@ -81,7 +81,7 @@ const ROOT_MENU = [
     label: 'Subscriptions',
     Icon: HandCoins,
     subMenu: [
-      // { label: 'Manage Subscriptions', section: ROOT_SECTIONS.SUBSCRIBERS },
+      { label: 'Manage Subscriptions', section: ROOT_SECTIONS.SUBSCRIBERS },
       { label: 'Legacy Subscribers', section: ROOT_SECTIONS.LEGACY_SUBSCRIBERS },
     ],
   },
