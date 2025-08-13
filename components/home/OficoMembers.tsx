@@ -4,6 +4,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
+import { Button } from '../ui/Button';
 
 const messages = defineMessages({
   title: {
@@ -135,14 +136,16 @@ const OficoMembers = () => {
         </div>
 
         <div className="text-center">
-          <a
-            href="https://oficonsortium.org/"
-            target="_blank"
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-6 py-3 font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-200"
-          >
-            {formatMessage(messages.learnMore)}
-            <ExternalLink className="h-4 w-4" />
-          </a>
+          <Button asChild variant="outline" className="gap-2 rounded-full">
+            <a
+              href="https://oficonsortium.org/"
+              target="_blank"
+              // className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-6 py-3 font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-200"
+            >
+              {formatMessage(messages.learnMore)}
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </Button>
         </div>
       </div>
     </section>
