@@ -16,6 +16,7 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
+  PLATFORM_BILLING = 'PLATFORM_BILLING',
 }
 
 enum Categories {
@@ -71,6 +72,15 @@ export const previewFeatures: PreviewFeature[] = [
     ),
     alwaysEnableInDev: true,
     publicBeta: true,
+    category: Categories.GENERAL,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.PLATFORM_BILLING,
+    title: '(WIP) Platform billing',
+    description: 'WIP',
+    alwaysEnableInDev: true,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
   },
   {

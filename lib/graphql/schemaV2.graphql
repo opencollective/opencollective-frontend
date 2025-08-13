@@ -4669,7 +4669,12 @@ type PlatformSubscriptionFeatures {
 type PlatformBilling {
   billingPeriod: PlatformBillingPeriod!
   subscriptions: [PlatformSubscription!]!
-  utilization: PlatformSubscriptionUtilization!
+  utilization: PlatformUtilization!
+  dueDate: DateTime!
+  baseAmount: Amount!
+  additional: PlatformBillingAdditional!
+  totalAmount: Amount!
+  expenses: [Expense!]!
 }
 
 type PlatformBillingPeriod {
@@ -4695,12 +4700,20 @@ enum PlatformBillingMonth {
   DECEMBER
 }
 
-type PlatformSubscriptionUtilization {
-  billingPeriod: PlatformBillingPeriod!
-  startDate: DateTime!
-  endDate: DateTime!
+type PlatformUtilization {
   activeCollectives: Int!
   expensesPaid: Int!
+}
+
+type PlatformBillingAdditional {
+  total: Amount!
+  amounts: PlatformBillingAdditionalUtilizationCharges
+  utilization: PlatformUtilization!
+}
+
+type PlatformBillingAdditionalUtilizationCharges {
+  activeCollectives: Amount!
+  expensesPaid: Amount!
 }
 
 input PlatformBillingPeriodInput {
@@ -25644,9 +25657,35 @@ input PlatformSubscriptionPlanInput {
   basePlanId: String!
 
   """
+  Features included in this subscription plan
+  """
+  features: PlatformSubscriptionFeaturesFeatures
+
+  """
   Pricing details for the subscription plan
   """
   pricing: PlatformSubscriptionPlanPricing!
+}
+
+input PlatformSubscriptionFeaturesFeatures {
+  TRANSFERWISE: Boolean!
+  PAYPAL_PAYOUTS: Boolean!
+  RECEIVE_HOST_APPLICATIONS: Boolean!
+  CHART_OF_ACCOUNTS: Boolean!
+  EXPENSE_SECURITY_CHECKS: Boolean!
+  EXPECTED_FUNDS: Boolean!
+  CHARGE_HOSTING_FEES: Boolean!
+  RESTRICTED_FUNDS: Boolean!
+  AGREEMENTS: Boolean!
+  TAX_FORMS: Boolean!
+  CONNECT_BANK_ACCOUNTS: Boolean!
+  FUNDS_GRANTS_MANAGEMENT: Boolean!
+  VENDORS: Boolean!
+  USE_EXPENSES: Boolean!
+  UPDATES: Boolean!
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
+  RECEIVE_EXPENSES: Boolean!
+  ACCOUNT_MANAGEMENT: Boolean!
 }
 
 input PlatformSubscriptionPlanPricing {

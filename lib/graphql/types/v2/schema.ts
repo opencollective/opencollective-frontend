@@ -10526,9 +10526,27 @@ export type PlaidLinkTokenCreateResponse = {
 
 export type PlatformBilling = {
   __typename?: 'PlatformBilling';
+  additional: PlatformBillingAdditional;
+  baseAmount: Amount;
   billingPeriod: PlatformBillingPeriod;
+  dueDate: Scalars['DateTime']['output'];
+  expenses: Array<Expense>;
   subscriptions: Array<PlatformSubscription>;
-  utilization: PlatformSubscriptionUtilization;
+  totalAmount: Amount;
+  utilization: PlatformUtilization;
+};
+
+export type PlatformBillingAdditional = {
+  __typename?: 'PlatformBillingAdditional';
+  amounts?: Maybe<PlatformBillingAdditionalUtilizationCharges>;
+  total: Amount;
+  utilization: PlatformUtilization;
+};
+
+export type PlatformBillingAdditionalUtilizationCharges = {
+  __typename?: 'PlatformBillingAdditionalUtilizationCharges';
+  activeCollectives: Amount;
+  expensesPaid: Amount;
 };
 
 export enum PlatformBillingMonth {
@@ -10592,6 +10610,27 @@ export type PlatformSubscriptionFeatures = {
   VENDORS: Scalars['Boolean']['output'];
 };
 
+export type PlatformSubscriptionFeaturesFeatures = {
+  ACCOUNT_MANAGEMENT: Scalars['Boolean']['input'];
+  AGREEMENTS: Scalars['Boolean']['input'];
+  CHARGE_HOSTING_FEES: Scalars['Boolean']['input'];
+  CHART_OF_ACCOUNTS: Scalars['Boolean']['input'];
+  CONNECT_BANK_ACCOUNTS: Scalars['Boolean']['input'];
+  EXPECTED_FUNDS: Scalars['Boolean']['input'];
+  EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['input'];
+  FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['input'];
+  PAYPAL_PAYOUTS: Scalars['Boolean']['input'];
+  RECEIVE_EXPENSES: Scalars['Boolean']['input'];
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];
+  RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['input'];
+  RESTRICTED_FUNDS: Scalars['Boolean']['input'];
+  TAX_FORMS: Scalars['Boolean']['input'];
+  TRANSFERWISE: Scalars['Boolean']['input'];
+  UPDATES: Scalars['Boolean']['input'];
+  USE_EXPENSES: Scalars['Boolean']['input'];
+  VENDORS: Scalars['Boolean']['input'];
+};
+
 export type PlatformSubscriptionInput = {
   /** The ID of the platform subscription to update */
   id?: InputMaybe<Scalars['String']['input']>;
@@ -10602,6 +10641,8 @@ export type PlatformSubscriptionInput = {
 export type PlatformSubscriptionPlanInput = {
   /** The ID of the base plan for this subscription tier */
   basePlanId: Scalars['String']['input'];
+  /** Features included in this subscription plan */
+  features?: InputMaybe<PlatformSubscriptionFeaturesFeatures>;
   /** Pricing details for the subscription plan */
   pricing: PlatformSubscriptionPlanPricing;
   /** The title of the subscription plan */
@@ -10652,13 +10693,10 @@ export type PlatformSubscriptionTierPricing = {
   pricePerMonth: Amount;
 };
 
-export type PlatformSubscriptionUtilization = {
-  __typename?: 'PlatformSubscriptionUtilization';
+export type PlatformUtilization = {
+  __typename?: 'PlatformUtilization';
   activeCollectives: Scalars['Int']['output'];
-  billingPeriod: PlatformBillingPeriod;
-  endDate: Scalars['DateTime']['output'];
   expensesPaid: Scalars['Int']['output'];
-  startDate: Scalars['DateTime']['output'];
 };
 
 export type Policies = {

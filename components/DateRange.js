@@ -9,7 +9,7 @@ const OneLineDate = styled(DateTime)`
   display: inline-block;
 `;
 
-const getMessage = (from, to) => {
+const getMessage = (from, to, dateStyle, timeStyle) => {
   if (!from && !to) {
     return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
   } else if (from && to) {
@@ -19,8 +19,8 @@ const getMessage = (from, to) => {
           defaultMessage="{dateFrom} to {dateTo}"
           id="76YT3Y"
           values={{
-            dateFrom: <OneLineDate value={from} dateStyle="medium" />,
-            dateTo: <OneLineDate value={to} dateStyle="medium" />,
+            dateFrom: <OneLineDate value={from} dateStyle={dateStyle} timeStyle={timeStyle} />,
+            dateTo: <OneLineDate value={to} dateStyle={dateStyle} timeStyle={timeStyle} />,
           }}
         />
       </div>
@@ -30,7 +30,7 @@ const getMessage = (from, to) => {
       <FormattedMessage
         defaultMessage="Since {date}"
         id="x9TypM"
-        values={{ date: <OneLineDate value={from} dateStyle="medium" /> }}
+        values={{ date: <OneLineDate value={from} dateStyle={dateStyle} timeStyle={timeStyle} /> }}
       />
     );
   } else {
@@ -38,7 +38,7 @@ const getMessage = (from, to) => {
       <FormattedMessage
         defaultMessage="Before {date}"
         id="U5sjCv"
-        values={{ date: <OneLineDate value={to} dateStyle="medium" /> }}
+        values={{ date: <OneLineDate value={to} dateStyle={dateStyle} timeStyle={timeStyle} /> }}
       />
     );
   }
@@ -54,8 +54,8 @@ const getMessage = (from, to) => {
  *
  * If isUTC is true, we also add a `(UTC)` to the end of the date.
  */
-export const DateRange = ({ from, to, isUTC }) => {
-  const message = getMessage(from, to);
+export const DateRange = ({ from, to = undefined, isUTC = false, dateStyle = 'medium', timeStyle = undefined }) => {
+  const message = getMessage(from, to, dateStyle, timeStyle);
   if (!isUTC || (!from && !to)) {
     return message;
   } else {
