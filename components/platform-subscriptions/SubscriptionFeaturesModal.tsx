@@ -9,14 +9,13 @@ import type { BaseModalProps } from '../ModalContext';
 
 import { PlatformSubscriptionFeatureList } from './PlatformSubscriptionFeatureList';
 
-
 type SubscriptionFeaturesModalProps = {
-  features: PlatformSubscriptionFeatures
+  features: PlatformSubscriptionFeatures;
 } & BaseModalProps;
 
 export function SubscriptionFeaturesModal(props: SubscriptionFeaturesModalProps) {
   return (
-    <Dialog open={props.open} onOpenChange={(isOpen) => props.setOpen(isOpen)}>
+    <Dialog open={props.open} onOpenChange={isOpen => props.setOpen(isOpen)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

@@ -158,7 +158,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
             <RadioGroupCard
               value={tier}
               className="flex w-min grow flex-col"
-              indicatorClassName="self-start"
+              indicatorClassName="self-start absolute top-4 left-4"
               contentClassName="flex-col"
             >
               <PlatformSubscriptionTierCard tier={tier} isCurrent={tier === props.currentPlan.type} />
@@ -323,7 +323,7 @@ function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) 
   const descriptionMessage = PlatformSubscriptionTierDescription[props.tier];
   const features = PlatformSubscriptionTierFeatures[props.tier];
   return (
-    <div>
+    <div className="pb-5">
       <div className="mb-4 flex justify-center">
         <div className="rounded-full bg-gray-200 p-2">
           <Icon />
@@ -342,7 +342,11 @@ function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) 
       <div className="flex grow flex-col justify-end">
         <PlatformSubscriptionFeatureList features={features} />
       </div>
-      {props.isCurrent ? <div className="mt-4">Current Tier</div> : <div className="mt-4 h-5" />}
+      {props.isCurrent && (
+        <div className="absolute bottom-0 left-0 w-full rounded-b-lg border border-blue-400 bg-blue-400 px-4 py-1 text-center font-semibold text-white">
+          Current tier
+        </div>
+      )}
     </div>
   );
 }
