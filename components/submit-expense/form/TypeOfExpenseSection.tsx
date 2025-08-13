@@ -63,10 +63,10 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
           disabled={isTypeLocked || props.isSubmitting}
           value={expenseTypeOption}
           onValueChange={newValue => props.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
-          className="flex"
+          className="flex flex-wrap"
         >
           <RadioGroupCard
-            className="grow basis-0"
+            className="min-w-48 grow basis-0"
             value={ExpenseType.INVOICE}
             disabled={props.initialLoading || props.isSubmitting}
           >
@@ -81,7 +81,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
           </RadioGroupCard>
 
           <RadioGroupCard
-            className="grow basis-0"
+            className="min-w-48 grow basis-0"
             value={ExpenseType.RECEIPT}
             disabled={props.initialLoading || props.isSubmitting}
           >

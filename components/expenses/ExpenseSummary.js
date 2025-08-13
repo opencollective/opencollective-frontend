@@ -455,8 +455,8 @@ const ExpenseSummary = ({
                       />
                     </Box>
                   )}
-                  <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
-                    <Flex flexDirection="column" justifyContent="center" flexGrow="1">
+                  <Flex justifyContent="space-between" minWidth="0" alignItems="flex-start" flex="1">
+                    <Flex flexDirection="column" minWidth="0" justifyContent="center" flexGrow="1">
                       {attachment.description ? (
                         <HTMLContent
                           content={attachment.description}
@@ -546,8 +546,8 @@ const ExpenseSummary = ({
             )}
           </Flex>
           {isMultiCurrency && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-              <Container fontWeight="500" mr={3} whiteSpace="nowrap">
+            <div className="mt-2 flex flex-wrap items-center justify-end gap-2 text-sm text-muted-foreground">
+              <span>
                 <FormattedMessage
                   defaultMessage="Accounted as ({currency}):"
                   id="4Wdhe4"
@@ -558,8 +558,8 @@ const ExpenseSummary = ({
                         : expense.amountInAccountCurrency.currency,
                   }}
                 />
-              </Container>
-              <Container>
+              </span>
+              <span>
                 <AmountWithExchangeRateInfo
                   amount={
                     isPaid && expense.amountInHostCurrency
@@ -567,7 +567,7 @@ const ExpenseSummary = ({
                       : expense.amountInAccountCurrency
                   }
                 />
-              </Container>
+              </span>
             </div>
           )}
         </Flex>

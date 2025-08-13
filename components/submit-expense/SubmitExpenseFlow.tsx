@@ -119,7 +119,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           className="overflow-hidden rounded-none p-0 sm:max-w-screen sm:min-w-screen sm:rounded-none sm:p-0"
           hideCloseButton
         >
-          <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC] before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')]">
+          <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')] sm:bg-[#F8FAFC]">
             <header className="z-30 flex min-w-screen items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
               <span className="text-xl leading-7 font-bold text-slate-800">
                 <FormattedMessage
@@ -187,7 +187,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
+        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl leading-7 font-bold text-slate-800">
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -210,7 +210,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           </header>
           <main className="flex w-full grow overflow-hidden">
             <div className="flex w-full grow justify-center">
-              <div className="relative flex w-full flex-row justify-center overflow-y-scroll pt-10 sm:gap-11 sm:px-8">
+              <div className="relative flex w-full flex-row justify-center overflow-y-scroll pt-4 sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
                   draftKey={props.draftKey}
@@ -286,7 +286,7 @@ function ExpenseFormikContainer(props: {
     <FormikProvider value={expenseForm}>
       <SubmitExpenseFlowSteps className="sticky top-0 hidden w-64 min-w-44 sm:block" activeStep={activeStep} />
 
-      <div className="h-max w-full px-4 pb-4 sm:max-w-3xl sm:overflow-x-hidden sm:px-0">
+      <div className="h-max w-full pb-4 sm:max-w-3xl sm:overflow-x-hidden">
         <form ref={formRef} onSubmit={e => e.preventDefault()}>
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}

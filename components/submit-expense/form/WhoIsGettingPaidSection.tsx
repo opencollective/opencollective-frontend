@@ -136,6 +136,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   return (
     <RadioGroup
       id="payeeSlug"
+      name="payeeSlug"
       data-cy="payee-selector"
       disabled={props.isSubmitting}
       value={props.payeeSlug}
@@ -150,6 +151,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           value={lastUsedProfile.slug}
           showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
           subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />}
+          className="min-w-0"
         >
           <ExpenseAccountItem account={lastUsedProfile} />
         </RadioGroupCard>
@@ -163,6 +165,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
           showSubcontent={!isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)}
           subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
+          className="min-w-0"
         >
           {isLoading ? <Skeleton className="h-6 w-full" /> : <ExpenseAccountItem account={personalProfile} />}
         </RadioGroupCard>
@@ -174,6 +177,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           checked={isMyOtherProfilesSelected}
           showSubcontent={isMyOtherProfilesSelected}
           disabled={props.isSubmitting}
+          className="min-w-0"
           subContent={
             <div>
               <CollectivePicker
@@ -198,6 +202,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
           showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
           disabled={props.initialLoading || props.isSubmitting}
+          className="min-w-0"
           subContent={
             <div>
               <CollectivePickerAsync
@@ -268,6 +273,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           checked
           showSubcontent
           disabled={props.initialLoading || props.isSubmitting}
+          className="min-w-0"
           subContent={
             <div>
               <InviteUserOption
@@ -346,6 +352,7 @@ const VendorOption = React.memo(function VendorOption(props: {
       checked={isVendorSelected}
       showSubcontent={isVendorSelected}
       disabled={props.isSubmitting}
+      className="min-w-0"
       subContent={
         <div>
           <CollectivePickerAsync

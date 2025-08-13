@@ -122,7 +122,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
+        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl leading-7 font-bold text-slate-800">
               {!submittedGrantId && (
@@ -409,7 +409,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
             <div className="px-4 pb-4">
               <FormContainer activeHeader={steps.activeHeaderName} onVisibleSectionChange={onVisibleSectionChange} />
             </div>
-            <div className="sticky bottom-0 z-20 bg-[#F8FAFC]">
+            <div className="sticky bottom-0 z-20 sm:bg-[#F8FAFC]">
               <div className="flex justify-between px-4 py-4">
                 {steps.activeHeader.previousButtonMessage ? (
                   <Button variant="outline" onClick={onBackStepClick} disabled={expenseForm.isSubmitting}>
@@ -566,7 +566,7 @@ function FormSectionContainer(props: FormSectionContainerProps) {
 
   return (
     <div ref={ref} id={props.id} className="scroll-m-8">
-      <div className="rounded-lg border border-white bg-white p-6">
+      <div className="rounded-lg border border-white bg-white p-4 sm:p-6">
         {props.title && (
           <div className="mb-4">
             <div className="text-xl font-bold text-[#0F1729]">{props.title}</div>
