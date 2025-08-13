@@ -12,6 +12,8 @@ import type {
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import MessageBox from '@/components/MessageBox';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+import { useModal } from '@/components/ModalContext';
+import { ManageSubscriptionModal } from '@/components/platform-subscriptions/ManageSubscriptionModal';
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -25,6 +27,7 @@ import { PlatformPaymentsView } from './PlatformPaymentsView';
 import { PlatformSubscriptionCard } from './PlatformSubscriptionCard';
 
 export function DashboardPlatformSubscription(props: DashboardSectionProps) {
+  const { showModal } = useModal();
   const query = useQuery<DashboardPlatformSubscriptionQuery, DashboardPlatformSubscriptionQueryVariables>(
     gql`
       query DashboardPlatformSubscription($slug: String!) {
@@ -61,8 +64,8 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         title={<FormattedMessage defaultMessage="Platform Billing" id="beRXFK" />}
         description={
           <FormattedMessage
-            defaultMessage="Review your platform billing details, pay any outstanding invoices, get clarity on the next billing cycle to ensure your collectives continue to be supported."
-            id="bSLWvg"
+            defaultMessage="Review your platform billing details, check utilization and pay outstanding invoices."
+            id="ajHwTP"
           />
         }
       />
@@ -93,8 +96,13 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
           </div>
           <Separator className="w-auto grow border-b bg-border" />
           <div>
-            <Button disabled={isLoading} variant="outline" size="xs">
-              <FormattedMessage defaultMessage="Change Plan" id="n7blLN" />
+            <Button
+              disabled={isLoading}
+              onClick={() => showModal(ManageSubscriptionModal, { currentPlan: activeSubscription.plan })}
+              variant="outline"
+              size="xs"
+            >
+              <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
             </Button>
           </div>
         </div>

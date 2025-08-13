@@ -1,11 +1,14 @@
 import React from 'react';
-import { Info, Receipt, Shapes } from 'lucide-react';
+import { ArrowRight, Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import type { PlatformBillingFieldsFragment, PlatformSubscriptionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import { useModal } from '@/components/ModalContext';
+import { SubscriptionFeaturesModal } from '@/components/platform-subscriptions/SubscriptionFeaturesModal';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 type PlatformSubscriptionCardProps = {
@@ -14,6 +17,7 @@ type PlatformSubscriptionCardProps = {
 };
 
 export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
+  const { showModal } = useModal();
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full flex-col rounded-xl border">
@@ -137,6 +141,18 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
                     }}
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="flex grow justify-end">
+              <div>
+                <Button
+                  variant="ghost"
+                  onClick={() => showModal(SubscriptionFeaturesModal, { features: props.subscription.plan.features })}
+                >
+                  <FormattedMessage defaultMessage="View all features" id="iHBbHN" />
+                  <ArrowRight size={14} />
+                </Button>
               </div>
             </div>
           </div>

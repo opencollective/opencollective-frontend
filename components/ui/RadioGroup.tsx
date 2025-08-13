@@ -43,6 +43,8 @@ const RadioGroupCard = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
     showSubcontent?: boolean;
     subContent?: React.ReactNode;
+    contentClassName?: string;
+    indicatorClassName?: string;
   }
 >(({ className, children, showSubcontent, subContent, ...props }, ref) => {
   return (
@@ -60,8 +62,13 @@ const RadioGroupCard = React.forwardRef<
         asChild={false}
         {...props}
       >
-        <div className="flex w-full items-center gap-4">
-          <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+        <div className={cn('flex w-full items-center gap-4', props.contentClassName)}>
+          <div
+            className={cn(
+              'flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              props.indicatorClassName,
+            )}
+          >
             <RadioGroupPrimitive.Indicator>
               <Circle className="h-2.5 w-2.5 fill-current text-current" />
             </RadioGroupPrimitive.Indicator>

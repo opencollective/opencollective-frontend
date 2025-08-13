@@ -32,6 +32,7 @@ export const platformSubscriptionFragment = gql`
     isCurrent
     plan {
       title
+      type
       pricing {
         pricePerMonth {
           valueInCents
