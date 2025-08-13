@@ -8,6 +8,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
+import { isHostAccount } from '@/lib/collective';
 import { loadGoogleMaps } from '@/lib/google-maps';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
@@ -52,11 +53,15 @@ const messages = defineMessages({
   },
 });
 
-const getDefaultSectionForAccount = account => {
+const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
+  } else if (loggedInUser?.isAccountantOnly(account) && isHostAccount(account)) {
+    return ALL_SECTIONS.HOST_EXPENSES;
+  } else if (loggedInUser?.isAccountantOnly(account)) {
+    return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {
     return ALL_SECTIONS.OVERVIEW;
   }
@@ -167,7 +172,7 @@ const DashboardPage = () => {
     skip: !activeSlug || !LoggedInUser || isRootProfile,
   });
   const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
-  const selectedSection = section || getDefaultSectionForAccount(account);
+  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
