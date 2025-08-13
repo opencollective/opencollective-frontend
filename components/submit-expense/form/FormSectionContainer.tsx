@@ -26,7 +26,7 @@ export function FormSectionContainer(props: FormSectionContainerProps) {
 
   return (
     <div ref={ref} id={props.step} className="scroll-m-8">
-      <div className="rounded-lg border border-white bg-white p-6">
+      <div className="rounded-lg border border-white bg-white p-4 sm:p-6">
         {!props.hideTitle && (
           <div className="mb-4">
             <div className="text-xl font-bold text-[#0F1729]">{props.title || <FormattedMessage {...stepTitle} />}</div>

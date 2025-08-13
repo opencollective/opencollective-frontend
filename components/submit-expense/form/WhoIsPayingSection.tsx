@@ -73,6 +73,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
     >
       <RadioGroup
         id="accountSlug"
+        name="accountSlug"
         disabled={!props.canChangeAccount || props.isSubmitting}
         value={props.accountSlug}
         onValueChange={accountSlug => {
