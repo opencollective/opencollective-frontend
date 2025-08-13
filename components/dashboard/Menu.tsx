@@ -435,7 +435,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           ? [
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
-                Icon: Wallet,
                 label: intl.formatMessage({ defaultMessage: 'Platform Subscription', id: '28toyD' }),
                 if: hasPlatformBillingEnabled,
               },

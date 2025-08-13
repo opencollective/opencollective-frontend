@@ -91,8 +91,8 @@ export function PlatformBillingUtilizationTable(props: PlatformBillingUtilizatio
       {props.billing.additional.total.valueInCents > 0 && (
         <div className="w-full rounded-xl rounded-t-none border-b bg-red-100 py-2 text-center text-sm text-oc-blue-tints-900">
           <FormattedMessage
-            defaultMessage="You will be charged an additional <b>{additionalAmount} on {dueDate}</b> as you're exceeding your plan limits."
-            id="6QTSqF"
+            defaultMessage="You will be charged an additional <b>{additionalAmount} on {dueDate}</b> for usage beyond your base plan."
+            id="GCs9yX"
             values={{
               b: I18nBold,
               dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={props.billing.dueDate} />,
