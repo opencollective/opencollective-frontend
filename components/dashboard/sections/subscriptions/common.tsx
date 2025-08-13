@@ -102,8 +102,8 @@ export const cols = {
     cell: ({ row }) => {
       const account = row.original;
       if ('platformSubscription' in account && account.platformSubscription.plan) {
-        const plan = account.platformSubscription?.plan;
-        const startDate = account.platformSubscription?.startDate;
+        const plan = account.platformSubscription.plan;
+        const startDate = account.platformSubscription.startDate;
         return (
           <div>
             <div className="text-sm font-medium text-foreground">{plan.title}</div>
