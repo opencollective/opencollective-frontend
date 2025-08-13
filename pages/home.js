@@ -4,13 +4,10 @@ import { defineMessages, useIntl } from 'react-intl';
 import { getRequestIntl } from '../lib/i18n/request';
 import { getWhitelabelProps } from '../lib/whitelabel';
 
-// import Banner from '../components/collectives/Banner';
-import JoinUsSection from '../components/collectives/sections/JoinUs';
-import CollaborateWithMoney from '../components/home/CollaborateWithMoneySection';
-import DedicatedTeam from '../components/home/DedicatedTeamSection';
-import GetToKnowUs from '../components/home/GetToKnowUsSection';
-import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
-import RaiseMoney from '../components/home/RaiseMoneySection';
+import OficoMembers from '../components/home/OficoMembers';
+import Solutions from '../components/home/Solutions';
+import Stats from '../components/home/Stats';
+
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
 
@@ -35,16 +32,10 @@ export const HomePage = () => {
       title={formatMessage(messages.defaultTitle)}
       description={formatMessage(messages.defaultDescription)}
     >
-      {/*
-      <Banner />
-      */}
       <TheFutureIsCollective />
-      <RaiseMoney />
-      <OpenCollectiveIs />
-      <CollaborateWithMoney />
-      <DedicatedTeam />
-      <GetToKnowUs />
-      <JoinUsSection />
+      <Solutions />
+      <OficoMembers />
+      <Stats />
     </Page>
   );
 };
