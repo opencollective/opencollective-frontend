@@ -136,6 +136,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   return (
     <RadioGroup
       id="payeeSlug"
+      name="payeeSlug"
       data-cy="payee-selector"
       disabled={props.isSubmitting}
       value={props.payeeSlug}
