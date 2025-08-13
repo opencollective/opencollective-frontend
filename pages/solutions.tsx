@@ -2,15 +2,13 @@ import React from 'react';
 import { ArrowRight, Eye, FileText, Home, PieChart, Users } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { getRequestIntl } from '../lib/i18n/request';
-import { getWhitelabelProps } from '../lib/whitelabel';
-
 import NextIllustration from '../components/collectives/HomeNextIllustration';
 import { MainDescription } from '../components/marketing/Text';
 import Page from '../components/Page';
 import { Button } from '@/components/ui/Button';
 import Features from '@/components/home/solutions/Features';
 import Testimonials from '@/components/home/solutions/Testimonials';
+import Link from '@/components/Link';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -161,8 +159,10 @@ export const Solutions = () => {
 
           {/* Call to Action Buttons */}
           <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-            <Button variant="marketing" className="rounded-full">
-              <FormattedMessage {...messages.joinAsOrg} />
+            <Button variant="marketing" className="rounded-full" asChild>
+              <Link href="/signup/organization">
+                <FormattedMessage {...messages.joinAsOrg} />
+              </Link>
             </Button>
             <Button variant="outline" className="rounded-full">
               <FormattedMessage {...messages.seePricing} />
