@@ -14,12 +14,12 @@ enum TRUST_LEVELS {
 
 const AccountTrustLevelMessages = defineMessages({
   [TRUST_LEVELS.VERIFIED]: {
-    id: 'TrustLevel.Trusted',
-    defaultMessage: 'Trusted',
+    id: 'TrustLevel.Verified',
+    defaultMessage: 'Verified',
   },
   [TRUST_LEVELS.FIRST_PARTY]: {
-    id: 'TrustLevel.FirstParty',
-    defaultMessage: 'First Party',
+    id: 'TrustLevel.OFiCoMember',
+    defaultMessage: 'OFiCo Member',
   },
 });
 

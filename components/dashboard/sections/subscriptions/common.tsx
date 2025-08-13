@@ -1,7 +1,8 @@
 import React from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
+import dayjs from 'dayjs';
 import { groupBy, mapValues, pick, toPairs } from 'lodash';
-import { ArrowUpRight } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedDate, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
@@ -9,18 +10,18 @@ import { z } from 'zod';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getCollectivePageCanonicalURL } from '../../../../lib/url-helpers';
 import { CollectiveType } from '@/lib/constants/collectives';
+import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Link from '@/components/Link';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import { Badge } from '../../../ui/Badge';
 import { TableActionsButton } from '../../../ui/Table';
 import { buildAccountTypeFilter } from '../../filters/AccountTypeFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
-export const cols: Record<string, ColumnDef<any, any>> = {
+export const cols = {
   collective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage id="Collective" defaultMessage="Collective" />,
@@ -30,25 +31,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       };
       const collective = row.original;
       const children = mapValues(groupBy(collective.childrenAccounts?.nodes, 'type'), 'length');
-      const isChild = collective.parent;
-      const secondLine = isChild ? (
-        <FormattedMessage
-          defaultMessage="{childAccountType} by {parentAccount}"
-          id="9f14iS"
-          values={{
-            childAccountType: (
-              <Badge size="xs" type="outline">
-                {formatCollectiveType(intl, collective.type)}
-              </Badge>
-            ),
-            parentAccount: collective.parent.name,
-          }}
-        />
-      ) : (
-        toPairs(children)
-          .map(([type, count]) => count && `${count} ${formatCollectiveType(intl, type, count)}`)
-          .join(', ')
-      );
+      const secondLine = toPairs(children)
+        .map(([type, count]) => count && `${count} ${formatCollectiveType(intl, type, count)}`)
+        .join(', ');
       return (
         <div className="flex items-center gap-2">
           <Link href={getCollectivePageCanonicalURL(collective)} passHref>
@@ -111,12 +96,33 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       }
     },
   },
+  plan: {
+    accessorKey: 'plan',
+    header: () => <FormattedMessage id="SubscriptionPlan" defaultMessage="Subscription Plan" />,
+    cell: ({ row }) => {
+      const account = row.original;
+      if ('platformSubscription' in account && account.platformSubscription.plan) {
+        const plan = account.platformSubscription?.plan;
+        const startDate = account.platformSubscription?.startDate;
+        return (
+          <div>
+            <div className="text-sm font-medium text-foreground">{plan.title}</div>
+            {startDate && (
+              <div className="text-xs text-muted-foreground">Since {dayjs.utc(startDate).format('MMM D, YYYY')}</div>
+            )}
+          </div>
+        );
+      } else {
+        return <FormattedMessage id="NoPlan" defaultMessage="No plan" />;
+      }
+    },
+  },
   legacyPlan: {
     accessorKey: 'legacyPlan',
     header: () => <FormattedMessage id="SubscriptionPlan" defaultMessage="Subscription Plan" />,
     cell: ({ row }) => {
       const account = row.original;
-      return account.legacyPlan ? (
+      return 'legacyPlan' in account ? (
         <div className="text-sm font-medium text-foreground">{account.legacyPlan.name}</div>
       ) : (
         <FormattedMessage id="NoPlan" defaultMessage="No plan" />
@@ -140,23 +146,19 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: '',
     cell: ({ row, table }) => {
       const collective = row.original;
-      const { onClickUpgrade } = table.options.meta as any;
+      const { onClickEdit } = table.options.meta as any;
       return (
         // Stop propagation since the row is clickable
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div className="flex flex-1 items-center justify-end" onClick={e => e.stopPropagation()}>
-          <TableActionsButton
-            title="Upgrade Subscription"
-            className="h-8 w-8"
-            onClick={() => onClickUpgrade(collective)}
-          >
-            <ArrowUpRight size={20} />
+          <TableActionsButton className="h-8 w-8" onClick={() => onClickEdit(collective)}>
+            <Pencil size={16} />
           </TableActionsButton>
         </div>
       );
     },
   },
-};
+} as Record<string, ColumnDef<SubscriberFieldsFragment>>;
 
 export const sortFilter = buildSortFilter({
   fieldSchema: z.enum(['MONEY_MANAGED', 'CREATED_AT', 'NAME']),
@@ -181,3 +183,51 @@ export const typeFilter = buildAccountTypeFilter({
   optional: true,
   defaultValue: [CollectiveType.ORGANIZATION],
 });
+
+export const AVAILABLE_FEATURES = [
+  'TRANSFERWISE',
+  'PAYPAL_PAYOUTS',
+  'RECEIVE_HOST_APPLICATIONS',
+  'CHART_OF_ACCOUNTS',
+  'EXPENSE_SECURITY_CHECKS',
+  'EXPECTED_FUNDS',
+  'CHARGE_HOSTING_FEES',
+  'RESTRICTED_FUNDS',
+  'AGREEMENTS',
+  'TAX_FORMS',
+  'CONNECT_BANK_ACCOUNTS',
+  'FUNDS_GRANTS_MANAGEMENT',
+  'VENDORS',
+  'USE_EXPENSES',
+  'UPDATES',
+  'RECEIVE_FINANCIAL_CONTRIBUTIONS',
+  'RECEIVE_EXPENSES',
+  'ACCOUNT_MANAGEMENT',
+] as const;
+
+export const AVAILABLE_FEATURES_LABELS: Record<(typeof AVAILABLE_FEATURES)[number], string> = {
+  // Basic features (all tiers)
+  ACCOUNT_MANAGEMENT: 'Account management',
+  USE_EXPENSES: 'Submit and review expenses',
+  RECEIVE_EXPENSES: 'Manually pay expenses',
+  UPDATES: 'Updates',
+  VENDORS: 'Vendors',
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: 'Crowdfunding',
+
+  // Paid tier features (Basic and Pro)
+  TRANSFERWISE: 'Pay with Wise',
+  PAYPAL_PAYOUTS: 'Pay with PayPal',
+  // ADVANCED_PERMISSIONS: 'Advanced permissions',
+  CHART_OF_ACCOUNTS: 'Chart of accounts',
+  RECEIVE_HOST_APPLICATIONS: 'Hosted collectives',
+  EXPENSE_SECURITY_CHECKS: 'Antifraud security checks',
+  EXPECTED_FUNDS: 'Expected funds',
+  CHARGE_HOSTING_FEES: 'Charge hosting fees',
+  RESTRICTED_FUNDS: 'Restricted funds',
+
+  // Pro tier features
+  AGREEMENTS: 'Agreements',
+  TAX_FORMS: 'Tax forms',
+  CONNECT_BANK_ACCOUNTS: 'Connect bank accounts',
+  FUNDS_GRANTS_MANAGEMENT: 'Funds & grants management',
+};

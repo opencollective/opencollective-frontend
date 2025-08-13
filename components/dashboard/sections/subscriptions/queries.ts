@@ -2,13 +2,34 @@ import { gql } from '@/lib/graphql/helpers';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 
+const planFeatures = gql`
+  fragment PlanFeatures on PlatformSubscriptionFeatures {
+    TRANSFERWISE
+    PAYPAL_PAYOUTS
+    RECEIVE_HOST_APPLICATIONS
+    CHART_OF_ACCOUNTS
+    EXPENSE_SECURITY_CHECKS
+    EXPECTED_FUNDS
+    CHARGE_HOSTING_FEES
+    RESTRICTED_FUNDS
+    AGREEMENTS
+    TAX_FORMS
+    CONNECT_BANK_ACCOUNTS
+    FUNDS_GRANTS_MANAGEMENT
+    VENDORS
+    USE_EXPENSES
+    UPDATES
+    RECEIVE_FINANCIAL_CONTRIBUTIONS
+    RECEIVE_EXPENSES
+    ACCOUNT_MANAGEMENT
+  }
+`;
+
 const fields = gql`
   fragment SubscriberFields on Account {
     id
-    legacyId
     name
     slug
-    website
     type
     currency
     imageUrl(height: 96)
@@ -64,8 +85,36 @@ const fields = gql`
       legacyPlan {
         name
       }
+      platformSubscription {
+        startDate
+        plan {
+          title
+          type
+          basePlanId
+          features {
+            ...PlanFeatures
+          }
+          pricing {
+            pricePerMonth {
+              valueInCents
+              currency
+            }
+            pricePerAdditionalCollective {
+              valueInCents
+              currency
+            }
+            pricePerAdditionalExpense {
+              valueInCents
+              currency
+            }
+            includedCollectives
+            includedExpensesPerMonth
+          }
+        }
+      }
     }
   }
+  ${planFeatures}
   ${accountHoverCardFields}
 `;
 
@@ -82,6 +131,8 @@ export const subscribersQuery = gql`
     $consolidatedBalance: AmountRangeInput
     $isVerified: Boolean
     $isFirstPartyHost: Boolean
+    $isPlatformSubscriber: Boolean
+    $plan: [String]
   ) {
     accounts(
       limit: $limit
@@ -94,8 +145,8 @@ export const subscribersQuery = gql`
       host: $host
       consolidatedBalance: $consolidatedBalance
       skipGuests: true
-      isSubscriber: true
-      plan: ["LEGACY"]
+      isPlatformSubscriber: $isPlatformSubscriber
+      plan: $plan
       isVerified: $isVerified
       isFirstPartyHost: $isFirstPartyHost
     ) {
@@ -111,8 +162,37 @@ export const subscribersQuery = gql`
       }
     }
   }
-
   ${fields}
+`;
+
+export const availablePlansQuery = gql`
+  query Plans {
+    platformSubscriptionTiers {
+      id
+      title
+      type
+      pricing {
+        pricePerMonth {
+          valueInCents
+          currency
+        }
+        pricePerAdditionalCollective {
+          valueInCents
+          currency
+        }
+        pricePerAdditionalExpense {
+          valueInCents
+          currency
+        }
+        includedCollectives
+        includedExpensesPerMonth
+      }
+      features {
+        ...PlanFeatures
+      }
+    }
+  }
+  ${planFeatures}
 `;
 
 export const updateAccountPlaformSubscriptionMutation = gql`

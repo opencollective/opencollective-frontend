@@ -52,7 +52,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   trustLevel: accountTrustLevelFilter.filter,
 };
 
-const LegacySubscribers = () => {
+const PlatformSubscribers = () => {
   const queryFilter = useQueryFilter({
     filters,
     schema,
@@ -61,7 +61,7 @@ const LegacySubscribers = () => {
   });
 
   const { data, error, loading } = useQuery(subscribersQuery, {
-    variables: queryFilter.variables,
+    variables: { ...queryFilter.variables, isPlatformSubscriber: true },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
@@ -70,7 +70,9 @@ const LegacySubscribers = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="menu.legacy-subscribers" defaultMessage="Legacy Subscribers" />} />
+      <DashboardHeader
+        title={<FormattedMessage id="menu.platform-subscribers" defaultMessage="Platform Subscribers" />}
+      />
 
       <Filterbar {...queryFilter} />
       {error ? (
@@ -81,13 +83,13 @@ const LegacySubscribers = () => {
         <React.Fragment>
           <DataTable
             innerClassName="text-muted-foreground"
-            columns={[cols.collective, cols.team, cols.moneyManaged, cols.legacyPlan, cols.createdAt, cols.actions]}
+            columns={[cols.collective, cols.team, cols.moneyManaged, cols.plan, cols.actions]}
             data={data?.accounts?.nodes || []}
             loading={loading}
             mobileTableView
             compact
             meta={{
-              onClickUpgrade: setShowPlanModal,
+              onClickEdit: setShowPlanModal,
             }}
             getRowDataCy={row => `account-${row.original.slug}`}
           />
@@ -95,15 +97,10 @@ const LegacySubscribers = () => {
         </React.Fragment>
       )}
       {!!showPlanModal && (
-        <SubscriberModal
-          open
-          setOpen={open => setShowPlanModal(open ? showPlanModal : null)}
-          account={showPlanModal}
-          isLegacy
-        />
+        <SubscriberModal open setOpen={open => setShowPlanModal(open ? showPlanModal : null)} account={showPlanModal} />
       )}
     </div>
   );
 };
 
-export default LegacySubscribers;
+export default PlatformSubscribers;
