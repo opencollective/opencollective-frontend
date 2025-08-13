@@ -22,6 +22,7 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import Image from './Image';
+import NextImage from 'next/image';
 import Link from './Link';
 import PopupMenu from './PopupMenu';
 import SearchModal from './Search';
@@ -44,7 +45,7 @@ const NavLinkContainer = styled(Box)`
 `;
 
 const NavButton = styled(StyledButton)`
-  color: #323334;
+  color: var(--color-slate-800);
   font-weight: 500;
   font-size: 16px;
   padding: 10px;
@@ -81,15 +82,22 @@ const TopBarIcon = ({ provider }) => {
         {provider?.logo ? (
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
         ) : (
-          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
+          // <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
+          <NextImage
+            width={555}
+            height={75}
+            className="h-6 w-auto"
+            src="/static/images/ofi-opencollective-logo.png"
+            alt="Open Collective"
+          />
         )}
-        {!provider && (
+        {/* {!provider && (
           <Hide xs sm md>
             <Box mx={2}>
               <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
             </Box>
           </Hide>
-        )}
+        )} */}
       </Flex>
     </Link>
   );
@@ -97,7 +105,7 @@ const TopBarIcon = ({ provider }) => {
 
 const TopBar = ({
   showSearch = true,
-  menuItems = { solutions: true, product: true, company: true, docs: true },
+  menuItems = { solutions: false, product: true, company: false, docs: false, about: true },
   showProfileAndChangelogMenu = true,
   account,
 }) => {
@@ -130,6 +138,7 @@ const TopBar = ({
     '/how-it-works',
     '/fiscal-hosting',
     '/help',
+    '/solutions',
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
 
@@ -279,6 +288,39 @@ const TopBar = ({
                       </NavButton>
                     </Link>
                   )}
+                  {menuItems.about && (
+                    <PopupMenu
+                      zIndex={2000}
+                      closingEvents={['focusin', 'mouseover']}
+                      Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                        <NavButton
+                          isBorderless
+                          onMouseOver={onMouseOver}
+                          onFocus={onFocus}
+                          onClick={onClick}
+                          whiteSpace="nowrap"
+                        >
+                          <FormattedMessage defaultMessage="About" id="g5pX+a" />
+                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </NavButton>
+                      )}
+                      placement="bottom"
+                      popupMarginTop="-10px"
+                    >
+                      <NavLinkContainer>
+                        <a href="https://blog.opencollective.com/">
+                          <NavItem as={Container} mt={16} mb={16}>
+                            <FormattedMessage id="company.blog" defaultMessage="Blog" />
+                          </NavItem>
+                        </a>
+                        <a href="https://documentation.opencollective.com/our-organization/about">
+                          <NavItem as={Container} mb={16}>
+                            <FormattedMessage id="collective.about.title" defaultMessage="About" />
+                          </NavItem>
+                        </a>
+                      </NavLinkContainer>
+                    </PopupMenu>
+                  )}
                 </React.Fragment>
               )}
               {whitelabel?.links?.map(({ label, href }) => (
@@ -296,14 +338,14 @@ const TopBar = ({
         </Hide>
         {showSearch && (
           <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-            <Flex>
+            <div className="flex items-center">
               <SearchIcon fill="#75777A" size={18} />
               <Hide xs sm>
-                <Span ml="5px">
+                <span className="ml-1 text-base" ml="5px">
                   <FormattedMessage id="Search" defaultMessage="Search" />
-                </Span>
+                </span>
               </Hide>
-            </Flex>
+            </div>
           </NavButton>
         )}
         <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
