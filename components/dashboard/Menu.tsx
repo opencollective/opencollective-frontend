@@ -137,6 +137,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
+      if: !isAccountantOnly,
     },
     {
       if: isIndividual,
