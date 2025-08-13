@@ -190,11 +190,11 @@ const Solutions = () => {
             </div>
 
             {/* Button */}
-            <Button variant="outline" className="w-full rounded-full">
-              <div className="flex items-center justify-center gap-2">
+            <Button variant="outline" className="w-full rounded-full" asChild>
+              <Link href="/create" className="flex items-center justify-center gap-2">
                 <FormattedMessage {...messages['home.solutions.unincorporated.button']} />
                 <ArrowRight size={16} />
-              </div>
+              </Link>
             </Button>
           </div>
         </div>
