@@ -4598,7 +4598,7 @@ type PlatformSubscriptionTier {
   """
   The title of the subscription tier
   """
-  id: String!
+  id: String
 
   """
   The title of the subscription tier
@@ -4609,6 +4609,11 @@ type PlatformSubscriptionTier {
   The type of the subscription tier (e.g., "basic", "premium")
   """
   type: String!
+
+  """
+  The ID of the base plan for this subscription tier
+  """
+  basePlanId: String
   pricing: PlatformSubscriptionTierPricing!
   features: PlatformSubscriptionFeatures!
 }
@@ -15942,7 +15947,7 @@ type Query {
     """
     Filter accounts that are subscribers to the platform
     """
-    isSubscriber: Boolean
+    isPlatformSubscriber: Boolean
 
     """
     Filter accounts that are verified
@@ -25632,6 +25637,11 @@ input PlatformSubscriptionPlanInput {
   The type of the subscription plan (e.g., "basic", "premium")
   """
   type: String!
+
+  """
+  The ID of the base plan for this subscription tier
+  """
+  basePlanId: String!
 
   """
   Pricing details for the subscription plan
