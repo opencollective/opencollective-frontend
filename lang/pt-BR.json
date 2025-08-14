@@ -751,6 +751,7 @@
   "collective.created.description": "Enquanto aguarda a aprovação de {host}, você pode personalizar sua página e começar a enviar despesas.",
   "Collective.CreateNew": "Crie um novo Coletivo",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Coletividades Ativas, Fundos e Hosts Fiscais não podem editar sua moeda. Contate o <SupportLink>suporte</SupportLink> se isso for um problema.",
   "collective.delete.description": "{type, select, EVENT {este Evento} PROJECT {este Projeto} FUND {este Fundo} COLLECTIVE {este Coletivo} ORGANIZATION {esta Organização} other {esta conta}} será deletado(a) juntamente com seus dados relativos.",
   "collective.delete.isHost": "Você não pode deletar {type, select, ORGANIZATION {sua Organização} other {sua conta}} enquanto for um administrador. Por favor, se desative como administrador primeiro (nas suas configurações de Hospedagem Fiscal).",

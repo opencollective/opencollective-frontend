@@ -562,7 +562,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                       defaultMessage="Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue."
                       values={{ SupportLink: I18nSupportLink }}
                     />
-                  ) : null
+                  ) : (
+                    <FormattedMessage
+                      id="collective.currency.info"
+                      defaultMessage="Select the preferred currency used in your profile page."
+                    />
+                  )
                 }
               >
                 {({ field }) => (
