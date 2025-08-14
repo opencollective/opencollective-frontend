@@ -751,6 +751,7 @@
   "collective.created.description": "等待 {host} 批准时，你可以自定义页面并开始提交支出。",
   "Collective.CreateNew": "新建集体",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "活跃的集体、基金会和财务托管方无法编辑他们的币种。如果遇到这个问题请<SupportLink>联系获得支持</SupportLink>。",
   "collective.delete.description": "此{type, select, EVENT {事件} PROJECT {项目} FUND {资金} COLLECTIVE {集体} ORGANIZATION {组织} other {账号}}将联同所有数据一起删除。",
   "collective.delete.isHost": "当你是托管方时，你无法删除{type, select, ORGANIZATION {你的组织} other {你的账号}}。请先停用托管方身份（在财务托管设置中）。",
