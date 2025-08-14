@@ -751,6 +751,7 @@
   "collective.created.description": "{host} onayını beklerken sayfanızı özelleştirebilir ve masrafları göndermeye başlayabilirsiniz.",
   "Collective.CreateNew": "Yeni Kolektif oluştur",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Aktif Kolektifler, Fonlar ve Mali Ev Sahipleri para birimlerini düzenleyemez. Bu bir sorunsa <SupportLink>destek</SupportLink> ile iletişime geçin.",
   "collective.delete.description": "{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} ilgili tüm verilerle birlikte silinecektir.",
   "collective.delete.isHost": "Host Sahibi olurken {type, select, ORGANIZATION {your Organization} other {your account}} silemezsiniz. Lütfen önce Hostluğu devre dışı bırakın (Mâli Barındırma ayarlarınızda yer alır).",
