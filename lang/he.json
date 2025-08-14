@@ -751,6 +751,7 @@
   "collective.created.description": "עד לקבלת אישור מ{host}, ניתן להתאים את הדף ולהתחיל להזין הוצאות צפויות.",
   "Collective.CreateNew": "יצירת Collective חדש",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "קבוצות פעילות, קופות, וארגונים לא יכולים לערוך את המטבע. נא ליצור קשר עם <SupportLink>התמיכה</SupportLink> אם זו בעיה.",
   "collective.delete.description": "{type, select,EVENT {האירוע הזה}PROJECT {הפרויקט הזה}FUND {הקופה הזו}COLLECTIVE {הקבוצה הזו}ORGANIZATION {הארגון הזה}other {החשבון הזה}} יימחקו, יחד עם כל המידע הרלוונטי.",
   "collective.delete.isHost": "אי אפשר למחוק{type, select,ORGANIZATION {הארגון שלך}other {החשבון שלך}} כשאתה מארח. נא לבטל את האפשרות לאירוח קודם (בהגדרות הארגון המארח).",
