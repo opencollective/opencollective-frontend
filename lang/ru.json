@@ -751,6 +751,7 @@
   "collective.created.description": "Пока вы ожидаете одобрения от {host}, вы можете настроить свою страницу и начать предоставлять данные о расходах.",
   "Collective.CreateNew": "Создать новый Коллектив",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue.",
   "collective.delete.description": "{type, select, EVENT {Это событие} PROJECT {Этот проект} FUND {Этот фонд} COLLECTIVE {Этот коллектив} ORGANIZATION {Эта организация} other {Этот аккаунт}} удалится вместе со всеми связанными данными.",
   "collective.delete.isHost": "Вы не можете удалить {type, select, ORGANIZATION {вашу организацию} other {вашу учетную запись}} пока она является хостингом. Пожалуйста, сначала деактивируйте ее как хост (в Финансовых настройках хостинга).",
