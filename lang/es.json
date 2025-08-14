@@ -751,6 +751,7 @@
   "collective.created.description": "Mientras esperas la aprobación de {host} puedes personalizar tu página y empezar a enviar gastos.",
   "Collective.CreateNew": "Crear un nuevo Colectivo",
   "collective.curency.placeholder": "Seleccione moneda",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Los Colectivos, Fondos y Anfitriones Fiscales activos no pueden editar su moneda. Ponte en contacto con <SupportLink>el soporte</SupportLink> si esto es un problema.",
   "collective.delete.description": "{type, select, EVENT {Este evento} PROJECT {Este proyecto} FUND {Este fondo} COLLECTIVE {Este colectivo} ORGANIZATION {Esta organización} other {Esta cuenta}} será borrad{type, select, EVENT {o} PROJECT {o} FUND {o} COLLECTIVE {o} ORGANIZATION {a} other {a}}, junto con todos los datos relacionados.",
   "collective.delete.isHost": "No puedes eliminar {type, select, ORGANIZATION {tu Organización} other {tu cuenta}} mientras seas anfitrión. Por favor desactivar como Anfitrión primero (en la configuración de Hospedaje Fiscal).",
