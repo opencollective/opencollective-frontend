@@ -751,6 +751,7 @@
   "collective.created.description": "In attesa di approvazione da {host}, puoi personalizzare la tua pagina e iniziare a sottomettere le spese.",
   "Collective.CreateNew": "Crea un nuovo Collettivo",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "I Collectives attivi, fondi e host fiscali attivi non possono modificare la loro valuta. Contatta support@opencollective. com se si tratta di un problema.",
   "collective.delete.description": "{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.",
   "collective.delete.isHost": "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings).",
