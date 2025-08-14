@@ -751,6 +751,7 @@
   "collective.created.description": "crwdns17130:0{host}crwdne17130:0",
   "Collective.CreateNew": "crwdns17132:0crwdne17132:0",
   "collective.curency.placeholder": "crwdns30099:0crwdne30099:0",
+  "collective.currency.info": "crwdns30359:0crwdne30359:0",
   "collective.currency.warning": "crwdns23060:0crwdne23060:0",
   "collective.delete.description": "crwdns17138:0type={type}crwdne17138:0",
   "collective.delete.isHost": "crwdns17140:0type={type}crwdne17140:0",
