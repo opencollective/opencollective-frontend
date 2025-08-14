@@ -751,6 +751,7 @@
   "collective.created.description": "Podczas oczekiwania na zatwierdzenie od {host} możesz dostosować swoją stronę i zacząć przesyłać wydatki.",
   "Collective.CreateNew": "Utwórz nową zbiórkę",
   "collective.curency.placeholder": "Wybierz walutę",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Aktywne zbiory, fundusze i gospodarze podatkowi nie mogą edytować swojej waluty. Skontaktuj się z <SupportLink>działem wsparcia</SupportLink>, aby rozwiązać ten problem.",
   "collective.delete.description": "{type, select, EVENT {Te wydarzenie zostanie usunięte} PROJECT {Ten projekt zostanie usunięty} FUND {Ten fundusz zostanie usunięty} COLLECTIVE {Ten zbiór zostanie usunięty} ORGANIZATION {Ta organizacja zostanie usunięta} other {Te konto zostanie usunięte}} wraz ze wszystkimi powiązanymi danymi.",
   "collective.delete.isHost": "Nie możesz usunąć {type, select, ORGANIZATION {Swojej organizacji} other {Swoje konto}} podczas byciem gospodarzem. Proszę najpierw dezaktywować jako gospodarz (w ustawieniach gospodarza podatkowego).",
