@@ -2,9 +2,10 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
 import { compact, flatten, get, isNil, isPlainObject, omitBy, set } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { omitDeep } from '@/lib/utils';
@@ -19,6 +20,7 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Label } from '@/components/ui/Label';
 import { DefaultSelect } from '@/components/ui/Select';
+import { useToast } from '@/components/ui/useToast';
 
 import { AVAILABLE_FEATURES, AVAILABLE_FEATURES_LABELS } from './common';
 import { availablePlansQuery, updateAccountPlaformSubscriptionMutation } from './queries';
@@ -67,6 +69,8 @@ const keysDeep = (obj: object, prefix?: string, omit?: string[]) =>
   );
 
 const SubscriberForm = (props: SubscriberFormProps) => {
+  const intl = useIntl();
+  const { toast } = useToast();
   const { data, loading } = useQuery(availablePlansQuery, { context: API_V2_CONTEXT });
   const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlaformSubscriptionMutation, {
     context: API_V2_CONTEXT,
@@ -99,12 +103,24 @@ const SubscriberForm = (props: SubscriberFormProps) => {
     set(values, 'plan.pricing.pricePerMonth.currency', 'USD');
     set(values, 'plan.pricing.pricePerAdditionalCollective.currency', 'USD');
     set(values, 'plan.pricing.pricePerAdditionalExpense.currency', 'USD');
-    await updateSubscription({
-      variables: {
-        account: values.account,
-        subscription: { plan: values.plan },
-      },
-    });
+    try {
+      const result = await updateSubscription({
+        variables: {
+          account: values.account,
+          subscription: { plan: values.plan },
+        },
+      });
+      toast({
+        variant: 'success',
+        message: `${result.data.updateAccountPlatformSubscription.name} plan updated successfully`,
+      });
+      props.onUpdate?.();
+    } catch (e) {
+      toast({
+        variant: 'error',
+        message: i18nGraphqlException(intl, e),
+      });
+    }
   };
 
   return (
