@@ -751,6 +751,7 @@
   "collective.created.description": "Při čekání na schválení od {host} si můžete přizpůsobit svou stránku a začít odesílat výdaje.",
   "Collective.CreateNew": "Vytvořit nový kolektiv",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Aktivní kolektory, fondy a daňové hostitele nemohou upravovat svou měnu. Pokud se jedná o problém, kontaktujte <SupportLink>podporu</SupportLink>.",
   "collective.delete.description": "Archivuji {type, select, EVENT {Tato událost} PROJECT {Tento projekt} FUND {Tento fond} COLLECTIVE {Tento soubor} ORGANIZATION {tato organizace} other {tento účet}} znamená, že se vizuálně objeví neaktivní a žádná nová aktivita nebude povolena.",
   "collective.delete.isHost": "Nemůžete smazat {type, select, ORGANIZATION {Organizace} other {Váš účet}} když jste hostitelem. Prosím nejprve deaktivujte jako hostitel (ve vašem nastavení fiskálního hostingu).",

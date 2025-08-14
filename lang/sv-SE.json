@@ -751,6 +751,7 @@
   "collective.created.description": "I väntan på godkännande från {host} kan du anpassa din sida och börja skicka in utgifter.",
   "Collective.CreateNew": "Skapa kollektiv",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Aktiva kollektiv, insamlingar och värdar kan inte redigera sin valuta. Kontakta <SupportLink>support</SupportLink> om detta är ett problem.",
   "collective.delete.description": "{type, select, EVENT {Detta event} PROJECT {Detta projekt} FUND {Denna fond} COLLECTIVE {Detta kollektiv} ORGANIZATION {Organisationen} other {Kontot}} kommer att tas bort, med all relaterad data.",
   "collective.delete.isHost": "Du kan inte arkivera {type, select, ORGANIZATION {din organisation} other {ditt konto}} medan du är värd. Vänligen inaktivera organisationen som värd först (i värdinställningarna).",
