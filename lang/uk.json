@@ -751,6 +751,7 @@
   "collective.created.description": "Під час очікування затвердження від {host} ви можете налаштувати свою сторінку і почати затверджувати витрати.",
   "Collective.CreateNew": "Створити новий Колектив",
   "collective.curency.placeholder": "Select currency",
+  "collective.currency.info": "Select the preferred currency used in your profile page.",
   "collective.currency.warning": "Активні колективи, фонди та фіскальні хости не можуть редагувати свою валюту. Зверніться до <SupportLink>підтримки</SupportLink>, якщо у вас виникла ця проблема.",
   "collective.delete.description": "{type, select, EVENT {Цю подію} PROJECT {Цей проєкт} FUND {Цей фонд} COLLECTIVE {Цей колектив} ORGANIZATION {Цю організацію} other {Цей акаунт}} буде видалено разом з усіма пов'язаними даними.",
   "collective.delete.isHost": "Ви не можете видалити {type, select, ORGANIZATION {вашу Організацію} other {ваш обліковий запис}} доки ви фіскальний агент. Спочатку зніміть з себе обов'язки фіскального агента (у своїх налаштуваннях фіскального агента).",
