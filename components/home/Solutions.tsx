@@ -134,7 +134,7 @@ const Solutions = () => {
 
             {/* Button */}
 
-            <Button asChild variant="marketing" className="w-full rounded-full">
+            <Button asChild variant="marketing" className="w-full rounded-full" size="lg">
               <Link href="/solutions">
                 <div className="flex items-center justify-center gap-2">
                   <FormattedMessage {...messages['home.solutions.legallyIncorporated.button']} />
@@ -190,7 +190,7 @@ const Solutions = () => {
             </div>
 
             {/* Button */}
-            <Button variant="outline" className="w-full rounded-full" asChild>
+            <Button asChild variant="outline" className="w-full rounded-full" size="lg">
               <Link href="/create" className="flex items-center justify-center gap-2">
                 <FormattedMessage {...messages['home.solutions.unincorporated.button']} />
                 <ArrowRight size={16} />

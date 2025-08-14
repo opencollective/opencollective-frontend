@@ -159,14 +159,16 @@ export const Solutions = () => {
 
           {/* Call to Action Buttons */}
           <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-            <Button variant="marketing" className="rounded-full" asChild>
+            <Button asChild variant="marketing" className="rounded-full" size="lg">
               <Link href="/signup/organization">
                 <FormattedMessage {...messages.joinAsOrg} />
               </Link>
             </Button>
-            <Button variant="outline" className="rounded-full">
-              <FormattedMessage {...messages.seePricing} />
-              <ArrowRight size={16} />
+            <Button asChild variant="outline" className="rounded-full" size="lg">
+              <Link href="/pricing" className="flex items-center gap-2">
+                <FormattedMessage {...messages.seePricing} />
+                <ArrowRight size={16} />
+              </Link>
             </Button>
           </div>
 
