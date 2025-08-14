@@ -95,7 +95,7 @@ const editAccountMutation = gql`
   ${editAccountFragment}
 `;
 
-const editAccountQuery = gql`
+export const infoSettingsDashboardQuery = gql`
   query InfoSettingsDashboard($id: String!) {
     account(id: $id) {
       id
@@ -185,7 +185,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const { toast } = useToast();
-  const { data, loading } = useQuery(editAccountQuery, {
+  const { data, loading } = useQuery(infoSettingsDashboardQuery, {
     context: API_V2_CONTEXT,
     variables: { id: accountFromParent.id },
   });
@@ -575,7 +575,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   >
                     <SelectTrigger
                       className={cn(!field.value && 'text-muted-foreground')}
-                      data-cy="organization-currency-trigger"
+                      data-testid="organization-currency-trigger"
                     >
                       {field.value ? (
                         field.value
