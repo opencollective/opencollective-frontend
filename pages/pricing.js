@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Page from '../components/Page';
-import Pricing from '../components/pricing';
+import Pricing from '../components/new-pricing';
 
 // next.js export
 // ts-unused-exports:disable-next-line
