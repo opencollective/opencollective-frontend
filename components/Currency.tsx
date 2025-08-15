@@ -36,8 +36,8 @@ const Currency = ({
   const { locale } = useIntl();
   if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
-  } else if (precision < 2 && value < 100) {
-    // Force precision if number is < $1 to never display $0 for small amounts
+  } else if (precision < 2 && value < 100 && value !== 0) {
+    // Force precision if number is < $1 to never display $0 for small amounts (except if value is actually 0)
     precision = 2;
   } else if (ZERO_DECIMAL_CURRENCIES.includes(currency)) {
     precision = 0;
