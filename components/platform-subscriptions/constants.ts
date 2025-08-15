@@ -1,4 +1,4 @@
-import { Building, Crown, Zap } from 'lucide-react';
+import { Building, Crown, LucideIcon, Zap } from 'lucide-react';
 import type React from 'react';
 import { defineMessages } from 'react-intl';
 
@@ -42,8 +42,8 @@ export const PlatformSubscriptionTierTagLine = defineMessages<(typeof PlatformSu
     id: 'bgl/3/',
   },
   Pro: {
-    defaultMessage: 'For professional Organization',
-    id: 'Wff5OS',
+    defaultMessage: 'For professional Organizations',
+    id: 'bS7TrO',
   },
 });
 
@@ -62,7 +62,7 @@ export const PlatformSubscriptionTierDescription = defineMessages<(typeof Platfo
   },
 });
 
-export const PlatformSubscriptionTierIcon: Record<(typeof PlatformSubscriptionTiers)[number], React.ComponentType> = {
+export const PlatformSubscriptionTierIcon: Record<(typeof PlatformSubscriptionTiers)[number], LucideIcon> = {
   Discover: Zap,
   Basic: Crown,
   Pro: Building,
@@ -105,15 +105,15 @@ export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof Platform
     id: 'R9kjJI',
   },
   PAYPAL_PAYOUTS: {
-    defaultMessage: 'Payouts With PayPal',
-    id: 'vHjZn7',
+    defaultMessage: 'Payouts with PayPal',
+    id: 'DktLfa',
   },
   TAX_FORMS: {
     defaultMessage: 'Tax Forms',
     id: 'skSw4d',
   },
   TRANSFERWISE: {
-    defaultMessage: 'Payouts With Wise',
-    id: 'YN48Qe',
+    defaultMessage: 'Payouts with Wise',
+    id: 'QwF3vJ',
   },
 });
