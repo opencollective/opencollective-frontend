@@ -227,6 +227,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 onPaymentMethodDeleted={onPaymentMethodDeleted}
                 onPaymentMethodEdited={onPaymentMethodEdited}
                 setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
+                refresh={props.refresh}
               />
             ))}
 
@@ -555,7 +556,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
           },
         });
 
-        props.refresh();
+        props.refresh?.();
       },
     },
   );
