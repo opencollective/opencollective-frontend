@@ -1,18 +1,22 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { Info, Receipt, Shapes } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import { i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   PlatformSubscriptionFieldsFragment,
   PlatformSubscriptionFormQuery,
   PlatformSubscriptionFormQueryVariables,
+  UpdatePlatformSubscriptionMutation,
+  UpdatePlatformSubscriptionMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 
+import { platformSubscriptionFragment } from '../dashboard/sections/platform-subscription/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import type { BaseModalProps } from '../ModalContext';
@@ -21,6 +25,7 @@ import { RadioGroup, RadioGroupCard } from '../ui/RadioGroup';
 import { Separator } from '../ui/Separator';
 import { Skeleton } from '../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+import { toast } from '../ui/useToast';
 
 import type { PlatformSubscriptionTierType } from './constants';
 import {
@@ -35,6 +40,7 @@ import { PlatformSubscriptionFeatureList } from './PlatformSubscriptionFeatureLi
 
 type ManageSubscriptionModalProps = {
   currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
+  accountSlug: string;
 } & BaseModalProps;
 
 export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
@@ -45,7 +51,11 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
           <DialogTitle>Manage Subscription</DialogTitle>
         </DialogHeader>
 
-        <PlatformSubscriptionForm currentPlan={props.currentPlan} />
+        <PlatformSubscriptionForm
+          currentPlan={props.currentPlan}
+          accountSlug={props.accountSlug}
+          onSuccess={() => props.setOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -53,6 +63,8 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
 
 type PlatformSubscriptionFormProps = {
   currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
+  accountSlug: string;
+  onSuccess: (plan: PlatformSubscriptionFieldsFragment['plan']) => void;
 };
 
 function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
@@ -87,12 +99,53 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
     },
   );
 
+  const [updatePlanMutation, mutationResult] = useMutation<
+    UpdatePlatformSubscriptionMutation,
+    UpdatePlatformSubscriptionMutationVariables
+  >(
+    gql`
+      mutation UpdatePlatformSubscription($accountSlug: String!, $planId: String!) {
+        updateAccountPlatformSubscription(account: { slug: $accountSlug }, planId: $planId) {
+          ... on AccountWithPlatformSubscription {
+            platformSubscription {
+              ...PlatformSubscriptionFields
+            }
+          }
+        }
+      }
+      ${platformSubscriptionFragment}
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        accountSlug: props.accountSlug,
+        planId: '',
+      },
+      refetchQueries: ['DashboardPlatformSubscription'],
+    },
+  );
+
+  const intl = useIntl();
+
   const form = useFormik({
     initialValues: {
       tier: props.currentPlan?.type ?? ('Discover' as PlatformSubscriptionTierType),
       planId: '',
     },
-    onSubmit() {},
+    async onSubmit(values) {
+      try {
+        const res = await updatePlanMutation({
+          variables: {
+            accountSlug: props.accountSlug,
+            planId: values.planId,
+          },
+        });
+        toast({ variant: 'success', message: 'Plan updated' });
+        props.onSuccess(res.data?.updateAccountPlatformSubscription?.['platformSubscription']);
+      } catch (err) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+      }
+    },
   });
 
   const plans = React.useMemo(() => {
@@ -131,6 +184,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
   }, [plans, form.values.planId, form.values.tier, currentPlanMatch, setFieldValue]);
 
   const isValidSelection = form.values.planId && currentPlanMatch?.id !== form.values.planId;
+
   if (query.error) {
     return <MessageBoxGraphqlError error={query.error} />;
   }
@@ -150,6 +204,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         </div>
       ) : (
         <RadioGroup
+          disabled={mutationResult.loading}
           className="flex grow gap-4"
           value={form.values.tier}
           onValueChange={value => form.setFieldValue('tier', value as PlatformSubscriptionTierType)}
@@ -177,6 +232,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         <Skeleton className="h-24 w-full" />
       ) : (
         <RadioGroup
+          disabled={mutationResult.loading}
           className="flex grow flex-col gap-4"
           value={form.values.planId}
           onValueChange={value => form.setFieldValue('planId', value as PlatformSubscriptionTierType)}
@@ -209,7 +265,9 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
           ))}
         </RadioGroup>
       )}
-      <Button disabled={!isValidSelection}>Update</Button>
+      <Button onClick={() => form.handleSubmit()} disabled={!isValidSelection} loading={mutationResult.loading}>
+        <FormattedMessage defaultMessage="Update" id="actions.update" />
+      </Button>
     </React.Fragment>
   );
 }

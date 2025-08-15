@@ -98,7 +98,12 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
           <div>
             <Button
               disabled={isLoading}
-              onClick={() => showModal(ManageSubscriptionModal, { currentPlan: activeSubscription.plan })}
+              onClick={() =>
+                showModal(ManageSubscriptionModal, {
+                  currentPlan: activeSubscription.plan,
+                  accountSlug: props.accountSlug,
+                })
+              }
               variant="outline"
               size="xs"
             >
