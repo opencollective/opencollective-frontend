@@ -20,13 +20,7 @@ const TheFutureIsCollective = () => {
       <div className="mt-20 flex items-center justify-center px-4">
         <div className="flex max-w-6xl flex-col items-center" flexDirection="column" alignItems="center">
           <div>
-            <h1
-              className="text-center text-5xl font-bold tracking-tight text-balance text-oc-blue-tints-900 sm:text-6xl md:text-7xl md:font-extrabold"
-              // fontSize={['52px', '64px', '72px']}
-              // lineHeight={['56px', '80px', '88px']}
-              // letterSpacing={['-0.04em', '0.012em', null]}
-              // textAlign="center"
-            >
+            <h1 className="text-center text-5xl font-bold tracking-tight text-balance text-oc sm:text-6xl md:text-7xl md:font-extrabold">
               <FormattedMessage
                 id="home.collaborativeMoneyManagement"
                 defaultMessage="Collaborative Money Management"
