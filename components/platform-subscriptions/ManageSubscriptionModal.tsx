@@ -342,7 +342,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
           <Icon className="size-6 text-muted-foreground" />
         </div>
       </div>
-      <div className="flex justify-center text-xl font-bold">
+      <div className="flex justify-center text-2xl font-bold">
         <FormattedMessage {...titleMessage} />
       </div>
       <div className="mt-2 flex justify-center text-sm font-medium text-nowrap text-blue-600">
@@ -352,7 +352,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
       <div className="mt-2 mb-6 flex justify-center text-center text-sm text-muted-foreground">
         <FormattedMessage {...descriptionMessage} />
       </div>
-      {props.includePrice && props.packages[0] && (
+      {props.includePrice && props.packages && (
         <div className="mt-6 mb-6 space-y-1 text-center">
           <p>
             <span className="text-4xl font-bold text-slate-900">
@@ -367,7 +367,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
           </p>
         </div>
       )}
-      {props.includePackageDetails && props.packages.length && (
+      {props.includePackageDetails && props.packages?.length && (
         <div className="mt-6 mb-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -424,7 +424,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
                       </tr>
                     </thead>
                     <tbody>
-                      {props.packages.map(pkg => (
+                      {props.packages?.map(pkg => (
                         <tr key={pkg.id} className="border-b border-border hover:bg-muted/50">
                           <td className="px-4 py-3 text-foreground">{pkg.pricing.includedCollectives}</td>
                           <td className="px-4 py-3 text-foreground">{pkg.pricing.includedExpensesPerMonth}</td>
@@ -446,8 +446,8 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
                       <span className="text-muted-foreground">Price per additional collective</span>
                       <span className="font-medium text-foreground">
                         <FormattedMoneyAmount
-                          amount={props.packages[0].pricing.pricePerAdditionalCollective.valueInCents}
-                          currency={props.packages[0].pricing.pricePerAdditionalCollective.currency}
+                          amount={props.packages?.[0].pricing.pricePerAdditionalCollective.valueInCents}
+                          currency={props.packages?.[0].pricing.pricePerAdditionalCollective.currency}
                           showCurrencyCode={false}
                         />
                       </span>
@@ -456,8 +456,8 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
                       <span className="text-muted-foreground">Price per additional expense</span>
                       <span className="font-medium text-foreground">
                         <FormattedMoneyAmount
-                          amount={props.packages[0].pricing.pricePerAdditionalExpense.valueInCents}
-                          currency={props.packages[0].pricing.pricePerAdditionalExpense.currency}
+                          amount={props.packages?.[0].pricing.pricePerAdditionalExpense.valueInCents}
+                          currency={props.packages?.[0].pricing.pricePerAdditionalExpense.currency}
                           showCurrencyCode={false}
                         />
                       </span>

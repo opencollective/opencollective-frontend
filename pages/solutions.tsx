@@ -147,7 +147,7 @@ export const Solutions = () => {
       <div className="mt-20 flex items-center justify-center px-4">
         <div className="flex max-w-6xl flex-col items-center">
           <div>
-            <h1 className="text-center text-5xl font-bold tracking-tight text-balance text-oc-blue-tints-900 sm:text-6xl md:text-7xl md:font-extrabold">
+            <h1 className="text-center text-5xl font-bold tracking-tight text-balance text-oc sm:text-6xl md:text-7xl md:font-extrabold">
               <FormattedMessage {...messages.heroTitle} />
             </h1>
           </div>

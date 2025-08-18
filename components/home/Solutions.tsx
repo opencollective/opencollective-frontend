@@ -100,7 +100,7 @@ const Solutions = () => {
                   className="w-full object-contain"
                 />
               </div>
-              <h3 className="relative mb-2 text-xl font-bold text-oc-blue-tints-900 sm:text-4xl">
+              <h3 className="relative mb-2 text-xl font-bold text-oc sm:text-4xl">
                 <FormattedMessage {...messages['home.solutions.legallyIncorporated.title']} />
               </h3>
             </div>
