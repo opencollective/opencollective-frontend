@@ -79,6 +79,7 @@ export const adminPanelQuery = gql`
         EMIT_GIFT_CARDS
         OFF_PLATFORM_TRANSACTIONS
         TAX_FORMS
+        CHART_OF_ACCOUNTS
       }
       policies {
         id

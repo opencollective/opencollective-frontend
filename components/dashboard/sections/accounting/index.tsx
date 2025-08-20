@@ -16,11 +16,14 @@ import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema
 import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { UpgradeSubscriptionBlocker } from '../../../platform-subscriptions/UpgradeSubscriptionBlocker';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { buildComboSelectFilter } from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
@@ -135,6 +138,9 @@ const hostOnlyFilter = buildComboSelectFilter(
  * The accounting sections lets host admins customize their chart of accounts.
  */
 export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProps) => {
+  const { account } = React.useContext(DashboardContext);
+  const featureEnabled = isFeatureEnabled(account, 'CHART_OF_ACCOUNTS');
+
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const { toast } = useToast();
@@ -288,7 +294,13 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
             />
           }
           actions={
-            <Button size="sm" className="gap-1" onClick={() => setIsCreateCategoryModalOpen(true)}>
+            <Button
+              disabled={!featureEnabled}
+              size="sm"
+              variant="outline"
+              className="gap-1"
+              onClick={() => setIsCreateCategoryModalOpen(true)}
+            >
               <span>
                 <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
               </span>
@@ -297,19 +309,25 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           }
         />
 
-        <Filterbar {...queryFilter} />
+        {!featureEnabled ? (
+          <UpgradeSubscriptionBlocker featureKey="CHART_OF_ACCOUNTS" className="mt-4" />
+        ) : (
+          <React.Fragment>
+            <Filterbar {...queryFilter} />
 
-        {query.error && <MessageBoxGraphqlError error={query.error} />}
+            {query.error && <MessageBoxGraphqlError error={query.error} />}
 
-        <AccountingCategoriesTable
-          hostSlug={accountSlug}
-          accountingCategories={filteredCategories}
-          isAdmin={isAdmin}
-          loading={query.loading}
-          isFiltered={!!queryFilter.values.searchTerm}
-          onDelete={onDelete}
-          onEdit={onEdit}
-        />
+            <AccountingCategoriesTable
+              hostSlug={accountSlug}
+              accountingCategories={filteredCategories}
+              isAdmin={isAdmin}
+              loading={query.loading}
+              isFiltered={!!queryFilter.values.searchTerm}
+              onDelete={onDelete}
+              onEdit={onEdit}
+            />
+          </React.Fragment>
+        )}
       </div>
       {isCreateCategoryModalOpen && (
         <CreateAccountingCategoryModal
