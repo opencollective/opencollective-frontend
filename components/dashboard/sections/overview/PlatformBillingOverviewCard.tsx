@@ -45,8 +45,8 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return <Skeleton className="h-16 w-full" />;
   }
 
-  if (query.data && !query.data.host.platformSubscription) {
-    return 'No Active Subscription';
+  if (!query.data?.host?.platformSubscription || !query.data?.host?.platformBilling) {
+    return null;
   }
 
   return (
