@@ -28,6 +28,9 @@ import type { DashboardSectionProps } from '../../types';
 import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
+import { DashboardContext } from '../../DashboardContext';
+import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 const hostDashboardTaxFormsQuery = gql`
   query HostTaxForms(
@@ -45,6 +48,9 @@ const hostDashboardTaxFormsQuery = gql`
       id
       legacyId
       slug
+      features {
+        TAX_FORMS
+      }
       taxForms: hostedLegalDocuments(
         limit: $limit
         offset: $offset
@@ -129,6 +135,9 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 };
 
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+  const { account } = React.useContext(DashboardContext);
+  const featureEnabled = isFeatureEnabled(account, 'TAX_FORMS');
+
   const [focusedLegalDocumentId, setFocusedLegalDocumentId] = React.useState(null);
   const queryFilter = useQueryFilter({
     filters,
@@ -140,12 +149,13 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
-  const getActions = useLegalDocumentActions(data?.host, refetch);
+  const getActions = useLegalDocumentActions(data?.host, refetch, featureEnabled);
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
 
+      {!featureEnabled && <UpgradeSubscriptionBlocker featureKey="TAX_FORMS" />}
       <Filterbar {...queryFilter} />
 
       {error ? (

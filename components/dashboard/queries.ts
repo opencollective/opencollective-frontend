@@ -78,6 +78,7 @@ export const adminPanelQuery = gql`
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
         OFF_PLATFORM_TRANSACTIONS
+        TAX_FORMS
       }
       policies {
         id
