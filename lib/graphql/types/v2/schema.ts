@@ -10530,7 +10530,7 @@ export type PlaidLinkTokenCreateResponse = {
 export type PlatformBilling = {
   __typename?: 'PlatformBilling';
   additional: PlatformBillingAdditional;
-  baseAmount: Amount;
+  base: PlatformBillingBase;
   billingPeriod: PlatformBillingPeriod;
   dueDate: Scalars['DateTime']['output'];
   expenses: Array<Expense>;
@@ -10550,6 +10550,22 @@ export type PlatformBillingAdditionalUtilizationCharges = {
   __typename?: 'PlatformBillingAdditionalUtilizationCharges';
   activeCollectives: Amount;
   expensesPaid: Amount;
+};
+
+export type PlatformBillingBase = {
+  __typename?: 'PlatformBillingBase';
+  subscriptions: Array<Maybe<PlatformBillingBaseCharges>>;
+  total: Amount;
+};
+
+export type PlatformBillingBaseCharges = {
+  __typename?: 'PlatformBillingBaseCharges';
+  amount: Amount;
+  /** End date (inclusive) */
+  endDate: Scalars['DateTime']['output'];
+  /** Start date (inclusive) */
+  startDate: Scalars['DateTime']['output'];
+  title: Scalars['String']['output'];
 };
 
 export enum PlatformBillingMonth {

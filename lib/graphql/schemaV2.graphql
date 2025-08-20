@@ -4671,7 +4671,7 @@ type PlatformBilling {
   subscriptions: [PlatformSubscription!]!
   utilization: PlatformUtilization!
   dueDate: DateTime!
-  baseAmount: Amount!
+  base: PlatformBillingBase!
   additional: PlatformBillingAdditional!
   totalAmount: Amount!
   expenses: [Expense!]!
@@ -4703,6 +4703,26 @@ enum PlatformBillingMonth {
 type PlatformUtilization {
   activeCollectives: Int!
   expensesPaid: Int!
+}
+
+type PlatformBillingBase {
+  total: Amount!
+  subscriptions: [PlatformBillingBaseCharges]!
+}
+
+type PlatformBillingBaseCharges {
+  title: String!
+  amount: Amount!
+
+  """
+  Start date (inclusive)
+  """
+  startDate: DateTime!
+
+  """
+  End date (inclusive)
+  """
+  endDate: DateTime!
 }
 
 type PlatformBillingAdditional {
