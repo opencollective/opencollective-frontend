@@ -11,6 +11,7 @@ import { runChecks } from '@/lib/setup-guide';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Label } from '@/components/ui/Label';
 
 const setupGuideQuery = gql`
@@ -20,6 +21,7 @@ const setupGuideQuery = gql`
       slug
       description
       currency
+      legacyId
       longDescription
       isHost
       tags
@@ -159,52 +161,67 @@ const SetupCategory = ({
   );
 };
 
-export const SetupGuideCard = ({ account, setOpen }) => {
+export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
   const router = useRouter();
   const { data } = useQuery(setupGuideQuery, {
-    variables: { accountSlug: account?.slug },
-    skip: !account,
+    variables: { accountSlug: _account?.slug },
+    skip: !_account,
     context: API_V2_CONTEXT,
   });
+  const account = data?.account;
   const { LoggedInUser } = useLoggedInUser();
   // Undefined here means the initial state, after that we can set to null or a specific category ID
   const [expandedCategory, setExpandedCategory] = useState(undefined);
-  const categories = useMemo(
-    () => (data?.account ? runChecks({ account: data?.account, router, LoggedInUser }) : []),
-    [data?.account, router, LoggedInUser],
-  );
+  const categories = useMemo(() => {
+    return account ? runChecks({ account: account, router, LoggedInUser }) : [];
+  }, [account, router, LoggedInUser]);
 
   const firstIncompleteCategory = useMemo(
     () => categories.find(category => category.steps.some(step => !step.completed)),
     [categories],
   );
 
+  // Automatically expands the first incomplete category
   useEffect(() => {
     if (firstIncompleteCategory && expandedCategory === undefined) {
       setExpandedCategory(firstIncompleteCategory.id);
-    } else if (categories.length > 0 && !firstIncompleteCategory) {
-      setOpen(false);
     }
-  }, [firstIncompleteCategory, expandedCategory]);
+  }, [firstIncompleteCategory, expandedCategory, account]);
+
+  useEffect(() => {
+    if (LoggedInUser && open === undefined && account && categories.length > 0) {
+      const showGuideKey = `id${account.legacyId}`;
+      const showGuide = LoggedInUser?.collective.settings?.showSetupGuide?.[showGuideKey];
+      if (!firstIncompleteCategory && showGuide !== true) {
+        setOpen(false);
+      } else {
+        setOpen(showGuide !== false ? true : false);
+      }
+    }
+  }, [firstIncompleteCategory, account, categories, open, setOpen, LoggedInUser]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">
-          <FormattedMessage defaultMessage="Setup guide" id="SetupGuide.Title" />
-        </CardTitle>
-        <CardDescription>Get going with Open Collective!</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6 divide-y">
-        {categories?.map(category => (
-          <SetupCategory
-            key={category.id}
-            expanded={expandedCategory === category.id}
-            setExpanded={setExpandedCategory}
-            {...category}
-          />
-        ))}
-      </CardContent>
-    </Card>
+    <Collapsible open={open}>
+      <CollapsibleContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">
+              <FormattedMessage defaultMessage="Setup guide" id="SetupGuide.Title" />
+            </CardTitle>
+            <CardDescription>Get going with Open Collective!</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6 divide-y">
+            {categories?.map(category => (
+              <SetupCategory
+                key={category.id}
+                expanded={expandedCategory === category.id}
+                setExpanded={setExpandedCategory}
+                {...category}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
