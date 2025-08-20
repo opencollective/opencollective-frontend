@@ -1,12 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { isHostAccount } from '@/lib/collective';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-
-import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
@@ -32,14 +30,6 @@ export function OrgOverview() {
   const [editAccountSetting] = useMutation(editAccountSettingMutation, {
     context: API_V2_CONTEXT,
   });
-
-  useEffect(() => {
-    if (LoggedInUser && showSetupGuide === undefined && account) {
-      const showGuideKey = `id${account.legacyId}`;
-      const showGuide = LoggedInUser.collective.settings?.showSetupGuide?.[showGuideKey];
-      setShowSetupGuide(showGuide !== false ? true : false);
-    }
-  }, [LoggedInUser, account, showSetupGuide]);
 
   const handleSetupGuideToggle = useCallback(
     async (open: boolean) => {
@@ -75,11 +65,7 @@ export function OrgOverview() {
       />
       {isHostAccount(account) ? (
         <React.Fragment>
-          <Collapsible open={showSetupGuide}>
-            <CollapsibleContent>
-              <SetupGuideCard account={account} setOpen={handleSetupGuideToggle} />
-            </CollapsibleContent>
-          </Collapsible>
+          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
