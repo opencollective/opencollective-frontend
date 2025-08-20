@@ -33,7 +33,11 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
+  --color-oc-primary-100: hsla(208, 100%, 95%, 1);
+  --color-oc-blue: hsla(218, 92%, 53%, 1);
+  --color-oc-blue-tints-050: hsla(208, 100%, 97%, 1);
   --color-oc-blue-tints-500: hsla(213, 100%, 59%, 1);
+  --color-oc-blue-tints-700: hsla(220, 85%, 45%, 1);
   --color-oc-blue-tints-800: hsla(222, 80%, 40%, 1);
   --color-oc-blue-tints-900: hsla(220, 71%, 33%, 1);
   --color-oc-blue-tints-transparent: hsla(216, 100%, 58%, 0.3);

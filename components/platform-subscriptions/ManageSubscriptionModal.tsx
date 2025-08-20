@@ -1,12 +1,15 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
+import clsx from 'clsx';
 import { useFormik } from 'formik';
-import { Info, Receipt, Shapes } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { omit } from 'lodash';
+import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, Shapes } from 'lucide-react';
+import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
+  PlatformBillingFieldsFragment,
   PlatformSubscriptionFieldsFragment,
   PlatformSubscriptionFormQuery,
   PlatformSubscriptionFormQueryVariables,
@@ -14,21 +17,27 @@ import type {
   UpdatePlatformSubscriptionMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/Dialog';
 
-import { platformSubscriptionFragment } from '../dashboard/sections/platform-subscription/fragments';
+import {
+  platformSubscriptionFeatures,
+  platformSubscriptionFragment,
+} from '../dashboard/sections/platform-subscription/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import type { BaseModalProps } from '../ModalContext';
 import { Button } from '../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../ui/RadioGroup';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Separator } from '../ui/Separator';
 import { Skeleton } from '../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { toast } from '../ui/useToast';
 
-import type { PlatformSubscriptionTierType } from './constants';
+import type { PlatformSubscriptionFeatures, PlatformSubscriptionTierType } from './constants';
 import {
+  PlatformSubscriptionFeatureTitles,
   PlatformSubscriptionTierDescription,
   PlatformSubscriptionTierFeatures,
   PlatformSubscriptionTierIcon,
@@ -41,33 +50,13 @@ import { PlatformSubscriptionFeatureList } from './PlatformSubscriptionFeatureLi
 type ManageSubscriptionModalProps = {
   currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
   accountSlug: string;
+  billing?: PlatformBillingFieldsFragment;
 } & BaseModalProps;
 
 export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
-  return (
-    <Dialog open={props.open} onOpenChange={isOpen => props.setOpen(isOpen)}>
-      <DialogContent className="sm:max-w-max">
-        <DialogHeader className="mb-4">
-          <DialogTitle>Manage Subscription</DialogTitle>
-        </DialogHeader>
+  const [step, setStep] = React.useState<Step>(Step.TIER);
+  const intl = useIntl();
 
-        <PlatformSubscriptionForm
-          currentPlan={props.currentPlan}
-          accountSlug={props.accountSlug}
-          onSuccess={() => props.setOpen(false)}
-        />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-type PlatformSubscriptionFormProps = {
-  currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
-  accountSlug: string;
-  onSuccess: (plan: PlatformSubscriptionFieldsFragment['plan']) => void;
-};
-
-function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
   const query = useQuery<PlatformSubscriptionFormQuery, PlatformSubscriptionFormQueryVariables>(
     gql`
       query PlatformSubscriptionForm {
@@ -91,15 +80,19 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
             includedCollectives
             includedExpensesPerMonth
           }
+          features {
+            ...PlatformSubscriptionFeatures
+          }
         }
       }
+      ${platformSubscriptionFeatures}
     `,
     {
       context: API_V2_CONTEXT,
     },
   );
 
-  const [updatePlanMutation, mutationResult] = useMutation<
+  const [updatePlanMutation] = useMutation<
     UpdatePlatformSubscriptionMutation,
     UpdatePlatformSubscriptionMutationVariables
   >(
@@ -125,52 +118,92 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
     },
   );
 
-  const intl = useIntl();
-
   const form = useFormik({
     initialValues: {
-      tier: props.currentPlan?.type ?? ('Discover' as PlatformSubscriptionTierType),
+      tier: (props.currentPlan?.type as PlatformSubscriptionTierType) ?? ('Discover' as PlatformSubscriptionTierType),
       planId: '',
     },
     async onSubmit(values) {
       try {
-        const res = await updatePlanMutation({
+        await updatePlanMutation({
           variables: {
             accountSlug: props.accountSlug,
             planId: values.planId,
           },
         });
         toast({ variant: 'success', message: 'Plan updated' });
-        props.onSuccess(res.data?.updateAccountPlatformSubscription?.['platformSubscription']);
+        props.setOpen(false);
       } catch (err) {
         toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
       }
     },
   });
 
+  const selectedPlan = query.data?.platformSubscriptionTiers?.find(plan => plan.id === form.values.planId);
+
+  return (
+    <Dialog open={props.open} onOpenChange={isOpen => props.setOpen(isOpen)}>
+      <DialogContent className="sm:max-w-max sm:min-w-[940px]">
+        <DialogHeader className="my-4">
+          <ManagePlatformSubscriptionSteps step={step} selectedTier={form.values.tier} selectedPlan={selectedPlan} />
+        </DialogHeader>
+
+        {query.error ? (
+          <MessageBoxGraphqlError error={query.error} />
+        ) : (
+          <PlatformSubscriptionForm
+            availablePlans={query.data?.platformSubscriptionTiers ?? []}
+            loading={query.loading}
+            form={form}
+            step={step}
+            setStep={setStep}
+            currentPlan={props.currentPlan}
+            billing={props.billing}
+            accountSlug={props.accountSlug}
+            onSuccess={() => props.setOpen(false)}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type PlatformSubscriptionFormProps = {
+  availablePlans: PlatformSubscriptionFormQuery['platformSubscriptionTiers'];
+  loading?: boolean;
+  form: ReturnType<typeof useFormik<{ planId: string; tier: string }>>;
+  currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
+  billing?: PlatformBillingFieldsFragment;
+  accountSlug: string;
+  onSuccess: (plan: PlatformSubscriptionFieldsFragment['plan']) => void;
+  step: Step;
+  setStep: React.Dispatch<React.SetStateAction<Step>>;
+};
+
+function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
   const plans = React.useMemo(() => {
-    if (query.data?.platformSubscriptionTiers?.length > 0) {
-      return query.data.platformSubscriptionTiers.filter(plan => plan.type === form.values.tier);
+    if (props.availablePlans.length > 0) {
+      return props.availablePlans.filter(plan => plan.type === props.form.values.tier);
     }
 
     return [];
-  }, [query.data?.platformSubscriptionTiers, form.values.tier]);
+  }, [props.availablePlans, props.form.values.tier]);
 
   const currentPlanMatch = React.useMemo(() => {
-    if (props.currentPlan && query.data?.platformSubscriptionTiers?.length > 0) {
-      return query.data?.platformSubscriptionTiers.find(
+    if (props.currentPlan && props.availablePlans.length > 0) {
+      return props.availablePlans.find(
         plan =>
           plan.type === props.currentPlan.type &&
           plan.pricing.pricePerMonth.valueInCents === props.currentPlan.pricing.pricePerMonth.valueInCents,
       );
     }
     return null;
-  }, [query.data?.platformSubscriptionTiers, props.currentPlan]);
+  }, [props.availablePlans, props.currentPlan]);
 
-  const { setFieldValue } = form;
+  const { setFieldValue } = props.form;
   React.useEffect(() => {
-    if (!form.values.planId && plans.length > 0) {
-      if (currentPlanMatch && currentPlanMatch.type === form.values.tier) {
+    if (!props.form.values.planId && plans.length > 0) {
+      if (currentPlanMatch && currentPlanMatch.type === props.form.values.tier) {
         setFieldValue('planId', currentPlanMatch.id);
         return;
       }
@@ -178,96 +211,71 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
       setFieldValue('planId', plans[0].id);
     }
 
-    if (form.values.planId && !plans.some(plan => plan.id === form.values.planId)) {
+    if (props.form.values.planId && !plans.some(plan => plan.id === props.form.values.planId)) {
       setFieldValue('planId', '');
     }
-  }, [plans, form.values.planId, form.values.tier, currentPlanMatch, setFieldValue]);
+  }, [plans, props.form.values.planId, props.form.values.tier, currentPlanMatch, setFieldValue]);
 
-  const isValidSelection = form.values.planId && currentPlanMatch?.id !== form.values.planId;
-
-  if (query.error) {
-    return <MessageBoxGraphqlError error={query.error} />;
-  }
+  const selectedPlan = plans?.find(plan => plan.id === props.form.values.planId);
+  const isValidSelection =
+    props.form.values.planId && currentPlanMatch?.id !== props.form.values.planId && selectedPlan;
 
   return (
     <React.Fragment>
-      <div className="flex items-center gap-4">
-        <div className="font-bold text-nowrap">Choose a tier</div>
-        <Separator className="w-auto grow" />
-      </div>
-
-      {query.loading ? (
-        <div className="flex gap-4">
-          <Skeleton className="h-96 w-72" />
-          <Skeleton className="h-96 w-72" />
-          <Skeleton className="h-96 w-72" />
-        </div>
-      ) : (
-        <RadioGroup
-          disabled={mutationResult.loading}
-          className="flex grow gap-4"
-          value={form.values.tier}
-          onValueChange={value => form.setFieldValue('tier', value as PlatformSubscriptionTierType)}
-        >
-          {PlatformSubscriptionTiers.map(tier => (
-            <RadioGroupCard
-              key={tier}
-              value={tier}
-              className="flex w-min grow flex-col"
-              indicatorClassName="self-start absolute top-4 left-4"
-              contentClassName="flex-col"
-            >
-              <PlatformSubscriptionTierCard tier={tier} isCurrent={tier === props.currentPlan.type} />
-            </RadioGroupCard>
-          ))}
-        </RadioGroup>
+      {props.step === Step.TIER && (
+        <TierStep
+          loading={props.loading}
+          currentPlan={props.currentPlan}
+          disabled={props.form.isSubmitting}
+          tier={props.form.values.tier}
+          onChange={tier => props.form.setFieldValue('tier', tier)}
+        />
       )}
 
-      <div className="mt-8 flex items-center gap-4">
-        <div className="font-bold text-nowrap">Choose a plan</div>
-        <Separator className="w-auto grow" />
-      </div>
-
-      {query.loading ? (
-        <Skeleton className="h-24 w-full" />
-      ) : (
-        <RadioGroup
-          disabled={mutationResult.loading}
-          className="flex grow flex-col gap-4"
-          value={form.values.planId}
-          onValueChange={value => form.setFieldValue('planId', value as PlatformSubscriptionTierType)}
-        >
-          {plans.map(plan => (
-            <RadioGroupCard
-              key={plan.id}
-              value={plan.id}
-              showSubcontent={plan.id === form.values.planId}
-              subContent={<PlatformSubscriptionPlanCard plan={plan} />}
-            >
-              <div className="flex grow justify-between gap-4">
-                <div>
-                  {currentPlanMatch?.id === plan.id ? (
-                    <div>
-                      <b>Current</b>:&nbsp;{plan.title}
-                    </div>
-                  ) : (
-                    plan.title
-                  )}
-                </div>
-                <div>
-                  <FormattedMoneyAmount
-                    amount={plan.pricing.pricePerMonth.valueInCents}
-                    currency={plan.pricing.pricePerMonth.currency}
-                  />
-                </div>
-              </div>
-            </RadioGroupCard>
-          ))}
-        </RadioGroup>
+      {props.step === Step.PLAN && (
+        <PlanStep
+          onChange={planId => props.form.setFieldValue('planId', planId)}
+          plans={plans}
+          currentPlanId={currentPlanMatch?.id}
+          currentPlan={props.currentPlan}
+          disabled={props.form.isSubmitting}
+          loading={props.loading}
+          planId={props.form.values.planId}
+          billing={props.billing}
+        />
       )}
-      <Button onClick={() => form.handleSubmit()} disabled={!isValidSelection} loading={mutationResult.loading}>
-        <FormattedMessage defaultMessage="Update" id="actions.update" />
-      </Button>
+
+      {props.step === Step.SUMMARY && (
+        <SummaryStep selectedPlan={selectedPlan} currentPlan={props.currentPlan} billing={props.billing} />
+      )}
+
+      <div className="flex justify-between">
+        <Button
+          variant="outline"
+          onClick={() => props.setStep(s => s - 1)}
+          disabled={props.step === Step.TIER}
+          loading={props.form.isSubmitting}
+        >
+          <ArrowLeft />
+          <FormattedMessage defaultMessage="Back" id="Back" />
+        </Button>
+        {props.step < Step.SUMMARY && (
+          <Button variant="outline" onClick={() => props.setStep(s => s + 1)} loading={props.form.isSubmitting}>
+            <FormattedMessage {...StepTitles[props.step]} />
+            <ArrowRight />
+          </Button>
+        )}
+
+        {props.step === Step.SUMMARY && (
+          <Button
+            onClick={() => props.form.handleSubmit()}
+            disabled={!isValidSelection}
+            loading={props.form.isSubmitting}
+          >
+            <FormattedMessage defaultMessage="Update Subscription" id="h8kExM" />
+          </Button>
+        )}
+      </div>
     </React.Fragment>
   );
 }
@@ -279,7 +287,7 @@ type PlatformSubscriptionPlanCardProps = {
 function PlatformSubscriptionPlanCard(props: PlatformSubscriptionPlanCardProps) {
   return (
     <div>
-      <div className="flex gap-4 p-4">
+      <div className="flex gap-4">
         <div className="flex gap-3">
           <div>
             <Shapes />
@@ -403,8 +411,420 @@ function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) 
         <PlatformSubscriptionFeatureList features={features} />
       </div>
       {props.isCurrent && (
-        <div className="absolute bottom-0 left-0 w-full rounded-b-lg border border-blue-400 bg-blue-400 px-4 py-1 text-center font-semibold text-white">
-          Current tier
+        <div className="absolute top-4 right-0 rounded-l-md bg-oc-blue-tints-050 px-2 py-1 text-center font-semibold text-oc-blue-tints-700">
+          Current
+        </div>
+      )}
+    </div>
+  );
+}
+
+type TierStepProps = {
+  tier: string;
+  onChange: (tier: PlatformSubscriptionTierType) => void;
+  loading?: boolean;
+  disabled?: boolean;
+  currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
+};
+
+function TierStep(props: TierStepProps) {
+  return (
+    <React.Fragment>
+      {props.loading ? (
+        <div className="flex gap-4">
+          <Skeleton className="h-96 w-72" />
+          <Skeleton className="h-96 w-72" />
+          <Skeleton className="h-96 w-72" />
+        </div>
+      ) : (
+        <RadioGroup
+          disabled={props.disabled}
+          className="flex grow gap-4"
+          value={props.tier}
+          onValueChange={value => props.onChange(value as PlatformSubscriptionTierType)}
+        >
+          {PlatformSubscriptionTiers.map(tier => (
+            <RadioGroupCard
+              key={tier}
+              value={tier}
+              className="flex w-min grow flex-col"
+              indicatorClassName="self-start absolute top-4 left-4"
+              contentClassName="flex-col"
+            >
+              <PlatformSubscriptionTierCard tier={tier} isCurrent={tier === props.currentPlan?.type} />
+            </RadioGroupCard>
+          ))}
+        </RadioGroup>
+      )}
+    </React.Fragment>
+  );
+}
+
+type PlanStepProps = {
+  plans: PlatformSubscriptionFormQuery['platformSubscriptionTiers'];
+  planId: string;
+  onChange: (planId: string) => void;
+  loading?: boolean;
+  disabled?: boolean;
+  currentPlanId?: string;
+  currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
+  billing?: PlatformBillingFieldsFragment;
+};
+
+function PlanStep(props: PlanStepProps) {
+  const hasAdditionalChargesInCurrentBillingPeriod =
+    props.billing?.additional?.utilization?.activeCollectives > 0 ||
+    props.billing?.additional?.utilization?.expensesPaid > 0;
+
+  const selectedPlan = props.plans?.find(plan => plan.id === props.planId);
+
+  return (
+    <React.Fragment>
+      {props.loading ? (
+        <div>
+          <Skeleton className="mb-4 h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      ) : (
+        <div>
+          {props.currentPlan && (
+            <div className="mb-4 rounded-md border p-4">
+              <div className="mb-4 font-bold text-slate-800">
+                <FormattedMessage defaultMessage="Current Plan" id="Z3GpJF" />
+              </div>
+              <PlatformSubscriptionPlanCard plan={props.currentPlan} />
+              <div className="mt-4">
+                <MessageBox type="info" className="text-sm text-slate-900">
+                  <FormattedMessage
+                    defaultMessage="In the current billing period, you are using {activeCollectives} active {activeCollectives, plural, one {collective} other {collectives}} and {paidExpenses} paid {paidExpenses, plural, one {expense} other {expenses}}."
+                    id="95UXnT"
+                    values={{
+                      activeCollectives: props.billing?.utilization?.activeCollectives ?? 0,
+                      paidExpenses: props.billing?.utilization?.expensesPaid ?? 0,
+                    }}
+                  />
+                  {hasAdditionalChargesInCurrentBillingPeriod && (
+                    <React.Fragment>
+                      <br />
+                      <FormattedMessage
+                        defaultMessage="The additional {additionalActiveCollectives} {additionalActiveCollectives, plural, one {collective} other {collectives}} and {additionalPaidExpenses} {additionalPaidExpenses, plural, one {expense} other {expenses}} are incurring additional charges."
+                        id="IwAO8T"
+                        values={{
+                          additionalActiveCollectives: props.billing?.additional?.utilization?.activeCollectives ?? 0,
+                          additionalPaidExpenses: props.billing?.additional?.utilization?.expensesPaid ?? 0,
+                        }}
+                      />
+                    </React.Fragment>
+                  )}
+                </MessageBox>
+              </div>
+            </div>
+          )}
+          <div className="rounded-md border p-4">
+            <div className="mb-2 font-bold text-slate-800">
+              <FormattedMessage defaultMessage="Choose new plan" id="BQcSP9" />
+            </div>
+            <Select value={props.planId} onValueChange={props.onChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a plan based on your requirements." />
+              </SelectTrigger>
+              <SelectContent>
+                {props.plans.map(plan => (
+                  <SelectItem key={plan.id} value={plan.id}>
+                    <FormattedMessage
+                      defaultMessage="{includedExpensesPerMonth} Active {includedExpensesPerMonth, plural, one {collective} other {collectives}} / {includedExpensesPerMonth} paid {includedExpensesPerMonth, plural, one {expense} other {expenses}}"
+                      id="N4RH9E"
+                      values={{
+                        includedCollectives: plan.pricing.includedCollectives,
+                        includedExpensesPerMonth: plan.pricing.includedExpensesPerMonth,
+                      }}
+                    />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedPlan && (
+              <React.Fragment>
+                <Separator className="my-4" />
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="font-bold text-slate-800">
+                    <FormattedMessage defaultMessage="Selected Plan" id="Hk2ZEF" />
+                  </div>
+                  <div className="bg-oc-blue-tints-050 p-2 font-bold text-slate-800">
+                    <FormattedMessage
+                      defaultMessage="{perMonth} / month"
+                      id="Dlu3sp"
+                      values={{
+                        perMonth: (
+                          <FormattedMoneyAmount
+                            amount={selectedPlan.pricing.pricePerMonth.valueInCents}
+                            currency={selectedPlan.pricing.pricePerMonth.currency}
+                          />
+                        ),
+                      }}
+                    />
+                  </div>
+                </div>
+                <PlatformSubscriptionPlanCard plan={selectedPlan} />
+              </React.Fragment>
+            )}
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
+type SummaryStepProps = {
+  currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
+  selectedPlan: PlatformSubscriptionFormQuery['platformSubscriptionTiers'][number];
+  billing?: PlatformBillingFieldsFragment;
+};
+
+function SummaryStep(props: SummaryStepProps) {
+  const featureDiff = React.useMemo(() => {
+    return changedFeatures(props.selectedPlan, props.currentPlan);
+  }, [props.currentPlan, props.selectedPlan]);
+
+  return (
+    <React.Fragment>
+      {props.currentPlan && (
+        <div className="rounded-md border p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="font-bold text-slate-800">
+              <FormattedMessage
+                defaultMessage="Current Plan: {planTitle}"
+                id="ZV0wTF"
+                values={{
+                  planTitle: props.currentPlan.title,
+                }}
+              />
+            </div>
+            <div className="bg-oc-blue-tints-050 p-2 font-bold text-slate-800">
+              <FormattedMessage
+                defaultMessage="{perMonth} / month"
+                id="Dlu3sp"
+                values={{
+                  perMonth: (
+                    <FormattedMoneyAmount
+                      amount={props.currentPlan.pricing.pricePerMonth.valueInCents}
+                      currency={props.currentPlan.pricing.pricePerMonth.currency}
+                    />
+                  ),
+                }}
+              />
+            </div>
+          </div>
+          <Separator className="my-4" />
+          <PlatformSubscriptionPlanCard plan={props.currentPlan} />
+        </div>
+      )}
+
+      <div className="rounded-md border p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="font-bold text-slate-800">
+            <FormattedMessage
+              defaultMessage="Selected Plan: {planTitle}"
+              id="A3BR0d"
+              values={{
+                planTitle: props.selectedPlan.title,
+              }}
+            />
+          </div>
+          <div className="bg-oc-blue-tints-050 p-2 font-bold text-slate-800">
+            <FormattedMessage
+              defaultMessage="{perMonth} / month"
+              id="Dlu3sp"
+              values={{
+                perMonth: (
+                  <FormattedMoneyAmount
+                    amount={props.selectedPlan.pricing.pricePerMonth.valueInCents}
+                    currency={props.selectedPlan.pricing.pricePerMonth.currency}
+                  />
+                ),
+              }}
+            />
+          </div>
+        </div>
+        <Separator className="my-4" />
+        <PlatformSubscriptionPlanCard plan={props.selectedPlan} />
+
+        {(featureDiff.added.length > 0 || featureDiff.removed.length > 0) && (
+          <React.Fragment>
+            <Separator className="my-4" />
+            <FeatureDiff added={featureDiff.added} removed={featureDiff.removed} />
+          </React.Fragment>
+        )}
+      </div>
+
+      {props.billing && (
+        <div className="rounded-md border p-4 text-sm">
+          <div className="mb-4 font-bold text-slate-800">
+            <FormattedMessage defaultMessage="Additional Information" id="laUK3e" />
+          </div>
+          <div className="max-w-[800px]">
+            <FormattedMessage
+              defaultMessage="Your newly selected plan starts effective immediately. You will be charged on {dueDate} on pro rata basis and the plan will renew automatically."
+              id="iUuuNo"
+              values={{
+                dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={props.billing.dueDate} />,
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
+enum Step {
+  TIER = 0,
+  PLAN = 1,
+  SUMMARY = 2,
+}
+
+type ManagePlatformSubscriptionStepsProps = {
+  step: Step;
+  selectedTier: PlatformSubscriptionTierType;
+  selectedPlan?: PlatformSubscriptionFormQuery['platformSubscriptionTiers'][number];
+};
+
+const StepTitles = defineMessages({
+  [Step.TIER]: { defaultMessage: 'Choose Tier', id: 'smQ1pN' },
+  [Step.PLAN]: { defaultMessage: 'Choose Plan', id: 'aEbRMo' },
+  [Step.SUMMARY]: { defaultMessage: 'Summary', id: 'Summary' },
+});
+
+function ManagePlatformSubscriptionSteps(props: ManagePlatformSubscriptionStepsProps) {
+  return (
+    <div>
+      <ol
+        className={clsx(
+          'flex w-full text-sm leading-4 font-medium tracking-wide uppercase [counter-reset:li]',
+          '[&>li]:relative [&>li]:flex [&>li]:shrink [&>li]:grow [&>li]:basis-0 [&>li]:flex-col [&>li]:items-center [&>li]:gap-2',
+          '[&>li]:[counter-increment:li] [&>li]:before:flex [&>li]:before:h-8 [&>li]:before:w-8 [&>li]:before:items-center [&>li]:before:justify-center [&>li]:before:self-center [&>li]:before:rounded-full [&>li]:before:border [&>li]:before:border-neutral-400 [&>li]:before:bg-white [&>li]:before:text-center [&>li]:before:text-neutral-500 [&>li]:before:content-[counter(li)]',
+          "[&>li[data-state='active']]:text-oc-blue [&>li[data-state='active']]:before:border-2 [&>li[data-state='active']]:before:border-oc-blue [&>li[data-state='active']]:before:text-oc-blue [&>li[data-state='active']]:before:ring-4 [&>li[data-state='active']]:before:ring-oc-primary-100",
+          "[&>li[data-state='complete']]:before:border-oc-blue [&>li[data-state='complete']]:before:bg-oc-blue [&>li[data-state='complete']]:before:text-lg [&>li[data-state='complete']]:before:text-white [&>li[data-state='complete']]:before:content-['✓']",
+          '[&>li]:after:absolute [&>li]:after:top-4 [&>li]:after:left-1/2 [&>li]:after:-z-10 [&>li]:after:w-full [&>li]:after:border [&>li]:after:border-dashed [&>li]:last:after:hidden',
+          "[&>li[data-state='complete']]:after:border-solid [&>li[data-state='complete']]:after:border-oc-blue",
+        )}
+      >
+        {[Step.TIER, Step.PLAN, Step.SUMMARY].map(step => {
+          const isComplete = props.step > step;
+          const isActive = props.step === step;
+          return (
+            <li key={step} data-state={isComplete ? 'complete' : isActive ? 'active' : 'none'}>
+              <div>
+                <div className="text-center">
+                  <FormattedMessage {...StepTitles[step]} />
+                </div>
+                {isComplete && (
+                  <div className="mt-2 text-center text-base font-normal [text-transform:none]">
+                    {step === Step.TIER && props.selectedTier && props.selectedTier}
+                    {step === Step.PLAN && props.selectedPlan && (
+                      <div>
+                        <div>
+                          <FormattedMessage
+                            defaultMessage="{includedCollectives} {includedCollectives, plural, one {active collective} other {active collectives}}"
+                            id="G8bZFJ"
+                            values={{
+                              includedCollectives: props.selectedPlan.pricing.includedCollectives,
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <FormattedMessage
+                            defaultMessage="{includedExpensesPerMonth} {includedExpensesPerMonth, plural, one {expense} other {expenses}}"
+                            id="x/eaxJ"
+                            values={{
+                              includedExpensesPerMonth: props.selectedPlan.pricing.includedExpensesPerMonth,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+function changedFeatures(
+  newPlan: PlatformSubscriptionFormQuery['platformSubscriptionTiers'][number],
+  oldPlan?: PlatformSubscriptionFieldsFragment['plan'],
+): { added: typeof PlatformSubscriptionFeatures; removed: typeof PlatformSubscriptionFeatures } {
+  const added = Object.entries(omit(newPlan.features, '__typename')).reduce((acc, [feature, included]) => {
+    if (included && !oldPlan?.features?.[feature]) {
+      return [...acc, feature];
+    }
+
+    return acc;
+  }, []);
+
+  const removed = Object.entries(omit(oldPlan?.features, '__typename')).reduce((acc, [feature, included]) => {
+    if (included && !newPlan.features[feature]) {
+      return [...acc, feature];
+    }
+
+    return acc;
+  }, []);
+
+  return { added, removed };
+}
+
+type FeatureDiffProps = {
+  added: typeof PlatformSubscriptionFeatures;
+  removed: typeof PlatformSubscriptionFeatures;
+};
+
+function FeatureDiff(props: FeatureDiffProps) {
+  return (
+    <div className="flex gap-4">
+      {props.removed.length > 0 && (
+        <div>
+          <div className="mb-2 font-bold text-slate-800">
+            <FormattedMessage defaultMessage="Removed Features:" id="DKAH7z" />
+          </div>
+          <ul className="flex flex-col gap-2 text-muted-foreground">
+            {props.removed.map(feature => (
+              <li className="flex gap-4" key={feature}>
+                <div>
+                  <Minus className="text-muted-foreground" />
+                </div>
+                {PlatformSubscriptionFeatureTitles[feature] ? (
+                  <FormattedMessage {...PlatformSubscriptionFeatureTitles[feature]} />
+                ) : (
+                  feature
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {props.added.length > 0 && (
+        <div>
+          <div className="mb-2 font-bold text-slate-800">
+            <FormattedMessage defaultMessage="Additional Features:" id="Px5Jio" />
+          </div>
+          <ul className="flex flex-col gap-2">
+            {props.added.map(feature => (
+              <li className="flex gap-4" key={feature}>
+                <div>
+                  <Check className="text-green-400" />
+                </div>
+                {PlatformSubscriptionFeatureTitles[feature] ? (
+                  <FormattedMessage {...PlatformSubscriptionFeatureTitles[feature]} />
+                ) : (
+                  feature
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
