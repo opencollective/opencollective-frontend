@@ -367,7 +367,7 @@ function getExpenseInviteEmailLink(to: string) {
       const expenseLink = $html(`a:contains("OK, let's go!")`);
       const href = expenseLink.attr('href');
       const parsedUrl = new URL(href);
-      // parsedUrl.searchParams.set('newExpenseFlowEnabled', 'true');
+      parsedUrl.searchParams.set('newGrantFlowEnabled', 'true');
       return `${parsedUrl.pathname}${parsedUrl.search.toString()}`;
     });
 }
