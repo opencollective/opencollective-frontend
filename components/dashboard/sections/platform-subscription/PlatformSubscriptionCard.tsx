@@ -166,8 +166,8 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
                 dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={props.billing.dueDate} />,
                 basePrice: (
                   <FormattedMoneyAmount
-                    amount={props.billing.baseAmount.valueInCents}
-                    currency={props.billing.baseAmount.currency}
+                    amount={props.billing.base.total.valueInCents}
+                    currency={props.billing.base.total.currency}
                   />
                 ),
               }}
