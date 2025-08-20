@@ -41,6 +41,146 @@ describe('New expense flow', () => {
   describe('Reimbursements', () => {
     commonScenarios('reimbursement');
   });
+
+  describe('Cross host expenses', () => {
+    describe('invite', () => {
+      it('submits an invited expense across my own hosts', () => {
+        cy.signup()
+          .as('hostAdmin')
+          .then(user => {
+            cy.createHostOrganization(user.email)
+              .as('host1')
+              .then(host => {
+                cy.signup()
+                  .as('collectiveAdmin1')
+                  .then(user => {
+                    cy.createCollectiveV2({
+                      email: user.email,
+                      skipApproval: true,
+                      host: { slug: host.slug },
+                      collective: { name: 'Test Collective Under host 1', settings: { expenseTypes: { GRANT: true } } },
+                    }).as('collective1');
+                  });
+              });
+          });
+
+        cy.get<{ email: string }>('@hostAdmin').then(user => {
+          cy.createHostOrganization(user.email)
+            .as('host2')
+            .then(host => {
+              cy.createPayoutMethod(
+                host.slug,
+                {
+                  type: 'BANK_ACCOUNT',
+                  data: {
+                    accountHolderName: 'Account holder name',
+                    details: {},
+                    type: 'ABA',
+                    currency: 'USD',
+                  },
+                  name: 'host 2 payout method',
+                  isSaved: true,
+                },
+                user.email,
+              );
+
+              cy.signup()
+                .as('collectiveAdmin2')
+                .then(user => {
+                  cy.createCollectiveV2({
+                    email: user.email,
+                    skipApproval: true,
+                    host: { slug: host.slug },
+                    collective: { name: 'Test Collective Under host 2', settings: { expenseTypes: { GRANT: true } } },
+                  }).as('collective2');
+                });
+            });
+        });
+
+        cy.get<{ email: string; collective: { slug: string } }>('@hostAdmin').then(user => {
+          cy.login({
+            email: user.email,
+            redirect: `/dashboard/${user.collective.slug}/submitted-expenses?newExpenseFlowEnabled=true`,
+          });
+        });
+
+        cy.contains('New expense').click();
+
+        cy.get<{ slug: string }>('@collective1').then(col => {
+          cy.get('#WHO_IS_PAYING').within(() => {
+            cy.contains('Find account').click();
+            cy.contains('Find account').parent().get('[role="combobox"]').click();
+            cy.contains('Find account').parent().get('[role="combobox"]').type(`${col.slug}{enter}`);
+            cy.root().closest('html').contains('[role="option"]', col.slug).click();
+          });
+        });
+
+        cy.get<{ slug: string }>('@collective2').then(col => {
+          cy.get('#WHO_IS_GETTING_PAID').within(() => {
+            cy.contains('Invite someone').click();
+            cy.contains('Invite someone').parent().get('[role="combobox"]').click();
+            cy.contains('Invite someone').parent().get('[role="combobox"]').type(col.slug);
+            cy.root().closest('html').contains('[role="option"]', col.slug).click();
+          });
+        });
+
+        cy.get('#PAYOUT_METHOD').within(() => {
+          cy.root().scrollIntoView();
+
+          cy.contains(
+            'The person you are inviting to submit this expense will be asked to provide payout method details.',
+          ).should('not.exist');
+
+          cy.contains('[role="radio"]', 'host 2 payout method')
+            .siblings('input[type="radio"]')
+            .first()
+            .should('be.checked');
+        });
+
+        fillTypeOfExpense({
+          expenseType: 'invoice',
+          hasInvoice: false,
+        });
+
+        cy.get('#EXPENSE_ITEMS').within(() => {
+          cy.root().scrollIntoView();
+
+          cy.get('[role="listitem"]')
+            .first()
+            .within(() => {
+              cy.contains('Item Description').click();
+              cy.focused().type('First item description');
+              cy.contains('Date').click();
+              cy.focused().type('2025-09-29');
+              cy.contains('Amount').click();
+              cy.focused().type('{selectall}125');
+            });
+        });
+
+        cy.get('form').contains('Submit Expense').scrollIntoView();
+        cy.get('form').contains('Submit Expense').click();
+
+        cy.get<{ email: string }>('@collectiveAdmin2').then(collectiveAdmin => {
+          getExpenseInviteEmailLink(collectiveAdmin.email).then(inviteLink => {
+            cy.login({
+              email: collectiveAdmin.email,
+              redirect: encodeURIComponent(inviteLink),
+            });
+          });
+        });
+
+        cy.contains('Continue submission').click();
+        fillTypeOfExpense({
+          expenseType: 'invoice',
+          hasInvoice: false,
+        });
+        cy.get('#PAYOUT_METHOD').should('not.exist');
+        cy.get('form').contains('Submit Expense').scrollIntoView();
+        cy.get('form').contains('Submit Expense').click();
+        cy.contains('has been submitted successfully!').should('exist');
+      });
+    });
+  });
 });
 
 function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
@@ -345,7 +485,7 @@ function getExpenseInviteEmailLink(to: string) {
       const expenseLink = $html(`a:contains("OK, let's go!")`);
       const href = expenseLink.attr('href');
       const parsedUrl = new URL(href);
-      parsedUrl.searchParams.set('newExpenseFlowEnabled', 'true');
+      // parsedUrl.searchParams.set('newExpenseFlowEnabled', 'true');
       return `${parsedUrl.pathname}${parsedUrl.search.toString()}`;
     });
 }

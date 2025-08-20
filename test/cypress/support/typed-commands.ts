@@ -76,6 +76,7 @@ declare global {
       createVendor: typeof createVendor;
 
       getAccount: typeof getAccount;
+      createPayoutMethod: typeof createPayoutMethod;
     }
   }
 }
@@ -96,6 +97,25 @@ Cypress.Commands.add('retryChain', function <
     }
   });
 });
+
+Cypress.Commands.add('createPayoutMethod', createPayoutMethod);
+function createPayoutMethod(accountSlug: string, payoutMethod, userEmail: string): Cypress.Chainable<{ id: string }> {
+  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
+    return graphqlQueryV2(token, {
+      operationName: 'CreatePayoutMethod',
+      query: gql`
+        mutation CreatePayoutMethod($payoutMethod: PayoutMethodInput!, $accountSlug: String!) {
+          createPayoutMethod(payoutMethod: $payoutMethod, account: { slug: $accountSlug }) {
+            id
+          }
+        }
+      `,
+      variables: { payoutMethod, accountSlug },
+    }).then(({ body }) => {
+      return body.data.createPayoutMethod;
+    });
+  });
+}
 
 Cypress.Commands.add('createVendor', createVendor);
 function createVendor(

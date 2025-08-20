@@ -1,3 +1,5 @@
+import * as cheerio from 'cheerio';
+
 describe('Grant Submission Flow', () => {
   beforeEach(() => {
     cy.signup()
@@ -255,4 +257,117 @@ describe('Grant Submission Flow', () => {
     // Verify we can see the "View All Grants" button
     cy.contains('View All Grants').should('be.visible');
   });
+
+  it('should submit invite grant request across hosts', () => {
+    cy.signup()
+      .as('hostAdmin')
+      .then(user => {
+        cy.createHostOrganization(user.email)
+          .as('host1')
+          .then(host => {
+            cy.signup()
+              .as('collectiveAdmin1')
+              .then(user => {
+                cy.createCollectiveV2({
+                  email: user.email,
+                  skipApproval: true,
+                  host: { slug: host.slug },
+                  collective: { name: 'Test Collective Under host 1', settings: { expenseTypes: { GRANT: true } } },
+                }).as('collective1');
+              });
+          });
+      });
+
+    cy.get<{ email: string }>('@hostAdmin').then(user => {
+      cy.createHostOrganization(user.email)
+        .as('host2')
+        .then(host => {
+          cy.createPayoutMethod(
+            host.slug,
+            {
+              type: 'BANK_ACCOUNT',
+              data: {
+                accountHolderName: 'Account holder name',
+                details: {},
+                type: 'ABA',
+                currency: 'USD',
+              },
+              name: 'host 2 payout method',
+              isSaved: true,
+            },
+            user.email,
+          );
+
+          cy.signup()
+            .as('collectiveAdmin2')
+            .then(user => {
+              cy.createCollectiveV2({
+                email: user.email,
+                skipApproval: true,
+                host: { slug: host.slug },
+                collective: { name: 'Test Collective Under host 2', settings: { expenseTypes: { GRANT: true } } },
+              }).as('collective2');
+            });
+        });
+    });
+
+    cy.get<{ email: string; collective: { slug: string } }>('@hostAdmin').then(user => {
+      cy.get<{ slug: string }>('@collective1').then(col => {
+        cy.login({
+          email: user.email,
+          redirect: `/${col.slug}/grants/new?newGrantFlowEnabled=true`,
+        });
+      });
+    });
+
+    cy.contains('button', 'Proceed').click();
+    cy.get<{ slug: string }>('@collective2').then(col => {
+      cy.get('#WHO_WILL_RECEIVE_FUNDS').within(() => {
+        cy.contains('Invite someone').click();
+        cy.contains('Invite someone').parent().get('[role="combobox"]').click();
+        cy.contains('Invite someone').parent().get('[role="combobox"]').type(col.slug);
+        cy.root().closest('html').contains('[role="option"]', col.slug).click();
+      });
+    });
+
+    cy.contains('Application Content').scrollIntoView();
+    cy.get('textarea[name="expenseItems.0.description"]').type('Grant application for community project');
+    cy.get('input[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
+
+    cy.contains('button', 'Proceed to Summary').click();
+    cy.contains('button', 'Submit Grant Request').click();
+
+    cy.get<{ email: string }>('@collectiveAdmin2').then(collectiveAdmin => {
+      getExpenseInviteEmailLink(collectiveAdmin.email).then(inviteLink => {
+        cy.login({
+          email: collectiveAdmin.email,
+          redirect: encodeURIComponent(inviteLink),
+        });
+      });
+    });
+
+    cy.contains('Continue submission').click();
+    cy.contains('button', 'Proceed').click();
+    cy.contains('Select a payout method').should('not.exist');
+    cy.contains('button', 'Proceed to Summary').click();
+    cy.contains('button', 'Submit Grant Request').click();
+    cy.contains('has been submitted successfully!').should('be.visible');
+  });
 });
+
+function getExpenseInviteEmailLink(to: string) {
+  return cy
+    .openEmail(
+      email =>
+        email.Tags.some(tag => tag === to.replace('@', '-at-')) &&
+        (email.Subject.includes('wants to pay you') || email.Subject.includes('to send funds to')),
+    )
+    .then(email => {
+      const $html = cheerio.load(email.HTML);
+      const expenseLink = $html(`a:contains("OK, let's go!")`);
+      const href = expenseLink.attr('href');
+      const parsedUrl = new URL(href);
+      // parsedUrl.searchParams.set('newExpenseFlowEnabled', 'true');
+      return `${parsedUrl.pathname}${parsedUrl.search.toString()}`;
+    });
+}
