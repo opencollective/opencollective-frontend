@@ -17,6 +17,7 @@ export const SECTIONS = {
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
   HOST_TAX_FORMS: 'host-tax-forms',
+  HOST_CONVERSATIONS: 'host-conversations',
   CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
@@ -277,6 +278,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [ALL_SECTIONS.HOST_CONVERSATIONS]: {
+    id: 'HostConversations',
+    defaultMessage: 'Conversations',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
