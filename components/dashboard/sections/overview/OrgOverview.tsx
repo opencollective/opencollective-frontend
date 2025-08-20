@@ -41,13 +41,6 @@ export function OrgOverview() {
       return;
     }
 
-    if (showSetupGuide === undefined) {
-      const showGuideKey = `id${account.legacyId}`;
-      const showGuide = LoggedInUser.collective.settings?.showSetupGuide?.[showGuideKey];
-
-      setShowSetupGuide(showGuide !== false ? true : false);
-    }
-
     if (showSubscriptionCard === undefined) {
       const showSubscriptionCardKey = `id${account.legacyId}`;
       const showSubscriptionCardSetting =
@@ -127,11 +120,7 @@ export function OrgOverview() {
               </CollapsibleContent>
             </Collapsible>
           )}
-          <Collapsible open={showSetupGuide}>
-            <CollapsibleContent>
-              <SetupGuideCard account={account} setOpen={handleSetupGuideToggle} />
-            </CollapsibleContent>
-          </Collapsible>
+          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
