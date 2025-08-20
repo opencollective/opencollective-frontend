@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
-type Action = {
+export type Action = {
   label: React.ReactNode;
   onClick: () => void;
   Icon?: LucideIcon;
