@@ -241,7 +241,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
           )}
 
           {!(isLoading || isLoadingPayee) &&
-            props.isAdminOfPayee &&
+            (props.isAdminOfPayee || isVendor) &&
             props.newPayoutMethodTypes?.length > 0 &&
             !(isVendor && payoutMethods.length > 0) && (
               <RadioGroupCard
