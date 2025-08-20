@@ -194,8 +194,8 @@ const SubscriberDetails = ({ id, openPlanModal }) => {
                 title={<FormattedMessage id="MoneyManaged" defaultMessage="Money Managed" />}
                 value={
                   <FormattedMoneyAmount
-                    amount={subscriber?.stats?.managedAmount.valueInCents}
-                    currency={subscriber?.stats?.managedAmount.currency}
+                    amount={subscriber.stats?.managedAmount.valueInCents}
+                    currency={subscriber.stats?.managedAmount.currency}
                     showCurrencyCode={true}
                   />
                 }
@@ -204,8 +204,8 @@ const SubscriberDetails = ({ id, openPlanModal }) => {
                 title={<FormattedMessage id="Balance" defaultMessage="Balance" />}
                 value={
                   <FormattedMoneyAmount
-                    amount={subscriber?.stats?.balance.valueInCents}
-                    currency={subscriber?.stats?.balance.currency}
+                    amount={subscriber.stats?.balance.valueInCents}
+                    currency={subscriber.stats?.balance.currency}
                     showCurrencyCode={true}
                   />
                 }
