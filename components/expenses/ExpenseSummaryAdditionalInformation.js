@@ -298,7 +298,7 @@ const ExpenseSummaryAdditionalInformation = ({
               type={
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
                   ? expense.draft?.payoutMethod?.type ||
-                    (expense?.draft?.payoutMethod?.id ? PayoutMethodType.OTHER : INVITE)
+                    (expense.draft?.payoutMethod?.id ? PayoutMethodType.OTHER : INVITE)
                   : isCharge
                     ? VIRTUAL_CARD
                     : expense.payoutMethod?.type
