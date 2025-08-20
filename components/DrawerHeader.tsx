@@ -4,21 +4,35 @@ import { MoreHorizontal, X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
+import type { Action } from '@/lib/actions/types';
 
 import { DropdownActionItem } from './table/RowActionsMenu';
 import { Button } from './ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/DropdownMenu';
 import { SheetClose } from './ui/Sheet';
 
+type DrawerHeaderProps = {
+  actions?: {
+    primary?: Action[];
+    secondary?: Action[];
+  };
+  entityName: string | React.ReactNode;
+  entityIdentifier: string | React.ReactNode;
+  entityLabel: string | React.ReactNode;
+  dropdownTriggerRef?: React.Ref<HTMLButtonElement>;
+  forceMoreActions?: boolean;
+  separateRowForEntityLabel?: boolean;
+};
+
 export default function DrawerHeader({
-  actions,
   entityName,
   entityIdentifier,
   entityLabel,
+  actions = {},
   dropdownTriggerRef,
   forceMoreActions = false,
   separateRowForEntityLabel = false,
-}) {
+}: DrawerHeaderProps) {
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
   const { primary, secondary } = actions || {};
@@ -53,7 +67,7 @@ export default function DrawerHeader({
             <div className="items-center gap-1 sm:flex">
               {primary?.map(action => (
                 <Button
-                  key={action.key || action.label}
+                  key={action.key}
                   variant="outline"
                   size="xs"
                   className="gap-1.5"
@@ -79,14 +93,14 @@ export default function DrawerHeader({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {shouldPutPrimaryInMoreActions &&
-                  primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                  primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
 
                 {shouldPutPrimaryInMoreActions && primary.length > 0 && secondary.length > 0 && (
                   <DropdownMenuSeparator />
                 )}
 
                 {secondary?.map(action => (
-                  <DropdownActionItem key={action.label} action={action} />
+                  <DropdownActionItem key={action.key} action={action} />
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
