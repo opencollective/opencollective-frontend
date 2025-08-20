@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
+import { ChevronDown, Pencil, X } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
@@ -13,8 +14,10 @@ import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import MessageBox from '@/components/MessageBox';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
+import { CancelSubscriptionModal } from '@/components/platform-subscriptions/CancelSubscriptionModal';
 import { ManageSubscriptionModal } from '@/components/platform-subscriptions/ManageSubscriptionModal';
 import { Button } from '@/components/ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 import { Separator } from '@/components/ui/Separator';
 import { Skeleton } from '@/components/ui/Skeleton';
 
@@ -68,6 +71,46 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             id="ajHwTP"
           />
         }
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="xs" variant="outline" className="gap-1">
+                <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
+                <ChevronDown className="text-muted-foreground" size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Button
+                  disabled={isLoading}
+                  onClick={() =>
+                    showModal(ManageSubscriptionModal, {
+                      currentPlan: activeSubscription.plan,
+                      accountSlug: props.accountSlug,
+                      billing: billing,
+                    })
+                  }
+                  variant="ghost"
+                  size="xs"
+                >
+                  <Pencil size={14} />
+                  <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  disabled={isLoading}
+                  onClick={() => showModal(CancelSubscriptionModal)}
+                  variant="ghost"
+                  size="xs"
+                >
+                  <X size={14} />
+                  <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
       />
       {queryError && <MessageBoxGraphqlError error={queryError} />}
 
@@ -95,21 +138,6 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             />
           </div>
           <Separator className="w-auto grow border-b bg-border" />
-          <div>
-            <Button
-              disabled={isLoading}
-              onClick={() =>
-                showModal(ManageSubscriptionModal, {
-                  currentPlan: activeSubscription.plan,
-                  accountSlug: props.accountSlug,
-                })
-              }
-              variant="outline"
-              size="xs"
-            >
-              <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
-            </Button>
-          </div>
         </div>
       )}
 
