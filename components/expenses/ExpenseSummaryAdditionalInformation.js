@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { INVITE, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
@@ -297,7 +297,8 @@ const ExpenseSummaryAdditionalInformation = ({
             <PayoutMethodTypeWithIcon
               type={
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
-                  ? expense.draft?.payoutMethod?.type || INVITE
+                  ? expense.draft?.payoutMethod?.type ||
+                    (expense?.draft?.payoutMethod?.id ? PayoutMethodType.OTHER : INVITE)
                   : isCharge
                     ? VIRTUAL_CARD
                     : expense.payoutMethod?.type

@@ -606,6 +606,7 @@ type ExpenseFormOptions = {
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
+  isAdminOfPayeeHost?: boolean;
   isHostAdmin?: boolean;
   submitter?: ExpenseFormSchemaQuery['submitter'];
   loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
@@ -704,6 +705,10 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
+          if (options.lockedFields && options.lockedFields.includes(ExpenseLockableFields.PAYOUT_METHOD)) {
+            return true;
+          }
+
           if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
             return true;
           }
@@ -1078,7 +1083,7 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
-          if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
+          if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && options.isAdminOfPayee) {
             const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
             const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
             if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
@@ -1098,6 +1103,10 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
+            if (options.lockedFields && options.lockedFields.includes(ExpenseLockableFields.PAYOUT_METHOD)) {
+              return true;
+            }
+
             if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
               return true;
             }
@@ -1466,6 +1475,10 @@ async function buildFormOptions(
       );
     }
 
+    if (payeeHost) {
+      options.isAdminOfPayeeHost = loggedInUser?.isAdminOfCollective(payeeHost) ?? false;
+    }
+
     if (payee && (AccountTypesWithHost as readonly string[]).includes(payee.type)) {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
@@ -1479,7 +1492,8 @@ async function buildFormOptions(
       options.isAdminOfPayee =
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
         values.payeeSlug === '__findAccountIAdminister';
-      if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
+
+      if (payee && payee.type !== CollectiveType.VENDOR && (options.isAdminOfPayee || options.isAdminOfPayeeHost)) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {
           options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
@@ -1975,7 +1989,10 @@ export function useExpenseForm(opts: {
     setFieldValue('accountSlug', formOptions.expense.account.slug);
     setFieldValue('expenseTypeOption', formOptions.expense.type);
     setFieldValue('hasTax', (formOptions.expense.taxes || []).length > 0);
-    setFieldValue('payoutMethodId', formOptions.expense.payoutMethod?.id);
+    setFieldValue(
+      'payoutMethodId',
+      formOptions.expense.payoutMethod?.id ?? formOptions.expense?.draft?.payoutMethod?.id,
+    );
     setFieldValue('tags', formOptions.expense.tags);
     if (formOptions.expense.taxes?.length > 0) {
       setFieldValue('tax.idNumber', formOptions.expense.taxes[0].idNumber);
@@ -2112,7 +2129,7 @@ export function useExpenseForm(opts: {
         setFieldValue('expenseItems.0.attachment', null);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
       } else {
-        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments?.length;
         let count = 0;
 
         expenseForm.values.expenseItems.forEach((item, i) => {
@@ -2331,7 +2348,8 @@ export function useExpenseForm(opts: {
     if (
       expenseForm.values.payoutMethodId &&
       !expenseForm.values.payoutMethodId.startsWith('__') &&
-      !formOptions.payoutMethods?.some(p => p.id === expenseForm.values.payoutMethodId)
+      !formOptions.payoutMethods?.some(p => p.id === expenseForm.values.payoutMethodId) &&
+      !(formOptions.lockedFields && formOptions.lockedFields.includes(ExpenseLockableFields.PAYOUT_METHOD))
     ) {
       setFieldValue('payoutMethodId', null);
     }
@@ -2364,6 +2382,7 @@ export function useExpenseForm(opts: {
     setFormOptions,
     expenseForm.touched.expenseItems,
     expenseForm.values.expenseItems,
+    formOptions.lockedFields,
   ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
