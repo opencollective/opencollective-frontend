@@ -38,7 +38,6 @@ const fields = gql`
     tags
     settings
     createdAt
-
     childrenAccounts {
       nodes {
         id
@@ -71,6 +70,12 @@ const fields = gql`
       managedAmount {
         valueInCents
         currency
+      }
+    }
+    transactions(limit: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+      nodes {
+        id
+        createdAt
       }
     }
     ... on AccountWithParent {
@@ -208,5 +213,39 @@ export const updateAccountPlaformSubscriptionMutation = gql`
       ...SubscriberFields
     }
   }
+  ${fields}
+`;
+
+export const subscriberDetailQuery = gql`
+  query Subscriber($id: String!) {
+    account(id: $id) {
+      id
+      slug
+      ...SubscriberFields
+      stats {
+        balance {
+          valueInCents
+          currency
+        }
+      }
+      expenses(type: PLATFORM_BILLING, direction: RECEIVED, limit: 6, orderBy: { field: CREATED_AT, direction: DESC }) {
+        nodes {
+          id
+          legacyId
+          createdAt
+          description
+          amount: amountV2 {
+            valueInCents
+            currency
+          }
+          account {
+            slug
+          }
+          status
+        }
+      }
+    }
+  }
+
   ${fields}
 `;
