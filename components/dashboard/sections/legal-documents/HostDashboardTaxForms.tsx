@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { defineMessage, FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
@@ -135,6 +135,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 };
 
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+  const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
   const featureEnabled = isFeatureEnabled(account, 'TAX_FORMS');
 
@@ -154,8 +155,16 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
-
-      {!featureEnabled && <UpgradeSubscriptionBlocker featureKey="TAX_FORMS" />}
+      {!featureEnabled && (
+        <UpgradeSubscriptionBlocker
+          featureKey="TAX_FORMS"
+          description={intl.formatMessage({
+            defaultMessage:
+              'This feature is not available on your current plan. Upgrade your subscription to start collecting tax forms from expense submitters.',
+            id: 'UpgradeSubscriptionBlocker.TaxForms.description',
+          })}
+        />
+      )}
       <Filterbar {...queryFilter} />
 
       {error ? (
