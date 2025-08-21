@@ -10,7 +10,6 @@ import { cn } from '../../lib/utils';
 import { useToast } from '../ui/useToast';
 
 import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
-import { isFeatureEnabled } from '@/lib/allowed-features';
 
 type SubmitExpenseFlowStepsProps = {
   className?: string;
