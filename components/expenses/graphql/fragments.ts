@@ -429,6 +429,7 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
+        TAX_FORMS
       }
       location {
         id

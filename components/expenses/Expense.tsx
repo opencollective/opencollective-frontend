@@ -61,6 +61,7 @@ import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
 import TaxFormMessage from './TaxFormMessage';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
@@ -357,7 +358,10 @@ function Expense(props: ExpenseProps) {
   }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
-  const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
+  const showTaxFormMsg =
+    isFeatureEnabled(expense?.account, 'TAX_FORMS') &&
+    includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') &&
+    !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
 
   const handlePolling = debounce(() => {
