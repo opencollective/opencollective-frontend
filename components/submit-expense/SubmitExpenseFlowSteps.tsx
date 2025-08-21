@@ -148,11 +148,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.EXPENSE_TITLE,
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
-      return (
-        form.options.isAccountingCategoryRequired &&
-        form.options.accountingCategories?.length &&
-        isFeatureEnabled(form.options.account, 'CHART_OF_ACCOUNTS')
-      );
+      return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
     }
 
     return true;

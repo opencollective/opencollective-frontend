@@ -86,7 +86,7 @@ const ExpensesList = ({
     }
   }, [openExpenseLegacyId, expenses]);
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
-
+  console.log({ expenses });
   const [selectedExpenseIndex, setSelectedExpenseIndex] = React.useState();
   const navigateIndex = dif => event => {
     if (hasKeyboardShortcutsEnabled && !openExpenseLegacyId) {
