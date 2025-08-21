@@ -24,6 +24,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
@@ -61,7 +62,6 @@ import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
 import TaxFormMessage from './TaxFormMessage';
-import { isFeatureEnabled } from '@/lib/allowed-features';
 
 const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))

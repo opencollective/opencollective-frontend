@@ -11,8 +11,12 @@ import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/sch
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { isFeatureEnabled } from '@/lib/allowed-features';
+
+import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
@@ -28,9 +32,6 @@ import type { DashboardSectionProps } from '../../types';
 import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
-import { DashboardContext } from '../../DashboardContext';
-import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
-import { isFeatureEnabled } from '@/lib/allowed-features';
 
 const hostDashboardTaxFormsQuery = gql`
   query HostTaxForms(
@@ -48,9 +49,6 @@ const hostDashboardTaxFormsQuery = gql`
       id
       legacyId
       slug
-      features {
-        TAX_FORMS
-      }
       taxForms: hostedLegalDocuments(
         limit: $limit
         offset: $offset

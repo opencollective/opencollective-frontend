@@ -25,12 +25,11 @@ type UpgradeSubscriptionBlockerProps = {
 
 export function UpgradeSubscriptionBlocker(props: UpgradeSubscriptionBlockerProps) {
   const { account } = React.useContext(DashboardContext);
-  const featureAccess = 'DISABLED'; // account.features[props.featureKey];
 
-  // if (isFeatureEnabled(account, featureKey)) {
-  //   return null;
-  // }
-
+  if (isFeatureEnabled(account, props.featureKey)) {
+    return null;
+  }
+  const featureAccess = account.features[props.featureKey];
   const title =
     featureAccess === CollectiveFeatureStatus.DISABLED ? (
       <FormattedMessage id="UpgradeSubscriptionBlocker.title.DISABLED" defaultMessage="Upgrade Required" />
@@ -66,7 +65,7 @@ export function UpgradeSubscriptionBlocker(props: UpgradeSubscriptionBlockerProp
           <AlertTitle className="flex items-center gap-2">{title}</AlertTitle>
           <AlertDescription className="mt-2">
             <div className="flex flex-col gap-3">
-              <p className="text-muted-foreground">{description}</p>
+              <p>{description}</p>
               {featureAccess === 'DISABLED' && (
                 <Button asChild className="w-fit" size="sm">
                   <Link href={getDashboardRoute(account, 'platform-subscription')}>
