@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -9,6 +10,8 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { SubscriberFieldsFragment, SubscribersQueryVariables } from '@/lib/graphql/types/v2/graphql';
+
+import { Sheet, SheetContent } from '@/components/ui/Sheet';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
@@ -23,6 +26,7 @@ import { searchFilter } from '../../filters/SearchFilter';
 
 import { cols, sortFilter, typeFilter } from './common';
 import { subscribersQuery } from './queries';
+import SubscriberDetails from './SubscriberDetails';
 import SubscriberModal from './SubscriberModal';
 
 const COLLECTIVES_PER_PAGE = 20;
@@ -52,7 +56,10 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   trustLevel: accountTrustLevelFilter.filter,
 };
 
+const PAGE_ROUTE = '/dashboard/root-actions/subscribers';
+
 const PlatformSubscribers = () => {
+  const router = useRouter();
   const queryFilter = useQueryFilter({
     filters,
     schema,
@@ -67,6 +74,12 @@ const PlatformSubscribers = () => {
   });
 
   const [showPlanModal, setShowPlanModal] = React.useState<SubscriberFieldsFragment>(null);
+  const subscriberDrawer = router.query?.subpath?.[0];
+  const openDrawer = React.useCallback(
+    id => router.push(`${PAGE_ROUTE}/${id}`, undefined, { shallow: true }),
+    [router],
+  );
+  const closeDrawer = React.useCallback(() => router.push(`${PAGE_ROUTE}`, undefined, { shallow: true }), [router]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -92,12 +105,20 @@ const PlatformSubscribers = () => {
               onClickEdit: setShowPlanModal,
             }}
             getRowDataCy={row => `account-${row.original.slug}`}
+            onClickRow={row => openDrawer(row.original.id)}
           />
           <Pagination queryFilter={queryFilter} total={data?.accounts?.totalCount} />
         </React.Fragment>
       )}
       {!!showPlanModal && (
         <SubscriberModal open setOpen={open => setShowPlanModal(open ? showPlanModal : null)} account={showPlanModal} />
+      )}
+      {subscriberDrawer && (
+        <Sheet open onOpenChange={closeDrawer}>
+          <SheetContent className="max-w-2xl">
+            <SubscriberDetails id={subscriberDrawer} openPlanModal={setShowPlanModal} />
+          </SheetContent>
+        </Sheet>
       )}
     </div>
   );

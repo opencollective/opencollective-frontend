@@ -8,11 +8,8 @@ import { defineMessage, FormattedDate, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
-import { getCollectivePageCanonicalURL } from '../../../../lib/url-helpers';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-
-import Link from '@/components/Link';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -36,13 +33,9 @@ export const cols = {
         .join(', ');
       return (
         <div className="flex items-center gap-2">
-          <Link href={getCollectivePageCanonicalURL(collective)} passHref>
-            <Avatar collective={collective} radius={48} />
-          </Link>
+          <Avatar collective={collective} radius={48} />
           <div className="flex flex-col items-start">
-            <Link href={getCollectivePageCanonicalURL(collective)} passHref>
-              {collective.name}
-            </Link>
+            {collective.name}
             <div className="text-xs">{secondLine}</div>
           </div>
         </div>
@@ -141,6 +134,20 @@ export const cols = {
       ) : null;
     },
   },
+  lastTransactionAt: {
+    accessorKey: 'lastTransactionAt',
+    header: () => <FormattedMessage id="LastTransactionAt" defaultMessage="Last Transaction" />,
+    cell: ({ row }) => {
+      const account = row.original;
+      const lastTransaction = account.transactions?.nodes?.[0];
+      return lastTransaction ? (
+        <div className="whitespace-nowrap">
+          <FormattedDate value={lastTransaction.createdAt} day="numeric" month="long" year="numeric" />
+        </div>
+      ) : null;
+    },
+  },
+
   actions: {
     accessorKey: 'actions',
     header: '',

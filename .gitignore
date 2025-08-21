@@ -29,6 +29,9 @@ storybook-static
 .idea/
 *.iml
 
+# Cursor
+.cursor/
+
 # Git time manager
 .gtm
 
