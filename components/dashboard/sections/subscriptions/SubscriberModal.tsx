@@ -23,7 +23,7 @@ import { DefaultSelect } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/useToast';
 
 import { AVAILABLE_FEATURES, AVAILABLE_FEATURES_LABELS } from './common';
-import { availablePlansQuery, updateAccountPlaformSubscriptionMutation } from './queries';
+import { availablePlansQuery, updateAccountPlatformSubscriptionMutation } from './queries';
 
 type SubscriberFormProps = {
   account: SubscriberFieldsFragment;
@@ -72,7 +72,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { data, loading } = useQuery(availablePlansQuery, { context: API_V2_CONTEXT });
-  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlaformSubscriptionMutation, {
+  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation, {
     context: API_V2_CONTEXT,
   });
   const planOptions = data?.platformSubscriptionTiers.map(plan => ({

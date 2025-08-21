@@ -195,7 +195,7 @@ export const availablePlansQuery = gql`
   ${planFeatures}
 `;
 
-export const updateAccountPlaformSubscriptionMutation = gql`
+export const updateAccountPlatformSubscriptionMutation = gql`
   mutation UpdateAccountPlatformSubscription(
     $account: AccountReferenceInput!
     $subscription: PlatformSubscriptionInput!
