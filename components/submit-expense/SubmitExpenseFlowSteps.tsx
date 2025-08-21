@@ -10,6 +10,7 @@ import { cn } from '../../lib/utils';
 import { useToast } from '../ui/useToast';
 
 import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 type SubmitExpenseFlowStepsProps = {
   className?: string;
@@ -147,7 +148,11 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.EXPENSE_TITLE,
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
-      return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
+      return (
+        form.options.isAccountingCategoryRequired &&
+        form.options.accountingCategories?.length &&
+        isFeatureEnabled(form.options.account, 'CHART_OF_ACCOUNTS')
+      );
     }
 
     return true;
