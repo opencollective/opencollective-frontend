@@ -1,4 +1,5 @@
 import React from 'react';
+import { truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { getCollectivePageRoute } from '../lib/url-helpers';
@@ -20,8 +21,10 @@ const LinkCollective = ({
   withHoverCard = false,
   className = undefined,
   hoverCardProps = undefined,
+  truncateNameLength = null,
   ...props
 }) => {
+  const formatName = name => (truncateNameLength ? truncate(name, { length: truncateNameLength }) : name);
   if (!collective || collective.isIncognito || (collective.type === 'USER' && (!collective.name || !collective.slug))) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (collective.isGuest) {
@@ -33,7 +36,7 @@ const LinkCollective = ({
       return collective.name;
     }
   } else if (!collective.slug || collective.type === 'VENDOR') {
-    return children || collective.name;
+    return children || formatName(collective.name);
   }
 
   const { slug, name } = collective;
@@ -45,7 +48,7 @@ const LinkCollective = ({
       className={cn('hover:underline', className)}
       {...props}
     >
-      {children || name || slug}
+      {children || formatName(name || slug)}
     </Link>
   );
 
