@@ -11,7 +11,7 @@ export const PlatformSubscriptionFeatures = [
   'PAYPAL_PAYOUTS',
   'CHART_OF_ACCOUNTS',
   'TAX_FORMS',
-  'CONNECT_BANK_ACCOUNTS',
+  'OFF_PLATFORM_TRANSACTIONS',
 ] satisfies PlatformSubscriptionFeaturesType[];
 
 export type PlatformSubscriptionTierType = 'Discover' | 'Basic' | 'Pro';
@@ -74,21 +74,21 @@ export const PlatformSubscriptionTierFeatures: Record<
 > = {
   Discover: {
     CHART_OF_ACCOUNTS: false,
-    CONNECT_BANK_ACCOUNTS: false,
+    OFF_PLATFORM_TRANSACTIONS: false,
     PAYPAL_PAYOUTS: false,
     TAX_FORMS: false,
     TRANSFERWISE: false,
   },
   Basic: {
     CHART_OF_ACCOUNTS: true,
-    CONNECT_BANK_ACCOUNTS: false,
+    OFF_PLATFORM_TRANSACTIONS: false,
     PAYPAL_PAYOUTS: true,
     TAX_FORMS: false,
     TRANSFERWISE: true,
   },
   Pro: {
     CHART_OF_ACCOUNTS: true,
-    CONNECT_BANK_ACCOUNTS: true,
+    OFF_PLATFORM_TRANSACTIONS: true,
     PAYPAL_PAYOUTS: true,
     TAX_FORMS: true,
     TRANSFERWISE: true,
@@ -100,7 +100,7 @@ export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof Platform
     defaultMessage: 'Chart of Accounts',
     id: 'IzFWHI',
   },
-  CONNECT_BANK_ACCOUNTS: {
+  OFF_PLATFORM_TRANSACTIONS: {
     defaultMessage: 'Bank Account Synchronization',
     id: 'R9kjJI',
   },

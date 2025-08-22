@@ -1109,7 +1109,6 @@ type CollectiveFeatures {
   RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
-  CONNECT_BANK_ACCOUNTS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
