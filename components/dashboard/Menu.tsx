@@ -28,7 +28,7 @@ import {
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -300,7 +300,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
       Icon: FileText,
       label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-      if: isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+      if: isFeatureSupported(account, 'TAX_FORMS'),
     },
     {
       if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isCommunityManagerOnly,
