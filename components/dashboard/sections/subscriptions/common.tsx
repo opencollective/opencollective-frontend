@@ -7,15 +7,21 @@ import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedDate, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import { integer } from '../../../../lib/filters/schemas';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { SubscriberFieldsFragment, SubscribersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { TableActionsButton } from '../../../ui/Table';
+import { accountTrustLevelFilter } from '../../filters/AccountTrustLevelFilter';
 import { buildAccountTypeFilter } from '../../filters/AccountTypeFilter';
+import { dateFilter } from '../../filters/DateFilter';
+import { dateToVariables } from '../../filters/DateFilter/schema';
+import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
 export const cols = {
@@ -136,7 +142,7 @@ export const cols = {
   },
   lastTransactionAt: {
     accessorKey: 'lastTransactionAt',
-    header: () => <FormattedMessage id="LastTransactionAt" defaultMessage="Last Transaction" />,
+    header: () => <FormattedMessage id="lastTransaction" defaultMessage="Last Transaction" />,
     cell: ({ row }) => {
       const account = row.original;
       const lastTransaction = account.transactions?.nodes?.[0];
@@ -168,7 +174,7 @@ export const cols = {
 } as Record<string, ColumnDef<SubscriberFieldsFragment>>;
 
 export const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['MONEY_MANAGED', 'CREATED_AT', 'NAME']),
+  fieldSchema: z.enum(['MONEY_MANAGED', 'LAST_TRANSACTION_CREATED_AT', 'CREATED_AT', 'NAME']),
   defaultValue: {
     field: 'MONEY_MANAGED',
     direction: 'DESC',
@@ -182,6 +188,10 @@ export const sortFilter = buildSortFilter({
       defaultMessage: 'Money Managed',
       id: 'moneyManaged',
     }),
+    LAST_TRANSACTION_CREATED_AT: defineMessage({
+      defaultMessage: 'Last Transaction',
+      id: 'lastTransaction',
+    }),
   },
 });
 
@@ -190,6 +200,40 @@ export const typeFilter = buildAccountTypeFilter({
   optional: true,
   defaultValue: [CollectiveType.ORGANIZATION],
 });
+
+const lastTransactionDateFilter = {
+  ...dateFilter,
+  toVariables: value => dateToVariables(value, 'lastTransaction'),
+  filter: {
+    ...dateFilter.filter,
+    labelMsg: defineMessage({ id: 'lastTransaction', defaultMessage: 'Last Transaction' }),
+  },
+};
+
+const COLLECTIVES_PER_PAGE = 20;
+
+export const schema = z.object({
+  limit: integer.default(COLLECTIVES_PER_PAGE),
+  offset: integer.default(0),
+  searchTerm: searchFilter.schema,
+  sort: sortFilter.schema,
+  type: typeFilter.schema,
+  trustLevel: accountTrustLevelFilter.schema,
+  lastTransactionDateFilter: lastTransactionDateFilter.schema,
+});
+
+export const toVariables: FiltersToVariables<z.infer<typeof schema>, SubscribersQueryVariables> = {
+  trustLevel: accountTrustLevelFilter.toVariables,
+  lastTransactionDateFilter: lastTransactionDateFilter.toVariables,
+};
+
+export const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
+  sort: sortFilter.filter,
+  searchTerm: searchFilter.filter,
+  type: typeFilter.filter,
+  trustLevel: accountTrustLevelFilter.filter,
+  lastTransactionDateFilter: lastTransactionDateFilter.filter,
+};
 
 export const AVAILABLE_FEATURES = [
   'TRANSFERWISE',

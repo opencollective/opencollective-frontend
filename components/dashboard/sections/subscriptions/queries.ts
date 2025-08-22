@@ -130,14 +130,12 @@ export const subscribersQuery = gql`
     $sort: OrderByInput
     $searchTerm: String
     $type: [AccountType]
-    $isHost: Boolean
-    $host: [AccountReferenceInput]
-    $isActive: Boolean
-    $consolidatedBalance: AmountRangeInput
     $isVerified: Boolean
     $isFirstPartyHost: Boolean
     $isPlatformSubscriber: Boolean
     $plan: [String]
+    $lastTransactionFrom: DateTime
+    $lastTransactionTo: DateTime
   ) {
     accounts(
       limit: $limit
@@ -145,15 +143,13 @@ export const subscribersQuery = gql`
       searchTerm: $searchTerm
       type: $type
       orderBy: $sort
-      isHost: $isHost
-      isActive: $isActive
-      host: $host
-      consolidatedBalance: $consolidatedBalance
       skipGuests: true
       isPlatformSubscriber: $isPlatformSubscriber
       plan: $plan
       isVerified: $isVerified
       isFirstPartyHost: $isFirstPartyHost
+      lastTransactionFrom: $lastTransactionFrom
+      lastTransactionTo: $lastTransactionTo
     ) {
       offset
       limit
@@ -242,6 +238,7 @@ export const subscriberDetailQuery = gql`
             slug
           }
           status
+          platformBillingData
         }
       }
     }
