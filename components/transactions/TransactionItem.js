@@ -135,7 +135,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   );
 };
 
-const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
+const TransactionItem = ({ displayActions, collective, transaction }) => {
   const {
     toAccount,
     fromAccount,
@@ -341,11 +341,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         )}
       </Box>
       {isExpanded && (hasOrder || isExpense) && (
-        <TransactionDetails
-          displayActions={displayActions}
-          transaction={transaction}
-          onMutationSuccess={onMutationSuccess}
-        />
+        <TransactionDetails displayActions={displayActions} transaction={transaction} />
       )}
     </Item>
   );

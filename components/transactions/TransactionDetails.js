@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -9,43 +8,18 @@ import { TransactionKind, TransactionTypes } from '../../lib/constants/transacti
 import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { getDashboardTransactionsRoute, getHostDashboardTransactionsRoute } from '@/lib/url-helpers';
 
 import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
-import { I18nBold } from '../I18nFormatters';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P } from '../Text';
 import { Button } from '../ui/Button';
-
-import TransactionRefundButton from './TransactionRefundButton';
-import TransactionRejectButton from './TransactionRejectButton';
-
-const rejectAndRefundTooltipContent = (showRefundHelp, showRejectHelp) => (
-  <Box>
-    {showRefundHelp && (
-      <P fontSize="12px" lineHeight="18px" mb={showRejectHelp ? 3 : 0}>
-        <FormattedMessage
-          id="transaction.refund.helpText"
-          defaultMessage="<bold>Refund:</bold> This action will reimburse the full amount back to your contributor. They can contribute again in the future."
-          values={{ bold: I18nBold }}
-        />
-      </P>
-    )}
-    {showRejectHelp && (
-      <P fontSize="12px" lineHeight="18px">
-        <FormattedMessage
-          id="transaction.reject.helpText"
-          defaultMessage="<bold>Reject:</bold> This action prevents the contributor from contributing in the future and will reimburse the full amount back to them."
-          values={{ bold: I18nBold }}
-        />
-      </P>
-    )}
-  </Box>
-);
 
 // Check whether transfer is child collective to parent or if the transfer is from host to one of its collectives
 const isInternalTransfer = (fromAccount, toAccount) => {
@@ -85,11 +59,12 @@ const DetailsContainer = styled(Flex)`
   }
 `;
 
-const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) => {
+const TransactionDetails = ({ displayActions, transaction }) => {
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
   const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
   const {
-    id,
+    legacyId,
     type,
     isRefunded,
     isRefund,
@@ -133,6 +108,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     t => t.kind === TransactionKind.PAYMENT_PROCESSOR_COVER && t.type === TransactionTypes.CREDIT,
   );
   const isProcessing = [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(order?.status);
+  const isCollectiveAdmin = LoggedInUser?.isAdminOfCollective(toAccount);
+  const isHostAdmin = LoggedInUser?.isAdminOfCollective(host);
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -299,18 +276,18 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
       {displayActions && ( // Let us override so we can hide buttons in the collective page
         <Flex flexDirection="column" width={[1, 0.3]}>
           <div className="flex flex-wrap items-center justify-start gap-2 md:justify-end">
-            {(showRefundButton || showRejectButton) && (
-              <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)} mt={2}>
-                <Info color="#1869F5" size={20} />
-              </StyledTooltip>
-            )}
-            {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
-            {showRejectButton && (
-              <TransactionRejectButton
-                id={id}
-                canRefund={permissions?.canRefund && !isRefunded}
-                onMutationSuccess={onMutationSuccess}
-              />
+            {(showRefundButton || showRejectButton) && (isCollectiveAdmin || isHostAdmin) && (
+              <Link
+                href={
+                  isHostAdmin
+                    ? getHostDashboardTransactionsRoute(host, { openTransactionId: legacyId, account: toAccount.slug })
+                    : getDashboardTransactionsRoute(toAccount, { openTransactionId: legacyId })
+                }
+              >
+                <Button variant="outline">
+                  <FormattedMessage defaultMessage="View in Dashboard" id="OpolXQ" />
+                </Button>
+              </Link>
             )}
             {showDownloadInvoiceButton && (
               <Button
