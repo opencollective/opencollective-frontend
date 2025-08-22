@@ -51,6 +51,7 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form.options, [
       'host',
       'isHostAdmin',
+      'isAdminOfPayeeHost',
       'payee',
       'payoutMethods',
       'newPayoutMethodTypes',
@@ -187,6 +188,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       !isVendor &&
       props.payeeSlug !== '__newVendor' &&
       !props.isAdminOfPayee &&
+      (!props.isAdminOfPayeeHost ? true : props.payoutMethods.length === 0) &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
         <MessageBox type="info">
           {props.expenseTypeOption === ExpenseType.GRANT ? (
@@ -222,6 +224,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 payoutMethod={p}
                 payeeSlug={props.payeeSlug}
                 payee={props.payee}
+                isAdminOfPayee={props.isAdminOfPayee}
                 isChecked={p.id === props.payoutMethodId}
                 isEditable={!isVendor}
                 onPaymentMethodDeleted={onPaymentMethodDeleted}
@@ -238,6 +241,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
           )}
 
           {!(isLoading || isLoadingPayee) &&
+            (props.isAdminOfPayee || isVendor || !props.loggedInAccount) &&
             props.newPayoutMethodTypes?.length > 0 &&
             !(isVendor && payoutMethods.length > 0) && (
               <RadioGroupCard
@@ -496,6 +500,7 @@ type PayoutMethodRadioGroupItemProps = {
     subContent: React.ReactNode;
   }>;
   moreActions?: React.ReactNode;
+  isAdminOfPayee?: boolean;
 };
 
 export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
@@ -515,11 +520,8 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
-    props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
-    props.payeeSlug &&
-    !props.payeeSlug.startsWith('__') &&
-    props.payeeSlug === props.payee?.slug &&
-    !isLegalNameFuzzyMatched;
+    props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && props.isAdminOfPayee && !isLegalNameFuzzyMatched;
+
   const isOpen = props.isChecked;
 
   const [isEditingPayoutMethod, setIsEditingPayoutMethod] = React.useState(false);

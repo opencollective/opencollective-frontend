@@ -3,7 +3,7 @@ import { useFormikContext } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../../lib/utils';
-import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { ExpenseLockableFields, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
 
 import ExpenseInviteWelcome from '@/components/expenses/ExpenseInviteWelcome';
 
@@ -52,7 +52,9 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       )}
       <WhoIsPayingSection inViewChange={onInViewChange} {...WhoIsPayingSection.getFormProps(form)} />
       <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
-      <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
+      {(!form.options.lockedFields || !form.options.lockedFields.includes(ExpenseLockableFields.PAYOUT_METHOD)) && (
+        <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
+      )}
       <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
       {form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length > 0 && (
         <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />

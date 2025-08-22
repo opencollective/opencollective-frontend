@@ -8539,6 +8539,11 @@ enum ExpenseLockableFields {
   Locks the type field.
   """
   TYPE
+
+  """
+  Locks the payout method field.
+  """
+  PAYOUT_METHOD
 }
 
 """

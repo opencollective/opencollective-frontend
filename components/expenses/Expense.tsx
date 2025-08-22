@@ -192,6 +192,7 @@ function Expense(props: ExpenseProps) {
         query: {
           expenseId: data?.expense?.legacyId,
           draftKey,
+          ...(router.query.newGrantFlowEnabled ? { newGrantFlowEnabled: true } : {}),
         },
       });
       return;

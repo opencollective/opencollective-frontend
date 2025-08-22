@@ -4986,6 +4986,8 @@ export enum ExpenseLockableFields {
   DESCRIPTION = 'DESCRIPTION',
   /** Locks the payee field, if the user is not on the platform it locks its email. */
   PAYEE = 'PAYEE',
+  /** Locks the payout method field. */
+  PAYOUT_METHOD = 'PAYOUT_METHOD',
   /** Locks the type field. */
   TYPE = 'TYPE'
 }

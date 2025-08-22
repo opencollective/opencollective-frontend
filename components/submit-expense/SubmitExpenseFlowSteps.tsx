@@ -6,6 +6,7 @@ import type { MessageDescriptor } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { cn } from '../../lib/utils';
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import { useToast } from '../ui/useToast';
 
@@ -148,6 +149,10 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
       return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
+    }
+
+    if (step === Step.PAYOUT_METHOD) {
+      return !form.options.lockedFields || !form.options.lockedFields.includes(ExpenseLockableFields.PAYOUT_METHOD);
     }
 
     return true;

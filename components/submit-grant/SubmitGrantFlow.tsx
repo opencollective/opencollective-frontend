@@ -13,7 +13,7 @@ import type {
   CreateExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutation,
 } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
+import { ExpenseLockableFields, ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { objectKeys } from '@/lib/utils';
 
@@ -325,6 +325,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
             name: Step.PAYOUT_METHOD,
             title: <FormattedMessage defaultMessage="Payout Method" id="PayoutMethod" />,
             formValues: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],
+            hidden: expenseForm.options.lockedFields?.includes(ExpenseLockableFields.PAYOUT_METHOD),
           },
           {
             name: Step.DESCRIPTION,
@@ -507,20 +508,22 @@ function FormContainer(props: FormContainerProps) {
             <WhoIsGettingPaidForm {...WhoIsGettingPaidForm.getFormProps(form)} />
           </FormSectionContainer>
 
-          <FormSectionContainer
-            id={Step.PAYOUT_METHOD}
-            inViewChange={onInViewChange}
-            title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
-            subtitle={
-              form.options.payee?.type === CollectiveType.VENDOR || !form.options.isAdminOfPayee ? (
-                <FormattedMessage defaultMessage="Where the money will be sent to" id="IQIlkE" />
-              ) : (
-                <FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />
-              )
-            }
-          >
-            <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(form)} />
-          </FormSectionContainer>
+          {(!form.options.lockedFields || !form.options.lockedFields.includes(ExpenseLockableFields.PAYOUT_METHOD)) && (
+            <FormSectionContainer
+              id={Step.PAYOUT_METHOD}
+              inViewChange={onInViewChange}
+              title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
+              subtitle={
+                form.options.payee?.type === CollectiveType.VENDOR || !form.options.isAdminOfPayee ? (
+                  <FormattedMessage defaultMessage="Where the money will be sent to" id="IQIlkE" />
+                ) : (
+                  <FormattedMessage defaultMessage="Where do you want to receive the money" id="CNCPij" />
+                )
+              }
+            >
+              <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(form)} />
+            </FormSectionContainer>
+          )}
 
           <FormSectionContainer
             id={Step.DESCRIPTION}
