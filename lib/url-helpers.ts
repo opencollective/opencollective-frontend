@@ -1,4 +1,4 @@
-import { find, isEmpty, isUndefined, omit, pickBy } from 'lodash';
+import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash';
 
 import type { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 
@@ -135,6 +135,29 @@ export const getDashboardRoute = (account, section = null) => {
     return '';
   }
   return `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+};
+
+export const getDashboardTransactionsRoute = (account, queryParams: { openTransactionId?: number } = {}) => {
+  const baseRoute = getDashboardRoute(account, 'transactions');
+  const params = new URLSearchParams(mapValues(queryParams, value => value?.toString()));
+  if (params.size > 0) {
+    return `${baseRoute}?${params.toString()}`;
+  } else {
+    return baseRoute;
+  }
+};
+
+export const getHostDashboardTransactionsRoute = (
+  host,
+  queryParams: { openTransactionId?: number; account?: string } = {},
+) => {
+  const baseRoute = getDashboardRoute(host, 'host-transactions');
+  const params = new URLSearchParams(mapValues(queryParams, value => value?.toString()));
+  if (params.size > 0) {
+    return `${baseRoute}?${params.toString()}`;
+  } else {
+    return baseRoute;
+  }
 };
 
 export const getOauthAppSettingsRoute = (account, app) => {
