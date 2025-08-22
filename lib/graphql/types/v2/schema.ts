@@ -1132,6 +1132,7 @@ export enum ActivityAndClassesType {
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
+  PLATFORM_SUBSCRIPTION_UPDATED = 'PLATFORM_SUBSCRIPTION_UPDATED',
   REPORTS = 'REPORTS',
   SUBSCRIPTION_ACTIVATED = 'SUBSCRIPTION_ACTIVATED',
   SUBSCRIPTION_CANCELED = 'SUBSCRIPTION_CANCELED',
@@ -1317,6 +1318,7 @@ export enum ActivityType {
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
+  PLATFORM_SUBSCRIPTION_UPDATED = 'PLATFORM_SUBSCRIPTION_UPDATED',
   SUBSCRIPTION_ACTIVATED = 'SUBSCRIPTION_ACTIVATED',
   SUBSCRIPTION_CANCELED = 'SUBSCRIPTION_CANCELED',
   SUBSCRIPTION_CONFIRMED = 'SUBSCRIPTION_CONFIRMED',
@@ -2584,7 +2586,6 @@ export type CollectiveFeatures = {
   CHART_OF_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   COLLECTIVE_GOALS?: Maybe<CollectiveFeatureStatus>;
   CONNECTED_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
-  CONNECT_BANK_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   CONTACT_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
   CONTACT_FORM?: Maybe<CollectiveFeatureStatus>;
   CONVERSATIONS?: Maybe<CollectiveFeatureStatus>;
@@ -10597,10 +10598,10 @@ export type PlatformSubscriptionFeatures = {
   AGREEMENTS: Scalars['Boolean']['output'];
   CHARGE_HOSTING_FEES: Scalars['Boolean']['output'];
   CHART_OF_ACCOUNTS: Scalars['Boolean']['output'];
-  CONNECT_BANK_ACCOUNTS: Scalars['Boolean']['output'];
   EXPECTED_FUNDS: Scalars['Boolean']['output'];
   EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['output'];
   FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['output'];
+  OFF_PLATFORM_TRANSACTIONS: Scalars['Boolean']['output'];
   PAYPAL_PAYOUTS: Scalars['Boolean']['output'];
   RECEIVE_EXPENSES: Scalars['Boolean']['output'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
@@ -10618,10 +10619,10 @@ export type PlatformSubscriptionFeaturesFeatures = {
   AGREEMENTS: Scalars['Boolean']['input'];
   CHARGE_HOSTING_FEES: Scalars['Boolean']['input'];
   CHART_OF_ACCOUNTS: Scalars['Boolean']['input'];
-  CONNECT_BANK_ACCOUNTS: Scalars['Boolean']['input'];
   EXPECTED_FUNDS: Scalars['Boolean']['input'];
   EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['input'];
   FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['input'];
+  OFF_PLATFORM_TRANSACTIONS: Scalars['Boolean']['input'];
   PAYPAL_PAYOUTS: Scalars['Boolean']['input'];
   RECEIVE_EXPENSES: Scalars['Boolean']['input'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];

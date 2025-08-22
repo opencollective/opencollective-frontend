@@ -4656,7 +4656,6 @@ type PlatformSubscriptionFeatures {
   RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
-  CONNECT_BANK_ACCOUNTS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
   VENDORS: Boolean!
   USE_EXPENSES: Boolean!
@@ -4664,6 +4663,7 @@ type PlatformSubscriptionFeatures {
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
+  OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
 
 type PlatformBilling {
@@ -6661,7 +6661,6 @@ type CollectiveFeatures {
   RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
-  CONNECT_BANK_ACCOUNTS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
@@ -7060,6 +7059,7 @@ enum ActivityType {
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
+  PLATFORM_SUBSCRIPTION_UPDATED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -18466,6 +18466,7 @@ enum ActivityAndClassesType {
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
+  PLATFORM_SUBSCRIPTION_UPDATED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -25684,7 +25685,6 @@ input PlatformSubscriptionFeaturesFeatures {
   RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
-  CONNECT_BANK_ACCOUNTS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
   VENDORS: Boolean!
   USE_EXPENSES: Boolean!
@@ -25692,6 +25692,7 @@ input PlatformSubscriptionFeaturesFeatures {
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
   RECEIVE_EXPENSES: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
+  OFF_PLATFORM_TRANSACTIONS: Boolean!
 }
 
 input PlatformSubscriptionPlanPricing {
