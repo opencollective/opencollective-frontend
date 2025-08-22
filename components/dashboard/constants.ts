@@ -171,8 +171,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Profile Sections',
   },
   [ALL_SECTIONS.EXPORT]: {
-    id: 'editCollective.menu.export',
-    defaultMessage: 'Export',
+    defaultMessage: 'Widgets',
+    id: 'jgOqxt',
   },
   [ALL_SECTIONS.POLICIES]: {
     id: 'editCollective.menu.policies',
