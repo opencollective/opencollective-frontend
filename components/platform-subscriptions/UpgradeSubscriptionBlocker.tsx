@@ -15,10 +15,8 @@ import Link from '../Link';
 import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { Button } from '../ui/Button';
 
-type FeatureKey = Exclude<keyof CollectiveFeatures, 'id' | '__typename'>;
-
 type UpgradeSubscriptionBlockerProps = {
-  featureKey: FeatureKey;
+  featureKey: Exclude<keyof CollectiveFeatures, 'id' | '__typename'>;
   className?: string;
   description?: string;
 };

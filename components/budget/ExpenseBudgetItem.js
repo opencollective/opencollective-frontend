@@ -14,6 +14,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -241,7 +242,10 @@ const ExpenseBudgetItem = ({
                     expense={expense}
                     host={host}
                     account={expense.account}
-                    canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
+                    canEdit={
+                      isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') &&
+                      get(expense, 'permissions.canEditAccountingCategory', false)
+                    }
                     allowNone
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
                   />
