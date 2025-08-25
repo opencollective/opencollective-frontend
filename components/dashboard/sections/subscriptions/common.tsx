@@ -246,7 +246,7 @@ export const AVAILABLE_FEATURES = [
   'RESTRICTED_FUNDS',
   'AGREEMENTS',
   'TAX_FORMS',
-  'CONNECT_BANK_ACCOUNTS',
+  'OFF_PLATFORM_TRANSACTIONS',
   'FUNDS_GRANTS_MANAGEMENT',
   'VENDORS',
   'USE_EXPENSES',
@@ -279,6 +279,6 @@ export const AVAILABLE_FEATURES_LABELS: Record<(typeof AVAILABLE_FEATURES)[numbe
   // Pro tier features
   AGREEMENTS: 'Agreements',
   TAX_FORMS: 'Tax forms',
-  CONNECT_BANK_ACCOUNTS: 'Connect bank accounts',
+  OFF_PLATFORM_TRANSACTIONS: 'Bank account synchronization',
   FUNDS_GRANTS_MANAGEMENT: 'Funds & grants management',
 };
