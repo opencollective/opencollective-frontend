@@ -74,9 +74,11 @@ export const platformBillingFragment = gql`
       activeCollectives
       expensesPaid
     }
-    baseAmount {
-      valueInCents
-      currency
+    base {
+      total {
+        valueInCents
+        currency
+      }
     }
     additional {
       utilization {
