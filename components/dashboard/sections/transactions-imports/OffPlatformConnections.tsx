@@ -28,6 +28,9 @@ import { Pagination } from '../../filters/Pagination';
 import { NewOffPlatformTransactionsConnection } from './NewOffPlatformTransactionsConnection';
 import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
+import { DashboardContext } from '../../DashboardContext';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 
 const NB_IMPORTS_DISPLAYED = 20;
 
@@ -62,6 +65,8 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const router = useRouter();
+  const { account } = React.useContext(DashboardContext);
+  const featureEnabled = isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
   const [selectedImport, setSelectedImport] = React.useState(null);
@@ -70,6 +75,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
+    skip: !featureEnabled,
   });
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
@@ -144,7 +150,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               size="sm"
               variant="outline"
               onClick={handleNewConnection}
-              disabled={!['idle', 'success'].includes(plaidConnectDialog.status)}
+              disabled={!['idle', 'success'].includes(plaidConnectDialog.status) || !featureEnabled}
               loading={plaidConnectDialog.status === 'loading'}
             >
               <Plus size={16} />
@@ -153,7 +159,16 @@ export const OffPlatformConnections = ({ accountSlug }) => {
           </React.Fragment>
         }
       />
-      {error ? (
+      {!featureEnabled ? (
+        <UpgradeSubscriptionBlocker
+          featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS}
+          description={intl.formatMessage({
+            defaultMessage:
+              'Upgrade your plan to be able to connect bank accounts to sync off-platform transactions to your ledger on the platform.',
+            id: 'UpgradeSubscriptionBlocker.BankAccountSync.description',
+          })}
+        />
+      ) : error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (
         <div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { CollectiveFeatures } from '../../lib/graphql/types/v2/schema';
+import type { FEATURES } from '@/lib/allowed-features';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -16,7 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { Button } from '../ui/Button';
 
 type UpgradeSubscriptionBlockerProps = {
-  featureKey: Exclude<keyof CollectiveFeatures, 'id' | '__typename'>;
+  featureKey: (typeof FEATURES)[keyof typeof FEATURES];
   className?: string;
   description?: string;
 };

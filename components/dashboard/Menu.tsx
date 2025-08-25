@@ -375,7 +375,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
           label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
-          if: isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          if: isFeatureSupported(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
         },
         {
           section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
@@ -456,7 +456,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS,
-                if: !isAccountantOnly && isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+                if: !isAccountantOnly && isFeatureSupported(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
               },
               {
                 section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
