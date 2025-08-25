@@ -21,9 +21,11 @@ import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-imp
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 import { getI18nLink } from '@/components/I18nFormatters';
+import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 import StackedAvatars from '@/components/StackedAvatars';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
@@ -42,6 +44,7 @@ import {
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
@@ -52,9 +55,6 @@ import { searchFilter } from '../../filters/SearchFilter';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowsBatchActionsBar } from './TransactionsImportRowsBatchActionsBar';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
-import { DashboardContext } from '../../DashboardContext';
-import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 
 const offPlatformTransactionsQuery = gql`
   query OffPlatformTransactions(
@@ -456,7 +456,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
               </Button>
             </div>
           )}
-
           {!featureEnabled ? (
             <UpgradeSubscriptionBlocker
               featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS}

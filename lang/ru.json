@@ -4011,6 +4011,7 @@
   "UpdateSearchFilter.placeholder": "Поиск по пользователю, названию, содержимому...",
   "uPFUUe": "Awaiting approval",
   "UpgradeSubscription": "Upgrade Subscription",
+  "UpgradeSubscriptionBlocker.BankAccountSync.description": "Upgrade your plan to be able to connect bank accounts to sync off-platform transactions to your ledger on the platform.",
   "UpgradeSubscriptionBlocker.description.DISABLED": "This feature is not available on your current plan. Upgrade your subscription to access this feature.",
   "UpgradeSubscriptionBlocker.description.UNSUPPORTED": "Your account type does not support this feature.",
   "UpgradeSubscriptionBlocker.TaxForms.description": "This feature is not available on your current plan. Upgrade your subscription to start collecting tax forms from expense submitters.",
