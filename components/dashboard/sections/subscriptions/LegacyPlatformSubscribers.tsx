@@ -15,7 +15,7 @@ import { Pagination } from '../../filters/Pagination';
 
 import { cols, filters, schema, toVariables } from './common';
 import { subscribersQuery } from './queries';
-import SubscriberModal from './SubscriberModal';
+import SubscriberPlanModal from './SubscriberPlanModal';
 
 const LegacyPlatformSubscribers = () => {
   const queryFilter = useQueryFilter({
@@ -67,7 +67,7 @@ const LegacyPlatformSubscribers = () => {
         </React.Fragment>
       )}
       {!!showPlanModal && (
-        <SubscriberModal
+        <SubscriberPlanModal
           open
           setOpen={open => setShowPlanModal(open ? showPlanModal : null)}
           account={showPlanModal}

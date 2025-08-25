@@ -212,8 +212,8 @@ export const updateAccountPlatformSubscriptionMutation = gql`
   ${fields}
 `;
 
-export const subscriberDetailQuery = gql`
-  query Subscriber($id: String!) {
+export const subscriberDrawerQuery = gql`
+  query SubscriberDrawer($id: String!) {
     account(id: $id) {
       id
       slug
