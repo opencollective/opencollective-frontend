@@ -1,7 +1,8 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import clsx from 'clsx';
-import { Pencil } from 'lucide-react';
+import { TooltipTrigger } from '@radix-ui/react-tooltip';
+import dayjs from 'dayjs';
+import { Info, Link as Link2, Pencil } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -11,11 +12,12 @@ import { CopyID } from '@/components/CopyId';
 import DrawerHeader from '@/components/DrawerHeader';
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 import Link from '@/components/Link';
+import { Button } from '@/components/ui/Button';
 import { SheetBody } from '@/components/ui/Sheet';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip, TooltipContent } from '@/components/ui/Tooltip';
 
 import Avatar from '../../../Avatar';
-import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -23,72 +25,151 @@ import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 
-import { subscriberDetailQuery } from './queries';
+import { subscriberDrawerQuery } from './queries';
 
 const platformBillingsColumns = [
   {
-    accessorKey: 'legacyId',
-    header: () => <FormattedMessage defaultMessage="ID" id="Fields.id" />,
-    cell: ({ cell, row }) => {
-      const account = row.original.account;
-      const id = cell.getValue();
-      return <Link href={`${account.slug}/expenses/${id}`}>{id}</Link>;
+    accessorKey: 'period',
+    header: () => <FormattedMessage defaultMessage="Billing Period" id="Fields.billingPeriod" />,
+    cell: ({ row }) => {
+      const billingData = row.original.platformBillingData;
+      if (!billingData) {
+        return '';
+      }
+      return <div className="whitespace-nowrap">{dayjs(billingData.billingPeriod).format('MMMM YYYY')}</div>;
     },
   },
   {
-    accessorKey: 'createdAt',
-    header: () => <FormattedMessage defaultMessage="Submitted At" id="szERSW" />,
-    cell: ({ cell, row }) => {
-      const createdAt = cell.getValue();
-      if (!createdAt) {
-        return (
-          <div className="whitespace-nowrap text-green-500">
-            <DateTime dateStyle="medium" timeStyle="short" value={row.original.createdAt} />
-          </div>
-        );
+    accessorKey: 'plan',
+    header: () => <FormattedMessage id="SubscriptionPlan" defaultMessage="Subscription Plan" />,
+    cell: ({ row }) => {
+      const billingData = row.original.platformBillingData;
+      const plan = billingData?.subscriptions?.[0].plan;
+      if (!billingData) {
+        return '';
       }
-      return (
-        <div className="whitespace-nowrap">
-          <DateTime dateStyle="medium" timeStyle="short" value={createdAt} />
-        </div>
-      );
+      return <div className="whitespace-nowrap">{plan.title}</div>;
     },
   },
   {
     accessorKey: 'amount',
     header: () => <FormattedMessage defaultMessage="Amount" id="Fields.amount" />,
-    cell: ({ cell }) => {
+    cell: ({ cell, row }) => {
       const amount = cell.getValue();
+      const billingData = row.original.platformBillingData;
+      const additional = billingData?.additional;
 
       return (
-        <div className={clsx('truncate font-semibold antialiased')}>
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            precision={2}
-            showCurrencyCode={false}
-          />
+        <div className="flex max-w-min gap-1">
+          <span className="truncate font-semibold antialiased">
+            <FormattedMoneyAmount
+              amount={amount.valueInCents}
+              currency={amount.currency}
+              precision={2}
+              showCurrencyCode={false}
+            />
+          </span>
+          {billingData && (
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size="16px" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <div>
+                  <FormattedMessage
+                    defaultMessage="Base amount: {amount}"
+                    id="BaseAmount"
+                    values={{
+                      amount: (
+                        <FormattedMoneyAmount
+                          amount={billingData.baseAmount}
+                          currency="USD"
+                          precision={2}
+                          showCurrencyCode={false}
+                        />
+                      ),
+                    }}
+                  />
+                </div>
+                {additional?.amounts?.activeCollectives > 0 && (
+                  <div>
+                    <FormattedMessage
+                      defaultMessage="{count} active Collectives: {amount}"
+                      id="billing.additionalActiveCollectives"
+                      values={{
+                        count: additional.utilization.activeCollectives,
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={additional.amounts.activeCollectives}
+                            currency="USD"
+                            precision={2}
+                            showCurrencyCode={false}
+                          />
+                        ),
+                      }}
+                    />
+                  </div>
+                )}
+                {additional?.amounts?.expensesPaid > 0 && (
+                  <div>
+                    <FormattedMessage
+                      defaultMessage="{count} Expenses paid: {amount}"
+                      id="billing.additionalExpensesPaid"
+                      values={{
+                        count: additional.utilization.expensesPaid,
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={additional.amounts.expensesPaid}
+                            currency="USD"
+                            precision={2}
+                            showCurrencyCode={false}
+                          />
+                        ),
+                      }}
+                    />
+                  </div>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },
   },
   {
     accessorKey: 'status',
+    meta: { className: 'w-[1%]' },
     header: () => <FormattedMessage id="Fields.status" defaultMessage="Status" />,
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <div className={clsx('truncate font-semibold antialiased')}>
+        <div className="truncate font-semibold antialiased">
           <ExpenseStatusTag status={status} />
         </div>
       );
     },
   },
+  {
+    accessorKey: 'action',
+    header: null,
+    meta: { className: 'text-right' },
+    cell: ({ row }) => {
+      const expense = row.original;
+      const account = row.original.account;
+      return (
+        <Button size="icon-xs" variant="outline">
+          <Link href={`${account.slug}/expenses/${expense.legacyId}`}>
+            <Link2 size="16px" />
+          </Link>
+        </Button>
+      );
+    },
+  },
 ];
 
-const SubscriberDetails = ({ id, openPlanModal }) => {
+const SubscriberDrawer = ({ id, openPlanModal }) => {
   const intl = useIntl();
-  const { data, loading: isLoading } = useQuery(subscriberDetailQuery, {
+  const { data, loading: isLoading } = useQuery(subscriberDrawerQuery, {
     variables: { id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -254,4 +335,4 @@ const SubscriberDetails = ({ id, openPlanModal }) => {
   );
 };
 
-export default SubscriberDetails;
+export default SubscriberDrawer;

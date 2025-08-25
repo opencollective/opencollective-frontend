@@ -24,6 +24,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
@@ -357,7 +358,10 @@ function Expense(props: ExpenseProps) {
   }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
-  const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
+  const showTaxFormMsg =
+    isFeatureEnabled(expense?.account, 'TAX_FORMS') &&
+    includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') &&
+    !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
 
   const handlePolling = debounce(() => {

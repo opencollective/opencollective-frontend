@@ -69,7 +69,7 @@ class ErrorPage extends React.Component {
       return <Loading />;
     }
 
-    if (error) {
+    if (error && error.type) {
       switch (error.type) {
         case ERROR.NOT_FOUND:
           return <NotFound searchTerm={get(error.payload, 'searchTerm')} />;
@@ -78,7 +78,12 @@ class ErrorPage extends React.Component {
             <FormattedMessage id="Error.BadCollectiveType" defaultMessage="This profile type is not supported" />,
           );
       }
-    } else if (get(data, 'error.message', '').includes('No collective found')) {
+    } else if (
+      get(data, 'error.message', '').includes('No collective found') ||
+      get(data, 'error.message', '').includes('Accounts not found') ||
+      get(error, 'message', '').includes('Accounts not found') ||
+      get(error, 'message', '').includes('No collective found')
+    ) {
       return <NotFound searchTerm={get(this.props.data, 'variables.slug')} />;
     }
 

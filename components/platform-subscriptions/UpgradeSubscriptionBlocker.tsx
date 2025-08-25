@@ -15,22 +15,19 @@ import Link from '../Link';
 import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { Button } from '../ui/Button';
 
-type FeatureKey = Exclude<keyof CollectiveFeatures, 'id' | '__typename'>;
-
 type UpgradeSubscriptionBlockerProps = {
-  featureKey: FeatureKey;
+  featureKey: Exclude<keyof CollectiveFeatures, 'id' | '__typename'>;
   className?: string;
+  description?: string;
 };
 
-// ts-unused-exports:disable-next-line
-export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSubscriptionBlockerProps) {
+export function UpgradeSubscriptionBlocker(props: UpgradeSubscriptionBlockerProps) {
   const { account } = React.useContext(DashboardContext);
-  const featureAccess = account.features[featureKey];
 
-  if (isFeatureEnabled(account, featureKey)) {
+  if (isFeatureEnabled(account, props.featureKey)) {
     return null;
   }
-
+  const featureAccess = account.features[props.featureKey];
   const title =
     featureAccess === CollectiveFeatureStatus.DISABLED ? (
       <FormattedMessage id="UpgradeSubscriptionBlocker.title.DISABLED" defaultMessage="Upgrade Required" />
@@ -43,10 +40,12 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
 
   const description =
     featureAccess === CollectiveFeatureStatus.DISABLED ? (
-      <FormattedMessage
-        id="UpgradeSubscriptionBlocker.description.DISABLED"
-        defaultMessage="This feature is not available on your current plan. Upgrade your subscription to access this feature."
-      />
+      (props.description ?? (
+        <FormattedMessage
+          id="UpgradeSubscriptionBlocker.description.DISABLED"
+          defaultMessage="This feature is not available on your current plan. Upgrade your subscription to access this feature."
+        />
+      ))
     ) : featureAccess === CollectiveFeatureStatus.UNSUPPORTED ? (
       <FormattedMessage
         id="UpgradeSubscriptionBlocker.description.UNSUPPORTED"
@@ -56,7 +55,7 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
 
   return (
     <React.Fragment>
-      <Alert variant="info" className={cn('flex gap-2 py-5', className)}>
+      <Alert variant="info" className={cn('flex gap-2 py-5', props.className)}>
         <div className="p-1">
           <Image src="/static/images/lock.png" alt="Lock" width={48} height={48} className="" />
         </div>
@@ -64,7 +63,7 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
           <AlertTitle className="flex items-center gap-2">{title}</AlertTitle>
           <AlertDescription className="mt-2">
             <div className="flex flex-col gap-3">
-              <p className="text-muted-foreground">{description}</p>
+              <p>{description}</p>
               {featureAccess === 'DISABLED' && (
                 <Button asChild className="w-fit" size="sm">
                   <Link href={getDashboardRoute(account, 'platform-subscription')}>

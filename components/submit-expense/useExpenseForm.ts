@@ -361,6 +361,7 @@ const formSchemaQuery = gql`
       id
       MULTI_CURRENCY_EXPENSES
       PAYPAL_PAYOUTS
+      CHART_OF_ACCOUNTS
     }
   }
 

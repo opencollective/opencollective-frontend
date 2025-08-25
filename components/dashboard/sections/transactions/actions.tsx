@@ -82,7 +82,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Transaction refunded', id: 's766TH' }),
       });
-      onMutationSuccess?.();
+      onMutationSuccess();
     };
 
     const handleDownloadInvoice = async () => {

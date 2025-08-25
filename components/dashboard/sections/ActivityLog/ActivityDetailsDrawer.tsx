@@ -65,19 +65,20 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
               title={<FormattedMessage id="Tags.USER" defaultMessage="User" />}
               value={<ActivityUser activity={activity} />}
             />
-
             <InfoListItem
               className="sm:col-span-2"
               title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-              value={<ActivityDescription activity={activity} />}
+              value={
+                <div className="flex flex-wrap items-center gap-1">
+                  <ActivityDescription activity={activity} />
+                </div>
+              }
             />
-
             <InfoListItem
               className="sm:col-span-2"
               title={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
               value={<DateTime value={activity.createdAt} timeStyle="long" />}
             />
-
             {ACCOUNT_KEYS.map(accountKey => {
               const account = activity[accountKey];
               if (!account) {

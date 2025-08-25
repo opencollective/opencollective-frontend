@@ -270,7 +270,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
   );
 };
 
-export default function SubscriberModal({
+export default function SubscriberPlanModal({
   open,
   setOpen,
   ...formProps

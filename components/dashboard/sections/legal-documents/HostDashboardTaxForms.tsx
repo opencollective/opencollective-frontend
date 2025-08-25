@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { defineMessage, FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
@@ -11,8 +11,12 @@ import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/sch
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { isFeatureEnabled } from '@/lib/allowed-features';
+
+import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
@@ -129,6 +133,10 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 };
 
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+  const intl = useIntl();
+  const { account } = React.useContext(DashboardContext);
+  const featureEnabled = isFeatureEnabled(account, 'TAX_FORMS');
+
   const [focusedLegalDocumentId, setFocusedLegalDocumentId] = React.useState(null);
   const queryFilter = useQueryFilter({
     filters,
@@ -140,12 +148,21 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
-  const getActions = useLegalDocumentActions(data?.host, refetch);
+  const getActions = useLegalDocumentActions(data?.host, refetch, featureEnabled);
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
-
+      {!featureEnabled && (
+        <UpgradeSubscriptionBlocker
+          featureKey="TAX_FORMS"
+          description={intl.formatMessage({
+            defaultMessage:
+              'This feature is not available on your current plan. Upgrade your subscription to start collecting tax forms from expense submitters.',
+            id: 'UpgradeSubscriptionBlocker.TaxForms.description',
+          })}
+        />
+      )}
       <Filterbar {...queryFilter} />
 
       {error ? (

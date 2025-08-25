@@ -138,6 +138,7 @@ export const expenseHostFields = gql`
       id
       MULTI_CURRENCY_EXPENSES
       PAYPAL_PAYOUTS
+      CHART_OF_ACCOUNTS
     }
     paypalPreApproval {
       id
@@ -429,6 +430,7 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
+        TAX_FORMS
       }
       location {
         id

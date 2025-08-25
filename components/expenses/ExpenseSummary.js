@@ -16,6 +16,7 @@ import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -247,7 +248,9 @@ const ExpenseSummary = ({
               host={host}
               account={expense.account}
               expense={expense}
-              canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
+              canEdit={
+                isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
+              }
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
