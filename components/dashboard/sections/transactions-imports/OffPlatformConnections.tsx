@@ -11,10 +11,12 @@ import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
+import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -22,15 +24,13 @@ import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
 
 import { NewOffPlatformTransactionsConnection } from './NewOffPlatformTransactionsConnection';
 import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
-import { DashboardContext } from '../../DashboardContext';
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
-import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
 
 const NB_IMPORTS_DISPLAYED = 20;
 

@@ -28,7 +28,7 @@ import {
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureSupported } from '../../lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
