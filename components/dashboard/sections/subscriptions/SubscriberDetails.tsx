@@ -57,7 +57,7 @@ const platformBillingsColumns = [
     cell: ({ cell, row }) => {
       const amount = cell.getValue();
       const billingData = row.original.platformBillingData;
-      const additional = billingData.additional;
+      const additional = billingData?.additional;
 
       return (
         <div className="flex max-w-min gap-1">

@@ -173,7 +173,7 @@ export const cols = {
   },
 } as Record<string, ColumnDef<SubscriberFieldsFragment>>;
 
-export const sortFilter = buildSortFilter({
+const sortFilter = buildSortFilter({
   fieldSchema: z.enum(['MONEY_MANAGED', 'LAST_TRANSACTION_CREATED_AT', 'CREATED_AT', 'NAME']),
   defaultValue: {
     field: 'MONEY_MANAGED',
@@ -195,7 +195,7 @@ export const sortFilter = buildSortFilter({
   },
 });
 
-export const typeFilter = buildAccountTypeFilter({
+const typeFilter = buildAccountTypeFilter({
   types: pick(CollectiveType, ['ORGANIZATION', 'INDIVIDUAL', 'COLLECTIVE', 'FUND']),
   optional: true,
   defaultValue: [CollectiveType.ORGANIZATION],
