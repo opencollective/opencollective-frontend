@@ -163,6 +163,9 @@ const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFie
     }
   }, [data]);
 
+  // if(true) {
+  //   return <div>This feature is only available</div>
+  // }
   if (error) {
     return (
       <MessageBox fontSize="12px" type="error">

@@ -94,6 +94,8 @@ export const adminPanelQuery = gql`
         OFF_PLATFORM_TRANSACTIONS
         TAX_FORMS
         CHART_OF_ACCOUNTS
+        PAYPAL_PAYOUTS
+        TRANSFERWISE
       }
       policies {
         id
