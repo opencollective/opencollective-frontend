@@ -4688,6 +4688,7 @@ export type Expense = {
   payoutMethod?: Maybe<PayoutMethod>;
   /** The permissions given to current logged in user for this expense */
   permissions: ExpensePermissions;
+  platformBillingData?: Maybe<Scalars['JSON']['output']>;
   /** Additional information about the payment as HTML. Only visible to user and admins. */
   privateMessage?: Maybe<Scalars['String']['output']>;
   quote?: Maybe<ExpenseQuote>;
@@ -9329,6 +9330,8 @@ export enum OrderByFieldType {
   HOSTED_COLLECTIVES_COUNT = 'HOSTED_COLLECTIVES_COUNT',
   HOST_RANK = 'HOST_RANK',
   LAST_CHARGED_AT = 'LAST_CHARGED_AT',
+  /** Order by the date of the last transaction. Using CollectiveTransactionStats.LatestTransactionCreatedAt. */
+  LAST_TRANSACTION_CREATED_AT = 'LAST_TRANSACTION_CREATED_AT',
   MEMBER_COUNT = 'MEMBER_COUNT',
   /** Order by the total amount managed by the Organization on the platform */
   MONEY_MANAGED = 'MONEY_MANAGED',
@@ -11447,6 +11450,8 @@ export type QueryAccountsArgs = {
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
   isPlatformSubscriber?: InputMaybe<Scalars['Boolean']['input']>;
   isVerified?: InputMaybe<Scalars['Boolean']['input']>;
+  lastTransactionFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  lastTransactionTo?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   onlyOpenToApplications?: InputMaybe<Scalars['Boolean']['input']>;

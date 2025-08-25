@@ -2,14 +2,10 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import { z } from 'zod';
 
-import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import type { SubscriberFieldsFragment, SubscribersQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import { Sheet, SheetContent } from '@/components/ui/Sheet';
 
@@ -17,44 +13,13 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import { accountTrustLevelFilter } from '../../filters/AccountTrustLevelFilter';
-import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
-import { collectiveStatusFilter } from '../../filters/CollectiveStatusFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
-import { searchFilter } from '../../filters/SearchFilter';
 
-import { cols, sortFilter, typeFilter } from './common';
+import { cols, filters, schema, toVariables } from './common';
 import { subscribersQuery } from './queries';
 import SubscriberDetails from './SubscriberDetails';
 import SubscriberModal from './SubscriberModal';
-
-const COLLECTIVES_PER_PAGE = 20;
-
-const schema = z.object({
-  limit: integer.default(COLLECTIVES_PER_PAGE),
-  offset: integer.default(0),
-  searchTerm: searchFilter.schema,
-  sort: sortFilter.schema,
-  hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
-  type: typeFilter.schema,
-  status: collectiveStatusFilter.schema,
-  consolidatedBalance: consolidatedBalanceFilter.schema,
-  trustLevel: accountTrustLevelFilter.schema,
-});
-
-const toVariables: FiltersToVariables<z.infer<typeof schema>, SubscribersQueryVariables> = {
-  status: collectiveStatusFilter.toVariables,
-  consolidatedBalance: consolidatedBalanceFilter.toVariables,
-  trustLevel: accountTrustLevelFilter.toVariables,
-};
-
-const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
-  sort: sortFilter.filter,
-  searchTerm: searchFilter.filter,
-  type: typeFilter.filter,
-  trustLevel: accountTrustLevelFilter.filter,
-};
 
 const PAGE_ROUTE = '/dashboard/root-actions/subscribers';
 

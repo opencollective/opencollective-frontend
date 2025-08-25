@@ -2725,6 +2725,7 @@ type Expense {
   [Host admins only] If the expense associated with a transactions import row, this field will reference it
   """
   transactionImportRow: TransactionsImportRow
+  platformBillingData: JSON
 }
 
 """
@@ -4978,6 +4979,11 @@ enum OrderByFieldType {
   Order by the total amount managed by the Organization on the platform
   """
   MONEY_MANAGED
+
+  """
+  Order by the date of the last transaction. Using CollectiveTransactionStats.LatestTransactionCreatedAt.
+  """
+  LAST_TRANSACTION_CREATED_AT
 }
 
 """
@@ -15976,6 +15982,16 @@ type Query {
     Filter accounts that are first party hosts
     """
     isFirstPartyHost: Boolean
+
+    """
+    Filter accounts that have a last transaction after this date
+    """
+    lastTransactionFrom: DateTime
+
+    """
+    Filter accounts that have a last transaction before this date
+    """
+    lastTransactionTo: DateTime
   ): AccountCollection!
   activities(
     """
