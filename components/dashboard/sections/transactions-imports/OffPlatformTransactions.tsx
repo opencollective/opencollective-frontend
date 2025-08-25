@@ -409,7 +409,16 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
           }
         />
       </div>
-      {!featureEnabled ? null : loading && !host ? (
+      {!featureEnabled ? (
+        <UpgradeSubscriptionBlocker
+          featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS}
+          description={intl.formatMessage({
+            defaultMessage:
+              'Upgrade your plan to be able to connect bank accounts to sync off-platform transactions to your ledger on the platform.',
+            id: 'UpgradeSubscriptionBlocker.BankAccountSync.description',
+          })}
+        />
+      ) : loading && !host ? (
         <LoadingPlaceholder height={300} />
       ) : error ? (
         <MessageBoxGraphqlError error={error} />
@@ -456,260 +465,249 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
               </Button>
             </div>
           )}
-          {!featureEnabled ? (
-            <UpgradeSubscriptionBlocker
-              featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS}
-              description={intl.formatMessage({
-                defaultMessage:
-                  'Upgrade your plan to be able to connect bank accounts to sync off-platform transactions to your ledger on the platform.',
-                id: 'UpgradeSubscriptionBlocker.BankAccountSync.description',
-              })}
+          <div>
+            {/** Tabs & filters */}
+            <Filterbar
+              className="mb-4"
+              {...queryFilter}
+              views={addCountsToViews(queryFilter.views, host.offPlatformTransactionsStats)}
+              meta={filtersMeta}
             />
-          ) : (
-            <div>
-              {/** Tabs & filters */}
-              <Filterbar
-                className="mb-4"
-                {...queryFilter}
-                views={addCountsToViews(queryFilter.views, host.offPlatformTransactionsStats)}
-                meta={filtersMeta}
-              />
 
-              {/** Selection/batch tool */}
-              <TransactionsImportRowsBatchActionsBar
-                rows={importRows}
-                selection={selection}
-                dispatchSelection={dispatchSelection}
-                totalCount={host.offPlatformTransactions.totalCount}
-                setRowsStatus={setRowsStatus}
-              />
+            {/** Selection/batch tool */}
+            <TransactionsImportRowsBatchActionsBar
+              rows={importRows}
+              selection={selection}
+              dispatchSelection={dispatchSelection}
+              totalCount={host.offPlatformTransactions.totalCount}
+              setRowsStatus={setRowsStatus}
+            />
 
-              {/** Import data table */}
-              <div className="relative mt-2">
-                {isInitialSync && (
-                  <div className="absolute z-50 flex h-full w-full items-center justify-center">
-                    <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
-                  </div>
-                )}
-                <DataTable<OffPlatformTransactionsQuery['host']['offPlatformTransactions']['nodes'][number], unknown>
-                  loading={loading || isInitialSync}
-                  getRowClassName={row =>
-                    row.original.status === TransactionsImportRowStatus.IGNORED
-                      ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30'
-                      : ''
-                  }
-                  enableMultiRowSelection
-                  rowSelection={selection.rows}
-                  setRowSelection={rows =>
-                    dispatchSelection({ type: 'SET', rows: typeof rows === 'function' ? rows(selection.rows) : rows })
-                  }
-                  data={importRows}
-                  getActions={getActions}
-                  openDrawer={row => setFocus({ rowId: row.original.id })}
-                  onClickRow={(row, _, e) => {
-                    // Ignore click when on checkbox or "Note" icon
-                    if (!(e.target as Element).closest('button')) {
-                      setFocus({ rowId: row.original.id });
-                    }
-                  }}
-                  emptyMessage={() => {
-                    if (host.transactionsImports.totalCount === 0) {
-                      return (
-                        <FormattedMessage
-                          defaultMessage="No bank accounts connected. Go to the <Link>connected bank accounts</Link> to setup your first connection."
-                          id="ihLQxw"
-                          values={{
-                            Link: getI18nLink({
-                              as: Link,
-                              href: `/dashboard/${accountSlug}/off-platform-connections`,
-                              textDecoration: 'underline',
-                            }),
-                          }}
-                        />
-                      );
-                    } else {
-                      return <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />;
-                    }
-                  }}
-                  columns={[
-                    {
-                      id: 'select',
-                      header: ({ table }) =>
-                        importRows.some(row => !row.expense && !row.order) ? (
-                          <Checkbox
-                            aria-label="Select all"
-                            className="translate-y-[2px] border-neutral-500"
-                            checked={
-                              table.getIsAllPageRowsSelected() ||
-                              (table.getIsSomePageRowsSelected() && 'indeterminate') ||
-                              false
-                            }
-                            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-                          />
-                        ) : null,
-                      cell: ({ row }) =>
-                        !row.original.expense &&
-                        !row.original.order && (
-                          <Checkbox
-                            checked={row.getIsSelected()}
-                            aria-label="Select row"
-                            className="translate-y-[2px] border-neutral-500"
-                            onCheckedChange={value => row.toggleSelected(!!value)}
-                          />
-                        ),
-                    },
-                    {
-                      header: 'Date',
-                      accessorKey: 'date',
-                      cell: ({ cell }) => {
-                        const date = cell.getValue() as string;
-                        return <DateTime value={new Date(date)} />;
-                      },
-                    },
-                    {
-                      header: 'Source',
-                      cell: ({ row }) => {
-                        const importRow =
-                          row.original as (typeof data)['host']['offPlatformTransactions']['nodes'][number];
-                        return (
-                          <div>
-                            <div className="mb-1 font-medium">{importRow.transactionsImport.source}</div>
-                            {importRow.institutionAccount && (
-                              <div className="text-sm text-neutral-500">
-                                {importRow.institutionAccount.name || `#${importRow.institutionAccount.id}`}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      },
-                    },
-                    {
-                      header: 'Description',
-                      accessorKey: 'description',
-                      cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
-                    },
-                    {
-                      header: 'Amount',
-                      accessorKey: 'amount',
-                      meta: {
-                        align: 'right',
-                      },
-                      cell: ({ cell }) => {
-                        const amount = cell.getValue() as Amount;
-                        const isCredit = amount.valueInCents > 0;
-                        return (
-                          <div
-                            className={cn('font-semibold antialiased', isCredit ? 'text-green-600' : 'text-slate-700')}
-                          >
-                            {amount.valueInCents > 0 ? '+' : ''}
-                            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
-                          </div>
-                        );
-                      },
-                    },
-                    {
-                      header: 'Status',
-                      cell: ({ row }) => {
-                        return <TransactionsImportRowStatusBadge row={row.original} />;
-                      },
-                    },
-                    {
-                      header: 'Collective',
-                      cell: ({ row }) => {
-                        const importRow =
-                          row.original as (typeof data)['host']['offPlatformTransactions']['nodes'][number];
-                        let displayedAccounts;
-
-                        if (importRow.expense) {
-                          displayedAccounts = [row.original.expense.account];
-                        } else if (importRow.order) {
-                          displayedAccounts = [row.original.order.toAccount];
-                        } else {
-                          displayedAccounts = importRow.assignedAccounts;
-                        }
-
-                        if (!displayedAccounts?.length) {
-                          return '-';
-                        } else {
-                          return (
-                            <StackedAvatars
-                              accounts={displayedAccounts}
-                              maxDisplayedAvatars={3}
-                              imageSize={24}
-                              withHoverCard
-                            />
-                          );
-                        }
-                      },
-                    },
-                    {
-                      header: 'Match',
-                      cell: ({ row }) => {
-                        if (row.original.expense) {
-                          return (
-                            <StyledLink
-                              className="flex items-center gap-1"
-                              href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
-                            >
-                              <FormattedMessage
-                                id="E9pJQz"
-                                defaultMessage="Expense #{id}"
-                                values={{ id: row.original.expense.legacyId }}
-                              />
-                            </StyledLink>
-                          );
-                        } else if (row.original.order) {
-                          return (
-                            <StyledLink
-                              className="flex items-center gap-1"
-                              href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
-                            >
-                              <FormattedMessage
-                                id="Siv4wU"
-                                defaultMessage="Contribution #{id}"
-                                values={{ id: row.original.order.legacyId }}
-                              />
-                            </StyledLink>
-                          );
-                        } else {
-                          return '-';
-                        }
-                      },
-                    },
-                    {
-                      header: 'Note',
-                      accessorKey: 'note',
-                      cell: ({ row, cell }) => {
-                        const hasNote = Boolean(cell.getValue());
-                        return (
-                          <Button
-                            className="relative"
-                            variant="ghost"
-                            size="icon-xs"
-                            onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
-                          >
-                            <MessageSquare size={16} className={hasNote ? 'text-neutral-700' : 'text-neutral-300'} />
-                          </Button>
-                        );
-                      },
-                    },
-                    {
-                      id: 'Actions',
-                      ...actionsColumn,
-                      header: () => {
-                        return (
-                          <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                        );
-                      },
-                    },
-                  ]}
-                />
-                <div className="mt-8">
-                  <Pagination queryFilter={queryFilter} total={data?.host?.offPlatformTransactions.totalCount} />
+            {/** Import data table */}
+            <div className="relative mt-2">
+              {isInitialSync && (
+                <div className="absolute z-50 flex h-full w-full items-center justify-center">
+                  <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
                 </div>
+              )}
+              <DataTable<OffPlatformTransactionsQuery['host']['offPlatformTransactions']['nodes'][number], unknown>
+                loading={loading || isInitialSync}
+                getRowClassName={row =>
+                  row.original.status === TransactionsImportRowStatus.IGNORED
+                    ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30'
+                    : ''
+                }
+                enableMultiRowSelection
+                rowSelection={selection.rows}
+                setRowSelection={rows =>
+                  dispatchSelection({ type: 'SET', rows: typeof rows === 'function' ? rows(selection.rows) : rows })
+                }
+                data={importRows}
+                getActions={getActions}
+                openDrawer={row => setFocus({ rowId: row.original.id })}
+                onClickRow={(row, _, e) => {
+                  // Ignore click when on checkbox or "Note" icon
+                  if (!(e.target as Element).closest('button')) {
+                    setFocus({ rowId: row.original.id });
+                  }
+                }}
+                emptyMessage={() => {
+                  if (host.transactionsImports.totalCount === 0) {
+                    return (
+                      <FormattedMessage
+                        defaultMessage="No bank accounts connected. Go to the <Link>connected bank accounts</Link> to setup your first connection."
+                        id="ihLQxw"
+                        values={{
+                          Link: getI18nLink({
+                            as: Link,
+                            href: `/dashboard/${accountSlug}/off-platform-connections`,
+                            textDecoration: 'underline',
+                          }),
+                        }}
+                      />
+                    );
+                  } else {
+                    return <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />;
+                  }
+                }}
+                columns={[
+                  {
+                    id: 'select',
+                    header: ({ table }) =>
+                      importRows.some(row => !row.expense && !row.order) ? (
+                        <Checkbox
+                          aria-label="Select all"
+                          className="translate-y-[2px] border-neutral-500"
+                          checked={
+                            table.getIsAllPageRowsSelected() ||
+                            (table.getIsSomePageRowsSelected() && 'indeterminate') ||
+                            false
+                          }
+                          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+                        />
+                      ) : null,
+                    cell: ({ row }) =>
+                      !row.original.expense &&
+                      !row.original.order && (
+                        <Checkbox
+                          checked={row.getIsSelected()}
+                          aria-label="Select row"
+                          className="translate-y-[2px] border-neutral-500"
+                          onCheckedChange={value => row.toggleSelected(!!value)}
+                        />
+                      ),
+                  },
+                  {
+                    header: 'Date',
+                    accessorKey: 'date',
+                    cell: ({ cell }) => {
+                      const date = cell.getValue() as string;
+                      return <DateTime value={new Date(date)} />;
+                    },
+                  },
+                  {
+                    header: 'Source',
+                    cell: ({ row }) => {
+                      const importRow =
+                        row.original as (typeof data)['host']['offPlatformTransactions']['nodes'][number];
+                      return (
+                        <div>
+                          <div className="mb-1 font-medium">{importRow.transactionsImport.source}</div>
+                          {importRow.institutionAccount && (
+                            <div className="text-sm text-neutral-500">
+                              {importRow.institutionAccount.name || `#${importRow.institutionAccount.id}`}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    header: 'Description',
+                    accessorKey: 'description',
+                    cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
+                  },
+                  {
+                    header: 'Amount',
+                    accessorKey: 'amount',
+                    meta: {
+                      align: 'right',
+                    },
+                    cell: ({ cell }) => {
+                      const amount = cell.getValue() as Amount;
+                      const isCredit = amount.valueInCents > 0;
+                      return (
+                        <div
+                          className={cn('font-semibold antialiased', isCredit ? 'text-green-600' : 'text-slate-700')}
+                        >
+                          {amount.valueInCents > 0 ? '+' : ''}
+                          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    header: 'Status',
+                    cell: ({ row }) => {
+                      return <TransactionsImportRowStatusBadge row={row.original} />;
+                    },
+                  },
+                  {
+                    header: 'Collective',
+                    cell: ({ row }) => {
+                      const importRow =
+                        row.original as (typeof data)['host']['offPlatformTransactions']['nodes'][number];
+                      let displayedAccounts;
+
+                      if (importRow.expense) {
+                        displayedAccounts = [row.original.expense.account];
+                      } else if (importRow.order) {
+                        displayedAccounts = [row.original.order.toAccount];
+                      } else {
+                        displayedAccounts = importRow.assignedAccounts;
+                      }
+
+                      if (!displayedAccounts?.length) {
+                        return '-';
+                      } else {
+                        return (
+                          <StackedAvatars
+                            accounts={displayedAccounts}
+                            maxDisplayedAvatars={3}
+                            imageSize={24}
+                            withHoverCard
+                          />
+                        );
+                      }
+                    },
+                  },
+                  {
+                    header: 'Match',
+                    cell: ({ row }) => {
+                      if (row.original.expense) {
+                        return (
+                          <StyledLink
+                            className="flex items-center gap-1"
+                            href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
+                          >
+                            <FormattedMessage
+                              id="E9pJQz"
+                              defaultMessage="Expense #{id}"
+                              values={{ id: row.original.expense.legacyId }}
+                            />
+                          </StyledLink>
+                        );
+                      } else if (row.original.order) {
+                        return (
+                          <StyledLink
+                            className="flex items-center gap-1"
+                            href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
+                          >
+                            <FormattedMessage
+                              id="Siv4wU"
+                              defaultMessage="Contribution #{id}"
+                              values={{ id: row.original.order.legacyId }}
+                            />
+                          </StyledLink>
+                        );
+                      } else {
+                        return '-';
+                      }
+                    },
+                  },
+                  {
+                    header: 'Note',
+                    accessorKey: 'note',
+                    cell: ({ row, cell }) => {
+                      const hasNote = Boolean(cell.getValue());
+                      return (
+                        <Button
+                          className="relative"
+                          variant="ghost"
+                          size="icon-xs"
+                          onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
+                        >
+                          <MessageSquare size={16} className={hasNote ? 'text-neutral-700' : 'text-neutral-300'} />
+                        </Button>
+                      );
+                    },
+                  },
+                  {
+                    id: 'Actions',
+                    ...actionsColumn,
+                    header: () => {
+                      return (
+                        <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
+                      );
+                    },
+                  },
+                ]}
+              />
+              <div className="mt-8">
+                <Pagination queryFilter={queryFilter} total={data?.host?.offPlatformTransactions.totalCount} />
               </div>
             </div>
-          )}
+          </div>
         </div>
       )}
       <TransactionsImportRowDrawer
