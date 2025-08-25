@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Check, ChevronDown, ChevronUp, LockKeyhole, LockKeyholeOpen } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, LockKeyhole } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
