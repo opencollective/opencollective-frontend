@@ -25,7 +25,7 @@ import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 
-import { subscriberDetailQuery } from './queries';
+import { subscriberDrawerQuery } from './queries';
 
 const platformBillingsColumns = [
   {
@@ -167,9 +167,9 @@ const platformBillingsColumns = [
   },
 ];
 
-const SubscriberDetails = ({ id, openPlanModal }) => {
+const SubscriberDrawer = ({ id, openPlanModal }) => {
   const intl = useIntl();
-  const { data, loading: isLoading } = useQuery(subscriberDetailQuery, {
+  const { data, loading: isLoading } = useQuery(subscriberDrawerQuery, {
     variables: { id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -335,4 +335,4 @@ const SubscriberDetails = ({ id, openPlanModal }) => {
   );
 };
 
-export default SubscriberDetails;
+export default SubscriberDrawer;

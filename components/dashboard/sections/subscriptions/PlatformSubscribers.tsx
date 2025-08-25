@@ -18,8 +18,8 @@ import { Pagination } from '../../filters/Pagination';
 
 import { cols, filters, schema, toVariables } from './common';
 import { subscribersQuery } from './queries';
-import SubscriberDetails from './SubscriberDetails';
-import SubscriberModal from './SubscriberModal';
+import SubscriberDrawer from './SubscriberDrawer';
+import SubscriberPlanModal from './SubscriberPlanModal';
 
 const PAGE_ROUTE = '/dashboard/root-actions/subscribers';
 
@@ -76,12 +76,16 @@ const PlatformSubscribers = () => {
         </React.Fragment>
       )}
       {!!showPlanModal && (
-        <SubscriberModal open setOpen={open => setShowPlanModal(open ? showPlanModal : null)} account={showPlanModal} />
+        <SubscriberPlanModal
+          open
+          setOpen={open => setShowPlanModal(open ? showPlanModal : null)}
+          account={showPlanModal}
+        />
       )}
       {subscriberDrawer && (
         <Sheet open onOpenChange={closeDrawer}>
           <SheetContent className="max-w-2xl">
-            <SubscriberDetails id={subscriberDrawer} openPlanModal={setShowPlanModal} />
+            <SubscriberDrawer id={subscriberDrawer} openPlanModal={setShowPlanModal} />
           </SheetContent>
         </Sheet>
       )}
