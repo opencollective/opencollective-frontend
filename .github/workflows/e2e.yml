@@ -111,7 +111,7 @@ jobs:
           ./mc mb --ignore-existing minio/opencollective-e2e
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -139,7 +139,7 @@ jobs:
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
@@ -147,19 +147,19 @@ jobs:
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
 
       - name: Checkout (PDF)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-pdf
           path: opencollective-pdf
