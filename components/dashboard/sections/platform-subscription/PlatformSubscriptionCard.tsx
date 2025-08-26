@@ -48,7 +48,7 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
             {!props.subscription.isCurrent && <span>&nbsp;-&nbsp;{props.subscription.plan.title}</span>}
           </div>
           <div className="flex gap-2">
-            <div className="flex items-center">
+            <div className="flex items-center text-nowrap">
               {props.subscription.isCurrent ? (
                 <Badge type="info" size="sm" className="px-4">
                   <FormattedMessage defaultMessage="Active" id="Subscriptions.Active" />
@@ -68,7 +68,7 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
         </div>
 
         {(props.subscription.isCurrent || isExpanded) && (
-          <div className="flex gap-4 p-4">
+          <div className="flex flex-wrap gap-4 p-4">
             <div className="flex gap-3">
               <div>
                 <Shapes />

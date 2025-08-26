@@ -17,6 +17,7 @@ export const getExpenseStatusMsgType = status => {
     case ExpenseStatus.SPAM:
     case ExpenseStatus.ERROR:
     case ExpenseStatus.INVITE_DECLINED:
+    case 'OVERDUE':
       return 'error';
     case ExpenseStatus.PENDING:
     case ExpenseStatus.UNVERIFIED:

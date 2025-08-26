@@ -1,15 +1,17 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
+import { Info } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { BillingProjectionQuery, BillingProjectionQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
-import MessageBox from '@/components/MessageBox';
+import { I18nBold } from '@/components/I18nFormatters';
+import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import { platformBillingFragment } from './fragments';
 
@@ -74,118 +76,182 @@ export function BillingProjection(props: BillingProjectionProps) {
           }}
         />
       </div>
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <FormattedMessage defaultMessage="Item" id="5ujeDa" />
-              </TableHead>
-              <TableHead>
-                <FormattedMessage defaultMessage="Start Date" id="QirE3M" />
-              </TableHead>
-              <TableHead>
-                <FormattedMessage defaultMessage="End Date" id="EndDate" />
-              </TableHead>
-              <TableHead>
-                <FormattedMessage defaultMessage="Additional Units" id="dGWxXw" />
-              </TableHead>
-              <TableHead>
-                <FormattedMessage defaultMessage="Est. Amount" id="BqQikK" />
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {billedSubscriptions.map(sub => (
-              <TableRow key={sub.startDate}>
-                <TableCell className="font-medium text-muted-foreground">{sub.title}</TableCell>
-                <TableCell>
-                  <FormattedDate timeZone="UTC" dateStyle="medium" value={sub.startDate} />
-                </TableCell>
-                <TableCell>
-                  <FormattedDate timeZone="UTC" dateStyle="medium" value={sub.endDate} />
-                </TableCell>
-                <TableCell>-</TableCell>
-                <TableCell>
+      <div className="rounded-md border px-6 py-4">
+        {billedSubscriptions.map((sub, idx) => (
+          <div key={sub.startDate} className="flex items-center justify-between border-b py-2">
+            <div>
+              <div className="flex gap-2 font-medium text-slate-800">
+                <FormattedMessage
+                  defaultMessage="{dateFrom} to {dateTo}"
+                  id="76YT3Y"
+                  values={{
+                    dateFrom: <FormattedDate timeZone="UTC" dateStyle="medium" value={sub.startDate} />,
+                    dateTo: <FormattedDate timeZone="UTC" dateStyle="medium" value={sub.endDate} />,
+                  }}
+                />
+                {idx === 0 && (
+                  <Badge type="info" size="xs" className="px-2">
+                    <FormattedMessage defaultMessage="Active Plan" id="EooOYM" />
+                  </Badge>
+                )}
+              </div>
+              <div className="text-muted-foreground">{sub.title}</div>
+            </div>
+            <div className="flex gap-2 font-bold">
+              <FormattedMoneyAmount
+                showCurrencyCode={false}
+                amount={sub.amount.valueInCents}
+                currency={sub.amount.currency}
+              />
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info size={16} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <FormattedMessage
+                    defaultMessage="You’re charged on pro-rata basis for the days you have used a particular plan."
+                    id="GO2cTz"
+                  />
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        ))}
+        <div className="flex items-center justify-between border-b py-2">
+          <div>
+            <div className="font-medium text-slate-800">
+              <FormattedMessage
+                defaultMessage="{expensesPaid} additional {expensesPaid, plural, one {expense} other {expenses}} paid"
+                id="6GrAmA"
+                values={{
+                  expensesPaid: billing?.additional?.utilization.expensesPaid ?? 0,
+                }}
+              />
+            </div>
+            <div className="text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="{pricePerAdditionalExpense} per additional expense"
+                id="qyhtiE"
+                values={{
+                  pricePerAdditionalExpense: (
+                    <FormattedMoneyAmount
+                      showCurrencyCode={false}
+                      amount={billing?.subscriptions[0].plan.pricing.pricePerAdditionalExpense.valueInCents}
+                      currency={billing?.subscriptions[0].plan.pricing.pricePerAdditionalExpense.currency}
+                    />
+                  ),
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 font-bold">
+            <FormattedMoneyAmount
+              showCurrencyCode={false}
+              amount={billing.additional.amounts.expensesPaid.valueInCents}
+              currency={billing.additional.amounts.expensesPaid.currency}
+            />
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={16} />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-64">
+                <FormattedMessage
+                  defaultMessage="Based on the active plan of the current billing cycle, your plan covers {includedCollectives} active {includedCollectives, plural, one {collective} other {collectives}}. You have {activeCollectives} active {activeCollectives, plural, one {collective} other {collectives}}. You’re being charged for the {additionalActiveCollectives} additional active {additionalActiveCollectives, plural, one {collective} other {collectives}} at {pricePerCollective} per collective. Charges will increase based on usage of additional units."
+                  id="hlyH4q"
+                  values={{
+                    includedCollectives: billing.subscriptions[0].plan.pricing.includedCollectives,
+                    activeCollectives: billing.utilization.activeCollectives,
+                    additionalActiveCollectives: billing.additional.utilization.activeCollectives,
+                    pricePerCollective: (
+                      <FormattedMoneyAmount
+                        showCurrencyCode={false}
+                        amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalCollective.valueInCents}
+                        currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalCollective.currency}
+                      />
+                    ),
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+        <div className="flex items-center justify-between border-b py-2">
+          <div>
+            <div className="font-medium text-slate-800">
+              <FormattedMessage
+                defaultMessage="{activeCollectives} additional active {activeCollectives, plural, one {collective} other {collectives}}"
+                id="4RHasz"
+                values={{
+                  activeCollectives: billing?.additional?.utilization?.activeCollectives ?? 0,
+                }}
+              />
+            </div>
+            <div className="text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="{pricePerAdditionalCollective} per additional collective"
+                id="C6vbcS"
+                values={{
+                  pricePerAdditionalCollective: (
+                    <FormattedMoneyAmount
+                      showCurrencyCode={false}
+                      amount={billing?.subscriptions[0].plan.pricing.pricePerAdditionalCollective.valueInCents}
+                      currency={billing?.subscriptions[0].plan.pricing.pricePerAdditionalCollective.currency}
+                    />
+                  ),
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 font-bold">
+            <FormattedMoneyAmount
+              showCurrencyCode={false}
+              amount={billing.additional.amounts.activeCollectives.valueInCents}
+              currency={billing.additional.amounts.activeCollectives.currency}
+            />
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={16} />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-64">
+                <FormattedMessage
+                  defaultMessage="Based on the active plan of the current billing cycle, your plan covers {includedPaidExpenses} paid {includedPaidExpenses, plural, one {expense} other {expenses}}. You have {paidExpenses} paid {paidExpenses, plural, one {expense} other {expenses}}. You’re being charged for the {additionalPaidExpenses} additional paid {additionalPaidExpenses, plural, one {expense} other {expenses}} at {pricePerPaidExpense} per expense. Charges will increase based on usage of additional units."
+                  id="iTvgcF"
+                  values={{
+                    includedPaidExpenses: billing.subscriptions[0].plan.pricing.includedExpensesPerMonth,
+                    paidExpenses: billing.utilization.expensesPaid,
+                    additionalPaidExpenses: billing.additional.utilization.expensesPaid,
+                    pricePerPaidExpense: (
+                      <FormattedMoneyAmount
+                        showCurrencyCode={false}
+                        amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.valueInCents}
+                        currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.currency}
+                      />
+                    ),
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-end">
+          <div className="text-base">
+            <FormattedMessage
+              defaultMessage="Estimated total: <b>{amount}</b> "
+              id="cKkeFO"
+              values={{
+                b: I18nBold,
+                amount: (
                   <FormattedMoneyAmount
-                    amount={sub.amount.valueInCents}
-                    currency={sub.amount.currency}
+                    amount={billing.totalAmount.valueInCents}
+                    currency={billing.totalAmount.currency}
                     showCurrencyCode={false}
                   />
-                </TableCell>
-              </TableRow>
-            ))}
-            <TableRow>
-              <TableCell className="font-medium text-muted-foreground">
-                <FormattedMessage defaultMessage="Additional Collectives" id="rQHbnT" />
-              </TableCell>
-              <TableCell>
-                <FormattedDate timeZone="UTC" dateStyle="medium" value={billing.billingPeriod.startDate} />
-              </TableCell>
-              <TableCell>
-                <FormattedDate timeZone="UTC" dateStyle="medium" value={billing.billingPeriod.endDate} />
-              </TableCell>
-              <TableCell>{billing.additional.utilization.activeCollectives}</TableCell>
-              <TableCell>
-                <FormattedMoneyAmount
-                  amount={billing.additional.amounts.activeCollectives.valueInCents}
-                  currency={billing.additional.amounts.activeCollectives.currency}
-                  showCurrencyCode={false}
-                />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-muted-foreground">
-                <FormattedMessage defaultMessage="Additional Expenses" id="IbJLYI" />
-              </TableCell>
-              <TableCell>
-                <FormattedDate timeZone="UTC" dateStyle="medium" value={billing.billingPeriod.startDate} />
-              </TableCell>
-              <TableCell>
-                <FormattedDate timeZone="UTC" dateStyle="medium" value={billing.billingPeriod.endDate} />
-              </TableCell>
-              <TableCell>{billing.additional.utilization.activeCollectives}</TableCell>
-              <TableCell>
-                <FormattedMoneyAmount
-                  amount={billing.additional.amounts.expensesPaid.valueInCents}
-                  currency={billing.additional.amounts.expensesPaid.currency}
-                  showCurrencyCode={false}
-                />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-          <TableFooter className="border-t bg-white font-bold text-slate-900">
-            <TableRow className="border-b-0">
-              <TableCell colSpan={4} align="right">
-                <FormattedMessage defaultMessage="Est. Total" id="QNwwvd" />
-              </TableCell>
-              <TableCell>
-                <FormattedMoneyAmount
-                  amount={billing.totalAmount.valueInCents}
-                  currency={billing.totalAmount.currency}
-                  showCurrencyCode={false}
-                />
-              </TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
-      <MessageBox type="info" className="mt-4">
-        {billing.subscriptions.length > 1 && (
-          <div className="text-sm">
-            <FormattedMessage
-              defaultMessage="You’re charged on pro-rata basis for the days you have used a particular plan. "
-              id="PScvSY"
+                ),
+              }}
             />
           </div>
-        )}
-        <div className="text-sm">
-          <FormattedMessage
-            defaultMessage=" The additional units are charged based on your active plan and will increase based on your usage."
-            id="uuQr+R"
-          />
         </div>
-      </MessageBox>
+      </div>
     </div>
   );
 }

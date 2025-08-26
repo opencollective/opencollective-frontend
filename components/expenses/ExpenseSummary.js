@@ -17,6 +17,7 @@ import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 import { isFeatureEnabled } from '@/lib/allowed-features';
+import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -215,7 +216,13 @@ const ExpenseSummary = ({
             <Box>
               <ExpenseStatusTag
                 display="block"
-                status={expense.onHold ? 'ON_HOLD' : expense.status}
+                status={
+                  expense.onHold
+                    ? 'ON_HOLD'
+                    : expense.type === ExpenseType.PLATFORM_BILLING && expense.status === ExpenseStatus.APPROVED
+                      ? 'OVERDUE'
+                      : expense.status
+                }
                 letterSpacing="0.8px"
                 fontWeight="bold"
                 fontSize="12px"

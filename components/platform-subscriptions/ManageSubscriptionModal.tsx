@@ -17,7 +17,7 @@ import type {
   UpdatePlatformSubscriptionMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/Dialog';
 
 import {
   platformSubscriptionFeatures,
@@ -144,7 +144,7 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
   return (
     <Dialog open={props.open} onOpenChange={isOpen => props.setOpen(isOpen)}>
       <DialogContent className="sm:max-w-max sm:min-w-[940px]">
-        <DialogHeader className="my-4">
+        <DialogHeader className="my-1">
           <ManagePlatformSubscriptionSteps step={step} selectedTier={form.values.tier} selectedPlan={selectedPlan} />
         </DialogHeader>
 
@@ -249,7 +249,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         <SummaryStep selectedPlan={selectedPlan} currentPlan={props.currentPlan} billing={props.billing} />
       )}
 
-      <div className="flex justify-between">
+      <DialogFooter className="mt-9 flex flex-col border-t pt-4 sm:justify-between">
         <Button
           variant="outline"
           onClick={() => props.setStep(s => s - 1)}
@@ -275,7 +275,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
             <FormattedMessage defaultMessage="Update Subscription" id="h8kExM" />
           </Button>
         )}
-      </div>
+      </DialogFooter>
     </React.Fragment>
   );
 }
@@ -439,7 +439,7 @@ function TierStep(props: TierStepProps) {
       ) : (
         <RadioGroup
           disabled={props.disabled}
-          className="flex grow gap-4"
+          className="flex grow flex-wrap gap-4"
           value={props.tier}
           onValueChange={value => props.onChange(value as PlatformSubscriptionTierType)}
         >
@@ -718,33 +718,43 @@ function ManagePlatformSubscriptionSteps(props: ManagePlatformSubscriptionStepsP
                 <div className="text-center">
                   <FormattedMessage {...StepTitles[step]} />
                 </div>
-                {isComplete && (
-                  <div className="mt-2 text-center text-base font-normal [text-transform:none]">
-                    {step === Step.TIER && props.selectedTier && props.selectedTier}
-                    {step === Step.PLAN && props.selectedPlan && (
+                <div className="mt-2 text-center text-base font-normal [text-transform:none]">
+                  {step === Step.TIER && (
+                    <span
+                      className={clsx({
+                        invisible: !isComplete || !props.selectedTier,
+                      })}
+                    >
+                      {props.selectedTier}
+                    </span>
+                  )}
+                  {step === Step.PLAN && (
+                    <div
+                      className={clsx({
+                        invisible: !isComplete || !props.selectedPlan?.pricing,
+                      })}
+                    >
                       <div>
-                        <div>
-                          <FormattedMessage
-                            defaultMessage="{includedCollectives} {includedCollectives, plural, one {active collective} other {active collectives}}"
-                            id="G8bZFJ"
-                            values={{
-                              includedCollectives: props.selectedPlan.pricing.includedCollectives,
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <FormattedMessage
-                            defaultMessage="{includedExpensesPerMonth} {includedExpensesPerMonth, plural, one {expense} other {expenses}}"
-                            id="x/eaxJ"
-                            values={{
-                              includedExpensesPerMonth: props.selectedPlan.pricing.includedExpensesPerMonth,
-                            }}
-                          />
-                        </div>
+                        <FormattedMessage
+                          defaultMessage="{includedCollectives} {includedCollectives, plural, one {active collective} other {active collectives}}"
+                          id="G8bZFJ"
+                          values={{
+                            includedCollectives: props.selectedPlan?.pricing?.includedCollectives,
+                          }}
+                        />
                       </div>
-                    )}
-                  </div>
-                )}
+                      <div>
+                        <FormattedMessage
+                          defaultMessage="{includedExpensesPerMonth} {includedExpensesPerMonth, plural, one {expense} other {expenses}}"
+                          id="x/eaxJ"
+                          values={{
+                            includedExpensesPerMonth: props.selectedPlan?.pricing?.includedExpensesPerMonth,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </li>
           );
