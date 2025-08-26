@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import dayjs from 'dayjs';
 import { ChevronDown, Pencil, X } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
@@ -24,8 +23,8 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
+import { BillingProjection } from './BillingProjection';
 import { platformBillingFragment, platformSubscriptionFragment } from './fragments';
-import { PlatformBillingUtilizationTable } from './PlatformBillingUtilizationTable';
 import { PlatformPaymentsView } from './PlatformPaymentsView';
 import { PlatformSubscriptionCard } from './PlatformSubscriptionCard';
 
@@ -74,7 +73,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         actions={
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="xs" variant="outline" className="gap-1">
+              <Button disabled={isLoading || !activeSubscription} size="xs" variant="outline" className="gap-1">
                 <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
                 <ChevronDown className="text-muted-foreground" size={16} />
               </Button>
@@ -121,23 +120,45 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
           <FormattedMessage defaultMessage="No active subscription" id="0imfIK" />
         </MessageBox>
       ) : (
-        <div className="mb-4 flex items-center gap-4">
-          <div className="font-bold">
+        <div>
+          <div className="mb-2 flex items-center gap-4">
+            <div className="font-bold">
+              <FormattedMessage
+                defaultMessage="Current Plan: {planTitle}"
+                id="ZV0wTF"
+                values={{
+                  planTitle: activeSubscription.plan.title,
+                }}
+              />
+            </div>
+            <Separator className="w-auto grow border-b bg-border" />
+            <div className="font-bold">
+              {activeSubscription.plan.pricing.pricePerMonth.valueInCents !== 0 && (
+                <FormattedMessage
+                  defaultMessage="{perMonth} / Month"
+                  id="+2hntI"
+                  values={{
+                    perMonth: (
+                      <FormattedMoneyAmount
+                        amount={activeSubscription.plan.pricing.pricePerMonth.valueInCents}
+                        currency={activeSubscription.plan.pricing.pricePerMonth.currency}
+                        showCurrencyCode={false}
+                      />
+                    ),
+                  }}
+                />
+              )}
+            </div>
+          </div>
+          <div className="mb-4 text-muted-foreground">
             <FormattedMessage
-              defaultMessage="Current Plan: {planTitle} at {perMonth} / month"
-              id="sl4rVT"
+              defaultMessage="Base subscription will renew on the {dueDate}"
+              id="28oT0p"
               values={{
-                planTitle: activeSubscription.plan.title,
-                perMonth: (
-                  <FormattedMoneyAmount
-                    amount={activeSubscription.plan.pricing.pricePerMonth.valueInCents}
-                    currency={activeSubscription.plan.pricing.pricePerMonth.currency}
-                  />
-                ),
+                dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
               }}
             />
           </div>
-          <Separator className="w-auto grow border-b bg-border" />
         </div>
       )}
 
@@ -147,48 +168,21 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         <div className="flex flex-col gap-4">
           {billing?.subscriptions?.length > 0 &&
             billing?.subscriptions.map(subscription => (
-              <PlatformSubscriptionCard key={subscription.startDate} subscription={subscription} billing={billing} />
+              <PlatformSubscriptionCard key={subscription.startDate} subscription={subscription} />
             ))}
         </div>
       )}
 
-      {isLoading ? (
-        <React.Fragment>
-          <Skeleton className="mb-1 h-5 w-46" />
-          <Skeleton className="h-48 w-full" />
-        </React.Fragment>
-      ) : !activeSubscription ? null : (
-        <React.Fragment>
-          <div className="mt-8 mb-1 flex items-center gap-4">
-            <div className="font-bold">
-              <FormattedMessage defaultMessage="Current Plan Utilization" id="vxyyjF" />
-            </div>
-            <Separator className="w-auto grow border-b bg-border" />
+      {billing?.subscriptions?.length !== 0 && (
+        <div className="mt-8 mb-1 flex items-center gap-4">
+          <div className="font-bold">
+            <FormattedMessage defaultMessage="Current Plan Utilization" id="vxyyjF" />
           </div>
-          <div className="mb-4 text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="For period {toFromDate} ({days} {days, plural, one {day} other {days}} left)"
-              id="mUwdZN"
-              values={{
-                toFromDate: (
-                  <FormattedMessage
-                    defaultMessage="{dateFrom} to {dateTo}"
-                    id="76YT3Y"
-                    values={{
-                      dateFrom: (
-                        <FormattedDate timeZone="UTC" dateStyle="medium" value={billing.billingPeriod.startDate} />
-                      ),
-                      dateTo: <FormattedDate timeZone="UTC" dateStyle="medium" value={billing.billingPeriod.endDate} />,
-                    }}
-                  />
-                ),
-                days: dayjs.utc(billing.billingPeriod.endDate).diff(dayjs.utc().startOf('day'), 'days'),
-              }}
-            />
-          </div>
-          <PlatformBillingUtilizationTable billing={billing} plan={activeSubscription.plan} />
-        </React.Fragment>
+          <Separator className="w-auto grow border-b bg-border" />
+        </div>
       )}
+
+      {isLoading ? <Skeleton className="h-48 w-full" /> : <BillingProjection accountSlug={props.accountSlug} />}
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />

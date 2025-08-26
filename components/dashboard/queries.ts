@@ -62,6 +62,13 @@ export const adminPanelQuery = gql`
         canStartResumeContributionsProcess
         hasResumeContributionsProcessStarted
       }
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          plan {
+            title
+          }
+        }
+      }
       childrenAccounts {
         totalCount
         nodes {

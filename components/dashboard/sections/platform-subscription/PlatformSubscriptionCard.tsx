@@ -1,8 +1,8 @@
 import React from 'react';
-import { ArrowRight, Info, Receipt, Shapes } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import type { PlatformBillingFieldsFragment, PlatformSubscriptionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { PlatformSubscriptionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { useModal } from '@/components/ModalContext';
@@ -13,49 +13,61 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 
 type PlatformSubscriptionCardProps = {
   subscription: PlatformSubscriptionFieldsFragment;
-  billing: PlatformBillingFieldsFragment;
 };
 
 export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
   const { showModal } = useModal();
+
+  const periodLabel = props.subscription.endDate ? (
+    <FormattedMessage
+      defaultMessage="{dateFrom} to {dateTo}"
+      id="76YT3Y"
+      values={{
+        dateFrom: <FormattedDate timeZone="UTC" dateStyle="medium" value={props.subscription.startDate} />,
+        dateTo: <FormattedDate timeZone="UTC" dateStyle="medium" value={props.subscription.endDate} />,
+      }}
+    />
+  ) : (
+    <FormattedMessage
+      defaultMessage="Since {date}"
+      id="x9TypM"
+      values={{
+        date: <FormattedDate timeZone="UTC" dateStyle="medium" value={props.subscription.startDate} />,
+      }}
+    />
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full flex-col rounded-xl border">
-        <div className="mb-4 flex justify-between px-4 pt-4">
+        <div className="mb-4 flex items-center justify-between px-4 pt-4">
           <div className="font-bold">
-            {props.subscription.endDate ? (
-              <FormattedMessage
-                defaultMessage="{dateFrom} to {dateTo}"
-                id="76YT3Y"
-                values={{
-                  dateFrom: <FormattedDate timeZone="UTC" dateStyle="medium" value={props.subscription.startDate} />,
-                  dateTo: <FormattedDate timeZone="UTC" dateStyle="medium" value={props.subscription.endDate} />,
-                }}
-              />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Since {date}"
-                id="x9TypM"
-                values={{
-                  date: <FormattedDate timeZone="UTC" dateStyle="medium" value={props.subscription.startDate} />,
-                }}
-              />
-            )}
+            <span>{periodLabel}</span>
+            {!props.subscription.isCurrent && <span>&nbsp;-&nbsp;{props.subscription.plan.title}</span>}
           </div>
-          <div>
-            {props.subscription.isCurrent ? (
-              <Badge type="info" size="sm" className="px-4">
-                <FormattedMessage defaultMessage="Active" id="Subscriptions.Active" />
-              </Badge>
-            ) : (
-              <Badge type="neutral" size="sm" className="px-4">
-                <FormattedMessage defaultMessage="Past Plan" id="yT1ekX" />
-              </Badge>
+          <div className="flex gap-2">
+            <div className="flex items-center">
+              {props.subscription.isCurrent ? (
+                <Badge type="info" size="sm" className="px-4">
+                  <FormattedMessage defaultMessage="Active" id="Subscriptions.Active" />
+                </Badge>
+              ) : (
+                <Badge type="neutral" size="sm" className="px-4">
+                  <FormattedMessage defaultMessage="Past Plan" id="yT1ekX" />
+                </Badge>
+              )}
+            </div>
+            {!props.subscription.isCurrent && (
+              <Button onClick={() => setIsExpanded(e => !e)} size="sm" variant="ghost">
+                {isExpanded ? <ChevronUp /> : <ChevronDown />}
+              </Button>
             )}
           </div>
         </div>
 
-        {props.subscription.isCurrent && (
+        {(props.subscription.isCurrent || isExpanded) && (
           <div className="flex gap-4 p-4">
             <div className="flex gap-3">
               <div>
@@ -155,23 +167,6 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
                 </Button>
               </div>
             </div>
-          </div>
-        )}
-        {props.subscription.isCurrent && !props.subscription.endDate && (
-          <div className="w-full rounded-xl rounded-t-none bg-green-100 py-2 text-center text-sm font-bold text-oc-blue-tints-900">
-            <FormattedMessage
-              defaultMessage="On {dueDate}, your subscription will be renewed and you will be billed {basePrice}"
-              id="yrldr5"
-              values={{
-                dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={props.billing.dueDate} />,
-                basePrice: (
-                  <FormattedMoneyAmount
-                    amount={props.billing.base.total.valueInCents}
-                    currency={props.billing.base.total.currency}
-                  />
-                ),
-              }}
-            />
           </div>
         )}
       </div>

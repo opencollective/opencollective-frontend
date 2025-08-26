@@ -49,10 +49,5 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return null;
   }
 
-  return (
-    <PlatformSubscriptionCard
-      subscription={query.data.host.platformSubscription}
-      billing={query.data.host.platformBilling}
-    />
-  );
+  return <PlatformSubscriptionCard subscription={query.data.host.platformSubscription} />;
 }

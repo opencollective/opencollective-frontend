@@ -79,6 +79,15 @@ export const platformBillingFragment = gql`
         valueInCents
         currency
       }
+      subscriptions {
+        title
+        amount {
+          valueInCents
+          currency
+        }
+        startDate
+        endDate
+      }
     }
     additional {
       utilization {
