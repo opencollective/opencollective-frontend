@@ -124,7 +124,7 @@ export function BillingProjection(props: BillingProjectionProps) {
                 defaultMessage="{expensesPaid} additional {expensesPaid, plural, one {expense} other {expenses}} paid"
                 id="6GrAmA"
                 values={{
-                  expensesPaid: billing?.additional?.utilization.expensesPaid ?? 0,
+                  expensesPaid: billing.additional.utilization.expensesPaid ?? 0,
                 }}
               />
             </div>
@@ -136,8 +136,8 @@ export function BillingProjection(props: BillingProjectionProps) {
                   pricePerAdditionalExpense: (
                     <FormattedMoneyAmount
                       showCurrencyCode={false}
-                      amount={billing?.subscriptions[0].plan.pricing.pricePerAdditionalExpense.valueInCents}
-                      currency={billing?.subscriptions[0].plan.pricing.pricePerAdditionalExpense.currency}
+                      amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.valueInCents}
+                      currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.currency}
                     />
                   ),
                 }}
@@ -182,7 +182,7 @@ export function BillingProjection(props: BillingProjectionProps) {
                 defaultMessage="{activeCollectives} additional active {activeCollectives, plural, one {collective} other {collectives}}"
                 id="4RHasz"
                 values={{
-                  activeCollectives: billing?.additional?.utilization?.activeCollectives ?? 0,
+                  activeCollectives: billing.additional.utilization.activeCollectives ?? 0,
                 }}
               />
             </div>
