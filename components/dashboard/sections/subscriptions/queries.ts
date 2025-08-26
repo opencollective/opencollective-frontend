@@ -2,7 +2,7 @@ import { gql } from '@/lib/graphql/helpers';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 
-const planFeatures = gql`
+export const planFeatures = gql`
   fragment PlanFeatures on PlatformSubscriptionFeatures {
     TRANSFERWISE
     PAYPAL_PAYOUTS
