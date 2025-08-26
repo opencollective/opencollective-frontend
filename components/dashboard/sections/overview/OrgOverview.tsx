@@ -51,7 +51,7 @@ export function OrgOverview() {
   }, [LoggedInUser, account, showSetupGuide, showSubscriptionCard]);
 
   const isPlatformBillingFeatureEnabled =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) && account?.platformSubscription;
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) && account.platformSubscription;
 
   const handleSetupGuideToggle = useCallback(
     async (open: boolean) => {

@@ -47,7 +47,7 @@ export function BillingProjection(props: BillingProjectionProps) {
 
   const billing = account && 'platformBilling' in account ? account.platformBilling : null;
   const currentPlan = billing?.subscriptions?.[0]?.plan;
-  const billedSubscriptions = billing.base.subscriptions;
+  const billedSubscriptions = billing?.base?.subscriptions ?? [];
 
   if (!billing || !currentPlan) {
     return null;
