@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { isUndefined } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -29,14 +30,14 @@ export default function ApproveExpenseModal({
 }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
   const [editExpense] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
-  const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory);
+  const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory || undefined);
   const { toast } = useToast();
   return (
     <ConfirmationModal
       onClose={onClose}
       header={<FormattedMessage defaultMessage="Approve Expense" id="PJNkaW" />}
       maxWidth={384}
-      disableSubmit={!selectedCategory}
+      disableSubmit={isUndefined(selectedCategory)}
       continueHandler={async () => {
         try {
           // 1. Edit the accounting category if it was changed
@@ -73,6 +74,7 @@ export default function ApproveExpenseModal({
           valuesByRole={expense.valuesByRole}
           allowNone={false}
           predictionStyle="full"
+          selectFirstOptionIfSingle
         />
       </div>
     </ConfirmationModal>

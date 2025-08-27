@@ -199,15 +199,6 @@ const getOptions = (
   // Allow categories that either match the expected appliesTo or have no appliesTo (meaning they apply to both)
   remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
 
-  if (allowNone) {
-    options.push({
-      key: null,
-      value: null,
-      label: getCategoryLabel(intl, null, false, valuesByRole),
-      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
-    });
-  }
-
   categories.forEach(category => {
     options.push({
       key: category.id,
@@ -216,6 +207,15 @@ const getOptions = (
       searchText: getSearchTextFromCategory(category),
     });
   });
+
+  if (allowNone || options.length === 0) {
+    options.push({
+      key: null,
+      value: null,
+      label: getCategoryLabel(intl, null, false, valuesByRole),
+      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
+    });
+  }
 
   return options;
 };
