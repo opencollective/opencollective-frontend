@@ -1551,6 +1551,12 @@ async function buildFormOptions(
       options.expenseCurrency = options.expense.currency;
     } else if (values.expenseTypeOption === ExpenseType.GRANT) {
       options.expenseCurrency = options.account?.currency;
+    } else if (
+      options.account?.currency &&
+      values.expenseItems.length > 0 &&
+      values.expenseItems.every(item => item.amount.currency === options.account?.currency)
+    ) {
+      options.expenseCurrency = options.account.currency;
     } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
