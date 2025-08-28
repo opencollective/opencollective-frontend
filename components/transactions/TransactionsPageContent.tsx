@@ -8,8 +8,13 @@ import roles from '../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type { Account, PaymentMethod, PaymentMethodType, Transaction } from '@/lib/graphql/types/v2/schema';
-import { TransactionKind } from '@/lib/graphql/types/v2/schema';
+import type {
+  Account,
+  PaymentMethod,
+  PaymentMethodType,
+  Transaction,
+  TransactionKind,
+} from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { cn } from '@/lib/utils';
@@ -317,15 +322,6 @@ const filters /* : FilterComponentConfigs<FilterValues, FilterMeta>*/ = {
   account: childAccountFilter.filter,
 };
 
-export const defaultFilterValues = {
-  kind: [
-    TransactionKind.ADDED_FUNDS,
-    TransactionKind.CONTRIBUTION,
-    TransactionKind.EXPENSE,
-    TransactionKind.BALANCE_TRANSFER,
-  ] as TransactionKind[],
-};
-
 const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) => {
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
@@ -341,7 +337,6 @@ const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) =>
       accountSlug: account.slug,
       childrenAccounts: account.childrenAccounts?.nodes ?? [],
     },
-    defaultFilterValues,
     shallow: true,
   });
 
