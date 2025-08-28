@@ -434,7 +434,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
           </p>
         </div>
       )}
-      {props.includePackageDetails && props.packages?.length && (
+      {props.includePackageDetails && props.packages && (
         <div className="mt-6 mb-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
