@@ -1,15 +1,16 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import type { PlatformSubscriptionFeatures } from '@/lib/graphql/types/v2/schema';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 
 import type { BaseModalProps } from '../ModalContext';
 
-import type { PlatformSubscriptionFeatures } from './constants';
 import { PlatformSubscriptionFeatureList } from './PlatformSubscriptionFeatureList';
 
 type SubscriptionFeaturesModalProps = {
-  features: Record<(typeof PlatformSubscriptionFeatures)[number], boolean>;
+  features: PlatformSubscriptionFeatures;
 } & BaseModalProps;
 
 export function SubscriptionFeaturesModal(props: SubscriptionFeaturesModalProps) {

@@ -4,14 +4,11 @@ import { defineMessages } from 'react-intl';
 
 import type { PlatformSubscriptionFeatures as PlatformSubscriptionFeaturesSchema } from '@/lib/graphql/types/v2/schema';
 
-type PlatformSubscriptionFeaturesType =
-  | keyof Omit<PlatformSubscriptionFeaturesSchema, '__typename'>
-  | 'CROWDFUNDING'
-  | 'EXPENSE_MANAGEMENT';
+type PlatformSubscriptionFeaturesType = keyof Omit<PlatformSubscriptionFeaturesSchema, '__typename'>;
 
 export const PlatformSubscriptionFeatures = [
-  'CROWDFUNDING',
-  'EXPENSE_MANAGEMENT',
+  'RECEIVE_FINANCIAL_CONTRIBUTIONS',
+  'USE_EXPENSES',
   'TRANSFERWISE',
   'PAYPAL_PAYOUTS',
   'CHART_OF_ACCOUNTS',
@@ -78,8 +75,8 @@ export const PlatformSubscriptionTierFeatures: Record<
   Record<(typeof PlatformSubscriptionFeatures)[number], boolean>
 > = {
   Discover: {
-    CROWDFUNDING: true,
-    EXPENSE_MANAGEMENT: true,
+    RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
+    USE_EXPENSES: true,
     CHART_OF_ACCOUNTS: false,
     OFF_PLATFORM_TRANSACTIONS: false,
     PAYPAL_PAYOUTS: false,
@@ -87,8 +84,8 @@ export const PlatformSubscriptionTierFeatures: Record<
     TRANSFERWISE: false,
   },
   Basic: {
-    CROWDFUNDING: true,
-    EXPENSE_MANAGEMENT: true,
+    RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
+    USE_EXPENSES: true,
     CHART_OF_ACCOUNTS: true,
     OFF_PLATFORM_TRANSACTIONS: false,
     PAYPAL_PAYOUTS: true,
@@ -96,8 +93,8 @@ export const PlatformSubscriptionTierFeatures: Record<
     TRANSFERWISE: true,
   },
   Pro: {
-    CROWDFUNDING: true,
-    EXPENSE_MANAGEMENT: true,
+    RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
+    USE_EXPENSES: true,
     CHART_OF_ACCOUNTS: true,
     OFF_PLATFORM_TRANSACTIONS: true,
     PAYPAL_PAYOUTS: true,
@@ -107,11 +104,11 @@ export const PlatformSubscriptionTierFeatures: Record<
 };
 
 export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof PlatformSubscriptionFeatures)[number]>({
-  CROWDFUNDING: {
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: {
     defaultMessage: 'Crowdfunding pages',
     id: 'lLH5Iy',
   },
-  EXPENSE_MANAGEMENT: {
+  USE_EXPENSES: {
     defaultMessage: 'Expense management',
     id: 'RYRVnQ',
   },
