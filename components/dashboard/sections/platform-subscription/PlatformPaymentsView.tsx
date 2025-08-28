@@ -1,6 +1,7 @@
 import React from 'react';
-import { take } from 'lodash';
+import { omitBy, take } from 'lodash';
 import { ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { type ExpensesListFieldsFragmentFragment, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
@@ -14,11 +15,33 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 type PlatformPaymentsViewProps = {
   expenses: ExpensesListFieldsFragmentFragment[];
+  accountSlug: string;
+};
+
+const ROUTE_PARAMS = ['slug', 'section'];
+const getQueryParams = newParams => {
+  return omitBy({ ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
 };
 
 export function PlatformPaymentsView(props: PlatformPaymentsViewProps) {
   const [inViewCount, setInViewCount] = React.useState(5);
-  const [openExpenseId, setOpenExpenseId] = React.useState(null);
+  const router = useRouter();
+  const query = router.query;
+
+  const openExpenseId = query.ExpenseId ? Number(query.ExpenseId) : null;
+  const setOpenExpenseId = React.useCallback(
+    expenseId => {
+      router.push(
+        {
+          pathname: `/dashboard/${props.accountSlug}/platform-subscription`,
+          query: getQueryParams({ ...query, ExpenseId: expenseId }),
+        },
+        undefined,
+        { shallow: true },
+      );
+    },
+    [props.accountSlug, query, router],
+  );
 
   return (
     <div>

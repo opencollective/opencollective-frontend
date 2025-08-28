@@ -220,7 +220,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             </div>
             <Separator className="w-auto grow border-b bg-border" />
           </div>
-          <PlatformPaymentsView expenses={billing.expenses} />
+          <PlatformPaymentsView expenses={billing.expenses} accountSlug={props.accountSlug} />
         </React.Fragment>
       )}
     </div>
