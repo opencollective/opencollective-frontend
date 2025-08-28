@@ -5,10 +5,10 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import NextIllustration from '../components/collectives/HomeNextIllustration';
 import { MainDescription } from '../components/marketing/Text';
 import Page from '../components/Page';
-import { Button } from '@/components/ui/Button';
 import Features from '@/components/home/solutions/Features';
 import Testimonials from '@/components/home/solutions/Testimonials';
 import Link from '@/components/Link';
+import { Button } from '@/components/ui/Button';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -134,7 +134,7 @@ const features = [
   },
 ];
 
-export const Solutions = () => {
+const Solutions = () => {
   const { formatMessage } = useIntl();
 
   return (

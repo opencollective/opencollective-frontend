@@ -4,6 +4,7 @@ import NextImage from 'next/image';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { Button } from '@/components/ui/Button';
+
 import Link from '../Link';
 
 const messages = defineMessages({
