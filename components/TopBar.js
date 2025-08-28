@@ -118,7 +118,7 @@ const TopBarIcon = ({ provider }) => {
 
 const TopBar = ({
   showSearch = true,
-  menuItems = { solutions: false, product: true, company: false, docs: false, about: true },
+  menuItems = { solutions: true, product: true, company: true, docs: true },
   showProfileAndChangelogMenu = true,
   account,
 }) => {
@@ -304,39 +304,6 @@ const TopBar = ({
                         <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                       </NavButton>
                     </Link>
-                  )}
-                  {menuItems.about && (
-                    <PopupMenu
-                      zIndex={2000}
-                      closingEvents={['focusin', 'mouseover']}
-                      Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                        <NavButton
-                          isBorderless
-                          onMouseOver={onMouseOver}
-                          onFocus={onFocus}
-                          onClick={onClick}
-                          whiteSpace="nowrap"
-                        >
-                          <FormattedMessage defaultMessage="About" id="g5pX+a" />
-                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                        </NavButton>
-                      )}
-                      placement="bottom"
-                      popupMarginTop="-10px"
-                    >
-                      <NavLinkContainer>
-                        <a href="https://blog.opencollective.com/">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage id="company.blog" defaultMessage="Blog" />
-                          </NavItem>
-                        </a>
-                        <a href="https://documentation.opencollective.com/our-organization/about">
-                          <NavItem as={Container} mb={16}>
-                            <FormattedMessage id="collective.about.title" defaultMessage="About" />
-                          </NavItem>
-                        </a>
-                      </NavLinkContainer>
-                    </PopupMenu>
                   )}
                 </React.Fragment>
               )}
