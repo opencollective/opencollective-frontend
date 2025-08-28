@@ -41,7 +41,7 @@ export function PlatformPaymentsView(props: PlatformPaymentsViewProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {take(props.expenses, inViewCount).map(expense => (
+          {take(props.expenses, inViewCount).map((expense, idx) => (
             <TableRow className="last:border-b-0" key={expense.id} onClick={() => setOpenExpenseId(expense.legacyId)}>
               <TableCell>
                 <DateTime value={expense.createdAt} />
@@ -52,7 +52,15 @@ export function PlatformPaymentsView(props: PlatformPaymentsViewProps) {
               <TableCell>{expense.description}</TableCell>
               <TableCell>
                 <div className="flex">
-                  <ExpenseStatusTag status={expense.status === ExpenseStatus.APPROVED ? 'OVERDUE' : expense.status} />
+                  <ExpenseStatusTag
+                    status={
+                      expense.status === ExpenseStatus.APPROVED
+                        ? idx !== 0
+                          ? 'OVERDUE'
+                          : 'PAYMENT_DUE'
+                        : expense.status
+                    }
+                  />
                 </div>
               </TableCell>
               <TableCell></TableCell>

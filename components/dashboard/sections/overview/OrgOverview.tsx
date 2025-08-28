@@ -44,7 +44,7 @@ export function OrgOverview() {
     if (showSubscriptionCard === undefined) {
       const showSubscriptionCardKey = `id${account.legacyId}`;
       const showSubscriptionCardSetting =
-        LoggedInUser.collective.settings?.showSubscriptionCard?.[showSubscriptionCardKey];
+        LoggedInUser.collective.settings?.showInitialOverviewSubscriptionCard?.[showSubscriptionCardKey];
 
       setShowSubscriptionCard(showSubscriptionCardSetting !== false ? true : false);
     }
@@ -76,7 +76,7 @@ export function OrgOverview() {
       await editAccountSetting({
         variables: {
           account: { legacyId: LoggedInUser.collective.id },
-          key: `showSubscriptionCard.id${account.legacyId}`,
+          key: `showInitialOverviewSubscriptionCard.id${account.legacyId}`,
           value: open,
         },
       }).catch(() => {});
@@ -92,15 +92,6 @@ export function OrgOverview() {
         actions={
           isHostAccount(account) && (
             <div className="flex gap-2">
-              {isPlatformBillingFeatureEnabled && (
-                <Button size="sm" variant="outline" onClick={() => handleSubscriptionCardToggle(!showSubscriptionCard)}>
-                  {showSubscriptionCard ? (
-                    <FormattedMessage defaultMessage="Hide subscription" id="SetupGuide.HideSubscriptionCard" />
-                  ) : (
-                    <FormattedMessage defaultMessage="Show subscription" id="SetupGuide.ShowSubscriptionCard" />
-                  )}
-                </Button>
-              )}
               <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
                 {showSetupGuide ? (
                   <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
@@ -117,7 +108,10 @@ export function OrgOverview() {
           {isPlatformBillingFeatureEnabled && (
             <Collapsible open={showSubscriptionCard}>
               <CollapsibleContent>
-                <PlatformBillingOverviewCard accountSlug={account.slug} />
+                <PlatformBillingOverviewCard
+                  accountSlug={account.slug}
+                  onDismiss={() => handleSubscriptionCardToggle(false)}
+                />
               </CollapsibleContent>
             </Collapsible>
           )}

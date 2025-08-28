@@ -13,6 +13,7 @@ import type {
 import {
   type Expense,
   type ExpenseReferenceInput,
+  ExpenseType,
   type PaymentMethod,
   PaymentMethodService,
 } from '@/lib/graphql/types/v2/schema';
@@ -26,12 +27,13 @@ import usePaymentIntent from '@/lib/stripe/usePaymentIntent';
 import { PayWithStripeForm } from '../contribution-flow/PayWithStripe';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { Button } from '../ui/Button';
+import { Checkbox } from '../ui/Checkbox';
 import { RadioGroup, RadioGroupCard } from '../ui/RadioGroup';
 import { Skeleton } from '../ui/Skeleton';
 import { toast } from '../ui/useToast';
 
 type PayExpenseWithStripeProps = {
-  expense: ExpenseReferenceInput & { account: Pick<Expense['account'], 'slug'> };
+  expense: ExpenseReferenceInput & { type: Expense['type']; account: Pick<Expense['account'], 'slug'> };
   onSuccess: () => Promise<void>;
 };
 
@@ -44,6 +46,9 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
   const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
     expense: pick(props.expense, ['id', 'legacyId']),
   });
+
+  const [acknowledgeAdditionalUsage, setAcknowledgeAdditionalUsage] = React.useState(false);
+  const [acknowledgeRenewal, setAcknowledgeRenewal] = React.useState(false);
 
   const {
     loading: loadingSavedPaymentMethods,
@@ -95,13 +100,24 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
     availableMethodLabels = [...availableMethodLabels.slice(0, 3), 'etc'];
   }
 
-  const isPayButtonDisabled = React.useMemo(
-    () =>
+  const needsPlatformBillingAcknowledges = props.expense.type === ExpenseType.PLATFORM_BILLING;
+
+  const isPayButtonDisabled = React.useMemo(() => {
+    const validPayoutMethod =
       selectedPaymentMethodId === 'new-payment-method'
-        ? !paymentElementData?.isCompleted
-        : !savedPaymentMethods.some(pm => pm.id === selectedPaymentMethodId),
-    [selectedPaymentMethodId, savedPaymentMethods, paymentElementData],
-  );
+        ? paymentElementData?.isCompleted
+        : savedPaymentMethods.some(pm => pm.id === selectedPaymentMethodId);
+    return (
+      !validPayoutMethod || (needsPlatformBillingAcknowledges && (!acknowledgeAdditionalUsage || !acknowledgeRenewal))
+    );
+  }, [
+    selectedPaymentMethodId,
+    paymentElementData?.isCompleted,
+    savedPaymentMethods,
+    needsPlatformBillingAcknowledges,
+    acknowledgeAdditionalUsage,
+    acknowledgeRenewal,
+  ]);
 
   const { onSuccess } = props;
   const onPayClick = React.useCallback(async () => {
@@ -200,6 +216,46 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
         </RadioGroup>
       ) : (
         stripeForm
+      )}
+
+      {needsPlatformBillingAcknowledges && (
+        <div className="mt-4 flex flex-col gap-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="acknowledgeAdditionalUsage"
+              checked={acknowledgeAdditionalUsage}
+              disabled={isConfirmingPayment}
+              onCheckedChange={checked => setAcknowledgeAdditionalUsage(Boolean(checked))}
+            />
+            <label
+              htmlFor="acknowledgeAdditionalUsage"
+              className="text-sm leading-none font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              <FormattedMessage
+                defaultMessage="I accept that additional charges may apply if I exceed plan limits."
+                id="TK5atK"
+              />
+            </label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="acknowledgeRenewal"
+              disabled={isConfirmingPayment}
+              checked={acknowledgeRenewal}
+              onCheckedChange={checked => setAcknowledgeRenewal(Boolean(checked))}
+            />
+            <label
+              htmlFor="acknowledgeRenewal"
+              className="text-sm leading-none font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              <FormattedMessage
+                defaultMessage="I accept that my subscription will automatically renew unless I cancel before the renewal date."
+                id="iB3QMn"
+              />
+            </label>
+          </div>
+        </div>
       )}
 
       <Button

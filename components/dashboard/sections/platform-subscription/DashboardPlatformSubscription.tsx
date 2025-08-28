@@ -10,6 +10,7 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import { getI18nLink } from '@/components/I18nFormatters';
 import MessageBox from '@/components/MessageBox';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
@@ -65,50 +66,58 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         className="mb-8"
         title={<FormattedMessage defaultMessage="Platform Billing" id="beRXFK" />}
         description={
-          <FormattedMessage
-            defaultMessage="Review your platform billing details, check utilization and pay outstanding invoices."
-            id="ajHwTP"
-          />
+          isLoading ? (
+            <Skeleton className="h-6 w-full" />
+          ) : (
+            activeSubscription && (
+              <FormattedMessage
+                defaultMessage="Review your platform billing details, check utilization and pay outstanding invoices."
+                id="ajHwTP"
+              />
+            )
+          )
         }
         actions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button disabled={isLoading || !activeSubscription} size="xs" variant="outline" className="gap-1">
-                <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
-                <ChevronDown className="text-muted-foreground" size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Button
-                  disabled={isLoading}
-                  onClick={() =>
-                    showModal(ManageSubscriptionModal, {
-                      currentPlan: activeSubscription.plan,
-                      accountSlug: props.accountSlug,
-                      billing: billing,
-                    })
-                  }
-                  variant="ghost"
-                  size="xs"
-                >
-                  <Pencil size={14} />
-                  <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
+          activeSubscription && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button disabled={isLoading || !activeSubscription} size="xs" variant="outline" className="gap-1">
+                  <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
+                  <ChevronDown className="text-muted-foreground" size={16} />
                 </Button>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Button
-                  disabled={isLoading}
-                  onClick={() => showModal(CancelSubscriptionModal)}
-                  variant="ghost"
-                  size="xs"
-                >
-                  <X size={14} />
-                  <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
-                </Button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Button
+                    disabled={isLoading}
+                    onClick={() =>
+                      showModal(ManageSubscriptionModal, {
+                        currentPlan: activeSubscription.plan,
+                        accountSlug: props.accountSlug,
+                        billing: billing,
+                      })
+                    }
+                    variant="ghost"
+                    size="xs"
+                  >
+                    <Pencil size={14} />
+                    <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
+                  </Button>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Button
+                    disabled={isLoading}
+                    onClick={() => showModal(CancelSubscriptionModal)}
+                    variant="ghost"
+                    size="xs"
+                  >
+                    <X size={14} />
+                    <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
+                  </Button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         }
       />
       {queryError && <MessageBoxGraphqlError error={queryError} />}
@@ -116,8 +125,25 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
       {isLoading ? (
         <Skeleton className="mb-1 h-5 w-full" />
       ) : !activeSubscription ? (
-        <MessageBox type="warning">
-          <FormattedMessage defaultMessage="No active subscription" id="0imfIK" />
+        <MessageBox type="info">
+          <FormattedMessage
+            defaultMessage="You are on our <LegacyPricingLink>legacy pricing</LegacyPricingLink>. Please <ContactLink>contact our support team</ContactLink> to upgrade to our <NewPricingLink>new pricing</NewPricingLink>."
+            id="S3DC9x"
+            values={{
+              LegacyPricingLink: getI18nLink({
+                href: 'https://opencollective.com/pricing',
+                openInNewTabNoFollow: true,
+              }),
+              ContactLink: getI18nLink({
+                href: 'https://opencollective.com/contact',
+                openInNewTabNoFollow: true,
+              }),
+              NewPricingLink: getI18nLink({
+                href: 'https://pricing-2026.opencollective.com',
+                openInNewTabNoFollow: true,
+              }),
+            }}
+          />
         </MessageBox>
       ) : (
         <div>

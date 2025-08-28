@@ -78,9 +78,9 @@ export function BillingProjection(props: BillingProjectionProps) {
       </div>
       <div className="rounded-md border px-6 py-4">
         {billedSubscriptions.map((sub, idx) => (
-          <div key={sub.startDate} className="flex items-center justify-between border-b py-2">
+          <div key={sub.startDate} className="flex items-center justify-between border-b py-4">
             <div>
-              <div className="flex gap-2 font-medium text-slate-800">
+              <div className="flex gap-2 text-sm leading-5 font-medium">
                 <FormattedMessage
                   defaultMessage="{dateFrom} to {dateTo}"
                   id="76YT3Y"
@@ -95,7 +95,7 @@ export function BillingProjection(props: BillingProjectionProps) {
                   </Badge>
                 )}
               </div>
-              <div className="text-muted-foreground">{sub.title}</div>
+              <div className="text-xs leading-4 text-slate-700">{sub.title}</div>
             </div>
             <div className="flex gap-2 font-bold">
               <FormattedMoneyAmount
@@ -117,9 +117,9 @@ export function BillingProjection(props: BillingProjectionProps) {
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-between border-b py-2">
+        <div className="flex items-center justify-between border-b py-4">
           <div>
-            <div className="font-medium text-slate-800">
+            <div className="text-sm leading-5 font-medium">
               <FormattedMessage
                 defaultMessage="{expensesPaid} additional {expensesPaid, plural, one {expense} other {expenses}} paid"
                 id="6GrAmA"
@@ -128,7 +128,7 @@ export function BillingProjection(props: BillingProjectionProps) {
                 }}
               />
             </div>
-            <div className="text-muted-foreground">
+            <div className="text-xs leading-4 text-slate-700">
               <FormattedMessage
                 defaultMessage="{pricePerAdditionalExpense} per additional expense"
                 id="qyhtiE"
@@ -156,17 +156,17 @@ export function BillingProjection(props: BillingProjectionProps) {
               </TooltipTrigger>
               <TooltipContent className="max-w-64">
                 <FormattedMessage
-                  defaultMessage="Based on the active plan of the current billing cycle, your plan covers {includedCollectives} active {includedCollectives, plural, one {collective} other {collectives}}. You have {activeCollectives} active {activeCollectives, plural, one {collective} other {collectives}}. You’re being charged for the {additionalActiveCollectives} additional active {additionalActiveCollectives, plural, one {collective} other {collectives}} at {pricePerCollective} per collective. Charges will increase based on usage of additional units."
-                  id="hlyH4q"
+                  defaultMessage="Your plan covers {includedPaidExpenses} paid {includedPaidExpenses, plural, one {expense} other {expenses}}. You currently have {paidExpenses}, which is {additionalPaidExpenses} over the limit. {pricePerPaidExpense} per extra expense is being charged as per your active plan. Charges will increase if the number of paid expenses grows."
+                  id="PrY6y8"
                   values={{
-                    includedCollectives: billing.subscriptions[0].plan.pricing.includedCollectives,
-                    activeCollectives: billing.utilization.activeCollectives,
-                    additionalActiveCollectives: billing.additional.utilization.activeCollectives,
-                    pricePerCollective: (
+                    includedPaidExpenses: billing.subscriptions[0].plan.pricing.includedExpensesPerMonth,
+                    paidExpenses: billing.utilization.expensesPaid,
+                    additionalPaidExpenses: billing.additional.utilization.expensesPaid,
+                    pricePerPaidExpense: (
                       <FormattedMoneyAmount
                         showCurrencyCode={false}
-                        amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalCollective.valueInCents}
-                        currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalCollective.currency}
+                        amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.valueInCents}
+                        currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.currency}
                       />
                     ),
                   }}
@@ -175,9 +175,9 @@ export function BillingProjection(props: BillingProjectionProps) {
             </Tooltip>
           </div>
         </div>
-        <div className="flex items-center justify-between border-b py-2">
+        <div className="flex items-center justify-between border-b py-4">
           <div>
-            <div className="font-medium text-slate-800">
+            <div className="text-sm leading-5 font-medium">
               <FormattedMessage
                 defaultMessage="{activeCollectives} additional active {activeCollectives, plural, one {collective} other {collectives}}"
                 id="4RHasz"
@@ -186,7 +186,7 @@ export function BillingProjection(props: BillingProjectionProps) {
                 }}
               />
             </div>
-            <div className="text-muted-foreground">
+            <div className="text-xs leading-4 text-slate-700">
               <FormattedMessage
                 defaultMessage="{pricePerAdditionalCollective} per additional collective"
                 id="C6vbcS"
@@ -214,17 +214,17 @@ export function BillingProjection(props: BillingProjectionProps) {
               </TooltipTrigger>
               <TooltipContent className="max-w-64">
                 <FormattedMessage
-                  defaultMessage="Based on the active plan of the current billing cycle, your plan covers {includedPaidExpenses} paid {includedPaidExpenses, plural, one {expense} other {expenses}}. You have {paidExpenses} paid {paidExpenses, plural, one {expense} other {expenses}}. You’re being charged for the {additionalPaidExpenses} additional paid {additionalPaidExpenses, plural, one {expense} other {expenses}} at {pricePerPaidExpense} per expense. Charges will increase based on usage of additional units."
-                  id="iTvgcF"
+                  defaultMessage="Your plan covers {includedCollectives} active {includedCollectives, plural, one {collective} other {collectives}}. You currently have {activeCollectives}, which is {additionalActiveCollectives} over the limit. {pricePerCollective} per extra collective is being charged as per your active plan. Charges will increase if the number of active collective grows."
+                  id="A4CAgS"
                   values={{
-                    includedPaidExpenses: billing.subscriptions[0].plan.pricing.includedExpensesPerMonth,
-                    paidExpenses: billing.utilization.expensesPaid,
-                    additionalPaidExpenses: billing.additional.utilization.expensesPaid,
-                    pricePerPaidExpense: (
+                    includedCollectives: billing.subscriptions[0].plan.pricing.includedCollectives,
+                    activeCollectives: billing.utilization.activeCollectives,
+                    additionalActiveCollectives: billing.additional.utilization.activeCollectives,
+                    pricePerCollective: (
                       <FormattedMoneyAmount
                         showCurrencyCode={false}
-                        amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.valueInCents}
-                        currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalExpense.currency}
+                        amount={billing.subscriptions[0].plan.pricing.pricePerAdditionalCollective.valueInCents}
+                        currency={billing.subscriptions[0].plan.pricing.pricePerAdditionalCollective.currency}
                       />
                     ),
                   }}
@@ -233,7 +233,7 @@ export function BillingProjection(props: BillingProjectionProps) {
             </Tooltip>
           </div>
         </div>
-        <div className="mt-4 flex items-center justify-end">
+        <div className="mt-4 flex items-center justify-end gap-2">
           <div className="text-base">
             <FormattedMessage
               defaultMessage="Estimated total: <b>{amount}</b> "
@@ -250,6 +250,17 @@ export function BillingProjection(props: BillingProjectionProps) {
               }}
             />
           </div>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info size={16} />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64">
+              <FormattedMessage
+                defaultMessage="This is an estimated amount. The final total will include charges for additional units and will be calculated on the last day of the month."
+                id="xK6dwZ"
+              />
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </div>

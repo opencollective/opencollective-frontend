@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import { ArrowRight, ChevronDown, ChevronUp, Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
@@ -17,8 +18,6 @@ type PlatformSubscriptionCardProps = {
 
 export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
-
-  const { showModal } = useModal();
 
   const periodLabel = props.subscription.endDate ? (
     <FormattedMessage
@@ -68,107 +67,116 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
         </div>
 
         {(props.subscription.isCurrent || isExpanded) && (
-          <div className="flex flex-wrap gap-4 p-4">
-            <div className="flex gap-3">
-              <div>
-                <Shapes />
-              </div>
-              <div className="flex flex-col gap-1">
-                <div>
-                  <b>
-                    <FormattedMessage
-                      defaultMessage="{includedCount} Active Collectives"
-                      id="PQL55g"
-                      values={{
-                        includedCount: props.subscription.plan.pricing.includedCollectives,
-                      }}
-                    />
-                  </b>
-                  &nbsp;
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info size={14} />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <FormattedMessage
-                        defaultMessage="Active collectives have at least one ledger transaction in the billing period."
-                        id="j0U5jT"
-                      />
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  <FormattedMessage
-                    defaultMessage="{amount} / Collective after that"
-                    id="vNN8Hw"
-                    values={{
-                      amount: (
-                        <FormattedMoneyAmount
-                          amount={props.subscription.plan.pricing.pricePerAdditionalCollective.valueInCents}
-                          currency={props.subscription.plan.pricing.pricePerAdditionalCollective.currency}
-                        />
-                      ),
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div>
-                <Receipt />
-              </div>
-              <div className="flex flex-col gap-1">
-                <div>
-                  <b>
-                    <FormattedMessage
-                      defaultMessage="{includedCount} Paid Expenses"
-                      id="V35NqH"
-                      values={{
-                        includedCount: props.subscription.plan.pricing.includedExpensesPerMonth,
-                      }}
-                    />
-                  </b>
-                  &nbsp;
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info size={14} />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <FormattedMessage defaultMessage="Completed expenses with the 'Paid' status." id="IHdyue" />
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  <FormattedMessage
-                    defaultMessage="{amount} / expense after that"
-                    id="F7fqJa"
-                    values={{
-                      amount: (
-                        <FormattedMoneyAmount
-                          amount={props.subscription.plan.pricing.pricePerAdditionalExpense.valueInCents}
-                          currency={props.subscription.plan.pricing.pricePerAdditionalExpense.currency}
-                        />
-                      ),
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex grow justify-end">
-              <div>
-                <Button
-                  variant="ghost"
-                  onClick={() => showModal(SubscriptionFeaturesModal, { features: props.subscription.plan.features })}
-                >
-                  <FormattedMessage defaultMessage="View all features" id="iHBbHN" />
-                  <ArrowRight size={14} />
-                </Button>
-              </div>
-            </div>
-          </div>
+          <PlatformSubscriptionDetails className="p-4" subscription={props.subscription} />
         )}
+      </div>
+    </div>
+  );
+}
+
+export function PlatformSubscriptionDetails(props: PlatformSubscriptionCardProps & { className?: string }) {
+  const { showModal } = useModal();
+
+  return (
+    <div className={clsx('flex flex-wrap gap-16', props.className)}>
+      <div className="flex gap-3">
+        <div>
+          <Shapes />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center text-sm">
+            <b>
+              <FormattedMessage
+                defaultMessage="{includedCount} Active Collectives"
+                id="PQL55g"
+                values={{
+                  includedCount: props.subscription.plan.pricing.includedCollectives,
+                }}
+              />
+            </b>
+            &nbsp;
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={14} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="Active collectives have at least one ledger transaction in the billing period."
+                  id="j0U5jT"
+                />
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            <FormattedMessage
+              defaultMessage="{amount} / Collective after that"
+              id="vNN8Hw"
+              values={{
+                amount: (
+                  <FormattedMoneyAmount
+                    amount={props.subscription.plan.pricing.pricePerAdditionalCollective.valueInCents}
+                    currency={props.subscription.plan.pricing.pricePerAdditionalCollective.currency}
+                  />
+                ),
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <div>
+          <Receipt />
+        </div>
+        <div className="flex flex-col gap-1 text-sm">
+          <div className="flex items-center">
+            <b>
+              <FormattedMessage
+                defaultMessage="{includedCount} Paid Expenses"
+                id="V35NqH"
+                values={{
+                  includedCount: props.subscription.plan.pricing.includedExpensesPerMonth,
+                }}
+              />
+            </b>
+            &nbsp;
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={14} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage defaultMessage="Completed expenses with the 'Paid' status." id="IHdyue" />
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            <FormattedMessage
+              defaultMessage="{amount} / expense after that"
+              id="F7fqJa"
+              values={{
+                amount: (
+                  <FormattedMoneyAmount
+                    amount={props.subscription.plan.pricing.pricePerAdditionalExpense.valueInCents}
+                    currency={props.subscription.plan.pricing.pricePerAdditionalExpense.currency}
+                  />
+                ),
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex grow justify-end">
+        <div>
+          <Button
+            variant="ghost"
+            className="text-sm font-bold"
+            onClick={() => showModal(SubscriptionFeaturesModal, { features: props.subscription.plan.features })}
+          >
+            <FormattedMessage defaultMessage="View all features" id="iHBbHN" />
+            <ArrowRight size={14} />
+          </Button>
+        </div>
       </div>
     </div>
   );

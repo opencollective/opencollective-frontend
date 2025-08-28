@@ -220,7 +220,7 @@ const ExpenseSummary = ({
                   expense.onHold
                     ? 'ON_HOLD'
                     : expense.type === ExpenseType.PLATFORM_BILLING && expense.status === ExpenseStatus.APPROVED
-                      ? 'OVERDUE'
+                      ? 'PAYMENT_DUE'
                       : expense.status
                 }
                 letterSpacing="0.8px"
