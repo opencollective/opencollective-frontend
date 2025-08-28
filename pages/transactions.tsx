@@ -20,7 +20,6 @@ import Header from '../components/Header';
 import Footer from '../components/navigation/Footer';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Transactions, {
-  defaultFilterValues,
   schema,
   toVariables,
   transactionsPageQuery,
@@ -49,7 +48,7 @@ const transactionsPageQueryHelper = getSSRQueryHelpers<
   query: transactionsPageQuery,
   getPropsFromContext: ctx => ({ query: ctx.query as TransactionsPageProps['query'] }),
   getVariablesFromContext: ctx => ({
-    ...getSSRVariablesFromQuery({ query: ctx.query, schema, toVariables, defaultFilterValues }),
+    ...getSSRVariablesFromQuery({ query: ctx.query, schema, toVariables }),
     slug: ctx.query.collectiveSlug,
   }),
   context: API_V2_CONTEXT,
