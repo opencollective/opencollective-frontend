@@ -98,7 +98,7 @@ const JoinUsActionContainer = ({ title, description, link }) => {
   );
 };
 
-const JoinUs = ({ page }) => (
+const JoinUs = ({ page = undefined }) => (
   <JoinUsWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}
