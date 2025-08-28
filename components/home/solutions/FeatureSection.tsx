@@ -1,14 +1,12 @@
-'use client';
-
 import React, { useEffect, useRef } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { useInView } from 'framer-motion';
+import { FormattedMessage } from 'react-intl';
 
 import { cn } from '@/lib/utils';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 
-import type { FeatureSection } from './features-data';
+import type { IFeatureSection } from './Features';
 
 export default function FeatureSection({
   section,
@@ -17,7 +15,7 @@ export default function FeatureSection({
   isActive,
   onBecomeVisible,
 }: {
-  section: FeatureSection;
+  section: IFeatureSection;
   sectionIndex: number;
   onItemSelect: (itemIndex: number) => void;
   isActive: boolean;
@@ -26,28 +24,21 @@ export default function FeatureSection({
   const [openItem, setOpenItem] = React.useState<string>(section.items[0].title.id);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Use Framer Motion's useInView hook instead of manual IntersectionObserver
   const inView = useInView(sectionRef, {
-    // Amount of element that needs to be visible (0-1)
     amount: 0.1,
-    // Only trigger once? Set to false to keep checking visibility
     once: false,
-    // Margin around the root similar to IntersectionObserver rootMargin
     margin: '-10% 0px -40% 0px',
   });
 
-  // When this section comes into view, notify the parent
   useEffect(() => {
     if (inView) {
       onBecomeVisible(sectionIndex);
     }
   }, [inView, sectionIndex, onBecomeVisible]);
 
-  // When an item is opened, update the parent component
   const handleValueChange = (value: string) => {
     setOpenItem(value);
 
-    // Find the index of the opened item
     const itemIndex = section.items.findIndex(item => item.title.id === value);
     if (itemIndex !== -1) {
       onItemSelect(itemIndex);
