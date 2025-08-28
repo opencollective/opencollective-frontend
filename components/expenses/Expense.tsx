@@ -252,7 +252,7 @@ function Expense(props: ExpenseProps) {
   }, []);
 
   // Disable polling while editing
-  React.useEffect(() => {
+  useEffect(() => {
     if ([PAGE_STATUS.EDIT, PAGE_STATUS.EDIT_SUMMARY].includes(state.status)) {
       if (state.isPollingEnabled) {
         setState(state => ({ ...state, isPollingEnabled: false }));

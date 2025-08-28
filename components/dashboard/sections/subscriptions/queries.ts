@@ -237,6 +237,7 @@ export const subscriberDrawerQuery = gql`
           account {
             slug
           }
+          type
           status
           platformBillingData
         }
