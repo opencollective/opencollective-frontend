@@ -12,8 +12,8 @@ import Link from '@/components/Link';
 
 const messages = defineMessages({
   defaultTitle: {
-    defaultMessage: 'Solutions for legally incorporated organizations',
-    id: 'X+QXuK',
+    defaultMessage: 'Collaborative Finances for Organizations',
+    id: 'solutions.hero.title',
   },
   defaultDescription: {
     defaultMessage:
@@ -21,15 +21,15 @@ const messages = defineMessages({
     id: 'LrBotK',
   },
   heroTitle: {
-    defaultMessage: 'Solutions for legally incorporated organisations',
+    defaultMessage: 'Collaborative Finances for Organizations',
     id: 'solutions.hero.title',
   },
   heroSubtitle: {
-    defaultMessage: 'Financial platform for Foundations, Non-Profits, Companies, Public Sector and Co-ops',
+    defaultMessage: 'Foundations, Non-Profits, Companies, Public Sector and Co-ops',
     id: 'solutions.hero.subtitle',
   },
   joinAsOrg: {
-    defaultMessage: 'Join As Organisation',
+    defaultMessage: 'Join As Organization',
     id: 'solutions.hero.joinAsOrg',
   },
   seePricing: {
