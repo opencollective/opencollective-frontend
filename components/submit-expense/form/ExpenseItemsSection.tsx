@@ -257,7 +257,7 @@ type ExpenseItemProps = {
 
 function getExpenseItemProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'isSubmitting']),
+    ...pick(form, ['setFieldValue', 'isSubmitting', 'setFieldTouched']),
     ...pick(form.options, [
       'allowExpenseItemAttachment',
       'isAdminOfPayee',
@@ -298,10 +298,13 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   const hasAttachment = props.allowExpenseItemAttachment;
   const attachmentId = useId();
 
-  const { setFieldValue } = props;
+  const { setFieldValue, setFieldTouched } = props;
 
   const onCurrencyChange = React.useCallback(
-    v => setFieldValue(`expenseItems.${props.index}.amount.currency`, v),
+    v => {
+      setFieldTouched('expenseItems');
+      setFieldValue(`expenseItems.${props.index}.amount.currency`, v);
+    },
     [props.index, setFieldValue],
   );
 
