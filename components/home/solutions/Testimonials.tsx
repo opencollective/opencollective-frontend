@@ -2,13 +2,6 @@ import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import Image from '@/components/Image';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselIndicator,
-  CarouselItem,
-  CarouselNavigation,
-} from '@/components/motion-primitives/Carousel';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
 
 const messages = defineMessages({
@@ -99,32 +92,13 @@ const Testimonials = () => {
           </h2>
         </div>
 
-        {/* Testimonials Display */}
-        {testimonials.length > 4 ? (
-          // Show carousel if more than 4 items
-          <div className="relative">
-            <Carousel className="mx-auto max-w-4xl">
-              <CarouselContent>
-                {testimonials.map(testimonial => (
-                  <CarouselItem key={testimonial.id} className="p-4 md:basis-1/2">
-                    <TestimonialCard testimonial={testimonial} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselNavigation alwaysShow />
-              <CarouselIndicator />
-            </Carousel>
+        <div className="mx-auto max-w-4xl">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {testimonials.map(testimonial => (
+              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+            ))}
           </div>
-        ) : (
-          // Show static grid if 4 or fewer items
-          <div className="mx-auto max-w-4xl">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {testimonials.map(testimonial => (
-                <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );

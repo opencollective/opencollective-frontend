@@ -5,10 +5,10 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import NextIllustration from '../components/collectives/HomeNextIllustration';
 import { MainDescription } from '../components/marketing/Text';
 import Page from '../components/Page';
-import { Button } from '@/components/ui/Button';
 import Features from '@/components/home/solutions/Features';
 import Testimonials from '@/components/home/solutions/Testimonials';
 import Link from '@/components/Link';
+import { Button } from '@/components/ui/Button';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -17,7 +17,7 @@ const messages = defineMessages({
   },
   defaultDescription: {
     defaultMessage:
-      "Open Collective is a legal and financial toolbox for groups. It's a fundraising + legal status + money management platform for your community. What do you want to do?",
+      'Open Collective is a legal and financial toolbox for groups. It’s a fundraising + legal status + money management platform for your community. What do you want to do?',
     id: 'LrBotK',
   },
   heroTitle: {
@@ -73,7 +73,7 @@ const messages = defineMessages({
   },
   transparency: {
     defaultMessage: 'Transparency',
-    id: 'solutions.features.transparency',
+    id: 'becomeASponsor.transparency',
   },
   transparencyDesc: {
     defaultMessage: 'Communicate your finances, transactions and real-time balances to your community.',
@@ -81,7 +81,7 @@ const messages = defineMessages({
   },
   hosting: {
     defaultMessage: 'Hosting',
-    id: 'solutions.features.hosting',
+    id: 'DkzeEN',
   },
   hostingDesc: {
     defaultMessage: 'Provide a fiscal umbrella by safely managing their funds under one organization.',
@@ -134,7 +134,7 @@ const features = [
   },
 ];
 
-export const Solutions = () => {
+const Solutions = () => {
   const { formatMessage } = useIntl();
 
   return (

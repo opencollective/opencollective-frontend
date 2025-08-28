@@ -1,34 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { useInView } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
-import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/motion-primitives/Accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 
-export type TFeatureSection = {
-  title: string;
-  description?: string;
-  tailwindColor?: string;
-  fgColor?: string;
-  bgColor?: string;
-  items: {
-    title: string;
-    description: string;
-    media?: {
-      src: string | StaticImport;
-      srcWidth: number;
-      srcHeight: number;
-      alt?: string;
-      containerClasses?: string;
-      mediaClasses?: string;
-      containerStyle?: React.CSSProperties;
-      style?: React.CSSProperties;
-    };
-  }[];
-};
+import type { FeatureSection } from './features-data';
 
 export default function FeatureSection({
   section,
@@ -37,13 +17,13 @@ export default function FeatureSection({
   isActive,
   onBecomeVisible,
 }: {
-  section: TFeatureSection;
+  section: FeatureSection;
   sectionIndex: number;
   onItemSelect: (itemIndex: number) => void;
   isActive: boolean;
   onBecomeVisible: (index: number) => void;
 }) {
-  const [openItem, setOpenItem] = React.useState<React.Key | null>(section.items[0].title);
+  const [openItem, setOpenItem] = React.useState<string>(section.items[0].title.id);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   // Use Framer Motion's useInView hook instead of manual IntersectionObserver
@@ -64,24 +44,15 @@ export default function FeatureSection({
   }, [inView, sectionIndex, onBecomeVisible]);
 
   // When an item is opened, update the parent component
-  const handleValueChange = (key: React.Key | null) => {
-    if (key) {
-      setOpenItem(key);
+  const handleValueChange = (value: string) => {
+    setOpenItem(value);
 
-      // Find the index of the opened item
-      const itemIndex = section.items.findIndex(item => item.title === key);
-      if (itemIndex !== -1) {
-        onItemSelect(itemIndex);
-      }
+    // Find the index of the opened item
+    const itemIndex = section.items.findIndex(item => item.title.id === value);
+    if (itemIndex !== -1) {
+      onItemSelect(itemIndex);
     }
   };
-
-  // Create a style object to locally set the --primary variable if provided
-  // const sectionStyle = section.tailwindColor
-  //   ? ({
-  //       "--primary": `var(--color-${section.tailwindColor})`,
-  //     } as React.CSSProperties)
-  //   : undefined;
 
   const sectionStyle = {
     ...(section.fgColor && {
@@ -91,10 +62,11 @@ export default function FeatureSection({
       '--card': `var(--color-${section.bgColor})`,
     }),
   } as React.CSSProperties;
+
   return (
     <div className="pb-[30dvh] last:pb-12">
       <div
-        key={section.title}
+        key={section.title.id}
         ref={sectionRef}
         style={sectionStyle}
         className={cn(
@@ -102,32 +74,39 @@ export default function FeatureSection({
           isActive ? 'opacity-100' : 'opacity-50',
         )}
       >
-        <h3 className="mb-4 text-4xl font-semibold tracking-tight">{section.title}</h3>
-        {section.description && <p className="mb-4 text-muted-foreground">{section.description}</p>}
-        <Accordion
-          className="flex w-full flex-col"
-          transition={{ duration: 0.2, ease: 'easeInOut' }}
-          expandedValue={openItem}
-          onValueChange={handleValueChange}
-        >
+        <h3 className="mb-4 text-4xl font-semibold tracking-tight">
+          <FormattedMessage {...section.title} />
+        </h3>
+        {section.description && (
+          <p className="mb-4 text-muted-foreground">
+            <FormattedMessage {...section.description} />
+          </p>
+        )}
+        <Accordion type="single" value={openItem} onValueChange={handleValueChange} className="flex w-full flex-col">
           {section.items.map(feature => {
             return (
-              <AccordionItem key={feature.title} value={feature.title} className="py-2">
+              <AccordionItem key={feature.title.id} value={feature.title.id} className="border-0 py-2">
                 <AccordionTrigger
                   className={cn(
-                    'w-full cursor-pointer border-b py-2 text-left text-xl',
-                    openItem === feature.title ? 'cursor-default' : 'cursor-pointer',
+                    'font-r w-full border-b py-2 text-left text-xl font-normal hover:no-underline',
+                    '[&[data-state=open]>div]:text-foreground',
+                    '[&[data-state=open]>div>div>div:first-child]:bg-primary',
+                    '[&>svg]:hidden', // Hide the default chevron
                   )}
                 >
-                  <div className="flex items-center justify-between text-slate-600 transition-colors group-hover:text-foreground group-data-expanded:text-foreground">
+                  <div className="flex items-center justify-between text-slate-600 transition-colors hover:text-foreground">
                     <div className="flex items-center gap-2.5">
-                      <div className="size-2 shrink-0 bg-gray-400 transition-colors group-hover:bg-primary group-data-expanded:bg-primary" />
-                      <div>{feature.title}</div>
+                      <div className="size-2 shrink-0 bg-gray-400 transition-colors" />
+                      <div>
+                        <FormattedMessage {...feature.title} />
+                      </div>
                     </div>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent>
-                  <p className="pt-4 pb-6 text-base text-muted-foreground">{feature.description}</p>
+                <AccordionContent className="pt-0">
+                  <p className="pt-4 pb-4 text-base text-muted-foreground">
+                    <FormattedMessage {...feature.description} />
+                  </p>
                 </AccordionContent>
               </AccordionItem>
             );

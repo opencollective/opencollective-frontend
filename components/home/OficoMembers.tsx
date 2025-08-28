@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
 });
 
-export const MEMBERS = [
+const MEMBERS = [
   {
     id: 'OSC',
     name: 'Open Source Collective',
