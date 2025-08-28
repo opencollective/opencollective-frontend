@@ -20,8 +20,8 @@ import type {
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -401,7 +401,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
   const tagLineMessage = PlatformSubscriptionTierTagLine[props.tier];
   const descriptionMessage = PlatformSubscriptionTierDescription[props.tier];
   const features = PlatformSubscriptionTierFeatures[props.tier];
-  console.log({ packages: props.packages });
+
   return (
     <div className="pt-2 pb-5">
       <div className="mb-6 flex justify-center">

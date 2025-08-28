@@ -100,7 +100,6 @@
     "lucide-react": "0.541.0",
     "memoize-one": "6.0.0",
     "next": "14.2.31",
-    "motion": "^12.23.12",
     "node-fetch": "^2.7.0",
     "nprogress": "0.2.0",
     "polished": "4.3.1",

@@ -1,12 +1,14 @@
 import React, { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useIntl } from 'react-intl';
 
 import { cn } from '@/lib/utils';
 
 import { featureSections } from './features-data';
 import FeatureSection from './FeatureSection';
 
-export default function Features({}) {
+export default function Features() {
+  const intl = useIntl();
   const containerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -34,7 +36,7 @@ export default function Features({}) {
       <div className="w-4/10 py-40">
         {featureSections.map((section, sectionIndex) => (
           <FeatureSection
-            key={`${section.title}-${sectionIndex}`}
+            key={section.title.id}
             section={section}
             sectionIndex={sectionIndex}
             onItemSelect={itemIndex => handleItemSelect(sectionIndex, itemIndex)}
@@ -50,15 +52,11 @@ export default function Features({}) {
           {/* sticky features box */}
           <div className="absolute inset-[0%] h-full">
             {featureSections.map((section, sectionIndex) => (
-              <React.Fragment key={`${section.title}-${sectionIndex}`}>
+              <React.Fragment key={section.title.id}>
                 {section.items.map((item, itemIndex) => {
                   const img = item.media || section.items[0]?.media;
                   const isActive = activeIndex === sectionIndex && activeSectionItems[sectionIndex] === itemIndex;
-                  // const sectionStyle = section.tailwindColor
-                  //   ? ({
-                  //       "--primary": `var(--color-${section.tailwindColor})`,
-                  //     } as React.CSSProperties)
-                  //   : undefined;
+
                   const sectionStyle = {
                     ...(section.fgColor && {
                       '--primary': `var(--color-${section.fgColor})`,
@@ -69,7 +67,7 @@ export default function Features({}) {
                   } as React.CSSProperties;
                   return (
                     <div
-                      key={`${item.title}-${itemIndex}`}
+                      key={`${section.title}-${item.title}`}
                       className="absolute inset-[0%] flex h-full items-center justify-center"
                       style={sectionStyle}
                     >
@@ -82,23 +80,13 @@ export default function Features({}) {
                       >
                         {img && (
                           <div className={cn('relative flex h-full w-full items-center justify-center')}>
-                            {img.src.startsWith('/') ? (
-                              <Image
-                                src={img.src}
-                                width={img.srcWidth}
-                                height={img.srcHeight}
-                                alt={img.alt ?? item.title}
-                                style={img.style}
-                              />
-                            ) : (
-                              <img
-                                src={img.src}
-                                style={img.style}
-                                width={img.srcWidth}
-                                height={img.srcHeight}
-                                alt={img.alt ?? item.title}
-                              />
-                            )}
+                            <Image
+                              src={img.src}
+                              width={img.srcWidth}
+                              height={img.srcHeight}
+                              alt={intl.formatMessage(item.title)}
+                              style={img.style}
+                            />
                           </div>
                         )}
                       </div>
@@ -110,7 +98,6 @@ export default function Features({}) {
           </div>
         </div>
       </div>
-      <div className="fixed top-6 right-6">{/* <SimpleFeaturesEditor onSave={handleSaveFeatures} /> */}</div>
     </section>
   );
 }

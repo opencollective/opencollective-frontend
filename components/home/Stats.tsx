@@ -9,11 +9,11 @@ const messages = defineMessages({
   },
   organizations: {
     defaultMessage: 'Organizations',
-    id: 'Stats.organizations',
+    id: 'TopContributors.Organizations',
   },
   collectives: {
     defaultMessage: 'Collectives',
-    id: 'Stats.collectives',
+    id: 'Collectives',
   },
   moneyManaged: {
     defaultMessage: 'Money Managed',
