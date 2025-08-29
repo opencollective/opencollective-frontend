@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { type ExpensesListFieldsFragmentFragment, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import DateTime from '@/components/DateTime';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
@@ -27,6 +28,10 @@ export function PlatformPaymentsView(props: PlatformPaymentsViewProps) {
   const [inViewCount, setInViewCount] = React.useState(5);
   const router = useRouter();
   const query = router.query;
+  const expenseValidations = React.useMemo(
+    () => ({ accountSlug: props.accountSlug, expenseType: ExpenseType.PLATFORM_BILLING }),
+    [props.accountSlug],
+  );
 
   const openExpenseId = query.ExpenseId ? Number(query.ExpenseId) : null;
   const setOpenExpenseId = React.useCallback(
@@ -100,7 +105,11 @@ export function PlatformPaymentsView(props: PlatformPaymentsViewProps) {
           </Button>
         </div>
       )}
-      <ExpenseDrawer openExpenseLegacyId={openExpenseId} handleClose={() => setOpenExpenseId(null)} />
+      <ExpenseDrawer
+        openExpenseLegacyId={openExpenseId}
+        handleClose={() => setOpenExpenseId(null)}
+        validate={expenseValidations}
+      />
     </div>
   );
 }
