@@ -703,6 +703,7 @@ const Contributions = ({
 
         {isIncoming &&
           !onlyExpectedFunds &&
+          metadata?.account?.canStartResumeContributionsProcess &&
           metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
           !metadata.account.parent && (
             <PausedIncomingContributionsMessage

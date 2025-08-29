@@ -287,7 +287,7 @@ export const AccountTodoList = () => {
 
   const pendingExpenseCount = account?.pendingExpenses.totalCount;
   const pendingGrantCount = account?.pendingGrants.totalCount;
-  const pausedIncomingContributionsCount = account?.pausedIncomingContributions.totalCount;
+  const pausedIncomingContributionsCount = account?.pausedResumableIncomingContributions.totalCount;
   const pausedOutgoingContributions = account?.pausedOutgoingContributions.totalCount;
   const canStartResumeContributionsProcess = account?.canStartResumeContributionsProcess;
   const canActOnPausedIncomingContributions =

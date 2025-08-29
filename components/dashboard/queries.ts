@@ -52,7 +52,14 @@ export const adminPanelQuery = gql`
       issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
         totalCount
       }
-      pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
+      pausedResumableIncomingContributions: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: false
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
+      ) {
         totalCount
       }
       pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
