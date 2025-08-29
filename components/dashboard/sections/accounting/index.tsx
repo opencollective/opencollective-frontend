@@ -16,7 +16,7 @@ import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema
 import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { isFeatureEnabled } from '@/lib/allowed-features';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -139,8 +139,7 @@ const hostOnlyFilter = buildComboSelectFilter(
  */
 export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProps) => {
   const { account } = React.useContext(DashboardContext);
-  const featureEnabled = isFeatureEnabled(account, 'CHART_OF_ACCOUNTS');
-
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const { toast } = useToast();
@@ -295,7 +294,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           }
           actions={
             <Button
-              disabled={!featureEnabled}
+              disabled={isUpgradeRequired}
               size="sm"
               variant="outline"
               className="gap-1"
@@ -309,7 +308,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           }
         />
 
-        {!featureEnabled ? (
+        {showUpgradeCTA ? (
           <UpgradeSubscriptionBlocker featureKey="CHART_OF_ACCOUNTS" className="mt-4" />
         ) : (
           <React.Fragment>

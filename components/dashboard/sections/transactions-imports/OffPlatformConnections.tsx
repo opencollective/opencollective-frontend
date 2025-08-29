@@ -11,7 +11,7 @@ import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
 import { getI18nLink } from '@/components/I18nFormatters';
@@ -66,7 +66,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const { toast } = useToast();
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
-  const featureEnabled = isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
   const [selectedImport, setSelectedImport] = React.useState(null);
@@ -75,7 +75,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
-    skip: !featureEnabled,
+    skip: isUpgradeRequired,
   });
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
@@ -150,7 +150,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               size="sm"
               variant="outline"
               onClick={handleNewConnection}
-              disabled={!['idle', 'success'].includes(plaidConnectDialog.status) || !featureEnabled}
+              disabled={!['idle', 'success'].includes(plaidConnectDialog.status) || isUpgradeRequired}
               loading={plaidConnectDialog.status === 'loading'}
             >
               <Plus size={16} />
@@ -159,7 +159,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
           </React.Fragment>
         }
       />
-      {!featureEnabled ? (
+      {isUpgradeRequired ? (
         <UpgradeSubscriptionBlocker featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
       ) : error ? (
         <MessageBoxGraphqlError error={error} />

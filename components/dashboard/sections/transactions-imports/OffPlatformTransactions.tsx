@@ -21,7 +21,7 @@ import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-imp
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
-import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 import { getI18nLink } from '@/components/I18nFormatters';
@@ -298,7 +298,8 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { account } = React.useContext(DashboardContext);
-  const featureEnabled = isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
+
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const apolloClient = useApolloClient();
@@ -335,7 +336,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
       ...queryFilter.variables,
       fetchOnlyRowIds: false,
     },
-    skip: !featureEnabled,
+    skip: isUpgradeRequired,
   });
 
   const host = data?.host;
@@ -409,7 +410,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
           }
         />
       </div>
-      {!featureEnabled ? (
+      {isUpgradeRequired ? (
         <UpgradeSubscriptionBlocker featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
       ) : loading && !host ? (
         <LoadingPlaceholder height={300} />
