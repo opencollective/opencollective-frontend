@@ -32,6 +32,24 @@ const content: Content = {
       id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.title',
       defaultMessage: 'Upgrade your plan to access chart of accounts.',
     }),
+    benefits: [
+      defineMessage({
+        id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.accountingCategories',
+        defaultMessage: 'Setup your accounting categories to mirror your accounting needs.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.categorize',
+        defaultMessage: 'Assign expenses and added funds to their correct accounting categories.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.export',
+        defaultMessage: 'Include the selected accounting categories in your exports.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize',
+        defaultMessage: 'Reduce the accounting costs, workload, and risk of accounting errors.',
+      }),
+    ],
     learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/chart-of-accounts',
   },
   TAX_FORMS: {
