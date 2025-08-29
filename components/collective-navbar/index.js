@@ -300,7 +300,15 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds) => {
+const getDefaultCallsToActions = (
+  collective,
+  sections,
+  isAdmin,
+  isAccountant,
+  LoggedInUser,
+  isAllowedAddFunds,
+  isHostAdmin,
+) => {
   if (!collective) {
     return {};
   }
@@ -308,7 +316,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, L
   const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
-    hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
+    hasContact: isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM'),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
@@ -503,7 +511,15 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds),
+    ...getDefaultCallsToActions(
+      collective,
+      sections,
+      isAdmin,
+      isAccountant,
+      LoggedInUser,
+      isAllowedAddFunds,
+      isHostAdmin,
+    ),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
