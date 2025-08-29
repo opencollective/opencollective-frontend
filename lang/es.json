@@ -4012,7 +4012,7 @@
   "uPFUUe": "Esperando aprobación",
   "UpgradeSubscription": "Upgrade Subscription",
   "UpgradeSubscriptionBlocker.description.DISABLED": "This feature is not available on your current plan. Upgrade your subscription to access this feature.",
-  "UpgradeSubscriptionBlocker.description.UNSUPPORTED": "Your account type does not support this feature.",
+  "UpgradeSubscriptionBlocker.description.UNSUPPORTED": "This feature is not supported for your account.",
   "UpgradeSubscriptionBlocker.TaxForms.description": "This feature is not available on your current plan. Upgrade your subscription to start collecting tax forms from expense submitters.",
   "UpgradeSubscriptionBlocker.title.DISABLED": "Upgrade Required",
   "UpgradeSubscriptionBlocker.title.UNSUPPORTED": "Feature not supported for your account",
