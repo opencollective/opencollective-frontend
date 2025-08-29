@@ -184,7 +184,7 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
               {customContent?.learnMoreUrl && (
                 <Button asChild variant="outline" size="sm">
                   <Link href={customContent.learnMoreUrl}>
-                    <FormattedMessage id="UpgradePlanCTA.learnMoreButton" defaultMessage="Learn More" />
+                    <FormattedMessage id="7DIW6+" defaultMessage="Learn More" />
                   </Link>
                 </Button>
               )}
