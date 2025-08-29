@@ -153,16 +153,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
-      {!featureEnabled && (
-        <UpgradeSubscriptionBlocker
-          featureKey="TAX_FORMS"
-          description={intl.formatMessage({
-            defaultMessage:
-              'This feature is not available on your current plan. Upgrade your subscription to start collecting tax forms from expense submitters.',
-            id: 'UpgradeSubscriptionBlocker.TaxForms.description',
-          })}
-        />
-      )}
+      {!featureEnabled && <UpgradeSubscriptionBlocker featureKey="TAX_FORMS" />}
       <Filterbar {...queryFilter} />
 
       {error ? (

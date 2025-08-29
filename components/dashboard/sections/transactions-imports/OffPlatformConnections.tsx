@@ -160,14 +160,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
         }
       />
       {!featureEnabled ? (
-        <UpgradeSubscriptionBlocker
-          featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS}
-          description={intl.formatMessage({
-            defaultMessage:
-              'Upgrade your plan to be able to connect bank accounts to sync off-platform transactions to your ledger on the platform.',
-            id: 'UpgradeSubscriptionBlocker.BankAccountSync.description',
-          })}
-        />
+        <UpgradeSubscriptionBlocker featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
       ) : error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (
