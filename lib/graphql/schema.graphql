@@ -58,7 +58,7 @@ interface CollectiveInterface {
   isSuspended: Boolean!
   isGuest: Boolean
   canApply: Boolean
-  canContact: Boolean
+  canContact: Boolean!
   isArchived: Boolean
   isApproved: Boolean
   isDeletable: Boolean
@@ -2128,7 +2128,7 @@ type Collective implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
@@ -2413,7 +2413,7 @@ type Event implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
@@ -2698,7 +2698,7 @@ type Fund implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
@@ -2983,7 +2983,7 @@ type Organization implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
@@ -3268,7 +3268,7 @@ type Project implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
@@ -3848,7 +3848,7 @@ type User implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
@@ -4135,7 +4135,7 @@ type Vendor implements CollectiveInterface {
   """
   Returns whether this collectives can be contacted
   """
-  canContact: Boolean
+  canContact: Boolean!
 
   """
   Returns whether this collective is incognito
