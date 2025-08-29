@@ -49,7 +49,7 @@ export function UpgradeSubscriptionBlocker(props: UpgradeSubscriptionBlockerProp
     ) : featureAccess === CollectiveFeatureStatus.UNSUPPORTED ? (
       <FormattedMessage
         id="UpgradeSubscriptionBlocker.description.UNSUPPORTED"
-        defaultMessage="Your account type does not support this feature."
+        defaultMessage="This feature is not supported for your account."
       />
     ) : null;
 
