@@ -20,7 +20,7 @@ import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { UpgradeSubscriptionBlocker } from '../../../platform-subscriptions/UpgradeSubscriptionBlocker';
+import { UpgradePlanCTA } from '../../../platform-subscriptions/UpgradePlanCTA.tsx';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
@@ -309,7 +309,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         />
 
         {isUpgradeRequired ? (
-          <UpgradeSubscriptionBlocker featureKey="CHART_OF_ACCOUNTS" className="mt-4" />
+          <UpgradePlanCTA featureKey="CHART_OF_ACCOUNTS" className="mt-4" />
         ) : (
           <React.Fragment>
             <Filterbar {...queryFilter} />

@@ -101,12 +101,12 @@ const content: Content = {
   },
 };
 
-type UpgradeSubscriptionBlockerProps = {
+type UpgradePlanCTAProps = {
   featureKey: FeatureKey;
   className?: string;
 };
 
-export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSubscriptionBlockerProps) {
+export function UpgradePlanCTA({ featureKey, className }: UpgradePlanCTAProps) {
   const { account } = React.useContext(DashboardContext);
 
   if (isFeatureEnabled(account, featureKey)) {

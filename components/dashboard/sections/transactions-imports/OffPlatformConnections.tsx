@@ -16,7 +16,7 @@ import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
-import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -160,7 +160,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
         }
       />
       {isUpgradeRequired ? (
-        <UpgradeSubscriptionBlocker featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
+        <UpgradePlanCTA featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
       ) : error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (

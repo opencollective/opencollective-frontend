@@ -25,7 +25,7 @@ import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 import { getI18nLink } from '@/components/I18nFormatters';
-import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import StackedAvatars from '@/components/StackedAvatars';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
@@ -411,7 +411,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
         />
       </div>
       {isUpgradeRequired ? (
-        <UpgradeSubscriptionBlocker featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
+        <UpgradePlanCTA featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
       ) : loading && !host ? (
         <LoadingPlaceholder height={300} />
       ) : error ? (

@@ -13,7 +13,7 @@ import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
-import { UpgradeSubscriptionBlocker } from '@/components/platform-subscriptions/UpgradeSubscriptionBlocker';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DashboardContext } from '../../DashboardContext';
@@ -152,7 +152,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
-      {isUpgradeRequired && <UpgradeSubscriptionBlocker featureKey="TAX_FORMS" />}
+      {isUpgradeRequired && <UpgradePlanCTA featureKey="TAX_FORMS" />}
       <Filterbar {...queryFilter} />
 
       {error ? (
