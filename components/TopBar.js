@@ -7,6 +7,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import NextImage from 'next/image';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -14,6 +15,8 @@ import styled from 'styled-components';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
+import { getEnvVar } from '@/lib/env-utils';
+import { parseToBoolean } from '@/lib/utils';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import ProfileMenu from './navigation/ProfileMenu';
@@ -28,7 +31,6 @@ import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
-import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 
 const NavList = styled(Flex)`
@@ -44,7 +46,7 @@ const NavLinkContainer = styled(Box)`
 `;
 
 const NavButton = styled(StyledButton)`
-  color: #323334;
+  color: var(--color-slate-800);
   font-weight: 500;
   font-size: 16px;
   padding: 10px;
@@ -80,15 +82,34 @@ const TopBarIcon = ({ provider }) => {
       <Flex alignItems="center">
         {provider?.logo ? (
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
+        ) : parseToBoolean(getEnvVar('NEW_PRICING')) ? (
+          <React.Fragment>
+            <NextImage
+              width={555}
+              height={75}
+              className="hidden h-6 w-auto sm:block"
+              src="/static/images/ofi-opencollective-logo.png"
+              alt="Open Collective"
+            />
+            <Image
+              width={32}
+              height={32}
+              className="block sm:hidden"
+              src="/static/images/oc-logo-watercolor-256.png"
+              alt="Open Collective"
+            />
+          </React.Fragment>
         ) : (
-          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
-        )}
-        {!provider && (
-          <Hide xs sm md>
-            <Box mx={2}>
-              <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
-            </Box>
-          </Hide>
+          <React.Fragment>
+            <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />{' '}
+            {!provider && (
+              <Hide xs sm md>
+                <Box mx={2}>
+                  <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+                </Box>
+              </Hide>
+            )}
+          </React.Fragment>
         )}
       </Flex>
     </Link>
@@ -130,6 +151,7 @@ const TopBar = ({
     '/how-it-works',
     '/fiscal-hosting',
     '/help',
+    '/solutions',
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
 
@@ -145,20 +167,24 @@ const TopBar = ({
       py={showSearch ? 2 : 3}
       alignItems="center"
       flexDirection="row"
-      justifyContent="space-around"
       css={{
         height: theme.sizes.navbarHeight,
         background: 'white',
         borderBottom: whitelabel?.border ?? '1px solid rgb(232, 233, 235)',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateAreas: '"left center right"',
       }}
       ref={ref}
     >
-      <TopBarIcon provider={whitelabel} />
-      <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
+      <Box css={{ gridArea: 'left' }}>
+        <TopBarIcon provider={whitelabel} />
+      </Box>
+
+      <Flex alignItems="center" justifyContent="center" css={{ gridArea: 'center' }}>
         <Hide xs sm>
-          {' '}
           {showMenu && (
-            <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+            <NavList as="ul" p={0} m={0} justifyContent="center" css="margin: 0;">
               {!whitelabel && (
                 <React.Fragment>
                   {menuItems.solutions && (
@@ -296,35 +322,38 @@ const TopBar = ({
         </Hide>
         {showSearch && (
           <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-            <Flex>
+            <div className="flex items-center">
               <SearchIcon fill="#75777A" size={18} />
               <Hide xs sm>
-                <Span ml="5px">
+                <span className="ml-1 text-base" ml="5px">
                   <FormattedMessage id="Search" defaultMessage="Search" />
-                </Span>
+                </span>
               </Hide>
-            </Flex>
+            </div>
           </NavButton>
         )}
         <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
       </Flex>
 
-      {showProfileAndChangelogMenu && (
-        <React.Fragment>
-          <div className="mr-2 hidden sm:block">
-            <ChangelogTrigger />
-          </div>
-          <ProfileMenu />
-        </React.Fragment>
-      )}
-      <Hide md lg>
-        <Box mx={3} onClick={toggleMobileMenu}>
-          <Flex as="a">
-            <MenuIcon color="#aaaaaa" size={24} />
-          </Flex>
-        </Box>
-        {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
-      </Hide>
+      {/* Right section - Profile, and Mobile Menu */}
+      <Flex alignItems="center" justifyContent="flex-end" css={{ gridArea: 'right' }}>
+        {showProfileAndChangelogMenu && (
+          <React.Fragment>
+            <div className="mr-2 hidden sm:block">
+              <ChangelogTrigger />
+            </div>
+            <ProfileMenu />
+          </React.Fragment>
+        )}
+        <Hide md lg>
+          <Box mx={3} onClick={toggleMobileMenu}>
+            <Flex as="a">
+              <MenuIcon color="#aaaaaa" size={24} />
+            </Flex>
+          </Box>
+          {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
+        </Hide>
+      </Flex>
     </Flex>
   );
 };

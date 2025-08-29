@@ -1,5 +1,5 @@
+import type { LucideIcon } from 'lucide-react';
 import { Building, Crown, Zap } from 'lucide-react';
-import type React from 'react';
 import { defineMessages } from 'react-intl';
 
 import type { PlatformSubscriptionFeatures as PlatformSubscriptionFeaturesSchema } from '@/lib/graphql/types/v2/schema';
@@ -7,6 +7,8 @@ import type { PlatformSubscriptionFeatures as PlatformSubscriptionFeaturesSchema
 type PlatformSubscriptionFeaturesType = keyof Omit<PlatformSubscriptionFeaturesSchema, '__typename'>;
 
 export const PlatformSubscriptionFeatures = [
+  'RECEIVE_FINANCIAL_CONTRIBUTIONS',
+  'USE_EXPENSES',
   'TRANSFERWISE',
   'PAYPAL_PAYOUTS',
   'CHART_OF_ACCOUNTS',
@@ -42,8 +44,8 @@ export const PlatformSubscriptionTierTagLine = defineMessages<(typeof PlatformSu
     id: 'bgl/3/',
   },
   Pro: {
-    defaultMessage: 'For professional Organization',
-    id: 'Wff5OS',
+    defaultMessage: 'For professional Organizations',
+    id: 'bS7TrO',
   },
 });
 
@@ -62,7 +64,7 @@ export const PlatformSubscriptionTierDescription = defineMessages<(typeof Platfo
   },
 });
 
-export const PlatformSubscriptionTierIcon: Record<(typeof PlatformSubscriptionTiers)[number], React.ComponentType> = {
+export const PlatformSubscriptionTierIcon: Record<(typeof PlatformSubscriptionTiers)[number], LucideIcon> = {
   Discover: Zap,
   Basic: Crown,
   Pro: Building,
@@ -73,6 +75,8 @@ export const PlatformSubscriptionTierFeatures: Record<
   Record<(typeof PlatformSubscriptionFeatures)[number], boolean>
 > = {
   Discover: {
+    RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
+    USE_EXPENSES: true,
     CHART_OF_ACCOUNTS: false,
     OFF_PLATFORM_TRANSACTIONS: false,
     PAYPAL_PAYOUTS: false,
@@ -80,6 +84,8 @@ export const PlatformSubscriptionTierFeatures: Record<
     TRANSFERWISE: false,
   },
   Basic: {
+    RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
+    USE_EXPENSES: true,
     CHART_OF_ACCOUNTS: true,
     OFF_PLATFORM_TRANSACTIONS: false,
     PAYPAL_PAYOUTS: true,
@@ -87,6 +93,8 @@ export const PlatformSubscriptionTierFeatures: Record<
     TRANSFERWISE: true,
   },
   Pro: {
+    RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
+    USE_EXPENSES: true,
     CHART_OF_ACCOUNTS: true,
     OFF_PLATFORM_TRANSACTIONS: true,
     PAYPAL_PAYOUTS: true,
@@ -96,6 +104,14 @@ export const PlatformSubscriptionTierFeatures: Record<
 };
 
 export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof PlatformSubscriptionFeatures)[number]>({
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: {
+    defaultMessage: 'Crowdfunding pages',
+    id: 'lLH5Iy',
+  },
+  USE_EXPENSES: {
+    defaultMessage: 'Expense management',
+    id: 'RYRVnQ',
+  },
   CHART_OF_ACCOUNTS: {
     defaultMessage: 'Chart of Accounts',
     id: 'IzFWHI',
@@ -105,15 +121,15 @@ export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof Platform
     id: 'R9kjJI',
   },
   PAYPAL_PAYOUTS: {
-    defaultMessage: 'Payouts With PayPal',
-    id: 'vHjZn7',
+    defaultMessage: 'Payouts with PayPal',
+    id: 'DktLfa',
   },
   TAX_FORMS: {
     defaultMessage: 'Tax Forms',
     id: 'skSw4d',
   },
   TRANSFERWISE: {
-    defaultMessage: 'Payouts With Wise',
-    id: 'YN48Qe',
+    defaultMessage: 'Payouts with Wise',
+    id: 'QwF3vJ',
   },
 });

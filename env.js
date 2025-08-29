@@ -49,6 +49,7 @@ const defaults = {
   SENTRY_TRACES_SAMPLE_RATE: null,
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
   DISABLE_CONTACT_FORM: false,
+  NEW_PRICING: false,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {
