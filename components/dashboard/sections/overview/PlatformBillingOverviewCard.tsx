@@ -15,7 +15,7 @@ import MessageBox from '@/components/MessageBox';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 
-import { platformBillingFragment, platformSubscriptionFragment } from '../platform-subscription/fragments';
+import { platformSubscriptionFragment } from '../platform-subscription/fragments';
 import { PlatformSubscriptionDetails } from '../platform-subscription/PlatformSubscriptionCard';
 
 type PlatformBillingOverviewCardProps = {
@@ -31,14 +31,9 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
           platformSubscription {
             ...PlatformSubscriptionFields
           }
-
-          platformBilling {
-            ...PlatformBillingFields
-          }
         }
       }
       ${platformSubscriptionFragment}
-      ${platformBillingFragment}
     `,
     {
       context: API_V2_CONTEXT,
@@ -52,7 +47,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return <Skeleton className="h-16 w-full" />;
   }
 
-  if (!query.data?.host?.platformSubscription || !query.data?.host?.platformBilling) {
+  if (!query.data?.host?.platformSubscription) {
     return null;
   }
 
