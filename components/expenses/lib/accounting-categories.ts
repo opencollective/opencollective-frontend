@@ -3,7 +3,14 @@ import { get } from 'lodash';
 import type LoggedInUser from '../../../lib/LoggedInUser';
 import { getPolicy } from '../../../lib/policies';
 import { isFeatureEnabled } from '@/lib/allowed-features';
-import type { Account, CollectiveFeatures, Expense, Host, Policies } from '@/lib/graphql/types/v2/graphql';
+import type {
+  Account,
+  CollectiveFeatures,
+  Expense,
+  ExpenseHostFieldsFragment,
+  Host,
+  Policies,
+} from '@/lib/graphql/types/v2/graphql';
 
 const getExpenseCategorizationPolicy = (
   collective: {
@@ -51,6 +58,7 @@ export const collectiveAdminsMustConfirmAccountingCategory = (
     host?: {
       policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'>;
       features: Pick<CollectiveFeatures, 'CHART_OF_ACCOUNTS'>;
+      expenseAccountingCategories: ExpenseHostFieldsFragment['expenseAccountingCategories'];
     };
   },
   host = collective?.['host'],
@@ -59,8 +67,9 @@ export const collectiveAdminsMustConfirmAccountingCategory = (
     return false;
   }
 
+  const hasAvailableCategories = host?.expenseAccountingCategories?.nodes?.length > 0;
   const policy = getExpenseCategorizationPolicy(collective, host);
-  return Boolean(policy?.requiredForCollectiveAdmins);
+  return Boolean(policy?.requiredForCollectiveAdmins && hasAvailableCategories);
 };
 
 // Defines the fields in the `Host` object where the accounting categories are stored
