@@ -147,20 +147,16 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
     <React.Fragment>
       <Alert variant="default" className={cn('px-6 py-8', className)}>
         <div className="flex flex-col items-center space-y-6 text-center">
-          {/* Lock Icon */}
           <div className="rounded-full bg-muted p-4">
             <Image src="/static/images/lock.png" alt="Lock" width={64} height={64} className="" />
           </div>
 
-          {/* Title */}
           <AlertTitle className="mb-8 text-center text-2xl font-semibold text-balance text-foreground">
             {title}
           </AlertTitle>
 
-          {/* Description */}
           {description && <AlertDescription className="max-w-md text-muted-foreground">{description}</AlertDescription>}
 
-          {/* Benefits List */}
           {featureAccess === 'DISABLED' && customContent?.benefits && (
             <div className="w-full max-w-xl space-y-3">
               {customContent.benefits.map(benefit => (

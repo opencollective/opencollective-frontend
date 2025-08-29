@@ -308,7 +308,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           }
         />
 
-        {showUpgradeCTA ? (
+        {isUpgradeRequired ? (
           <UpgradeSubscriptionBlocker featureKey="CHART_OF_ACCOUNTS" className="mt-4" />
         ) : (
           <React.Fragment>
