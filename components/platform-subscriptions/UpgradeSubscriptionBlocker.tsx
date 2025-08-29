@@ -13,7 +13,7 @@ import Image from '@/components/Image';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import Link from '../Link';
-import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
+import { Alert, AlertTitle } from '../ui/Alert';
 import { Button } from '../ui/Button';
 
 type FeatureKey = (typeof FEATURES)[keyof typeof FEATURES];
@@ -21,7 +21,6 @@ type FeatureKey = (typeof FEATURES)[keyof typeof FEATURES];
 type Content = {
   [K in FeatureKey]?: {
     title: MessageDescriptor;
-    description?: MessageDescriptor;
     benefits?: MessageDescriptor[];
     learnMoreUrl?: string;
   };
@@ -126,23 +125,6 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
       <FormattedMessage id="UpgradePlanCTA.title.UNSUPPORTED" defaultMessage="Feature not supported for your account" />
     ) : null;
 
-  const description =
-    featureAccess === CollectiveFeatureStatus.DISABLED ? (
-      customContent?.description ? (
-        <FormattedMessage {...customContent.description} />
-      ) : (
-        <FormattedMessage
-          id="UpgradePlanCTA.description.DISABLED"
-          defaultMessage="This feature is not available on your current plan. Upgrade your subscription to access this feature."
-        />
-      )
-    ) : featureAccess === CollectiveFeatureStatus.UNSUPPORTED ? (
-      <FormattedMessage
-        id="UpgradePlanCTA.description.UNSUPPORTED"
-        defaultMessage="Your account type does not support this feature."
-      />
-    ) : null;
-
   return (
     <React.Fragment>
       <Alert variant="default" className={cn('px-6 py-8', className)}>
@@ -154,8 +136,6 @@ export function UpgradeSubscriptionBlocker({ featureKey, className }: UpgradeSub
           <AlertTitle className="mb-8 text-center text-2xl font-semibold text-balance text-foreground">
             {title}
           </AlertTitle>
-
-          {description && <AlertDescription className="max-w-md text-muted-foreground">{description}</AlertDescription>}
 
           {featureAccess === 'DISABLED' && customContent?.benefits && (
             <div className="w-full max-w-xl space-y-3">
