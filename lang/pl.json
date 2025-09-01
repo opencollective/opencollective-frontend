@@ -1,7 +1,7 @@
 {
   "++1FQ+": "Wysłano przypomnienie o wygasającej karcie kredytowej na konto <Account></Account>",
   "+1HAHt": "URL profilu",
-  "+2hntI": "{perMonth} / Month",
+  "+2hntI": "{perMonth} / Miesiąc",
   "+5Kafe": "Szczegóły wydatku",
   "+5KHJy": "Usuń token",
   "+5TQLy": "<Individual></Individual> poprosił o ponowne zatwierdzenie <Expense>{expenseDescription}</Expense>",
@@ -66,7 +66,7 @@
   "0b9yMU": "Private notes are only visible to you and other Host admins.",
   "0bkmNx": "Pause {count} recurring contributions",
   "0Eavm2": "Indicates “REFUNDED” if this transaction was refunded (otherwise empty).",
-  "0eCOkC": "Organization's Detail",
+  "0eCOkC": "",
   "0frjVr": "Utwórz fundusz",
   "0FWFFg": "Required by {isSelfHosted, select, true {{collectiveName}} other {{hostName}, the legal entity that provides {collectiveName} with financial services,}} as total contributions in the current fiscal year exceeds {amount}.",
   "0HT+Ib": "Archiwum",
