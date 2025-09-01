@@ -133,7 +133,7 @@ const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
 
 const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
-    if (!['ADMIN', 'ACCOUNTANT', 'HOST'].includes(m.role) || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.collective.isArchived) {
       return false;
     } else if (['EVENT', 'PROJECT'].includes(m.collective.type)) {
       return false;
