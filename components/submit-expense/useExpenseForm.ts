@@ -2084,6 +2084,7 @@ export function useExpenseForm(opts: {
           },
         })),
       );
+      setFieldTouched('expenseItems');
     }
   }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue, setFieldTouched]);
 
