@@ -117,6 +117,32 @@ const content: Content = {
       }),
     ],
   },
+  TRANSFERWISE: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.AUTOMATED_PAYMENTS.title',
+      defaultMessage: 'Upgrade your plan for automated payments.',
+    }),
+    benefits: [
+      defineMessage({
+        id: 'UpgradePlanCTA.AUTOMATED_PAYMENTS.payOnPlatform',
+        defaultMessage: 'Pay with a click of a button.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.AUTOMATED_PAYMENTS.ledger',
+        defaultMessage: 'Transfer & fee values are automatically recorded.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.AUTOMATED_PAYMENTS.reduceErrors',
+        defaultMessage: 'Reduce manual data entry errors.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.AUTOMATED_PAYMENTS.saveTime',
+        defaultMessage: 'Process more expenses in less time.',
+      }),
+    ],
+    learnMoreUrl:
+      'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-as-a-fiscal-host',
+  },
 };
 
 type UpgradePlanCTAProps = {
