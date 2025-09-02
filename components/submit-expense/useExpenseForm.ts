@@ -1663,6 +1663,7 @@ export function useExpenseForm(opts: {
   const { LoggedInUser } = useLoggedInUser();
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
   const startOptions = React.useRef(opts.startOptions);
+  const [expenseLoaded, setExpenseLoaded] = React.useState(false);
   const setInitialExpenseValues = React.useRef(false);
   const setInitialFormOptions = React.useRef(false);
   const initialLoading = React.useRef(true);
@@ -2084,7 +2085,8 @@ export function useExpenseForm(opts: {
           },
         })),
       );
-      setFieldTouched('expenseItems');
+      setFieldTouched('expenseItems', true);
+      setExpenseLoaded(true);
     }
   }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue, setFieldTouched]);
 
@@ -2328,15 +2330,18 @@ export function useExpenseForm(opts: {
 
     runValidation();
   }, [formOptions.schema, validateForm]);
-
   React.useEffect(() => {
+    if (startOptions.current.expenseId && !expenseLoaded) {
+      return;
+    }
+
     for (let i = 0; i < (expenseForm.values.expenseItems?.length ?? 0); i++) {
       const expenseItem = expenseForm.values.expenseItems[i];
       if (!expenseItem.amount?.currency) {
         setFieldValue(`expenseItems.${i}.amount.currency`, formOptions.expenseCurrency);
       }
     }
-  }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+  }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, expenseLoaded]);
 
   React.useEffect(() => {
     if (
