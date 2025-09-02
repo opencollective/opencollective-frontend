@@ -96,6 +96,7 @@ export const adminPanelQuery = gql`
         CHART_OF_ACCOUNTS
         PAYPAL_PAYOUTS
         TRANSFERWISE
+        AGREEMENTS
       }
       policies {
         id
