@@ -261,7 +261,6 @@ function ExpenseFormikContainer(props: {
           key: 'initial', // "key" is only used for enabling FlipMove animations
           amount: {
             valueInCents: 0,
-            currency: 'USD',
           },
           description: '',
         },
