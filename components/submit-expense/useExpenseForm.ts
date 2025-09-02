@@ -2234,14 +2234,15 @@ export function useExpenseForm(opts: {
           `,
           context: {
             ...API_V2_CONTEXT,
-            fetchOptions: {
-              signal: ctrl.signal,
-            },
           },
           variables: {
             exchangeRateRequests,
           },
         });
+
+        if (ctrl.signal.aborted) {
+          return;
+        }
 
         queryComplete = true;
         if (!isEmpty(res.data?.currencyExchangeRate)) {
