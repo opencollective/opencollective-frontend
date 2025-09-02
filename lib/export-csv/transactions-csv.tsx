@@ -41,6 +41,14 @@ export type CSVField =
   | 'oppositeAccountName'
   | 'oppositeAccountType'
   | 'oppositeAccountEmail'
+  | 'parentAccountSlug'
+  | 'parentAccountName'
+  | 'parentAccountType'
+  | 'parentAccountEmail'
+  | 'oppositeParentAccountSlug'
+  | 'oppositeParentAccountName'
+  | 'oppositeParentAccountType'
+  | 'oppositeParentAccountEmail'
   | 'hostSlug'
   | 'hostName'
   | 'hostType'
@@ -122,6 +130,14 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   oppositeAccountName: 'Opposite Account Name',
   oppositeAccountType: 'Opposite Account Type',
   oppositeAccountEmail: 'Opposite Account Email',
+  parentAccountSlug: 'Parent Account Handle',
+  parentAccountName: 'Parent Account Name',
+  parentAccountType: 'Parent Account Type',
+  parentAccountEmail: 'Parent Account Email',
+  oppositeParentAccountSlug: 'Opposite Parent Account Handle',
+  oppositeParentAccountName: 'Opposite Parent Account Name',
+  oppositeParentAccountType: 'Opposite Parent Account Type',
+  oppositeParentAccountEmail: 'Opposite Parent Account Email',
   hostSlug: 'Host Handle',
   hostName: 'Host Name',
   hostType: 'Host Type',
@@ -423,6 +439,84 @@ export const FIELDS: Array<{
       <FormattedMessage defaultMessage="A contact email for the opposite account (for individuals only)." id="fG5bjt" />
     ),
     label: 'Opposite Account Email',
+  },
+
+  {
+    id: 'parentAccountSlug',
+    group: 'account',
+    label: 'Parent Account Handle',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The handle (URL identifier on the website) for the parent account, if it exists."
+        id="EbIAqw"
+      />
+    ),
+  },
+  {
+    id: 'parentAccountName',
+    group: 'account',
+    label: 'Parent Account Name',
+    tooltip: <FormattedMessage defaultMessage="The full name of the parent account, if it exists." id="tjroCC" />,
+  },
+  {
+    id: 'parentAccountType',
+    group: 'account',
+    label: 'Parent Account Type',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The type of the parent account (person, organization, collective, host, fund, etc.)"
+        id="Zkrf1y"
+      />
+    ),
+  },
+  {
+    id: 'parentAccountEmail',
+    group: 'account',
+    label: 'Parent Account Email',
+    tooltip: (
+      <FormattedMessage defaultMessage="A contact email for the parent account (for individuals only)." id="sGtR3j" />
+    ),
+  },
+  {
+    id: 'oppositeParentAccountSlug',
+    group: 'account',
+    label: 'Opposite Parent Account Handle',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The handle (URL identifier on the website) for the opposite parent account, if it exists."
+        id="EwFdb6"
+      />
+    ),
+  },
+  {
+    id: 'oppositeParentAccountName',
+    group: 'account',
+    label: 'Opposite Parent Account Name',
+    tooltip: (
+      <FormattedMessage defaultMessage="The full name of the opposite parent account, if it exists." id="lClEDA" />
+    ),
+  },
+  {
+    id: 'oppositeParentAccountType',
+    group: 'account',
+    label: 'Opposite Parent Account Type',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The type of the opposite parent account (person, organization, collective, host, fund, etc.)"
+        id="71u3AU"
+      />
+    ),
+  },
+  {
+    id: 'oppositeParentAccountEmail',
+    group: 'account',
+    label: 'Opposite Parent Account Email',
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="A contact email for the opposite parent account (for individuals only)."
+        id="hBFcf+"
+      />
+    ),
   },
   {
     id: 'orderLegacyId',
