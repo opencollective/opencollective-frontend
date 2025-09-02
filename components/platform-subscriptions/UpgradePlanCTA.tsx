@@ -140,7 +140,8 @@ const content: Content = {
         defaultMessage: 'Process more expenses in less time.',
       }),
     ],
-    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/expense-payment',
+    learnMoreUrl:
+      'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-as-a-fiscal-host',
   },
   PAYPAL_PAYOUTS: {
     title: defineMessage({
@@ -165,7 +166,8 @@ const content: Content = {
         defaultMessage: 'Process more expenses in less time.',
       }),
     ],
-    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/expense-payment',
+    learnMoreUrl:
+      'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-as-a-fiscal-host',
   },
 };
 
