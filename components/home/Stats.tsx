@@ -2,6 +2,15 @@ import React from 'react';
 import Image from 'next/image';
 import { defineMessages, useIntl } from 'react-intl';
 
+// Hardcoded stats from 2025-09-03, based on host's with "isTrustedHost"=true
+const stats = {
+  organizations: '41',
+  collectives: '10K+',
+  moneyManaged: '$40M',
+  expensesPaid: '116K+',
+  contributionsReceived: '1M+',
+  transactionsRecorded: '6M+',
+};
 const messages = defineMessages({
   title: {
     defaultMessage: 'Our Impact, By the Numbers',
@@ -60,25 +69,25 @@ const Stats = () => {
             <div className="grid grid-cols-3 gap-8">
               {/* Top Row */}
               <div className="text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">51</div>
+                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.organizations}</div>
                 <div className="text-xl text-slate-700">{formatMessage(messages.organizations)}</div>
               </div>
               <div className="text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">28K+</div>
+                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.collectives}</div>
                 <div className="text-xl text-slate-700">{formatMessage(messages.collectives)}</div>
               </div>
               <div className="text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">$30M</div>
+                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.moneyManaged}</div>
                 <div className="text-xl text-slate-700">{formatMessage(messages.moneyManaged)}</div>
               </div>
 
               {/* Bottom Row */}
               <div className="pt-8 text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">800K+</div>
+                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.expensesPaid}</div>
                 <div className="text-xl text-slate-700">{formatMessage(messages.expensesPaid)}</div>
               </div>
               <div className="pt-8 text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">910K+</div>
+                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.contributionsReceived}</div>
                 <div className="text-xl text-slate-700">{formatMessage(messages.contributionsReceived)}</div>
               </div>
               <div className="pt-8 text-center">
