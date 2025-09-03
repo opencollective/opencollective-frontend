@@ -92,6 +92,31 @@ const content: Content = {
       }),
     ],
   },
+  AGREEMENTS: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.AGREEMENTS.title',
+      defaultMessage: 'Upgrade your plan to upload agreements',
+    }),
+    benefits: [
+      defineMessage({
+        id: 'UpgradePlanCTA.AGREEMENTS.compliance',
+        defaultMessage: 'Track legal and contractual obligations for proper expense processing.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.AGREEMENTS.documentation',
+        defaultMessage: 'Store all agreement documents in one centralized location.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.AGREEMENTS.expiration',
+        defaultMessage: 'Set expiration dates to stay on top of agreement renewals.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.AGREEMENTS.review',
+        defaultMessage: 'Access relevant agreements when reviewing expenses.',
+      }),
+    ],
+    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/managing-your-collectives/agreements',
+  },
   OFF_PLATFORM_TRANSACTIONS: {
     title: defineMessage({
       id: 'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.title',
@@ -203,7 +228,7 @@ export function UpgradePlanCTA({ featureKey, className }: UpgradePlanCTAProps) {
               </Button>
               {customContent?.learnMoreUrl && (
                 <Button asChild variant="outline" size="sm">
-                  <Link href={customContent.learnMoreUrl}>
+                  <Link href={customContent.learnMoreUrl} target="_blank">
                     <FormattedMessage id="7DIW6+" defaultMessage="Learn More" />
                   </Link>
                 </Button>

@@ -12,6 +12,9 @@ import type { HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2
 import type { Agreement } from '../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import { useAgreementActions } from '../../agreements/actions';
 import AgreementDrawer from '../../agreements/AgreementDrawer';
@@ -22,6 +25,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import ConfirmationModal from '../../NewConfirmationModal';
 import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
+import { DashboardContext } from '../DashboardContext';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
@@ -85,6 +89,8 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION, { context: API_V2_CONTEXT });
   const { toast } = useToast();
   const intl = useIntl();
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.AGREEMENTS);
 
   const queryFilter = useQueryFilter({
     filters,
@@ -96,6 +102,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const { data, error, variables, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
+    skip: isUpgradeRequired,
   });
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
@@ -128,7 +135,8 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
               data-cy="btn-new-agreement"
               className="gap-1"
               size="sm"
-              disabled={loading || loadingLoggedInUser}
+              variant="outline"
+              disabled={loading || loadingLoggedInUser || isUpgradeRequired}
               onClick={() => {
                 setAgreementInDrawer(null);
                 setAgreementDrawerOpen(true);
@@ -143,33 +151,40 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
         }
       />
 
-      <Filterbar {...queryFilter} />
-
-      {error ? (
-        <MessageBoxGraphqlError error={error} my={4} />
-      ) : !loading && !data?.host.hostedAccountAgreements?.nodes?.length ? (
-        <EmptyResults
-          hasFilters={queryFilter.hasFilters}
-          entityType="AGREEMENTS"
-          onResetFilters={() => queryFilter.resetFilters({})}
-        />
+      {isUpgradeRequired ? (
+        <UpgradePlanCTA featureKey={FEATURES.AGREEMENTS} />
       ) : (
         <React.Fragment>
-          <AgreementsTable
-            agreements={data?.host.hostedAccountAgreements}
-            loading={loading}
-            nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
-            resetFilters={() => queryFilter.resetFilters({})}
-            onFilePreview={handleFilePreview}
-            openAgreement={agreement => {
-              setAgreementDrawerOpen(true);
-              setAgreementInDrawer(agreement);
-            }}
-            getActions={getActions}
-          />
-          <Pagination queryFilter={queryFilter} total={data?.host?.hostedAccountAgreements?.totalCount} />
+          <Filterbar {...queryFilter} />
+
+          {error ? (
+            <MessageBoxGraphqlError error={error} my={4} />
+          ) : !loading && !data?.host.hostedAccountAgreements?.nodes?.length ? (
+            <EmptyResults
+              hasFilters={queryFilter.hasFilters}
+              entityType="AGREEMENTS"
+              onResetFilters={() => queryFilter.resetFilters({})}
+            />
+          ) : (
+            <React.Fragment>
+              <AgreementsTable
+                agreements={data?.host.hostedAccountAgreements}
+                loading={loading}
+                nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
+                resetFilters={() => queryFilter.resetFilters({})}
+                onFilePreview={handleFilePreview}
+                openAgreement={agreement => {
+                  setAgreementDrawerOpen(true);
+                  setAgreementInDrawer(agreement);
+                }}
+                getActions={getActions}
+              />
+              <Pagination queryFilter={queryFilter} total={data?.host?.hostedAccountAgreements?.totalCount} />
+            </React.Fragment>
+          )}
         </React.Fragment>
       )}
+
       <AgreementDrawer
         open={agreementDrawerOpen}
         agreement={agreementInDrawer}
