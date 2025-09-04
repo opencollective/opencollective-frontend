@@ -8,7 +8,8 @@ import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { cn } from '../../lib/utils';
+import { cn, parseToBoolean } from '../../lib/utils';
+import { getEnvVar } from '@/lib/env-utils';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import Image from '../Image';
@@ -166,15 +167,32 @@ const Footer = () => {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div className="flex flex-col gap-2">
               <Link href="/home">
-                <Image
-                  src="/static/images/opencollectivelogo-footer-n.svg"
-                  alt="Open Collective"
-                  height={28}
-                  width={167}
-                />
+                {parseToBoolean(getEnvVar('NEW_PRICING')) ? (
+                  <Image
+                    width={555}
+                    height={75}
+                    className="h-6 max-h-6 w-auto"
+                    src="/static/images/ofi-opencollective-logo.png"
+                    alt="Open Collective"
+                  />
+                ) : (
+                  <Image
+                    src="/static/images/opencollectivelogo-footer-n.svg"
+                    alt="Open Collective"
+                    height={28}
+                    width={167}
+                  />
+                )}
               </Link>
               <span className="relative top-px hidden text-xs text-muted-foreground md:block">
-                <FormattedMessage id="footer.OC.description" defaultMessage="Make your community sustainable." />
+                {parseToBoolean(getEnvVar('NEW_PRICING')) ? (
+                  <FormattedMessage
+                    id="footer.OC.description.new"
+                    defaultMessage="Collaborative, transparent, financial management tool"
+                  />
+                ) : (
+                  <FormattedMessage id="footer.OC.description" defaultMessage="Make your community sustainable." />
+                )}
               </span>
             </div>
             <LanguageSwitcher />
