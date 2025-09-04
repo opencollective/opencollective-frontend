@@ -3,7 +3,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import clsx from 'clsx';
 import { useFormik } from 'formik';
 import { omit } from 'lodash';
-import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, Shapes } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, ReceiptIcon, Shapes, ShapesIcon } from 'lucide-react';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
@@ -393,6 +393,7 @@ type PlatformSubscriptionTierCardProps = {
   includePrice?: boolean;
   includePackageDetails?: boolean;
   packages?: any[];
+  children?: React.ReactNode;
 };
 
 export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) {
@@ -419,123 +420,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
       <div className="mt-2 mb-6 flex justify-center text-center text-sm text-muted-foreground">
         <FormattedMessage {...descriptionMessage} />
       </div>
-      {props.includePrice && props.packages && (
-        <div className="mt-6 mb-6 space-y-1 text-center">
-          <p>
-            <span className="text-4xl font-bold text-slate-900">
-              <FormattedMoneyAmount
-                amount={props.packages[0].pricing.pricePerMonth.valueInCents}
-                currency={props.packages[0].pricing.pricePerMonth.currency}
-                showCurrencyCode={false}
-                precision={0}
-              />
-            </span>
-            <span className="text-sm text-muted-foreground">/month</span>
-          </p>
-        </div>
-      )}
-      {props.includePackageDetails && props.packages && (
-        <div className="mt-6 mb-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-slate-700">Active collectives included</span>
-              <span className="font-medium text-slate-900">{props.packages[0].pricing.includedCollectives}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-700">Price per additional collective</span>
-              <span className="font-medium text-slate-900">
-                <FormattedMoneyAmount
-                  amount={props.packages[0].pricing.pricePerAdditionalCollective.valueInCents}
-                  currency={props.packages[0].pricing.pricePerAdditionalCollective.currency}
-                  showCurrencyCode={false}
-                />
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-700">Monthly expenses included</span>
-              <span className="font-medium text-slate-900">{props.packages[0].pricing.includedExpensesPerMonth}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-700">Price per additional expense</span>
-              <span className="font-medium text-slate-900">
-                <FormattedMoneyAmount
-                  amount={props.packages[0].pricing.pricePerAdditionalExpense.valueInCents}
-                  currency={props.packages[0].pricing.pricePerAdditionalExpense.currency}
-                  showCurrencyCode={false}
-                />
-              </span>
-            </div>
-          </div>
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="mt-4 w-full rounded-full">
-                See more plans
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle>
-                  <FormattedMessage {...titleMessage} /> Packages
-                </DialogTitle>
-                <DialogDescription>Choose the perfect package for your organization's needs.</DialogDescription>
-              </DialogHeader>
-              <div className="">
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="px-4 py-3 text-left font-medium text-foreground">Active Collectives</th>
-                        <th className="px-4 py-3 text-left font-medium text-foreground">Monthly Expenses</th>
-                        <th className="px-4 py-3 text-left font-medium text-foreground">Monthly Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {props.packages?.map(pkg => (
-                        <tr key={pkg.id} className="border-b border-border hover:bg-muted/50">
-                          <td className="px-4 py-3 text-foreground">{pkg.pricing.includedCollectives}</td>
-                          <td className="px-4 py-3 text-foreground">{pkg.pricing.includedExpensesPerMonth}</td>
-                          <td className="px-4 py-3 text-foreground">
-                            <FormattedMoneyAmount
-                              amount={pkg.pricing.pricePerMonth.valueInCents}
-                              currency={pkg.pricing.pricePerMonth.currency}
-                              showCurrencyCode={false}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="mt-6 rounded-lg bg-muted p-4">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Price per additional collective</span>
-                      <span className="font-medium text-foreground">
-                        <FormattedMoneyAmount
-                          amount={props.packages?.[0].pricing.pricePerAdditionalCollective.valueInCents}
-                          currency={props.packages?.[0].pricing.pricePerAdditionalCollective.currency}
-                          showCurrencyCode={false}
-                        />
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Price per additional expense</span>
-                      <span className="font-medium text-foreground">
-                        <FormattedMoneyAmount
-                          amount={props.packages?.[0].pricing.pricePerAdditionalExpense.valueInCents}
-                          currency={props.packages?.[0].pricing.pricePerAdditionalExpense.currency}
-                          showCurrencyCode={false}
-                        />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      )}
+      {props.children}
       <div className="flex grow flex-col justify-end">
         <PlatformSubscriptionFeatureList features={features} />
       </div>
