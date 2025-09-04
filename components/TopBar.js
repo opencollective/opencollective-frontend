@@ -120,7 +120,7 @@ const newMarketingMenu = [
   {
     label: defineMessage({
       defaultMessage: 'Product',
-      id: 'x/ZVlU',
+      id: 'ContributionType.Product',
     }),
     items: [
       {
@@ -132,8 +132,15 @@ const newMarketingMenu = [
       },
       {
         label: defineMessage({
+          defaultMessage: 'For Fiscal Hosts',
+          id: 'pricing.fiscalHost',
+        }),
+        href: '/solutions',
+      },
+      {
+        label: defineMessage({
           defaultMessage: 'For Collectives',
-          id: 'hRt3bF',
+          id: 'pricing.forCollective',
         }),
         href: '/collectives',
       },
@@ -142,7 +149,7 @@ const newMarketingMenu = [
   {
     label: defineMessage({
       defaultMessage: 'About',
-      id: 'g5pX+a',
+      id: 'collective.about.title',
     }),
     items: [
       {
@@ -163,7 +170,7 @@ const newMarketingMenu = [
       {
         label: defineMessage({
           defaultMessage: 'Contact',
-          id: 'zFegDD',
+          id: 'Contact',
         }),
         href: '/contact',
       },

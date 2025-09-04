@@ -3,7 +3,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import clsx from 'clsx';
 import { useFormik } from 'formik';
 import { omit } from 'lodash';
-import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, ReceiptIcon, Shapes, ShapesIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, Shapes } from 'lucide-react';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
@@ -17,15 +17,7 @@ import type {
   UpdatePlatformSubscriptionMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/Dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/Dialog';
 
 import {
   platformSubscriptionFeatures,
