@@ -112,7 +112,7 @@ function TierPricePlansDisplay({ tier, packages }) {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="border-b border-border">
+                    <tr className="border-b border-border text-sm">
                       <th className="px-4 py-3 text-left font-medium text-foreground">
                         <FormattedMessage defaultMessage="Active Collectives" id="b4gw3f" />
                       </th>
@@ -122,9 +122,7 @@ function TierPricePlansDisplay({ tier, packages }) {
                       <th className="px-4 py-3 text-left font-medium text-foreground">
                         <FormattedMessage defaultMessage="Monthly Price" id="BYbiJx" />
                       </th>
-                      <th className="px-4 py-3 text-center font-medium text-foreground">
-                        <FormattedMessage defaultMessage="Select" id="kQAf2d" />
-                      </th>
+                      <th className="px-4 py-3 text-center font-medium text-foreground"></th>
                     </tr>
                   </thead>
                   <tbody>
