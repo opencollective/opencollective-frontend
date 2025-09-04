@@ -91,7 +91,7 @@ const Stats = () => {
                 <div className="text-xl text-slate-700">{formatMessage(messages.contributionsReceived)}</div>
               </div>
               <div className="pt-8 text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">540M</div>
+                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.transactionsRecorded}</div>
                 <div className="text-xl text-slate-700">{formatMessage(messages.transactionsRecorded)}</div>
               </div>
             </div>
