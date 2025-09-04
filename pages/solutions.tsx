@@ -1,15 +1,14 @@
-import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import React, { useRef } from 'react';
+import { useInView } from 'framer-motion';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import NextIllustration from '../components/collectives/HomeNextIllustration';
 import { MainDescription } from '../components/marketing/Text';
 import Page from '../components/Page';
 import Features from '@/components/home/solutions/Features';
+import { FloatingJoinCTA, JoinCTAButtons } from '@/components/home/solutions/JoinCTAButtons';
 import Testimonials from '@/components/home/solutions/Testimonials';
 import Image from '@/components/Image';
-import Link from '@/components/Link';
-import { Button } from '@/components/ui/Button';
 
 const featureHighlights = [
   {
@@ -85,6 +84,10 @@ const featureHighlights = [
 ];
 
 const Solutions = () => {
+  const staticButtonsRef = useRef(null);
+  const isStaticButtonsInView = useInView(staticButtonsRef, {
+    amount: 0.1,
+  });
   return (
     <Page>
       <div className="mt-20 flex items-center justify-center px-4">
@@ -103,19 +106,7 @@ const Solutions = () => {
             </MainDescription>
           </div>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-            <Button asChild variant="marketing" className="rounded-full" size="lg">
-              <Link href="/signup/organization">
-                <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-full" size="lg">
-              <Link href="/pricing" className="flex items-center gap-2">
-                <FormattedMessage defaultMessage="See Pricing" id="solutions.hero.seePricing" />
-                <ArrowRight size={16} />
-              </Link>
-            </Button>
-          </div>
+          <JoinCTAButtons ref={staticButtonsRef} />
 
           <div className="mt-4 mb-4">
             <NextIllustration
@@ -155,6 +146,7 @@ const Solutions = () => {
         </div>
       </div>
       <Testimonials />
+      <FloatingJoinCTA isVisible={!isStaticButtonsInView} />
     </Page>
   );
 };

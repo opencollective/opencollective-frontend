@@ -77,18 +77,13 @@ const Solutions = () => {
         />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex max-w-6xl flex-col items-center">
-        {/* Main Title */}
         <h2 className="mb-10 text-center text-[2rem] font-bold text-oc">
           <FormattedMessage {...messages['home.solutions.title']} />
         </h2>
 
-        {/* Two Column Layout */}
         <div className="flex w-full max-w-[64rem] flex-col items-center gap-3 md:flex-row">
-          {/* Left Panel - Legally Incorporated */}
           <div className="flex flex-1 flex-col rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
-            {/* Title with green underline */}
             <div className="relative mb-6">
               <div className="absolute right-0 -bottom-1 left-0 w-full">
                 <NextImage
@@ -105,12 +100,10 @@ const Solutions = () => {
               </h3>
             </div>
 
-            {/* Description */}
             <p className="mb-4 text-xl font-semibold">
               <FormattedMessage {...messages['home.solutions.legallyIncorporated.description']} />
             </p>
 
-            {/* Features List */}
             <div className="mb-8 flex-grow space-y-2">
               <div className="flex items-center gap-2">
                 <div className="h-1 w-1 rounded-full bg-slate-400"></div>
@@ -132,25 +125,17 @@ const Solutions = () => {
               </div>
             </div>
 
-            {/* Button */}
-
-            <Button asChild variant="marketing" className="h-12 w-full rounded-full text-lg" size="lg">
+            <Button asChild variant="marketing" className="h-12 w-full rounded-full text-base" size="lg">
               <Link href="/solutions">
                 <div className="flex items-center justify-center gap-2">
                   <FormattedMessage {...messages['home.solutions.legallyIncorporated.button']} />
-                  <ArrowRight size={18} />
+                  <ArrowRight size={16} />
                 </div>
               </Link>
             </Button>
           </div>
 
-          {/* OR Element */}
           <div className="relative flex items-center justify-center md:flex-col">
-            {/* Background Line */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-px w-16 bg-slate-300"></div>
-            </div>
-            {/* OR Circle */}
             <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-gray-200 bg-white shadow-lg">
               <span className="text-sm font-semibold text-slate-600">
                 <FormattedMessage id="Or" defaultMessage="OR" />
@@ -158,9 +143,7 @@ const Solutions = () => {
             </div>
           </div>
 
-          {/* Right Panel - Unincorporated */}
           <div className="flex flex-1 flex-col rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
-            {/* Title with pink underline */}
             <div className="relative mb-6">
               <div className="absolute right-0 -bottom-1 left-0 w-3/4">
                 <NextImage
@@ -177,12 +160,10 @@ const Solutions = () => {
               </h3>
             </div>
 
-            {/* Description */}
             <p className="mb-4 text-xl font-semibold">
               <FormattedMessage {...messages['home.solutions.unincorporated.description']} />
             </p>
 
-            {/* Features List */}
             <div className="mb-8 flex-grow space-y-2">
               <div className="flex items-center gap-2">
                 <div className="h-1 w-1 rounded-full bg-slate-400"></div>
@@ -204,11 +185,10 @@ const Solutions = () => {
               </div>
             </div>
 
-            {/* Button */}
-            <Button asChild variant="outline" className="h-12 w-full rounded-full text-lg" size="lg">
+            <Button asChild variant="outline" className="h-12 w-full rounded-full text-base" size="lg">
               <Link href="/create" className="flex items-center justify-center gap-2">
                 <FormattedMessage {...messages['home.solutions.unincorporated.button']} />
-                <ArrowRight size={18} />
+                <ArrowRight size={16} />
               </Link>
             </Button>
           </div>

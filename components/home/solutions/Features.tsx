@@ -719,7 +719,7 @@ export default function Features() {
                   } as React.CSSProperties;
                   return (
                     <div
-                      key={`${section.title}-${item.title}`}
+                      key={`${section.title.id}-${item.title.id}`}
                       className="absolute inset-[0%] flex h-full items-center justify-center"
                       style={sectionStyle}
                     >

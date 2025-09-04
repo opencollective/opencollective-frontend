@@ -16,12 +16,13 @@ import {
 import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
 
 function TierPricePlansDisplay({ tier, packages }) {
-  const [selectedPackage, setSelectedPackage] = React.useState(packages[0]);
+  const [selectedPackage, setSelectedPackage] = React.useState(packages?.[0]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const titleMessage = PlatformSubscriptionTierTitles[tier];
 
@@ -31,8 +32,8 @@ function TierPricePlansDisplay({ tier, packages }) {
         <p>
           <span className="text-4xl font-bold text-slate-900">
             <FormattedMoneyAmount
-              amount={selectedPackage.pricing.pricePerMonth.valueInCents}
-              currency={selectedPackage.pricing.pricePerMonth.currency}
+              amount={selectedPackage?.pricing.pricePerMonth.valueInCents}
+              currency={selectedPackage?.pricing.pricePerMonth.currency}
               showCurrencyCode={false}
               precision={0}
             />
@@ -52,13 +53,13 @@ function TierPricePlansDisplay({ tier, packages }) {
                 <FormattedMessage
                   defaultMessage="{count} Active collectives"
                   id="AAWOc+"
-                  values={{ count: selectedPackage.pricing.includedCollectives }}
+                  values={{ count: selectedPackage?.pricing.includedCollectives }}
                 />
               </p>
               <p className="text-xs text-slate-600">
                 <FormattedMoneyAmount
-                  amount={selectedPackage.pricing.pricePerAdditionalCollective.valueInCents}
-                  currency={selectedPackage.pricing.pricePerAdditionalCollective.currency}
+                  amount={selectedPackage?.pricing.pricePerAdditionalCollective.valueInCents}
+                  currency={selectedPackage?.pricing.pricePerAdditionalCollective.currency}
                   showCurrencyCode={false}
                 />{' '}
                 <FormattedMessage defaultMessage="per additional collective" id="NhdeA6" />
@@ -73,13 +74,13 @@ function TierPricePlansDisplay({ tier, packages }) {
                 <FormattedMessage
                   defaultMessage="{count} Paid expenses monthly"
                   id="SZ0HfS"
-                  values={{ count: selectedPackage.pricing.includedExpensesPerMonth }}
+                  values={{ count: selectedPackage?.pricing.includedExpensesPerMonth }}
                 />
               </p>
               <p className="text-xs text-slate-600">
                 <FormattedMoneyAmount
-                  amount={selectedPackage.pricing.pricePerAdditionalExpense.valueInCents}
-                  currency={selectedPackage.pricing.pricePerAdditionalExpense.currency}
+                  amount={selectedPackage?.pricing.pricePerAdditionalExpense.valueInCents}
+                  currency={selectedPackage?.pricing.pricePerAdditionalExpense.currency}
                   showCurrencyCode={false}
                 />{' '}
                 <FormattedMessage defaultMessage="per additional expense" id="j8oKWe" />
@@ -168,8 +169,8 @@ function TierPricePlansDisplay({ tier, packages }) {
                     </span>
                     <span className="font-medium text-foreground">
                       <FormattedMoneyAmount
-                        amount={selectedPackage.pricing.pricePerAdditionalCollective.valueInCents}
-                        currency={selectedPackage.pricing.pricePerAdditionalCollective.currency}
+                        amount={selectedPackage?.pricing.pricePerAdditionalCollective.valueInCents}
+                        currency={selectedPackage?.pricing.pricePerAdditionalCollective.currency}
                         showCurrencyCode={false}
                       />
                     </span>
@@ -180,8 +181,8 @@ function TierPricePlansDisplay({ tier, packages }) {
                     </span>
                     <span className="font-medium text-foreground">
                       <FormattedMoneyAmount
-                        amount={selectedPackage.pricing.pricePerAdditionalExpense.valueInCents}
-                        currency={selectedPackage.pricing.pricePerAdditionalExpense.currency}
+                        amount={selectedPackage?.pricing.pricePerAdditionalExpense.valueInCents}
+                        currency={selectedPackage?.pricing.pricePerAdditionalExpense.currency}
                         showCurrencyCode={false}
                       />
                     </span>
@@ -255,7 +256,6 @@ export default function Pricing() {
           </p>
         </div>
 
-        {/* Pricing Cards */}
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
           {PlatformSubscriptionTiers.map(tier => (
             <Card>
@@ -271,7 +271,14 @@ export default function Pricing() {
           ))}
         </div>
 
-        {/* Contact Section */}
+        <div className="mt-12 flex justify-center">
+          <Button asChild variant="marketing" className="rounded-full" size="lg">
+            <Link href="/signup/organization">
+              <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
+            </Link>
+          </Button>
+        </div>
+
         <div className="mt-24 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 p-12 text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
             <MessageCircle className="h-8 w-8 text-primary" />
