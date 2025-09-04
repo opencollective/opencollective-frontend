@@ -291,7 +291,7 @@ export default function InternalTransferModal({
                             inputMode="numeric"
                             onChange={e =>
                               setFieldValue('amount', {
-                                valueInCents: e.target.value ? parseFloat(e.target.value) * 100 : '',
+                                valueInCents: e.target.value ? Math.round(parseFloat(e.target.value) * 100) : '',
                                 currency: data.account.currency,
                               })
                             }
