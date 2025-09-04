@@ -256,7 +256,7 @@ export default function Pricing() {
 
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
           {PlatformSubscriptionTiers.map(tier => (
-            <Card>
+            <Card key={tier}>
               <CardContent>
                 <PlatformSubscriptionTierCard key={tier} tier={tier}>
                   <TierPricePlansDisplay

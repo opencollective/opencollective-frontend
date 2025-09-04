@@ -22,12 +22,14 @@ import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn, parseToBoolean } from '../../lib/utils';
+import { getEnvVar } from '@/lib/env-utils';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
 import LoginBtn from '../LoginBtn';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
+import SignupLogin from '../SignupLogin';
 import { Badge } from '../ui/Badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Separator } from '../ui/Separator';
@@ -35,8 +37,6 @@ import { Separator } from '../ui/Separator';
 import { DrawerMenu } from './DrawerMenu';
 import { ProfileMenuIconsMap } from './Icons';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
-import { getEnvVar } from '@/lib/env-utils';
-import SignupLogin from '../SignupLogin';
 
 const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {

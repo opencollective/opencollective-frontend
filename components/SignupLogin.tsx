@@ -1,15 +1,15 @@
 import React, { useEffect, useRef } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import { X, ArrowRight } from 'lucide-react';
 
 import { cn } from '../lib/utils';
 
+import { Button } from './ui/Button';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 import Image from './Image';
 import Link from './Link';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
-import { Button } from './ui/Button';
 
 interface SignupLoginProps {
   /**

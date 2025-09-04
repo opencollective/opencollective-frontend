@@ -289,7 +289,7 @@ const TopBar = ({
                       >
                         <NavLinkContainer>
                           {section.items.map(item => (
-                            <Link href={item.href} target={item.target}>
+                            <Link key={item.label.id} href={item.href} target={item.target}>
                               <NavItem as={Container} mt={16} mb={16}>
                                 {intl.formatMessage(item.label)}
                               </NavItem>
