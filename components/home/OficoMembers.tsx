@@ -42,7 +42,7 @@ const messages = defineMessages({
   'fiscalHosting.hosts.raft': {
     id: 'fiscalHosting.hosts.raft',
     defaultMessage:
-      'Raft Foundation is a US-based 501(c)(3) fiscal sponsor that brings communities together to support neighbors in need through',
+      'Raft Foundation is a US-based 501(c)(3) fiscal sponsor that brings communities together to support neighbors in need.',
   },
 });
 

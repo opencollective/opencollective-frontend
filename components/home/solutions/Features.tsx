@@ -210,7 +210,7 @@ const featureSections: IFeatureSection[] = [
     description: defineMessage({
       id: 'solutions.features.section.money-out.description',
       defaultMessage:
-        'A comprehensive suite of tools for submitting, review, correcting, approving and paying out disbursements. A small team of administrators can efficiently thousands of monthly payment requests.',
+        'A comprehensive suite of tools for submitting, review, correcting, approving and paying out disbursements. A small team of administrators can efficiently handle thousands of monthly payment requests.',
     }),
     bgColor: 'rose-50',
     fgColor: 'rose-600',
@@ -303,7 +303,7 @@ const featureSections: IFeatureSection[] = [
         description: defineMessage({
           id: 'solutions.features.item.pay-instantly.description',
           defaultMessage:
-            'Pay using Wise & Paypal integrations or manually mark expenses that have been paid off-platform (for example: from your bank account) as paid.',
+            'Pay using Wise & PayPal integrations or manually mark expenses that have been paid off-platform (for example: from your bank account) as paid.',
         }),
         media: {
           src: '/static/images/features/16.png',
