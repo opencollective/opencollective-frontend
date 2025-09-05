@@ -19,6 +19,10 @@ exports.REWRITES = [
     destination: '/welcome',
   },
   {
+    source: '/solutions',
+    destination: '/solutions',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
   },
@@ -394,6 +398,14 @@ exports.REWRITES = [
   {
     source: '/pricing',
     destination: '/pricing',
+  },
+  {
+    source: '/new-pricing',
+    destination: '/new-pricing',
+  },
+  {
+    source: '/legacy-pricing',
+    destination: '/legacy-pricing',
   },
   {
     source: '/pricing-old',

@@ -7,13 +7,16 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import NextImage from 'next/image';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
+import { getEnvVar } from '@/lib/env-utils';
+import { parseToBoolean } from '@/lib/utils';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import ProfileMenu from './navigation/ProfileMenu';
@@ -28,7 +31,6 @@ import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
-import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 
 const NavList = styled(Flex)`
@@ -44,7 +46,7 @@ const NavLinkContainer = styled(Box)`
 `;
 
 const NavButton = styled(StyledButton)`
-  color: #323334;
+  color: var(--color-slate-800);
   font-weight: 500;
   font-size: 16px;
   padding: 10px;
@@ -80,20 +82,115 @@ const TopBarIcon = ({ provider }) => {
       <Flex alignItems="center">
         {provider?.logo ? (
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
+        ) : parseToBoolean(getEnvVar('NEW_PRICING')) ? (
+          <React.Fragment>
+            <NextImage
+              width={555}
+              height={75}
+              className="hidden h-6 w-auto sm:block"
+              src="/static/images/ofi-opencollective-logo.png"
+              alt="Open Collective"
+            />
+            <Image
+              width={32}
+              height={32}
+              className="block sm:hidden"
+              src="/static/images/oc-logo-watercolor-256.png"
+              alt="Open Collective"
+            />
+          </React.Fragment>
         ) : (
-          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
-        )}
-        {!provider && (
-          <Hide xs sm md>
-            <Box mx={2}>
-              <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
-            </Box>
-          </Hide>
+          <React.Fragment>
+            <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />{' '}
+            {!provider && (
+              <Hide xs sm md>
+                <Box mx={2}>
+                  <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+                </Box>
+              </Hide>
+            )}
+          </React.Fragment>
         )}
       </Flex>
     </Link>
   );
 };
+
+const newMarketingMenu = [
+  {
+    label: defineMessage({
+      defaultMessage: 'Product',
+      id: 'ContributionType.Product',
+    }),
+    items: [
+      {
+        label: defineMessage({
+          defaultMessage: 'For Organizations',
+          id: 'ipKxcj',
+        }),
+        href: '/solutions',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'For Fiscal Hosts',
+          id: 'pricing.fiscalHost',
+        }),
+        href: '/solutions',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'For Collectives',
+          id: 'pricing.forCollective',
+        }),
+        href: '/collectives',
+      },
+    ],
+  },
+  {
+    label: defineMessage({
+      defaultMessage: 'About',
+      id: 'collective.about.title',
+    }),
+    items: [
+      {
+        label: defineMessage({
+          defaultMessage: 'Help & Support',
+          id: 'Uf3+S6',
+        }),
+        href: '/help',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'About Us',
+          id: 'ZjDH42',
+        }),
+        href: 'https://documentation.opencollective.com/our-organization/about',
+        target: '_blank',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Contact',
+          id: 'Contact',
+        }),
+        href: '/contact',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Terms of Service',
+          id: '32rBNK',
+        }),
+        href: '/tos',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Privacy policy',
+          id: 'cPwv2c',
+        }),
+        href: '/privacypolicy',
+      },
+    ],
+  },
+];
 
 const TopBar = ({
   showSearch = true,
@@ -101,6 +198,7 @@ const TopBar = ({
   showProfileAndChangelogMenu = true,
   account,
 }) => {
+  const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -130,8 +228,11 @@ const TopBar = ({
     '/how-it-works',
     '/fiscal-hosting',
     '/help',
+    '/solutions',
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
+
+  const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
 
   if (onDashboardRoute || (!onHomeRoute && LoggedInUser)) {
     return <NewTopBar {...{ account }} />;
@@ -145,139 +246,179 @@ const TopBar = ({
       py={showSearch ? 2 : 3}
       alignItems="center"
       flexDirection="row"
-      justifyContent="space-around"
       css={{
         height: theme.sizes.navbarHeight,
         background: 'white',
         borderBottom: whitelabel?.border ?? '1px solid rgb(232, 233, 235)',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateAreas: '"left center right"',
       }}
       ref={ref}
     >
-      <TopBarIcon provider={whitelabel} />
-      <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
+      <Box css={{ gridArea: 'left' }}>
+        <TopBarIcon provider={whitelabel} />
+      </Box>
+
+      <Flex alignItems="center" justifyContent="center" css={{ gridArea: 'center' }}>
         <Hide xs sm>
-          {' '}
           {showMenu && (
-            <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+            <NavList as="ul" p={0} m={0} justifyContent="center" css="margin: 0;">
               {!whitelabel && (
                 <React.Fragment>
-                  {menuItems.solutions && (
-                    <PopupMenu
-                      zIndex={2000}
-                      closingEvents={['focusin', 'mouseover']}
-                      Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
-                        <NavButton
-                          isBorderless
-                          onMouseOver={onMouseOver}
-                          onFocus={onFocus}
-                          onClick={onClick}
-                          whiteSpace="nowrap"
+                  {usingNewPricing ? (
+                    newMarketingMenu.map(section => (
+                      <PopupMenu
+                        key={section.id}
+                        zIndex={2000}
+                        closingEvents={['focusin', 'mouseover']}
+                        Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
+                          <NavButton
+                            isBorderless
+                            onMouseOver={onMouseOver}
+                            onFocus={onFocus}
+                            onClick={onClick}
+                            whiteSpace="nowrap"
+                          >
+                            {intl.formatMessage(section.label)}
+                            {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </NavButton>
+                        )}
+                        placement="bottom"
+                        popupMarginTop="-10px"
+                      >
+                        <NavLinkContainer>
+                          {section.items.map(item => (
+                            <Link key={item.label.id} href={item.href} target={item.target}>
+                              <NavItem as={Container} mt={16} mb={16}>
+                                {intl.formatMessage(item.label)}
+                              </NavItem>
+                            </Link>
+                          ))}
+                        </NavLinkContainer>
+                      </PopupMenu>
+                    ))
+                  ) : (
+                    <React.Fragment>
+                      {menuItems.solutions && (
+                        <PopupMenu
+                          zIndex={2000}
+                          closingEvents={['focusin', 'mouseover']}
+                          Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
+                            <NavButton
+                              isBorderless
+                              onMouseOver={onMouseOver}
+                              onFocus={onFocus}
+                              onClick={onClick}
+                              whiteSpace="nowrap"
+                            >
+                              <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
+                              {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </NavButton>
+                          )}
+                          placement="bottom"
+                          popupMarginTop="-10px"
                         >
-                          <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
-                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                        </NavButton>
+                          <NavLinkContainer>
+                            <Link href="/collectives">
+                              <NavItem as={Container} mt={16} mb={16}>
+                                <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
+                              </NavItem>
+                            </Link>
+                            <Link href="/become-a-sponsor">
+                              <NavItem as={Container} mt={16} mb={16}>
+                                <FormattedMessage defaultMessage="For Sponsors" id="1rESHf" />
+                              </NavItem>
+                            </Link>
+                            <Link href="/become-a-host">
+                              <NavItem as={Container} mt={16} mb={16}>
+                                <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
+                              </NavItem>
+                            </Link>
+                          </NavLinkContainer>
+                        </PopupMenu>
                       )}
-                      placement="bottom"
-                      popupMarginTop="-10px"
-                    >
-                      <NavLinkContainer>
-                        <Link href="/collectives">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
-                          </NavItem>
-                        </Link>
-                        <Link href="/become-a-sponsor">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage defaultMessage="For Sponsors" id="1rESHf" />
-                          </NavItem>
-                        </Link>
-                        <Link href="/become-a-host">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
-                          </NavItem>
-                        </Link>
-                      </NavLinkContainer>
-                    </PopupMenu>
-                  )}
 
-                  {menuItems.product && (
-                    <PopupMenu
-                      zIndex={2000}
-                      closingEvents={['focusin', 'mouseover']}
-                      Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                        <NavButton
-                          isBorderless
-                          onMouseOver={onMouseOver}
-                          onFocus={onFocus}
-                          onClick={onClick}
-                          whiteSpace="nowrap"
+                      {menuItems.product && (
+                        <PopupMenu
+                          zIndex={2000}
+                          closingEvents={['focusin', 'mouseover']}
+                          Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                            <NavButton
+                              isBorderless
+                              onMouseOver={onMouseOver}
+                              onFocus={onFocus}
+                              onClick={onClick}
+                              whiteSpace="nowrap"
+                            >
+                              <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
+                              {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </NavButton>
+                          )}
+                          placement="bottom"
+                          popupMarginTop="-10px"
                         >
-                          <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                        </NavButton>
+                          <NavLinkContainer>
+                            <Link href="/pricing">
+                              <NavItem as={Container} mt={16} mb={16}>
+                                <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
+                              </NavItem>
+                            </Link>
+                            <Link href="/how-it-works">
+                              <NavItem as={Container}>
+                                <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                              </NavItem>
+                            </Link>
+                            <Link href="/fiscal-hosting">
+                              <NavItem as={Container} mt={16} mb={16}>
+                                <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
+                              </NavItem>
+                            </Link>
+                          </NavLinkContainer>
+                        </PopupMenu>
                       )}
-                      placement="bottom"
-                      popupMarginTop="-10px"
-                    >
-                      <NavLinkContainer>
-                        <Link href="/pricing">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-                          </NavItem>
-                        </Link>
-                        <Link href="/how-it-works">
-                          <NavItem as={Container}>
-                            <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-                          </NavItem>
-                        </Link>
-                        <Link href="/fiscal-hosting">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-                          </NavItem>
-                        </Link>
-                      </NavLinkContainer>
-                    </PopupMenu>
-                  )}
 
-                  {menuItems.company && (
-                    <PopupMenu
-                      zIndex={2000}
-                      closingEvents={['focusin', 'mouseover']}
-                      Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                        <NavButton
-                          isBorderless
-                          onMouseOver={onMouseOver}
-                          onFocus={onFocus}
-                          onClick={onClick}
-                          whiteSpace="nowrap"
+                      {menuItems.company && (
+                        <PopupMenu
+                          zIndex={2000}
+                          closingEvents={['focusin', 'mouseover']}
+                          Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                            <NavButton
+                              isBorderless
+                              onMouseOver={onMouseOver}
+                              onFocus={onFocus}
+                              onClick={onClick}
+                              whiteSpace="nowrap"
+                            >
+                              <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
+                              {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </NavButton>
+                          )}
+                          placement="bottom"
+                          popupMarginTop="-10px"
                         >
-                          <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
-                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                        </NavButton>
+                          <NavLinkContainer>
+                            <a href="https://blog.opencollective.com/">
+                              <NavItem as={Container} mt={16} mb={16}>
+                                <FormattedMessage id="company.blog" defaultMessage="Blog" />
+                              </NavItem>
+                            </a>
+                            <a href="https://documentation.opencollective.com/our-organization/about">
+                              <NavItem as={Container} mb={16}>
+                                <FormattedMessage id="collective.about.title" defaultMessage="About" />
+                              </NavItem>
+                            </a>
+                          </NavLinkContainer>
+                        </PopupMenu>
                       )}
-                      placement="bottom"
-                      popupMarginTop="-10px"
-                    >
-                      <NavLinkContainer>
-                        <a href="https://blog.opencollective.com/">
-                          <NavItem as={Container} mt={16} mb={16}>
-                            <FormattedMessage id="company.blog" defaultMessage="Blog" />
-                          </NavItem>
-                        </a>
-                        <a href="https://documentation.opencollective.com/our-organization/about">
-                          <NavItem as={Container} mb={16}>
-                            <FormattedMessage id="collective.about.title" defaultMessage="About" />
-                          </NavItem>
-                        </a>
-                      </NavLinkContainer>
-                    </PopupMenu>
-                  )}
-                  {menuItems.docs && (
-                    <Link href="/help">
-                      <NavButton as={Container} whiteSpace="nowrap">
-                        <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
-                      </NavButton>
-                    </Link>
+                      {menuItems.docs && (
+                        <Link href="/help">
+                          <NavButton as={Container} whiteSpace="nowrap">
+                            <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
+                          </NavButton>
+                        </Link>
+                      )}
+                    </React.Fragment>
                   )}
                 </React.Fragment>
               )}
@@ -296,35 +437,38 @@ const TopBar = ({
         </Hide>
         {showSearch && (
           <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-            <Flex>
+            <div className="flex items-center">
               <SearchIcon fill="#75777A" size={18} />
               <Hide xs sm>
-                <Span ml="5px">
+                <span className="ml-1 text-base" ml="5px">
                   <FormattedMessage id="Search" defaultMessage="Search" />
-                </Span>
+                </span>
               </Hide>
-            </Flex>
+            </div>
           </NavButton>
         )}
         <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
       </Flex>
 
-      {showProfileAndChangelogMenu && (
-        <React.Fragment>
-          <div className="mr-2 hidden sm:block">
-            <ChangelogTrigger />
-          </div>
-          <ProfileMenu />
-        </React.Fragment>
-      )}
-      <Hide md lg>
-        <Box mx={3} onClick={toggleMobileMenu}>
-          <Flex as="a">
-            <MenuIcon color="#aaaaaa" size={24} />
-          </Flex>
-        </Box>
-        {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
-      </Hide>
+      {/* Right section - Profile, and Mobile Menu */}
+      <Flex alignItems="center" justifyContent="flex-end" css={{ gridArea: 'right' }}>
+        {showProfileAndChangelogMenu && (
+          <React.Fragment>
+            <div className="mr-2 hidden sm:block">
+              <ChangelogTrigger />
+            </div>
+            <ProfileMenu />
+          </React.Fragment>
+        )}
+        <Hide md lg>
+          <Box mx={3} onClick={toggleMobileMenu}>
+            <Flex as="a">
+              <MenuIcon color="#aaaaaa" size={24} />
+            </Flex>
+          </Box>
+          {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
+        </Hide>
+      </Flex>
     </Flex>
   );
 };

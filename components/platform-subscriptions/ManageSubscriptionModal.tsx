@@ -382,31 +382,37 @@ function PlatformSubscriptionPlanCard(props: PlatformSubscriptionPlanCardProps) 
 type PlatformSubscriptionTierCardProps = {
   tier: PlatformSubscriptionTierType;
   isCurrent?: boolean;
+  includePrice?: boolean;
+  includePackageDetails?: boolean;
+  packages?: any[];
+  children?: React.ReactNode;
 };
 
-function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) {
+export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) {
   const Icon = PlatformSubscriptionTierIcon[props.tier];
   const titleMessage = PlatformSubscriptionTierTitles[props.tier];
   const tagLineMessage = PlatformSubscriptionTierTagLine[props.tier];
   const descriptionMessage = PlatformSubscriptionTierDescription[props.tier];
   const features = PlatformSubscriptionTierFeatures[props.tier];
+
   return (
-    <div className="pb-5">
-      <div className="mb-4 flex justify-center">
-        <div className="rounded-full bg-gray-200 p-2">
-          <Icon />
+    <div className="pt-2 pb-5">
+      <div className="mb-6 flex justify-center">
+        <div className="rounded-full bg-muted p-3">
+          <Icon className="size-6 text-muted-foreground" />
         </div>
       </div>
-      <div className="flex justify-center text-xl font-bold">
+      <div className="flex justify-center text-2xl font-bold">
         <FormattedMessage {...titleMessage} />
       </div>
-      <div className="mb-1 flex justify-center text-sm text-nowrap text-blue-700">
+      <div className="mt-2 flex justify-center text-sm font-medium text-nowrap text-blue-600">
         <FormattedMessage {...tagLineMessage} />
       </div>
 
-      <div className="mb-8 flex justify-center text-center text-sm">
+      <div className="mt-2 mb-6 flex justify-center text-center text-sm text-muted-foreground">
         <FormattedMessage {...descriptionMessage} />
       </div>
+      {props.children}
       <div className="flex grow flex-col justify-end">
         <PlatformSubscriptionFeatureList features={features} />
       </div>
