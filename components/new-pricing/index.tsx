@@ -271,7 +271,7 @@ export default function Pricing() {
 
         <div className="mt-12 flex justify-center">
           <Button asChild variant="marketing" className="rounded-full" size="lg">
-            <Link href="/signup/organization">
+            <Link href="/signup/organization?active=true">
               <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
             </Link>
           </Button>
