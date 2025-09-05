@@ -10,7 +10,7 @@ export const JoinCTAButtons = React.forwardRef<HTMLDivElement>((props, ref) => {
   return (
     <div ref={ref} className="flex flex-col gap-4 sm:flex-row">
       <Button asChild variant="marketing" className="rounded-full" size="lg">
-        <Link href="/signup/organization">
+        <Link href="/signup/organization?active=true">
           <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
         </Link>
       </Button>
