@@ -223,4 +223,5 @@ function CarouselNext({
   );
 }
 
+// ts-unused-exports:disable-next-line
 export { type CarouselApi, Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext };

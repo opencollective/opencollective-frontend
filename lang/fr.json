@@ -697,6 +697,8 @@
   "CancelEdit": "Annuler l'édition",
   "Captcha.Button.Verified": "Humain Vérifié.",
   "Captcha.Button.Verify": "Je ne suis pas un robot.",
+  "Carousel.NextSlide": "Next slide",
+  "Carousel.PreviousSlide": "Previous slide",
   "CAYwc2": "Qui recevra les fonds ?",
   "CBITv6": "Un profil représentant une entreprise ou une organisation au lieu d'une personne",
   "CCaOhC": "<Individual></Individual> a commenté sur la conversation <Conversation>{conversationTitle}</Conversation>",
