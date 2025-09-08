@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 import { defineMessages, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
@@ -52,40 +53,40 @@ const MEMBERS = [
     name: 'Open Source Collective',
     location: '🇺🇸 United States',
     collectivePath: '/opensource',
-    bgImage: 'osc',
-    logo: '/static/images/become-a-host/osc-logo.png',
+    bgImage: '/static/images/ofico/osc-bg.png',
+    logo: '/static/images/ofico/osc-logo.png',
   },
   {
     id: 'OCE',
     name: 'Open Collective Europe',
     location: ' 🇪🇺 Europe',
     collectivePath: '/europe',
-    bgImage: 'oce-bg',
-    logo: '/static/images/fiscal-hosting/oce.png',
+    bgImage: '/static/images/ofico/oce-bg.jpg',
+    logo: '/static/images/ofico/oce-logo.png',
   },
   {
     id: 'giftcollective',
     name: 'Gift Collective',
     location: '🇳🇿 New Zealand',
     collectivePath: '/giftcollective',
-    bgImage: 'giftcollective-bg',
-    logo: '/static/images/fiscal-hosting/giftcollective.png',
+    bgImage: '/static/images/ofico/giftcollective-bg.png',
+    logo: '/static/images/ofico/giftcollective-logo.png',
   },
   {
     id: 'socialchangenestcollective',
     name: 'Social Change Nest',
     location: '🇬🇧 United Kingdom',
     collectivePath: '/the-social-change-nest',
-    bgImage: 'socialchangenest',
-    logo: '/static/images/become-a-host/socialchangenest-logo.png',
+    bgImage: '/static/images/ofico/scn-bg.png',
+    logo: '/static/images/ofico/scn-logo.png',
   },
   {
     id: 'raft',
     name: 'Raft Foundation',
     location: '🇺🇸 United States',
     collectivePath: '/raft',
-    bgImage: 'raft-bg',
-    logo: '/static/images/fiscal-hosting/raft.png',
+    bgImage: '/static/images/ofico/raft-bg.png',
+    logo: '/static/images/ofico/raft-logo.png',
   },
 ];
 
@@ -126,14 +127,17 @@ const OficoMembers = () => {
               key={member.id}
               className="w-full max-w-md overflow-hidden rounded-lg bg-background p-6 transition-colors duration-200 hover:bg-muted md:w-96"
             >
-              <div
-                className="flex h-52 w-full items-center justify-center rounded-lg bg-cover bg-center bg-no-repeat p-4"
-                style={{
-                  backgroundImage: `url("/static/images/become-a-host/${member.bgImage}.png")`,
-                  backgroundSize: 'cover',
-                }}
-              >
-                <Avatar radius="96px" src={member.logo} name={member.name} type="ORGANIZATION" className="bg-white" />
+              <div className="relative flex h-52 w-full items-center justify-center overflow-hidden rounded-lg p-4">
+                <Image
+                  src={member.bgImage}
+                  alt={`${member.name} background`}
+                  fill
+                  className="object-cover"
+                  sizes="448px"
+                />
+                <div className="relative z-10">
+                  <Avatar radius="96px" src={member.logo} name={member.name} type="ORGANIZATION" className="bg-white" />
+                </div>
               </div>
 
               <div className="mt-3">
