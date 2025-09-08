@@ -1,8 +1,9 @@
 import React from 'react';
+import Image from 'next/image';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import Image from '@/components/Image';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/Carousel';
 
 const messages = defineMessages({
   title: {
@@ -13,28 +14,63 @@ const messages = defineMessages({
 
 const testimonials = [
   {
-    id: 1,
     title: 'Streamlining our operations, saving us time and reducing administrative overhead.',
-    body: "Open Collective keeps our financial records accurate, timely, and transparent, helping us build trust within our community. By automating many tasks related to managing financial contributions and expenses, we're able to focus on providing meaningful support to our hosted collectives.",
+    paragraphs: [
+      'Open Collective keeps our financial records accurate, timely, and transparent, helping us build trust within our community.',
+      "By automating many tasks related to managing financial contributions and expenses, we're able to focus on providing meaningful support to our hosted collectives.",
+    ],
     author: 'Lauren Gardner',
     role: 'Executive Director',
     org: 'Open Source Collective',
-    avatar: '/static/images/laurengardner.png',
-    avatarWidth: 512,
-    avatarHeight: 512,
+    avatar: '/static/images/testimonials/lauren-gardner.png',
     orgLink: 'https://oscollective.org',
   },
   {
-    id: 2,
     title: 'Open Collective is essential to how we operate as a foundation.',
-    body: "The platform allows us to support hundreds of grassroots and open-source communities with transparent budgets, accessible financial tools, and smooth cross-border grant distribution. It's an indispensable partner in making collective financial infrastructure truly work at scale.",
+    paragraphs: [
+      'The platform allows us to support hundreds of grassroots and open-source communities with transparent budgets, accessible financial tools, and smooth cross-border grant distribution.',
+      "It's an indispensable partner in making collective financial infrastructure truly work at scale.",
+    ],
     author: 'Jean-François De Hertogh',
     role: 'Executive Director',
     org: 'Open Collective Europe Foundation',
-    avatar: '/static/images/jf.png',
-    avatarWidth: 384,
-    avatarHeight: 512,
+    avatar: '/static/images/testimonials/jf.png',
     orgLink: 'https://www.oceurope.org',
+  },
+  {
+    paragraphs: [
+      'Open Collective enables us to deliver valuable services to numerous collectives in a structured and automated way.',
+      'Our communities appreciate how efficient and user-friendly the platform is, allowing them not only to fundraise but also to manage their budgets and expenses transparently.',
+      'With frequent updates, the platform continues to make it easier for us to support our collectives and for them to work with greater clarity and simplicity.',
+    ],
+    author: 'Babette',
+    avatar: '/static/images/testimonials/babette.png',
+    org: 'All For Climate',
+    orgLink: 'https://allforclimate.earth/',
+  },
+  {
+    paragraphs: [
+      'Open Collective has enabled us to distribute funds across community groups and collectives in transparent and clear ways.',
+      'The platform has unlocked our capacity to build sustainable infrastructure for our work - peer to peer learning and action - in meaningful and sustainable ways.',
+      'Furthermore the support we receive is thorough and consistent - we deeply appreciate the platform and the team.',
+    ],
+    author: 'Anna Garlands',
+    avatar: '/static/images/testimonials/anna-garlands.jpeg',
+    org: 'Huddlecraft',
+    role: 'Co-Director',
+    orgLink: 'https://www.huddlecraft.com/',
+  },
+  {
+    paragraphs: [
+      'Open Collective has democratised community organising, helping to build trust and foster collaboration and transparency across community led work.',
+      'Our continued partnership with Open Collective has enabled our network of more than 600 fiscally hosted community groups worldwide to manage their finances with ease and reassurance, thus freeing up headspace to focus on front line impact and long term strategy.',
+      "It's an easy to use platform and the Open Collective team are dedicated to ensuring that client feedback from our network is fed into further product design.",
+    ],
+    author: 'Esther',
+    avatar: '/static/images/testimonials/esther-foreman.jpg',
+    org: 'Social Change Nest',
+    role: 'CEO and Chair of the Board',
+    orgLink: 'https://thesocialchangenest.org',
   },
 ];
 
@@ -42,19 +78,23 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
   <Card className="h-full">
     <CardContent className="flex-1 px-6">
       <blockquote>
-        <h3 className="mb-4 text-lg font-bold text-slate-900">{testimonial.title}</h3>
-        <p className="text-slate-600">{testimonial.body}</p>
+        {testimonial.title && <h3 className="mb-3 text-lg font-bold text-slate-900">{testimonial.title}</h3>}
+        <div className="space-y-2">
+          {testimonial.paragraphs.map(text => (
+            <p className="text-slate-600">{text}</p>
+          ))}
+        </div>
       </blockquote>
     </CardContent>
     <CardFooter className="px-6">
       <div className="flex items-center">
-        <div className="mr-4 h-16 w-16 overflow-hidden rounded-full bg-slate-200">
+        <div className="relative mr-4 h-16 w-16 overflow-hidden rounded-full bg-slate-200">
           <Image
             src={testimonial.avatar}
             alt={testimonial.author}
-            width={testimonial.avatarWidth}
-            height={testimonial.avatarHeight}
             className="h-full w-full object-cover"
+            fill
+            sizes="64px"
           />
         </div>
         <div className="flex-1">
@@ -92,12 +132,25 @@ const Testimonials = () => {
           </h2>
         </div>
 
-        <div className="mx-auto max-w-4xl">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {testimonials.map(testimonial => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))}
-          </div>
+        <div className="w-full px-12">
+          <Carousel
+            opts={{
+              align: 'start',
+            }}
+            className="mx-auto w-full max-w-4xl"
+          >
+            <CarouselContent>
+              {testimonials.map(testimonial => (
+                <CarouselItem key={testimonial.author} className="basis-full lg:basis-1/2">
+                  <div className="p-1">
+                    <TestimonialCard testimonial={testimonial} />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
       </div>
     </section>
