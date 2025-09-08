@@ -81,7 +81,9 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
         {testimonial.title && <h3 className="mb-3 text-lg font-bold text-slate-900">{testimonial.title}</h3>}
         <div className="space-y-2">
           {testimonial.paragraphs.map(text => (
-            <p className="text-slate-600">{text}</p>
+            <p key={text.slice(0, 12)} className="text-slate-600">
+              {text}
+            </p>
           ))}
         </div>
       </blockquote>
