@@ -58,7 +58,7 @@ const AddFundsModalContainer = styled(StyledModal)<{ $showSuccessModal: boolean 
   ${props =>
     props.$showSuccessModal &&
     css`
-      background-image: url('/static/images/platform-tip-background.svg');
+      background-image: url('/static/images/platform-tip-background.png');
       background-repeat: no-repeat;
       background-size: 100%;
       background-position: left 0 top 0;
