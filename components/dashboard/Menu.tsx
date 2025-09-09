@@ -358,12 +358,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: HeartHandshake,
     },
     {
-      if: !isHost && !isCommunityManagerOnly,
+      if: !(isHost || isSelfHosted) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
     },
     {
-      if: isHost && !isCommunityManagerOnly,
+      if: (isHost || isSelfHosted) && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
       Icon: ArrowRightLeft,
