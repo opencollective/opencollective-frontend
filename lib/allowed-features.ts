@@ -31,11 +31,14 @@ export const FEATURES = {
   VIRTUAL_CARDS: 'VIRTUAL_CARDS',
   MULTI_CURRENCY_EXPENSES: 'MULTI_CURRENCY_EXPENSES',
   AGREEMENTS: 'AGREEMENTS',
-  // Not implemented in API features endpoint yet
-  SUBMIT_EXPENSE_ON_BEHALF: 'SUBMIT_EXPENSE_ON_BEHALF',
+  TAX_FORMS: 'TAX_FORMS',
   CONTACT_FORM: 'CONTACT_FORM',
   CONNECTED_ACCOUNTS: 'CONNECTED_ACCOUNTS',
   OFF_PLATFORM_TRANSACTIONS: 'OFF_PLATFORM_TRANSACTIONS',
+  CHART_OF_ACCOUNTS: 'CHART_OF_ACCOUNTS',
+
+  // Not implemented in API features endpoint yet
+  SUBMIT_EXPENSE_ON_BEHALF: 'SUBMIT_EXPENSE_ON_BEHALF',
 };
 
 /**
@@ -85,7 +88,7 @@ export const isFeatureEnabled = (collective, feature) => {
  */
 export const requiresUpgrade = (collective, feature) => {
   const featureStatus = getFeatureStatus(collective, feature);
-  return featureStatus === 'DISABLED' && collective.platformSubscription;
+  return featureStatus === 'DISABLED' && Boolean(collective.platformSubscription);
 };
 
 /**

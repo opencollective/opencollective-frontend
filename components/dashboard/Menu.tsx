@@ -28,7 +28,7 @@ import {
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES, isFeatureSupported } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -36,6 +36,7 @@ import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
@@ -108,6 +109,16 @@ const ROOT_MENU = [
 ] as GroupMenuItem[];
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
+
+function shouldIncludeMenuItemWithLegacyFallback(
+  account: DashboardQuery['account'],
+  featureKey: (typeof FEATURES)[keyof typeof FEATURES],
+  fallback: boolean,
+) {
+  return 'platformSubscription' in account && account.platformSubscription
+    ? isFeatureSupported(account, featureKey)
+    : fallback;
+}
 
 export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
@@ -292,7 +303,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       section: ALL_SECTIONS.HOST_AGREEMENTS,
-      if: isHost && canHostAccounts,
+      if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, isHost && canHostAccounts),
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
@@ -300,7 +311,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
       Icon: FileText,
       label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-      if: isFeatureSupported(account, 'TAX_FORMS'),
+      if: shouldIncludeMenuItemWithLegacyFallback(
+        account,
+        FEATURES.TAX_FORMS,
+        isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+      ),
     },
     {
       if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isCommunityManagerOnly,
@@ -375,7 +390,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
           label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
-          if: isFeatureSupported(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.OFF_PLATFORM_TRANSACTIONS,
+            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          ),
         },
         {
           section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
@@ -456,7 +475,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS,
-                if: !isAccountantOnly && isFeatureSupported(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+                if:
+                  !isAccountantOnly &&
+                  shouldIncludeMenuItemWithLegacyFallback(
+                    account,
+                    FEATURES.OFF_PLATFORM_TRANSACTIONS,
+                    isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+                  ),
               },
               {
                 section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
