@@ -697,6 +697,8 @@
   "CancelEdit": "取消编辑",
   "Captcha.Button.Verified": "人机验证通过。",
   "Captcha.Button.Verify": "我不是机器人。",
+  "Carousel.NextSlide": "Next slide",
+  "Carousel.PreviousSlide": "Previous slide",
   "CAYwc2": "Who will receive the funds?",
   "CBITv6": "代表公司或组织而非个人的资料",
   "CCaOhC": "<Individual></Individual> commented on conversation <Conversation>{conversationTitle}</Conversation>",

@@ -697,6 +697,8 @@
   "CancelEdit": "編集をキャンセル",
   "Captcha.Button.Verified": "Verified Human.",
   "Captcha.Button.Verify": "私はロボットではありません。",
+  "Carousel.NextSlide": "Next slide",
+  "Carousel.PreviousSlide": "Previous slide",
   "CAYwc2": "Who will receive the funds?",
   "CBITv6": "個人としてではなく、企業や団体として自己紹介するプロフィール",
   "CCaOhC": "<Individual></Individual> commented on conversation <Conversation>{conversationTitle}</Conversation>",
