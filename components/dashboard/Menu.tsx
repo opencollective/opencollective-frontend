@@ -41,7 +41,6 @@ import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
-import { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
 
