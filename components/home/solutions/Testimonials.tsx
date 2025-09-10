@@ -117,7 +117,7 @@ const Testimonials = () => {
       <div className="absolute inset-0 overflow-hidden">
         <div className="mx-auto h-full max-w-[1400px]">
           <Image
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
             alt=""
             src="/static/images/testimonials-bg.png"
             width={4096}
