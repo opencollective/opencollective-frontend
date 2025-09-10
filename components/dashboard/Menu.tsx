@@ -28,12 +28,7 @@ import {
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import hasFeature, {
-  FEATURES,
-  isFeatureEnabled,
-  isFeatureSupported,
-  requiresUpgrade,
-} from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -41,6 +36,7 @@ import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
@@ -117,7 +113,7 @@ export type MenuItem = PageMenuItem | GroupMenuItem;
 
 function shouldIncludeMenuItemWithLegacyFallback(
   account: DashboardQuery['account'],
-  featureKey: keyof typeof FEATURES,
+  featureKey: (typeof FEATURES)[keyof typeof FEATURES],
   fallback: boolean,
 ) {
   return 'platformSubscription' in account && account.platformSubscription
