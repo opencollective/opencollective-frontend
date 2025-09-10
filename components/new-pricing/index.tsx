@@ -198,7 +198,7 @@ function TierPricePlansDisplay({ tier, packages }) {
 export default function Pricing() {
   const query = useQuery<PlatformSubscriptionFormQuery, PlatformSubscriptionFormQueryVariables>(
     gql`
-      query PlatformSubscriptionForm {
+      query PlatformSubscriptionTiers {
         platformSubscriptionTiers {
           id
           title
