@@ -5,6 +5,7 @@ import { Form } from 'formik';
 import { isEmpty, max, min, omit, orderBy, pick, set } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
+import slugify from 'slugify';
 import { z } from 'zod';
 
 import { suggestSlug } from '@/lib/collective';
@@ -88,6 +89,11 @@ type FormValuesSchema = z.infer<typeof formSchema>;
 
 export type OrganizationFormProps = {
   onSuccess?: (organization: OrganizationSignupMutation['createOrganization']) => void;
+};
+
+const emailToAdmin = email => {
+  const username = email.split('@')?.[0];
+  return { memberInfo: { email, name: username ? slugify(username) : null }, role: 'ADMIN' };
 };
 
 const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
@@ -202,9 +208,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         variables: {
           individual: 'id' in individual ? null : omit(individual, ['passwordConfirmation']),
           organization: organization,
-          inviteMembers: invitedAdmins?.length
-            ? invitedAdmins.map(email => ({ memberInfo: { email }, role: 'ADMIN' }))
-            : undefined,
+          inviteMembers: invitedAdmins?.length ? invitedAdmins.map(emailToAdmin) : undefined,
           captcha: captchaResult,
           roleDescription,
           financiallyActive: router.query?.active === 'true',
@@ -553,6 +557,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                     name={`invitedAdmins.${index}`}
                     label={<FormattedMessage id="Email" defaultMessage="Email" />}
                     type="email"
+                    required={false}
                   >
                     {({ field }) => (
                       <div className="flex gap-1">
