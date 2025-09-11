@@ -262,7 +262,7 @@ export const generateSetupGuideSteps = ({
             !isEmpty(account.host?.policies?.EXPENSE_POLICIES?.receiptPolicy),
           action: {
             label: <FormattedMessage defaultMessage="Set up expense policies" id="SetupGuide.Expenses" />,
-            onClick: () => router.push(getDashboardRoute(account, 'policies')),
+            onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
           },
         },
         {
