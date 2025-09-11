@@ -212,11 +212,19 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
       subMenu: [
         {
-          if: isHost && canHostAccounts,
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.FUNDS_GRANTS_MANAGEMENT,
+            isHost && canHostAccounts,
+          ),
           section: ALL_SECTIONS.HOSTED_FUNDS,
         },
         {
-          if: isHost || isSelfHosted,
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.FUNDS_GRANTS_MANAGEMENT,
+            isHost || isSelfHosted,
+          ),
           section: ALL_SECTIONS.HOSTED_GRANTS,
           label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
         },
