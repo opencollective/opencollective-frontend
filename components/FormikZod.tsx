@@ -350,7 +350,10 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   const intl = useIntl();
   const context = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
-    values => defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), _validate?.(values) || {}),
+    async values => {
+      const validationError = _validate ? await Promise.resolve(_validate(values)) : {};
+      return defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), validationError);
+    },
     [intl, schema, _validate],
   );
   return (
