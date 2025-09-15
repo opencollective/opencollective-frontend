@@ -4183,6 +4183,7 @@
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize": "crwdns30487:0crwdne30487:0",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.title": "crwdns30489:0crwdne30489:0",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.accounting": "crwdns30491:0crwdne30491:0",
+  "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importCSV": "crwdns30873:0crwdne30873:0",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importing": "crwdns30493:0crwdne30493:0",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.offPlatformTransactions": "crwdns30495:0crwdne30495:0",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.reconcilliation": "crwdns30497:0crwdne30497:0",
