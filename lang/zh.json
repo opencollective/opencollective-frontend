@@ -4183,6 +4183,7 @@
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize": "Reduce the accounting costs, workload, and risk of accounting errors.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.title": "Upgrade your plan to access chart of accounts.",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.accounting": "Provide your accountants with a consolidated transaction exports.",
+  "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importCSV": "Manually import transactions with CSV files",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importing": "Automatically import transactions from banks and other financial services.",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.offPlatformTransactions": "Accurately represent your finances on the platform by importing off-platform financial activities",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.reconcilliation": "Reconcile and match imported transactions with platform activities.",
