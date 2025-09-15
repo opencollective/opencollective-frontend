@@ -1,13 +1,7 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type {
-  PlatformSubscriptionTiersQuery,
-  PlatformSubscriptionTiersQueryVariables,
-} from '@/lib/graphql/types/v2/graphql';
 
 import {
   PlatformSubscriptionTiers,
@@ -221,11 +215,7 @@ function TierPricePlansDisplay({ tier, packages }) {
   );
 }
 
-export default function Pricing() {
-  const query = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(pricingPageQuery, {
-    context: API_V2_CONTEXT,
-  });
-
+export default function Pricing({ data }) {
   return (
     <div className="min-h-screen py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -260,7 +250,7 @@ export default function Pricing() {
                 <PlatformSubscriptionTierCard key={tier} tier={tier}>
                   <TierPricePlansDisplay
                     tier={tier}
-                    packages={query.data?.platformSubscriptionTiers.filter(plan => plan.type === tier)}
+                    packages={data?.platformSubscriptionTiers.filter(plan => plan.type === tier)}
                   />
                 </PlatformSubscriptionTierCard>
               </CardContent>
