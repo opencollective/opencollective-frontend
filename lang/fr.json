@@ -4183,6 +4183,7 @@
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize": "Réduire les coûts comptables, la charge de travail et les risques d'erreurs comptables.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.title": "Upgrade your plan to access chart of accounts.",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.accounting": "Fournissez à vos comptables des exportations consolidées d'opérations.",
+  "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importCSV": "Manually import transactions with CSV files",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importing": "Importez automatiquement les transactions des banques et d'autres services financiers.",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.offPlatformTransactions": "Représentez précisément vos finances sur la plateforme en important des activités financières hors plateforme",
   "UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.reconcilliation": "Reconcile and match imported transactions with platform activities.",
