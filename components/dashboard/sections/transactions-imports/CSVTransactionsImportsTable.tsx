@@ -12,12 +12,16 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
 import { capitalize } from '../../../../lib/utils';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
+
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
 
@@ -51,12 +55,15 @@ const ledgerCSVImportsQuery = gql`
 
 export const CSVTransactionsImportsTable = ({ accountSlug }) => {
   const intl = useIntl();
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
   const [hasNewImportDialog, setHasNewImportDialog] = React.useState(false);
   const router = useRouter();
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const { data, loading, refetch, error } = useQuery(ledgerCSVImportsQuery, {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
+    skip: isUpgradeRequired,
   });
 
   return (
@@ -67,14 +74,21 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
         className="mb-5"
         actions={
           <React.Fragment>
-            <Button size="sm" variant="outline" onClick={() => setHasNewImportDialog(true)}>
+            <Button
+              disabled={isUpgradeRequired}
+              size="sm"
+              variant="outline"
+              onClick={() => setHasNewImportDialog(true)}
+            >
               <FileUp size={16} />
               <FormattedMessage defaultMessage="Import CSV" id="2uzHxT" />
             </Button>
           </React.Fragment>
         }
       />
-      {error ? (
+      {isUpgradeRequired ? (
+        <UpgradePlanCTA featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
+      ) : error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (
         <div>

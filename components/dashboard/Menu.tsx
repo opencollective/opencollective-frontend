@@ -399,6 +399,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
           label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
+          if: shouldIncludeMenuItemWithLegacyFallback(
+            account,
+            FEATURES.OFF_PLATFORM_TRANSACTIONS,
+            isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+          ),
         },
       ],
     },
