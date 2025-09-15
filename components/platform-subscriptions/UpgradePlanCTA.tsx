@@ -133,6 +133,10 @@ const content: Content = {
         defaultMessage: 'Automatically import transactions from banks and other financial services.',
       }),
       defineMessage({
+        id: 'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.importCSV',
+        defaultMessage: 'Manually import transactions with CSV files',
+      }),
+      defineMessage({
         id: 'UpgradePlanCTA.OFF_PLATFORM_TRANSACTIONS.reconcilliation',
         defaultMessage: 'Reconcile and match imported transactions with platform activities.',
       }),
