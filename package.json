@@ -244,7 +244,7 @@
     "cypress-terminal-report": "^7.1.0",
     "cz-conventional-changelog": "^3.3.0",
     "dot-path-value": "^0.0.11",
-    "esbuild": "0.25.8",
+    "esbuild": "0.25.9",
     "eslint": "^9.29.0",
     "eslint-config-opencollective": "^6.1.0",
     "eslint-import-resolver-typescript": "^4.4.4",
