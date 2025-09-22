@@ -33,6 +33,10 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/Sidebar';
+import SearchTrigger from '@/components/SearchTrigger';
+import { SearchCommand } from '@/components/search/SearchCommand';
+import ProfileMenu from '@/components/navigation/ProfileMenu';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -208,6 +212,7 @@ const DashboardPage = () => {
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
+  const [showSearchModal, setShowSearchModal] = React.useState(false);
 
   return (
     <DashboardContext.Provider
@@ -222,14 +227,26 @@ const DashboardPage = () => {
         setDefaultSlug: slug => setWorkspace({ slug }),
       }}
     >
-      <div className="flex min-h-screen flex-col justify-between">
-        <Page
+      <SidebarProvider>
+        {/* <Page
           noRobots
           collective={account}
           title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
           pageTitle={titleBase}
           showFooter={false}
-        >
+        > */}
+        <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
+        <div>
+          <div className="sticky top-0 flex h-15 items-center justify-between bg-background px-4">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <SearchTrigger setShowSearchModal={setShowSearchModal} />
+            </div>
+            {/* <div className="hidden sm:block">{!whitelabel && <ChangelogTrigger />}</div> */}
+            <ProfileMenu
+            // logoutParameters={{ skipQueryRefetch: onDashboardRoute, redirect: onDashboardRoute ? '/' : undefined }}
+            />
+          </div>
           {Boolean(notification) && <NotificationBar {...notification} />}
           {blocker ? (
             <div className="my-32 flex flex-col items-center">
@@ -244,31 +261,37 @@ const DashboardPage = () => {
               {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
             </div>
           ) : (
-            <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
-              data-cy="admin-panel-container"
-            >
-              <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-              {LoggedInUser &&
-              require2FAForAdmins(account) &&
-              !LoggedInUser.hasTwoFactorAuth &&
-              selectedSection !== 'user-security' ? (
-                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-              ) : (
-                <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
+            <div>
+              <div
+                className="flex min-h-[600px] flex-col justify-center gap-6 md:flex-row lg:gap-12"
+                data-cy="admin-panel-container"
+              >
+                <div className="px-4 py-6 lg:py-8 xl:px-6">
+                  {LoggedInUser &&
+                  require2FAForAdmins(account) &&
+                  !LoggedInUser.hasTwoFactorAuth &&
+                  selectedSection !== 'user-security' ? (
+                    <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+                  ) : (
+                    <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
+                      <DashboardSection
+                        section={selectedSection}
+                        isLoading={isLoading}
+                        account={account}
+                        subpath={subpath}
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
-        </Page>
-        <Footer />
-      </div>
+          <Footer />
+        </div>
+        <SearchCommand open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+
+        {/* </Page> */}
+      </SidebarProvider>
     </DashboardContext.Provider>
   );
 };

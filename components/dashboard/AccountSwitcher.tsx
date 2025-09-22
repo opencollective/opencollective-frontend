@@ -60,9 +60,9 @@ const DropdownButton = styled.button`
   all: unset;
   display: flex;
   background: white;
-  border: 1px solid #e6e8eb;
+  // border: 1px solid #e6e8eb;
   width: 100%;
-  border-radius: 24px;
+  border-radius: 8px;
   padding: 8px 12px;
   margin: 0 -4px;
   align-items: center;
@@ -186,9 +186,9 @@ const Option = ({
         <P color="black.800" fontSize="14px" letterSpacing="0" fontWeight="500" truncateOverflow>
           {collective?.name}
         </P>
-        <P color="black.700" fontSize="12px" letterSpacing="0" fontWeight="400" truncateOverflow>
+        {/* <P color="black.700" fontSize="12px" letterSpacing="0" fontWeight="400" truncateOverflow>
           {description}
-        </P>
+        </P> */}
       </Flex>
     </Flex>
   );
