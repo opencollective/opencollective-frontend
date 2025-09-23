@@ -98,7 +98,7 @@ const Tiers = ({ collective }) => {
           </P>
           <P mt={3}>
             <StyledLink
-              href="https://docs.opencollective.com/help/collectives/collective-settings/tiers-goals"
+              href="https://documentation.opencollective.com/collectives/raising-money/setting-goals-and-tiers"
               openInNewTab
             >
               <FormattedMessage defaultMessage="Learn more about tiers" id="108gPp" />.

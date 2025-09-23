@@ -2,11 +2,6 @@
 
 We use [Cypress](https://www.cypress.io/) for E2E (end-to-end) tests.
 
-## Writing E2E tests
-
-See the following guide in our documentation:
-https://docs.opencollective.com/help/contributing/development/testing-with-cypress
-
 ## Running the E2E tests in development environment
 
 In dev environment, to execute the E2E tests, you will need to open 4 different terminals in 2 different projects.

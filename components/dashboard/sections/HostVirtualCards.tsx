@@ -321,7 +321,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
             values={{
               learnMoreLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
+                href: 'https://documentation.opencollective.com/fiscal-hosts/virtual-cards',
                 openInNewTabNoFollow: true,
               }),
             }}

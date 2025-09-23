@@ -67,7 +67,7 @@ Not required, but a bonus:
 
 [Open Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world.
 
-“Open Collective” means transparency (“Open”) and community (“Collective”), and thus our platform is built on values of openness, transparency, and collective collaboration. The team is a group of optimistic, driven, nerdy, and open people. Our culture, though ever-changing and sometimes chaotic like many start-ups, is also oriented toward care, candor, rigor, generosity, and autonomy. (You can read more about our values in our [Community Guidelines](https://docs.opencollective.com/help/about/the-open-collective-way/community-guidelines).)
+“Open Collective” means transparency (“Open”) and community (“Collective”), and thus our platform is built on values of openness, transparency, and collective collaboration. The team is a group of optimistic, driven, nerdy, and open people. Our culture, though ever-changing and sometimes chaotic like many start-ups, is also oriented toward care, candor, rigor, generosity, and autonomy. (You can read more about our values in our [Community Guidelines](https://documentation.opencollective.com/our-organization/our-community-guidelines).)
 
 Our international, fully-remote, highly-collaborative team currently includes members in Spain, France, Belgium, Germany, the UK, Romania, the United States, Mexico, Canada, Indonesia, Brazil, India, and New Zealand. To learn more about the company, [watch this 50-second video](https://www.youtube.com/watch?v=SfHeSpoSHTM), skim through our [blog](https://blog.opencollective.com), and read about our [strategy](https://blog.opencollective.com/oc-strategy-2023-2024/). We look forward to learning more about you, too!
 
@@ -221,7 +221,7 @@ Watch this video about what we do and why we are passionate about it:
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% open source.
 
-If you want to know more about us, join our open [Discord](https://discord.opencollective.com), read [our blog](https://blog.opencollective.com), and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to understand our values and how we work.
+If you want to know more about us, join our open [Discord](https://discord.opencollective.com), read [our blog](https://blog.opencollective.com), and check out the [Open Collective Way](https://documentation.opencollective.com/our-organization) to understand our values and how we work.
 
 We are a fully remote team that loves distributed collaboration around the world: Spain, France, Belgium, Germany, Romania, UK, US, Canada, Mexico, Brazil, India, New Zealand. This start-up culture is truly different – one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and overwork, you will be happy to find another way is possible.
 

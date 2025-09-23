@@ -216,8 +216,8 @@ const Security = ({ collective }) => {
               <Link
                 href={
                   data.account.isHost
-                    ? 'https://docs.opencollective.com/help/fiscal-hosts/payouts/two-factor-authentication-for-payouts'
-                    : 'https://docs.opencollective.com/help/product/two-factor-authentication'
+                    ? 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-security#two-factor-authentication-for-payouts'
+                    : 'https://documentation.opencollective.com/advanced/security-for-accounts/two-factor-authentication'
                 }
               >
                 <FormattedMessage defaultMessage="Read the documentation about 2FA" id="E+Bll1" />
