@@ -293,7 +293,7 @@ export function initClient({
   initialState = null,
   twoFactorAuthContext = null,
   accessToken = null,
-}): ReturnType<typeof createClient> {
+} = {}): ReturnType<typeof createClient> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
