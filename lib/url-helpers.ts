@@ -85,13 +85,6 @@ export const mastodonShareURL = opts => {
 };
 
 /**
- * Generate a URL from a twitter handle
- */
-export const twitterProfileUrl = twitterHandle => {
-  return `https://x.com/${twitterHandle}`;
-};
-
-/**
  * @param opts {object} With the following attributes:
  *  - text: The message to share
  */
