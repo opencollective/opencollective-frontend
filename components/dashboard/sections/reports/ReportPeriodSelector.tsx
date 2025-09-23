@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';

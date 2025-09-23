@@ -13,7 +13,7 @@ import { get } from 'lodash';
 import { ArrowRightLeft, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';

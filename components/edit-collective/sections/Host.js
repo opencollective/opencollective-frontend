@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 import { getWebsiteUrl } from '../../../lib/utils';

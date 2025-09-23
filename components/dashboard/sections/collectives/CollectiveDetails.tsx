@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { PopoverTrigger } from '@radix-ui/react-popover';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { clamp, cloneDeep, groupBy, isEmpty, isEqual, isNaN, round } from 'lodash';
 import { AlertTriangle, ArrowLeft, ArrowRight, ChevronDown, FileText, Undo } from 'lucide-react';
 import { useRouter } from 'next/router';

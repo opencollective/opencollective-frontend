@@ -1,6 +1,6 @@
 import React from 'react';
 import { Times } from '@styled-icons/fa-solid/Times';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type {
   BackgroundProps,
   BorderProps,

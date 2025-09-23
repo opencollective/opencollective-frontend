@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';

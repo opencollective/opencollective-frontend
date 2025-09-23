@@ -1,5 +1,5 @@
 import React from 'react';
-import type { QueryOptions } from '@apollo/client';
+import type { ApolloClient, ApolloQueryResult, QueryOptions } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 import { cloneDeep, isUndefined, omitBy, pick } from 'lodash';
@@ -7,13 +7,13 @@ import { cloneDeep, isUndefined, omitBy, pick } from 'lodash';
 import { APOLLO_STATE_PROP_NAME, APOLLO_VARIABLES_PROP_NAME, initClient } from '../apollo-client';
 
 type QueryParams = QueryOptions & {
-  getVariablesFromProps?: (props: any) => any;
+  getVariablesFromProps?: (props: Record<string, unknown>) => Record<string, unknown>;
   /** Whether to fetch data for nested queries. This currently doesn't work for pages with a `useRouter` call, see https://github.com/opencollective/opencollective/issues/7013 */
   fetchDataFromTree?: boolean;
   /** @deprecated Whether to use the legacy data structure from Apollo, as returned by `withData`. Intended to make the transition from old pages smoother, should not be used in new developments */
   useLegacyDataStructure?: boolean;
   /** A custom function to preload more data on the client */
-  preload?: (client: any, mainQueryResult: any) => Promise<void>;
+  preload?: (client: ApolloClient<unknown>, mainQueryResult: ApolloQueryResult<unknown>) => Promise<void>;
 };
 
 export const ssrGraphQLQuery = ({
@@ -26,7 +26,7 @@ export const ssrGraphQLQuery = ({
   return ComposedComponent => {
     return class WithSSRQuery extends React.Component {
       static async getInitialProps(context) {
-        const client =
+        const client: ApolloClient<unknown> =
           context.req?.apolloClient ||
           initClient({
             initialState: window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME],

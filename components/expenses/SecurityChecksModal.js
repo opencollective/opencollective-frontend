@@ -5,7 +5,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { compact, find, first, uniq, upperCase } from 'lodash';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import useKeyboardKey, { S } from '../../lib/hooks/useKeyboardKey';
 

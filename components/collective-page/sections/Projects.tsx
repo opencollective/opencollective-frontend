@@ -3,7 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import { css } from '@styled-system/css';
 import { isEmpty } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import type {

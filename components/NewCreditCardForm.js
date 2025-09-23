@@ -4,7 +4,7 @@ import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
 import { isUndefined } from 'lodash';
 import { HelpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../lib/constants/payment-methods';
 

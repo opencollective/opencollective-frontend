@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import INTERVALS from '../../lib/constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';

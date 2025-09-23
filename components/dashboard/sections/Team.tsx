@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Edit } from '@styled-icons/material/Edit';
 import { get, truncate } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';

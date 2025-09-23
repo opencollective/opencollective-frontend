@@ -1,5 +1,5 @@
 import { LoaderAlt } from '@styled-icons/boxicons-regular/LoaderAlt';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { SpaceProps } from 'styled-system';
 import { space } from 'styled-system';
 

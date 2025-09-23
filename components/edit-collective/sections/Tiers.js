@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';

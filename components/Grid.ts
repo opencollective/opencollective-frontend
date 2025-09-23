@@ -3,7 +3,7 @@
  * See https://github.com/opencollective/opencollective/issues/2929 for more info.
  */
 
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { ColorProps, FlexboxProps, GridProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { border, color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
 

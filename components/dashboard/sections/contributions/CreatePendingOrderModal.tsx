@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
 import { cloneDeep, debounce, groupBy, map, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';

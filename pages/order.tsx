@@ -3,7 +3,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';

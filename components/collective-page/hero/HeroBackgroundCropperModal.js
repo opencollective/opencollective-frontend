@@ -6,7 +6,7 @@ import { cloneDeep, get, set } from 'lodash';
 import ReactDropzone from 'react-dropzone';
 import Cropper from 'react-easy-crop';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { upload } from '../../../lib/api';
 import { formatErrorMessage, getErrorFromXhrUpload, i18nGraphqlException } from '../../../lib/errors';

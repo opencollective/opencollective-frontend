@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { background, display } from 'styled-system';
 
 import Avatar from '../../Avatar';

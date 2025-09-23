@@ -87,7 +87,7 @@ export const ImportedTransactionDataList = ({
                 label={key}
                 itemClassName="truncate max-w-full"
                 labelClassName="basis-1/3 min-w-auto max-w-auto"
-                value={value}
+                value={value as object | React.ReactNode}
                 showValueAsItemTitle
               />
             ))}

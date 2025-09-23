@@ -2,6 +2,7 @@ import React from 'react';
 import type { ApolloClient, FetchResult } from '@apollo/client';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
+import type { Account } from '@opencollective/taxes/dist/types/Accounts';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
@@ -11,7 +12,7 @@ import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import type { ZodObjectDef } from 'zod';
-import z from 'zod';
+import { z } from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
@@ -169,6 +170,7 @@ type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setF
     field: F,
     value: PathValue<ExpenseFormValues, F>,
   ) => Promise<void> | Promise<FormikErrors<ExpenseFormValues>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getFieldProps: <F extends Path<ExpenseFormValues>>(field: F) => FieldInputProps<any>;
 };
 
@@ -623,7 +625,7 @@ type ExpenseFormOptions = {
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
-  async (apolloClient: ApolloClient<any>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
+  async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
       context: API_V2_CONTEXT,
@@ -1358,7 +1360,7 @@ function getPayeeSlug(values: ExpenseFormValues): string {
 
 async function buildFormOptions(
   intl: IntlShape,
-  apolloClient: ApolloClient<any>,
+  apolloClient: ApolloClient<unknown>,
   loggedInUser: LoggedInUser,
   values: ExpenseFormValues,
   startOptions: ExpenseFormStartOptions,
@@ -1448,11 +1450,8 @@ async function buildFormOptions(
       options.isHostAdmin = loggedInUser?.isAdminOfCollective(host) ?? false;
       options.host = host;
       options.vendorsForAccount =
-        'vendorsForAccount' in host
-          ? ((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []
-          : [];
-      options.showVendorsOption =
-        options.isHostAdmin || ('vendors' in host ? (host.vendors as any)?.totalCount > 0 : false);
+        'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
+      options.showVendorsOption = options.isHostAdmin || ('vendors' in host ? host.vendors?.['totalCount'] > 0 : false);
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1582,7 +1581,7 @@ async function buildFormOptions(
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
-      if (accountHasVAT(account as any, host as any)) {
+      if (accountHasVAT(account as Account, host as Account)) {
         options.taxType = TaxType.VAT;
       } else if (accountHasGST(host || account)) {
         options.taxType = TaxType.GST;
@@ -1656,7 +1655,7 @@ export function useExpenseForm(opts: {
     formikHelpers: FormikHelpers<ExpenseFormValues>,
     options: ExpenseFormOptions,
     startOptions: ExpenseFormStartOptions,
-  ) => void | Promise<any>;
+  ) => void | Promise<unknown>;
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();

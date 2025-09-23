@@ -2,7 +2,7 @@ import React from 'react';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import StyledLink from './StyledLink';
 

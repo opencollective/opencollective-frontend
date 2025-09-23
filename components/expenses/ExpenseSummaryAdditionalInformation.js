@@ -1,7 +1,7 @@
 import React from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';

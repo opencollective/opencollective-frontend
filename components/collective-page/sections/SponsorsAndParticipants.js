@@ -1,7 +1,7 @@
 import React from 'react';
 import { get, groupBy, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { exportRSVPs } from '../../../lib/export_file';
 

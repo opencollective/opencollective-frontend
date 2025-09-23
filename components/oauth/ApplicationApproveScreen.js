@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { addAuthTokenToHeader } from '../../lib/api';
 import { ERROR, formatErrorType } from '../../lib/errors';

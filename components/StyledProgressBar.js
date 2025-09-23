@@ -1,6 +1,6 @@
 import React from 'react';
 import { clamp } from 'lodash';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { border, color, layout } from 'styled-system';
 
 const BackgroundBar = styled.div`

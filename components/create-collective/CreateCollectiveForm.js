@@ -4,7 +4,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';

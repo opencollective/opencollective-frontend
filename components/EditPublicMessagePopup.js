@@ -4,7 +4,7 @@ import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Popper } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
 import { gqlV1 } from '../lib/graphql/helpers';

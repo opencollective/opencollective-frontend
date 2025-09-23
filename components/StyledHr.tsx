@@ -1,6 +1,6 @@
 import { themeGet } from '@styled-system/theme-get';
 import type React from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { BorderProps, DisplayProps, FlexProps, LayoutProps, ShadowProps, SpaceProps } from 'styled-system';
 import { border, display, flex, layout, shadow, space } from 'styled-system';
 

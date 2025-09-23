@@ -95,7 +95,7 @@ export default function ContributePage() {
                           <iframe
                             width={node.getAttribute('width')}
                             height={node.getAttribute('height')}
-                            allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                            allowFullScreen={node.getAttribute('allowfullscreen') as unknown as boolean}
                             title={node.getAttribute('title') || 'Embed content'}
                             src={src}
                           />

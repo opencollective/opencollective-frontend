@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';

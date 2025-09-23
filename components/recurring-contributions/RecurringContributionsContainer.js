@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 

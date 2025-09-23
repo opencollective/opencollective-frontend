@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';

@@ -75,7 +75,7 @@ export function NestedObjectDataListItem({
   labelClassName,
   showValueAsItemTitle,
 }: Omit<DataListItemProps, 'value'> & {
-  value: any; // Intended any: the component is meant to recursively display any kind of value
+  value: object | React.ReactNode; // Intended any: the component is meant to recursively display any kind of value
 }) {
   if (isObject(value) && value !== null) {
     return (
@@ -104,7 +104,7 @@ export function NestedObjectDataListItem({
   return (
     <DataListItem
       label={label}
-      value={value}
+      value={value as React.ReactNode}
       className={className}
       itemClassName={itemClassName}
       labelClassName={labelClassName}

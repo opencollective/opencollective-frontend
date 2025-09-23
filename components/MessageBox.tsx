@@ -4,7 +4,7 @@ import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type {
   BordersProps,
   ColorProps,

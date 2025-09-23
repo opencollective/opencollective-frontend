@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { get, sortBy } from 'lodash';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import type { ReactNode } from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import type { ButtonSize } from '../lib/theme/variants/button';
 

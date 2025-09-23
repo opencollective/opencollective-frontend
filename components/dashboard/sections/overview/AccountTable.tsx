@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import type { Column, ColumnDef, Row, TableMeta } from '@tanstack/react-table';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { isNil, omit } from 'lodash';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';

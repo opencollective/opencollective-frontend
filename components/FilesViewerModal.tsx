@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { themeGet } from '@styled-system/theme-get';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { unescape } from 'lodash';
 import { ChevronLeft, ChevronRight, Download, ExternalLink, X } from 'lucide-react';
 import dynamic from 'next/dynamic';

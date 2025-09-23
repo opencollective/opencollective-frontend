@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { display } from 'styled-system';
 
 import { Box, Flex } from '../../Grid';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from '@styled-system/css';
 import { get, remove } from 'lodash';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 

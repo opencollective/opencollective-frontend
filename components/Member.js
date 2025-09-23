@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';

@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { Search } from 'lucide-react';
 import { defineMessages, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { escapeInput } from '../../lib/utils';
 

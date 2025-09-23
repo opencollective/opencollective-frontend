@@ -4,7 +4,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';

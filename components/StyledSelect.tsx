@@ -11,7 +11,7 @@ import type {
   ValueContainerProps,
 } from 'react-select';
 import Select, { components as ReactSelectComponents } from 'react-select';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { layout, space, typography } from 'styled-system';
 

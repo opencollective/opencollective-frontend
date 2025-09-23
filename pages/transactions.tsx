@@ -1,7 +1,7 @@
 import React from 'react';
 import type { InferGetServerSidePropsType } from 'next';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { z } from 'zod';
 
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';

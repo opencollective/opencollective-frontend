@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { ArrowRight, ChevronDown, ChevronUp, Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 

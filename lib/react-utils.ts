@@ -39,11 +39,7 @@ export function elementFromClass(type, className) {
     ref,
   ) => {
     children = Array.isArray(children) ? children : [children];
-    return React.createElement(
-      type,
-      { ...props, className: cn(className, propsClassName), ref } as any,
-      ...(children as any),
-    );
+    return React.createElement(type, { ...props, className: cn(className, propsClassName), ref }, ...children);
   };
   render.displayName = typeof type === 'string' ? type : type.name;
   return React.forwardRef(render);

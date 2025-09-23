@@ -8,7 +8,7 @@ import { first } from 'lodash';
 import { Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';

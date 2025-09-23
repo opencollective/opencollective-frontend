@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import ReactAnimateHeight from 'react-animate-height';

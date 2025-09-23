@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';

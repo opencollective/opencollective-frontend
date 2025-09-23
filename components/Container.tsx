@@ -1,6 +1,6 @@
 import type React from 'react';
 import type { CSSProp } from 'styled-components';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type {
   BackgroundProps,
   BorderProps,

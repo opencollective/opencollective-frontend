@@ -3,7 +3,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { debounce, isEmpty, truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { usePopper } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { searchDocs } from '../../lib/api';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';

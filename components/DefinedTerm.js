@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { borderColor, color, typography } from 'styled-system';
 
 import { textTransform } from '../lib/styled-system-custom-properties';

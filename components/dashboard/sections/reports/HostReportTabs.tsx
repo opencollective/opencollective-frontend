@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
 const Tab = ({ title, description, isActive, onClick }) => {

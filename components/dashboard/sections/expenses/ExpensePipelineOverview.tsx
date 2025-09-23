@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Paypal } from '@styled-icons/remix-line/Paypal';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../../../../lib/api';

@@ -5,7 +5,7 @@ import { themeGet } from '@styled-system/theme-get';
 import Geosuggest from '@ubilabs/react-geosuggest';
 import { get, isNil, omitBy } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { isURL } from 'validator';
 
 import Container from './Container';
