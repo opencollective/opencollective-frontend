@@ -40,7 +40,11 @@
         "react-animate-height",
         "react-pdf",
         "zod",
-        "react-verification-input"
+        "react-verification-input",
+        "@formatjs/cli",
+        "tailwindcss",
+        "tailwindcss-animate",
+        "postcss"
       ]
     }
   ]
