@@ -13,7 +13,6 @@ export const Sections = {
   GOALS: 'goals',
   UPDATES: 'updates',
   CONVERSATIONS: 'conversations',
-  RECURRING_CONTRIBUTIONS: 'recurring-contributions',
   TICKETS: 'tickets',
   LOCATION: 'location',
   // Navigation v2 main sections
