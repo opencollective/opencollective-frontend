@@ -161,7 +161,7 @@ export const regularFooterItems: Item[] = [
       },
       {
         label: <FormattedMessage id="company.securityPolicy" defaultMessage="Security Policy" />,
-        href: 'https://docs.opencollective.com/help/product/security',
+        href: 'https://documentation.opencollective.com/advanced/security-for-accounts',
       },
       {
         label: <FormattedMessage id="contactUs" defaultMessage="Contact us" />,

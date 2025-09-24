@@ -321,7 +321,7 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
             },
             {
               LearnMoreLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards',
+                href: 'https://documentation.opencollective.com/giving-to-collectives/giving-as-a-company/gift-cards',
                 openInNewTab: true,
               }),
             },

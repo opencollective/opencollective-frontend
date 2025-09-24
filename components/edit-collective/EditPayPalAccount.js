@@ -132,7 +132,7 @@ const EditPayPalAccount = props => {
               defaultMessage="Connect a PayPal account to pay expenses with one click. (<a>Instructions</a>)."
               values={{
                 a: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-paypal',
+                  href: 'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-with-paypal',
                   openInNewTab: true,
                 }),
               }}

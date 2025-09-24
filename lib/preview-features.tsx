@@ -76,8 +76,8 @@ export const previewFeatures: PreviewFeature[] = [
   },
   {
     key: PREVIEW_FEATURE_KEYS.PLATFORM_BILLING,
-    title: '(WIP) Platform billing',
-    description: 'WIP',
+    title: 'Platform billing',
+    description: 'New platform billing dashboard',
     alwaysEnableInDev: true,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
