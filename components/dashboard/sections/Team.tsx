@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { Edit } from '@styled-icons/material/Edit';
 import { get, truncate } from 'lodash';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
@@ -41,6 +41,15 @@ import { P } from '../../Text';
 import { Button } from '../../ui/Button';
 import DashboardHeader from '../DashboardHeader';
 import type { DashboardSectionProps } from '../types';
+import { MemberFieldsFragment, TeamSectionQuery } from '@/lib/graphql/types/v2/graphql';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/Select';
+import { actionsColumn, DataTable } from '@/components/table/DataTable';
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import DateTime from '@/components/DateTime';
+import { ColumnHeader } from '@/components/table/ColumnHeader';
+import { AccountHoverCard } from '@/components/AccountHoverCard';
+import { Badge } from '@/components/ui/Badge';
 
 const MemberContainer = styled(Container)`
   display: block;
@@ -67,12 +76,110 @@ const MemberLogoContainer = styled(Box)`
 `;
 
 type MemberCardProps = {
-  member: Partial<Member & MemberInvitation>;
+  member: MemberFieldsFragment; // Partial<Member & MemberInvitation>;
   account: Partial<Account & AccountWithHost & AccountWithParent>;
   index: number;
   nbAdmins?: number;
   refetch: () => void;
 };
+
+type TeamTableQueryNode = TeamSectionQuery['account']['members']['nodes'][number];
+const columnHelper = createColumnHelper<TeamTableQueryNode>();
+
+export const columns: ColumnDef<TeamTableQueryNode>[] = [
+  columnHelper.accessor('account', {
+    meta: {
+      // className: 'w-32 2xl:w-48',
+      labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+    },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ cell }) => {
+      const account = cell.getValue();
+      return (
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-4">
+              <Avatar collective={account} radius={36} />
+              <div>
+                <div className="line-clamp-1 max-w-sm text-foreground">{account.name}</div>
+                <p className="text-sm text-muted-foreground">@{account.slug}</p>
+              </div>
+            </div>
+          }
+        />
+      );
+    },
+  }),
+  columnHelper.accessor('account', {
+    id: 'email',
+    meta: { labelMsg: defineMessage({ defaultMessage: 'Email', id: 'sy+pv5' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ cell, row }) => {
+      // const account = cell.getValue();
+      const email = row.original.account.email;
+      return email;
+    },
+  }),
+  columnHelper.accessor('since', {
+    id: 'date',
+    meta: {
+      //  className: 'w-48',
+      labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }),
+    },
+    header: 'Since',
+    cell: ({ cell }) => {
+      const since = cell.getValue() as TeamTableQueryNode['since'];
+
+      return (
+        <div className="whitespace-nowrap">
+          <DateTime dateStyle="medium" value={since} />
+        </div>
+      );
+    },
+  }),
+
+  columnHelper.accessor('role', {
+    meta: { className: 'w-32 2xl:w-auto', labelMsg: defineMessage({ defaultMessage: 'Role', id: '1ZgrhW' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ cell, table, meta }) => {
+      const { intl } = table.options.meta;
+
+      return <Badge>{formatMemberRole(intl, cell.getValue())}</Badge>;
+    },
+  }),
+
+  actionsColumn,
+];
+
+function Member({ member, account, index, nbAdmins, refetch }: MemberCardProps) {
+  const intl = useIntl();
+  return (
+    <div className="flex items-center justify-between gap-4 p-4">
+      <div className="flex items-center gap-4">
+        <Avatar collective={member.account} radius={36} />
+        <div>
+          <div className="flex items-center gap-2">
+            <LinkCollective collective={member.account} className="line-clamp-1 max-w-sm" />
+            <p className="font-medium text-muted-foreground">@{member.account.slug}</p>
+          </div>
+          <p className="text-sm text-muted-foreground">{'email' in member.account && member.account?.email}</p>
+        </div>
+      </div>
+
+      <div>
+        <Select>
+          <SelectTrigger className="border-none font-medium">
+            {formatMemberRole(intl, get(member, 'role'))}
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ADMIN">Admin</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
 
 const MemberCard = ({ member, account, index, nbAdmins, refetch }: MemberCardProps) => {
   const intl = useIntl();
@@ -214,8 +321,8 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
     data?.account?.childrenAccounts?.nodes?.filter(child => child.members?.nodes?.length > 0) || [];
 
   return (
-    <div className="max-w-(--breakpoint-lg)">
-      <DashboardHeader title={<FormattedMessage id="Team" defaultMessage="Team" />} />
+    <div className="max-w-(--breakpoint-lg) space-y-4">
+      <DashboardHeader title={<FormattedMessage id="Team" defaultMessage="Team" />} description="Manage your team." />
 
       {loading ? (
         <Loading />
@@ -239,7 +346,20 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <Box>
+          <DataTable
+            data-cy="team-table"
+            innerClassName="table-fixed text-muted-foreground"
+            columns={columns}
+            data={members}
+            loading={loading}
+            nbPlaceholders={5}
+            mobileTableView
+            getRowId={row => String(row.legacyId)}
+            // getActions={getActions}
+            // queryFilter={queryFilter}
+            compact
+          />
+          {/* <Box>
             {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(data?.account?.type) &&
               Boolean(host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins) && (
                 <P lineHeight="20px" letterSpacing="normal" mt={3}>
@@ -280,9 +400,9 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                 </Box>
               ))}
             </P>
-          </Box>
+          </Box> */}
 
-          <Grid
+          {/* <Grid
             mt={4}
             gridGap={20}
             gridTemplateColumns="repeat(auto-fill, 164px)"
@@ -302,17 +422,22 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                 </Flex>
               </Flex>
             </InviteNewCard>
-            {members.map((m, idx) => (
-              <MemberCard
-                key={`${m.id}-${data?.account.id}`}
-                index={idx}
-                member={m}
-                account={data?.account}
-                nbAdmins={nbAdmins}
-                refetch={refetch}
-              />
-            ))}
-          </Grid>
+           
+          </Grid> */}
+          <Card className="py-0">
+            <div className="divide-y">
+              {members.map((m, idx) => (
+                <Member
+                  key={`${m.id}-${data?.account.id}`}
+                  index={idx}
+                  member={m}
+                  account={data?.account}
+                  nbAdmins={nbAdmins}
+                  refetch={refetch}
+                />
+              ))}
+            </div>
+          </Card>
 
           {childrenAccountsWithMembers.length > 0 && (
             <React.Fragment>
