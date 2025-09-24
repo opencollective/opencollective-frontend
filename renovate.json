@@ -23,7 +23,25 @@
     },
     {
       "assignees": ["gustavlrsn"],
-      "matchPackageNames": ["clsx", "cmdk", "tailwind-merge", "@radix-ui/**"]
+      "matchPackageNames": [
+        "clsx",
+        "cmdk",
+        "tailwind-merge",
+        "@radix-ui/**",
+        "@dnd-kit/**",
+        "@icons-pack/react-simple-icons",
+        "@tanstack/react-table",
+        "apexcharts",
+        "class-variance-authority",
+        "framer-motion",
+        "lucide-react",
+        "react-day-picker",
+        "react-apexcharts",
+        "react-animate-height",
+        "react-pdf",
+        "zod",
+        "react-verification-input"
+      ]
     }
   ]
 }
