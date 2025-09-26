@@ -9,7 +9,7 @@ import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lod
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import { getCollectiveTypeForUrl } from '../../lib/collective';
 import CommentType from '../../lib/constants/commentTypes';
@@ -481,7 +481,7 @@ function Expense(props: ExpenseProps) {
     await refetch();
     await fetchMore({
       variables: { legacyExpenseId, draftKey, offset: get(data, 'expense.comments.nodes', []).length },
-      updateQuery: (prev: any, { fetchMoreResult }) => {
+      updateQuery: (prev: unknown, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
         }
@@ -489,10 +489,10 @@ function Expense(props: ExpenseProps) {
         const resultExpense = fetchMoreResult['expense'] as { comments: { nodes: Comment[] } };
         const newValues = {
           expense: {
-            ...prev.expense,
+            ...prev['expense'],
             comments: {
               ...resultExpense.comments,
-              nodes: [...prev.expense.comments.nodes, ...resultExpense.comments.nodes],
+              nodes: [...prev['expense'].comments.nodes, ...resultExpense.comments.nodes],
             },
           },
         };

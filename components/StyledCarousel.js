@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';

@@ -7,7 +7,7 @@ import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { isURL } from 'validator';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';

@@ -319,7 +319,7 @@ const VerticalContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <React.Fragment>
       {React.Children.map(children, (child, i) => {
-        const isCompletedStep = (React.isValidElement(child) && (child.props as any).isCompletedStep) ?? i < activeStep;
+        const isCompletedStep = (React.isValidElement(child) && child.props['isCompletedStep']) ?? i < activeStep;
         const isLastStep = i === stepCount - 1;
         const isCurrentStep = i === activeStep;
 
@@ -394,7 +394,7 @@ interface StepInternalConfig {
 
 interface FullStepProps extends StepProps, StepInternalConfig {}
 
-const Step = React.forwardRef<HTMLLIElement, StepProps>((props, ref: React.Ref<any>) => {
+const Step = React.forwardRef<HTMLDivElement, StepProps>((props, ref: React.Ref<HTMLDivElement>) => {
   const {
     children,
     description,
@@ -772,7 +772,7 @@ const StepButtonContainer = ({
 
 // <---------- STEP ICON ---------->
 
-type IconType = LucideIcon | React.ComponentType<any> | undefined;
+type IconType = LucideIcon | React.ComponentType | undefined;
 
 const iconVariants = cva('', {
   variants: {

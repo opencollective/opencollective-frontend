@@ -5,7 +5,7 @@ import { BellOff } from '@styled-icons/feather/BellOff';
 import { get } from 'lodash';
 import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 

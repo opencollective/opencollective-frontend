@@ -5,7 +5,7 @@
 
 import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import type { Dayjs } from 'dayjs';
 import { isEqual, omit } from 'lodash';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';

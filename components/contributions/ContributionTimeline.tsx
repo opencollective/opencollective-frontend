@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import dayjs from 'dayjs';
 import { flatten, groupBy, sortBy, startCase, uniq } from 'lodash';
 import {

@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
 import { gqlV1 } from '../lib/graphql/helpers';

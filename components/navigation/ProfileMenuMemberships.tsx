@@ -2,7 +2,7 @@ import React from 'react';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import type LoggedInUser from '../../lib/LoggedInUser';

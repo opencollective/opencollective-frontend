@@ -5,7 +5,7 @@ import { first, isEmpty, omit, pick, trimStart } from 'lodash';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getAccountReferenceInput } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';

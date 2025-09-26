@@ -5,7 +5,7 @@ import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-re
 import memoizeOne from 'memoize-one';
 import type { ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { space } from 'styled-system';
 
 import { CollectiveType } from '../../lib/constants/collectives';

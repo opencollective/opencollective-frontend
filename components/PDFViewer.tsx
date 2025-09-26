@@ -5,7 +5,7 @@ import { throttle } from 'lodash';
 import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Document, Page, pdfjs } from 'react-pdf';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from './Container';
 import { getI18nLink } from './I18nFormatters';

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 

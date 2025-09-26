@@ -1,5 +1,5 @@
 import type React from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { ColorProps, DisplayProps, SpaceProps, TypographyProps } from 'styled-system';
 import { color, display, space, typography } from 'styled-system';
 

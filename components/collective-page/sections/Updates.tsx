@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/fa-solid/Lock';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import type { Account, Update } from '../../../lib/graphql/types/v2/schema';

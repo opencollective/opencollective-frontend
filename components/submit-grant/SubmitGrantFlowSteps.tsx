@@ -77,7 +77,11 @@ type StepItemValue<StepNames extends string> = StepCommonValue<StepNames> & {
 };
 
 type StepHeaderValue<StepNames extends string> = StepCommonValue<StepNames> & {
-  items?: any[];
+  items?: {
+    name: string;
+    hidden?: boolean;
+    formValues?: string[];
+  }[];
   isHeader: true;
   previousButtonMessage?: React.ReactNode;
   nextButtonMessage?: React.ReactNode;
@@ -131,7 +135,7 @@ export default function SubmitGrantFlowSteps(props: SubmitGrantFlowStepsProps) {
     [props.steps],
   );
   const activeHeader = React.useMemo(
-    () => props.steps.find((s): s is StepHeaderValue<any> => s.isHeader && s.isActive),
+    () => props.steps.find((s): s is StepHeaderValue<string> => s.isHeader && s.isActive),
     [props.steps],
   );
 

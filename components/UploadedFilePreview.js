@@ -3,7 +3,7 @@ import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { max } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
 import { getFileExtensionFromUrl } from '../lib/url-helpers';

@@ -2,7 +2,7 @@ import React from 'react';
 import { Search, X } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
 import { compose } from '../lib/utils';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { Flex } from '../../Grid';
 import StyledButton from '../../StyledButton';

@@ -5,7 +5,7 @@ import { FormikProvider, useFormik, useFormikContext } from 'formik';
 import { cloneDeep, kebabCase, omit, round } from 'lodash';
 import { CircleHelp } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { BorderProps, SpaceProps } from 'styled-system';
 import { border, color, space, typography } from 'styled-system';
 
@@ -21,6 +21,7 @@ import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -131,7 +132,7 @@ const generateDefaultReference = (expense, limit) => {
 };
 
 const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFieldsProps) => {
-  const formik = useFormikContext<any>();
+  const formik = useFormikContext();
   const generateReference = host.settings?.transferwise?.generateReference !== false;
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
@@ -398,9 +399,9 @@ type PayExpenseModalProps = {
   collective: Pick<Account, 'currency'>;
   host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings'>;
   onClose: () => void;
-  onSubmit: (values: any) => Promise<void>;
-  error?: any;
-  LoggedInUser: any;
+  onSubmit: (values: unknown) => Promise<void>;
+  error?: Error;
+  LoggedInUser: LoggedInUser;
 };
 
 /**

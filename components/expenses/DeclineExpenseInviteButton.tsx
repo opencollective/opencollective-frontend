@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import z from 'zod';
+import { z } from 'zod';
 
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Expense } from '../../lib/graphql/types/v2/schema';

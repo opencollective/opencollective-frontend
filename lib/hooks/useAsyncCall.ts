@@ -13,7 +13,7 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
   call: (...args: Parameters<T>) => Promise<void>;
   callWith: (...args: Parameters<T>) => () => Promise<void>;
   data: Awaited<ReturnType<T>>;
-  error: any;
+  error?: Error;
 } => {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState(defaultData);

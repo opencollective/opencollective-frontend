@@ -5,7 +5,7 @@ import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { getErrorFromGraphqlException } from '../../lib/errors';

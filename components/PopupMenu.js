@@ -1,6 +1,6 @@
 import React from 'react';
 import { Popper } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 

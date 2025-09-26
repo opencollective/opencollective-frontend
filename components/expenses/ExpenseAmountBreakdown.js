@@ -1,7 +1,7 @@
 import React from 'react';
 import { round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { computeExpenseAmounts, getTaxAmount, isTaxRateValid } from './lib/utils';

@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { Markup } from 'interweave';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useIntl } from 'react-intl';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
 
 import Avatar from '../Avatar';

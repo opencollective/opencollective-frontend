@@ -14,10 +14,12 @@ import { P, Span } from '../Text';
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import AttachedFiles from './AttachedFiles';
 
+type FileInput = { url: string } | File;
+
 type AttachedFilesFormProps = {
-  onChange: (files: any) => void;
+  onChange: (files: FileInput | FileInput[]) => void;
   disabled?: boolean;
-  defaultValue?: any;
+  defaultValue?: FileInput | FileInput[];
   title: React.ReactNode;
   description?: React.ReactNode;
   isMulti?: boolean;
@@ -37,7 +39,13 @@ const AttachedFilesForm = ({
   name,
   openFileViewer,
 }: AttachedFilesFormProps) => {
-  const [files, setFiles] = React.useState(isMulti ? uniqBy(defaultValue, 'url') : defaultValue ? [defaultValue] : []);
+  const [files, setFiles] = React.useState<FileInput[]>(
+    isMulti
+      ? uniqBy(defaultValue as FileInput[], 'url')
+      : (defaultValue as FileInput)
+        ? [defaultValue as FileInput]
+        : [],
+  );
   return (
     <div>
       <Flex alignItems="center" my={16}>
@@ -63,9 +71,9 @@ const AttachedFilesForm = ({
             kind={kind}
             disabled={disabled}
             onSuccess={data => {
-              const uploadedFiles = [...files, data];
+              const uploadedFiles = [...files, data as FileInput];
               setFiles(uploadedFiles);
-              onChange(data);
+              onChange(data as FileInput | FileInput[]);
             }}
           />
         )}
@@ -80,7 +88,7 @@ const AttachedFilesForm = ({
           files={files}
           openFileViewer={openFileViewer}
           onRemove={idx => {
-            let updatedFiles = null;
+            let updatedFiles: FileInput[] = null;
             if (isMulti) {
               updatedFiles = [...files];
               updatedFiles.splice(idx, 1);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { find, isUndefined } from 'lodash';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { size } from 'styled-system';
 
 import Container from './Container';

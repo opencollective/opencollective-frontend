@@ -4,7 +4,7 @@ import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
 import { get, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { i18nGraphqlException } from '../../../lib/errors';

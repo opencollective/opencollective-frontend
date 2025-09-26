@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import { StyledSelectFilter } from '../../StyledSelectFilter';

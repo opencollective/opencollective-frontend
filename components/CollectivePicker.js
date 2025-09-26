@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 import ReactDOM from 'react-dom';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';

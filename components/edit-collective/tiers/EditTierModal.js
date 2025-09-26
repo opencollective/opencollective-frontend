@@ -4,7 +4,7 @@ import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
 import { isNil, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getLegacyIdForCollective } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';

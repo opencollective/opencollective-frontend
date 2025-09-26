@@ -1,5 +1,5 @@
 import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { typography } from 'styled-system';
 
 import { H1, H2, P } from '../Text';

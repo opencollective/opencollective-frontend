@@ -5,7 +5,7 @@ import { Github } from '@styled-icons/fa-brands/Github';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 

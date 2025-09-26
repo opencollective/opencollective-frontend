@@ -3,7 +3,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
 import { get, isEmpty, omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';

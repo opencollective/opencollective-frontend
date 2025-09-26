@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { formatAmountForLegend } from '../../../../lib/charts';

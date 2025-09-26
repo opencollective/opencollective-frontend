@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Avatar from '../Avatar';
 import Container from '../Container';

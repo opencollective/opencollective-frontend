@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { Calendar, TestTube2, UserCog } from 'lucide-react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { BorderProps, ColorProps, LayoutProps, SpaceProps } from 'styled-system';
 import { border, color, layout, space } from 'styled-system';
 

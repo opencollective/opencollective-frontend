@@ -28,7 +28,7 @@ export const buttonSize = variant({
   prop: 'buttonSize',
 });
 
-export const getButtonSizes = (): Record<ButtonSize, Record<string, any>> => {
+export const getButtonSizes = (): Record<ButtonSize, React.CSSProperties> => {
   return {
     xLarge: {
       fontSize: 17,

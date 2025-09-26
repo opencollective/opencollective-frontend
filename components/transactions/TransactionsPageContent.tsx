@@ -282,7 +282,7 @@ interface TransactionsProps {
   };
   loading?: boolean;
   refetch?(...args: unknown[]): unknown;
-  error?: any;
+  error?: Error;
   LoggedInUser?: LoggedInUser;
   query?: {
     searchTerm?: string;

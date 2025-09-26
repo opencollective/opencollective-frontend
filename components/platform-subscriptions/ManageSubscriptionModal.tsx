@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { useFormik } from 'formik';
 import { omit } from 'lodash';
 import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, Shapes } from 'lucide-react';
@@ -384,7 +384,6 @@ type PlatformSubscriptionTierCardProps = {
   isCurrent?: boolean;
   includePrice?: boolean;
   includePackageDetails?: boolean;
-  packages?: any[];
   children?: React.ReactNode;
 };
 

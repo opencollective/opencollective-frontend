@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 

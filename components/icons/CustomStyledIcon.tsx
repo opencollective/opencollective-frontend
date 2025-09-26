@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { alignSelf, height, margin, verticalAlign, width } from 'styled-system';
 
 import { cursor } from '../../lib/styled-system-custom-properties';

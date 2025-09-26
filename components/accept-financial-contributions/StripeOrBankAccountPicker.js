@@ -6,7 +6,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { find, has } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
 import { i18nGraphqlException } from '../../lib/errors';

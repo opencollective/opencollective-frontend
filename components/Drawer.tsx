@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 

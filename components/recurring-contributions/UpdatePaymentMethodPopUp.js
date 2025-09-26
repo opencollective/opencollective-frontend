@@ -5,7 +5,7 @@ import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, merge, pick, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';

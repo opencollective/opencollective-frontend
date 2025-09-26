@@ -5,7 +5,7 @@ import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';

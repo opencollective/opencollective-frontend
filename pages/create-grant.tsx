@@ -153,7 +153,7 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
 
 function getApolloClient(ctx: NextPageContext) {
   return (
-    ((ctx.req as any)?.apolloClient as ApolloClient<unknown>) ||
+    (ctx.req as { apolloClient?: ApolloClient<unknown> })?.apolloClient ||
     initClient({
       initialState: window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME],
     })

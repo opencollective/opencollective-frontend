@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from './Container';
 import StyledInput from './StyledInput';
