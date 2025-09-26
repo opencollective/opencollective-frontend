@@ -40,7 +40,6 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
 import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
@@ -479,7 +478,6 @@ const CollectiveNavbar = ({
   onCollectiveClick = undefined,
   isInHero = false,
   onlyInfos = false,
-  showBackButton = true,
   useAnchorsForCategories = false,
   showSelectedCategoryOnMobile = false,
 }) => {
@@ -570,17 +568,6 @@ const CollectiveNavbar = ({
           <InfosContainer px={[3, 0]} py={[2, 1]}>
             <Flex alignItems="center" maxWidth={['90%', '100%']} flex="1 1">
               <BackButtonAndAvatar data-hide-on-desktop={isInHero}>
-                {showBackButton && (
-                  <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
-                    {collective && (
-                      <Link href={getCollectivePageRoute(collective)}>
-                        <StyledButton px={1} isBorderless>
-                          &larr;
-                        </StyledButton>
-                      </Link>
-                    )}
-                  </Container>
-                )}
                 <AvatarBox>
                   <LinkCollective collective={collective} onClick={onCollectiveClick}>
                     <Container borderRadius="25%" mr={2}>

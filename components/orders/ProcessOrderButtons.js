@@ -3,14 +3,13 @@ import { useMutation } from '@apollo/client';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
-import StyledButton from '../StyledButton';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 const processPendingOrderMutation = gql`
@@ -26,8 +25,6 @@ const processPendingOrderMutation = gql`
     }
   }
 `;
-
-const ButtonLabel = styled.span({ marginLeft: 6 });
 
 const usablePermissions = ['canMarkAsPaid', 'canMarkAsExpired'];
 
@@ -73,11 +70,8 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
     const isSelectedAction = selectedAction === action;
     return {
       'data-cy': `${action}-button`,
-      buttonSize: 'tiny',
-      minWidth: 130,
-      mx: 2,
-      mt: 2,
-      py: '9px',
+      size: 'xs',
+      className: 'min-w-[130px] mx-2 mt-2',
       disabled: loading && !isSelectedAction,
       loading: loading && isSelectedAction,
       onClick: () => {
@@ -90,24 +84,24 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
   return (
     <React.Fragment>
       {permissions.canMarkAsPaid && (
-        <StyledButton
+        <Button
           {...getButtonProps('MARK_AS_PAID')}
           onClick={() => setShowContributionConfirmationModal(true)}
-          buttonStyle="successSecondary"
+          variant="outlineSuccess"
         >
           <ApproveIcon size={12} />
-          <ButtonLabel>
+          <span className="ml-1.5">
             <FormattedMessage id="order.markAsCompleted" defaultMessage="Mark as completed" />
-          </ButtonLabel>
-        </StyledButton>
+          </span>
+        </Button>
       )}
       {permissions.canMarkAsExpired && (
-        <StyledButton {...getButtonProps('MARK_AS_EXPIRED')} buttonStyle="dangerSecondary">
+        <Button {...getButtonProps('MARK_AS_EXPIRED')} variant="outlineDestructive">
           <RejectIcon size={14} />
-          <ButtonLabel>
+          <span className="ml-1.5">
             <FormattedMessage id="order.markAsExpired" defaultMessage="Mark as expired" />
-          </ButtonLabel>
-        </StyledButton>
+          </span>
+        </Button>
       )}
       {hasConfirm && (
         <ConfirmationModal
