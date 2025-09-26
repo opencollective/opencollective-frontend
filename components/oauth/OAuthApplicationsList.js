@@ -76,7 +76,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
           id="dG3sDf"
           values={{
             link: getI18nLink({
-              href: 'https://docs.opencollective.com/help/developers/oauth',
+              href: 'https://documentation.opencollective.com/development/oauth',
             }),
           }}
         />

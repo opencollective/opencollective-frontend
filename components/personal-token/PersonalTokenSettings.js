@@ -132,7 +132,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
               },
               {
                 Link: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/developers/personal-tokens',
+                  href: 'https://documentation.opencollective.com/development/api',
                   openInNewTab: true,
                 }),
               },
@@ -207,7 +207,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                     },
                     {
                       Link: getI18nLink({
-                        href: 'https://docs.opencollective.com/help/developers/oauth#text-available-scopes',
+                        href: 'https://documentation.opencollective.com/development/api',
                         openInNewTab: true,
                       }),
                     },

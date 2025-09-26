@@ -1,9 +1,7 @@
 import React from 'react';
-import { themeGet } from '@styled-system/theme-get';
 import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import type { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { styled } from 'styled-components';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
@@ -19,13 +17,11 @@ import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
-import Container from '../components/Container';
 import { confirmContributionFieldsFragment } from '../components/contributions/ConfirmContributionForm';
 import CreatePendingOrderModal from '../components/dashboard/sections/contributions/CreatePendingOrderModal';
 import DateTime from '../components/DateTime';
 import ErrorPage from '../components/ErrorPage';
 import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
-import { Box, Flex, Grid } from '../components/Grid';
 import HTMLContent from '../components/HTMLContent';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import LinkCollective from '../components/LinkCollective';
@@ -36,14 +32,13 @@ import ProcessOrderButtons, { hasProcessButtons } from '../components/orders/Pro
 import Page from '../components/Page';
 import PaymentMethodTypeWithIcon from '../components/PaymentMethodTypeWithIcon';
 import StyledButton from '../components/StyledButton';
-import StyledCard from '../components/StyledCard';
-import StyledHr from '../components/StyledHr';
 import StyledLink from '../components/StyledLink';
-import StyledTag from '../components/StyledTag';
-import StyledTooltip from '../components/StyledTooltip';
 import Tags from '../components/Tags';
-import { H1, H5, P, Span } from '../components/Text';
 import { getDisplayedAmount } from '../components/transactions/TransactionItem';
+import { Badge } from '../components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/Tooltip';
+import { Separator } from '@/components/ui/Separator';
 
 import Custom404 from './404';
 
@@ -212,47 +207,22 @@ const messages = defineMessages({
   },
 });
 
-const ButtonsContainer = styled(Flex).attrs<{
-  'data-cy'?: string;
-}>({ 'data-cy': 'order-actions' })`
-  flex-wrap: wrap;
-  transition: opacity 0.05s;
-  justify-content: flex-end;
-
-  @media (max-width: 40em) {
-    justify-content: center;
-  }
-
-  & > *:last-child {
-    margin-right: 0;
-  }
-`;
-
-const OrderDetails = ({ children: [field, value] }: { children: [React.ReactNode, React.ReactNode] }) => (
-  <Box>
-    <P
-      fontWeight="500"
-      fontSize="11px"
-      lineHeight="12px"
-      textTransform="uppercase"
-      color="black.700"
-      letterSpacing="0.06em"
-    >
-      {field}
-    </P>
-    <Container fontSize="12px" color="black.700" lineHeight="18px" mt={1}>
-      {value}
-    </Container>
-  </Box>
+const ButtonsContainer = ({ children, ...props }: { children: React.ReactNode; [key: string]: any }) => (
+  <div
+    className="flex flex-wrap justify-end transition-opacity duration-75 max-sm:justify-center [&>*:last-child]:mr-0"
+    data-cy="order-actions"
+    {...props}
+  >
+    {children}
+  </div>
 );
 
-const TransactionDetailsWrapper = styled(Flex)`
-  padding-bottom: 16px;
-  &:not(:last-child) {
-    border-bottom: 1px dotted #e6e8eb;
-    margin-bottom: 24px;
-  }
-`;
+const OrderDetails = ({ children: [field, value] }: { children: [React.ReactNode, React.ReactNode] }) => (
+  <div>
+    <p className="text-xs leading-3 font-medium tracking-[0.06em] text-gray-600 uppercase">{field}</p>
+    <div className="mt-1 text-xs leading-[18px] text-gray-600">{value}</div>
+  </div>
+);
 
 const TransactionDetails = ({
   children: [title, value, fees, description],
@@ -261,50 +231,27 @@ const TransactionDetails = ({
   children: [React.ReactNode, React.ReactNode, React.ReactNode?, React.ReactNode?];
   [key: string]: any;
 }) => (
-  <TransactionDetailsWrapper
+  <div
     data-cy="transaction-details-wrapper"
     {...props}
-    alignItems="center"
-    justifyContent="space-between"
+    className="mb-4 flex items-center justify-between border-gray-100 pb-4 not-last:border-b"
   >
-    <Box>
-      <Box fontWeight="400" fontSize="14px" lineHeight="20px" color="black.900">
-        {title}
-      </Box>
-      <Box fontWeight="400" fontSize="12px" lineHeight="18px" color="black.700">
-        {description}
-      </Box>
-    </Box>
-    <Box textAlign="end">
-      <Container fontWeight="700" fontSize="16px" lineHeight="24px" color="black.900">
-        {value}
-      </Container>
-      {fees && (
-        <Container fontWeight="400" fontSize="12px" lineHeight="18px" color="black.700">
-          {fees}
-        </Container>
-      )}
-    </Box>
-  </TransactionDetailsWrapper>
+    <div>
+      <div className="text-sm leading-5 font-normal text-gray-900">{title}</div>
+      <div className="text-xs leading-[18px] font-normal text-gray-600">{description}</div>
+    </div>
+    <div className="text-right">
+      <div className="text-sm leading-6 font-bold text-gray-900">{value}</div>
+      {fees && <div className="text-xs leading-[18px] font-normal text-gray-600">{fees}</div>}
+    </div>
+  </div>
 );
 
-const SummaryHeader = styled(H1)`
-  > a {
-    color: inherit;
-    text-decoration: underline;
-
-    &:hover {
-      color: ${themeGet('colors.black.600')};
-    }
-  }
-`;
-
-const OverdueTag = styled.span`
-  padding: 2px 6px;
-  background: ${themeGet('colors.yellow.300')};
-  color: ${themeGet('colors.yellow.900')};
-  border-radius: 4px;
-`;
+const OverdueTag = ({ children, ...props }: { children: React.ReactNode; [key: string]: any }) => (
+  <span className="rounded bg-yellow-300 px-1.5 py-0.5 text-yellow-900" {...props}>
+    {children}
+  </span>
+);
 
 const getTransactionsToDisplay = (account, transactions) => {
   if (!transactions?.length) {
@@ -371,412 +318,384 @@ export default function OrderPage(props) {
       })}
     >
       <CollectiveNavbar collective={account} isLoading={!account} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />
-      <Flex justifyContent="center" data-cy="contribution-page-content">
+      <div className="flex justify-center py-12" data-cy="contribution-page-content">
         {!order ? (
           <div className="p-20">
             <Loading />
           </div>
         ) : (
-          <Flex
-            maxWidth="1200px"
-            py={[0, 5]}
-            px={[2, 3, 4]}
-            mt={2}
-            mb={5}
-            flexDirection={['column', null, null, 'row']}
-            justifyContent={'space-between'}
-          >
-            <Box flex="1 0" flexBasis={['initial', null, null, 'min(832px, 70%)']} width="100%" mr={[null, 2, 3, 4]}>
+          <div className="mt-2 mb-5 flex max-w-[1200px] flex-col justify-between px-2 py-0 sm:px-3 sm:py-5 lg:px-4 xl:flex-row">
+            <div className="mr-0 w-full flex-1 flex-shrink-0 basis-auto sm:mr-2 lg:mr-3 xl:mr-4 xl:max-w-[70%] xl:min-w-[832px]">
               {error && <MessageBoxGraphqlError error={error} my={4} />}
-              <SummaryHeader fontWeight="700" fontSize="24px" lineHeight="32px">
+              <h1 className="text-2xl font-bold">
                 <FormattedMessage
                   id="PendingContributionSummary"
                   defaultMessage="{status, select, PENDING {Pending Contribution} other {Contribution}} to {account}"
                   values={{
                     status: order.status,
                     account: (
-                      <LinkCollective collective={order.toAccount} textDecoration="underline">
+                      <LinkCollective collective={order.toAccount} className="underline">
                         {order.toAccount.name}
                       </LinkCollective>
                     ),
                   }}
                 />
-              </SummaryHeader>
-              <StyledCard mt="24px" p={[16, 24, 32]}>
-                <Flex
-                  flexDirection={['column-reverse', 'row']}
-                  alignItems={['stretch', 'center']}
-                  justifyContent="space-between"
-                  data-cy="contribution-title"
-                  mb={1}
-                >
-                  <Box mr={[0, 2]}>
-                    <h4 className="text-xl font-medium" data-cy="contribution-description">
-                      {order.description}
-                    </h4>
-                  </Box>
-                  <Box mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
-                    <OrderStatusTag status={order.status} />
-                  </Box>
-                </Flex>
-                <Flex>
-                  <StyledTag
-                    variant="rounded-left"
-                    fontSize="10px"
-                    fontWeight="500"
-                    mr={1}
-                    textTransform="uppercase"
-                    closeButtonProps={undefined}
-                  >
-                    <FormattedMessage defaultMessage="Contribution" id="0LK5eg" /> #{order.legacyId}
-                  </StyledTag>
-                  <Tags order={order} canEdit={order.permissions.canSetTags} />
-                </Flex>
-                <Flex alignItems="center" mt={1}>
-                  <P mt="5px" fontSize="12px" color="black.600">
-                    <FormattedMessage
-                      defaultMessage="From {contributor} to {account}"
-                      id="nqRBcp"
-                      values={{
-                        contributor: <LinkCollective collective={order.fromAccount} />,
-                        account: <LinkCollective collective={order.toAccount} />,
-                      }}
-                    />
-                    {' • '}
-                    <DateTime
-                      value={order.processedAt || order.createdAt}
-                      dateStyle={undefined}
-                      timeStyle={undefined}
-                    />
-                  </P>
-                </Flex>
-                <Grid mt="24px" gridGap="20px 50px" gridTemplateColumns={['1fr', '1fr 1fr', `repeat(4, 1fr)`]}>
-                  {order.pendingContributionData?.ponumber && (
-                    <OrderDetails>
-                      <StyledTooltip
-                        content={
-                          <FormattedMessage
-                            defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
-                            id="LqD2Po"
-                          />
-                        }
-                        containerCursor="default"
-                      >
-                        <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
-                      </StyledTooltip>
-                      {`#${order.pendingContributionData.ponumber}`}
-                    </OrderDetails>
-                  )}
-                  {order.pendingContributionData?.expectedAt && (
-                    <OrderDetails>
-                      <FormattedMessage defaultMessage="Expected" id="6srLb2" />
-                      {isOverdue ? (
-                        <OverdueTag>
+              </h1>
+              <Card className="mt-10 px-6 py-12">
+                <CardHeader>
+                  <CardTitle>
+                    <div
+                      className="flex flex-col-reverse items-stretch justify-between sm:flex-row sm:items-center"
+                      data-cy="contribution-title"
+                    >
+                      <div className="mr-0 sm:mr-2">
+                        <h4 className="text-xl font-medium" data-cy="contribution-description">
+                          {order.description}
+                        </h4>
+                      </div>
+                      <div className="mb-3 flex items-center justify-between sm:mb-0 sm:justify-end">
+                        <OrderStatusTag status={order.status} />
+                      </div>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex">
+                    <Badge className="mr-2" type="neutral" size="sm">
+                      <FormattedMessage defaultMessage="Contribution" id="0LK5eg" /> #{order.legacyId}
+                    </Badge>
+                    <Tags order={order} canEdit={order.permissions.canSetTags} />
+                  </div>
+                  <div className="mt-1 flex items-center">
+                    <p className="mt-1 text-xs text-gray-600">
+                      <FormattedMessage
+                        defaultMessage="From {contributor} to {account}"
+                        id="nqRBcp"
+                        values={{
+                          contributor: <LinkCollective collective={order.fromAccount} />,
+                          account: <LinkCollective collective={order.toAccount} />,
+                        }}
+                      />
+                      {' • '}
+                      <DateTime
+                        value={order.processedAt || order.createdAt}
+                        dateStyle={undefined}
+                        timeStyle={undefined}
+                      />
+                    </p>
+                  </div>
+                  <div className="mt-6 grid grid-cols-1 gap-x-12 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {order.pendingContributionData?.ponumber && (
+                      <OrderDetails>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="cursor-default">
+                                <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <FormattedMessage
+                                defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
+                                id="LqD2Po"
+                              />
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        {`#${order.pendingContributionData.ponumber}`}
+                      </OrderDetails>
+                    )}
+                    {order.pendingContributionData?.expectedAt && (
+                      <OrderDetails>
+                        <FormattedMessage defaultMessage="Expected" id="6srLb2" />
+                        {isOverdue ? (
+                          <OverdueTag>
+                            <DateTime
+                              value={order.pendingContributionData.expectedAt}
+                              dateStyle={'medium'}
+                              timeStyle={undefined}
+                            />
+                            <span className="font-bold tracking-[0.06em] uppercase">
+                              &nbsp;
+                              <FormattedMessage defaultMessage="Overdue" id="M0vCGv" />
+                            </span>
+                          </OverdueTag>
+                        ) : (
                           <DateTime
                             value={order.pendingContributionData.expectedAt}
                             dateStyle={'medium'}
                             timeStyle={undefined}
                           />
-                          <Span textTransform="uppercase" fontWeight="bold" letterSpacing="0.06em">
-                            &nbsp;
-                            <FormattedMessage defaultMessage="Overdue" id="M0vCGv" />
-                          </Span>
-                        </OverdueTag>
-                      ) : (
-                        <DateTime
-                          value={order.pendingContributionData.expectedAt}
-                          dateStyle={'medium'}
-                          timeStyle={undefined}
-                        />
-                      )}
-                    </OrderDetails>
-                  )}
-                  {order.paymentMethod ? (
-                    <OrderDetails>
-                      <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
-                      <PaymentMethodTypeWithIcon type={order.paymentMethod?.type} iconSize={16} />
-                    </OrderDetails>
-                  ) : (
-                    <OrderDetails>
-                      <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
-                      {i18nPaymentMethodProviderType(
-                        intl,
-                        order.pendingContributionData?.paymentMethod || 'BANK_TRANSFER',
-                      )}
-                    </OrderDetails>
-                  )}
-
-                  {!isEmpty(order.pendingContributionData?.fromAccountInfo) && (
-                    <OrderDetails>
-                      <FormattedMessage id="Contact" defaultMessage="Contact" />
-                      <span>
-                        {order.pendingContributionData.fromAccountInfo.name}
-
-                        {order.pendingContributionData.fromAccountInfo.email && (
-                          <React.Fragment>
-                            &nbsp;(
-                            <StyledLink
-                              href={`mailto:${order.pendingContributionData.fromAccountInfo.email}`}
-                              openInNewTab
-                            >
-                              {order.pendingContributionData.fromAccountInfo.email}
-                            </StyledLink>
-                            )
-                          </React.Fragment>
                         )}
-                      </span>
-                    </OrderDetails>
-                  )}
-                </Grid>
-
-                <Box mt={4}>
-                  <P fontWeight="700" fontSize="16px" lineHeight="24px" color="black.900">
-                    {isPending ? (
-                      <FormattedMessage defaultMessage="Contribution Details" id="tijsiA" />
-                    ) : (
-                      <FormattedMessage defaultMessage="Related Transactions" id="Sz+Qhv" />
+                      </OrderDetails>
                     )}
-                  </P>
-                </Box>
+                    {order.paymentMethod ? (
+                      <OrderDetails>
+                        <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+                        <PaymentMethodTypeWithIcon type={order.paymentMethod?.type} iconSize={16} />
+                      </OrderDetails>
+                    ) : (
+                      <OrderDetails>
+                        <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
+                        {i18nPaymentMethodProviderType(
+                          intl,
+                          order.pendingContributionData?.paymentMethod || 'BANK_TRANSFER',
+                        )}
+                      </OrderDetails>
+                    )}
 
-                <Box mt={4}>
-                  {isPending ? (
-                    <React.Fragment>
-                      <TransactionDetails>
-                        <FormattedMessage defaultMessage="Expected Total Amount" id="PEp9t9" />
-                        <FormattedMoneyAmount
-                          currency={order.totalAmount.currency}
-                          precision={2}
-                          amount={order.totalAmount.valueInCents}
-                        />
+                    {!isEmpty(order.pendingContributionData?.fromAccountInfo) && (
+                      <OrderDetails>
+                        <FormattedMessage id="Contact" defaultMessage="Contact" />
+                        <span>
+                          {order.pendingContributionData.fromAccountInfo.name}
 
-                        <FormattedMessage defaultMessage="Payment Fees not Considered" id="ysc4k/" />
-                        <FormattedMessage
-                          id="contribution.createdAt"
-                          defaultMessage="Created on {date}"
-                          values={{
-                            date: <DateTime value={order.createdAt} dateStyle={'medium'} timeStyle="short" />,
-                          }}
-                        />
-                      </TransactionDetails>
-                      {Boolean(order.taxAmount?.valueInCents) && (
+                          {order.pendingContributionData.fromAccountInfo.email && (
+                            <React.Fragment>
+                              &nbsp;(
+                              <StyledLink
+                                href={`mailto:${order.pendingContributionData.fromAccountInfo.email}`}
+                                openInNewTab
+                              >
+                                {order.pendingContributionData.fromAccountInfo.email}
+                              </StyledLink>
+                              )
+                            </React.Fragment>
+                          )}
+                        </span>
+                      </OrderDetails>
+                    )}
+                  </div>
+
+                  <div className="mt-12">
+                    <p className="text-base leading-6 font-bold text-gray-900">
+                      {isPending ? (
+                        <FormattedMessage defaultMessage="Contribution Details" id="tijsiA" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Related Transactions" id="Sz+Qhv" />
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    {isPending ? (
+                      <React.Fragment>
                         <TransactionDetails>
+                          <FormattedMessage defaultMessage="Expected Total Amount" id="PEp9t9" />
+                          <FormattedMoneyAmount
+                            currency={order.totalAmount.currency}
+                            precision={2}
+                            amount={order.totalAmount.valueInCents}
+                          />
+
+                          <FormattedMessage defaultMessage="Payment Fees not Considered" id="ysc4k/" />
                           <FormattedMessage
-                            defaultMessage="Expected {taxType} ({rate}%)"
-                            id="U5Xeen"
+                            id="contribution.createdAt"
+                            defaultMessage="Created on {date}"
                             values={{
-                              taxType: i18nTaxType(intl, order.tax?.type || 'Tax', 'long'),
-                              rate: order.tax?.rate * 100,
+                              date: <DateTime value={order.createdAt} dateStyle={'medium'} timeStyle="short" />,
                             }}
                           />
-                          <FormattedMoneyAmount
-                            currency={order.amount.currency}
-                            precision={2}
-                            amount={-order.taxAmount.valueInCents}
-                          />
                         </TransactionDetails>
-                      )}
-                      {Boolean(order.hostFeePercent) && (
-                        <TransactionDetails>
-                          <FormattedMessage defaultMessage="Expected Host Fees" id="+UwJxq" />
-                          <FormattedMoneyAmount
-                            currency={order.amount.currency}
-                            precision={2}
-                            amount={
-                              (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
-                              (order.hostFeePercent / -100)
-                            }
-                          />
-                          <FormattedMessage
-                            defaultMessage="Based on default host fees, can be changed at settling time"
-                            id="b8rZxx"
-                          />
-                        </TransactionDetails>
-                      )}
-                      {Boolean(order.platformTipAmount?.valueInCents) && (
-                        <TransactionDetails>
-                          <FormattedMessage defaultMessage="Expected Platform Tip" id="20RyRD" />
-                          <FormattedMoneyAmount
-                            currency={order.platformTipAmount.currency}
-                            amount={-order.platformTipAmount.valueInCents}
-                          />
-                        </TransactionDetails>
-                      )}
-                    </React.Fragment>
-                  ) : (
-                    orderBy(displayedTransactions, ['legacyId'], ['desc']).map(transaction => {
-                      const displayedAmount = getDisplayedAmount(transaction, account);
-                      const displayPaymentFees =
-                        transaction.type === 'CREDIT' &&
-                        transaction.netAmount?.valueInCents !== displayedAmount.valueInCents &&
-                        transaction.paymentProcessorFee?.valueInCents !== 0;
-
-                      return (
-                        <TransactionDetails key={transaction.id}>
-                          <span>{transaction.description}</span>
-                          <FormattedMoneyAmount
-                            currency={displayedAmount.currency}
-                            precision={2}
-                            amount={displayedAmount.valueInCents}
-                          />
-                          <div>
-                            {Boolean(transaction.taxAmount?.valueInCents) && (
-                              <Span display="block">
-                                <FormattedMoneyAmount
-                                  currency={transaction.taxAmount.currency}
-                                  precision={2}
-                                  amount={transaction.taxAmount.valueInCents}
-                                />{' '}
-                                ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
-                                {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
-                              </Span>
-                            )}
-                            {displayPaymentFees && (
-                              <Span display="block">
-                                <FormattedMessage
-                                  defaultMessage="{value} (Payment Processor Fee)"
-                                  id="ijvoto"
-                                  values={{
-                                    value: (
-                                      <FormattedMoneyAmount
-                                        currency={transaction.paymentProcessorFee.currency}
-                                        amount={transaction.paymentProcessorFee.valueInCents}
-                                      />
-                                    ),
-                                  }}
-                                />
-                              </Span>
-                            )}
-                          </div>
-                          <span>
+                        {Boolean(order.taxAmount?.valueInCents) && (
+                          <TransactionDetails>
                             <FormattedMessage
-                              defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
-                              id="XhoJIl"
+                              defaultMessage="Expected {taxType} ({rate}%)"
+                              id="U5Xeen"
                               values={{
-                                type: transaction.type,
-                                date: <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />,
-                                account: <LinkCollective collective={transaction.account} />,
+                                taxType: i18nTaxType(intl, order.tax?.type || 'Tax', 'long'),
+                                rate: order.tax?.rate * 100,
                               }}
                             />
-                          </span>
-                        </TransactionDetails>
-                      );
-                    })
-                  )}
-                </Box>
-                {hasProcessButtons(order?.permissions) && (
-                  <Box mt="40px">
-                    <StyledHr />
-                    <Flex
-                      justifyContent={['stretch', 'space-between']}
-                      flexDirection={['column-reverse', 'row']}
-                      mt="8px"
-                    >
-                      <ButtonsContainer flexDirection={['column', 'row']}>
-                        {order.permissions.canEdit && (
-                          <React.Fragment>
-                            <StyledButton
-                              data-cy="edit-order-button"
-                              buttonSize="tiny"
-                              minWidth="130px"
-                              mx={2}
-                              mt={2}
-                              py="9px"
-                              height="34px"
-                              onClick={() => setShowCreatePendingOrderModal(true)}
-                            >
-                              <FormattedMessage id="contribution.edit" defaultMessage="Edit Contribution" />
-                            </StyledButton>
-                            {showCreatePendingOrderModal && (
-                              <CreatePendingOrderModal
-                                hostSlug={account.host.slug}
-                                onClose={() => setShowCreatePendingOrderModal(false)}
-                                onSuccess={() => queryResult.refetch()}
-                                edit={order}
-                              />
-                            )}{' '}
-                          </React.Fragment>
+                            <FormattedMoneyAmount
+                              currency={order.amount.currency}
+                              precision={2}
+                              amount={-order.taxAmount.valueInCents}
+                            />
+                          </TransactionDetails>
                         )}
-                      </ButtonsContainer>
-                      <ButtonsContainer flexDirection={['column', 'row']}>
-                        <ProcessOrderButtons
-                          order={order}
-                          permissions={order.permissions}
-                          onSuccess={() => queryResult.refetch()}
-                        />
-                      </ButtonsContainer>
-                    </Flex>
-                  </Box>
-                )}
-              </StyledCard>
+                        {Boolean(order.hostFeePercent) && (
+                          <TransactionDetails>
+                            <FormattedMessage defaultMessage="Expected Host Fees" id="+UwJxq" />
+                            <FormattedMoneyAmount
+                              currency={order.amount.currency}
+                              precision={2}
+                              amount={
+                                (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
+                                (order.hostFeePercent / -100)
+                              }
+                            />
+                            <FormattedMessage
+                              defaultMessage="Based on default host fees, can be changed at settling time"
+                              id="b8rZxx"
+                            />
+                          </TransactionDetails>
+                        )}
+                        {Boolean(order.platformTipAmount?.valueInCents) && (
+                          <TransactionDetails>
+                            <FormattedMessage defaultMessage="Expected Platform Tip" id="20RyRD" />
+                            <FormattedMoneyAmount
+                              currency={order.platformTipAmount.currency}
+                              amount={-order.platformTipAmount.valueInCents}
+                            />
+                          </TransactionDetails>
+                        )}
+                      </React.Fragment>
+                    ) : (
+                      orderBy(displayedTransactions, ['legacyId'], ['desc']).map(transaction => {
+                        const displayedAmount = getDisplayedAmount(transaction, account);
+                        const displayPaymentFees =
+                          transaction.type === 'CREDIT' &&
+                          transaction.netAmount?.valueInCents !== displayedAmount.valueInCents &&
+                          transaction.paymentProcessorFee?.valueInCents !== 0;
+
+                        return (
+                          <TransactionDetails key={transaction.id}>
+                            <span>{transaction.description}</span>
+                            <FormattedMoneyAmount
+                              currency={displayedAmount.currency}
+                              precision={2}
+                              amount={displayedAmount.valueInCents}
+                            />
+                            <div>
+                              {Boolean(transaction.taxAmount?.valueInCents) && (
+                                <span className="block">
+                                  <FormattedMoneyAmount
+                                    currency={transaction.taxAmount.currency}
+                                    precision={2}
+                                    amount={transaction.taxAmount.valueInCents}
+                                  />{' '}
+                                  ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
+                                  {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
+                                </span>
+                              )}
+                              {displayPaymentFees && (
+                                <span className="block">
+                                  <FormattedMessage
+                                    defaultMessage="{value} (Payment Processor Fee)"
+                                    id="ijvoto"
+                                    values={{
+                                      value: (
+                                        <FormattedMoneyAmount
+                                          currency={transaction.paymentProcessorFee.currency}
+                                          amount={transaction.paymentProcessorFee.valueInCents}
+                                        />
+                                      ),
+                                    }}
+                                  />
+                                </span>
+                              )}
+                            </div>
+                            <span>
+                              <FormattedMessage
+                                defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
+                                id="XhoJIl"
+                                values={{
+                                  type: transaction.type,
+                                  date: (
+                                    <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />
+                                  ),
+                                  account: <LinkCollective collective={transaction.account} />,
+                                }}
+                              />
+                            </span>
+                          </TransactionDetails>
+                        );
+                      })
+                    )}
+                  </div>
+                  {hasProcessButtons(order?.permissions) && (
+                    <div className="mt-10">
+                      <Separator />
+                      <div className="mt-2 flex flex-col-reverse justify-stretch sm:flex-row sm:justify-between">
+                        <ButtonsContainer flexDirection={['column', 'row']}>
+                          {order.permissions.canEdit && (
+                            <React.Fragment>
+                              <StyledButton
+                                data-cy="edit-order-button"
+                                buttonSize="tiny"
+                                minWidth="130px"
+                                mx={2}
+                                mt={2}
+                                py="9px"
+                                height="34px"
+                                onClick={() => setShowCreatePendingOrderModal(true)}
+                              >
+                                <FormattedMessage id="contribution.edit" defaultMessage="Edit Contribution" />
+                              </StyledButton>
+                              {showCreatePendingOrderModal && (
+                                <CreatePendingOrderModal
+                                  hostSlug={account.host.slug}
+                                  onClose={() => setShowCreatePendingOrderModal(false)}
+                                  onSuccess={() => queryResult.refetch()}
+                                  edit={order}
+                                />
+                              )}{' '}
+                            </React.Fragment>
+                          )}
+                        </ButtonsContainer>
+                        <ButtonsContainer flexDirection={['column', 'row']}>
+                          <ProcessOrderButtons
+                            order={order}
+                            permissions={order.permissions}
+                            onSuccess={() => queryResult.refetch()}
+                          />
+                        </ButtonsContainer>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
               {order?.memo && (
-                <Box mt={4}>
-                  <P fontWeight="700" fontSize="16px" lineHeight="24px" color="black.900">
+                <div className="mt-4">
+                  <p className="text-base leading-6 font-bold text-gray-900">
                     <FormattedMessage defaultMessage="Additional Details" id="DgTPfL" />
-                  </P>
+                  </p>
 
-                  <Span fontSize="12px" color="black.700" fontWeight="bold">
+                  <span className="text-xs font-bold text-gray-600">
                     <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
                     &nbsp;&nbsp;
                     <PrivateInfoIcon className="text-muted-foreground" size={12} />
-                  </Span>
+                  </span>
                   <HTMLContent color="black.700" mt={1} fontSize="13px" content={order.memo} />
-                </Box>
+                </div>
               )}
-            </Box>
-            <Flex
-              minWidth="270px"
-              display={['none', 'block']}
-              justifyContent={['center', null, 'flex-start', 'flex-end']}
-              pt={[4, null, 80]}
-            >
+            </div>
+            <div className="hidden min-w-[270px] justify-center pt-4 sm:flex lg:justify-start lg:pt-20 xl:justify-end">
               {account.isActive && (
-                <Box px={2}>
-                  <H5 mb={3} textTransform="capitalize">
+                <div className="px-2">
+                  <h5 className="mb-3 capitalize">
                     <FormattedMessage
                       id="CollectiveBalance"
                       defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
                       values={{ type: account.type || '' }}
                     />
-                  </H5>
-                  <Container
-                    borderLeft="1px solid"
-                    borderColor="black.300"
-                    pl={3}
-                    fontSize="20px"
-                    color="black.500"
-                    data-cy="collective-balance"
-                  >
-                    <Box>
+                  </h5>
+                  <div className="border-l border-gray-300 pl-3 text-xl text-gray-500" data-cy="collective-balance">
+                    <div>
                       <FormattedMoneyAmount
                         currency={account.stats.balanceWithBlockedFunds.currency}
                         amount={account.stats.balanceWithBlockedFunds.valueInCents}
                         amountClassName="text-foreground"
                       />
                       {account.host && (
-                        <P fontSize="11px" color="black.600" mt={2}>
-                          <Span
-                            fontSize="9px"
-                            fontWeight="600"
-                            textTransform="uppercase"
-                            color="black.500"
-                            letterSpacing="0.06em"
-                          >
+                        <p className="mt-2 text-xs text-gray-600">
+                          <span className="text-[9px] font-semibold tracking-[0.06em] text-gray-500 uppercase">
                             <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
-                          </Span>
+                          </span>
                           <br />
                           <LinkCollective collective={account.host} />
-                        </P>
+                        </p>
                       )}
-                    </Box>
-                  </Container>
-                </Box>
+                    </div>
+                  </div>
+                </div>
               )}
-            </Flex>
-          </Flex>
+            </div>
+          </div>
         )}
-      </Flex>
+      </div>
     </Page>
   );
 }

@@ -102,7 +102,7 @@ const MoreFeatures = () => (
             defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together <Link>some resources to help you succeed</Link>."
             values={{
               Link: getI18nLink({
-                href: 'https://docs.opencollective.com/help/financial-contributors/organizations/sustainer-resources',
+                href: 'https://documentation.opencollective.com/giving-to-collectives/giving-as-a-company',
                 color: 'rgb(220, 95, 125)',
               }),
             }}

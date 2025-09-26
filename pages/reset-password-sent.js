@@ -51,7 +51,7 @@ class ResetPasswordSent extends Component {
               defaultMessage="<Link>Learn more</Link> about our login system."
               values={{
                 Link: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/product/log-in-system',
+                  href: 'https://documentation.opencollective.com/advanced/security-for-accounts/logging-into-your-account',
                   openInNewTab: true,
                 }),
               }}

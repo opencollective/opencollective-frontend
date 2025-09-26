@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { ConfirmContributionForm } from './contributions/ConfirmContributionForm';
+import { Button } from './ui/Button';
 import Container from './Container';
-import StyledButton from './StyledButton';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
 
 interface ContributionConfirmationModalProps {
@@ -44,26 +44,24 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }: Contributi
         footer={
           <ModalFooter isFullWidth>
             <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="wrap">
-              <StyledButton
-                buttonStyle="secondary"
+              <Button
+                variant="secondary"
                 onClick={onClose}
-                mr={[0, '16px']}
-                mb={['16px', 0]}
-                minWidth={['268px', 0]}
                 type="button"
                 disabled={submitting}
+                className="mr-0 mb-4 min-w-[268px] md:mr-4 md:mb-0 md:min-w-0"
               >
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
-                minWidth={240}
-                buttonStyle="primary"
+              </Button>
+              <Button
+                variant="default"
                 loading={submitting}
                 type="submit"
                 data-cy="order-confirmation-modal-submit"
+                className="min-w-[240px]"
               >
                 <FormattedMessage defaultMessage="Confirm contribution" id="k/uy+b" />
-              </StyledButton>
+              </Button>
             </Container>
           </ModalFooter>
         }

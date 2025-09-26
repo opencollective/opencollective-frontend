@@ -269,7 +269,6 @@ class CollectivePage extends Component {
           isAdmin={isAdmin}
           selectedCategory={selectedCategory}
           onCollectiveClick={this.onCollectiveClick}
-          showBackButton={false}
           isFullWidth
           useAnchorsForCategories
           isInHero={!isFixed}

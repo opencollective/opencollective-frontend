@@ -12,7 +12,7 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, H2, P } from '../Text';
 
-const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
+const TIERS_INFO_LINK = 'https://documentation.opencollective.com/collectives/raising-money/setting-goals-and-tiers';
 
 class SuccessPage extends React.Component {
   static propTypes = {

@@ -3,8 +3,8 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
+import { Button } from './ui/Button';
 import Container from './Container';
-import StyledButton from './StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P } from './Text';
 
@@ -68,24 +68,22 @@ const ConfirmationModal = ({
       </ModalBody>
       <ModalFooter>
         <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-          <StyledButton
-            mx={20}
-            my={1}
+          <Button
+            className="mx-5 my-1 min-w-[140px]"
             autoFocus
-            minWidth={140}
             onClick={cancelHandler}
             disabled={submitting}
             data-cy="confirmation-modal-cancel"
+            variant="outline"
           >
             {cancelLabel || formatMessage(messages.cancel)}
-          </StyledButton>
-          <StyledButton
-            my={1}
-            minWidth={140}
-            buttonStyle={isDanger ? 'danger' : isSuccess ? 'success' : 'primary'}
+          </Button>
+          <Button
+            className="my-1 min-w-[140px]"
             data-cy="confirmation-modal-continue"
             loading={submitting}
             disabled={disableSubmit}
+            variant={isDanger ? 'destructive' : isSuccess ? 'success' : 'default'}
             onClick={async () => {
               let result;
               try {
@@ -99,7 +97,7 @@ const ConfirmationModal = ({
             }}
           >
             {continueLabel || formatMessage(confirmBtnMsgs[type])}
-          </StyledButton>
+          </Button>
         </Container>
       </ModalFooter>
     </StyledModal>

@@ -245,7 +245,7 @@ function WiseStatus(props: WiseStatusProps) {
           href={
             isConnected
               ? 'https://wise.com/user/account'
-              : 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise#connecting-transferwise'
+              : 'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-with-wise#connecting-transferwise'
           }
         >
           <StyledButton buttonSize="tiny" width="100%">

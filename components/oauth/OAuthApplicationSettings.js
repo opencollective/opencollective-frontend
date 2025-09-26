@@ -149,7 +149,7 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
               },
               {
                 Link: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/developers/oauth',
+                  href: 'https://documentation.opencollective.com/development/oauth',
                   openInNewTab: true,
                 }),
               },
