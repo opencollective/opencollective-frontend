@@ -88,10 +88,6 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
         </PopoverTrigger>
         <PopoverContent align="end" sideOffset={10} className="w-full max-w-md p-6">
           <div className="relative">
-            <h3 className="mb-4 text-2xl font-bold text-slate-800">
-              <FormattedMessage defaultMessage="Sign up for free!" id="39AHJm" />
-            </h3>
-
             <div className="space-y-3">
               <Link
                 href="/signup/organization?active=true"
