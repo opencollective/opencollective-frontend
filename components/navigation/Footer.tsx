@@ -5,7 +5,7 @@ import { Linkedin } from '@styled-icons/fa-brands/Linkedin';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { cn, parseToBoolean } from '../../lib/utils';
@@ -15,9 +15,10 @@ import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 import Image from '../Image';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import Link from '../Link';
+import SignupLogin from '../SignupLogin';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
 
-import { dashboardFooterItems, regularFooterItems } from './menu-items';
+import { dashboardFooterItems, newMarketingMenu, regularFooterItems } from './menu-items';
 
 const SocialLink = ({ href, children, ...props }) => (
   <Link
@@ -31,36 +32,37 @@ const SocialLink = ({ href, children, ...props }) => (
   </Link>
 );
 
-const SocialLinks = ({ className }: { className?: string }) => {
+const SocialLinks = ({ className, iconSize = 16 }: { className?: string; iconSize?: number }) => {
   return (
     <div className={cn('flex items-center gap-1', className)}>
       <SocialLink href="https://linkedin.com/company/opencollective" rel="me" title="Open Collective LinkedIn link">
-        <Linkedin size={16} />
+        <Linkedin size={iconSize} />
       </SocialLink>
       <SocialLink href="https://x.com/@opencollect" rel="me" title="Open Collective Twitter link">
-        <Twitter size={16} />
+        <Twitter size={iconSize} />
       </SocialLink>
       <SocialLink
         href="https://mastodon.opencollective.com/@opencollective"
         rel="me"
         aria-label="Open Collective Mastodon link"
       >
-        <Mastodon size={16} />
+        <Mastodon size={iconSize} />
       </SocialLink>
       <SocialLink href="https://github.com/opencollective" rel="me" aria-label="Open Collective Github link">
-        <Github size={16} />
+        <Github size={iconSize} />
       </SocialLink>
       <SocialLink href="https://discord.opencollective.com" aria-label="Open Collective Discord link">
-        <Discord size={16} />
+        <Discord size={iconSize} />
       </SocialLink>
       <SocialLink href="/contact" aria-label="Contact Open Collective">
-        <Mail size={16} />
+        <Mail size={iconSize} />
       </SocialLink>
     </div>
   );
 };
 
 const Footer = () => {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const whitelabel = useWhitelabelProvider();
 
@@ -159,7 +161,73 @@ const Footer = () => {
       </footer>
     );
   }
+  if (parseToBoolean(getEnvVar('NEW_PRICING'))) {
+    return (
+      <footer className="bg-background">
+        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 xl:flex xl:gap-20">
+          <div className="max-w-xs space-y-8">
+            <div className="space-y-4">
+              <Link href="/home" className="block">
+                <Image
+                  width={555}
+                  height={75}
+                  className="h-6 w-auto"
+                  src="/static/images/ofi-opencollective-logo.png"
+                  alt="Open Collective"
+                />
+              </Link>
+              <p className="text-sm text-muted-foreground">
+                <FormattedMessage
+                  id="footer.OC.description.new"
+                  defaultMessage="Collaborative, transparent, financial management tool"
+                />
+              </p>
+            </div>
+            <LanguageSwitcher />
+          </div>
 
+          <div className="mt-16 grid flex-1 grid-cols-1 gap-8 sm:grid-cols-2 xl:col-span-2 xl:mt-0 xl:grid-cols-3">
+            {newMarketingMenu.map(({ label, items }) => (
+              <div className="text-sm antialiased" key={label.id}>
+                <p className="mb-4 font-medium text-foreground">{intl.formatMessage(label)}</p>
+                <ul className="space-y-2">
+                  {items.map(item =>
+                    !LoggedInUser || (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
+                      <li className="text-muted-foreground hover:text-foreground" key={item.href}>
+                        {item.href[0] === '/' ? (
+                          <Link href={item.href}>{intl.formatMessage(item.label)}</Link>
+                        ) : (
+                          <a href={item.href}>
+                            {intl.formatMessage(item.label)} <ExternalLink className="inline-block" size={12} />
+                          </a>
+                        )}
+                      </li>
+                    ) : null,
+                  )}
+                </ul>
+              </div>
+            ))}
+
+            <div>
+              <h3 className="mb-4 text-sm font-medium text-foreground antialiased">
+                <FormattedMessage defaultMessage="Get started" id="getstarted" />
+              </h3>
+              <SignupLogin className="flex-col items-start" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-muted">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} Open Finance Technologies Inc. All rights reserved.
+            </p>
+            <SocialLinks className="gap-2" iconSize={18} />
+          </div>
+        </div>
+      </footer>
+    );
+  }
   return (
     <footer className="flex-row border-t p-6 py-12">
       <div className="mx-auto flex w-full max-w-(--breakpoint-xl) flex-1 flex-col gap-8">
@@ -224,7 +292,6 @@ const Footer = () => {
             </div>
           ))}
         </div>
-
         <SocialLinks className="flex lg:hidden" />
       </div>
     </footer>

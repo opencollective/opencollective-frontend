@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage } from 'react-intl';
 
 type Item = {
   label: React.ReactNode;
@@ -166,6 +166,82 @@ export const regularFooterItems: Item[] = [
       {
         label: <FormattedMessage id="contactUs" defaultMessage="Contact us" />,
         href: '/contact',
+      },
+    ],
+  },
+];
+
+export const newMarketingMenu = [
+  {
+    label: defineMessage({
+      defaultMessage: 'Product',
+      id: 'ContributionType.Product',
+    }),
+    items: [
+      {
+        label: defineMessage({
+          defaultMessage: 'For Organizations',
+          id: 'ipKxcj',
+        }),
+        href: '/solutions',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'For Fiscal Hosts',
+          id: 'pricing.fiscalHost',
+        }),
+        href: '/solutions',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'For Collectives',
+          id: 'pricing.forCollective',
+        }),
+        href: '/collectives',
+      },
+    ],
+  },
+  {
+    label: defineMessage({
+      defaultMessage: 'About',
+      id: 'collective.about.title',
+    }),
+    items: [
+      {
+        label: defineMessage({
+          defaultMessage: 'Help & Support',
+          id: 'Uf3+S6',
+        }),
+        href: '/help',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'About Us',
+          id: 'ZjDH42',
+        }),
+        href: 'https://documentation.opencollective.com/our-organization/about',
+        target: '_blank',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Contact',
+          id: 'Contact',
+        }),
+        href: '/contact',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Terms of Service',
+          id: '32rBNK',
+        }),
+        href: '/tos',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Privacy policy',
+          id: 'cPwv2c',
+        }),
+        href: '/privacypolicy',
       },
     ],
   },

@@ -9,7 +9,7 @@ import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
 import NextImage from 'next/image';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -19,6 +19,7 @@ import { getEnvVar } from '@/lib/env-utils';
 import { parseToBoolean } from '@/lib/utils';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
+import { newMarketingMenu } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
 import NewTopBar from './navigation/TopBar';
 import Container from './Container';
@@ -116,82 +117,6 @@ const TopBarIcon = ({ provider }) => {
   );
 };
 
-const newMarketingMenu = [
-  {
-    label: defineMessage({
-      defaultMessage: 'Product',
-      id: 'ContributionType.Product',
-    }),
-    items: [
-      {
-        label: defineMessage({
-          defaultMessage: 'For Organizations',
-          id: 'ipKxcj',
-        }),
-        href: '/solutions',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'For Fiscal Hosts',
-          id: 'pricing.fiscalHost',
-        }),
-        href: '/solutions',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'For Collectives',
-          id: 'pricing.forCollective',
-        }),
-        href: '/collectives',
-      },
-    ],
-  },
-  {
-    label: defineMessage({
-      defaultMessage: 'About',
-      id: 'collective.about.title',
-    }),
-    items: [
-      {
-        label: defineMessage({
-          defaultMessage: 'Help & Support',
-          id: 'Uf3+S6',
-        }),
-        href: '/help',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'About Us',
-          id: 'ZjDH42',
-        }),
-        href: 'https://documentation.opencollective.com/our-organization/about',
-        target: '_blank',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'Contact',
-          id: 'Contact',
-        }),
-        href: '/contact',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'Terms of Service',
-          id: '32rBNK',
-        }),
-        href: '/tos',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'Privacy policy',
-          id: 'cPwv2c',
-        }),
-        href: '/privacypolicy',
-      },
-    ],
-  },
-];
-
 const TopBar = ({
   showSearch = true,
   menuItems = { solutions: true, product: true, company: true, docs: true },
@@ -256,9 +181,9 @@ const TopBar = ({
       }}
       ref={ref}
     >
-      <Box css={{ gridArea: 'left' }}>
+      <div className="max-w-fit" css={{ gridArea: 'left' }}>
         <TopBarIcon provider={whitelabel} />
-      </Box>
+      </div>
 
       <Flex alignItems="center" justifyContent="center" css={{ gridArea: 'center' }}>
         <Hide xs sm>

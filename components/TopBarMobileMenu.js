@@ -7,8 +7,12 @@ import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
+import { getEnvVar } from '../lib/env-utils';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+import { parseToBoolean } from '../lib/utils';
 
+import { newMarketingMenu } from './navigation/menu-items';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/Collapsible';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
@@ -35,10 +39,8 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
-/**
- * @deprecated Will be replaced by `components/navigation/SiteMenu` when Workspace moves out of preview feature
- */
 const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
+  const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
   const [state, setState] = React.useState({
     viewSolutionsMenu: false,
     viewProductsMenu: false,
@@ -51,6 +53,69 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
       closeMenu();
     }
   });
+
+  if (usingNewPricing && !useDashboard) {
+    return (
+      <React.Fragment>
+        <HideGlobalScroll />
+        <Container
+          ref={innerRef}
+          bg="white.full"
+          width="100%"
+          position="absolute"
+          right={[0, 0, 16]}
+          top={[69, 69, 75]}
+          p={3}
+          zIndex={3000}
+          borderRadius="0px 0px 16px 16px"
+          boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
+          data-cy="user-menu"
+        >
+          <Box as="ul" my={2} pl={0} pb={2}>
+            {newMarketingMenu.map((menuItem, index) => (
+              <Fragment key={menuItem.label.id}>
+                <ListItem>
+                  <Collapsible>
+                    <CollapsibleTrigger asChild>
+                      <Flex justifyContent="space-between" style={{ cursor: 'pointer' }}>
+                        <FormattedMessage {...menuItem.label} />
+                        <ChevronDown size={20} />
+                      </Flex>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <Box as="ul" my={2} pl="12px">
+                        {menuItem.items.map(subItem => (
+                          <SubListItem key={subItem.href}>
+                            {subItem.target === '_blank' ? (
+                              <a href={subItem.href} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
+                                <FormattedMessage {...subItem.label} />
+                              </a>
+                            ) : (
+                              <Link href={subItem.href} onClick={closeMenu}>
+                                <FormattedMessage {...subItem.label} />
+                              </Link>
+                            )}
+                          </SubListItem>
+                        ))}
+                      </Box>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </ListItem>
+                {index < newMarketingMenu.length - 1 && <hr className="my-5" />}
+              </Fragment>
+            ))}
+            <hr className="my-5" />
+            <ListItem>
+              <Link href="/search" onClick={closeMenu}>
+                <FormattedMessage id="Explore" defaultMessage="Explore" />
+              </Link>
+            </ListItem>
+          </Box>
+        </Container>
+      </React.Fragment>
+    );
+  }
+
   return (
     <React.Fragment>
       <HideGlobalScroll />
