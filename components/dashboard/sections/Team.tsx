@@ -148,7 +148,7 @@ const MembersTable = ({
           <div className="row flex">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <TableActionsButton>
+                <TableActionsButton data-cy="member-actions-btn">
                   <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
                 </TableActionsButton>
               </DropdownMenuTrigger>
@@ -162,7 +162,11 @@ const MembersTable = ({
                   <FormattedMessage id="Edit" defaultMessage="Edit" />
                 </DropdownMenuItem>
                 {isInvitation && (
-                  <DropdownMenuItem className="cursor-pointer" onClick={() => handleResendInvite(member)}>
+                  <DropdownMenuItem
+                    data-cy="resend-invite-btn"
+                    className="cursor-pointer"
+                    onClick={() => handleResendInvite(member)}
+                  >
                     <Mail className="mr-2" size="16" />
                     <FormattedMessage id="ResendInvite" defaultMessage="Resend invite" />
                   </DropdownMenuItem>
@@ -214,7 +218,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
           />
         }
         actions={
-          <Button size="sm" className="gap-1" onClick={() => setShowInviteModal(true)}>
+          <Button data-cy="invite-member-btn" size="sm" className="gap-1" onClick={() => setShowInviteModal(true)}>
             <span>
               <FormattedMessage defaultMessage="Invite member" id="4h0Zyf" />
             </span>
