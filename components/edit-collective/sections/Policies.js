@@ -305,6 +305,10 @@ const Policies = ({ collective }) => {
   React.useEffect(() => {
     if (data) {
       formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename', 'id']));
+      if (typeof window !== 'undefined' && window.location.hash !== '') {
+        document.querySelector(window.location.hash)?.scrollIntoView();
+        window.location.hash = '';
+      }
     }
   }, [data]);
 
@@ -475,7 +479,7 @@ const Policies = ({ collective }) => {
             )}
           </Container>
 
-          <SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
+          <SettingsSectionTitle id="expenses">{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
 
           <StyledInputField
             name="policies.EXPENSE_POLICIES.invoicePolicy"

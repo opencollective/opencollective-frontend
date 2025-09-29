@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 import { isHostAccount } from '@/lib/collective';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 
@@ -49,9 +48,6 @@ export function OrgOverview() {
       setShowSubscriptionCard(showSubscriptionCardSetting !== false ? true : false);
     }
   }, [LoggedInUser, account, showSetupGuide, showSubscriptionCard]);
-
-  const isPlatformBillingFeatureEnabled =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) && account.platformSubscription;
 
   const handleSetupGuideToggle = useCallback(
     async (open: boolean) => {
@@ -105,7 +101,7 @@ export function OrgOverview() {
       />
       {isHostAccount(account) ? (
         <React.Fragment>
-          {isPlatformBillingFeatureEnabled && (
+          {account.platformSubscription && (
             <Collapsible open={showSubscriptionCard}>
               <CollapsibleContent>
                 <PlatformBillingOverviewCard
