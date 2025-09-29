@@ -243,7 +243,7 @@ const TopBar = ({
   return (
     <Flex
       px={[3, '24px']}
-      py={showSearch ? 2 : 3}
+      py={2}
       alignItems="center"
       flexDirection="row"
       css={{
