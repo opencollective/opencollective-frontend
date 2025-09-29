@@ -63,7 +63,7 @@ describe('edit collective', () => {
     cy.contains('#section-our-team', 'AmazingNewUser');
 
     cy.visit(`/dashboard/${collectiveSlug}/team`);
-    cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
 
