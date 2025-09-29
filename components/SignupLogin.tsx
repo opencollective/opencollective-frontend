@@ -82,7 +82,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
     <div className="flex items-center gap-3">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="marketing" className="rounded-full">
+          <Button variant="marketing" className="rounded-full whitespace-nowrap">
             <FormattedMessage id="SignUp" defaultMessage="Sign Up" />
           </Button>
         </PopoverTrigger>
@@ -129,7 +129,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
           </div>
         </PopoverContent>
       </Popover>
-      <Button asChild variant="outline" className="rounded-full">
+      <Button asChild variant="outline" className="rounded-full whitespace-nowrap">
         <Link href={{ pathname: '/signin', query: { next: redirectAfterSigninRef.current } }}>
           {loadingLoggedInUser ? <StyledSpinner size="1em" /> : label}
         </Link>
