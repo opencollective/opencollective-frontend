@@ -149,10 +149,10 @@ const MembersTable = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <TableActionsButton data-cy="member-actions-btn">
-                  <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
+                  <MoreHorizontal className="relative size-4.5" aria-hidden="true" />
                 </TableActionsButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={() => setShowEditModal(member)}
