@@ -1,10 +1,11 @@
 import React, { useCallback, useRef, useState } from 'react';
-import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { cn } from '@/lib/utils';
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
+
+import Image from '@/components/Image';
 
 import FeatureSection from './FeatureSection';
 
@@ -686,8 +687,75 @@ export default function Features() {
   };
 
   return (
-    <section className="relative flex gap-18 px-6 pb-24" ref={containerRef}>
-      <div className="w-4/10 py-40">
+    <section className="relative flex flex-col px-6 pb-24 lg:flex-row lg:gap-18" ref={containerRef}>
+      {/* Mobile Layout: Sections with integrated visuals */}
+      <div className="lg:hidden">
+        {featureSections.map((section, sectionIndex) => (
+          <div key={section.title.id} className="mb-16">
+            {/* Mobile visual for current section - always visible */}
+            <div className="relative mb-8">
+              {section.items.map((item, itemIndex) => {
+                const img = item.media || section.items[0]?.media;
+                const isActive = activeSectionItems[sectionIndex] === itemIndex;
+
+                const sectionStyle = {
+                  ...(section.fgColor && {
+                    '--primary': `var(--color-${section.fgColor})`,
+                  }),
+                  ...(section.bgColor && {
+                    '--card': `var(--color-${section.bgColor})`,
+                  }),
+                } as React.CSSProperties;
+
+                return (
+                  <div
+                    key={`${section.title.id}-${item.title.id}`}
+                    className={cn(
+                      'absolute inset-0 transition-opacity duration-300',
+                      isActive ? 'opacity-100' : 'opacity-0',
+                    )}
+                    style={sectionStyle}
+                  >
+                    <div
+                      className={cn(
+                        'relative aspect-square w-full overflow-clip rounded-4xl border border-slate-100',
+                        'bg-card',
+                      )}
+                    >
+                      {img && (
+                        <div className={cn('relative flex h-full w-full items-center justify-center')}>
+                          <Image
+                            src={img.src}
+                            width={img.srcWidth}
+                            height={img.srcHeight}
+                            alt={intl.formatMessage(item.title)}
+                            style={{ height: undefined }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              {/* Spacer to maintain aspect ratio */}
+              <div className="aspect-square w-full opacity-0">
+                <div className="h-full w-full" />
+              </div>
+            </div>
+            {/* Mobile section content */}
+            <FeatureSection
+              section={section}
+              sectionIndex={sectionIndex}
+              onItemSelect={itemIndex => handleItemSelect(sectionIndex, itemIndex)}
+              isActive={activeIndex === sectionIndex}
+              onBecomeVisible={handleSectionVisible}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden py-40 lg:block lg:w-4/10">
         {featureSections.map((section, sectionIndex) => (
           <FeatureSection
             key={section.title.id}
@@ -699,8 +767,9 @@ export default function Features() {
           />
         ))}
       </div>
-      {/* Sticky features visuals */}
-      <div className="relative w-6/10 self-stretch">
+
+      {/* Desktop sticky features visuals */}
+      <div className="relative hidden self-stretch lg:block lg:w-6/10">
         <div className="sticky top-[16vh] flex flex-col items-center justify-start pt-[74vh]">
           <div className="absolute inset-[0%] h-full">
             {featureSections.map((section, sectionIndex) => (
@@ -737,7 +806,7 @@ export default function Features() {
                               width={img.srcWidth}
                               height={img.srcHeight}
                               alt={intl.formatMessage(item.title)}
-                              style={img.style}
+                              style={{ height: undefined }}
                             />
                           </div>
                         )}
