@@ -7,6 +7,7 @@ export default function useDebouncedValue(
 ): { debouncedValue: string; isDebouncing: boolean } {
   const [debouncedValue, setDebouncedValue] = React.useState(input);
   const [isDebouncing, setIsDebouncing] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
 
   const debouncedInput = React.useRef(
     debounce((value: string) => {
@@ -16,13 +17,20 @@ export default function useDebouncedValue(
   );
 
   React.useEffect(() => {
-    setIsDebouncing(true);
-    debouncedInput.current(input);
+    setIsMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (isMounted) {
+      setIsDebouncing(true);
+      debouncedInput.current(input);
+    }
 
     return () => {
       debouncedInput.current.cancel();
     };
-  }, [input, delay]);
+  }, [input, delay, isMounted]);
 
-  return { debouncedValue, isDebouncing };
+  // During SSR, always return false for isDebouncing to prevent hydration mismatch
+  return { debouncedValue, isDebouncing: isMounted ? isDebouncing : false };
 }
