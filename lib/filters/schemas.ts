@@ -7,20 +7,6 @@ export function isMulti<T>(value: z.ZodType<T, any, any>) {
   return z.union([singleValueToArray, enumArray]);
 }
 
-// Use isNullable to allow setting null values in the query filter
-// filter schema helper
-// ts-unused-exports:disable-next-line
-export function isNullable(value: z.ZodType<any, any>) {
-  return z.union([
-    z
-      .string()
-      .refine(str => str === 'null' || str === '')
-      .transform(() => null)
-      .pipe(z.null()),
-    z.nullable(value),
-  ]);
-}
-
 export const integer = z.coerce.number().min(0).int();
 export const offset = integer.default(0);
 export const limit = integer.default(20);

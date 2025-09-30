@@ -253,13 +253,13 @@ function addFilterValidationErrorToast(error, intl) {
     errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
   });
 
-  if (typeof setImmediate !== 'undefined') {
-    setImmediate(() => {
-      toast({
-        variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
-        message: errorMessage,
-      });
+  // Use setTimeout instead of setImmediate to avoid hydration mismatch
+  // setImmediate is Node.js only and causes client/server differences
+  setTimeout(() => {
+    toast({
+      variant: 'error',
+      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
+      message: errorMessage,
     });
-  }
+  }, 0);
 }
