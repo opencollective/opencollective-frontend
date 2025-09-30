@@ -210,7 +210,7 @@ const Footer = () => {
 
             <div>
               <h3 className="mb-4 text-sm font-medium text-foreground antialiased">
-                <FormattedMessage defaultMessage="Get started" id="getstarted" />
+                <FormattedMessage defaultMessage="Get started" id="/aBLH2" />
               </h3>
               <SignupLogin className="flex-col items-start" />
             </div>
