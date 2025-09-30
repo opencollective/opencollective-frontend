@@ -4546,6 +4546,11 @@ type Contributor {
   account: Account
 
   """
+  List of accounts the contributor has contributed to
+  """
+  accountsContributedTo: [Account]
+
+  """
   Contributor avatar or logo
   """
   image(height: Int, format: ImageFormat): String @deprecated(reason: "2024-08-26: Use account.image instead")
@@ -8532,6 +8537,7 @@ enum SecurityCheckScope {
   COLLECTIVE
   PAYEE
   PAYOUT_METHOD
+  ATTACHMENTS
 }
 
 """
@@ -16111,6 +16117,45 @@ type Query {
   ): Conversation
 
   """
+  Get Contributors grouped by their profiles
+  """
+  contributors(
+    """
+    Host hosting the account
+    """
+    account: AccountReferenceInput
+
+    """
+    Host hosting the account
+    """
+    host: AccountReferenceInput
+    role: [MemberRole]
+    type: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+    limit: Int! = 100
+    offset: Int! = 0
+  ): ContributorCollection!
+
+  """
+  Get Contributors grouped by their profiles
+  """
+  contributor(
+    """
+    Contributor Account reference
+    """
+    account: AccountReferenceInput!
+
+    """
+    Context host to fetch the contributor from
+    """
+    host: AccountReferenceInput!
+  ): Contributor
+
+  """
   Get exchange rates from Open Collective
   """
   currencyExchangeRate(
@@ -16451,6 +16496,41 @@ type Query {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(
+    """
+    Host hosting the account
+    """
+    account: AccountReferenceInput
+
+    """
+    Host hosting the account
+    """
+    host: AccountReferenceInput
+    limit: Int! = 100
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Filter members by tier. Pass null to filter for members without any tier.
+    """
+    tier: TierReferenceInput
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
+  ): MemberCollection!
   order(
     """
     Identifiers to retrieve the Order

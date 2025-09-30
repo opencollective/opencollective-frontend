@@ -2796,6 +2796,8 @@ export type ContributionStats = {
 export type Contributor = {
   __typename?: 'Contributor';
   account?: Maybe<Account>;
+  /** List of accounts the contributor has contributed to */
+  accountsContributedTo?: Maybe<Array<Maybe<Account>>>;
   /**
    * If the contributor has a page on Open Collective, this is the slug to link to it. Always null for incognito contributors
    * @deprecated 2024-08-26: Use account.slug instead
@@ -11400,6 +11402,10 @@ export type Query = {
   activities: ActivityCollection;
   application?: Maybe<Application>;
   collective?: Maybe<Collective>;
+  /** Get Contributors grouped by their profiles */
+  contributor?: Maybe<Contributor>;
+  /** Get Contributors grouped by their profiles */
+  contributors: ContributorCollection;
   conversation?: Maybe<Conversation>;
   /** Get exchange rates from Open Collective */
   currencyExchangeRate: Array<CurrencyExchangeRate>;
@@ -11416,6 +11422,8 @@ export type Query = {
   me?: Maybe<Individual>;
   /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
+  /** Get all members (admins, members, backers, followers) */
+  members: MemberCollection;
   /** Get financial institutions for off-platform transactions */
   offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
   order?: Maybe<Order>;
@@ -11516,6 +11524,25 @@ export type QueryCollectiveArgs = {
   id?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   throwIfMissing?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** This is the root query */
+export type QueryContributorArgs = {
+  account: AccountReferenceInput;
+  host: AccountReferenceInput;
+};
+
+
+/** This is the root query */
+export type QueryContributorsArgs = {
+  account?: InputMaybe<AccountReferenceInput>;
+  email?: InputMaybe<Scalars['EmailAddress']['input']>;
+  host?: InputMaybe<AccountReferenceInput>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 
 
@@ -11646,6 +11673,21 @@ export type QueryMemberInvitationsArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   memberAccount?: InputMaybe<AccountReferenceInput>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+};
+
+
+/** This is the root query */
+export type QueryMembersArgs = {
+  account?: InputMaybe<AccountReferenceInput>;
+  accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
+  email?: InputMaybe<Scalars['EmailAddress']['input']>;
+  host?: InputMaybe<AccountReferenceInput>;
+  includeInherited?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  orderBy?: ChronologicalOrderInput;
+  role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -12046,6 +12088,7 @@ export enum SecurityCheckLevel {
 
 /** All supported SecurityCheck scopes */
 export enum SecurityCheckScope {
+  ATTACHMENTS = 'ATTACHMENTS',
   COLLECTIVE = 'COLLECTIVE',
   PAYEE = 'PAYEE',
   PAYOUT_METHOD = 'PAYOUT_METHOD',
