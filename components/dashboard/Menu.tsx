@@ -136,7 +136,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isChild = isChildAccount(account);
   const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
 
-  const hasPlatformBillingEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING);
+  const hasPlatformBillingEnabled =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription;
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
