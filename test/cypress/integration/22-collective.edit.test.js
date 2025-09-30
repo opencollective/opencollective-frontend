@@ -37,12 +37,17 @@ describe('edit collective', () => {
     cy.wait(200);
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
-    cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('exist');
     cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').should('eq', 1);
 
     // Re-send the invitation email
     cy.mailpitDeleteAllEmails();
-    cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
+    cy.get('[data-cy="members-table"]')
+      .find('tr:nth-child(2) ')
+      .find('[data-cy="member-actions-btn"]')
+      .should('exist')
+      .click({ force: true });
+    cy.getByDataCy('resend-invite-btn').should('exist').click({ force: true });
 
     // Check invitation email
     cy.openEmail(({ Subject }) => Subject.includes('Invitation to join CollectiveToEdit')).then(email => {
@@ -63,7 +68,7 @@ describe('edit collective', () => {
     cy.contains('#section-our-team', 'AmazingNewUser');
 
     cy.visit(`/dashboard/${collectiveSlug}/team`);
-    cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
 
