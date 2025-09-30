@@ -73,6 +73,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
     >
       <RadioGroup
         id="accountSlug"
+        name="accountSlug"
         disabled={!props.canChangeAccount || props.isSubmitting}
         value={props.accountSlug}
         onValueChange={accountSlug => {
@@ -83,13 +84,13 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
         {!isLoading &&
           props.canChangeAccount &&
           recentlySubmittedAccounts.map(a => (
-            <RadioGroupCard key={a.slug} value={a.slug} disabled={props.isSubmitting}>
+            <RadioGroupCard key={a.slug} value={a.slug} disabled={props.isSubmitting} className="min-w-0">
               <ExpenseAccountItem account={a} />
             </RadioGroupCard>
           ))}
 
         {isLoading && (
-          <RadioGroupCard value="" disabled>
+          <RadioGroupCard value="" disabled className="min-w-0">
             <Skeleton className="h-6 w-full" />
           </RadioGroupCard>
         )}
@@ -100,6 +101,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
             checked={isFindSelected}
             showSubcontent={isFindSelected}
             disabled={props.isSubmitting}
+            className="min-w-0"
             subContent={
               <CollectivePickerAsync
                 disabled={props.isSubmitting}
@@ -126,7 +128,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
         )}
 
         {!isLoading && !props.canChangeAccount && props.account && (
-          <RadioGroupCard value={props.account.slug} disabled={props.isSubmitting}>
+          <RadioGroupCard value={props.account.slug} disabled={props.isSubmitting} className="min-w-0">
             <ExpenseAccountItem account={props.account} />
           </RadioGroupCard>
         )}

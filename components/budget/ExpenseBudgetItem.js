@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
-import { get, includes } from 'lodash';
+import { get, includes, truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space } from 'styled-system';
@@ -511,7 +511,8 @@ const ExpenseBudgetItem = ({
                       withHoverCard
                       hoverCardProps={{ includeAdminMembership: { accountSlug: lastComment.fromAccount.slug } }}
                     >
-                      <Avatar collective={lastComment.fromAccount} radius={24} /> {lastComment.fromAccount.name}
+                      <Avatar collective={lastComment.fromAccount} radius={24} />{' '}
+                      {truncate(lastComment.fromAccount.name, { length: 40 })}
                     </LinkCollective>
                   </div>
                 </div>

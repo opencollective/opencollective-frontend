@@ -232,7 +232,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             ))}
 
           {(isLoading || isLoadingPayee) && (
-            <RadioGroupCard value="" disabled>
+            <RadioGroupCard value="" disabled className="min-w-0">
               <Skeleton className="h-6 w-full" />
             </RadioGroupCard>
           )}
@@ -246,6 +246,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 checked={isNewPayoutMethodSelected}
                 disabled={isLoading || props.initialLoading || props.isSubmitting}
                 showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
+                className="min-w-0"
                 subContent={<NewPayoutMethodOptionWrapper />}
               >
                 <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
@@ -709,6 +710,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
           disabled={props.archived}
           showSubcontent={isOpen}
           asChild
+          className="min-w-0"
           subContent={
             isEditingPayoutMethod ? (
               <React.Fragment>
@@ -860,7 +862,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             )
           }
         >
-          <div className="flex grow items-center gap-2">
+          <div className="flex min-w-0 grow items-center gap-2">
             <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
             {props.archived && (
               <Badge type="outline" size="xs">
