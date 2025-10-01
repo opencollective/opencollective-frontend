@@ -79,61 +79,60 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="marketing" className="rounded-full">
-            <FormattedMessage id="SignUp" defaultMessage="Sign Up" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent align="end" sideOffset={10} className="w-full max-w-md p-6">
-          <div className="relative">
-            <h3 className="mb-4 text-2xl font-bold text-slate-800">
-              <FormattedMessage defaultMessage="Sign up for free!" id="39AHJm" />
-            </h3>
+    <div className={cn('flex items-center gap-3', className)}>
+      {!loadingLoggedInUser && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="marketing" className="rounded-full whitespace-nowrap" size="sm">
+              <FormattedMessage id="SignUp" defaultMessage="Sign Up" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" sideOffset={10} className="w-full max-w-md p-6">
+            <div className="relative">
+              <div className="space-y-3">
+                <Link
+                  href="/signup/organization?active=true"
+                  className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <div>
+                    <h4 className="mb-1 text-lg font-semibold text-blue-800">
+                      <FormattedMessage defaultMessage="Join as an organization" id="eVjJXR" />
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      <FormattedMessage defaultMessage="If you have a legal entity" id="Zx+AFA" />
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
+                </Link>
 
-            <div className="space-y-3">
-              <Link
-                href="/signup/organization?active=true"
-                className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
-              >
-                <div>
-                  <h4 className="mb-1 text-lg font-semibold text-blue-800">
-                    <FormattedMessage defaultMessage="Join as an organization" id="eVjJXR" />
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    <FormattedMessage defaultMessage="If you have a legal entity" id="Zx+AFA" />
-                  </p>
-                </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
-              </Link>
+                <Link
+                  href="/create"
+                  className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <div>
+                    <h4 className="mb-1 text-lg font-semibold text-blue-800">
+                      <FormattedMessage defaultMessage="Join as a collective" id="asmRTg" />
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      <FormattedMessage defaultMessage="If you do NOT have a legal entity" id="Xzk6kY" />
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
+                </Link>
+              </div>
 
-              <Link
-                href="/create"
-                className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
-              >
-                <div>
-                  <h4 className="mb-1 text-lg font-semibold text-blue-800">
-                    <FormattedMessage defaultMessage="Join as a collective" id="asmRTg" />
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    <FormattedMessage defaultMessage="If you do NOT have a legal entity" id="Xzk6kY" />
-                  </p>
-                </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
-              </Link>
+              <div className="mt-4">
+                <span className="text-sm text-muted-foreground">Or </span>
+                <Link href="/create-account" className="text-sm text-blue-800 underline hover:text-blue-700">
+                  <FormattedMessage defaultMessage="Join as an individual" id="s+BE7Y" />
+                </Link>
+              </div>
             </div>
+          </PopoverContent>
+        </Popover>
+      )}
 
-            <div className="mt-4">
-              <span className="text-sm text-muted-foreground">Or </span>
-              <Link href="/create-account" className="text-sm text-blue-800 underline hover:text-blue-700">
-                <FormattedMessage defaultMessage="Join as an individual" id="s+BE7Y" />
-              </Link>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-      <Button asChild variant="outline" className="rounded-full">
+      <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="sm">
         <Link href={{ pathname: '/signin', query: { next: redirectAfterSigninRef.current } }}>
           {loadingLoggedInUser ? <StyledSpinner size="1em" /> : label}
         </Link>

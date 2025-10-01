@@ -1,7 +1,7 @@
 import React from 'react';
-import Image from 'next/image';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import Image from '@/components/Image';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/Carousel';
 
@@ -66,7 +66,7 @@ const testimonials = [
       'Our continued partnership with Open Collective has enabled our network of more than 600 fiscally hosted community groups worldwide to manage their finances with ease and reassurance, thus freeing up headspace to focus on front line impact and long term strategy.',
       "It's an easy to use platform and the Open Collective team are dedicated to ensuring that client feedback from our network is fed into further product design.",
     ],
-    author: 'Esther',
+    author: 'Esther Foreman',
     avatar: '/static/images/testimonials/esther-foreman.jpg',
     org: 'Social Change Nest',
     role: 'CEO and Chair of the Board',
@@ -97,6 +97,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
             className="h-full w-full object-cover"
             fill
             sizes="64px"
+            style={{ height: undefined }}
           />
         </div>
         <div className="flex-1">
@@ -122,6 +123,7 @@ const Testimonials = () => {
             src="/static/images/testimonials-bg.png"
             width={4096}
             height={1743}
+            style={{ height: undefined }}
           />
         </div>
       </div>
