@@ -193,7 +193,7 @@ const Footer = () => {
                 <ul className="space-y-2">
                   {items.map(item =>
                     !LoggedInUser || (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
-                      <li className="text-muted-foreground hover:text-foreground" key={item.href}>
+                      <li className="text-muted-foreground hover:text-foreground" key={item.label.id}>
                         {item.href[0] === '/' ? (
                           <Link href={item.href}>{intl.formatMessage(item.label)}</Link>
                         ) : (
