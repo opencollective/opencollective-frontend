@@ -143,9 +143,12 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: ENGINEERS,
     publicBeta: false,
     isEnabled() {
-      return document.cookie.indexOf('enableAuthSsr') !== -1;
+      return typeof document !== 'undefined' && document.cookie.indexOf('enableAuthSsr') !== -1;
     },
     setIsEnabled(enabled) {
+      if (typeof document === 'undefined') {
+        return;
+      }
       if (!enabled) {
         document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
       } else {
@@ -161,9 +164,12 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ENGINEERS,
     isEnabled() {
-      return document.cookie.indexOf('backend=vercel') !== -1;
+      return typeof document !== 'undefined' && document.cookie.indexOf('backend=vercel') !== -1;
     },
     setIsEnabled(enabled) {
+      if (typeof document === 'undefined') {
+        return;
+      }
       if (!enabled) {
         document.cookie = 'backend=; Path=/; Max-Age=0';
       } else {
