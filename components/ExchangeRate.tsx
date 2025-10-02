@@ -9,7 +9,7 @@ import { cn } from '../lib/utils';
 import { Input } from './ui/Input';
 import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from './ui/Tooltip';
 import { formatFxRateInfo } from './AmountWithExchangeRateInfo';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 
 /**
  * Displays an exchange rate in the format: 1 {fromCurrency} = {value} {toCurrency}
@@ -78,7 +78,7 @@ export const ExchangeRate = ({
             ) : (
               <span>
                 {exchangeRate['isApproximate'] ? '~' : ''}
-                {loading ? <StyledSpinner size="1em" /> : exchangeRate.value ? round(exchangeRate.value, 7) : '?'}{' '}
+                {loading ? <Spinner size="1em" /> : exchangeRate.value ? round(exchangeRate.value, 7) : '?'}{' '}
                 {exchangeRate.toCurrency}
               </span>
             )}

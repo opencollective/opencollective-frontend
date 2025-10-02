@@ -23,7 +23,7 @@ import type { MessageType } from '../lib/theme/variants/message';
 import { messageType } from '../lib/theme/variants/message';
 
 import { Box, Flex } from './Grid';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 
 type MessageProps = BordersProps &
   ShadowProps &
@@ -118,7 +118,7 @@ const MessageBox = ({
       <Flex gap="16px">
         {(finalIcon || isLoading) && (
           <Box flexShrink={0} alignSelf={alignIcon} color={!icon && iconColors[type]}>
-            {isLoading ? <StyledSpinner size="1.2em" /> : finalIcon}
+            {isLoading ? <Spinner size="1.2em" /> : finalIcon}
           </Box>
         )}
 

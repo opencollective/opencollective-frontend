@@ -12,7 +12,7 @@ import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
 
 import { useModal } from '../../../../ModalContext';
-import StyledSpinner from '../../../../StyledSpinner';
+import Spinner from '../../../../Spinner';
 import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
@@ -206,7 +206,7 @@ export const useTransactionsImportActions = ({
         label: (
           <div>
             <FormattedMessage defaultMessage="Put on Hold" id="+pCc8I" />
-            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+            {isUpdatingRow && <Spinner size={14} className="ml-2" />}
           </div>
         ),
       });
@@ -219,7 +219,7 @@ export const useTransactionsImportActions = ({
         label: (
           <div>
             <FormattedMessage defaultMessage="Restore" id="zz6ObK" />
-            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+            {isUpdatingRow && <Spinner size={14} className="ml-2" />}
           </div>
         ),
       });
@@ -235,7 +235,7 @@ export const useTransactionsImportActions = ({
           <div>
             <FormattedMessage defaultMessage="No action" id="zue9QR" />
 
-            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+            {isUpdatingRow && <Spinner size={14} className="ml-2" />}
           </div>
         ),
       });

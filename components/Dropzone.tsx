@@ -15,7 +15,7 @@ import { Button } from './ui/Button';
 import { useToast } from './ui/useToast';
 import { getI18nLink } from './I18nFormatters';
 import LocalFilePreview from './LocalFilePreview';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 import UploadedFilePreview from './UploadedFilePreview';
 
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
@@ -145,7 +145,7 @@ const Dropzone = ({
             className="absolute flex items-center justify-center"
             style={{ height: innerMinHeight, width: innerMinHeight }}
           >
-            {UploadingComponent ? <UploadingComponent /> : <StyledSpinner size="50%" />}
+            {UploadingComponent ? <UploadingComponent /> : <Spinner size="50%" />}
           </div>
           {isUploading && <div className="text-xs">{uploadProgress}%</div>}
           {isLoading && !isNil(loadingProgress) && <div>{loadingProgress}%</div>}

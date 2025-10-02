@@ -4,7 +4,7 @@ import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
 import { size, typography } from 'styled-system';
 
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 
 const IconCheckmark = () => {
   return (
@@ -35,7 +35,7 @@ const CustomCheckbox = styled.span`
     fill: white;
   }
 
-  ${StyledSpinner} {
+  svg[data-spinner='true'] {
     opacity: 1;
     fill: #999999;
   }
@@ -102,7 +102,7 @@ const CheckboxContainer = styled.div`
             svg {
               opacity: 1;
             }
-            ${StyledSpinner} {
+            svg[data-spinner='true'] {
               fill: #eeeeee;
             }
           }
@@ -180,7 +180,7 @@ class StyledCheckbox extends React.Component {
           tabIndex="-1" // Prevents the checkbox from being focused, since we're using the container as the focusable element
         />
         <CustomCheckbox data-cy="custom-checkbox">
-          {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
+          {isLoading ? <Spinner size={size} /> : <IconCheckmark />}
         </CustomCheckbox>
         {label && <label htmlFor={inputId}>{label}</label>}
       </CheckboxContainer>

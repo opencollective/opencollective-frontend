@@ -26,12 +26,12 @@ import { DROPZONE_ACCEPT_IMAGES } from '../Dropzone';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
 import MessageBox from '../MessageBox';
+import Spinner from '../Spinner';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputLocation from '../StyledInputLocation';
 import StyledSelect from '../StyledSelect';
-import StyledSpinner from '../StyledSpinner';
 import StyledTextarea from '../StyledTextarea';
 import { Button } from '../ui/Button';
 import { Label } from '../ui/Label';
@@ -137,7 +137,7 @@ const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReje
           <Download size="20" />
         </div>
       ) : isUploading ? (
-        <StyledSpinner size={32} />
+        <Spinner size={32} />
       ) : (
         <Avatar src={value} type="VENDOR" radius={radius}>
           {value ? (

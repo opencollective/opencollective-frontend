@@ -8,7 +8,7 @@ import withViewport, { VIEWPORTS } from '../lib/withViewport';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 import { P } from './Text';
 
 const Circle = styled.svg`
@@ -248,7 +248,7 @@ const PieHalfCircleRight = styled(PieHalfCircle)`
 
 const getBubbleContent = (idx, checked, disabled, focused, loading) => {
   if (loading) {
-    return <StyledSpinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
+    return <Spinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
   } else if (checked) {
     return <Check color="white" size={14} />;
   }

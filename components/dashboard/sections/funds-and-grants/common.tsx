@@ -21,8 +21,8 @@ import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpe
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
+import Spinner from '@/components/Spinner';
 import StyledLink from '@/components/StyledLink';
-import StyledSpinner from '@/components/StyledSpinner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -189,7 +189,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
             >
               <Check className="text-muted-foreground" size={16} />
               <FormattedMessage defaultMessage="Approve grant" id="202vW9" />
-              {processExpense.loading && processExpense.currentAction === 'APPROVE' && <StyledSpinner size={16} />}
+              {processExpense.loading && processExpense.currentAction === 'APPROVE' && <Spinner size={16} />}
             </DropdownMenuItem>
           )}
           {permissions?.canReject && (

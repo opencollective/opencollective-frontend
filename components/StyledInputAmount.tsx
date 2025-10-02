@@ -9,9 +9,9 @@ import { cn } from '../lib/utils';
 import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 
 import { Separator } from './ui/Separator';
+import Spinner from './Spinner';
 import { StyledCurrencyPicker } from './StyledCurrencyPicker';
 import StyledInput from './StyledInput';
-import StyledSpinner from './StyledSpinner';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
@@ -316,7 +316,7 @@ const StyledInputAmount = ({
           />
         </div>
       )}
-      {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
+      {loadingExchangeRate && <Spinner size={16} className="absolute right-8 text-slate-700" />}
       {suffix && (
         <div className="pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs text-muted-foreground">
           {suffix}

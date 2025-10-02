@@ -3,7 +3,7 @@ import type { Row, Table } from '@tanstack/react-table';
 import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import StyledSpinner from '../StyledSpinner';
+import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
 import {
   DropdownMenu,
@@ -24,7 +24,7 @@ export function DropdownActionItem({ action }) {
     >
       {action.Icon && <action.Icon className="shrink-0 text-muted-foreground" size={16} />}
       {action.label}
-      {action.isLoading && <StyledSpinner className="ml-auto size-4 text-muted-foreground" />}
+      {action.isLoading && <Spinner className="ml-auto size-4 text-muted-foreground" />}
     </DropdownMenuItem>
   );
 }

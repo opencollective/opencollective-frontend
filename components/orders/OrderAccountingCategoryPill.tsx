@@ -9,7 +9,7 @@ import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql
 import { cn } from '../../lib/utils';
 
 import AccountingCategorySelect from '../AccountingCategorySelect';
-import StyledSpinner from '../StyledSpinner';
+import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
@@ -81,7 +81,7 @@ export const OrderAdminAccountingCategoryPill = ({
     >
       <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90')}>
         <span className="mr-1">{getCategoryLabel(order.accountingCategory)}</span>
-        {loading ? <StyledSpinner size="1em" /> : <ChevronDown size="1em" />}
+        {loading ? <Spinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
     </AccountingCategorySelect>
   );

@@ -21,7 +21,7 @@ import Avatar from './Avatar';
 import FollowButton from './FollowButton';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 
 export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
@@ -376,7 +376,7 @@ export const AccountHoverCard = ({
             </div>
           )}
 
-          {loading && <StyledSpinner className="absolute top-0 right-0 text-muted-foreground" />}
+          {loading && <Spinner className="absolute top-0 right-0 text-muted-foreground" />}
         </div>
       </HoverCardContent>
     </HoverCard>

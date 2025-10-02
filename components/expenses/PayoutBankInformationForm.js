@@ -15,7 +15,7 @@ import { FormField } from '../FormField';
 import { I18nSupportLink } from '../I18nFormatters';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
 import MessageBox from '../MessageBox';
-import StyledSpinner from '../StyledSpinner';
+import Spinner from '../Spinner';
 import { Input } from '../ui/Input';
 import { Separator } from '../ui/Separator';
 
@@ -261,7 +261,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
   );
 
   if (loading && !data) {
-    return <StyledSpinner />;
+    return <Spinner />;
   }
   if (error) {
     return (
@@ -524,7 +524,7 @@ const PayoutBankInformationForm = ({
 
   // Display spinner if loading
   if (loading) {
-    return <StyledSpinner />;
+    return <Spinner />;
   }
 
   if (!currencies) {
