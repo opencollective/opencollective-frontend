@@ -182,6 +182,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
           createdAt
           quantity
           publicMessage
+          status
           fromCollective {
             id
             type
