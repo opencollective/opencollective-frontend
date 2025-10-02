@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, withApollo } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -10,6 +10,7 @@ import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchE
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/html';
+import { withApollo } from '@/lib/apollo-client';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';

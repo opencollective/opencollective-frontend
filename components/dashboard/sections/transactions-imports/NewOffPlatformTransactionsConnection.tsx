@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { ArrowLeft, Building2, ExternalLink, Globe, Loader2, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

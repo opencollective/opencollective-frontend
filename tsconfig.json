@@ -20,10 +20,17 @@
     "paths": {
       "@/components/*": ["./components/*"],
       "@/lib/*": ["./lib/*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+    // "strictNullChecks": true
   },
   "include": [
     ".eslintrc.js",
+    "app",
     "components",
     "cypress",
     "*.config.*",
@@ -36,6 +43,7 @@
     "server",
     "stories",
     "test"
+    // ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

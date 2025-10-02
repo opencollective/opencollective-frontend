@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { themeGet } from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
 import { debounce, isEmpty, omit, pick } from 'lodash';

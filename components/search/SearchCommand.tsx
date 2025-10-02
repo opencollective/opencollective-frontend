@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from "@apollo/client/react";
 import { Command as CommandPrimitive } from 'cmdk';
 import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';

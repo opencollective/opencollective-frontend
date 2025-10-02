@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';

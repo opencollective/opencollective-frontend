@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { Plus, Trash } from 'lucide-react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';

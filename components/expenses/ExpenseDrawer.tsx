@@ -1,5 +1,5 @@
 import React from 'react';
-import { useApolloClient, useQuery } from '@apollo/client';
+import { useApolloClient, useQuery } from "@apollo/client/react";
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';

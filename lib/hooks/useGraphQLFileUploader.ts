@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import type { Accept, FileRejection } from 'react-dropzone';
 import { useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';

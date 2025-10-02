@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { FormattedMessage } from 'react-intl';
 
 import { gqlV1 } from '../lib/graphql/helpers';

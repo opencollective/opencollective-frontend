@@ -1,5 +1,6 @@
 import React from 'react';
-import { ApolloError, useApolloClient } from '@apollo/client';
+import { ApolloError } from "@apollo/client/v4-migration";
+import { useApolloClient } from "@apollo/client/react";
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';

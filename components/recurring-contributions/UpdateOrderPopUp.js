@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

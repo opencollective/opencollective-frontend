@@ -12,7 +12,8 @@
   },
   "files": [],
   "dependencies": {
-    "@apollo/client": "3.12.10",
+    "@apollo/client": "4.0.7",
+    "@apollo/client-integration-nextjs": "^0.13.2",
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "8.0.0",
     "@dnd-kit/utilities": "3.2.2",
@@ -64,7 +65,7 @@
     "@ubilabs/react-geosuggest": "2.17.1",
     "accepts": "1.3.8",
     "apexcharts": "4.7.0",
-    "apollo-upload-client": "17.0.0",
+    "apollo-upload-client": "19.0.0",
     "canvas-confetti": "1.9.3",
     "class-variance-authority": "^0.7.0",
     "cloudflare-ip": "0.0.7",
@@ -101,7 +102,7 @@
     "lottie-react": "2.4.1",
     "lucide-react": "0.541.0",
     "memoize-one": "6.0.0",
-    "next": "14.2.32",
+    "next": "15.5.4",
     "node-fetch": "^2.7.0",
     "nprogress": "0.2.0",
     "polished": "4.3.1",
@@ -129,6 +130,7 @@
     "react-verification-input": "4.2.2",
     "react-window": "1.8.11",
     "redis": "4.7.0",
+    "rxjs": "^7.8.2",
     "sanitize-html": "2.17.0",
     "slugify": "1.6.6",
     "spdx-license-list": "6.10.0",
@@ -164,7 +166,7 @@
     "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",
-    "dev": "node server",
+    "dev": "next dev",
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "git:clean": "cross-env ./scripts/git_clean.sh",
     "graphql:codegen": "graphql-codegen --config scripts/config/graphql-codegen.ts",
@@ -210,7 +212,7 @@
     "@formatjs/cli": "^6.2.12",
     "@graphql-codegen/cli": "5.0.7",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
-    "@next/bundle-analyzer": "^14.2.3",
+    "@next/bundle-analyzer": "15.5.4",
     "@rollup/plugin-commonjs": "^26.0.0",
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-json": "^6.1.0",
@@ -222,11 +224,11 @@
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/apollo-upload-client": "17.0.5",
+    "@types/apollo-upload-client": "^18.0.1",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.14",
-    "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "19.1.16",
+    "@types/react-dom": "19.1.9",
     "@types/styled-system": "^5.1.22",
     "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^8.35.0",
@@ -329,5 +331,9 @@
       "cypress-multi-reporters",
       "@jest/globals"
     ]
+  },
+  "overrides": {
+    "@types/react": "19.1.16",
+    "@types/react-dom": "19.1.9"
   }
 }

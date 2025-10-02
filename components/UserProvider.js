@@ -1,11 +1,12 @@
+'use client';
+
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
-
+import { withApollo } from '@/lib/apollo-client';
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';

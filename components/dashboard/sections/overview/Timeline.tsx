@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

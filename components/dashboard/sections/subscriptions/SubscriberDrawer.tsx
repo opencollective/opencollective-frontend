@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import dayjs from 'dayjs';
 import { Info, Link as Link2, Pencil } from 'lucide-react';

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { FetchResult } from '@apollo/client';
+import type { ApolloLink } from '@apollo/client';
 import { FormikProvider, useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash';
 import { X } from 'lucide-react';
@@ -240,7 +240,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   );
 
   const onSuccess = React.useCallback(
-    (result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>) => {
+    (result: ApolloLink.Result<CreateExpenseFromDashboardMutation> | ApolloLink.Result<EditExpenseFromDashboardMutation>) => {
       toast({
         variant: 'success',
         title: <FormattedMessage defaultMessage="Grant Request submitted" id="m/bWLw" />,

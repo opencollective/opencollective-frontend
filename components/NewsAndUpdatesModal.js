@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from '@apollo/client/react/components';
+import { useQuery } from '@apollo/client/react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
@@ -112,6 +112,10 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
 
 const NewsAndUpdatesModal = ({ open, setOpen }) => {
   const onClose = () => setOpen(false);
+  const { data, loading, error } = useQuery(newsAndUpdatesQuery, {
+    context: API_V2_CONTEXT,
+  });
+
   return (
     <Dialog open={open} onOpenChange={open => setOpen(open)}>
       <DialogContent className="p-0">
@@ -136,11 +140,7 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
           </div>
         </DialogHeader>
         <Separator className="my-3" />
-        <div className="px-0 pb-6">
-          <Query query={newsAndUpdatesQuery} context={API_V2_CONTEXT}>
-            {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
-          </Query>
-        </div>
+        <div className="px-0 pb-6">{renderStyledCarousel(data, loading, error, onClose)}</div>
       </DialogContent>
     </Dialog>
   );

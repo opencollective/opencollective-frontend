@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { isEmpty } from 'lodash';
 import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -580,10 +581,10 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     <div className="flex flex-col gap-6">
                       {Array.from({ length: 3 }).map((_, index) => (
                         // eslint-disable-next-line react/no-array-index-key
-                        <div className="flex gap-5" key={index}>
+                        (<div className="flex gap-5" key={index}>
                           <Skeleton className="h-10 w-12 rounded-full" />
                           <Skeleton className="mt-2 h-10 w-full" />
-                        </div>
+                        </div>)
                       ))}
                     </div>
                   ) : (

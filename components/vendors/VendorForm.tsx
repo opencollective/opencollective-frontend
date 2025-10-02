@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
 import { Download, Pencil, Trash, Upload, X } from 'lucide-react';

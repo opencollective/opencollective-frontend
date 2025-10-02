@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
 import { PieChart } from '@styled-icons/material/PieChart';

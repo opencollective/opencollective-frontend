@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { ArrowLeft, Eye, Pencil, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage, useIntl } from 'react-intl';

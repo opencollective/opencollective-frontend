@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useApolloClient, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useApolloClient, useQuery } from "@apollo/client/react";
 import { truncate } from 'lodash';
 import Lottie from 'lottie-react';
 import {

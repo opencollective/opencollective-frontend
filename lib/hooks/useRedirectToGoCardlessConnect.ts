@@ -1,5 +1,7 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+
+import { useMutation } from "@apollo/client/react";
 
 import { API_V2_CONTEXT } from '../graphql/helpers';
 import { LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';

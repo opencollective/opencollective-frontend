@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import dayjs from 'dayjs';
 import { Field, Form, Formik } from 'formik';
 import { compact, isEmpty, pick, toString } from 'lodash';

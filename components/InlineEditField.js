@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/client/react/components';
+import { useMutation } from '@apollo/client/react';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -185,8 +185,10 @@ class InlineEditField extends Component {
     } else {
       return (
         <WarnIfUnsavedChanges hasUnsavedChanges={warnIfUnsavedChanges && isValid}>
-          <Mutation mutation={mutation} {...mutationOptions}>
-            {(updateField, { loading, error }) => (
+          {(() => {
+            const { updateField, mutationResult } = this.props;
+            const { loading, error } = mutationResult;
+            return (
               <React.Fragment>
                 {children ? (
                   children({
@@ -259,12 +261,19 @@ class InlineEditField extends Component {
                   </Flex>
                 </Box>
               </React.Fragment>
-            )}
-          </Mutation>
+            );
+          })()}
         </WarnIfUnsavedChanges>
       );
     }
   }
 }
 
-export default injectIntl(InlineEditField);
+// Wrapper component to use hooks with class component
+const InlineEditFieldWrapper = props => {
+  const [updateField, mutationResult] = useMutation(props.mutation, props.mutationOptions || {});
+
+  return <InlineEditField {...props} updateField={updateField} mutationResult={mutationResult} />;
+};
+
+export default injectIntl(InlineEditFieldWrapper);

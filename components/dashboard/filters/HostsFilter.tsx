@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from "@apollo/client/react";
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 

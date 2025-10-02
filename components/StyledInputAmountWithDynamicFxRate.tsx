@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';

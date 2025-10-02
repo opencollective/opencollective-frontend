@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { get } from 'lodash';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -203,7 +203,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             />
             <Separator className="my-1" />
             {!whitelabel ? ( // <div className="min-h-10" />
-              <React.Fragment>
+              (<React.Fragment>
                 <MenuItem
                   Icon={Home}
                   href="/home"
@@ -221,7 +221,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                   label={intl.formatMessage({ id: 'menu.documentation', defaultMessage: 'Documentation' })}
                 />
                 <Separator className="my-1" />
-              </React.Fragment>
+              </React.Fragment>)
             ) : (
               menuLinks?.length > 0 && (
                 <React.Fragment>

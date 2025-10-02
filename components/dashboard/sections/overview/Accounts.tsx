@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import dayjs from 'dayjs';
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link'; // eslint-disable-line no-restricted-imports

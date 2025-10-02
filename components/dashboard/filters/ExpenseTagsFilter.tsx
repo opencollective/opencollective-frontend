@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useLazyQuery } from "@apollo/client/react";
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 

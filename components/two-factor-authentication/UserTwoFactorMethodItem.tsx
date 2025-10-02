@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { CheckCircle2Icon, Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

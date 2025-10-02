@@ -143,13 +143,15 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: ENGINEERS,
     publicBeta: false,
     isEnabled() {
-      return document.cookie.indexOf('enableAuthSsr') !== -1;
+      return typeof document !== 'undefined' && document.cookie.indexOf('enableAuthSsr') !== -1;
     },
     setIsEnabled(enabled) {
-      if (!enabled) {
-        document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
-      } else {
-        document.cookie = 'enableAuthSsr=1; Path=/; Max-Age=9999999';
+      if (typeof document !== 'undefined') {
+        if (!enabled) {
+          document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
+        } else {
+          document.cookie = 'enableAuthSsr=1; Path=/; Max-Age=9999999';
+        }
       }
     },
     category: Categories.FOR_NERDS,
@@ -161,13 +163,15 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ENGINEERS,
     isEnabled() {
-      return document.cookie.indexOf('backend=vercel') !== -1;
+      return typeof document !== 'undefined' && document.cookie.indexOf('backend=vercel') !== -1;
     },
     setIsEnabled(enabled) {
-      if (!enabled) {
-        document.cookie = 'backend=; Path=/; Max-Age=0';
-      } else {
-        document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
+      if (typeof document !== 'undefined') {
+        if (!enabled) {
+          document.cookie = 'backend=; Path=/; Max-Age=0';
+        } else {
+          document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
+        }
       }
     },
     category: Categories.FOR_NERDS,

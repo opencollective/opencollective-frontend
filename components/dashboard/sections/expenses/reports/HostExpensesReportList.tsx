@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import dayjs from 'dayjs';
 import { groupBy, orderBy, sumBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';

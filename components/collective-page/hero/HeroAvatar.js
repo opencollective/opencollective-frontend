@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
-import { Mutation } from '@apollo/client/react/components';
+import { useMutation } from '@apollo/client/react';
 import { Camera } from '@styled-icons/feather/Camera';
 import { inRange } from 'lodash';
 import dynamic from 'next/dynamic';
@@ -90,6 +89,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
   const [editImage] = useMutation(editCollectiveAvatarMutation);
+  const [editAvatar] = useMutation(editCollectiveAvatarMutation);
   const { toast, dismissToasts } = useToast();
 
   const onDropImage = async ([image]) => {
@@ -243,71 +243,67 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
-      <Mutation mutation={editCollectiveAvatarMutation}>
-        {editAvatar => (
-          <Fragment>
-            <EditingAvatarContainer borderRadius={borderRadius}>
-              <img
-                data-cy="collective-avatar-image-preview"
-                src={uploadedImage ? uploadedImage.preview : collective.imageUrl}
-                alt=""
-              />
-            </EditingAvatarContainer>
-            <Container
-              position="absolute"
-              display="flex"
-              mt={2}
-              p={2}
-              zIndex={2}
-              background="white"
-              boxShadow="0px 3px 5px -2px #777777"
-            >
-              <Triangle>▲</Triangle>
-              <StyledButton
-                textTransform="capitalize"
-                minWidth={150}
-                disabled={submitting}
-                onClick={() => {
-                  setUploadedImage(null);
-                  setEditing(false);
-                }}
-              >
-                <FormattedMessage id="form.cancel" defaultMessage="cancel" />
-              </StyledButton>
-              <StyledButton
-                data-cy="heroAvatarDropzoneSave"
-                textTransform="capitalize"
-                buttonStyle="primary"
-                ml={3}
-                minWidth={150}
-                loading={submitting}
-                onClick={async () => {
-                  setSubmitting(true); // Need this because `upload` is not a graphql function
+      <Fragment>
+        <EditingAvatarContainer borderRadius={borderRadius}>
+          <img
+            data-cy="collective-avatar-image-preview"
+            src={uploadedImage ? uploadedImage.preview : collective.imageUrl}
+            alt=""
+          />
+        </EditingAvatarContainer>
+        <Container
+          position="absolute"
+          display="flex"
+          mt={2}
+          p={2}
+          zIndex={2}
+          background="white"
+          boxShadow="0px 3px 5px -2px #777777"
+        >
+          <Triangle>▲</Triangle>
+          <StyledButton
+            textTransform="capitalize"
+            minWidth={150}
+            disabled={submitting}
+            onClick={() => {
+              setUploadedImage(null);
+              setEditing(false);
+            }}
+          >
+            <FormattedMessage id="form.cancel" defaultMessage="cancel" />
+          </StyledButton>
+          <StyledButton
+            data-cy="heroAvatarDropzoneSave"
+            textTransform="capitalize"
+            buttonStyle="primary"
+            ml={3}
+            minWidth={150}
+            loading={submitting}
+            onClick={async () => {
+              setSubmitting(true); // Need this because `upload` is not a graphql function
 
-                  try {
-                    // Upload image if changed or remove it
-                    let imgURL = collective.image;
-                    if (uploadedImage) {
-                      imgURL = await upload(uploadedImage, 'ACCOUNT_AVATAR');
-                    }
+              try {
+                // Upload image if changed or remove it
+                let imgURL = collective.image;
+                if (uploadedImage) {
+                  imgURL = await upload(uploadedImage, 'ACCOUNT_AVATAR');
+                }
 
-                    // Update settings
-                    await editAvatar({ variables: { id: collective.id, image: imgURL } });
+                // Update settings
+                await editAvatar({ variables: { id: collective.id, image: imgURL } });
 
-                    // Reset
-                    setUploadedImage(null);
-                    setEditing(false);
-                  } finally {
-                    setSubmitting(false);
-                  }
-                }}
-              >
-                <FormattedMessage id="save" defaultMessage="Save" />
-              </StyledButton>
-            </Container>
-          </Fragment>
-        )}
-      </Mutation>
+                // Reset
+                setUploadedImage(null);
+                setEditing(false);
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+          >
+            <FormattedMessage id="save" defaultMessage="Save" />
+          </StyledButton>
+        </Container>
+      </Fragment>
     ) : (
       <Avatar collective={collective} radius={AVATAR_SIZE} />
     );

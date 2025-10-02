@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { DialogClose, DialogDescription } from '@radix-ui/react-dialog';
 import { Form, FormikProvider } from 'formik';
 import { useRouter } from 'next/router';

@@ -1,6 +1,7 @@
 import React from 'react';
-import type { ApolloCache, MutationFunction } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
+import type { ApolloCache } from '@apollo/client';
+import type { MutationFunction } from "@apollo/client/react";
+import { graphql } from "@apollo/client/v4-migration";
 import { cloneDeep, get, pick } from 'lodash';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';

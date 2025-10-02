@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';

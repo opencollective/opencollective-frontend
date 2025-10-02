@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mutation } from '@apollo/client/react/components';
+import { useMutation } from '@apollo/client/react';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -129,6 +129,7 @@ const REACT_POPPER_MODIFIERS = [
 
 function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message = '', intl }) {
   const [messageDraft, setMessageDraft] = useState(message || '');
+  const [submitMessage, { loading, error }] = useMutation(editPublicMessageMutation);
 
   // Can't be rendered SSR
   if (typeof window === 'undefined' || !cardRef.current) {
@@ -136,99 +137,95 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
   }
 
   return createPortal(
-    <Mutation mutation={editPublicMessageMutation}>
-      {(submitMessage, { loading, error }) => (
-        <Popper
-          referenceElement={cardRef.current}
-          placement={width < 780 ? 'bottom' : 'right'}
-          modifiers={REACT_POPPER_MODIFIERS}
+    <Popper
+      referenceElement={cardRef.current}
+      placement={width < 780 ? 'bottom' : 'right'}
+      modifiers={REACT_POPPER_MODIFIERS}
+    >
+      {({ ref, style, placement, arrowProps }) => (
+        <EditPublicMessagePopupContainer
+          data-cy="EditPublicMessagePopup"
+          ref={ref}
+          style={style}
+          data-placement={placement}
         >
-          {({ ref, style, placement, arrowProps }) => (
-            <EditPublicMessagePopupContainer
-              data-cy="EditPublicMessagePopup"
-              ref={ref}
-              style={style}
-              data-placement={placement}
-            >
-              <Flex justifyContent="flex-end">
-                <Times size="1em" color="#a2a2a2" cursor="pointer" onClick={onClose} />
-              </Flex>
-              <Flex flexDirection="column" p={2}>
-                <Span fontSize="14px" color="black.600" mb={2}>
-                  <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
-                </Span>
+          <Flex justifyContent="flex-end">
+            <Times size="1em" color="#a2a2a2" cursor="pointer" onClick={onClose} />
+          </Flex>
+          <Flex flexDirection="column" p={2}>
+            <Span fontSize="14px" color="black.600" mb={2}>
+              <FormattedMessage id="contribute.publicMessage" defaultMessage="Leave a public message (optional)" />
+            </Span>
 
-                <StyledInput
-                  name="publicMessage"
-                  as="textarea"
-                  px={10}
-                  py={10}
-                  width="100%"
-                  height={112}
-                  fontSize="14px"
-                  style={{ resize: 'none' }}
-                  placeholder={intl.formatMessage(messages.publicMessagePlaceholder)}
-                  value={messageDraft}
-                  maxLength={PUBLIC_MESSAGE_MAX_LENGTH}
-                  onChange={e => setMessageDraft(e.target.value)}
-                  disabled={loading}
-                />
-                {error && (
-                  <Span color="red.500" fontSize="12px" mt={2}>
-                    {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
-                  </Span>
-                )}
-                <Box m="0 auto">
-                  <StyledButton
-                    data-cy="EditPublicMessagePopup_SubmitButton"
-                    buttonSize="small"
-                    fontWeight="bold"
-                    px={4}
-                    mt={3}
-                    loading={loading}
-                    onClick={async () => {
-                      await submitMessage({
-                        variables: {
-                          fromCollectiveId,
-                          collectiveId,
-                          message: messageDraft ? messageDraft.trim() : null,
+            <StyledInput
+              name="publicMessage"
+              as="textarea"
+              px={10}
+              py={10}
+              width="100%"
+              height={112}
+              fontSize="14px"
+              style={{ resize: 'none' }}
+              placeholder={intl.formatMessage(messages.publicMessagePlaceholder)}
+              value={messageDraft}
+              maxLength={PUBLIC_MESSAGE_MAX_LENGTH}
+              onChange={e => setMessageDraft(e.target.value)}
+              disabled={loading}
+            />
+            {error && (
+              <Span color="red.500" fontSize="12px" mt={2}>
+                {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
+              </Span>
+            )}
+            <Box m="0 auto">
+              <StyledButton
+                data-cy="EditPublicMessagePopup_SubmitButton"
+                buttonSize="small"
+                fontWeight="bold"
+                px={4}
+                mt={3}
+                loading={loading}
+                onClick={async () => {
+                  await submitMessage({
+                    variables: {
+                      fromCollectiveId,
+                      collectiveId,
+                      message: messageDraft ? messageDraft.trim() : null,
+                    },
+                    // Update cache after mutation
+                    refetchQueries({ data: { editPublicMessage } }) {
+                      const [member] = editPublicMessage;
+                      const collectiveSlug = member.collective.slug;
+                      const tier = member.tier;
+                      const queries = [
+                        {
+                          query: collectivePageQuery,
+                          variables: {
+                            slug: collectiveSlug,
+                            nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+                          },
                         },
-                        // Update cache after mutation
-                        refetchQueries({ data: { editPublicMessage } }) {
-                          const [member] = editPublicMessage;
-                          const collectiveSlug = member.collective.slug;
-                          const tier = member.tier;
-                          const queries = [
-                            {
-                              query: collectivePageQuery,
-                              variables: {
-                                slug: collectiveSlug,
-                                nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-                              },
-                            },
-                          ];
-                          if (tier) {
-                            queries.push({
-                              query: tierPageQuery,
-                              variables: { tierId: tier.id },
-                            });
-                          }
-                          return queries;
-                        },
-                      });
-                      onClose();
-                    }}
-                  >
-                    <FormattedMessage id="submit" defaultMessage="Submit" />
-                  </StyledButton>
-                </Box>
-              </Flex>
-              <Arrow {...arrowProps} data-placement={placement} />
-            </EditPublicMessagePopupContainer>
-          )}
-        </Popper>
+                      ];
+                      if (tier) {
+                        queries.push({
+                          query: tierPageQuery,
+                          variables: { tierId: tier.id },
+                        });
+                      }
+                      return queries;
+                    },
+                  });
+                  onClose();
+                }}
+              >
+                <FormattedMessage id="submit" defaultMessage="Submit" />
+              </StyledButton>
+            </Box>
+          </Flex>
+          <Arrow {...arrowProps} data-placement={placement} />
+        </EditPublicMessagePopupContainer>
       )}
-    </Mutation>,
+    </Popper>,
     document.body,
   );
 }

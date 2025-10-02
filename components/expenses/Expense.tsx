@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import type { ApolloClient } from '@apollo/client';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
@@ -117,7 +117,7 @@ interface ExpenseProps {
   legacyExpenseId?: number;
   draftKey?: string;
   edit?: string;
-  client?: ApolloClient<object>;
+  client?: ApolloClient;
   loading?: boolean;
   error?: any;
   refetch?: () => void;

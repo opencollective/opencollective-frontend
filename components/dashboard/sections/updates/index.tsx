@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { uniqBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -177,7 +177,7 @@ const UpdatesList = () => {
             <MessageBoxGraphqlError error={error} />
           ) : loading ? (
             // eslint-disable-next-line react/no-array-index-key
-            Array.from({ length: 3 }).map((_, index) => <Skeleton className="h-4 w-80" key={index} />)
+            (Array.from({ length: 3 }).map((_, index) => <Skeleton className="h-4 w-80" key={index} />))
           ) : updates?.nodes.length === 0 ? (
             <EmptyResults
               hasFilters={queryFilter.hasFilters}

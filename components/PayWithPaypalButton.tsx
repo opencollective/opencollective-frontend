@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from "@apollo/client/v4-migration";
 import { truncate } from 'lodash';
 import { injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';

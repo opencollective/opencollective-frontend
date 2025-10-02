@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { partition } from 'lodash';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';

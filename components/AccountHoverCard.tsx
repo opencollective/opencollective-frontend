@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import type { Content } from '@radix-ui/react-hover-card';
 import { clsx } from 'clsx';
 import { get } from 'lodash';
@@ -359,7 +359,7 @@ export const AccountHoverCard = ({
                 <div className="flex flex-col gap-2">
                   {infoItems.map(({ Icon, info }, i) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <InfoItem key={i} Icon={Icon} info={info} />
+                    (<InfoItem key={i} Icon={Icon} info={info} />)
                   ))}
                 </div>
               )}
@@ -368,7 +368,7 @@ export const AccountHoverCard = ({
                   <div className={clsx('flex flex-col gap-2', infoItems.length > 0 && 'mt-2')}>
                     {asyncInfoItems.map(({ Icon, info }, i) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <InfoItem key={i} Icon={Icon} info={info} />
+                      (<InfoItem key={i} Icon={Icon} info={info} />)
                     ))}
                   </div>
                 </CollapsibleContent>

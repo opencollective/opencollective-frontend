@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { DialogClose } from '@radix-ui/react-dialog';
 import { FormattedMessage, useIntl } from 'react-intl';
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { isNil } from 'lodash';
 import { AlertTriangle, ArrowLeft, ArrowRight, InfoIcon, Undo } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger

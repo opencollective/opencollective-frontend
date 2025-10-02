@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from "@apollo/client/v4-migration";
 import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';

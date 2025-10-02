@@ -1,5 +1,5 @@
 import React from 'react';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { get, omit, pick } from 'lodash';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';

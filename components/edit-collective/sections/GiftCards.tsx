@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Add } from '@styled-icons/material/Add';
 import { get, last, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';

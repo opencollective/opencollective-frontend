@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { ceil, floor, omit, pick } from 'lodash';
 import { ArrowLeft, ArrowRight, Ban, ExternalLink, Save } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

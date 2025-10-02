@@ -1,5 +1,5 @@
 import React from 'react';
-import { NetworkStatus, useQuery } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client/react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';

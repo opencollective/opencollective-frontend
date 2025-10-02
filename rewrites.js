@@ -444,6 +444,12 @@ exports.REWRITES = [
     source: '/robots.txt',
     destination: '/api/robots',
   },
+  // App Router Routes (must come before catch-all /:slug)
+  // ----------------
+  {
+    source: '/deshboard/:path*',
+    destination: '/deshboard/:path*',
+  },
   // Collective
   // ----------
   // Collective page

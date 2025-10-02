@@ -1,6 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
-import { Mutation } from '@apollo/client/react/components';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -76,6 +75,10 @@ const Tiers = ({ collective }) => {
   const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const intl = useIntl();
   const tiers = get(data, 'account.tiers.nodes', []);
+  const [editSettings, { loading: editLoading }] = useMutation(editAccountSettingsMutation, {
+    refetchQueries: [{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }],
+    awaitRefetchQueries: true,
+  });
   return (
     <div>
       <Grid gridTemplateColumns={['1fr', '172px 1fr']} gridGap={62} mt={34}>
@@ -122,34 +125,26 @@ const Tiers = ({ collective }) => {
                   defaultMessage="The default contribution tier doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
                 />
               </P>
-              <Mutation
-                mutation={editAccountSettingsMutation}
-                refetchQueries={[{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }]}
-                awaitRefetchQueries
-              >
-                {(editSettings, { loading }) => (
-                  <StyledCheckbox
-                    name="custom-contributions"
-                    label={intl.formatMessage({
-                      id: 'tier.defaultContribution.label',
-                      defaultMessage: 'Enable default contribution tier',
-                    })}
-                    defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
-                    width="auto"
-                    isLoading={loading}
-                    onChange={({ target }) => {
-                      editSettings({
-                        variables: {
-                          account: { legacyId: collective.id },
-                          key: 'disableCustomContributions',
-                          value: !target.value,
-                        },
-                        context: API_V2_CONTEXT,
-                      });
-                    }}
-                  />
-                )}
-              </Mutation>
+              <StyledCheckbox
+                name="custom-contributions"
+                label={intl.formatMessage({
+                  id: 'tier.defaultContribution.label',
+                  defaultMessage: 'Enable default contribution tier',
+                })}
+                defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
+                width="auto"
+                isLoading={editLoading}
+                onChange={({ target }) => {
+                  editSettings({
+                    variables: {
+                      account: { legacyId: collective.id },
+                      key: 'disableCustomContributions',
+                      value: !target.value,
+                    },
+                    context: API_V2_CONTEXT,
+                  });
+                }}
+              />
             </Box>
             <AdminContributeCardsContainer
               collective={collective}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from "@apollo/client/v4-migration";
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';

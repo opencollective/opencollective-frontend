@@ -1,4 +1,5 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { compact } from 'lodash';
 import { Download, Filter, MinusCircle, Undo2 } from 'lucide-react';
 import type React from 'react';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';

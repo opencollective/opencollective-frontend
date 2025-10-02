@@ -1,13 +1,14 @@
 // This file is mostly adapted from:
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
-import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
+import type { NormalizedCacheObject, OperationVariables, QueryOptions } from '@apollo/client';
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
-import { mergeDeep } from '@apollo/client/utilities';
-import { createUploadLink } from 'apollo-upload-client';
-import { isUndefined, omitBy, pick } from 'lodash';
+import { useApolloClient, useQuery } from '@apollo/client/react';
+import React from 'react';
+import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs';
+import { isUndefined, merge, omitBy, pick } from 'lodash';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
@@ -30,7 +31,7 @@ export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 export const APOLLO_QUERY_DATA_PROP_NAME = '__APOLLO_QUERY_DATA__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
-  if (process.browser) {
+  if (typeof window !== 'undefined') {
     return '/api';
   }
 
@@ -51,7 +52,7 @@ const getBaseApiUrl = (apiVersion, internal = false) => {
  * @returns {string} GraphQL api url.
  */
 const getGraphqlUrl = (apiVersion, internal = false) => {
-  const apiKey = !process.browser ? process.env.API_KEY : null;
+  const apiKey = typeof window === 'undefined' ? process.env.API_KEY : null;
   return `${getBaseApiUrl(apiVersion, internal)}/graphql/${apiVersion}${apiKey ? `?api_key=${apiKey}` : ''}`;
 };
 
@@ -148,9 +149,11 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
         },
       };
     }
+    return {};
   });
 
-  const errorLink = onError(({ graphQLErrors, networkError }) => {
+  const errorLink = onError(errorResponse => {
+    const { graphQLErrors, networkError } = errorResponse;
     if (graphQLErrors) {
       graphQLErrors.map(error => {
         if (error) {
@@ -180,16 +183,17 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
         headers: { ...headers, 'x-sentry-force-sample': '1' },
       };
     }
+    return {};
   });
 
-  const linkFetch = process.browser ? fetch : serverSideFetch;
+  const linkFetch = typeof window !== 'undefined' ? fetch : serverSideFetch;
 
   const httpHeaders = {
-    'oc-application': process.env.OC_APPLICATION,
-    'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
+    'oc-application': process.env.OC_APPLICATION || '',
+    'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7) || '',
   };
 
-  const apiV1DefaultLink = createUploadLink({
+  const apiV1DefaultLink = new UploadHttpLink({
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
@@ -197,7 +201,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
       formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
     },
   });
-  const apiV2DefaultLink = createUploadLink({
+  const apiV2DefaultLink = new UploadHttpLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
@@ -208,21 +212,23 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
 
   // Setup internal links handling to be able to split traffic to different API servers
   const apiV1Link =
-    INTERNAL_API_V1_URL && !process.browser
+    INTERNAL_API_V1_URL && typeof window === 'undefined'
       ? ApolloLink.split(
           ({ operationName }) =>
-            !INTERNAL_API_V1_OPERATION_NAMES || INTERNAL_API_V1_OPERATION_NAMES.split(',').includes(operationName),
-          new HttpLink({ uri: getGraphqlUrl('v1', true), fetch: linkFetch, headers: httpHeaders }),
+            !INTERNAL_API_V1_OPERATION_NAMES ||
+            INTERNAL_API_V1_OPERATION_NAMES.split(',').includes(operationName || ''),
+          new HttpLink({ uri: getGraphqlUrl('v1', true) || '', fetch: linkFetch }),
           apiV1DefaultLink,
         )
       : apiV1DefaultLink;
 
   const apiV2Link =
-    INTERNAL_API_V2_URL && !process.browser
+    INTERNAL_API_V2_URL && typeof window === 'undefined'
       ? ApolloLink.split(
           ({ operationName }) =>
-            !INTERNAL_API_V2_OPERATION_NAMES || INTERNAL_API_V2_OPERATION_NAMES.split(',').includes(operationName),
-          new HttpLink({ uri: getGraphqlUrl('v2', true), fetch: linkFetch, headers: httpHeaders }),
+            !INTERNAL_API_V2_OPERATION_NAMES ||
+            INTERNAL_API_V2_OPERATION_NAMES.split(',').includes(operationName || ''),
+          new HttpLink({ uri: getGraphqlUrl('v2', true) || '', fetch: linkFetch }),
           apiV2DefaultLink,
         )
       : apiV2DefaultLink;
@@ -283,9 +289,12 @@ function createClient({ initialState = null, twoFactorAuthContext = null, access
   return new ApolloClient({
     cache,
     link,
-    connectToDevTools: process.browser,
-    ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
-    ssrForceFetchDelay: 100, // See https://www.apollographql.com/docs/react/performance/server-side-rendering/#store-rehydration
+    ssrMode: typeof window === 'undefined', // Disables forceFetch on the server (so queries are only run once)
+    // ssrForceFetchDelay removed in v4 - no longer needed
+    // connectToDevTools removed in v4 - use devtools instead
+    devtools: {
+      enabled: typeof window !== 'undefined',
+    },
   });
 }
 
@@ -294,7 +303,7 @@ export function initClient({ initialState = null, twoFactorAuthContext = null, a
 > {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
-  if (!process.browser) {
+  if (typeof window === 'undefined') {
     return createClient({ initialState, accessToken });
   }
 
@@ -310,7 +319,7 @@ export function initClient({ initialState = null, twoFactorAuthContext = null, a
     const existingCache = apolloClient.extract();
 
     // Merge the existing cache into data passed from getStaticProps/getServerSideProps
-    const data = mergeDeep(initialState, existingCache);
+    const data = merge({}, initialState, existingCache);
 
     // Restore the cache with the merged data
     apolloClient.cache.restore(data);
@@ -327,14 +336,18 @@ type SSRQueryHelperProps<TVariables, TQueryData> = {
 };
 
 export type Context = GetServerSidePropsContext & {
-  req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<unknown> };
+  req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<NormalizedCacheObject> };
 };
 
 /**
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
  */
-export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>, TQueryData = Record<string, unknown>>({
+export function getSSRQueryHelpers<
+  TVariables extends OperationVariables,
+  TProps = Record<string, unknown>,
+  TQueryData = Record<string, unknown>,
+>({
   query,
   getVariablesFromContext = undefined,
   getPropsFromContext = undefined,
@@ -344,7 +357,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
   getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
   getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
   skipClientIfSSRThrows404?: boolean;
-  preload?: (client: ApolloClient<unknown>, queryResult: TQueryData) => Promise<void>;
+  preload?: (client: ApolloClient<NormalizedCacheObject>, queryResult: TQueryData) => Promise<void>;
 }) {
   type ServerSideProps = TProps & SSRQueryHelperProps<TVariables, TQueryData>;
   return {
@@ -386,8 +399,16 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
     getVariablesFromPageProps: (pageProps: ServerSideProps): Partial<TVariables> => {
       return pageProps[APOLLO_VARIABLES_PROP_NAME];
     },
-    getSSRErrorFromPageProps: (pageProps: ServerSideProps): OCError => {
-      return pageProps[APOLLO_ERROR_PROP_NAME] && getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]);
+    getSSRErrorFromPageProps: (pageProps: ServerSideProps): OCError | null => {
+      return pageProps[APOLLO_ERROR_PROP_NAME] ? getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]) : null;
     },
   };
+}
+
+export function withApollo(PageComponent: any) {
+  const WithApollo = (props: any) => {
+    const client = useApolloClient();
+    return <PageComponent {...props} client={client} />;
+  };
+  return WithApollo;
 }

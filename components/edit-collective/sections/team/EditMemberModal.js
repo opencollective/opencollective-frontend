@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { get } from 'lodash';
 import { Trash } from 'lucide-react';
 import { useRouter } from 'next/router';

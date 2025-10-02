@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from './Toast';

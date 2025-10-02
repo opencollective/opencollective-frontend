@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import * as simplewebauthn from '@simplewebauthn/browser';
 import { X } from 'lucide-react';

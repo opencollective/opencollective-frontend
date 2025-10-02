@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withApollo } from '@apollo/client/react/hoc';
+import { withApollo } from '@/lib/apollo-client';
 import * as Sentry from '@sentry/browser';
 import { capitalize, pick } from 'lodash';
 import { withRouter } from 'next/router';

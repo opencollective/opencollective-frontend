@@ -103,6 +103,11 @@ export function parseToBoolean(value, defaultValue = false) {
 }
 
 export function getQueryParams() {
+  // Return empty object on server-side to prevent hydration mismatch
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
   const urlParams = {};
   let match;
   const pl = /\+/g, // Regex for replacing addition symbol with a space
@@ -123,7 +128,8 @@ export function formatDate(
   options: Intl.DateTimeFormatOptions & { locale?: Intl.LocalesArgument } = { month: 'long', year: 'numeric' },
 ) {
   const d = new Date(date);
-  const locale = typeof window !== 'undefined' ? window.navigator.language : options.locale || 'en-US';
+  // Always use the provided locale or fallback to 'en-US' to ensure consistent server/client rendering
+  const locale = options.locale || 'en-US';
   try {
     return d.toLocaleDateString(locale, options);
   } catch {
@@ -211,7 +217,7 @@ export const getWebsiteUrl = () => {
   if (typeof window !== 'undefined' && window.location) {
     return `${window.location.protocol}//${window.location.host}`;
   } else {
-    return process.env.WEBSITE_URL;
+    return process.env.WEBSITE_URL || process.env.NEXT_PUBLIC_WEBSITE_URL;
   }
 };
 

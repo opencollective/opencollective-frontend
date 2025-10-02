@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import * as webauthn from '@simplewebauthn/browser';
 import { Plus } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

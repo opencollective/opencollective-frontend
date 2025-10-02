@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
 import { themeGet } from '@styled-system/theme-get';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useRef } from 'react';
 import { useIsomorphicLayoutEffect } from 'framer-motion';
 import { Markup } from 'interweave';

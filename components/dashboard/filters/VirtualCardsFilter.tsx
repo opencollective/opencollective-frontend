@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { CreditCard } from 'lucide-react';
 
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../../lib/currency-utils';

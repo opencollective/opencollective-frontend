@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client/react';
 import dayjs from 'dayjs';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useApolloClient, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import { AlertTriangle, ArchiveIcon, Plug } from 'lucide-react';

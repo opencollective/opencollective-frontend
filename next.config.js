@@ -17,6 +17,17 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Next.js 15 specific configurations
+  // experimental: {
+  //   turbo: {
+  //     rules: {
+  //       '*.svg': {
+  //         loaders: ['@svgr/webpack'],
+  //         as: '*.js',
+  //       },
+  //     },
+  //   },
+  // },
   compiler: {
     styledComponents: {
       displayName: ['ci', 'test', 'development', 'e2e'].includes(process.env.OC_ENV),
@@ -25,17 +36,15 @@ const nextConfig = {
   images: {
     disableStaticImages: true,
   },
-  experimental: {
-    outputFileTracingExcludes: {
-      '*': [
-        'node_modules/@swc/core-linux-x64-gnu',
-        'node_modules/@swc/core-linux-x64-musl',
-        'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
-      ],
-    },
-    outputFileTracingIncludes: {
-      '/_document': ['./.next/language-manifest.json'],
-    },
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/core-linux-x64-gnu',
+      'node_modules/@swc/core-linux-x64-musl',
+      'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
+    ],
+  },
+  outputFileTracingIncludes: {
+    '/_document': ['./.next/language-manifest.json'],
   },
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
@@ -74,16 +83,17 @@ const nextConfig = {
       }),
     );
 
-    if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      const CircularDependencyPlugin = require('circular-dependency-plugin');
-      config.plugins.push(
-        new CircularDependencyPlugin({
-          include: /components|pages|server/,
-          failOnError: true,
-          cwd: process.cwd(),
-        }),
-      );
-    }
+    // Temporarily disable CircularDependencyPlugin for Next.js 15 compatibility
+    // if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
+    //   const CircularDependencyPlugin = require('circular-dependency-plugin');
+    //   config.plugins.push(
+    //     new CircularDependencyPlugin({
+    //       include: /components|pages|server/,
+    //       failOnError: true,
+    //       cwd: process.cwd(),
+    //     }),
+    //   );
+    // }
 
     if (!dev) {
       config.plugins.push(

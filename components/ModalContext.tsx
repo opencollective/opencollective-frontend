@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useReducer } from 'react';
 
 import type { ConfirmationModalProps } from './NewConfirmationModal';
