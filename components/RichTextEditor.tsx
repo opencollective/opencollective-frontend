@@ -322,8 +322,10 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const figures = htmlDoc.querySelectorAll('figure[data-trix-content-type="--embed-iframe-video"]');
     figures.forEach(figure => {
       const iframe = figure.querySelector('iframe');
-      const dataTrixAttachment = { content: iframe.outerHTML, contentType: '--embed-iframe-video' };
-      figure.setAttribute('data-trix-attachment', JSON.stringify(dataTrixAttachment));
+      if (iframe) {
+        const dataTrixAttachment = { content: iframe.outerHTML, contentType: '--embed-iframe-video' };
+        figure.setAttribute('data-trix-attachment', JSON.stringify(dataTrixAttachment));
+      }
     });
 
     return htmlDoc.querySelector('body').innerHTML;
@@ -471,7 +473,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       if (videoServices.includes(service)) {
         attachmentData = {
           contentType: '--embed-iframe-video',
-          content: `<iframe src="${sanitizedLink}/?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`,
+          content: `<iframe src="${sanitizedLink}?showinfo=0" width="100%" height="394" frameborder="0" allowfullscreen/>`,
         };
       } else {
         attachmentData = {
