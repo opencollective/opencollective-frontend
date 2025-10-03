@@ -12,7 +12,6 @@ import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
-import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
@@ -42,7 +41,7 @@ const PopupContainer = styled(`div`)`
     display: none;
   }
 
-  ${StyledSpinner} {
+  svg[data-spinner='true'] {
     display: block;
     margin: auto;
   }

@@ -13,7 +13,7 @@ import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
-import StyledSpinner from '../StyledSpinner';
+import Spinner from '../Spinner';
 import { P } from '../Text';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
@@ -181,7 +181,7 @@ class EditConnectedAccount extends React.Component {
       <Box width="100%">
         {this.isConnectCallback() ? (
           <Flex flexDirection="column" alignItems="center" my={4}>
-            <StyledSpinner size={32} />
+            <Spinner size={32} />
             <P mt={2} fontSize="12px" color="black.600" fontWeight="normal">
               <FormattedMessage defaultMessage="Connecting..." id="5y2qWO" />
             </P>

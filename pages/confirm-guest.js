@@ -16,7 +16,7 @@ import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import Page from '../components/Page';
-import StyledSpinner from '../components/StyledSpinner';
+import Spinner from '../components/Spinner';
 import { P } from '../components/Text';
 
 const STATUS = {
@@ -112,7 +112,7 @@ const ConfirmGuestPage = () => {
             </Container>
             <Container textAlign="center" p={2}>
               <Box my={2}>
-                <StyledSpinner size={32} />
+                <Spinner size={32} />
               </Box>
               {data?.confirmGuestAccount?.account && (
                 <P fontSize="13px" lineHeight="18px" textAlign="center">

@@ -8,9 +8,9 @@ import { borderColor, borderRadius, height, typography } from 'styled-system';
 import { compose } from '../lib/utils';
 
 import { Box, Flex } from './Grid';
+import Spinner from './Spinner';
 import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
-import StyledSpinner from './StyledSpinner';
 import { Span } from './Text';
 
 const SearchInputContainer = styled(Flex)`
@@ -147,7 +147,7 @@ class SearchForm extends React.Component {
               isBorderless
               mr="6px"
             >
-              {this.state.isLoading ? <StyledSpinner size="20px" /> : <Span>→</Span>}
+              {this.state.isLoading ? <Spinner size="20px" /> : <Span>→</Span>}
             </StyledRoundButton>
           )}
         </SearchInputContainer>

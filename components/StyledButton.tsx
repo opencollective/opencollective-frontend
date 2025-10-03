@@ -18,7 +18,7 @@ import { textTransform, whiteSpace } from '../lib/styled-system-custom-propertie
 import type { ButtonSize, ButtonStyle } from '../lib/theme/variants/button';
 import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 
 export type StyledButtonProps = BackgroundProps &
   BorderProps &
@@ -153,7 +153,7 @@ const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forward
       type="button"
       ref={allRefs}
     >
-      <StyledSpinner size="0.9em" />
+      <Spinner size="0.9em" />
     </StyledButtonContent>
   );
 });

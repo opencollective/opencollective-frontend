@@ -24,8 +24,8 @@ import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
+import Spinner from '../../Spinner';
 import StyledButton from '../../StyledButton';
-import StyledSpinner from '../../StyledSpinner';
 import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
@@ -263,7 +263,7 @@ class SectionContribute extends React.PureComponent {
                     <React.Fragment>
                       {isSaving && (
                         <ContainerOverlay position="fixed" top={0} alignItems="center">
-                          <StyledSpinner size={64} />
+                          <Spinner size={64} />
                           <P mt={3} fontSize="15px">
                             <FormattedMessage id="Saving" defaultMessage="Saving..." />
                           </P>

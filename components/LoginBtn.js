@@ -6,7 +6,7 @@ import { cn } from '../lib/utils';
 
 import Image from './Image';
 import Link from './Link';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 import { withUser } from './UserProvider';
 /**
  * A user login button with proper redirect function.
@@ -61,7 +61,7 @@ class LoginBtn extends React.Component {
           )}
         >
           {this.props.loadingLoggedInUser ? (
-            <StyledSpinner size="1em" />
+            <Spinner size="1em" />
           ) : (
             <React.Fragment>
               <FormattedMessage id="signInWith" defaultMessage="Sign In with" />
@@ -89,7 +89,7 @@ class LoginBtn extends React.Component {
           this.props.className,
         )}
       >
-        {this.props.loadingLoggedInUser ? <StyledSpinner size="1em" /> : label}
+        {this.props.loadingLoggedInUser ? <Spinner size="1em" /> : label}
       </Link>
     );
   }

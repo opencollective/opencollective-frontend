@@ -8,7 +8,7 @@ import { Button } from './ui/Button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 import Image from './Image';
 import Link from './Link';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 import { withUser } from './UserProvider';
 
 interface SignupLoginProps {
@@ -61,7 +61,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
         )}
       >
         {loadingLoggedInUser ? (
-          <StyledSpinner size="1em" />
+          <Spinner size="1em" />
         ) : (
           <React.Fragment>
             <FormattedMessage id="signInWith" defaultMessage="Sign In with" />
@@ -134,7 +134,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
 
       <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="sm">
         <Link href={{ pathname: '/signin', query: { next: redirectAfterSigninRef.current } }}>
-          {loadingLoggedInUser ? <StyledSpinner size="1em" /> : label}
+          {loadingLoggedInUser ? <Spinner size="1em" /> : label}
         </Link>
       </Button>
     </div>

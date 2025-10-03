@@ -7,7 +7,7 @@ import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } fr
 import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
-import StyledSpinner from '@/components/StyledSpinner';
+import Spinner from '@/components/Spinner';
 import { InputGroup } from '@/components/ui/Input';
 import { Separator } from '@/components/ui/Separator';
 
@@ -219,7 +219,7 @@ const InputAmount = ({
       append={
         loadingExchangeRate ? (
           <div className="px-3 py-2">
-            <StyledSpinner size={16} color="black.700" className="" />
+            <Spinner size={16} className="text-slate-700" />
           </div>
         ) : canUseExchangeRate ? (
           <div className="flex h-[38px] flex-auto basis-1/2 items-center" data-cy={`${props.id}-converted`}>

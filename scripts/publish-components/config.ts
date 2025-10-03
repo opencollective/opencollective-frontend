@@ -54,7 +54,7 @@ export default {
     'components/StyledSelectCreatable.*',
     'components/StyledSelectFilter.*',
     'components/StyledSelect.*',
-    'components/StyledSpinner.*',
+    'components/Spinner.*',
     'components/StyledTag.*',
     'components/StyledTextarea.*',
     'components/StyledTooltip.*',
