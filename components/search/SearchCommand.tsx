@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
-import { SearchIcon } from 'lucide-react';
+import { CornerDownLeft, SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -20,6 +20,7 @@ import {
 } from '../../lib/url-helpers';
 import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/schema';
 
+import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
 import Link from '../Link';
@@ -41,6 +42,7 @@ import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
+import { cn } from '@/lib/utils';
 
 // TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
@@ -50,11 +52,13 @@ export const SearchCommand = ({ open, setOpen }) => {
   const { workspace } = useWorkspace();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { account } = React.useContext(DashboardContext);
-  const defaultContext: { slug: string; type: 'account' | 'host' } | undefined = account?.isHost
-    ? { slug: account.slug, type: 'host' }
-    : account?.slug && account.slug !== 'root-actions'
-      ? { slug: account.slug, type: 'account' }
-      : undefined;
+  const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
+    return account?.isHost
+      ? { slug: account.slug, type: 'host' }
+      : account?.slug && account.slug !== 'root-actions'
+        ? { slug: account.slug, type: 'account' }
+        : undefined;
+  }, [account?.isHost, account?.slug]);
 
   const [input, setInput] = React.useState('');
   const queryFilter = useQueryFilter({
@@ -176,15 +180,17 @@ export const SearchCommand = ({ open, setOpen }) => {
   const flattenedMenuItems = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
 
-    return menuItems.flatMap(menuItem =>
-      'subMenu' in menuItem
-        ? menuItem.subMenu.map(subItem => ({
-            ...subItem,
-            Icon: menuItem.Icon,
-            label: `${menuItem.label} / ${subItem.label}`,
-          }))
-        : menuItem,
-    );
+    return menuItems
+      .flatMap(menuItem =>
+        'subMenu' in menuItem
+          ? menuItem.subMenu.map(subItem => ({
+              ...subItem,
+              Icon: menuItem.Icon,
+              group: menuItem.label,
+            }))
+          : menuItem,
+      )
+      .filter(item => item.section !== ALL_SECTIONS.SEARCH);
   }, [intl, account, LoggedInUser]);
 
   const filteredGoToPages = React.useMemo(() => {
@@ -193,7 +199,10 @@ export const SearchCommand = ({ open, setOpen }) => {
     }
 
     return flattenedMenuItems.filter(menuItem =>
-      menuItem.label.toString().toLowerCase().includes(debouncedInput.toLowerCase()),
+      (menuItem.group ? `${menuItem.group} ${menuItem.label}` : menuItem.label)
+        .toString()
+        .toLowerCase()
+        .includes(debouncedInput.toLowerCase()),
     );
   }, [debouncedInput, flattenedMenuItems, queryFilter.values.context]);
 
@@ -204,11 +213,11 @@ export const SearchCommand = ({ open, setOpen }) => {
       shouldFilter={false}
       onKeyDown={handleKeyDown}
       description="Search for accounts, expenses, transactions, updates, comments, and more"
+      className="sm:max-w-2xl"
     >
       <DialogTitle className="hidden">
         <FormattedMessage defaultMessage="Search" id="Search" />
       </DialogTitle>
-      {}
       <div className="group flex items-center gap-3 border-b px-3" cmdk-input-wrapper="">
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
         {queryFilter.values.context && (
@@ -221,7 +230,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           ref={inputRef}
           onValueChange={setInput}
           value={input}
-          placeholder={queryFilter.values.context ? '' : 'Search...'}
+          placeholder="Search..."
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
         {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
@@ -229,25 +238,87 @@ export const SearchCommand = ({ open, setOpen }) => {
 
       <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <CommandItem value="-" className="hidden" />
+
+        {!queryFilter.values.context && defaultContext && input.length === 0 && (
+          <CommandGroup heading="">
+            <SearchCommandItem
+              onSelect={() => {
+                queryFilter.setFilter('context', defaultContext);
+                setInput('');
+              }}
+              actionLabel={'Add context'}
+              showAction
+            >
+              <ContextPill slug={defaultContext.slug} />
+            </SearchCommandItem>
+          </CommandGroup>
+        )}
+        {input.length > 0 && (
+          <React.Fragment>
+            <CommandGroup heading="">
+              {defaultContext && (
+                <SearchCommandItem
+                  onSelect={() => {
+                    queryFilter.setFilter('context', defaultContext);
+                    setInput('');
+                  }}
+                  actionLabel={'Search in this workspace'}
+                  showAction
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="flex size-7 items-center justify-center rounded-md bg-muted">
+                      <SearchIcon className="size-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col">
+                      {/* <span className="text-xs">Search within workspace</span> */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <ContextPill slug={defaultContext.slug} /> {input}
+                      </div>
+                    </div>
+                  </div>
+                </SearchCommandItem>
+              )}
+
+              <SearchCommandItem
+                onSelect={() => {
+                  queryFilter.setFilter('context', defaultContext);
+                  setInput('');
+                }}
+                actionLabel={'Search all of Open Collective'}
+                showAction
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex size-7 items-center justify-center rounded-md bg-muted">
+                    <SearchIcon className="size-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="">{input}</div>
+                  </div>
+                </div>
+              </SearchCommandItem>
+            </CommandGroup>
+          </React.Fragment>
+        )}
         {recentlyVisited.length > 0 && debouncedInput === '' && (
           <CommandGroup heading="Recent">
             {recentlyVisited.map(recentVisit => (
-              <CommandItem key={recentVisit.key} className="gap-2" onSelect={() => handleResultSelect(recentVisit)}>
+              <SearchCommandItem key={recentVisit.key} onSelect={() => handleResultSelect(recentVisit)}>
                 {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
                 {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
                 {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
                 {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
                 {recentVisit.type === 'update' && <UpdateResult update={recentVisit.data} />}
-              </CommandItem>
+              </SearchCommandItem>
             ))}
           </CommandGroup>
         )}
+
         {filteredGoToPages.length > 0 && (
-          <CommandGroup heading="Dashboard">
+          <CommandGroup heading="Go to">
             {filteredGoToPages.map(page => (
-              <CommandItem key={page.section} onSelect={() => handleResultSelect({ type: 'page', data: page })}>
+              <SearchCommandItem key={page.section} onSelect={() => handleResultSelect({ type: 'page', data: page })}>
                 <PageResult page={page} />
-              </CommandItem>
+              </SearchCommandItem>
             ))}
           </CommandGroup>
         )}
@@ -257,11 +328,11 @@ export const SearchCommand = ({ open, setOpen }) => {
           input={debouncedInput}
           nodes={data?.search.results.accounts.collection.nodes}
           renderNode={account => (
-            <CommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
+            <SearchCommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
               <Link className="block w-full" href={getCollectivePageRoute(account)} onClick={e => e.preventDefault()}>
                 <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
               </Link>
-            </CommandItem>
+            </SearchCommandItem>
           )}
         />
         <SearchCommandGroup
@@ -270,11 +341,11 @@ export const SearchCommand = ({ open, setOpen }) => {
           nodes={data?.search.results.expenses.collection.nodes}
           input={debouncedInput}
           renderNode={expense => (
-            <CommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
+            <SearchCommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
               <Link className="block w-full" href={getExpensePageUrl(expense)} onClick={e => e.preventDefault()}>
                 <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
               </Link>
-            </CommandItem>
+            </SearchCommandItem>
           )}
         />
         {data?.search.results.orders && (
@@ -284,7 +355,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             totalCount={data?.search.results.orders.collection.totalCount}
             nodes={data?.search.results.orders.collection.nodes}
             renderNode={order => (
-              <CommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
+              <SearchCommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
                 <Link
                   className="block w-full"
                   href={getOrderUrl(order, LoggedInUser)}
@@ -292,7 +363,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                 >
                   <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
                 </Link>
-              </CommandItem>
+              </SearchCommandItem>
             )}
           />
         )}
@@ -303,7 +374,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             totalCount={data?.search.results.transactions.collection.totalCount}
             nodes={data?.search.results.transactions.collection.nodes}
             renderNode={transaction => (
-              <CommandItem
+              <SearchCommandItem
                 key={transaction.id}
                 onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
               >
@@ -311,7 +382,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                   transaction={transaction}
                   highlights={data.search.results.transactions.highlights[transaction.id]}
                 />
-              </CommandItem>
+              </SearchCommandItem>
             )}
           />
         )}
@@ -321,7 +392,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           totalCount={data?.search.results.updates.collection.totalCount}
           nodes={data?.search.results.updates.collection.nodes}
           renderNode={update => (
-            <CommandItem key={update.id} onSelect={() => handleResultSelect({ type: 'update', data: update })}>
+            <SearchCommandItem key={update.id} onSelect={() => handleResultSelect({ type: 'update', data: update })}>
               <Link
                 className="block w-full"
                 href={getUpdateUrl(update, LoggedInUser)}
@@ -329,7 +400,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               >
                 <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
               </Link>
-            </CommandItem>
+            </SearchCommandItem>
           )}
         />
         <SearchCommandGroup
@@ -338,7 +409,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           totalCount={data?.search.results.comments.collection.totalCount}
           nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
           renderNode={comment => (
-            <CommandItem key={comment.id} onSelect={() => handleResultSelect({ type: 'comment', data: comment })}>
+            <SearchCommandItem key={comment.id} onSelect={() => handleResultSelect({ type: 'comment', data: comment })}>
               <Link
                 className="block w-full"
                 href={getCommentUrl(comment, LoggedInUser)}
@@ -346,7 +417,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               >
                 <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
               </Link>
-            </CommandItem>
+            </SearchCommandItem>
           )}
         />
       </CommandList>
@@ -354,3 +425,27 @@ export const SearchCommand = ({ open, setOpen }) => {
     </CommandDialog>
   );
 };
+
+function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAction = false }) {
+  return (
+    <CommandItem
+      onSelect={onSelect}
+      className={cn(
+        'justify-between gap-2',
+        '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
+        '[&[data-selected=true]_.action]:text-foreground',
+        showAction ? '' : '[&[data-selected=false]_.action]:hidden',
+      )}
+    >
+      {children}
+      <div
+        className={cn(
+          'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
+          showAction ? '' : 'absolute right-2',
+        )}
+      >
+        {actionLabel}
+      </div>
+    </CommandItem>
+  );
+}
