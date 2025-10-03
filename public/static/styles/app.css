@@ -647,6 +647,11 @@ html {
   @apply min-w-[200px] pt-2 text-left align-top;
 }
 
+/* Search highlight styling */
+mark {
+  @apply bg-amber-400/20 text-amber-950 px-0.5 -mx-0.5 py-0.5 rounded-sm relative;
+}
+
 /* TODO: Migrate away from these default styles below */
 summary {
   color: #337ab7;
