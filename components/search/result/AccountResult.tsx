@@ -14,12 +14,13 @@ export function AccountResult({ account, highlights }: { account: AccountResultD
   const intl = useIntl();
   const highlightFields = getHighlightsFields(highlights, ['name', 'slug']);
   const otherHighlight = Object.values(highlightFields.others)[0]?.[0];
+
   return (
     <div className="flex w-full items-center gap-2">
       <Avatar collective={account} size={36} />
 
       <div className="flex-1 overflow-hidden">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
           <div className="truncate font-medium">
             {highlightFields.top.name ? (
               <Markup allowList={['mark']} content={highlightFields.top.name[0]} />

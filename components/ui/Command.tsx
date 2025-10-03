@@ -31,12 +31,13 @@ interface CommandDialogProps extends DialogProps {
   shouldFilter?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   description?: string;
+  className?: string;
 }
 
-const CommandDialog = ({ children, shouldFilter, onKeyDown, description, ...props }: CommandDialogProps) => {
+const CommandDialog = ({ children, shouldFilter, onKeyDown, description, className, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent hideCloseButton className="overflow-hidden p-0 shadow-lg">
+      <DialogContent hideCloseButton className={cn('overflow-hidden p-0 shadow-lg', className)}>
         {description && <DialogDescription className="hidden">{description}</DialogDescription>}
         <Command
           onKeyDown={onKeyDown}
