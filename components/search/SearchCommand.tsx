@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
 import { CornerDownLeft, SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -14,11 +14,13 @@ import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import {
   getCollectivePageRoute,
   getCommentUrl,
+  getDashboardRoute,
   getExpensePageUrl,
   getOrderUrl,
   getUpdateUrl,
 } from '../../lib/url-helpers';
 import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/schema';
+import { cn } from '@/lib/utils';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
@@ -38,12 +40,10 @@ import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
 import { PageResult } from './PageResult';
 import { searchCommandQuery } from './queries';
-import { SearchCommandGroup } from './SearchCommandGroup';
+import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
-import { cn } from '@/lib/utils';
-
 // TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
@@ -62,52 +62,49 @@ export const SearchCommand = ({ open, setOpen }) => {
 
   const [input, setInput] = React.useState('');
   const queryFilter = useQueryFilter({
-    schema: z.object({
-      context: z
-        .object({
-          slug: z.string(),
-          type: z.enum(['account', 'host']),
-        })
-        .nullable()
-        .default(null),
-      limit: z.number().default(5),
-    }),
+    schema,
     filters: {},
     toVariables: {
-      context: context => {
-        if (context?.type === 'account') {
-          return { account: { slug: context.slug }, includeTransactions: true };
-        } else if (context?.type === 'host') {
-          return { host: { slug: context.slug }, includeTransactions: true };
-        } else if (account?.slug === 'root-actions') {
+      workspace: val => {
+        if (val) {
+          const context = defaultContext;
+          if (context?.type === 'account') {
+            return { account: { slug: context.slug }, includeTransactions: true };
+          } else if (context?.type === 'host') {
+            return { host: { slug: context.slug }, includeTransactions: true };
+          } else if (account?.slug === 'root-actions') {
+            return { includeTransactions: true };
+          }
+          return { includeTransactions: false };
+        } else {
           return { includeTransactions: true };
         }
-        return { includeTransactions: false };
       },
     },
-    defaultFilterValues: { context: defaultContext },
+    defaultFilterValues: { workspace: account?.slug },
     skipRouter: true,
   });
 
   useEffect(() => {
     if (open) {
-      queryFilter.setFilter('context', defaultContext);
+      queryFilter.setFilter('workspace', account?.slug);
     }
   }, [open]);
 
-  const [search, { data, loading }] = useLazyQuery(searchCommandQuery, {
-    variables: { ...queryFilter.variables, imageHeight: 72 },
+  const { data, loading } = useQuery(searchCommandQuery, {
+    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
+    skip: !queryFilter.values.searchTerm,
   });
 
   const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
   useEffect(() => {
     if (debouncedInput?.length > 0) {
-      search({ variables: { searchTerm: debouncedInput } });
+      queryFilter.setFilter('searchTerm', debouncedInput);
     }
-  }, [debouncedInput, search]);
+  }, [debouncedInput]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -115,7 +112,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       if (input) {
         if (e.key === 'Delete' || e.key === 'Backspace') {
           if (input.value === '') {
-            queryFilter.setFilter('context', null);
+            queryFilter.setFilter('workspace', undefined);
           }
         }
       }
@@ -194,7 +191,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   }, [intl, account, LoggedInUser]);
 
   const filteredGoToPages = React.useMemo(() => {
-    if (!queryFilter.values.context || !debouncedInput) {
+    if (!queryFilter.values.workspace || !debouncedInput) {
       return [];
     }
 
@@ -204,7 +201,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         .toLowerCase()
         .includes(debouncedInput.toLowerCase()),
     );
-  }, [debouncedInput, flattenedMenuItems, queryFilter.values.context]);
+  }, [debouncedInput, flattenedMenuItems, queryFilter.values.workspace]);
 
   return (
     <CommandDialog
@@ -220,10 +217,10 @@ export const SearchCommand = ({ open, setOpen }) => {
       </DialogTitle>
       <div className="group flex items-center gap-3 border-b px-3" cmdk-input-wrapper="">
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
-        {queryFilter.values.context && (
+        {queryFilter.values.workspace && (
           <ContextPill
-            slug={queryFilter.values.context.slug}
-            onRemove={() => queryFilter.setFilter('context', undefined)}
+            slug={queryFilter.values.workspace}
+            onRemove={() => queryFilter.setFilter('workspace', undefined)}
           />
         )}
         <CommandPrimitive.Input
@@ -239,11 +236,11 @@ export const SearchCommand = ({ open, setOpen }) => {
       <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <CommandItem value="-" className="hidden" />
 
-        {!queryFilter.values.context && defaultContext && input.length === 0 && (
+        {!queryFilter.values.workspace && defaultContext && input.length === 0 && (
           <CommandGroup heading="">
             <SearchCommandItem
               onSelect={() => {
-                queryFilter.setFilter('context', defaultContext);
+                queryFilter.setFilter('workspace', defaultContext.slug);
                 setInput('');
               }}
               actionLabel={'Add context'}
@@ -259,8 +256,11 @@ export const SearchCommand = ({ open, setOpen }) => {
               {defaultContext && (
                 <SearchCommandItem
                   onSelect={() => {
-                    queryFilter.setFilter('context', defaultContext);
-                    setInput('');
+                    queryFilter.resetFilters(
+                      { searchTerm: input, workspace: defaultContext.slug },
+                      getDashboardRoute(account, ALL_SECTIONS.SEARCH),
+                    );
+                    setOpen(false);
                   }}
                   actionLabel={'Search in this workspace'}
                   showAction
@@ -270,7 +270,6 @@ export const SearchCommand = ({ open, setOpen }) => {
                       <SearchIcon className="size-4 text-muted-foreground" />
                     </div>
                     <div className="flex flex-col">
-                      {/* <span className="text-xs">Search within workspace</span> */}
                       <div className="flex items-center gap-2 text-sm">
                         <ContextPill slug={defaultContext.slug} /> {input}
                       </div>
@@ -281,8 +280,11 @@ export const SearchCommand = ({ open, setOpen }) => {
 
               <SearchCommandItem
                 onSelect={() => {
-                  queryFilter.setFilter('context', defaultContext);
-                  setInput('');
+                  queryFilter.resetFilters(
+                    { searchTerm: input, workspace: 'ALL' },
+                    getDashboardRoute(account, ALL_SECTIONS.SEARCH),
+                  );
+                  setOpen(false);
                 }}
                 actionLabel={'Search all of Open Collective'}
                 showAction
@@ -324,8 +326,11 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
         <SearchCommandGroup
           label="Accounts"
+          entity={SearchEntity.ACCOUNTS}
           totalCount={data?.search.results.accounts.collection.totalCount}
           input={debouncedInput}
+          queryFilter={queryFilter}
+          setOpen={setOpen}
           nodes={data?.search.results.accounts.collection.nodes}
           renderNode={account => (
             <SearchCommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
@@ -337,9 +342,12 @@ export const SearchCommand = ({ open, setOpen }) => {
         />
         <SearchCommandGroup
           label="Expenses"
+          entity={SearchEntity.EXPENSES}
           totalCount={data?.search.results.expenses.collection.totalCount}
-          nodes={data?.search.results.expenses.collection.nodes}
           input={debouncedInput}
+          queryFilter={queryFilter}
+          setOpen={setOpen}
+          nodes={data?.search.results.expenses.collection.nodes}
           renderNode={expense => (
             <SearchCommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
               <Link className="block w-full" href={getExpensePageUrl(expense)} onClick={e => e.preventDefault()}>
@@ -351,7 +359,10 @@ export const SearchCommand = ({ open, setOpen }) => {
         {data?.search.results.orders && (
           <SearchCommandGroup
             label="Contributions"
+            entity={SearchEntity.CONTRIBUTIONS}
             input={debouncedInput}
+            queryFilter={queryFilter}
+            setOpen={setOpen}
             totalCount={data?.search.results.orders.collection.totalCount}
             nodes={data?.search.results.orders.collection.nodes}
             renderNode={order => (
@@ -370,7 +381,10 @@ export const SearchCommand = ({ open, setOpen }) => {
         {data?.search.results.transactions && (
           <SearchCommandGroup
             label="Transactions"
+            entity={SearchEntity.TRANSACTIONS}
             input={debouncedInput}
+            queryFilter={queryFilter}
+            setOpen={setOpen}
             totalCount={data?.search.results.transactions.collection.totalCount}
             nodes={data?.search.results.transactions.collection.nodes}
             renderNode={transaction => (
@@ -388,7 +402,10 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
         <SearchCommandGroup
           label="Updates"
+          entity={SearchEntity.UPDATES}
           input={debouncedInput}
+          queryFilter={queryFilter}
+          setOpen={setOpen}
           totalCount={data?.search.results.updates.collection.totalCount}
           nodes={data?.search.results.updates.collection.nodes}
           renderNode={update => (
@@ -405,7 +422,10 @@ export const SearchCommand = ({ open, setOpen }) => {
         />
         <SearchCommandGroup
           label="Comments"
+          entity={SearchEntity.COMMENTS}
           input={debouncedInput}
+          queryFilter={queryFilter}
+          setOpen={setOpen}
           totalCount={data?.search.results.comments.collection.totalCount}
           nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
           renderNode={comment => (
@@ -426,7 +446,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   );
 };
 
-function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAction = false }) {
+function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAction = false, className = undefined }) {
   return (
     <CommandItem
       onSelect={onSelect}
@@ -435,6 +455,7 @@ function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAc
         '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
         '[&[data-selected=true]_.action]:text-foreground',
         showAction ? '' : '[&[data-selected=false]_.action]:hidden',
+        className,
       )}
     >
       {children}
@@ -447,5 +468,45 @@ function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAc
         {actionLabel}
       </div>
     </CommandItem>
+  );
+}
+
+function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
+  if (totalCount > limit) {
+    return (
+      <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
+        <div className="flex size-9 items-center justify-center rounded-md border text-muted-foreground">
+          <SearchIcon />
+        </div>
+        <span>
+          See {Number(totalCount - limit).toLocaleString()} more {label}
+        </span>
+      </SearchCommandItem>
+    );
+  }
+}
+
+function SearchCommandGroup({ totalCount, label, nodes, renderNode, input, queryFilter, entity, setOpen }) {
+  const { account } = React.useContext(DashboardContext);
+
+  if (!totalCount || input === '') {
+    return null;
+  }
+
+  return (
+    <CommandGroup heading={label} className="[&:last-child_.separator]:hidden">
+      {nodes.map(renderNode)}
+      <SeeMoreItemsCommandItem
+        onSelect={() => {
+          queryFilter.resetFilters({ ...queryFilter.values, entity }, getDashboardRoute(account, ALL_SECTIONS.SEARCH));
+          setOpen(false);
+        }}
+        key={`more-${entity}`}
+        totalCount={totalCount}
+        limit={queryFilter.values.limit}
+        label={label}
+      />
+      <hr className="separator -mx-2 my-2 h-px bg-border" />
+    </CommandGroup>
   );
 }

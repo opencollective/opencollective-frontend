@@ -4,7 +4,6 @@ import { SearchIcon } from 'lucide-react';
 import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import {
@@ -17,7 +16,7 @@ import {
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import Link from '../Link';
-import StyledSpinner from '../StyledSpinner';
+import Spinner from '../Spinner';
 
 import { AccountResult } from './result/AccountResult';
 import { CommentResult } from './result/CommentResult';
@@ -32,6 +31,7 @@ import Tabs from '@/components/Tabs';
 import { cn } from '@/lib/utils';
 import { EmptyResults } from '../dashboard/EmptyResults';
 import { Skeleton } from '../ui/Skeleton';
+import { SearchEntity } from './schema';
 // TODO i18n
 
 type EntityFilter = 'ALL' | 'ACCOUNTS' | 'EXPENSES' | 'TRANSACTIONS' | 'CONTRIBUTIONS' | 'UPDATES' | 'COMMENTS';
@@ -46,18 +46,10 @@ export const SearchResults = () => {
 
   const queryFilter = useQueryFilter({
     schema: z.object({
-      // context: isNullable(
-      //   z.object({
-      //     slug: z.string(),
-      //     type: z.enum(['account', 'host']),
-      //   }),
-      // ),
       workspace: z.string().optional(),
       limit: z.number().default(5),
       searchTerm: z.string().optional(),
-      entity: z
-        .enum(['ALL', 'ACCOUNTS', 'EXPENSES', 'TRANSACTIONS', 'CONTRIBUTIONS', 'UPDATES', 'COMMENTS'])
-        .default('ALL'),
+      entity: z.nativeEnum(SearchEntity).default(SearchEntity.ALL),
     }),
     filters: {},
     toVariables: {
@@ -87,7 +79,7 @@ export const SearchResults = () => {
         }
       },
       entity: value => {
-        if (value !== 'ALL') {
+        if (value !== SearchEntity.ALL) {
           return { limit: 20 };
         } else {
           return { limit: 5 };
@@ -99,6 +91,11 @@ export const SearchResults = () => {
   });
   const [input, setInput] = React.useState(queryFilter.values.searchTerm);
 
+  // Sync input state with URL changes (e.g., from SearchCommand navigation)
+  useEffect(() => {
+    setInput(queryFilter.values.searchTerm || '');
+  }, [queryFilter.values.searchTerm]);
+
   const { data, loading } = useQuery(searchCommandQuery, {
     variables: { ...queryFilter.variables, imageHeight: 72, includeTransactions: true },
     notifyOnNetworkStatusChange: true,
@@ -106,11 +103,6 @@ export const SearchResults = () => {
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm,
   });
-
-  // const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
-  // useEffect(() => {
-  //   queryFilter.setFilter('searchTerm', debouncedInput);
-  // }, [debouncedInput]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -131,30 +123,6 @@ export const SearchResults = () => {
 
   const isLoading = loading;
 
-  //   const flattenedMenuItems = React.useMemo(() => {
-  //     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
-
-  //     return menuItems.flatMap(menuItem =>
-  //       'subMenu' in menuItem
-  //         ? menuItem.subMenu.map(subItem => ({
-  //             ...subItem,
-  //             Icon: menuItem.Icon,
-  //             label: `${menuItem.label} / ${subItem.label}`,
-  //           }))
-  //         : menuItem,
-  //     );
-  //   }, [intl, account, LoggedInUser]);
-
-  //   const filteredGoToPages = React.useMemo(() => {
-  //     if (!queryFilter.values.context || !debouncedInput) {
-  //       return [];
-  //     }
-
-  //     return flattenedMenuItems.filter(menuItem =>
-  //       menuItem.label.toString().toLowerCase().includes(debouncedInput.toLowerCase()),
-  //     );
-  //   }, [debouncedInput, flattenedMenuItems, queryFilter.values.context]);
-  console.log({ queryFilterValues: queryFilter.values });
   let totalCount =
     (data?.search.results.accounts.collection.totalCount || 0) +
     (data?.search.results.expenses.collection.totalCount || 0) +
@@ -182,45 +150,45 @@ export const SearchResults = () => {
           autoFocus
           onKeyDown={handleKeyDown}
         />
-        {isLoading && <StyledSpinner size={16} className="absolute right-4 text-muted-foreground" />}
+        {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
       <div>
         <Tabs
           selectedId={queryFilter.values.entity}
-          onChange={val => queryFilter.setFilter('entity', val as EntityFilter)}
+          onChange={val => queryFilter.setFilter('entity', val as SearchEntity)}
           tabs={[
             {
-              id: 'ALL',
+              id: SearchEntity.ALL,
               label: 'All',
               count: totalCount,
             },
             {
-              id: 'ACCOUNTS',
+              id: SearchEntity.ACCOUNTS,
               label: 'Accounts',
               count: data?.search.results.accounts.collection.totalCount,
             },
             {
-              id: 'EXPENSES',
+              id: SearchEntity.EXPENSES,
               label: 'Expenses',
               count: data?.search.results.expenses.collection.totalCount,
             },
             {
-              id: 'CONTRIBUTIONS',
+              id: SearchEntity.CONTRIBUTIONS,
               label: 'Contributions',
               count: data?.search.results.contributions?.collection.totalCount,
             },
             {
-              id: 'TRANSACTIONS',
+              id: SearchEntity.TRANSACTIONS,
               label: 'Transactions',
               count: data?.search.results.transactions?.collection.totalCount,
             },
             {
-              id: 'COMMENTS',
+              id: SearchEntity.COMMENTS,
               label: 'Comments',
               count: data?.search.results.comments?.collection.totalCount,
             },
             {
-              id: 'UPDATES',
+              id: SearchEntity.UPDATES,
               label: 'Updates',
               count: data?.search.results.updates?.collection.totalCount,
             },
@@ -240,6 +208,7 @@ export const SearchResults = () => {
         <SearchResultsList data={data} queryFilter={queryFilter} totalCount={totalCount} loading={loading} />
         {/* {recentlyVisited.length > 0 && debouncedInput === '' && (
           <div>
+
             {recentlyVisited.map(recentVisit => (
               <CommandItem key={recentVisit.key} className="gap-2" onSelect={() => handleResultSelect(recentVisit)}>
                 {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
