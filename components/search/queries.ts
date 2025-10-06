@@ -16,7 +16,6 @@ export const searchCommandQuery = gql`
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $limit: Int!
-    $includeTransactions: Boolean!
     $imageHeight: Int
   ) {
     search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account) {
@@ -109,7 +108,7 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        orders @include(if: $includeTransactions) {
+        orders {
           highlights
           collection {
             totalCount
@@ -132,7 +131,7 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        transactions @include(if: $includeTransactions) {
+        transactions {
           highlights
           collection {
             totalCount
