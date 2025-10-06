@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
-import { CornerDownLeft, SearchIcon } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -243,7 +242,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                 queryFilter.setFilter('workspace', defaultContext.slug);
                 setInput('');
               }}
-              actionLabel={'Add context'}
+              actionLabel={'Add workspace'}
               showAction
             >
               <ContextPill slug={defaultContext.slug} />
@@ -266,8 +265,8 @@ export const SearchCommand = ({ open, setOpen }) => {
                   showAction
                 >
                   <div className="flex items-center gap-2">
-                    <div className="flex size-7 items-center justify-center rounded-md bg-muted">
-                      <SearchIcon className="size-4 text-muted-foreground" />
+                    <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                      <SearchIcon />
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 text-sm">
@@ -290,8 +289,8 @@ export const SearchCommand = ({ open, setOpen }) => {
                 showAction
               >
                 <div className="flex items-center gap-2">
-                  <div className="flex size-7 items-center justify-center rounded-md bg-muted">
-                    <SearchIcon className="size-4 text-muted-foreground" />
+                  <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                    <SearchIcon />
                   </div>
                   <div className="flex flex-col">
                     <div className="">{input}</div>
@@ -356,50 +355,44 @@ export const SearchCommand = ({ open, setOpen }) => {
             </SearchCommandItem>
           )}
         />
-        {data?.search.results.orders && (
-          <SearchCommandGroup
-            label="Contributions"
-            entity={SearchEntity.CONTRIBUTIONS}
-            input={debouncedInput}
-            queryFilter={queryFilter}
-            setOpen={setOpen}
-            totalCount={data?.search.results.orders.collection.totalCount}
-            nodes={data?.search.results.orders.collection.nodes}
-            renderNode={order => (
-              <SearchCommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
-                <Link
-                  className="block w-full"
-                  href={getOrderUrl(order, LoggedInUser)}
-                  onClick={e => e.preventDefault()}
-                >
-                  <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
-                </Link>
-              </SearchCommandItem>
-            )}
-          />
-        )}
-        {data?.search.results.transactions && (
-          <SearchCommandGroup
-            label="Transactions"
-            entity={SearchEntity.TRANSACTIONS}
-            input={debouncedInput}
-            queryFilter={queryFilter}
-            setOpen={setOpen}
-            totalCount={data?.search.results.transactions.collection.totalCount}
-            nodes={data?.search.results.transactions.collection.nodes}
-            renderNode={transaction => (
-              <SearchCommandItem
-                key={transaction.id}
-                onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
-              >
-                <TransactionResult
-                  transaction={transaction}
-                  highlights={data.search.results.transactions.highlights[transaction.id]}
-                />
-              </SearchCommandItem>
-            )}
-          />
-        )}
+        <SearchCommandGroup
+          label="Contributions"
+          entity={SearchEntity.CONTRIBUTIONS}
+          input={debouncedInput}
+          queryFilter={queryFilter}
+          setOpen={setOpen}
+          totalCount={data?.search.results.orders.collection.totalCount}
+          nodes={data?.search.results.orders.collection.nodes}
+          renderNode={order => (
+            <SearchCommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
+              <Link className="block w-full" href={getOrderUrl(order, LoggedInUser)} onClick={e => e.preventDefault()}>
+                <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
+              </Link>
+            </SearchCommandItem>
+          )}
+        />
+
+        <SearchCommandGroup
+          label="Transactions"
+          entity={SearchEntity.TRANSACTIONS}
+          input={debouncedInput}
+          queryFilter={queryFilter}
+          setOpen={setOpen}
+          totalCount={data?.search.results.transactions.collection.totalCount}
+          nodes={data?.search.results.transactions.collection.nodes}
+          renderNode={transaction => (
+            <SearchCommandItem
+              key={transaction.id}
+              onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
+            >
+              <TransactionResult
+                transaction={transaction}
+                highlights={data.search.results.transactions.highlights[transaction.id]}
+              />
+            </SearchCommandItem>
+          )}
+        />
+
         <SearchCommandGroup
           label="Updates"
           entity={SearchEntity.UPDATES}
@@ -475,7 +468,7 @@ function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
   if (totalCount > limit) {
     return (
       <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
-        <div className="flex size-9 items-center justify-center rounded-md border text-muted-foreground">
+        <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <SearchIcon />
         </div>
         <span>
