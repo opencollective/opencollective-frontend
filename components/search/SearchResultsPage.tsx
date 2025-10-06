@@ -97,7 +97,7 @@ export const SearchResults = () => {
   }, [queryFilter.values.searchTerm]);
 
   const { data, loading } = useQuery(searchCommandQuery, {
-    variables: { ...queryFilter.variables, imageHeight: 72, includeTransactions: true },
+    variables: { ...queryFilter.variables, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -126,7 +126,7 @@ export const SearchResults = () => {
   let totalCount =
     (data?.search.results.accounts.collection.totalCount || 0) +
     (data?.search.results.expenses.collection.totalCount || 0) +
-    (data?.search.results.contributions?.collection.totalCount || 0) +
+    (data?.search.results.orders?.collection.totalCount || 0) +
     (data?.search.results.transactions?.collection.totalCount || 0) +
     (data?.search.results.comments?.collection.totalCount || 0) +
     (data?.search.results.updates?.collection.totalCount || 0);
@@ -175,7 +175,7 @@ export const SearchResults = () => {
             {
               id: SearchEntity.CONTRIBUTIONS,
               label: 'Contributions',
-              count: data?.search.results.contributions?.collection.totalCount,
+              count: data?.search.results.orders?.collection.totalCount,
             },
             {
               id: SearchEntity.TRANSACTIONS,
@@ -377,7 +377,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
   //   };
 
   switch (queryFilter.values.entity) {
-    case 'ALL':
+    case SearchEntity.ALL:
       if (loading) {
         return (
           <div>
@@ -420,37 +420,36 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
               </Link>
             )}
           />
-          {data?.search.results.orders && (
-            <SearchResultsGroup
-              label="Contributions"
-              totalCount={data?.search.results.orders.collection.totalCount}
-              nodes={data?.search.results.orders.collection.nodes}
-              renderNode={order => (
-                <Link
-                  key={order.id}
-                  className="block w-full"
-                  href={getOrderUrl(order, LoggedInUser)}
-                  //   onClick={e => e.preventDefault()}
-                >
-                  <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
-                </Link>
-              )}
-            />
-          )}
-          {data?.search.results.transactions && (
-            <SearchResultsGroup
-              label="Transactions"
-              totalCount={data?.search.results.transactions.collection.totalCount}
-              nodes={data?.search.results.transactions.collection.nodes}
-              renderNode={transaction => (
-                <TransactionResult
-                  key={transaction.id}
-                  transaction={transaction}
-                  highlights={data.search.results.transactions.highlights[transaction.id]}
-                />
-              )}
-            />
-          )}
+
+          <SearchResultsGroup
+            label="Contributions"
+            totalCount={data?.search.results.orders.collection.totalCount}
+            nodes={data?.search.results.orders.collection.nodes}
+            renderNode={order => (
+              <Link
+                key={order.id}
+                className="block w-full"
+                href={getOrderUrl(order, LoggedInUser)}
+                //   onClick={e => e.preventDefault()}
+              >
+                <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
+              </Link>
+            )}
+          />
+
+          <SearchResultsGroup
+            label="Transactions"
+            totalCount={data?.search.results.transactions.collection.totalCount}
+            nodes={data?.search.results.transactions.collection.nodes}
+            renderNode={transaction => (
+              <TransactionResult
+                key={transaction.id}
+                transaction={transaction}
+                highlights={data.search.results.transactions.highlights[transaction.id]}
+              />
+            )}
+          />
+
           <SearchResultsGroup
             label="Updates"
             totalCount={data?.search.results.updates.collection.totalCount}
@@ -485,12 +484,13 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           />
         </div>
       );
-    case 'ACCOUNTS':
+    case SearchEntity.ACCOUNTS:
       return (
         <SearchResultsGroup
           //   label="Accounts"
           totalCount={data?.search.results.accounts.collection.totalCount}
           nodes={data?.search.results.accounts.collection.nodes}
+          showEmpty
           renderNode={account => (
             <Link
               key={account.id}
@@ -503,12 +503,13 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           )}
         />
       );
-    case 'EXPENSES':
+    case SearchEntity.EXPENSES:
       return (
         <SearchResultsGroup
           //   label="Expenses"
           totalCount={data?.search.results.expenses.collection.totalCount}
           nodes={data?.search.results.expenses.collection.nodes}
+          showEmpty
           renderNode={expense => (
             <Link
               key={expense.id}
@@ -517,6 +518,77 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
               // onClick={e => e.preventDefault()}
             >
               <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
+            </Link>
+          )}
+        />
+      );
+    case SearchEntity.CONTRIBUTIONS:
+      return (
+        <SearchResultsGroup
+          totalCount={data?.search.results.orders.collection.totalCount}
+          nodes={data?.search.results.orders.collection.nodes}
+          showEmpty
+          renderNode={order => (
+            <Link
+              key={order.id}
+              className="block w-full"
+              href={getOrderUrl(order, LoggedInUser)}
+              //   onClick={e => e.preventDefault()}
+            >
+              <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
+            </Link>
+          )}
+        />
+      );
+    case SearchEntity.COMMENTS:
+      return (
+        <SearchResultsGroup
+          totalCount={data?.search.results.comments.collection.totalCount}
+          nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
+          showEmpty
+          renderNode={comment => (
+            <Link
+              key={comment.id}
+              className="block w-full"
+              href={getCommentUrl(comment, LoggedInUser)}
+              onClick={e => e.preventDefault()}
+            >
+              <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
+            </Link>
+          )}
+        />
+      );
+    case SearchEntity.TRANSACTIONS:
+      return (
+        <SearchResultsGroup
+          label="Transactions"
+          totalCount={data?.search.results.transactions.collection.totalCount}
+          nodes={data?.search.results.transactions.collection.nodes}
+          showEmpty
+          renderNode={transaction => (
+            <TransactionResult
+              key={transaction.id}
+              transaction={transaction}
+              highlights={data.search.results.transactions.highlights[transaction.id]}
+            />
+          )}
+        />
+      );
+    case SearchEntity.UPDATES:
+      return (
+        <SearchResultsGroup
+          label="Updates"
+          totalCount={data?.search.results.updates.collection.totalCount}
+          nodes={data?.search.results.updates.collection.nodes}
+          showEmpty
+          renderNode={update => (
+            <Link
+              key={update.id}
+              className="block w-full"
+              href={getUpdateUrl(update, LoggedInUser)}
+              // onClick={e => e.preventDefault()}
+            >
+              <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
             </Link>
           )}
         />
@@ -531,14 +603,17 @@ function SearchResultsGroup({
   totalCount,
   nodes,
   renderNode,
+  showEmpty = false,
 }: {
   label?: string;
   totalCount?: number;
   nodes: unknown[];
   renderNode: (node: unknown) => React.ReactNode;
+  showEmpty?: boolean;
 }) {
-  if (!totalCount) {
-    // || input = ""
+  if (showEmpty && totalCount === 0) {
+    return <EmptyResults hasFilters />;
+  } else if (!totalCount) {
     return null;
   }
   const moreCount = totalCount - nodes.length;
