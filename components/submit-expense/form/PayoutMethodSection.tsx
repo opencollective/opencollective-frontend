@@ -39,6 +39,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type PayoutMethodSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -49,6 +50,7 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.options, [
+      'account',
       'host',
       'isHostAdmin',
       'payee',
@@ -136,7 +138,6 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   ]);
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
-
   const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
 
   const onPaymentMethodDeleted = React.useCallback(
@@ -228,6 +229,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 onPaymentMethodEdited={onPaymentMethodEdited}
                 setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
                 refresh={props.refresh}
+                account={props.account}
               />
             ))}
 
@@ -293,7 +295,7 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
-    ...pick(form.options, ['newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
+    ...pick(form.options, ['account', 'newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
   };
 }
 
@@ -394,10 +396,15 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       ) : (
         <React.Fragment>
           <FormField
+            name="newPayoutMethod.type"
             disabled={props.isSubmitting}
             label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
             isPrivate
-            name="newPayoutMethod.type"
+            privateMessage={
+              props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+                ? privateInfoYouCollectiveAndHost
+                : privateInfoYouAndHost
+            }
           >
             {({ field }) => (
               <ComboSelect
@@ -497,6 +504,7 @@ type PayoutMethodRadioGroupItemProps = {
     subContent: React.ReactNode;
   }>;
   moreActions?: React.ReactNode;
+  account?: ExpenseForm['options']['account'];
 };
 
 export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
@@ -768,6 +776,11 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                   payoutMethod={props.payoutMethod}
                   maxItems={3}
                   className={props.archived && 'text-gray-500!'}
+                  privateMessage={
+                    props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+                      ? privateInfoYouCollectiveAndHost
+                      : privateInfoYouAndHost
+                  }
                 />
                 {isMissingCurrency && !props.disableWarningMessages && (
                   <div className="mt-2">

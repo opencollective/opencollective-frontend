@@ -24,6 +24,7 @@ import { YesNoOption } from '../useExpenseForm';
 import { ExpensePolicyContainer } from './ExpensePolicyContainer';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type TypeOfExpenseSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -243,6 +244,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
               disabled={props.isSubmitting}
               name="invoiceFile"
               isPrivate
+              privateMessage={privateInfoYouCollectiveAndHost}
               label={attachInvoiceLabel}
             >
               {({ field }) => (
@@ -270,6 +272,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
               disabled={props.isSubmitting}
               name="invoiceNumber"
               isPrivate
+              privateMessage={privateInfoYouCollectiveAndHost}
               label={<FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />}
               placeholder="e.g. INV 001"
               hint={
