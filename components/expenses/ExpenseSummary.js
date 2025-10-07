@@ -273,7 +273,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
+            <Container ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
               {isDraft && expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedBy"
@@ -342,7 +342,7 @@ const ExpenseSummary = ({
                   />
                 </React.Fragment>
               )}
-            </P>
+            </Container>
           </React.Fragment>
         )}
       </Flex>
