@@ -2114,6 +2114,14 @@ export function useExpenseForm(opts: {
     setFieldValue,
   ]);
 
+  // Drop taxes when not supported
+  React.useEffect(() => {
+    if (!formOptions.taxType) {
+      setFieldValue('hasTax', false);
+      setFieldValue('tax', null);
+    }
+  }, [formOptions.taxType, setFieldValue]);
+
   // Move attachments when switching expense type
   React.useEffect(() => {
     if (expenseForm.values.expenseTypeOption === ExpenseType.INVOICE) {
