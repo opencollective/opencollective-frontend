@@ -26,8 +26,9 @@ import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
 import Link from '../Link';
 import Spinner from '../Spinner';
-import { CommandDialog, CommandEmpty, CommandGroup, CommandItem, CommandList } from '../ui/Command';
+import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
+import { Skeleton } from '../ui/Skeleton';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { AccountResult } from './result/AccountResult';
@@ -320,7 +321,8 @@ export const SearchCommand = ({ open, setOpen }) => {
             </CommandGroup>
           </React.Fragment>
         )}
-        {recentlyVisited.length > 0 && debouncedInput === '' && (
+
+        {recentlyVisited.length > 0 && input === '' && (
           <CommandGroup heading="Recent">
             {recentlyVisited.map(recentVisit => (
               <SearchCommandItem key={recentVisit.key} onSelect={() => handleResultSelect(recentVisit)}>
@@ -344,116 +346,155 @@ export const SearchCommand = ({ open, setOpen }) => {
             <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
-        <SearchCommandGroup
-          label="Accounts"
-          entity={SearchEntity.ACCOUNTS}
-          totalCount={data?.search.results.accounts.collection.totalCount}
-          input={debouncedInput}
-          queryFilter={queryFilter}
-          setOpen={setOpen}
-          nodes={data?.search.results.accounts.collection.nodes}
-          renderNode={account => (
-            <SearchCommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
-              <Link className="block w-full" href={getCollectivePageRoute(account)} onClick={e => e.preventDefault()}>
-                <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
-              </Link>
-            </SearchCommandItem>
-          )}
-        />
-        <SearchCommandGroup
-          label="Expenses"
-          entity={SearchEntity.EXPENSES}
-          totalCount={data?.search.results.expenses.collection.totalCount}
-          input={debouncedInput}
-          queryFilter={queryFilter}
-          setOpen={setOpen}
-          nodes={data?.search.results.expenses.collection.nodes}
-          renderNode={expense => (
-            <SearchCommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
-              <Link className="block w-full" href={getExpensePageUrl(expense)} onClick={e => e.preventDefault()}>
-                <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
-              </Link>
-            </SearchCommandItem>
-          )}
-        />
-        <SearchCommandGroup
-          label="Contributions"
-          entity={SearchEntity.CONTRIBUTIONS}
-          input={debouncedInput}
-          queryFilter={queryFilter}
-          setOpen={setOpen}
-          totalCount={data?.search.results.orders.collection.totalCount}
-          nodes={data?.search.results.orders.collection.nodes}
-          renderNode={order => (
-            <SearchCommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
-              <Link className="block w-full" href={getOrderUrl(order, LoggedInUser)} onClick={e => e.preventDefault()}>
-                <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
-              </Link>
-            </SearchCommandItem>
-          )}
-        />
+        {isLoading && input !== '' && (
+          <CommandGroup heading="Loading...">
+            {[1, 2, 3, 4, 5].map(id => (
+              <div key={`skeleton-${id}`} className="flex items-center gap-2 px-2 py-3">
+                <Skeleton className="size-9 shrink-0 rounded-md" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </CommandGroup>
+        )}
+        {!isLoading && (
+          <React.Fragment>
+            <SearchCommandGroup
+              label="Accounts"
+              entity={SearchEntity.ACCOUNTS}
+              totalCount={data?.search.results.accounts.collection.totalCount}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              nodes={data?.search.results.accounts.collection.nodes}
+              renderNode={account => (
+                <SearchCommandItem
+                  key={account.id}
+                  onSelect={() => handleResultSelect({ type: 'account', data: account })}
+                >
+                  <Link
+                    className="block w-full"
+                    href={getCollectivePageRoute(account)}
+                    onClick={e => e.preventDefault()}
+                  >
+                    <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
+                  </Link>
+                </SearchCommandItem>
+              )}
+            />
+            <SearchCommandGroup
+              label="Expenses"
+              entity={SearchEntity.EXPENSES}
+              totalCount={data?.search.results.expenses.collection.totalCount}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              nodes={data?.search.results.expenses.collection.nodes}
+              renderNode={expense => (
+                <SearchCommandItem
+                  key={expense.id}
+                  onSelect={() => handleResultSelect({ type: 'expense', data: expense })}
+                >
+                  <Link className="block w-full" href={getExpensePageUrl(expense)} onClick={e => e.preventDefault()}>
+                    <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
+                  </Link>
+                </SearchCommandItem>
+              )}
+            />
+            <SearchCommandGroup
+              label="Contributions"
+              entity={SearchEntity.CONTRIBUTIONS}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.orders.collection.totalCount}
+              nodes={data?.search.results.orders.collection.nodes}
+              renderNode={order => (
+                <SearchCommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
+                  <Link
+                    className="block w-full"
+                    href={getOrderUrl(order, LoggedInUser)}
+                    onClick={e => e.preventDefault()}
+                  >
+                    <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
+                  </Link>
+                </SearchCommandItem>
+              )}
+            />
 
-        <SearchCommandGroup
-          label="Transactions"
-          entity={SearchEntity.TRANSACTIONS}
-          input={debouncedInput}
-          queryFilter={queryFilter}
-          setOpen={setOpen}
-          totalCount={data?.search.results.transactions.collection.totalCount}
-          nodes={data?.search.results.transactions.collection.nodes}
-          renderNode={transaction => (
-            <SearchCommandItem
-              key={transaction.id}
-              onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
-            >
-              <TransactionResult
-                transaction={transaction}
-                highlights={data.search.results.transactions.highlights[transaction.id]}
-              />
-            </SearchCommandItem>
-          )}
-        />
+            <SearchCommandGroup
+              label="Transactions"
+              entity={SearchEntity.TRANSACTIONS}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.transactions.collection.totalCount}
+              nodes={data?.search.results.transactions.collection.nodes}
+              renderNode={transaction => (
+                <SearchCommandItem
+                  key={transaction.id}
+                  onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
+                >
+                  <TransactionResult
+                    transaction={transaction}
+                    highlights={data.search.results.transactions.highlights[transaction.id]}
+                  />
+                </SearchCommandItem>
+              )}
+            />
 
-        <SearchCommandGroup
-          label="Updates"
-          entity={SearchEntity.UPDATES}
-          input={debouncedInput}
-          queryFilter={queryFilter}
-          setOpen={setOpen}
-          totalCount={data?.search.results.updates.collection.totalCount}
-          nodes={data?.search.results.updates.collection.nodes}
-          renderNode={update => (
-            <SearchCommandItem key={update.id} onSelect={() => handleResultSelect({ type: 'update', data: update })}>
-              <Link
-                className="block w-full"
-                href={getUpdateUrl(update, LoggedInUser)}
-                onClick={e => e.preventDefault()}
-              >
-                <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
-              </Link>
-            </SearchCommandItem>
-          )}
-        />
-        <SearchCommandGroup
-          label="Comments"
-          entity={SearchEntity.COMMENTS}
-          input={debouncedInput}
-          queryFilter={queryFilter}
-          setOpen={setOpen}
-          totalCount={data?.search.results.comments.collection.totalCount}
-          nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
-          renderNode={comment => (
-            <SearchCommandItem key={comment.id} onSelect={() => handleResultSelect({ type: 'comment', data: comment })}>
-              <Link
-                className="block w-full"
-                href={getCommentUrl(comment, LoggedInUser)}
-                onClick={e => e.preventDefault()}
-              >
-                <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
-              </Link>
-            </SearchCommandItem>
-          )}
-        />
+            <SearchCommandGroup
+              label="Updates"
+              entity={SearchEntity.UPDATES}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.updates.collection.totalCount}
+              nodes={data?.search.results.updates.collection.nodes}
+              renderNode={update => (
+                <SearchCommandItem
+                  key={update.id}
+                  onSelect={() => handleResultSelect({ type: 'update', data: update })}
+                >
+                  <Link
+                    className="block w-full"
+                    href={getUpdateUrl(update, LoggedInUser)}
+                    onClick={e => e.preventDefault()}
+                  >
+                    <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
+                  </Link>
+                </SearchCommandItem>
+              )}
+            />
+            <SearchCommandGroup
+              label="Comments"
+              entity={SearchEntity.COMMENTS}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.comments.collection.totalCount}
+              nodes={data?.search.results.comments.collection.nodes.filter(comment =>
+                getCommentUrl(comment, LoggedInUser),
+              )} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
+              renderNode={comment => (
+                <SearchCommandItem
+                  key={comment.id}
+                  onSelect={() => handleResultSelect({ type: 'comment', data: comment })}
+                >
+                  <Link
+                    className="block w-full"
+                    href={getCommentUrl(comment, LoggedInUser)}
+                    onClick={e => e.preventDefault()}
+                  >
+                    <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
+                  </Link>
+                </SearchCommandItem>
+              )}
+            />
+          </React.Fragment>
+        )}
         {showNoResults && (
           <div className="py-6 text-center text-sm text-muted-foreground">
             <FormattedMessage defaultMessage="No results" id="search.noResults" />
