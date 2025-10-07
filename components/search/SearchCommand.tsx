@@ -26,7 +26,7 @@ import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
 import Link from '../Link';
 import Spinner from '../Spinner';
-import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
+import { CommandDialog, CommandEmpty, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
 import { useWorkspace } from '../WorkspaceProvider';
 
@@ -84,11 +84,13 @@ export const SearchCommand = ({ open, setOpen }) => {
     skipRouter: true,
   });
 
-  useEffect(() => {
-    if (open) {
-      queryFilter.setFilter('workspace', account?.slug);
-    }
-  }, [open]);
+  // useEffect(() => {
+  //   if (open) {
+  //     queryFilter.setFilter('workspace', account?.slug);
+  //     queryFilter.setFilter('searchTerm', undefined);
+  //     setInput('');
+  //   }
+  // }, [open]);
 
   const { data, loading } = useQuery(searchCommandQuery, {
     variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
@@ -202,6 +204,23 @@ export const SearchCommand = ({ open, setOpen }) => {
     );
   }, [debouncedInput, flattenedMenuItems, queryFilter.values.workspace]);
 
+  const hasSearchResults = React.useMemo(() => {
+    if (!data?.search?.results) {
+      return false;
+    }
+    const results = data.search.results;
+    return (
+      (results.accounts?.collection?.totalCount || 0) > 0 ||
+      (results.expenses?.collection?.totalCount || 0) > 0 ||
+      (results.orders?.collection?.totalCount || 0) > 0 ||
+      (results.transactions?.collection?.totalCount || 0) > 0 ||
+      (results.updates?.collection?.totalCount || 0) > 0 ||
+      (results.comments?.collection?.totalCount || 0) > 0
+    );
+  }, [data]);
+
+  const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
+
   return (
     <CommandDialog
       open={open}
@@ -251,7 +270,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
         {input.length > 0 && (
           <React.Fragment>
-            <CommandGroup heading="">
+            <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
               {defaultContext && (
                 <SearchCommandItem
                   onSelect={() => {
@@ -297,6 +316,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                   </div>
                 </div>
               </SearchCommandItem>
+              <hr className="separator -mx-2 my-2 h-px bg-border" />
             </CommandGroup>
           </React.Fragment>
         )}
@@ -315,12 +335,13 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
 
         {filteredGoToPages.length > 0 && (
-          <CommandGroup heading="Go to">
+          <CommandGroup heading="Go to" className="[&:last-child_.separator]:hidden">
             {filteredGoToPages.map(page => (
               <SearchCommandItem key={page.section} onSelect={() => handleResultSelect({ type: 'page', data: page })}>
                 <PageResult page={page} />
               </SearchCommandItem>
             ))}
+            <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
         <SearchCommandGroup
@@ -433,6 +454,11 @@ export const SearchCommand = ({ open, setOpen }) => {
             </SearchCommandItem>
           )}
         />
+        {showNoResults && (
+          <div className="py-6 text-center text-sm text-muted-foreground">
+            <FormattedMessage defaultMessage="No results" id="search.noResults" />
+          </div>
+        )}
       </CommandList>
       <SearchCommandLegend />
     </CommandDialog>
