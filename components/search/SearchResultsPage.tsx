@@ -181,7 +181,7 @@ export const SearchResults = () => {
           ]}
         />
       </div>
-      <div className="py-4 [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
+      <div className="py-1 [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <SearchResultsList data={data} queryFilter={queryFilter} totalCount={totalCount} loading={loading} />
       </div>
     </div>
@@ -195,8 +195,19 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
     case SearchEntity.ALL:
       if (loading) {
         return (
-          <div>
-            <Skeleton className="h-12" />
+          <div className="space-y-3 text-sm">
+            <p className="font-medium text-muted-foreground"> </p>
+            <div className="flex flex-col gap-2">
+              {[1, 2, 3, 4, 5].map(id => (
+                <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
+                  <Skeleton className="size-9 shrink-0 rounded-md" />
+                  <div className="flex flex-1 flex-col gap-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         );
       }
@@ -276,6 +287,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           totalCount={data?.search.results.accounts.collection.totalCount}
           nodes={data?.search.results.accounts.collection.nodes}
           showEmpty
+          loading={loading}
           renderNode={account => (
             <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
           )}
@@ -288,6 +300,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           totalCount={data?.search.results.expenses.collection.totalCount}
           nodes={data?.search.results.expenses.collection.nodes}
           showEmpty
+          loading={loading}
           renderNode={expense => (
             <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
           )}
@@ -300,6 +313,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           totalCount={data?.search.results.orders.collection.totalCount}
           nodes={data?.search.results.orders.collection.nodes}
           showEmpty
+          loading={loading}
           renderNode={order => (
             <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
           )}
@@ -312,6 +326,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           totalCount={data?.search.results.comments.collection.totalCount}
           nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
           showEmpty
+          loading={loading}
           renderNode={comment => (
             <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
           )}
@@ -324,6 +339,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           totalCount={data?.search.results.transactions.collection.totalCount}
           nodes={data?.search.results.transactions.collection.nodes}
           showEmpty
+          loading={loading}
           renderNode={transaction => (
             <TransactionResult
               transaction={transaction}
@@ -339,6 +355,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           totalCount={data?.search.results.updates.collection.totalCount}
           nodes={data?.search.results.updates.collection.nodes}
           showEmpty
+          loading={loading}
           renderNode={update => (
             <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
           )}
@@ -356,6 +373,7 @@ function SearchResultsGroup({
   renderNode,
   showEmpty = false,
   type,
+  loading,
 }: {
   label?: string;
   totalCount?: number;
@@ -363,30 +381,58 @@ function SearchResultsGroup({
   renderNode: (node: unknown) => React.ReactNode;
   showEmpty?: boolean;
   type: PageVisit['type'];
+  loading?: boolean;
 }) {
   const { getLinkProps } = useGetLinkProps();
 
-  if (showEmpty && totalCount === 0) {
+  if (showEmpty && !totalCount && !loading) {
     return <EmptyResults hasFilters />;
-  } else if (!totalCount) {
+  } else if (!totalCount && !loading) {
     return null;
   }
-  const moreCount = totalCount - nodes.length;
+  const moreCount = totalCount - nodes?.length;
   return (
-    <div className="space-y-2 text-sm">
-      <p>{label}</p>
-      <div className="space-y-4">
-        {nodes.map(node => {
-          const { href, onClick } = getLinkProps({ type, data: node });
+    <div className="space-y-3 text-sm">
+      {label && <p className="font-medium text-muted-foreground">{label}</p>}
+      <div className="flex flex-col gap-2">
+        {loading
+          ? [1, 2, 3, 4, 5].map(id => (
+              <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
+                <Skeleton className="size-9 shrink-0 rounded-md" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            ))
+          : nodes.map(node => {
+              const { href, onClick } = getLinkProps({ type, data: node });
 
-          return (
-            <Link key={node.id} href={href} onClick={onClick} className="block w-full">
-              {renderNode(node)}
-            </Link>
-          );
-        })}
+              return (
+                <Link
+                  key={node.id}
+                  href={href}
+                  onClick={onClick}
+                  className="-mx-2 block w-full rounded-sm px-2 py-1.5 hover:bg-muted"
+                >
+                  {renderNode(node)}
+                </Link>
+              );
+            })}
+        {moreCount > 0 && (
+          <button
+            onClick={() => {}}
+            className="-mx-2 flex w-full items-center gap-2 rounded-sm px-2 py-1.5 hover:bg-muted"
+          >
+            <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+              <SearchIcon />
+            </div>
+            <span>
+              See {moreCount.toLocaleString()} more {label}
+            </span>
+          </button>
+        )}
       </div>
-      {moreCount > 0 && <button>See {moreCount} more results</button>}
     </div>
   );
 }
