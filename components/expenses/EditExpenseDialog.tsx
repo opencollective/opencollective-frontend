@@ -214,6 +214,10 @@ const EditPayee = ({ expense, onSubmit }) => {
                 : {
                     id: values.payoutMethodId,
                   },
+          tax:
+            values.hasTax && values.tax && formOptions.taxType
+              ? [{ type: formOptions.taxType, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+              : [],
         }),
       };
       return onSubmit(editValues);
@@ -324,6 +328,10 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
           incurredAt: new Date(ei.incurredAt),
           url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
         })),
+        tax:
+          values.hasTax && values.tax && formOptions.taxType
+            ? [{ type: formOptions.taxType, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+            : [],
       };
       return onSubmit(editValues);
     },
@@ -409,6 +417,10 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       })),
       invoiceFile,
       reference: values.invoiceNumber,
+      tax:
+        values.hasTax && values.tax
+          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          : [],
     };
     return onSubmit(editValues);
   };
@@ -600,6 +612,10 @@ const EditExpenseType = ({ expense, onSubmit }) => {
             : undefined,
       reference: values.invoiceNumber,
       type: values.expenseTypeOption,
+      tax:
+        values.hasTax && values.tax
+          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          : [],
     };
     return onSubmit(editValues);
   };
