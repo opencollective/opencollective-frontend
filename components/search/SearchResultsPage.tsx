@@ -110,13 +110,14 @@ export const SearchResults = () => {
   const isLoading = loading;
 
   let totalCount =
-    (data?.search.results.accounts.collection.totalCount || 0) +
-    (data?.search.results.expenses.collection.totalCount || 0) +
-    (data?.search.results.orders?.collection.totalCount || 0) +
-    (data?.search.results.transactions?.collection.totalCount || 0) +
-    (data?.search.results.comments?.collection.totalCount || 0) +
-    (data?.search.results.updates?.collection.totalCount || 0);
-  totalCount = totalCount === 0 ? undefined : totalCount;
+    data?.search.results.accounts.collection.totalCount +
+    data?.search.results.expenses.collection.totalCount +
+    data?.search.results.orders?.collection.totalCount +
+    data?.search.results.transactions?.collection.totalCount +
+    data?.search.results.comments?.collection.totalCount +
+    data?.search.results.updates?.collection.totalCount;
+  totalCount = isNaN(totalCount) ? undefined : totalCount;
+
   return (
     <div className="space-y-4">
       <div className={cn(BASE_INPUT_CLASS, 'relative items-center gap-3')}>
@@ -212,7 +213,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
         );
       }
       if (!totalCount) {
-        return <EmptyResults hasFilters={false} />;
+        return <EmptyResults isEmptySearch={totalCount !== 0} hasFilters={false} />;
       }
       return (
         <div className="space-y-8">
@@ -386,7 +387,7 @@ function SearchResultsGroup({
   const { getLinkProps } = useGetLinkProps();
 
   if (showEmpty && !totalCount && !loading) {
-    return <EmptyResults hasFilters />;
+    return <EmptyResults hasFilters={false} isEmptySearch={totalCount !== 0} />;
   } else if (!totalCount && !loading) {
     return null;
   }
