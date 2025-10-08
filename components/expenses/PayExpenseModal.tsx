@@ -425,7 +425,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   ].includes(payoutMethodType);
   const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
 
-  const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
+  const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !blockAutomaticPayment;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
@@ -836,10 +836,9 @@ Please add funds to your Wise {currency} account."
                   loading={formik.isSubmitting}
                   data-cy="mark-as-paid-button"
                   disabled={
-                    (canQuote &&
-                      !isManualPayment &&
-                      (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)) ||
-                    (blockAutomaticPayment && !isManualPayment)
+                    !isManualPayment &&
+                    (blockAutomaticPayment ||
+                      (canQuote && (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)))
                   }
                 >
                   {isManualPayment ? (
