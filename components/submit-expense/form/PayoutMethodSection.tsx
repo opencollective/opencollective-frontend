@@ -350,7 +350,9 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       setFieldValue('newPayoutMethod', { data: {} });
       toast({ variant: 'success', message: 'Payout method created' });
     } catch (e) {
-      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      if (get(e, 'graphQLErrors.0')) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
     } finally {
       setIsCreatingPayoutMethod(false);
     }

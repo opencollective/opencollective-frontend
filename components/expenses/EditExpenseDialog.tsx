@@ -891,6 +891,7 @@ export default function EditExpenseDialog({
         await editExpense({
           variables: {
             expense: editInput,
+            isDraftEdit: true,
           },
         });
         setOpen(false);
