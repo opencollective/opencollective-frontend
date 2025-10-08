@@ -177,9 +177,10 @@ const content: Content = {
 type UpgradePlanCTAProps = {
   featureKey: FeatureKey;
   className?: string;
+  compact?: boolean;
 };
 
-export function UpgradePlanCTA({ featureKey, className }: UpgradePlanCTAProps) {
+export function UpgradePlanCTA({ featureKey, className, compact = false }: UpgradePlanCTAProps) {
   const { account } = React.useContext(DashboardContext);
 
   if (isFeatureEnabled(account, featureKey)) {
@@ -197,6 +198,49 @@ export function UpgradePlanCTA({ featureKey, className }: UpgradePlanCTAProps) {
     ) : featureAccess === CollectiveFeatureStatus.UNSUPPORTED ? (
       <FormattedMessage id="UpgradePlanCTA.title.UNSUPPORTED" defaultMessage="Feature not supported for your account" />
     ) : null;
+
+  if (compact) {
+    return (
+      <Alert variant="info" className={cn('p-4', className)}>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Image src="/static/images/lock.png" alt="Lock" width={24} height={24} className="shrink-0" />
+            <div className="min-w-0 flex-1">
+              <AlertTitle className="leading-tight font-semibold text-foreground">{title}</AlertTitle>
+            </div>
+          </div>
+          {featureAccess === 'DISABLED' && customContent?.benefits && (
+            <div className="space-y-1">
+              {customContent.benefits.map(benefit => (
+                <div key={benefit.id} className="flex items-start gap-2 text-left">
+                  <Check className="mt-0.5 h-3 w-3 flex-shrink-0 text-green-600" />
+                  <span className="text-xs text-muted-foreground">
+                    <FormattedMessage {...benefit} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          {featureAccess === 'DISABLED' && (
+            <div className="flex gap-2">
+              <Button asChild size="sm" className="">
+                <Link href={getDashboardRoute(account, 'platform-subscription')}>
+                  <FormattedMessage id="UpgradePlanCTA.upgradeButton" defaultMessage="Upgrade your plan" />
+                </Link>
+              </Button>
+              {customContent?.learnMoreUrl && (
+                <Button asChild variant="outline" size="sm" className="">
+                  <Link href={customContent.learnMoreUrl} target="_blank">
+                    <FormattedMessage id="7DIW6+" defaultMessage="Learn More" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </Alert>
+    );
+  }
 
   return (
     <React.Fragment>
