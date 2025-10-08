@@ -822,7 +822,7 @@ function buildFormSchema(
           }
 
           if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
-            return !!invoiceNumber;
+            return options.isAdminOfPayee || options.payee?.type === CollectiveType.VENDOR ? !!invoiceNumber : true;
           }
           return true;
         },
