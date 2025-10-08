@@ -4271,6 +4271,7 @@
   "verificationCriteria": "קריטריון אימות",
   "VerifyEmailAddress": "אימות כתובת מייל",
   "VerifyEmailInstructions": "כתובת מייל לאימות נשלחה לכתובת {email}. נא ללחוץ על הלינק כדי להמשיך בעריכת דרישת התשלום. אם לא קיבלת את המייל, נא לבדוק בספאם.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Something went wrong, please refresh or try something else",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",

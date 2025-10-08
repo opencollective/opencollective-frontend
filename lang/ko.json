@@ -4271,6 +4271,7 @@
   "verificationCriteria": "verification criteria",
   "VerifyEmailAddress": "이메일 주소 인증",
   "VerifyEmailInstructions": "{email}으로 확인 이메일을 보냈어요. 이 청구의 제출을 완료하려면 해당 링크를 클릭하세요. 이메일을 받지 못했나요? 정크 폴더나 스팸 폴더를 확인해 보세요.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Something went wrong, please refresh or try something else",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",

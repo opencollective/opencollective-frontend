@@ -4271,6 +4271,7 @@
   "verificationCriteria": "criterios de verificación",
   "VerifyEmailAddress": "Verificar tu dirección de correo electrónico",
   "VerifyEmailInstructions": "Se ha enviado un correo electrónico de verificación a {email}. Haz clic en el enlace para completar el envío de este gasto. Si no te aparece el correo electrónico en tu bandeja de entrada revisa tu bandeja de Spam.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Ha ocurrido un error, por favor actualiza la página o intenta algo distinto",
   "VfJsl4": "Beneficiario/a",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> a {account}",

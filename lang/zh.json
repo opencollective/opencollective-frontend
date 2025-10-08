@@ -4271,6 +4271,7 @@
   "verificationCriteria": "核查标准",
   "VerifyEmailAddress": "验证你的电子邮件地址",
   "VerifyEmailInstructions": "验证邮件已发送至 {email}。点击链接完成提交这笔费用。 如果您没有收到电子邮件，请检查你的垃圾邮件。",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "出错了，请重试或稍后再试。",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",

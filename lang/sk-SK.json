@@ -4271,6 +4271,7 @@
   "verificationCriteria": "verification criteria",
   "VerifyEmailAddress": "Overiť vašu e-mailovú adresu",
   "VerifyEmailInstructions": "Overovací e-mail bol odoslaný na adresu {email}. Kliknutím na odkaz dokončite odoslanie tohto výdavku. Ak ste e-mail nedostali, skontrolujte si, prosím, nevyžiadanú poštu.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Something went wrong, please refresh or try something else",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",

@@ -4271,6 +4271,7 @@
   "verificationCriteria": "verifieringskriterier",
   "VerifyEmailAddress": "Verifiera din e-postadress",
   "VerifyEmailInstructions": "Ett verifieringsmeddelande har skickats till {email}. Klicka på länken för att slutföra denna utgift. Om du inte har fått e-postmeddelandet, vänligen kontrollera din skräppost.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Something went wrong, please refresh or try something else",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",

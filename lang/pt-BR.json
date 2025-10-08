@@ -4271,6 +4271,7 @@
   "verificationCriteria": "critérios de verificação",
   "VerifyEmailAddress": "Verifique seu endereço de e-mail",
   "VerifyEmailInstructions": "Um e-mail de verificação foi enviado para {email}. Clique no link para concluir o envio dessa despesa. Caso não tenha recebido, verifique a caixa de spam.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Algo deu errado, atualize ou tente outra coisa",
   "VfJsl4": "Beneficiário",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> à {account}",

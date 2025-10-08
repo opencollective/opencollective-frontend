@@ -4271,6 +4271,7 @@
   "verificationCriteria": "承認基準",
   "VerifyEmailAddress": "メールアドレス認証",
   "VerifyEmailInstructions": "A verification email has been sent to {email}. Click the link to complete submitting this expense. If you have not received the email, please check your spam.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "問題が発生しました。ページの更新などを試してみてください。",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",
