@@ -131,6 +131,7 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.searchCommandDescription"
       />
     ),
+    alwaysEnableInDev: true,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
