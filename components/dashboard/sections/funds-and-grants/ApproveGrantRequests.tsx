@@ -92,7 +92,7 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
   const router = useRouter();
 
-  const { data: metadata } = useQuery(accountExpensesMetadataQuery, {
+  const { data: metadata, refetch } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
     context: API_V2_CONTEXT,
   });
@@ -189,6 +189,7 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
                 {
                   enableViewGrantsByBeneficiary: true,
                   onViewDetailsClick,
+                  refetch,
                 } as GrantsTableMeta
               }
               columns={compact([

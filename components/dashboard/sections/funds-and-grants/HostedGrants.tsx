@@ -191,7 +191,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     context: API_V2_CONTEXT,
   });
 
-  const { data, error, loading } = expenses;
+  const { data, error, loading, refetch } = expenses;
 
   const onViewDetailsClick = React.useCallback(
     (grant: Expense) => {
@@ -249,6 +249,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
               {
                 enableViewGrantsByBeneficiary: true,
                 onViewDetailsClick,
+                refetch,
               } as GrantsTableMeta
             }
             columns={compact([
