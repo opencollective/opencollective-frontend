@@ -45,6 +45,7 @@ type SubmitGrantFlowProps = {
   draftKey?: string;
   handleOnClose: () => void;
   onGrantSubmitted?: (grantId: number) => void;
+  duplicateGrant?: boolean;
 };
 
 export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
@@ -55,6 +56,7 @@ export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
       account={props.account}
       handleOnClose={props.handleOnClose}
       onGrantSubmitted={props.onGrantSubmitted}
+      duplicateGrant={props.duplicateGrant}
     />
   );
 }
@@ -77,6 +79,7 @@ type SubmitGrantDialogProps = {
   expenseId?: number;
   draftKey?: string;
   account: { slug: string; name?: string };
+  duplicateGrant?: boolean;
   onGrantSubmitted?: (grantId: number) => void;
 };
 
@@ -174,6 +177,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
                 draftKey={props.draftKey}
                 expenseId={props.expenseId}
                 accountSlug={props.account.slug}
+                duplicateGrant={props.duplicateGrant}
                 onGrantSubmitted={onGrantSubmitted}
               />
             )}
@@ -217,6 +221,7 @@ type SubmitGrantDialogContentProps = {
   accountSlug: string;
   expenseId?: number;
   draftKey?: string;
+  duplicateGrant?: boolean;
   onGrantSubmitted: (expenseId: number) => void;
 };
 
@@ -230,6 +235,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,
     draftKey: props.draftKey,
+    duplicateExpense: props.duplicateGrant,
   });
 
   const onError = React.useCallback(
