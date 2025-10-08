@@ -155,9 +155,10 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           <Skeleton className="h-30 w-full" />
         </div>
       )}
-      <div className="flex justify-between pr-12">
+      <div className="flex flex-wrap justify-between gap-2 md:pr-12">
         <Button
           variant="outline"
+          className="shrink-0"
           disabled={props.initialLoading || isAmountLocked || props.isSubmitting}
           onClick={() =>
             setFieldValue('expenseItems', [
@@ -174,7 +175,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
         >
           <Plus size={16} /> <FormattedMessage defaultMessage="Add item" id="KDO3hW" />
         </Button>
-        <div>
+        <div className="flex-grow">
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
             {props.hasTax && props.tax && (
               <React.Fragment>
@@ -621,7 +622,7 @@ const Taxes = React.memo(function Taxes(props: {
         )}
       </FormField>
 
-      <div className="items-top mt-4 flex gap-4">
+      <div className="items-top mt-4 flex flex-wrap gap-4">
         <div>
           {props.hasTax && props.taxType === TaxType.GST && (
             <FormField
@@ -682,19 +683,21 @@ const Taxes = React.memo(function Taxes(props: {
         </div>
 
         {props.hasTax && (
-          <FormField
-            name="tax.idNumber"
-            htmlFor={`input-${props.taxType}-idNumber`}
-            label={intl.formatMessage(
-              { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
-              { taxName: i18nTaxType(intl, props.taxType, 'short') },
-            )}
-            placeholder={intl.formatMessage(
-              { id: 'examples', defaultMessage: 'e.g., {examples}' },
-              { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
-            )}
-            disabled={props.isSubmitting}
-          />
+          <div>
+            <FormField
+              name="tax.idNumber"
+              htmlFor={`input-${props.taxType}-idNumber`}
+              label={intl.formatMessage(
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: i18nTaxType(intl, props.taxType, 'short') },
+              )}
+              placeholder={intl.formatMessage(
+                { id: 'examples', defaultMessage: 'e.g., {examples}' },
+                { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
+              )}
+              disabled={props.isSubmitting}
+            />
+          </div>
         )}
       </div>
     </div>
