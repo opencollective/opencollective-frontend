@@ -1395,6 +1395,7 @@ async function buildFormOptions(
 
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
+    const expenseType = values.expenseTypeOption || options.expense?.type;
     const host = account && 'host' in account ? account.host : null;
     const payee =
       query.data?.payee ||
@@ -1548,7 +1549,7 @@ async function buildFormOptions(
       options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
     ) {
       options.expenseCurrency = options.expense.currency;
-    } else if (values.expenseTypeOption === ExpenseType.GRANT) {
+    } else if (expenseType === ExpenseType.GRANT) {
       options.expenseCurrency = options.account?.currency;
     } else if (
       options.account?.currency &&
@@ -1567,21 +1568,22 @@ async function buildFormOptions(
     options.hasExpenseItemDate = true;
     options.canSetupRecurrence = true;
 
-    if (values.expenseTypeOption === ExpenseType.GRANT) {
+    if (expenseType === ExpenseType.GRANT) {
       options.isLongFormItemDescription = true;
       options.allowDifferentItemCurrency = false;
       options.hasExpenseItemDate = false;
       options.canSetupRecurrence = false;
     }
 
-    options.allowExpenseItemAttachment = values.expenseTypeOption
-      ? values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE
-      : options.expense?.type === ExpenseType.RECEIPT || options.expense?.type === ExpenseType.CHARGE;
+    options.allowExpenseItemAttachment = expenseType === ExpenseType.RECEIPT || expenseType === ExpenseType.CHARGE;
 
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
-    if (values.expenseTypeOption === ExpenseType.INVOICE) {
-      if (accountHasVAT(account as Account, host as Account)) {
+    if (expenseType === ExpenseType.INVOICE) {
+      // Preserve tax type from existing expense if it has taxes
+      if (options.expense?.taxes?.length > 0) {
+        options.taxType = options.expense.taxes[0].type;
+      } else if (accountHasVAT(account as Account, host as Account)) {
         options.taxType = TaxType.VAT;
       } else if (accountHasGST(host || account)) {
         options.taxType = TaxType.GST;
@@ -1641,7 +1643,7 @@ type ExpenseFormStartOptions = {
 };
 
 export function useExpenseForm(opts: {
-  formRef?: React.MutableRefObject<HTMLFormElement>;
+  formRef?: React.RefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
   startOptions: ExpenseFormStartOptions;
   handleOnSubmit?: boolean;
@@ -1974,6 +1976,7 @@ export function useExpenseForm(opts: {
   const setFieldValue = expenseForm.setFieldValue;
   const setFieldTouched = expenseForm.setFieldTouched;
 
+  // Load initial values from expense
   React.useEffect(() => {
     if (!formOptions.expense || setInitialExpenseValues.current) {
       return;
@@ -1983,15 +1986,18 @@ export function useExpenseForm(opts: {
     setFieldValue('accountingCategoryId', formOptions.expense.accountingCategory?.id);
     setFieldValue('accountSlug', formOptions.expense.account.slug);
     setFieldValue('expenseTypeOption', formOptions.expense.type);
-    setFieldValue('hasTax', (formOptions.expense.taxes || []).length > 0);
     setFieldValue('payoutMethodId', formOptions.expense.payoutMethod?.id);
     setFieldValue('tags', formOptions.expense.tags);
-    if (formOptions.expense.taxes?.length > 0) {
-      setFieldValue('tax.idNumber', formOptions.expense.taxes[0].idNumber);
-      setFieldValue('tax.rate', formOptions.expense.taxes[0].rate);
-    }
     setFieldValue('title', formOptions.expense.description);
     setFieldTouched('title', true);
+
+    // Load taxes
+    const taxes = formOptions.expense.taxes || [];
+    setFieldValue('hasTax', taxes.length > 0);
+    if (taxes?.length > 0) {
+      setFieldValue('tax.idNumber', taxes[0].idNumber);
+      setFieldValue('tax.rate', taxes[0].rate);
+    }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT && formOptions.expense.draft?.payee) {
       if (
@@ -2108,6 +2114,7 @@ export function useExpenseForm(opts: {
     setFieldValue,
   ]);
 
+  // Drop taxes when not supported
   React.useEffect(() => {
     if (!formOptions.taxType) {
       setFieldValue('hasTax', false);
@@ -2168,7 +2175,9 @@ export function useExpenseForm(opts: {
   ]);
 
   React.useEffect(() => {
-    if (!expenseForm.values.hasTax) {
+    if (initialLoading.current) {
+      return;
+    } else if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
     } else if (!expenseForm.values.tax) {
       const selectedVendor = formOptions.vendorsForAccount?.find(
