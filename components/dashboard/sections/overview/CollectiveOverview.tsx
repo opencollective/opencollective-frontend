@@ -31,6 +31,9 @@ import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import clsx from 'clsx';
 
 export const schema = z.object({
   period: periodCompareFilter.schema,
@@ -41,6 +44,7 @@ export const schema = z.object({
 
 export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
   const router = useRouter();
   const queryFilter = useQueryFilter({
@@ -176,7 +180,14 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   }
 
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div
+      className={clsx(
+        'space-y-6',
+        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+          ? 'mx-auto max-w-(--breakpoint-xl)'
+          : 'max-w-(--breakpoint-lg)',
+      )}
+    >
       <div className="flex flex-col gap-3">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}

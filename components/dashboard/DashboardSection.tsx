@@ -78,6 +78,8 @@ import {
 } from './constants';
 import { DashboardContext } from './DashboardContext';
 import DashboardHeader from './DashboardHeader';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import clsx from 'clsx';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -170,7 +172,14 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const RootComponent = ROOT_COMPONENTS[section];
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
-      <div className="w-full pb-6">
+      <div
+        className={clsx(
+          'w-full',
+          LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+            ? 'mx-auto max-w-(--breakpoint-xl)'
+            : 'w-full pb-6',
+        )}
+      >
         <RootComponent subpath={subpath} isDashboard />
       </div>
     );
@@ -179,7 +188,14 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
     return (
-      <div className="w-full pb-6">
+      <div
+        className={clsx(
+          'w-full',
+          LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+            ? 'mx-auto max-w-(--breakpoint-xl)'
+            : 'w-full pb-6',
+        )}
+      >
         <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
       </div>
     );
@@ -187,7 +203,14 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-(--breakpoint-lg) pb-6">
+      <div
+        className={clsx(
+          'w-full',
+          LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+            ? 'mx-auto max-w-(--breakpoint-xl)'
+            : 'max-w-(--breakpoint-lg) pb-6',
+        )}
+      >
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
@@ -202,7 +225,13 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (SettingsComponent) {
     return (
       // <div className="flex max-w-(--breakpoint-lg) justify-center">
-      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
+      <div
+        className={clsx(
+          LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+            ? 'mx-auto w-full max-w-(--breakpoint-xl)'
+            : 'max-w-(--breakpoint-md) flex-1 pb-6',
+        )}
+      >
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
@@ -211,11 +240,16 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
       // <div className="flex max-w-(--breakpoint-lg) justify-center">
-      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
+      <div
+        className={clsx(
+          LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+            ? 'mx-auto w-full max-w-(--breakpoint-xl)'
+            : 'max-w-(--breakpoint-md) flex-1 pb-6',
+        )}
+      >
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
-
         <AccountSettings account={account} section={section} />
       </div>
       // </div>

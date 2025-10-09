@@ -16,6 +16,8 @@ import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
 import { PlatformBillingOverviewCard } from './PlatformBillingOverviewCard';
 import { SetupGuideCard } from './SetupGuide';
+import clsx from 'clsx';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 const editAccountSettingMutation = gql`
   mutation UpdateSetupGuideState($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -82,7 +84,14 @@ export function OrgOverview() {
   );
 
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div
+      className={clsx(
+        'space-y-6',
+        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
+          ? 'mx-auto max-w-(--breakpoint-xl)'
+          : 'max-w-(--breakpoint-lg)',
+      )}
+    >
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={

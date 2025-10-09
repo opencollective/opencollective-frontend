@@ -111,7 +111,7 @@ const ROOT_MENU = [
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
-function shouldIncludeMenuItemWithLegacyFallback(
+export function shouldIncludeMenuItemWithLegacyFallback(
   account: DashboardQuery['account'],
   featureKey: (typeof FEATURES)[keyof typeof FEATURES],
   fallback: boolean,

@@ -18,6 +18,7 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
+  SIDEBAR_REORG = 'SIDEBAR_REORG',
   PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
 }
 
@@ -133,6 +134,13 @@ export const previewFeatures: PreviewFeature[] = [
       />
     ),
     alwaysEnableInDev: true,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    category: Categories.GENERAL,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG,
+    title: <FormattedMessage defaultMessage="Sidebar re-org" id="PreviewFeatures.sidebarReorg" />,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,

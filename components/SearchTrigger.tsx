@@ -22,7 +22,12 @@ const SearchTrigger = ({ setShowSearchModal }) => {
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <button
-      className="relative flex h-8 w-8 shrink items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-hidden focus-visible:ring-2 lg:w-auto lg:justify-start lg:px-2 lg:pr-4"
+      className={clsx(
+        'relative flex h-8 w-8 shrink items-center justify-center gap-1.5 text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-hidden focus-visible:ring-2 lg:justify-start lg:px-2 lg:pr-4',
+        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND)
+          ? 'max-w-lg rounded-sm bg-slate-100 lg:w-full'
+          : 'rounded-full border lg:w-auto',
+      )}
       onClick={() => setShowSearchModal(true)}
     >
       <Search size={16} />
