@@ -147,6 +147,7 @@ export type ExpenseFormValues = {
   tags?: string[];
   expenseItems?: ExpenseItem[];
   additionalAttachments?: Attachment[];
+  referenceCurrency?: Currency; // The "payment source" currency to use for conversions
   hasTax?: boolean;
   tax?: {
     rate: number;
@@ -616,6 +617,7 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  availableReferenceCurrencies?: Currency[]; // Available currencies that can be selected as reference
   allowDifferentItemCurrency?: boolean;
   isLongFormItemDescription?: boolean;
   hasExpenseItemDate?: boolean;
@@ -782,6 +784,19 @@ function buildFormSchema(
       ),
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    referenceCurrency: z.nativeEnum(Currency).refine(
+      v => {
+        // If multiple currencies are supported, the reference currency must be set
+        if (options.availableReferenceCurrencies.length > 1) {
+          return v && options.availableReferenceCurrencies?.includes(v);
+        } else {
+          return !v || v === options.availableReferenceCurrencies[0];
+        }
+      },
+      {
+        message: 'Invalid currency',
+      },
+    ),
     expenseAttachedFiles: z
       .array(
         z.object({
@@ -1543,24 +1558,40 @@ async function buildFormOptions(
       options.lockedFields = options.expense.lockedFields;
     }
 
-    if (
-      options.expense &&
-      !startOptions.duplicateExpense &&
-      options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
-    ) {
-      options.expenseCurrency = options.expense.currency;
+    // Compute available reference currencies from all sources
+    const availableCurrencies = new Set<Currency>();
+    if (options.expense && options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)) {
+      availableCurrencies.add(options.expense.currency);
     } else if (expenseType === ExpenseType.GRANT) {
-      options.expenseCurrency = options.account?.currency;
-    } else if (
-      options.account?.currency &&
-      values.expenseItems.length > 0 &&
-      values.expenseItems.every(item => item.amount.currency === options.account?.currency)
-    ) {
-      options.expenseCurrency = options.account.currency;
-    } else if (options.payoutMethod) {
-      options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
+      // Grants are always in the account currency
+      availableCurrencies.add(options.account?.currency);
     } else {
-      options.expenseCurrency = options.expense?.currency ?? options.account?.currency;
+      // For all other expenses, the currency must be either the account currency, the payout method currency, or the items currencies
+      if (options.account?.currency) {
+        availableCurrencies.add(options.account.currency);
+      }
+      if (options.payoutMethod?.data?.currency) {
+        availableCurrencies.add(options.payoutMethod.data.currency as Currency);
+      }
+      values.expenseItems?.forEach(item => {
+        if (item.amount?.currency) {
+          availableCurrencies.add(item.amount.currency as Currency);
+        }
+      });
+    }
+
+    options.availableReferenceCurrencies = Array.from(availableCurrencies);
+
+    if (options.availableReferenceCurrencies.length === 1) {
+      options.expenseCurrency = options.availableReferenceCurrencies[0]; // If there's only one available currency, use it
+    } else if (options.availableReferenceCurrencies.includes(values.referenceCurrency as Currency)) {
+      options.expenseCurrency = values.referenceCurrency as Currency; // If the user provided a reference currency, use it
+    } else if (options.expense?.currency) {
+      options.expenseCurrency = options.expense.currency; // Use the expense currency if it's set
+    } else if (options.account?.currency) {
+      options.expenseCurrency = options.account.currency; // Use the account currency if it's set
+    } else if (options.payoutMethod?.data?.currency) {
+      options.expenseCurrency = options.payoutMethod.data.currency as Currency; // Use the payout method currency if it's set
     }
 
     options.isLongFormItemDescription = false;
@@ -2201,18 +2232,32 @@ export function useExpenseForm(opts: {
     }
   }, [formOptions.accountingCategories, expenseForm.values.accountingCategoryId, setFieldValue]);
 
+  // Reset reference currency if it's no longer in the available currencies
+  React.useEffect(() => {
+    if (
+      expenseForm.values.referenceCurrency &&
+      !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
+    ) {
+      setFieldValue('referenceCurrency', null);
+    }
+  }, [expenseForm.values.referenceCurrency, formOptions.availableReferenceCurrencies, setFieldValue]);
+
   React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {
       return;
     }
 
+    // For non-receipt expenses, use current date for exchange rates
+    // For receipts (reimbursements), use the item's date
+    const isReimbursement = expenseForm.values.expenseTypeOption === ExpenseType.RECEIPT;
+
     const exchangeRateRequests = uniqBy(
       expenseForm.values.expenseItems.filter(needExchangeRateFilter(formOptions.expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: formOptions.expenseCurrency,
-        date: dayjs.utc(ei.incurredAt).toDate(),
+        date: isReimbursement ? dayjs.utc(ei.incurredAt).toDate() : dayjs.utc().toDate(),
       })),
-      ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
+      ei => `${ei.fromCurrency}-${ei.toCurrency}-${dayjs.utc(ei.date).format('YYYY-MM-DD')}`,
     );
 
     expenseForm.values.expenseItems.forEach((ei, i) => {
@@ -2258,24 +2303,27 @@ export function useExpenseForm(opts: {
         if (!isEmpty(res.data?.currencyExchangeRate)) {
           expenseForm.values.expenseItems.forEach((ei, i) => {
             if (needExchangeRateFilter(formOptions.expenseCurrency)(ei)) {
-              const exchangeRate =
-                res.data.currencyExchangeRate.find(
-                  rate =>
-                    rate.fromCurrency === ei.amount.currency &&
-                    rate.toCurrency === formOptions.expenseCurrency &&
-                    (!ei.incurredAt || dayjs.utc(ei.incurredAt).isSame(dayjs.utc(rate.date), 'day')),
-                ) ||
-                res.data.currencyExchangeRate.find(
-                  rate => rate.fromCurrency === ei.amount.currency && rate.toCurrency === formOptions.expenseCurrency,
+              const exchangeRate = res.data.currencyExchangeRate.find(rate => {
+                if (rate.fromCurrency !== ei.amount.currency || rate.toCurrency !== formOptions.expenseCurrency) {
+                  return false;
+                }
+                // For reimbursements, match the item date; for others, use any rate (current)
+                if (isReimbursement && ei.incurredAt) {
+                  return dayjs.utc(ei.incurredAt).isSame(dayjs.utc(rate.date), 'day');
+                }
+                return true;
+              });
+
+              if (exchangeRate) {
+                setFieldValue(
+                  `expenseItems.${i}.amount.exchangeRate`,
+                  pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
                 );
-              setFieldValue(
-                `expenseItems.${i}.amount.exchangeRate`,
-                pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
-              );
-              setFieldValue(
-                `expenseItems.${i}.amount.referenceExchangeRate`,
-                pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
-              );
+                setFieldValue(
+                  `expenseItems.${i}.amount.referenceExchangeRate`,
+                  pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
+                );
+              }
             }
           });
         }
@@ -2291,7 +2339,13 @@ export function useExpenseForm(opts: {
         ctrl.abort();
       }
     };
-  }, [apolloClient, formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+  }, [
+    apolloClient,
+    formOptions.expenseCurrency,
+    expenseForm.values.expenseItems,
+    expenseForm.values.expenseTypeOption,
+    setFieldValue,
+  ]);
 
   const setStatus = expenseForm.setStatus;
   React.useEffect(() => {

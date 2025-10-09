@@ -25,6 +25,7 @@ export enum Step {
   TYPE_OF_EXPENSE = 'TYPE_OF_EXPENSE',
   EXPENSE_CATEGORY = 'EXPENSE_CATEGORY',
   EXPENSE_ITEMS = 'EXPENSE_ITEMS',
+  REFERENCE_CURRENCY = 'REFERENCE_CURRENCY',
   EXPENSE_TITLE = 'EXPENSE_TITLE',
   SUMMARY = 'SUMMARY',
 }
@@ -47,6 +48,7 @@ export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   [Step.EXPENSE_TITLE]: ['title', 'acknowledgedCollectiveTitleExpensePolicy', 'acknowledgedHostTitleExpensePolicy'],
   [Step.SUMMARY]: [],
   [Step.INVITE_WELCOME]: [],
+  [Step.REFERENCE_CURRENCY]: ['referenceCurrency'],
 };
 
 export const StepTitles: Record<Step, MessageDescriptor> = {
@@ -77,6 +79,10 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
   [Step.EXPENSE_ITEMS]: defineMessage({
     defaultMessage: 'Expense items',
     id: '3ldWIL',
+  }),
+  [Step.REFERENCE_CURRENCY]: defineMessage({
+    defaultMessage: 'Reference currency',
+    id: 'Ho3XqF',
   }),
   [Step.EXPENSE_TITLE]: defineMessage({
     defaultMessage: 'Title',
@@ -144,10 +150,13 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.TYPE_OF_EXPENSE,
     Step.EXPENSE_CATEGORY,
     Step.EXPENSE_ITEMS,
+    Step.REFERENCE_CURRENCY,
     Step.EXPENSE_TITLE,
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
       return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
+    } else if (step === Step.REFERENCE_CURRENCY) {
+      return form.options.availableReferenceCurrencies && form.options.availableReferenceCurrencies.length > 1;
     }
 
     return true;
