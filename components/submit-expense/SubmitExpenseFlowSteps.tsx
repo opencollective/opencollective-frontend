@@ -59,8 +59,8 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
     id: 'NpMPF+',
   }),
   [Step.WHO_IS_GETTING_PAID]: defineMessage({
-    defaultMessage: 'Who is getting paid?',
-    id: 'W5Z+Fm',
+    defaultMessage: 'Who is getting paid',
+    id: 'nCANDg',
   }),
   [Step.PAYOUT_METHOD]: defineMessage({
     defaultMessage: 'Payout Method',
