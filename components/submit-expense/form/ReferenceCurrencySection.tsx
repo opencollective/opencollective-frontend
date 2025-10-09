@@ -18,9 +18,7 @@ import type { ExpenseForm } from '../useExpenseForm';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
 
-type ReferenceCurrencySectionProps = {
-  inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-} & ReturnType<typeof getFormProps>;
+type ReferenceCurrencySectionProps = ReturnType<typeof getFormProps>;
 
 function getFormProps(form: ExpenseForm) {
   return {
@@ -36,7 +34,23 @@ function getFormProps(form: ExpenseForm) {
   };
 }
 
-export const ReferenceCurrencySection = memoWithGetFormProps(function ReferenceCurrencySection(
+export function ReferenceCurrencySection(
+  props: ReferenceCurrencySectionProps & {
+    inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
+  },
+) {
+  return (
+    <FormSectionContainer
+      title={<FormattedMessage defaultMessage="Reference currency" id="Ho3XqF" />}
+      step={Step.REFERENCE_CURRENCY}
+      inViewChange={props.inViewChange}
+    >
+      <ReferenceCurrencyForm {...props} />
+    </FormSectionContainer>
+  );
+}
+
+export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurrencySection(
   props: ReferenceCurrencySectionProps,
 ) {
   const {
@@ -53,7 +67,7 @@ export const ReferenceCurrencySection = memoWithGetFormProps(function ReferenceC
   const hasMultipleCurrencies = availableReferenceCurrencies && availableReferenceCurrencies.length > 1;
 
   const onCurrencyChange = React.useCallback(
-    (currency: string) => {
+    (currency: Currency) => {
       setFieldValue('referenceCurrency', currency);
     },
     [setFieldValue],
@@ -74,11 +88,7 @@ export const ReferenceCurrencySection = memoWithGetFormProps(function ReferenceC
       : totalInvoicedInExpenseCurrency);
 
   return (
-    <FormSectionContainer
-      title={<FormattedMessage defaultMessage="Reference currency" id="Ho3XqF" />}
-      step={Step.REFERENCE_CURRENCY}
-      inViewChange={props.inViewChange}
-    >
+    <React.Fragment>
       <MessageBox type="info" className="mb-4">
         {expenseTypeOption === ExpenseType.RECEIPT ? (
           <FormattedMessage
@@ -134,6 +144,6 @@ export const ReferenceCurrencySection = memoWithGetFormProps(function ReferenceC
           </div>
         )}
       </FormField>
-    </FormSectionContainer>
+    </React.Fragment>
   );
 }, getFormProps);

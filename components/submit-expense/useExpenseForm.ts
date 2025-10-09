@@ -788,7 +788,7 @@ function buildFormSchema(
       v => {
         // If multiple currencies are supported, the reference currency must be set
         if (options.availableReferenceCurrencies.length > 1) {
-          return v && options.availableReferenceCurrencies?.includes(v);
+          return v && options.availableReferenceCurrencies.includes(v);
         } else {
           return !v || v === options.availableReferenceCurrencies[0];
         }
