@@ -103,6 +103,7 @@ const ExpenseSummary = ({
   openFileViewer,
   enableKeyboardShortcuts,
   openedItemId,
+  onCloneModalOpenChange = undefined,
   ...props
 }) => {
   const intl = useIntl();
@@ -149,6 +150,7 @@ const ExpenseSummary = ({
     >
       <ExpenseMoreActionsButton
         onEdit={LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? undefined : onEdit}
+        onCloneModalOpenChange={onCloneModalOpenChange}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}

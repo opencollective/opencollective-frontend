@@ -114,6 +114,7 @@ const ExpenseMoreActionsButton = ({
   onExpenseUpdate,
   isViewingExpenseInHostContext = false,
   enableKeyboardShortcuts,
+  onCloneModalOpenChange,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
@@ -355,11 +356,12 @@ const ExpenseMoreActionsButton = ({
                 onClick={() => {
                   setDuplicateExpenseId(expense.legacyId);
                   setIsExpenseFlowOpen(true);
+                  onCloneModalOpenChange?.(true);
                 }}
                 disabled={processExpense.loading || isDisabled}
                 data-cy="duplicate-expense-btn"
               >
-                <Copy size="16px" />
+                <Copy size="16px" color="#888" />
                 <FormattedMessage defaultMessage="Duplicate Expense" id="MXaO+R" />
               </Action>
             )}
@@ -390,6 +392,7 @@ const ExpenseMoreActionsButton = ({
             onClose={submittedExpense => {
               setDuplicateExpenseId(null);
               setIsExpenseFlowOpen(false);
+              onCloneModalOpenChange?.(false);
               if (submittedExpense) {
                 onExpenseUpdate?.();
               }
