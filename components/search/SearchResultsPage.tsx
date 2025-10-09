@@ -72,7 +72,7 @@ export const SearchResults = () => {
         }
       },
     },
-    defaultFilterValues: { workspace: account.slug },
+    defaultFilterValues: { workspace: account?.slug },
     shallow: true,
   });
   const [input, setInput] = React.useState(queryFilter.values.searchTerm);
@@ -94,11 +94,11 @@ export const SearchResults = () => {
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       const input = inputRef.current;
       if (input) {
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-          if (input.value === '') {
-            queryFilter.setFilter('workspace', undefined);
-          }
-        }
+        // if (e.key === 'Delete' || e.key === 'Backspace') {
+        //   if (input.value === '') {
+        //     queryFilter.setFilter('workspace', undefined);
+        //   }
+        // }
         if (e.key === 'Enter') {
           queryFilter.setFilter('searchTerm', input.value);
         }
@@ -122,12 +122,12 @@ export const SearchResults = () => {
     <div className="space-y-4">
       <div className={cn(BASE_INPUT_CLASS, 'relative items-center gap-3')}>
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
-        {queryFilter.values.workspace && (
+        {/* {queryFilter.values.workspace && (
           <ContextPill
             slug={queryFilter.values.workspace}
             onRemove={() => queryFilter.setFilter('workspace', undefined)}
           />
-        )}
+        )} */}
         <input
           ref={inputRef}
           onChange={e => setInput(e.target.value)}
