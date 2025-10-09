@@ -76,13 +76,11 @@ export const SearchCommand = ({ open, setOpen }) => {
     skipRouter: true,
   });
 
-  // useEffect(() => {
-  //   if (open) {
-  //     queryFilter.setFilter('workspace', account?.slug);
-  //     queryFilter.setFilter('searchTerm', undefined);
-  //     setInput('');
-  //   }
-  // }, [open]);
+  useEffect(() => {
+    if (open) {
+      queryFilter.setFilter('workspace', account?.slug);
+    }
+  }, [open, account?.slug]);
 
   const { data, loading } = useQuery(searchCommandQuery, {
     variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
