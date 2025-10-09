@@ -5,20 +5,11 @@ import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
-import {
-  getCollectivePageRoute,
-  getCommentUrl,
-  getDashboardRoute,
-  getExpensePageUrl,
-  getOrderUrl,
-  getUpdateUrl,
-} from '../../lib/url-helpers';
-import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/schema';
+import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
 import { cn } from '@/lib/utils';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
@@ -38,13 +29,12 @@ import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
+import { useGetLinkProps } from './lib';
 import { PageResult } from './PageResult';
 import { searchCommandQuery } from './queries';
 import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
-import { useGetLinkProps } from './lib';
 // TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
@@ -54,12 +44,12 @@ export const SearchCommand = ({ open, setOpen }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { account } = React.useContext(DashboardContext);
   const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
-    return account?.isHost
-      ? { slug: account.slug, type: 'host' }
-      : account?.slug && account.slug !== 'root-actions'
-        ? { slug: account.slug, type: 'account' }
+    return workspace?.isHost
+      ? { slug: workspace.slug, type: 'host' }
+      : workspace?.slug && workspace.slug !== 'root-actions'
+        ? { slug: workspace.slug, type: 'account' }
         : undefined;
-  }, [account?.isHost, account?.slug]);
+  }, [workspace]);
 
   const [input, setInput] = React.useState('');
   const queryFilter = useQueryFilter({
@@ -82,7 +72,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         }
       },
     },
-    defaultFilterValues: { workspace: account?.slug },
+    defaultFilterValues: { workspace: account?.slug }, // use account.slug here, as it means we are on a dashboard page
     skipRouter: true,
   });
 
@@ -127,7 +117,6 @@ export const SearchCommand = ({ open, setOpen }) => {
   const { getLinkProps } = useGetLinkProps();
 
   const isLoading = loading || isDebouncing;
-
   const flattenedMenuItems = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
 
@@ -214,7 +203,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                 queryFilter.setFilter('workspace', defaultContext.slug);
                 setInput('');
               }}
-              actionLabel={'Add workspace'}
+              actionLabel={'Add current workspace'}
               showAction
             >
               <ContextPill slug={defaultContext.slug} />
@@ -229,7 +218,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                   onSelect={() => {
                     queryFilter.resetFilters(
                       { searchTerm: input, workspace: defaultContext.slug },
-                      getDashboardRoute(account, ALL_SECTIONS.SEARCH),
+                      getDashboardRoute(workspace, ALL_SECTIONS.SEARCH),
                     );
                     setOpen(false);
                   }}
@@ -251,10 +240,7 @@ export const SearchCommand = ({ open, setOpen }) => {
 
               <SearchCommandItem
                 onSelect={() => {
-                  queryFilter.resetFilters(
-                    { searchTerm: input, workspace: 'ALL' },
-                    getDashboardRoute(account, ALL_SECTIONS.SEARCH),
-                  );
+                  queryFilter.resetFilters({ searchTerm: input, workspace: 'ALL' }, '/search-results');
                   setOpen(false);
                 }}
                 actionLabel={'Search all of Open Collective'}
@@ -287,7 +273,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                     onClick?.();
                   }}
                 >
-                  <Link href={href}>
+                  <Link href={href} className="block w-full">
                     {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
                     {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
                     {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
@@ -313,7 +299,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                     onClick?.();
                   }}
                 >
-                  <Link href={href}>
+                  <Link href={href} className="block w-full">
                     <PageResult page={page} />
                   </Link>
                 </SearchCommandItem>
@@ -477,6 +463,7 @@ function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
 
 function SearchCommandGroup({ totalCount, label, nodes, renderNode, input, queryFilter, entity, setOpen, type }) {
   const { account } = React.useContext(DashboardContext);
+  const { workspace } = useWorkspace();
   const router = useRouter();
   const { getLinkProps } = useGetLinkProps();
   if (!totalCount || input === '') {
@@ -504,7 +491,10 @@ function SearchCommandGroup({ totalCount, label, nodes, renderNode, input, query
       })}
       <SeeMoreItemsCommandItem
         onSelect={() => {
-          queryFilter.resetFilters({ ...queryFilter.values, entity }, getDashboardRoute(account, ALL_SECTIONS.SEARCH));
+          queryFilter.resetFilters(
+            { ...queryFilter.values, entity },
+            queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
+          );
           setOpen(false);
         }}
         key={`more-${entity}`}

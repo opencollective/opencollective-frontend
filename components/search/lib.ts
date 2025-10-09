@@ -42,7 +42,6 @@ export function getHighlightsFields<T extends string>(
 export function useGetLinkProps() {
   const { addToRecent } = useRecentlyVisited();
   const { LoggedInUser } = useLoggedInUser();
-  const { account } = React.useContext(DashboardContext);
   const { workspace } = useWorkspace();
   const getLinkProps = useCallback(
     ({
@@ -79,8 +78,8 @@ export function useGetLinkProps() {
           onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
           break;
         case 'transaction':
-          if (account?.slug === 'root-actions' || account?.isHost) {
-            href = `/dashboard/${account.slug}/host-transactions?openTransactionId=${data.legacyId}`;
+          if (workspace?.slug === 'root-actions' || workspace?.isHost) {
+            href = `/dashboard/${workspace.slug}/host-transactions?openTransactionId=${data.legacyId}`;
           } else if (workspace.slug) {
             href = `/dashboard/${workspace.slug}/transactions?openTransactionId=${data.legacyId}`;
           } else {
@@ -107,7 +106,7 @@ export function useGetLinkProps() {
       }
       return { href, onClick };
     },
-    [LoggedInUser, account, workspace, addToRecent],
+    [LoggedInUser, workspace, addToRecent],
   );
 
   return { getLinkProps };
