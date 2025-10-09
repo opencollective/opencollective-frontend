@@ -369,11 +369,11 @@ const formSchemaQuery = gql`
 
   fragment ExpenseFormSchemaPolicyFields on Account {
     policies {
+      COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
       EXPENSE_CATEGORIZATION {
         requiredForExpenseSubmitters
         requiredForCollectiveAdmins
       }
-
       EXPENSE_POLICIES {
         invoicePolicy
         receiptPolicy

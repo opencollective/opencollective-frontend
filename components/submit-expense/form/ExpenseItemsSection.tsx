@@ -4,7 +4,7 @@ import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useFormikContext } from 'formik';
 import { get, isNil, pick, round } from 'lodash';
-import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +24,7 @@ import { DISABLE_ANIMATIONS } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
 import { FormField } from '@/components/FormField';
+import PrivateInfoIcon from '@/components/icons/PrivateInfoIcon';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -42,6 +43,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type ExpenseItemsSectionProps = {
   form: ExpenseForm;
@@ -53,12 +55,7 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
     <FormSectionContainer
       step={Step.EXPENSE_ITEMS}
       inViewChange={props.inViewChange}
-      subtitle={
-        <div className="flex items-center gap-2">
-          <FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />
-          <Lock size={14} />
-        </div>
-      }
+      subtitle={<FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />}
     >
       <React.Fragment>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(props.form)} />
@@ -357,6 +354,8 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 disabled={props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
+                isPrivate
+                privateMessage={privateInfoYouCollectiveAndHost}
               >
                 {({ field }) => {
                   return (
@@ -517,8 +516,9 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
 
   return (
     <div>
-      <Label htmlFor="additionalAttachments">
+      <Label htmlFor="additionalAttachments" className="mt-5 mb-1 flex items-center gap-2">
         <FormattedMessage defaultMessage="Additional Attachments (Optional)" id="n3evmu" />
+        <PrivateInfoIcon>{privateInfoYouCollectiveAndHost}</PrivateInfoIcon>
       </Label>
       <div className="flex flex-wrap gap-4 pt-2">
         <div>

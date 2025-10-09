@@ -35,6 +35,7 @@ function flattenDetailsObject(details: any) {
 
 type PayoutMethodDetailsProps = {
   payoutMethod: Omit<PayoutMethod, 'id'> & { id?: string };
+  privateMessage?: React.ReactNode;
 };
 
 function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
@@ -54,7 +55,8 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
         id: 'email',
         label: (
           <div className="flex gap-2">
-            <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" /> <PrivateInfoIcon />
+            <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />{' '}
+            <PrivateInfoIcon>{props.privateMessage}</PrivateInfoIcon>
           </div>
         ),
         value: props.payoutMethod.data.email ?? '********',
@@ -72,7 +74,8 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
         id: 'details',
         label: (
           <div className="flex gap-2">
-            <FormattedMessage id="Details" defaultMessage="Details" /> <PrivateInfoIcon />
+            <FormattedMessage id="Details" defaultMessage="Details" />{' '}
+            <PrivateInfoIcon>{props.privateMessage}</PrivateInfoIcon>
           </div>
         ),
         value: props.payoutMethod.data.content ?? '********',
@@ -101,7 +104,8 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
             id: 'accountHolderName',
             label: (
               <div className="flex gap-2">
-                <FormattedMessage defaultMessage="Account Holder" id="GEFifJ" /> <PrivateInfoIcon />
+                <FormattedMessage defaultMessage="Account Holder" id="GEFifJ" />{' '}
+                <PrivateInfoIcon>{props.privateMessage}</PrivateInfoIcon>
               </div>
             ),
             value: props.payoutMethod.data.accountHolderName,
@@ -133,6 +137,7 @@ export function PayoutMethodDetailsContainer(props: {
   payoutMethod: ExpenseForm['options']['payoutMethod'];
   maxItems?: number;
   className?: string;
+  privateMessage?: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleContainer = React.useCallback(() => {
