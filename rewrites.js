@@ -396,6 +396,10 @@ exports.REWRITES = [
     destination: '/search',
   },
   {
+    source: '/search-results',
+    destination: '/search-results',
+  },
+  {
     source: '/pricing',
     destination: '/pricing',
   },
