@@ -26,8 +26,8 @@ ENV INTERNAL_API_URL $INTERNAL_API_URL
 ARG IMAGES_URL=https://images-staging.opencollective.com
 ENV IMAGES_URL $IMAGES_URL
 
-ARG PDF_SERVICE_V2_URL=https://pdf-staging.opencollective.com
-ENV PDF_SERVICE_V2_URL $PDF_SERVICE_V2_URL
+ARG PDF_SERVICE_URL=https://pdf-staging.opencollective.com
+ENV PDF_SERVICE_URL $PDF_SERVICE_URL
 
 ARG ML_SERVICE_URL=https://ml.opencollective.com
 ENV ML_SERVICE_URL $ML_SERVICE_URL
