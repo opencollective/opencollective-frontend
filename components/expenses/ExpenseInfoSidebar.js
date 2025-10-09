@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { CurrencyPrecision } from '../../lib/constants/currency-precision';
 
 import Container from '../Container';
+import { DefinitionTooltip } from '../dashboard/sections/reports/DefinitionTooltip';
 import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box } from '../Grid';
@@ -12,13 +13,17 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { H5, P, Span } from '../Text';
 
 import ExpandableExpensePolicies from './ExpandableExpensePolicies';
-
 /**
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
 const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, children = undefined }) => {
+  const balance = collective?.stats.balance;
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
+  const blockedFundsAmount = {
+    valueInCents: balance?.amount.valueInCents - balanceWithBlockedFunds?.amount.valueInCents,
+    currency: balance?.currency,
+  };
   return (
     <Box width="100%">
       <Box display={['none', 'block']}>
@@ -40,16 +45,44 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
           color="black.500"
           data-cy="collective-balance"
         >
-          {isLoading && !balanceWithBlockedFunds ? (
+          {isLoading && !balance ? (
             <LoadingPlaceholder height={28} width={75} />
           ) : (
             <Box>
-              <FormattedMoneyAmount
-                currency={balanceWithBlockedFunds.currency}
-                amount={balanceWithBlockedFunds.valueInCents}
-                amountClassName="text-foreground"
-                precision={CurrencyPrecision.DEFAULT}
-              />
+              {blockedFundsAmount.valueInCents > 0 ? (
+                <DefinitionTooltip
+                  definition={
+                    <FormattedMessage
+                      defaultMessage="This number accounts for {blockedFunds} currently not available to spend"
+                      id="LWUmrm"
+                      values={{
+                        blockedFunds: (
+                          <FormattedMoneyAmount
+                            amount={blockedFundsAmount.valueInCents}
+                            currency={balance?.currency}
+                            precision={CurrencyPrecision.DEFAULT}
+                          />
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <FormattedMoneyAmount
+                    currency={balance.currency}
+                    amount={balance.valueInCents}
+                    amountClassName="text-foreground"
+                    precision={CurrencyPrecision.DEFAULT}
+                  />
+                </DefinitionTooltip>
+              ) : (
+                <FormattedMoneyAmount
+                  currency={balance.currency}
+                  amount={balance.valueInCents}
+                  amountClassName="text-foreground"
+                  precision={CurrencyPrecision.DEFAULT}
+                />
+              )}
+
               {host && (
                 <P fontSize="11px" color="black.700" mt={3}>
                   <Span
