@@ -4266,6 +4266,7 @@
   "verificationCriteria": "критерії перевірки",
   "VerifyEmailAddress": "Підтвердьте адресу електронної пошти",
   "VerifyEmailInstructions": "Електронний лист для перевірки надіслано на {email}. Натисніть на посилання, щоб підтвердити цю витрату. Якщо ви не отримали електронного листа, будь ласка, перевірте ваш спам.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Щось пішло не так. Оновіть або спробуйте щось інше",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",

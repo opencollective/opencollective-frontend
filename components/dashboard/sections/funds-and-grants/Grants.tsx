@@ -217,6 +217,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
                 {
                   enableViewGrantsByBeneficiary: true,
                   onViewDetailsClick,
+                  refetch,
                 } as GrantsTableMeta
               }
               columns={compact([

@@ -4266,6 +4266,7 @@
   "verificationCriteria": "kryteria weryfikacji",
   "VerifyEmailAddress": "Zweryfikuj swój adres e-mail",
   "VerifyEmailInstructions": "E-mail weryfikacyjny został wysłany na adres {email}. Kliknij link, aby zakończyć przesyłanie tego wydatku. Jeśli nie otrzymałeś e-maila, sprawdź swój spam.",
+  "VErmYl": "Duplicate grant",
   "VEUYB7": "Coś poszło nie tak, proszę odświeżyć lub spróbować czegoś innego",
   "VfJsl4": "Beneficiary",
   "VGuckw": "{date}: <ExpenseLink>{amount} {expenseType}</ExpenseLink> to {account}",
