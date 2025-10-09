@@ -10,7 +10,7 @@ import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { get } from 'lodash';
-import { ArrowRightLeft, FileText } from 'lucide-react';
+import { ArrowRightLeft, Copy, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -18,12 +18,15 @@ import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
+import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
@@ -32,6 +35,12 @@ import { useToast } from '../ui/useToast';
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+
+// Lazy load the submit expense flow
+const SubmitExpenseFlow = React.lazy(() =>
+  import('../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
+);
+
 const Action = styled.button`
   ${margin}
   padding: 16px;
@@ -75,6 +84,21 @@ const getTransactionsUrl = (dashboardAccount, expense) => {
   return null;
 };
 
+const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
+  if (!LoggedInUser || !expense) {
+    return false;
+  }
+
+  return (
+    [ExpenseType.INVOICE, ExpenseType.RECEIPT].includes(expense.type) &&
+    expense.status !== ExpenseStatus.DRAFT &&
+    (LoggedInUser.CollectiveId === expense.createdByAccount?.legacyId ||
+      LoggedInUser.isAdminOfCollective(expense.account) ||
+      LoggedInUser.isAdminOfCollective(expense.payee) ||
+      LoggedInUser.isAdminOfCollective(expense.host))
+  );
+};
+
 /**
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
@@ -87,12 +111,15 @@ const ExpenseMoreActionsButton = ({
   linkAction = 'copy',
   onModalToggle,
   onDelete,
+  onExpenseUpdate,
   isViewingExpenseInHostContext = false,
   enableKeyboardShortcuts,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
+  const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
+  const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const { isCopied, copy } = useClipboard();
   const { account } = React.useContext(DashboardContext);
   const { toast } = useToast();
@@ -124,6 +151,9 @@ const ExpenseMoreActionsButton = ({
     },
   });
   const { LoggedInUser } = useLoggedInUser();
+
+  const hasNewSubmitExpenseFlow =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
@@ -320,6 +350,19 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </Action>
+            {hasNewSubmitExpenseFlow && shouldShowDuplicateExpenseButton(LoggedInUser, expense) && (
+              <Action
+                onClick={() => {
+                  setDuplicateExpenseId(expense.legacyId);
+                  setIsExpenseFlowOpen(true);
+                }}
+                disabled={processExpense.loading || isDisabled}
+                data-cy="duplicate-expense-btn"
+              >
+                <Copy size="16px" />
+                <FormattedMessage defaultMessage="Duplicate Expense" id="MXaO+R" />
+              </Action>
+            )}
             {viewTransactionsUrl && (
               <Action onClick={() => router.push(viewTransactionsUrl)} disabled={processExpense.loading || isDisabled}>
                 <ArrowRightLeft size="16" color="#888" />
@@ -338,6 +381,23 @@ const ExpenseMoreActionsButton = ({
           expense={expense}
           showDeleteConfirmMoreActions={showDeleteConfirmMoreActions}
         />
+      )}
+      {isExpenseFlowOpen && (
+        <React.Suspense
+          fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setIsExpenseFlowOpen(false)} />}
+        >
+          <SubmitExpenseFlow
+            onClose={submittedExpense => {
+              setDuplicateExpenseId(null);
+              setIsExpenseFlowOpen(false);
+              if (submittedExpense) {
+                onExpenseUpdate?.();
+              }
+            }}
+            expenseId={duplicateExpenseId}
+            duplicateExpense={!!duplicateExpenseId}
+          />
+        </React.Suspense>
       )}
     </React.Fragment>
   );
