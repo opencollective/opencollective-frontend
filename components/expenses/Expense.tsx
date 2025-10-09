@@ -110,6 +110,7 @@ const PrivateNoteLabel = () => {
 };
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
+export const EXPENSE_PAGE_POLLING_INTERVAL = 60 * 1000;
 
 interface ExpenseProps {
   collectiveSlug?: string;
@@ -222,7 +223,6 @@ function Expense(props: ExpenseProps) {
   const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
   const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
   const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
-  const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
@@ -372,7 +372,7 @@ function Expense(props: ExpenseProps) {
           props.refetch?.();
           pollingPaused = false;
         }
-        props.startPolling?.(pollingInterval * 1000);
+        props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
         pollingStarted = true;
       }
 
@@ -382,7 +382,7 @@ function Expense(props: ExpenseProps) {
         props.stopPolling?.();
         pollingStarted = false;
         pollingPaused = true;
-      }, pollingInterval * 1000);
+      }, EXPENSE_PAGE_POLLING_INTERVAL);
     }
   }, 100);
 
@@ -400,7 +400,7 @@ function Expense(props: ExpenseProps) {
   };
 
   const onCancel = () => {
-    props.startPolling?.(pollingInterval * 1000);
+    props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
     return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
   };
 
@@ -433,7 +433,7 @@ function Expense(props: ExpenseProps) {
         await refetch();
       }
       const createdUser = editedExpense.payee;
-      props.startPolling?.(pollingInterval * 1000);
+      props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
@@ -658,6 +658,13 @@ function Expense(props: ExpenseProps) {
             openFileViewer={openFileViewer}
             enableKeyboardShortcuts={enableKeyboardShortcuts}
             openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
+            onCloneModalOpenChange={isOpen => {
+              if (isOpen) {
+                props.stopPolling?.();
+              } else {
+                props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
+              }
+            }}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (

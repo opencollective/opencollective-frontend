@@ -485,6 +485,7 @@ const CollectiveNavbar = ({
   onlyInfos = false,
   useAnchorsForCategories = false,
   showSelectedCategoryOnMobile = false,
+  onSubmitExpenseModalOpenChange = undefined,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -499,7 +500,11 @@ const CollectiveNavbar = ({
     skip: !collective?.slug || !LoggedInUser,
   });
 
-  const [isSubmitExpenseModalOpen, setIsSubmitExpenseModalOpen] = React.useState(false);
+  const [isSubmitExpenseModalOpen, _setIsSubmitExpenseModalOpen] = React.useState(false);
+  const setIsSubmitExpenseModalOpen = open => {
+    _setIsSubmitExpenseModalOpen(open);
+    onSubmitExpenseModalOpenChange?.(open);
+  };
 
   const loading = isLoading || dataLoading;
 
