@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { SearchIcon } from 'lucide-react';
+import { Search, SearchIcon } from 'lucide-react';
 import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import useQueryFilter from '../../lib/hooks/useQueryFilter';
+import useQueryFilter, { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl } from '../../lib/url-helpers';
 import { cn } from '@/lib/utils';
 
@@ -24,7 +24,6 @@ import { ExpenseResult } from './result/ExpenseResult';
 import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
-import { ContextPill } from './ContextPill';
 import { useGetLinkProps } from './lib';
 import { searchCommandQuery } from './queries';
 import { SearchEntity } from './schema';
@@ -122,12 +121,7 @@ export const SearchResults = () => {
     <div className="space-y-4">
       <div className={cn(BASE_INPUT_CLASS, 'relative items-center gap-3')}>
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
-        {/* {queryFilter.values.workspace && (
-          <ContextPill
-            slug={queryFilter.values.workspace}
-            onRemove={() => queryFilter.setFilter('workspace', undefined)}
-          />
-        )} */}
+
         <input
           ref={inputRef}
           onChange={e => setInput(e.target.value)}
@@ -220,35 +214,42 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           <SearchResultsGroup
             label="Accounts"
             type="account"
+            entity={SearchEntity.ACCOUNTS}
             totalCount={data?.search.results.accounts.collection.totalCount}
             nodes={data?.search.results.accounts.collection.nodes}
             renderNode={account => (
               <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
             )}
+            queryFilter={queryFilter}
           />
           <SearchResultsGroup
             type="expense"
             label="Expenses"
+            entity={SearchEntity.EXPENSES}
             totalCount={data?.search.results.expenses.collection.totalCount}
             nodes={data?.search.results.expenses.collection.nodes}
             renderNode={expense => (
               <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
             )}
+            queryFilter={queryFilter}
           />
 
           <SearchResultsGroup
             type="order"
             label="Contributions"
+            entity={SearchEntity.CONTRIBUTIONS}
             totalCount={data?.search.results.orders.collection.totalCount}
             nodes={data?.search.results.orders.collection.nodes}
             renderNode={order => (
               <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
             )}
+            queryFilter={queryFilter}
           />
 
           <SearchResultsGroup
             type="transaction"
             label="Transactions"
+            entity={SearchEntity.TRANSACTIONS}
             totalCount={data?.search.results.transactions.collection.totalCount}
             nodes={data?.search.results.transactions.collection.nodes}
             renderNode={transaction => (
@@ -257,19 +258,23 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
                 highlights={data.search.results.transactions.highlights[transaction.id]}
               />
             )}
+            queryFilter={queryFilter}
           />
 
           <SearchResultsGroup
             label="Updates"
             type="update"
+            entity={SearchEntity.UPDATES}
             totalCount={data?.search.results.updates.collection.totalCount}
             nodes={data?.search.results.updates.collection.nodes}
             renderNode={update => (
               <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
             )}
+            queryFilter={queryFilter}
           />
           <SearchResultsGroup
             type="comment"
+            entity={SearchEntity.COMMENTS}
             label="Comments"
             totalCount={data?.search.results.comments.collection.totalCount}
             nodes={data?.search.results.comments.collection.nodes.filter(comment =>
@@ -278,6 +283,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
             renderNode={comment => (
               <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
             )}
+            queryFilter={queryFilter}
           />
         </div>
       );
@@ -374,7 +380,9 @@ function SearchResultsGroup({
   renderNode,
   showEmpty = false,
   type,
+  entity,
   loading,
+  queryFilter,
 }: {
   label?: string;
   totalCount?: number;
@@ -382,7 +390,9 @@ function SearchResultsGroup({
   renderNode: (node: unknown) => React.ReactNode;
   showEmpty?: boolean;
   type: PageVisit['type'];
+  entity?: SearchEntity;
   loading?: boolean;
+  queryFilter?: useQueryFilterReturnType<any, any>;
 }) {
   const { getLinkProps } = useGetLinkProps();
 
@@ -420,9 +430,9 @@ function SearchResultsGroup({
                 </Link>
               );
             })}
-        {moreCount > 0 && (
+        {moreCount > 0 && entity && (
           <button
-            onClick={() => {}}
+            onClick={() => queryFilter.setFilter('entity', entity)}
             className="-mx-2 flex w-full items-center gap-2 rounded-sm px-2 py-1.5 hover:bg-muted"
           >
             <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
