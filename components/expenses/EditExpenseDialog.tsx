@@ -32,6 +32,7 @@ import {
   ExpenseItemWrapper,
 } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
+import { ReferenceCurrencyForm } from '../submit-expense/form/ReferenceCurrencySection';
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
@@ -294,6 +295,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
       payoutMethodId: true,
       payee: true,
       payeeLocation: true,
+      referenceCurrency: true,
     },
   });
   const transformedOnSubmit = React.useCallback(
@@ -370,6 +372,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
+        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -389,6 +392,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       invoiceFile: true,
       invoiceNumber: true,
       invoiceInfo: true,
+      referenceCurrency: true,
     },
   });
   const transformedOnSubmit = values => {
@@ -464,6 +468,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
+        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
