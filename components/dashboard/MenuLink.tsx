@@ -51,7 +51,7 @@ export const MenuLink = ({
   });
   const subMenuExpanded = sectionExpanded || selfExpanded;
 
-  const isSelected = !subMenu && section && sectionAndSubpath === section;
+  const isSelected = !subMenu && section && (sectionAndSubpath === section || selectedSection === section);
 
   if (!label && SECTION_LABELS[section]) {
     label = formatMessage(SECTION_LABELS[section]);
