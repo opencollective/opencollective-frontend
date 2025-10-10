@@ -51,7 +51,9 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <ExpenseSummary
             onDelete={() => {}}
             onEdit={() => {}}
-            openFileViewer={() => {}}
+            openFileViewer={url => {
+              window.open(url, '_blank');
+            }}
             enableKeyboardShortcuts={false}
             drawerActionsContainer={null}
             canEditTags={false}
