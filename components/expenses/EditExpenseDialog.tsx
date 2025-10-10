@@ -388,6 +388,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       expenseAttachedFiles: true,
       invoiceFile: true,
       invoiceNumber: true,
+      invoiceInfo: true,
     },
   });
   const transformedOnSubmit = values => {
@@ -418,6 +419,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       attachedFiles: values.additionalAttachments.map(a => ({
         url: typeof a === 'string' ? a : a?.url,
       })),
+      invoiceInfo: values.invoiceInfo,
       invoiceFile,
       reference: values.invoiceNumber,
       tax:
@@ -583,6 +585,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       expenseAttachedFiles: true,
       invoiceFile: true,
       invoiceNumber: true,
+      invoiceInfo: true,
       expenseTypeOption: true,
     },
   });
@@ -613,6 +616,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
           : values.invoiceFile
             ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
             : undefined,
+      invoiceInfo: values.invoiceInfo,
       reference: values.invoiceNumber,
       type: values.expenseTypeOption,
       tax:
