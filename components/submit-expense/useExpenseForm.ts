@@ -163,6 +163,7 @@ export type ExpenseFormValues = {
   hasInvoiceOption?: YesNoOption;
   invoiceFile?: Attachment;
   invoiceNumber?: string;
+  invoiceInfo?: string;
 };
 
 type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue' | 'getFieldProps'> & {
@@ -830,6 +831,7 @@ function buildFormSchema(
           message: 'Required',
         },
       ),
+    invoiceInfo: z.string().optional(),
     expenseItems: z.array(
       z
         .object({
@@ -1791,7 +1793,7 @@ export function useExpenseForm(opts: {
             attachedFiles,
             currency: formOptions.expenseCurrency,
             customData: null,
-            invoiceInfo: null,
+            invoiceInfo: values.invoiceInfo || null,
             invoiceFile:
               values.hasInvoiceOption === YesNoOption.NO
                 ? null
@@ -2055,6 +2057,10 @@ export function useExpenseForm(opts: {
           additionalAttachments.map(af => af.url),
         );
       }
+    }
+
+    if (formOptions.expense.invoiceInfo) {
+      setFieldValue('invoiceInfo', formOptions.expense.invoiceInfo);
     }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
