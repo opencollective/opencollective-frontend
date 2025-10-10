@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`StyledInputFormikField With Zod schema automatically adds attributes from Zod schema 1`] = `
 <div>
