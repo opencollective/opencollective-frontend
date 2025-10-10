@@ -580,7 +580,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border antialiased;
   }
   body {
     @apply h-full overflow-y-scroll bg-background text-foreground;
