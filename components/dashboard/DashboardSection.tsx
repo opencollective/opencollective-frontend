@@ -29,6 +29,7 @@ import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
+import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
@@ -100,6 +101,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.APPROVE_GRANT_REQUESTS]: ApproveGrantRequests,
   [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
   [SECTIONS.CONTRIBUTORS]: Contributors,
+  [SECTIONS.PEOPLE]: PeopleRouter,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
