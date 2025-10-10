@@ -46,6 +46,8 @@ export type Account = {
   /** Categories set by Open Collective to help moderation. */
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...) */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   conversations: ConversationCollection;
@@ -182,6 +184,12 @@ export type AccountChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -334,6 +342,7 @@ export type AccountOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1524,6 +1533,8 @@ export type Bot = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   conversations: ConversationCollection;
@@ -1655,6 +1666,12 @@ export type BotChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Bot account */
+export type BotCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -1814,6 +1831,7 @@ export type BotOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2026,6 +2044,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -2198,6 +2218,12 @@ export type CollectiveChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Collective account */
+export type CollectiveCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -2379,6 +2405,7 @@ export type CollectiveOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2691,6 +2718,47 @@ export enum CommentType {
 export type CommentUpdateInput = {
   html?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
+};
+
+export type CommunityAssociatedCollective = {
+  __typename?: 'CommunityAssociatedCollective';
+  account?: Maybe<Account>;
+  relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
+};
+
+export enum CommunityRelationType {
+  ADMIN = 'ADMIN',
+  ATTENDEE = 'ATTENDEE',
+  CONTRIBUTOR = 'CONTRIBUTOR',
+  EXPENSE_APPROVER = 'EXPENSE_APPROVER',
+  EXPENSE_SUBMITTER = 'EXPENSE_SUBMITTER',
+  GRANTEE = 'GRANTEE',
+  PAYEE = 'PAYEE'
+}
+
+export type CommunityStats = {
+  __typename?: 'CommunityStats';
+  activities?: Maybe<ActivityCollection>;
+  associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedCollective>>>;
+  firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
+  lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
+  relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
+  transactionSummary?: Maybe<Array<Maybe<CommunityTransactionSummary>>>;
+};
+
+
+export type CommunityStatsActivitiesArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+export type CommunityTransactionSummary = {
+  __typename?: 'CommunityTransactionSummary';
+  contributionCount?: Maybe<Scalars['Int']['output']>;
+  contributionTotal?: Maybe<Amount>;
+  expenseCount?: Maybe<Scalars['Int']['output']>;
+  expenseTotal?: Maybe<Amount>;
+  year?: Maybe<Scalars['Int']['output']>;
 };
 
 /** Response for the confirmGuestAccount mutation */
@@ -4067,6 +4135,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -4249,6 +4319,12 @@ export type EventChildrenAccountsArgs = {
 
 
 /** This represents an Event account */
+export type EventCommunityStatsArgs = {
+  host: AccountReferenceInput;
+};
+
+
+/** This represents an Event account */
 export type EventConnectedAccountsArgs = {
   service?: InputMaybe<ConnectedAccountService>;
 };
@@ -4426,6 +4502,7 @@ export type EventOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5332,6 +5409,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -5500,6 +5579,12 @@ export type FundChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Project account */
+export type FundCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -5681,6 +5766,7 @@ export type FundOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5944,6 +6030,8 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -6172,6 +6260,12 @@ export type HostChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Host account */
+export type HostCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -6491,6 +6585,7 @@ export type HostOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7032,6 +7127,8 @@ export type Individual = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** Company slugs the user is part of. */
   company?: Maybe<Scalars['String']['output']>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
@@ -7188,6 +7285,12 @@ export type IndividualChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -7366,6 +7469,7 @@ export type IndividualOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -9550,6 +9654,8 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -9721,6 +9827,12 @@ export type OrganizationChildrenAccountsArgs = {
 
 
 /** This represents an Organization account */
+export type OrganizationCommunityStatsArgs = {
+  host: AccountReferenceInput;
+};
+
+
+/** This represents an Organization account */
 export type OrganizationConnectedAccountsArgs = {
   service?: InputMaybe<ConnectedAccountService>;
 };
@@ -9884,6 +9996,7 @@ export type OrganizationOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10133,6 +10246,7 @@ export type PaymentMethodOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10862,6 +10976,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -11032,6 +11148,12 @@ export type ProjectChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Project account */
+export type ProjectCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -11213,6 +11335,7 @@ export type ProjectOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11400,6 +11523,8 @@ export type Query = {
   activities: ActivityCollection;
   application?: Maybe<Application>;
   collective?: Maybe<Collective>;
+  /** Return accounts that have interacted with a given account or host */
+  community: AccountCollection;
   conversation?: Maybe<Conversation>;
   /** Get exchange rates from Open Collective */
   currencyExchangeRate: Array<CurrencyExchangeRate>;
@@ -11516,6 +11641,19 @@ export type QueryCollectiveArgs = {
   id?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   throwIfMissing?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** This is the root query */
+export type QueryCommunityArgs = {
+  account?: InputMaybe<AccountReferenceInput>;
+  email?: InputMaybe<Scalars['EmailAddress']['input']>;
+  host?: InputMaybe<AccountReferenceInput>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  relation?: InputMaybe<Array<InputMaybe<CommunityRelationType>>>;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 
 
@@ -11675,6 +11813,7 @@ export type QueryOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -12046,6 +12185,7 @@ export enum SecurityCheckLevel {
 
 /** All supported SecurityCheck scopes */
 export enum SecurityCheckScope {
+  ATTACHMENTS = 'ATTACHMENTS',
   COLLECTIVE = 'COLLECTIVE',
   PAYEE = 'PAYEE',
   PAYOUT_METHOD = 'PAYOUT_METHOD',
@@ -13189,6 +13329,8 @@ export type Vendor = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -13349,6 +13491,12 @@ export type VendorChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Vendor account */
+export type VendorCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -13516,6 +13664,7 @@ export type VendorOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
