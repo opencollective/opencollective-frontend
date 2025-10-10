@@ -685,7 +685,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
         disabled={expenseForm.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE) || expenseForm.isSubmitting}
         value={expenseForm.values.expenseTypeOption}
         onValueChange={newValue => expenseForm.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
-        className="flex"
+        className="mb-4 flex flex-wrap"
       >
         <RadioGroupCard
           className="grow basis-0"
@@ -732,7 +732,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
           </div>
         </RadioGroupCard>
       </RadioGroup>
-      <DialogFooter>
+      <DialogFooter className="gap-2 sm:gap-0">
         <DialogClose asChild>
           <Button variant="outline">
             <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
@@ -804,7 +804,7 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
       )}
 
       <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-      <DialogFooter>
+      <DialogFooter className="mt-4 gap-2 sm:gap-0">
         <Button variant="outline" onClick={prevStep}>
           <FormattedMessage defaultMessage="Back" id="Back" />
         </Button>
@@ -849,7 +849,7 @@ function EditExpenseActionButtons({
   const formik = useFormikContext();
 
   return (
-    <DialogFooter>
+    <DialogFooter className="gap-2 sm:gap-0">
       <DialogClose asChild>
         <Button variant="outline">
           <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
