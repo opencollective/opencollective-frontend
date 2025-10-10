@@ -17,6 +17,7 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
+  PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
 }
 
 enum Categories {
@@ -177,5 +178,14 @@ export const previewFeatures: PreviewFeature[] = [
       }
     },
     category: Categories.FOR_NERDS,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD,
+    title: 'People Dashboard',
+    description: 'Access a new dashboard to manage and engage with your community members.',
+    publicBeta: false,
+    closedBetaAccessFor: PLATFORM_ACCOUNTS,
+    category: Categories.HOSTING,
+    alwaysEnableInDev: true,
   },
 ];

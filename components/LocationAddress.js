@@ -1,5 +1,7 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+import { getCountryDisplayName } from '@/lib/i18n/countries';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
 import { Span } from './Text';
@@ -8,6 +10,7 @@ import { Span } from './Text';
  * Displays a location object
  */
 const LocationAddress = ({ location, isLoading = false, showMessageIfEmpty = false, singleLine = false }) => {
+  const intl = useIntl();
   if (isLoading) {
     return (
       <div>
@@ -27,8 +30,8 @@ const LocationAddress = ({ location, isLoading = false, showMessageIfEmpty = fal
   return (
     <React.Fragment>
       {location.address}
-      {!singleLine ? <br /> : ', '}
-      {location.country}
+      {!singleLine ? location.address ? <br /> : null : ', '}
+      {getCountryDisplayName(intl, location.country)}
     </React.Fragment>
   );
 };
