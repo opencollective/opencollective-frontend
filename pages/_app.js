@@ -185,6 +185,9 @@ class OpenCollectiveFrontendApp extends App {
       console.log('pageProps apollo cache', pageProps?.[APOLLO_STATE_PROP_NAME]);
     }
 
+    // Use the layout defined at the page level, if available
+    const getLayout = Component.getLayout || (page => page);
+
     return (
       <Fragment>
         <ApolloProvider
@@ -206,7 +209,8 @@ class OpenCollectiveFrontendApp extends App {
                         <WorkspaceProvider>
                           <ModalProvider>
                             <NewsAndUpdatesProvider>
-                              <Component {...pageProps} />
+                              {getLayout(<Component {...pageProps} />)}
+
                               <Toaster />
                               <GlobalNewsAndUpdates />
                               <TwoFactorAuthenticationModal />

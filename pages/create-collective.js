@@ -8,8 +8,8 @@ import { isHiddenAccount } from '@/lib/collective';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
-import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
+import ActionLayout from '@/components/layouts/ActionLayout';
 
 const createCollectiveHostQuery = gql`
   query CreateCollectiveHost($slug: String!) {
@@ -52,9 +52,9 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   return (
-    <Page showFooter={Boolean(LoggedInUser)}>
-      <CreateCollective host={data && data.host} />
-    </Page>
+    // <Page showFooter={Boolean(LoggedInUser)}>
+    <CreateCollective host={data && data.host} />
+    // </Page>
   );
 };
 
@@ -64,6 +64,12 @@ CreateCollectivePage.getInitialProps = () => {
   };
 };
 
+const CreateCollectivePageWithUser = withUser(CreateCollectivePage);
+// Apply DashboardLayout to this page
+CreateCollectivePageWithUser.getLayout = function getLayout(page) {
+  return <ActionLayout title="Create Collective">{page}</ActionLayout>;
+};
+
 // next.js export
 // ts-unused-exports:disable-next-line
-export default withUser(CreateCollectivePage);
+export default CreateCollectivePageWithUser;

@@ -61,6 +61,7 @@ import AccountSwitcher from './NewAccountSwitcher';
 import { ALL_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { type MenuItem, shouldIncludeMenuItemWithLegacyFallback } from './Menu';
+import { useWorkspace } from '../WorkspaceProvider';
 
 enum SidebarOption {
   DEFAULT = 'DEFAULT',
@@ -70,17 +71,18 @@ export default function DashboardLayout({
   children,
   menuItems: ogMenu,
   isLoading,
-  activeSlug,
+  // activeSlug,
 }: {
   children: React.ReactNode;
   isLoading?: boolean;
   onRoute?: () => void;
   activeSlug?: string;
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
 }) {
+  const { workspace, account } = useWorkspace();
+  const activeSlug = workspace?.slug;
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-  const { account } = React.useContext(DashboardContext);
   const intl = useIntl();
   const sidebarOption = SidebarOption.GROUPING;
   //   const menuItems = React.useMemo(() => ogMenu, [isLoading, activeSlug, LoggedInUser, ogMenu]);
@@ -463,7 +465,7 @@ export default function DashboardLayout({
             <SidebarGroupContent>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={false}>
-                  <Link href={'/explore'}>
+                  <Link href={'/search'}>
                     <Telescope />
                     <span>Explore</span>
                   </Link>

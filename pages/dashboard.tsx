@@ -14,6 +14,7 @@ import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -37,7 +38,6 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import DashboardLayout from '@/components/dashboard/Layout';
 
 const messages = defineMessages({
@@ -254,16 +254,14 @@ const DashboardPage = () => {
       }}
     >
       {LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG) ? (
-        <DashboardLayout isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems}>
-          {LoggedInUser &&
-          require2FAForAdmins(account) &&
-          !LoggedInUser.hasTwoFactorAuth &&
-          selectedSection !== 'user-security' ? (
-            <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-          ) : (
-            <DashboardSection section={selectedSection} isLoading={isLoading} account={account} subpath={subpath} />
-          )}
-        </DashboardLayout>
+        LoggedInUser && //         <DashboardLayout isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems}>
+        require2FAForAdmins(account) &&
+        !LoggedInUser.hasTwoFactorAuth &&
+        selectedSection !== 'user-security' ? (
+          <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+        ) : (
+          <DashboardSection section={selectedSection} isLoading={isLoading} account={account} subpath={subpath} />
+        )
       ) : (
         <div className="flex min-h-screen flex-col justify-between">
           <Page
@@ -315,6 +313,11 @@ const DashboardPage = () => {
       )}
     </DashboardContext.Provider>
   );
+};
+
+// Apply DashboardLayout to this page
+DashboardPage.getLayout = function getLayout(page: React.ReactElement) {
+  return <DashboardLayout>{page}</DashboardLayout>;
 };
 
 // next.js export

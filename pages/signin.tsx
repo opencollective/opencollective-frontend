@@ -11,6 +11,7 @@ import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils'
 import { getEnvVar } from '@/lib/env-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
 import type LoggedInUser from '@/lib/LoggedInUser';
+import type { NextPageWithLayoutType } from '@/lib/types';
 import { getWhitelabelProviderFromRedirectionUrl, type WhitelabelProps } from '@/lib/whitelabel';
 
 import Body from '../components/Body';
@@ -22,6 +23,7 @@ import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
+import MinimalLayout from '@/components/layouts/MinimalLayout';
 
 type SigninPageProps = {
   token: string;
@@ -256,7 +258,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   render() {
     return (
       <div className="LoginPage">
-        <Header
+        {/* <Header
           title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
           showMenuItems={false}
@@ -264,7 +266,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
           showProfileAndChangelogMenu={false}
           withTopBar={!this.props.requestedByWhitelabelProvider}
           noRobots={Boolean(this.props.token || this.props.email)}
-        />
+        /> */}
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>
             {this.renderContent()}
@@ -277,4 +279,12 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default withUser(withRouter(SigninPage));
+const SigninPageWithLayout: NextPageWithLayoutType = withUser(withRouter(SigninPage));
+
+// Apply MinimalLayout to this page
+SigninPageWithLayout.getLayout = function getLayout(page) {
+  console.log({ page });
+  return <MinimalLayout>{page}</MinimalLayout>;
+};
+
+export default SigninPageWithLayout;
