@@ -278,7 +278,7 @@ export const generateSetupGuideSteps = ({
           completed: 'host' in account && account.host?.hostFeePercent > 0,
           requiresUpgrade: planFeatures && !planFeatures.CHARGE_HOSTING_FEES,
           action: {
-            label: <FormattedMessage defaultMessage="Set up hosting feess" id="SetupGuide.HostingFees.Action" />,
+            label: <FormattedMessage defaultMessage="Set up hosting fees" id="SetupGuide.HostingFees.Action" />,
             onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
           },
         },
