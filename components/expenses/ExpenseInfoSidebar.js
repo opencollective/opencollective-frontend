@@ -21,7 +21,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
   const balance = collective?.stats.balance;
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
   const blockedFundsAmount = {
-    valueInCents: balance?.amount.valueInCents - balanceWithBlockedFunds?.amount.valueInCents,
+    valueInCents: balance?.valueInCents - balanceWithBlockedFunds?.valueInCents,
     currency: balance?.currency,
   };
   return (
