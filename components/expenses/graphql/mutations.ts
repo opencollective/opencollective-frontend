@@ -3,8 +3,8 @@ import { gql } from '../../../lib/graphql/helpers';
 import { accountingCategoryFields, expensePageExpenseFieldsFragment, expenseValuesByRoleFragment } from './fragments';
 
 export const editExpenseMutation = gql`
-  mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
-    editExpense(expense: $expense, draftKey: $draftKey) {
+  mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String, $isDraftEdit: Boolean) {
+    editExpense(expense: $expense, draftKey: $draftKey, isDraftEdit: $isDraftEdit) {
       id
       ...ExpensePageExpenseFields
     }

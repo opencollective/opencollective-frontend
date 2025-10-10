@@ -6,7 +6,7 @@ import { unescape } from 'lodash';
 import { ChevronLeft, ChevronRight, Download, ExternalLink, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
 import { generateDownloadUrlForFileUrl } from '../lib/image-utils';

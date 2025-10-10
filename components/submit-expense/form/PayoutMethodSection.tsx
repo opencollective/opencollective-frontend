@@ -356,7 +356,9 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
         message: intl.formatMessage({ defaultMessage: 'Payout method created', id: 'RHYtWe' }),
       });
     } catch (e) {
-      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      if (get(e, 'graphQLErrors.0')) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
     } finally {
       setIsCreatingPayoutMethod(false);
     }
