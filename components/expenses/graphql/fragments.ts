@@ -448,7 +448,11 @@ export const expensePageExpenseFieldsFragment = gql`
 
       stats {
         id
-        balanceWithBlockedFunds {
+        balance {
+          valueInCents
+          currency
+        }
+        balanceWithBlockedFunds: balance(withBlockedFunds: true) {
           valueInCents
           currency
         }
