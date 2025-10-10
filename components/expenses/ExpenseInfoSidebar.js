@@ -59,7 +59,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
                         blockedFunds: (
                           <FormattedMoneyAmount
                             amount={blockedFundsAmount.valueInCents}
-                            currency={balance?.currency}
+                            currency={balance.currency}
                             precision={CurrencyPrecision.DEFAULT}
                           />
                         ),
