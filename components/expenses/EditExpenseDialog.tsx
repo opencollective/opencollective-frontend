@@ -25,6 +25,7 @@ import { accountsQuery } from '../dashboard/sections/accounts/queries';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
 import MessageBox from '../MessageBox';
+import RichTextEditor from '../RichTextEditor';
 import {
   AdditionalAttachments,
   ExpenseItemsForm,
@@ -72,6 +73,8 @@ const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
       return <EditPayee onSubmit={onSubmit} expense={expense} />;
     case 'paidBy':
       return <EditPaidBy expense={expense} handleClose={handleClose} />;
+    case 'privateMessage':
+      return <EditPrivateMessage onSubmit={onSubmit} expense={expense} />;
   }
 };
 
@@ -822,6 +825,58 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
   );
 };
 
+const EditPrivateMessage = ({ expense, onSubmit }) => {
+  const schema = z.object({
+    privateMessage: z.string().optional(),
+  });
+
+  return (
+    <FormikZod
+      schema={schema}
+      initialValues={{ privateMessage: expense.privateMessage || '' }}
+      onSubmit={values => onSubmit(schema.parse(values))}
+    >
+      {({ setFieldValue, values }) => (
+        <Form className="space-y-6">
+          <FormField
+            name="privateMessage"
+            label={<FormattedMessage defaultMessage="Additional notes" id="xqG0ln" />}
+            hint={
+              <FormattedMessage
+                defaultMessage="Share any important information that hasn't been covered in the previous sections."
+                id="expense.notes.hint"
+              />
+            }
+            isPrivate
+            required={false}
+            privateMessage={
+              <FormattedMessage
+                defaultMessage="This will only be visible to you, the Collective admins and its Fiscal Host"
+                id="734IeW"
+              />
+            }
+          >
+            {({ field }) => (
+              <RichTextEditor
+                id={field.id}
+                withBorders
+                version="simplified"
+                inputName={field.name}
+                editorMinHeight={72}
+                onChange={e => setFieldValue('privateMessage', e.target.value)}
+                defaultValue={values.privateMessage}
+                fontSize="13px"
+                data-cy="ExpenseNotesEditor"
+              />
+            )}
+          </FormField>
+          <EditExpenseActionButtons />
+        </Form>
+      )}
+    </FormikZod>
+  );
+};
+
 const EditExpenseTitle = ({ expense, onSubmit }) => {
   const schema = z.object({
     description: z.string().min(1),
@@ -882,7 +937,8 @@ export default function EditExpenseDialog({
     | 'paidBy'
     | 'type'
     | 'attachments'
-    | 'invoiceFile';
+    | 'invoiceFile'
+    | 'privateMessage';
   title: string;
   description?: string;
   dialogContentClassName?: string;

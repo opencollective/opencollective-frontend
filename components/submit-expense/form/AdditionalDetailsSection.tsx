@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { expenseTagsQuery } from '../../dashboard/filters/ExpenseTagsFilter';
 import { AutocompleteEditTags } from '../../EditTags';
 import ExpenseTypeTag from '../../expenses/ExpenseTypeTag';
+import RichTextEditor from '../../RichTextEditor';
 import { Label } from '../../ui/Label';
 import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
@@ -30,6 +31,7 @@ function getFormProps(form: ExpenseForm) {
       'expenseTypeOption',
       'tags',
       'accountSlug',
+      'privateMessage',
       'acknowledgedHostTitleExpensePolicy',
       'acknowledgedCollectiveTitleExpensePolicy',
     ]),
@@ -46,7 +48,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
   const collectiveSlug = props.accountSlug;
 
   return (
-    <FormSectionContainer step={Step.EXPENSE_TITLE} inViewChange={props.inViewChange}>
+    <FormSectionContainer step={Step.ADDITIONAL_DETAILS} inViewChange={props.inViewChange}>
       <FormField
         disabled={
           props.initialLoading ||
@@ -55,6 +57,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
         }
         name="title"
         placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}
+        label={<FormattedMessage defaultMessage="Title" id="Title" />}
       />
 
       {!props.initialLoading &&
@@ -105,6 +108,44 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
           />
         )}
         {props.initialLoading && <Skeleton className="h-5 w-16" />}
+      </div>
+
+      <div className="mt-6">
+        <FormField
+          name="privateMessage"
+          label={<FormattedMessage defaultMessage="Additional notes" id="xqG0ln" />}
+          hint={
+            <FormattedMessage
+              defaultMessage="Share any important information that hasn't been covered in the previous sections."
+              id="expense.notes.hint"
+            />
+          }
+          isPrivate
+          required={false}
+          privateMessage={
+            <FormattedMessage
+              defaultMessage="This will only be visible to you, the Collective admins and its Fiscal Host"
+              id="734IeW"
+            />
+          }
+        >
+          {({ field }) =>
+            !props.initialLoading && (
+              <RichTextEditor
+                id={field.id}
+                withBorders
+                version="simplified"
+                inputName={field.name}
+                editorMinHeight={72}
+                onChange={e => props.setFieldValue('privateMessage', e.target.value)}
+                disabled={props.isSubmitting}
+                defaultValue={props.privateMessage}
+                fontSize="13px"
+                data-cy="ExpenseNotesEditor"
+              />
+            )
+          }
+        </FormField>
       </div>
     </FormSectionContainer>
   );
