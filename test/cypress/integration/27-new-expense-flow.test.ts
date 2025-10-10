@@ -502,7 +502,7 @@ function submitExpense(options: {
     }
   });
 
-  cy.get('#EXPENSE_TITLE').within(() => {
+  cy.get('#ADDITIONAL_DETAILS').within(() => {
     cy.root().scrollIntoView();
     cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`);
     cy.contains('Add tag').click();
