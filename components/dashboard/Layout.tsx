@@ -11,10 +11,12 @@ import {
   HandCoins,
   Home,
   LayoutDashboard,
+  LifeBuoy,
   Network,
   Receipt,
   Rows3,
   Settings,
+  Telescope,
   User,
   Vault,
 } from 'lucide-react';
@@ -337,70 +339,12 @@ export default function DashboardLayout({
           </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {menuItems?.main.map(item => {
-                  // Handle group items (with sub-menu)
-                  if (item.type === 'group') {
-                    const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
-
-                    return (
-                      <Collapsible
-                        key={item.label}
-                        asChild
-                        defaultOpen={hasActiveSubItem}
-                        className="group/collapsible"
-                      >
-                        <SidebarMenuItem>
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuButton tooltip={item.label}>
-                              {item.Icon && <item.Icon />}
-                              <span>{item.label}</span>
-                              <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
-                            </SidebarMenuButton>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {item.subMenu?.map(subItem => (
-                                <SidebarMenuSubItem key={subItem.section}>
-                                  <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
-                                    <Link href={getDashboardRoute(account, subItem.section)}>
-                                      <span>{subItem.label}</span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </SidebarMenuItem>
-                      </Collapsible>
-                    );
-                  }
-
-                  // Handle regular page items
-                  return (
-                    <SidebarMenuItem key={item.section}>
-                      <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                        <Link href={getDashboardRoute(account, item.section)}>
-                          {item.Icon && <item.Icon />}
-                          <span>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-          {menuItems.tools && (
+        <SidebarContent className="justify-between">
+          <div>
             <SidebarGroup>
-              <SidebarGroupLabel>Tools</SidebarGroupLabel>
-
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {menuItems?.tools?.map(item => {
+                  {menuItems?.main.map(item => {
                     // Handle group items (with sub-menu)
                     if (item.type === 'group') {
                       const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
@@ -453,7 +397,88 @@ export default function DashboardLayout({
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-          )}
+            {menuItems.tools && (
+              <SidebarGroup>
+                <SidebarGroupLabel>Tools</SidebarGroupLabel>
+
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {menuItems?.tools?.map(item => {
+                      // Handle group items (with sub-menu)
+                      if (item.type === 'group') {
+                        const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
+
+                        return (
+                          <Collapsible
+                            key={item.label}
+                            asChild
+                            defaultOpen={hasActiveSubItem}
+                            className="group/collapsible"
+                          >
+                            <SidebarMenuItem>
+                              <CollapsibleTrigger asChild>
+                                <SidebarMenuButton tooltip={item.label}>
+                                  {item.Icon && <item.Icon />}
+                                  <span>{item.label}</span>
+                                  <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                                </SidebarMenuButton>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                <SidebarMenuSub>
+                                  {item.subMenu?.map(subItem => (
+                                    <SidebarMenuSubItem key={subItem.section}>
+                                      <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
+                                        <Link href={getDashboardRoute(account, subItem.section)}>
+                                          <span>{subItem.label}</span>
+                                        </Link>
+                                      </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                  ))}
+                                </SidebarMenuSub>
+                              </CollapsibleContent>
+                            </SidebarMenuItem>
+                          </Collapsible>
+                        );
+                      }
+
+                      // Handle regular page items
+                      return (
+                        <SidebarMenuItem key={item.section}>
+                          <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
+                            <Link href={getDashboardRoute(account, item.section)}>
+                              {item.Icon && <item.Icon />}
+                              <span>{item.label}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
+          </div>
+          <SidebarGroup>
+            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={false}>
+                  <Link href={'/explore'}>
+                    <Telescope />
+                    <span>Explore</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={false}>
+                  <Link href={'/help'}>
+                    <LifeBuoy />
+                    <span>Help & Support</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
 
         {/* <SidebarFooter>
