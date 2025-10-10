@@ -3,6 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
 import { get, isEmpty, omit, pick, truncate } from 'lodash';
 import { Pencil, Trash2, Undo2 } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -260,7 +261,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   );
 }, getFormProps);
 
-function generatePayoutMethodName(type, data) {
+function generatePayoutMethodName(intl: IntlShape, type: PayoutMethodType, data) {
   switch (type) {
     case PayoutMethodType.PAYPAL:
       return data.email;
@@ -276,7 +277,7 @@ function generatePayoutMethodName(type, data) {
       } else if (data?.accountHolderName && data?.currency) {
         return `${data.accountHolderName} (${data.currency})`;
       }
-      return `Bank Account`;
+      return intl.formatMessage({ defaultMessage: 'Bank account', id: 'BankAccount' });
     case PayoutMethodType.OTHER:
       return truncate(data?.content, { length: 20 }).replace(/\n|\t/g, ' ');
     default:
@@ -350,7 +351,10 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       await refresh();
       setFieldValue('payoutMethodId', newPayoutMethodId);
       setFieldValue('newPayoutMethod', { data: {} });
-      toast({ variant: 'success', message: 'Payout method created' });
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Payout method created', id: 'RHYtWe' }),
+      });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     } finally {
@@ -574,7 +578,10 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     try {
       await submitLegalNameMutation();
       setLegalNameUpdated(true);
-      toast({ variant: 'success', message: 'Updated' });
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Legal name updated', id: 'aLu6aT' }),
+      });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
@@ -734,7 +741,11 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       host={props.host}
                     />
                     {values.editingPayoutMethod.name !==
-                      generatePayoutMethodName(values.editingPayoutMethod.type, values.editingPayoutMethod.data) && (
+                      generatePayoutMethodName(
+                        intl,
+                        values.editingPayoutMethod.type,
+                        values.editingPayoutMethod.data,
+                      ) && (
                       <Button
                         disabled={props.isSubmitting}
                         loading={props.isSubmitting}
@@ -744,7 +755,11 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                         onClick={() => {
                           setFieldValue(
                             `editingPayoutMethod.name`,
-                            generatePayoutMethodName(values.editingPayoutMethod.type, values.editingPayoutMethod.data),
+                            generatePayoutMethodName(
+                              intl,
+                              values.editingPayoutMethod.type,
+                              values.editingPayoutMethod.data,
+                            ),
                           );
                           setFieldTouched(`editingPayoutMethod.name`, false);
                         }}

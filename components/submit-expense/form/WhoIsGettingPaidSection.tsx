@@ -473,7 +473,10 @@ function LegalNameWarning(props: {
     try {
       await submitLegalNameMutation();
       handleLegalNameUpdate();
-      toast({ variant: 'success', message: 'Updated' });
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Legal name updated', id: 'aLu6aT' }),
+      });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }

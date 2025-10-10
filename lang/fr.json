@@ -3435,6 +3435,7 @@
   "RGpvqu": "Obligatoire à des fins juridiques, car votre contribution annuelle totale est supérieure à {amount}. Cette information est privée mais elle sera partagée avec {collectiveName}{isSelfHosted, select, false { et {hostName}} other {}}.",
   "RHApk3": "À propos des formules de contribution",
   "RHr16v": "Webhooks pour {collective}",
+  "RHYtWe": "Payout method created",
   "Ri4REE": "Sélectionnez une méthode de paiement",
   "Rih0DL": "Synchroniser",
   "RilevA": "Fournisseurs",
