@@ -2,14 +2,16 @@ import React from 'react';
 
 import type { SocialLink } from '../../lib/graphql/types/v2/schema';
 import { iconForSocialLinkType } from '../../lib/social-links';
+import { cn } from '@/lib/utils';
 
 import Link from '../Link';
 
 type HeroSocialLinksProps = {
   socialLinks: SocialLink[];
+  className?: string;
 };
 
-export default function HeroSocialLinks({ socialLinks }: HeroSocialLinksProps) {
+export default function HeroSocialLinks({ socialLinks, className }: HeroSocialLinksProps) {
   return (
     <div className="flex justify-center gap-1">
       {socialLinks.map((socialLink, index) => {
@@ -19,7 +21,7 @@ export default function HeroSocialLinks({ socialLinks }: HeroSocialLinksProps) {
             key={socialLink.type + socialLink.url}
             data-cy={`social-link-${index}`}
             href={socialLink.url}
-            className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-primary/10"
+            className={cn('flex size-8 items-center justify-center rounded-full hover:bg-primary/10', className)}
           >
             <Icon size={16} />
           </Link>
