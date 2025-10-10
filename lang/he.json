@@ -3435,6 +3435,7 @@
   "RGpvqu": "Required for legal purposes as your total anual contribution is more than {amount}. This information is private but it will be shared with {collectiveName}{isSelfHosted, select, false { and {hostName}} other {}}.",
   "RHApk3": "אודות שכבות תמיכה",
   "RHr16v": "Webhooks for {collective}",
+  "RHYtWe": "Payout method created",
   "Ri4REE": "Select a payout method",
   "Rih0DL": "Synchronize",
   "RilevA": "Vendors",
