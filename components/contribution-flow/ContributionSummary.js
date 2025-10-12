@@ -204,18 +204,25 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
       )}
       <StyledHr borderColor="black.500" my={1} />
       <P color="black.500" fontSize="11px" mt={2} mb={1}>
-        Country detection powered by{' '}
-        <StyledLink
-          href="https://www.openstreetmap.org/"
-          openInNewTab
-          color="black.900"
-          display="inline-flex"
-          alignItems="center"
-          gap={1}
-        >
-          OpenStreetMap
-          <ExternalLink size={12} style={{ display: 'inline-block' }} />
-        </StyledLink>
+        <FormattedMessage
+          id="ContributionSummary.CountryDetectionAttribution"
+          defaultMessage="Country detection powered by {osmLink}"
+          values={{
+            osmLink: (
+              <StyledLink
+                href="https://www.openstreetmap.org/"
+                openInNewTab
+                color="black.900"
+                display="inline-flex"
+                alignItems="center"
+                gap={1}
+              >
+                OpenStreetMap
+                <ExternalLink size={12} style={{ display: 'inline-block' }} />
+              </StyledLink>
+            ),
+          }}
+        />
       </P>
       {stepDetails.interval && stepDetails.interval !== INTERVALS.oneTime && (
         <P color="black.800" fontSize="12px" mt={3}>
