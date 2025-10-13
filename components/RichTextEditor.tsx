@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from '@styled-system/css';
-import { get, remove } from 'lodash';
+import { get } from 'lodash';
 import { styled } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -271,7 +271,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
     // Load Trix
     if (typeof window !== 'undefined') {
-      this.Trix = require('@opencollective/trix').default; // eslint-disable-line @typescript-eslint/no-require-imports
+      this.Trix = require('trix').default; // eslint-disable-line @typescript-eslint/no-require-imports
       document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }
@@ -357,8 +357,21 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
   trixBeforeInitialize = () => {
     this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
     this.Trix.config.attachments.preview.caption = { name: false, size: false };
-    remove(this.Trix.config.parser.forbiddenElements, type => type === 'iframe'); // Allow iframes for video embeds
-    this.Trix.config.parser.allowedAttributes.push('frameborder', 'allowfullscreen');
+
+    // Allow iframes for video embeds
+    this.Trix.config.dompurify.ADD_TAGS = ['iframe'];
+    this.Trix.config.dompurify.ADD_ATTR = ['allow', 'allowfullscreen', 'frameborder', 'src', 'width', 'height'];
+
+    // Monkey patch for configuring HTML sanitization on attachment HTML. See https://github.com/basecamp/trix/issues/1178
+    const originalSetHTML = this.Trix.HTMLSanitizer.setHTML;
+    const originalDomPurifyConfig = this.Trix.config.dompurify;
+    const htmlSanitizer = this.Trix.HTMLSanitizer;
+    this.Trix.HTMLSanitizer.setHTML = function (element, html, options) {
+      options = options || {};
+      options.forbiddenElements = ['script', 'form', 'noscript']; // explicitly omitting iframe
+      options.purifyOptions = originalDomPurifyConfig;
+      originalSetHTML.apply(htmlSanitizer, [element, html, options]);
+    };
   };
 
   trixInitialize = event => {
