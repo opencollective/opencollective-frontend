@@ -22,7 +22,7 @@ export default defineConfig([
   pluginCypress.configs.recommended,
   jsxA11y.flatConfigs.recommended,
   styledA11y.flatConfigs.recommended,
-  reactHooks.configs['recommended-latest'],
+  reactHooks.configs.flat.recommended,
   includeIgnoreFile(gitignorePath),
   globalIgnores(['lib/graphql/types/v2/*', 'lib/graphql/*.graphql']),
 
