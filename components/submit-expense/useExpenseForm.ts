@@ -145,6 +145,7 @@ export type ExpenseFormValues = {
   title?: string;
   accountingCategoryId?: string;
   tags?: string[];
+  privateMessage?: string;
   expenseItems?: ExpenseItem[];
   additionalAttachments?: Attachment[];
   hasTax?: boolean;
@@ -753,6 +754,7 @@ function buildFormSchema(
       }, requiredMessage),
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    privateMessage: z.string().optional().nullable(),
     expenseAttachedFiles: z
       .array(
         z.object({
@@ -1705,7 +1707,7 @@ export function useExpenseForm(opts: {
                   : null,
             })),
             longDescription: null,
-            privateMessage: null,
+            privateMessage: values.privateMessage || null,
             tags: values.tags,
             tax: values.hasTax
               ? [
@@ -1875,6 +1877,7 @@ export function useExpenseForm(opts: {
     setFieldValue('tags', formOptions.expense.tags);
     setFieldValue('title', formOptions.expense.description);
     setFieldTouched('title', true);
+    setFieldValue('privateMessage', formOptions.expense.privateMessage);
 
     // Load taxes
     const taxes = formOptions.expense.taxes || [];
