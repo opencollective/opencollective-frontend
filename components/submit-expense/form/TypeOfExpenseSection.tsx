@@ -167,7 +167,7 @@ function getInvoiceFormProps(form: ExpenseForm) {
     initialLoading: form.initialLoading,
     isSubmitting: form.isSubmitting,
     ...pick(form.options, ['isAdminOfPayee', 'payee']),
-    ...pick(form.values, ['invoiceFile', 'hasInvoiceOption', 'expenseTypeOption']),
+    ...pick(form.values, ['invoiceFile', 'hasInvoiceOption', 'expenseTypeOption', 'invoiceInfo']),
   };
 }
 
@@ -283,6 +283,32 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
               }
             />
           </div>
+        </TabsContent>
+        <TabsContent value={YesNoOption.NO}>
+          <FormField
+            disabled={props.isSubmitting}
+            name="invoiceInfo"
+            inputType="textarea"
+            isPrivate
+            privateMessage={privateInfoYouCollectiveAndHost}
+            label={
+              <FormattedMessage
+                id="OptionalFieldLabel"
+                defaultMessage="{field} (optional)"
+                values={{
+                  field: (
+                    <FormattedMessage defaultMessage="Additional invoice information" id="ExpenseForm.InvoiceInfo" />
+                  ),
+                }}
+              />
+            }
+            hint={
+              <FormattedMessage
+                defaultMessage="Add any details you'd like printed on the invoice, such as your tax ID or company registration number"
+                id="1k5yaB"
+              />
+            }
+          />
         </TabsContent>
       </Tabs>
     </div>
