@@ -19,7 +19,7 @@ const Spinner: React.FC<SpinnerProps> = ({ size = '1em', title = 'Loading', clas
       size={size}
       aria-label={title}
       role="img"
-      className={cn('animate-spin', className)}
+      className={cn('inline-block animate-spin', className)}
       data-spinner="true"
       {...props}
     />
