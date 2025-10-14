@@ -3259,6 +3259,7 @@
   "pricing.grow.fee": "Des revenus que votre Organisation gagne grâce aux frais d'Hôte ¹",
   "pricing.grow.feeNote": "Seulement si vous facturez pour vos services",
   "pricing.hostFees": "{revshare} Commission de la plateforme sur vos revenus de frais d'Hôte",
+  "pricing.newModel.description": "We’ve updated our pricing model to better support long-term sustainability. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>.",
   "pricing.noHostFees": "{fee} si vous ne facturez pas les frais d'Hôte à vos Collectifs",
   "pricing.notes.paymentProcessor": "Des frais de traitement de paiement s'appliquent lorsque vous utilisez <stripeLink></stripeLink>, <paypalLink></paypalLink>, ou <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Fonds extérieurs",

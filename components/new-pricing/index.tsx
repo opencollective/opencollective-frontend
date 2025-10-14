@@ -219,6 +219,24 @@ export default function Pricing({ data }) {
   return (
     <div className="min-h-screen py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 flex items-center justify-center">
+          <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
+            <span>
+              <FormattedMessage
+                defaultMessage="We’ve updated our pricing model to better support long-term sustainability. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
+                id="pricing.newModel.description"
+                values={{
+                  LinkLegacyPricing: parts => (
+                    <Link href="/legacy-pricing" className="font-medium underline hover:text-blue-900">
+                      {parts}
+                    </Link>
+                  ),
+                }}
+              />
+            </span>
+          </div>
+        </div>
+
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             <FormattedMessage defaultMessage="Platform Pricing" id="1LgC28" />
