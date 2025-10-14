@@ -2141,17 +2141,13 @@ export function useExpenseForm(opts: {
       return;
     }
 
-    // For non-receipt expenses, use current date for exchange rates
-    // For receipts (reimbursements), use the item's date
-    const isReimbursement = expenseForm.values.expenseTypeOption === ExpenseType.RECEIPT;
-
     const exchangeRateRequests = uniqBy(
       expenseForm.values.expenseItems.filter(needExchangeRateFilter(formOptions.expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: formOptions.expenseCurrency,
-        date: isReimbursement ? dayjs.utc(ei.incurredAt).toDate() : dayjs.utc().toDate(),
+        date: dayjs.utc(ei.incurredAt).toDate(),
       })),
-      ei => `${ei.fromCurrency}-${ei.toCurrency}-${dayjs.utc(ei.date).format('YYYY-MM-DD')}`,
+      ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
     );
 
     expenseForm.values.expenseItems.forEach((ei, i) => {
@@ -2197,27 +2193,24 @@ export function useExpenseForm(opts: {
         if (!isEmpty(res.data?.currencyExchangeRate)) {
           expenseForm.values.expenseItems.forEach((ei, i) => {
             if (needExchangeRateFilter(formOptions.expenseCurrency)(ei)) {
-              const exchangeRate = res.data.currencyExchangeRate.find(rate => {
-                if (rate.fromCurrency !== ei.amount.currency || rate.toCurrency !== formOptions.expenseCurrency) {
-                  return false;
-                }
-                // For reimbursements, match the item date; for others, use any rate (current)
-                if (isReimbursement && ei.incurredAt) {
-                  return dayjs.utc(ei.incurredAt).isSame(dayjs.utc(rate.date), 'day');
-                }
-                return true;
-              });
-
-              if (exchangeRate) {
-                setFieldValue(
-                  `expenseItems.${i}.amount.exchangeRate`,
-                  pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
+              const exchangeRate =
+                res.data.currencyExchangeRate.find(
+                  rate =>
+                    rate.fromCurrency === ei.amount.currency &&
+                    rate.toCurrency === formOptions.expenseCurrency &&
+                    (!ei.incurredAt || dayjs.utc(ei.incurredAt).isSame(dayjs.utc(rate.date), 'day')),
+                ) ||
+                res.data.currencyExchangeRate.find(
+                  rate => rate.fromCurrency === ei.amount.currency && rate.toCurrency === formOptions.expenseCurrency,
                 );
-                setFieldValue(
-                  `expenseItems.${i}.amount.referenceExchangeRate`,
-                  pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
-                );
-              }
+              setFieldValue(
+                `expenseItems.${i}.amount.exchangeRate`,
+                pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
+              );
+              setFieldValue(
+                `expenseItems.${i}.amount.referenceExchangeRate`,
+                pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
+              );
             }
           });
         }
