@@ -153,7 +153,7 @@ const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forward
       type="button"
       ref={allRefs}
     >
-      <Spinner size="0.9em" />
+      <Spinner className="mx-auto" size="0.9em" />
     </StyledButtonContent>
   );
 });
