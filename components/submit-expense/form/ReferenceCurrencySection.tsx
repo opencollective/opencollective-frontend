@@ -26,7 +26,6 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form.values, ['referenceCurrency', 'expenseTypeOption', 'expenseItems', 'hasTax', 'tax']),
     ...pick(form.options, [
       'availableReferenceCurrencies',
-      'expenseCurrency',
       'account',
       'payoutMethod',
       'totalInvoicedInExpenseCurrency',
@@ -56,8 +55,8 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
   const {
     setFieldValue,
     availableReferenceCurrencies,
-    expenseCurrency,
     expenseTypeOption,
+    referenceCurrency,
     totalInvoicedInExpenseCurrency,
     hasTax,
     tax,
@@ -76,9 +75,6 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
   if (!hasMultipleCurrencies || expenseTypeOption === ExpenseType.GRANT) {
     return null;
   }
-
-  // If no reference currency is selected, default to the current expense currency
-  const selectedCurrency = props.referenceCurrency || expenseCurrency;
 
   // Calculate total amount including tax if applicable
   const totalAmount =
@@ -119,28 +115,30 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
               inputId="reference-currency"
               data-cy="reference-currency-picker"
               availableCurrencies={availableReferenceCurrencies}
-              value={selectedCurrency}
+              value={referenceCurrency}
               onChange={onCurrencyChange}
               disabled={props.isSubmitting}
             />
-            <div className="mt-2 text-sm text-muted-foreground">
-              {totalAmount ? (
-                <FormattedMessage
-                  defaultMessage="Selecting {currency} means the collective will pay exactly {amount} {currency}, and any currency conversions will be based on this amount."
-                  id="ReferenceCurrency.HintWithAmount"
-                  values={{
-                    currency: selectedCurrency,
-                    amount: formatCurrency(totalAmount, selectedCurrency as Currency, { precision: 2 }),
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="Selecting {currency} means the collective will pay in {currency}, and any currency conversions will be based on this amount."
-                  id="ReferenceCurrency.Hint"
-                  values={{ currency: selectedCurrency }}
-                />
-              )}
-            </div>
+            {referenceCurrency && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                {totalAmount ? (
+                  <FormattedMessage
+                    defaultMessage="Selecting {currency} means the collective will pay exactly {amount} {currency}, and any currency conversions will be based on this amount."
+                    id="ReferenceCurrency.HintWithAmount"
+                    values={{
+                      currency: referenceCurrency,
+                      amount: formatCurrency(totalAmount, referenceCurrency as Currency, { precision: 2 }),
+                    }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="Selecting {currency} means the collective will pay in {currency}, and any currency conversions will be based on this amount."
+                    id="ReferenceCurrency.Hint"
+                    values={{ currency: referenceCurrency }}
+                  />
+                )}
+              </div>
+            )}
           </div>
         )}
       </FormField>

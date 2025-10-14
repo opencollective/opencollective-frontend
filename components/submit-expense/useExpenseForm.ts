@@ -758,19 +758,23 @@ function buildFormSchema(
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     privateMessage: z.string().optional().nullable(),
-    referenceCurrency: z.nativeEnum(Currency).refine(
-      v => {
-        // If multiple currencies are supported, the reference currency must be set
-        if (options.availableReferenceCurrencies.length > 1) {
-          return v && options.availableReferenceCurrencies.includes(v);
-        } else {
-          return !v || v === options.availableReferenceCurrencies[0];
-        }
-      },
-      () => ({
-        message: intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' }),
-      }),
-    ),
+    referenceCurrency: z
+      .nativeEnum(Currency)
+      .refine(
+        v => {
+          // If multiple currencies are supported, the reference currency must be set
+          if (options.availableReferenceCurrencies.length > 1) {
+            return v && options.availableReferenceCurrencies.includes(v);
+          } else {
+            return !v || v === options.availableReferenceCurrencies[0];
+          }
+        },
+        () => ({
+          message: intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' }),
+        }),
+      )
+      .optional()
+      .nullable(),
     expenseAttachedFiles: z
       .array(
         z.object({
