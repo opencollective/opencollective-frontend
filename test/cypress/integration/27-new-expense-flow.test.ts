@@ -1,5 +1,8 @@
 /* eslint-disable prefer-arrow-callback */
 import * as cheerio from 'cheerio';
+import getSymbolFromCurrency from 'currency-symbol-map';
+
+import type { Currency } from '@/lib/graphql/types/v2/schema';
 
 import { randomSlug } from '../support/faker';
 
@@ -149,6 +152,25 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       invitee: {
         slug: 'piamancini',
       },
+    });
+  });
+
+  describe('multi-currency', function () {
+    it('must provide a reference currency when payout method currency != account currency', function () {
+      cy.contains('New expense').click();
+      submitExpense({
+        expenseType,
+        accountSlug: this.e2eHostedCollective.slug,
+        payeeSlug: this.userSlug,
+        referenceCurrency: 'USD',
+        fxRateToReferenceCurrency: 1.1,
+        payoutMethod: {
+          data: {
+            currency: 'EUR',
+            content: 'Bank Account: 007',
+          },
+        },
+      });
     });
   });
 
@@ -368,6 +390,8 @@ function submitExpense(options: {
     save?: boolean;
     data?: Record<string, unknown> & { currency: string };
   };
+  referenceCurrency?: string;
+  fxRateToReferenceCurrency?: number;
   invitee?: {
     name?: string;
     email?: string;
@@ -381,6 +405,7 @@ function submitExpense(options: {
   const opts = {
     titleSlug: randomSlug(),
     ...options,
+    fxRateToReferenceCurrency: options?.fxRateToReferenceCurrency || 1,
     payoutMethod: {
       type: 'OTHER',
       slug: randomSlug(),
@@ -502,6 +527,12 @@ function submitExpense(options: {
     }
   });
 
+  if (opts.referenceCurrency) {
+    cy.contains('Reference currency').click();
+    cy.getByDataCy('reference-currency-picker').click();
+    cy.contains('[data-cy="select-option"]', opts.referenceCurrency).click();
+  }
+
   cy.get('#ADDITIONAL_DETAILS').within(() => {
     cy.root().scrollIntoView();
     cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`);
@@ -515,6 +546,14 @@ function submitExpense(options: {
     cy.contains('The expense title').should('exist');
     cy.contains('a tag').should('exist');
 
+    const expectedMainCurrency = opts.referenceCurrency || 'USD';
+    const defaultItemCurrency = opts.payoutMethod.data?.currency || 'USD';
+    const expectedFirstItemAmount = Math.round(125_00 * opts.fxRateToReferenceCurrency);
+    const expectedSecondItemAmount = Math.round(500_00 * 1.1); // BRL to default currency is always 1.1
+    const expectedTotalAmount = Math.round(expectedFirstItemAmount + expectedSecondItemAmount);
+    const addCurrencyToAmount = (amount: number, currency: string) =>
+      `${getSymbolFromCurrency(currency as Currency)}${(amount / 100).toFixed(2)} ${currency}`;
+
     cy.contains('label', 'Items')
       .parent()
       .within(() => {
@@ -522,7 +561,11 @@ function submitExpense(options: {
           .should('exist')
           .closest('[role="listitem"]')
           .within(() => {
-            cy.contains('$125.00 USD').should('exist');
+            cy.contains(addCurrencyToAmount(125_00, defaultItemCurrency)).should('exist');
+            if (opts.referenceCurrency !== defaultItemCurrency) {
+              cy.contains(addCurrencyToAmount(expectedFirstItemAmount, defaultItemCurrency)).should('exist');
+            }
+
             if (opts.expenseType === 'reimbursement') {
               cy.get('a').should('exist');
             }
@@ -531,18 +574,18 @@ function submitExpense(options: {
           .should('exist')
           .closest('[role="listitem"]')
           .within(() => {
-            cy.contains('$550.00 USD').should('exist');
+            cy.contains(addCurrencyToAmount(500_00, expectedMainCurrency)).should('exist');
             cy.contains('R$500.00 BRL').should('exist');
 
             if (opts.expenseType === 'reimbursement') {
               cy.get('a').should('exist');
             }
           });
-        cy.contains('$675.00 USD').should('exist');
+        cy.contains(addCurrencyToAmount(expectedTotalAmount, expectedMainCurrency)).should('exist');
 
         if (opts.taxes?.hasTax) {
-          cy.contains('$135.00 USD').should('exist');
-          cy.contains('$810.00 USD').should('exist');
+          cy.contains(addCurrencyToAmount(135_00, expectedMainCurrency)).should('exist');
+          cy.contains(addCurrencyToAmount(810_00, expectedMainCurrency)).should('exist');
         }
       });
 

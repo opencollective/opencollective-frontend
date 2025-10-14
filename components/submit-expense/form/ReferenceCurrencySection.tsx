@@ -1,4 +1,3 @@
-/* eslint-disable prefer-arrow-callback */
 import React from 'react';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -29,6 +28,7 @@ function getFormProps(form: ExpenseForm) {
       'account',
       'payoutMethod',
       'totalInvoicedInExpenseCurrency',
+      'expenseCurrency',
     ]),
   };
 }
@@ -49,6 +49,7 @@ export function ReferenceCurrencySection(
   );
 }
 
+// eslint-disable-next-line prefer-arrow-callback
 export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurrencySection(
   props: ReferenceCurrencySectionProps,
 ) {
@@ -58,6 +59,7 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
     expenseTypeOption,
     referenceCurrency,
     totalInvoicedInExpenseCurrency,
+    expenseCurrency,
     hasTax,
     tax,
   } = props;
@@ -72,7 +74,7 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
     [setFieldValue],
   );
 
-  if (!hasMultipleCurrencies || expenseTypeOption === ExpenseType.GRANT) {
+  if (!hasMultipleCurrencies) {
     return null;
   }
 
@@ -121,7 +123,7 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
             />
             {referenceCurrency && (
               <div className="mt-2 text-sm text-muted-foreground">
-                {totalAmount ? (
+                {totalAmount && referenceCurrency === expenseCurrency ? (
                   <FormattedMessage
                     defaultMessage="Selecting {currency} means the collective will pay exactly {amount} {currency}, and any currency conversions will be based on this amount."
                     id="ReferenceCurrency.HintWithAmount"
