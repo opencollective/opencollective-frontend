@@ -172,7 +172,7 @@ export const generateSetupGuideSteps = ({
             />
           ),
           id: 'enable-hosting',
-          completed: account.isHost,
+          completed: account.isHost && account.settings?.canHostAccounts !== false,
           action: {
             label: <FormattedMessage defaultMessage="Enable hosting" id="SetupGuide.EnableHosting" />,
             onClick: () => {
