@@ -225,7 +225,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 payeeSlug={props.payeeSlug}
                 payee={props.payee}
                 isChecked={p.id === props.payoutMethodId}
-                isEditable={!isVendor}
+                isEditable
                 onPaymentMethodDeleted={onPaymentMethodDeleted}
                 onPaymentMethodEdited={onPaymentMethodEdited}
                 setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
