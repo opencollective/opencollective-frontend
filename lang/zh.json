@@ -3226,6 +3226,8 @@
   "PricePerAdditionalActiveCollective": "Price per additional active collective",
   "PricePerAdditionalActiveExpense": "Price per additional Expense",
   "PricePerMonth": "Base Monthly Price",
+  "Pricing-Crowdfunding": "Crowdfunded contributions",
+  "Pricing-Crowdfunding-Price": "Free with Platform Tips activated",
   "pricing.accounting": "不再有杂乱无章的电子表格！全部自动化，你的会计师会感谢你的",
   "pricing.addFunds": "手动从其他渠道添加资金",
   "pricing.bankTransfer": "银行转帐支付",
