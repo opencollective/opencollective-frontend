@@ -2,8 +2,6 @@ import React from 'react';
 
 import PricingNavTabs from '@/components/new-pricing/NavTabs';
 import Page from '@/components/Page';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FormattedMessage } from 'react-intl';
 
 export default function PricingForCollectivesPage() {
