@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
+import { MessageCircle, ReceiptIcon, ShapesIcon, HandCoinsIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -67,6 +67,18 @@ function TierPricePlansDisplay({ tier, packages }) {
 
       <div className="mt-6 mb-6 rounded-lg border bg-slate-50 p-4 text-sm">
         <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <HandCoinsIcon size={24} className="text-slate-800" />
+            <div className="space-y-1">
+              <p className="font-medium text-slate-900">
+                <FormattedMessage defaultMessage="Crowdfunded contributions" id="Pricing-Crowdfunding" />
+              </p>
+              <p className="text-xs text-slate-600">
+                <FormattedMessage defaultMessage="Free with Platform Tips activated" id="Pricing-Crowdfunding-Price" />
+              </p>
+            </div>
+          </div>
+
           <div className="flex items-center gap-3">
             <ShapesIcon size={24} className="text-slate-800" />
             <div className="space-y-1">
