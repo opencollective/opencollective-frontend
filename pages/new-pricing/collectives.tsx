@@ -1,9 +1,11 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import PricingNavTabs from '@/components/new-pricing/NavTabs';
 import Page from '@/components/Page';
-import { FormattedMessage } from 'react-intl';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function PricingForCollectivesPage() {
   return (
     <Page>
