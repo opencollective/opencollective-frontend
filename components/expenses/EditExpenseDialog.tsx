@@ -25,6 +25,7 @@ import { accountsQuery } from '../dashboard/sections/accounts/queries';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
 import MessageBox from '../MessageBox';
+import RichTextEditor from '../RichTextEditor';
 import {
   AdditionalAttachments,
   ExpenseItemsForm,
@@ -72,6 +73,8 @@ const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
       return <EditPayee onSubmit={onSubmit} expense={expense} />;
     case 'paidBy':
       return <EditPaidBy expense={expense} handleClose={handleClose} />;
+    case 'privateMessage':
+      return <EditPrivateMessage onSubmit={onSubmit} expense={expense} />;
   }
 };
 
@@ -214,6 +217,10 @@ const EditPayee = ({ expense, onSubmit }) => {
                 : {
                     id: values.payoutMethodId,
                   },
+          tax:
+            values.hasTax && values.tax && formOptions.taxType
+              ? [{ type: formOptions.taxType, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+              : [],
         }),
       };
       return onSubmit(editValues);
@@ -324,6 +331,10 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
           incurredAt: new Date(ei.incurredAt),
           url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
         })),
+        tax:
+          values.hasTax && values.tax && formOptions.taxType
+            ? [{ type: formOptions.taxType, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+            : [],
       };
       return onSubmit(editValues);
     },
@@ -377,6 +388,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       expenseAttachedFiles: true,
       invoiceFile: true,
       invoiceNumber: true,
+      invoiceInfo: true,
     },
   });
   const transformedOnSubmit = values => {
@@ -407,8 +419,13 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       attachedFiles: values.additionalAttachments.map(a => ({
         url: typeof a === 'string' ? a : a?.url,
       })),
+      invoiceInfo: values.invoiceInfo,
       invoiceFile,
       reference: values.invoiceNumber,
+      tax:
+        values.hasTax && values.tax
+          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          : [],
     };
     return onSubmit(editValues);
   };
@@ -568,6 +585,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       expenseAttachedFiles: true,
       invoiceFile: true,
       invoiceNumber: true,
+      invoiceInfo: true,
       expenseTypeOption: true,
     },
   });
@@ -598,8 +616,13 @@ const EditExpenseType = ({ expense, onSubmit }) => {
           : values.invoiceFile
             ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
             : undefined,
+      invoiceInfo: values.invoiceInfo,
       reference: values.invoiceNumber,
       type: values.expenseTypeOption,
+      tax:
+        values.hasTax && values.tax
+          ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
+          : [],
     };
     return onSubmit(editValues);
   };
@@ -669,7 +692,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
         disabled={expenseForm.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE) || expenseForm.isSubmitting}
         value={expenseForm.values.expenseTypeOption}
         onValueChange={newValue => expenseForm.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
-        className="flex"
+        className="mb-4 flex flex-wrap"
       >
         <RadioGroupCard
           className="grow basis-0"
@@ -716,7 +739,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
           </div>
         </RadioGroupCard>
       </RadioGroup>
-      <DialogFooter>
+      <DialogFooter className="gap-2 sm:gap-0">
         <DialogClose asChild>
           <Button variant="outline">
             <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
@@ -788,7 +811,7 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
       )}
 
       <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-      <DialogFooter>
+      <DialogFooter className="mt-4 gap-2 sm:gap-0">
         <Button variant="outline" onClick={prevStep}>
           <FormattedMessage defaultMessage="Back" id="Back" />
         </Button>
@@ -803,6 +826,58 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
         </Button>
       </DialogFooter>
     </React.Fragment>
+  );
+};
+
+const EditPrivateMessage = ({ expense, onSubmit }) => {
+  const schema = z.object({
+    privateMessage: z.string().optional(),
+  });
+
+  return (
+    <FormikZod
+      schema={schema}
+      initialValues={{ privateMessage: expense.privateMessage || '' }}
+      onSubmit={values => onSubmit(schema.parse(values))}
+    >
+      {({ setFieldValue, values }) => (
+        <Form className="space-y-6">
+          <FormField
+            name="privateMessage"
+            label={<FormattedMessage defaultMessage="Additional notes" id="xqG0ln" />}
+            hint={
+              <FormattedMessage
+                defaultMessage="Share any important information that hasn't been covered in the previous sections."
+                id="expense.notes.hint"
+              />
+            }
+            isPrivate
+            required={false}
+            privateMessage={
+              <FormattedMessage
+                defaultMessage="This will only be visible to you, the Collective admins and its Fiscal Host"
+                id="734IeW"
+              />
+            }
+          >
+            {({ field }) => (
+              <RichTextEditor
+                id={field.id}
+                withBorders
+                version="simplified"
+                inputName={field.name}
+                editorMinHeight={72}
+                onChange={e => setFieldValue('privateMessage', e.target.value)}
+                defaultValue={values.privateMessage}
+                fontSize="13px"
+                data-cy="ExpenseNotesEditor"
+              />
+            )}
+          </FormField>
+          <EditExpenseActionButtons />
+        </Form>
+      )}
+    </FormikZod>
   );
 };
 
@@ -833,7 +908,7 @@ function EditExpenseActionButtons({
   const formik = useFormikContext();
 
   return (
-    <DialogFooter>
+    <DialogFooter className="gap-2 sm:gap-0">
       <DialogClose asChild>
         <Button variant="outline">
           <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
@@ -866,7 +941,8 @@ export default function EditExpenseDialog({
     | 'paidBy'
     | 'type'
     | 'attachments'
-    | 'invoiceFile';
+    | 'invoiceFile'
+    | 'privateMessage';
   title: string;
   description?: string;
   dialogContentClassName?: string;

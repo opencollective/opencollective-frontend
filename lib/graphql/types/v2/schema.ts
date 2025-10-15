@@ -8605,7 +8605,7 @@ export type MutationEditConversationArgs = {
 export type MutationEditExpenseArgs = {
   draftKey?: InputMaybe<Scalars['String']['input']>;
   expense: ExpenseUpdateInput;
-  isDraftEdit?: InputMaybe<Scalars['Boolean']['input']>;
+  isDraftEdit?: Scalars['Boolean']['input'];
 };
 
 

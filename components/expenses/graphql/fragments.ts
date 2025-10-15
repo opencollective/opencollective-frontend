@@ -139,6 +139,7 @@ export const expenseHostFields = gql`
       MULTI_CURRENCY_EXPENSES
       PAYPAL_PAYOUTS
       CHART_OF_ACCOUNTS
+      TRANSFERWISE
     }
     paypalPreApproval {
       id
@@ -172,6 +173,13 @@ export const expenseHostFields = gql`
       EXPENSE_CATEGORIZATION {
         requiredForExpenseSubmitters
         requiredForCollectiveAdmins
+      }
+    }
+    ... on AccountWithPlatformSubscription {
+      platformSubscription {
+        plan {
+          title
+        }
       }
     }
   }
@@ -440,7 +448,11 @@ export const expensePageExpenseFieldsFragment = gql`
 
       stats {
         id
-        balanceWithBlockedFunds {
+        balance {
+          valueInCents
+          currency
+        }
+        balanceWithBlockedFunds: balance(withBlockedFunds: true) {
           valueInCents
           currency
         }

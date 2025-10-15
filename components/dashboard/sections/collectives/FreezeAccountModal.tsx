@@ -355,7 +355,7 @@ const FreezeAccountModal = ({
           </Button>
           <Button
             loading={submitting}
-            disabled={loading || (!isUnfreezing && !hasConfirmed)}
+            disabled={Boolean(loading || error || (!isUnfreezing && !hasConfirmed))}
             variant="destructive"
             className="w-full min-w-36 sm:w-auto"
             onClick={async () => {

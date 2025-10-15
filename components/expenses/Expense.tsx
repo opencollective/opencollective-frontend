@@ -30,16 +30,13 @@ import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
 import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
-import HTMLContent from '../HTMLContent';
 import { WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -48,7 +45,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
-import { H1, H5, Span } from '../Text';
+import { H1, Span } from '../Text';
 
 import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
@@ -99,17 +96,8 @@ const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
   }
 `;
 
-const PrivateNoteLabel = () => {
-  return (
-    <Span fontSize="12px" color="black.700" fontWeight="bold">
-      <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
-      &nbsp;&nbsp;
-      <PrivateInfoIcon size={12} className="text-muted-foreground" />
-    </Span>
-  );
-};
-
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
+export const EXPENSE_PAGE_POLLING_INTERVAL = 60 * 1000;
 
 interface ExpenseProps {
   collectiveSlug?: string;
@@ -222,7 +210,6 @@ function Expense(props: ExpenseProps) {
   const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
   const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
   const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
-  const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
@@ -372,7 +359,7 @@ function Expense(props: ExpenseProps) {
           props.refetch?.();
           pollingPaused = false;
         }
-        props.startPolling?.(pollingInterval * 1000);
+        props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
         pollingStarted = true;
       }
 
@@ -382,7 +369,7 @@ function Expense(props: ExpenseProps) {
         props.stopPolling?.();
         pollingStarted = false;
         pollingPaused = true;
-      }, pollingInterval * 1000);
+      }, EXPENSE_PAGE_POLLING_INTERVAL);
     }
   }, 100);
 
@@ -400,7 +387,7 @@ function Expense(props: ExpenseProps) {
   };
 
   const onCancel = () => {
-    props.startPolling?.(pollingInterval * 1000);
+    props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
     return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
   };
 
@@ -433,7 +420,7 @@ function Expense(props: ExpenseProps) {
         await refetch();
       }
       const createdUser = editedExpense.payee;
-      props.startPolling?.(pollingInterval * 1000);
+      props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
@@ -658,21 +645,15 @@ function Expense(props: ExpenseProps) {
             openFileViewer={openFileViewer}
             enableKeyboardShortcuts={enableKeyboardShortcuts}
             openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
+            onCloneModalOpenChange={isOpen => {
+              if (isOpen) {
+                props.stopPolling?.();
+              } else {
+                props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
+              }
+            }}
           />
 
-          {status !== PAGE_STATUS.EDIT_SUMMARY && (
-            <React.Fragment>
-              {expense?.privateMessage && (
-                <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                  <H5 fontSize="16px" mb={3}>
-                    <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                  </H5>
-                  <PrivateNoteLabel />
-                  <HTMLContent color="black.700" mt={1} fontSize="13px" content={expense.privateMessage} />
-                </Container>
-              )}
-            </React.Fragment>
-          )}
           {status === PAGE_STATUS.EDIT_SUMMARY && (
             <Box mt={24}>
               {isDraft && !loggedInAccount && (

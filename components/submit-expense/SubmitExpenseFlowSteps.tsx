@@ -25,7 +25,7 @@ export enum Step {
   TYPE_OF_EXPENSE = 'TYPE_OF_EXPENSE',
   EXPENSE_CATEGORY = 'EXPENSE_CATEGORY',
   EXPENSE_ITEMS = 'EXPENSE_ITEMS',
-  EXPENSE_TITLE = 'EXPENSE_TITLE',
+  ADDITIONAL_DETAILS = 'ADDITIONAL_DETAILS',
   SUMMARY = 'SUMMARY',
 }
 
@@ -44,7 +44,12 @@ export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   ],
   [Step.EXPENSE_CATEGORY]: ['accountingCategoryId'],
   [Step.EXPENSE_ITEMS]: ['expenseItems', 'tax'],
-  [Step.EXPENSE_TITLE]: ['title', 'acknowledgedCollectiveTitleExpensePolicy', 'acknowledgedHostTitleExpensePolicy'],
+  [Step.ADDITIONAL_DETAILS]: [
+    'title',
+    'acknowledgedCollectiveTitleExpensePolicy',
+    'acknowledgedHostTitleExpensePolicy',
+    'privateMessage',
+  ],
   [Step.SUMMARY]: [],
   [Step.INVITE_WELCOME]: [],
 };
@@ -59,8 +64,8 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
     id: 'NpMPF+',
   }),
   [Step.WHO_IS_GETTING_PAID]: defineMessage({
-    defaultMessage: 'Who is getting paid?',
-    id: 'W5Z+Fm',
+    defaultMessage: 'Who is getting paid',
+    id: 'nCANDg',
   }),
   [Step.PAYOUT_METHOD]: defineMessage({
     defaultMessage: 'Payout Method',
@@ -78,9 +83,9 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
     defaultMessage: 'Expense items',
     id: '3ldWIL',
   }),
-  [Step.EXPENSE_TITLE]: defineMessage({
-    defaultMessage: 'Title',
-    id: 'Title',
+  [Step.ADDITIONAL_DETAILS]: defineMessage({
+    defaultMessage: 'Additional details',
+    id: '9YDDtr',
   }),
   [Step.SUMMARY]: defineMessage({
     defaultMessage: 'Summary',
@@ -144,7 +149,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.TYPE_OF_EXPENSE,
     Step.EXPENSE_CATEGORY,
     Step.EXPENSE_ITEMS,
-    Step.EXPENSE_TITLE,
+    Step.ADDITIONAL_DETAILS,
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
       return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;

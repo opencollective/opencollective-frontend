@@ -4,7 +4,7 @@ import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useFormikContext } from 'formik';
 import { get, isNil, pick, round } from 'lodash';
-import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +24,7 @@ import { DISABLE_ANIMATIONS } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
 import { FormField } from '@/components/FormField';
+import PrivateInfoIcon from '@/components/icons/PrivateInfoIcon';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -42,6 +43,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type ExpenseItemsSectionProps = {
   form: ExpenseForm;
@@ -53,12 +55,7 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
     <FormSectionContainer
       step={Step.EXPENSE_ITEMS}
       inViewChange={props.inViewChange}
-      subtitle={
-        <div className="flex items-center gap-2">
-          <FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />
-          <Lock size={14} />
-        </div>
-      }
+      subtitle={<FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />}
     >
       <React.Fragment>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(props.form)} />
@@ -155,9 +152,10 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           <Skeleton className="h-30 w-full" />
         </div>
       )}
-      <div className="flex justify-between pr-12">
+      <div className="flex flex-wrap justify-between gap-2 md:pr-12">
         <Button
           variant="outline"
+          className="shrink-0"
           disabled={props.initialLoading || isAmountLocked || props.isSubmitting}
           onClick={() =>
             setFieldValue('expenseItems', [
@@ -174,7 +172,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
         >
           <Plus size={16} /> <FormattedMessage defaultMessage="Add item" id="KDO3hW" />
         </Button>
-        <div>
+        <div className="flex-grow">
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
             {props.hasTax && props.tax && (
               <React.Fragment>
@@ -357,6 +355,8 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 disabled={props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
+                isPrivate
+                privateMessage={privateInfoYouCollectiveAndHost}
               >
                 {({ field }) => {
                   return (
@@ -517,8 +517,9 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
 
   return (
     <div>
-      <Label htmlFor="additionalAttachments">
+      <Label htmlFor="additionalAttachments" className="mt-5 mb-1 flex items-center gap-2">
         <FormattedMessage defaultMessage="Additional Attachments (Optional)" id="n3evmu" />
+        <PrivateInfoIcon>{privateInfoYouCollectiveAndHost}</PrivateInfoIcon>
       </Label>
       <div className="flex flex-wrap gap-4 pt-2">
         <div>
@@ -621,7 +622,7 @@ const Taxes = React.memo(function Taxes(props: {
         )}
       </FormField>
 
-      <div className="items-top mt-4 flex gap-4">
+      <div className="items-top mt-4 flex flex-wrap gap-4">
         <div>
           {props.hasTax && props.taxType === TaxType.GST && (
             <FormField
@@ -682,19 +683,21 @@ const Taxes = React.memo(function Taxes(props: {
         </div>
 
         {props.hasTax && (
-          <FormField
-            name="tax.idNumber"
-            htmlFor={`input-${props.taxType}-idNumber`}
-            label={intl.formatMessage(
-              { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
-              { taxName: i18nTaxType(intl, props.taxType, 'short') },
-            )}
-            placeholder={intl.formatMessage(
-              { id: 'examples', defaultMessage: 'e.g., {examples}' },
-              { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
-            )}
-            disabled={props.isSubmitting}
-          />
+          <div>
+            <FormField
+              name="tax.idNumber"
+              htmlFor={`input-${props.taxType}-idNumber`}
+              label={intl.formatMessage(
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: i18nTaxType(intl, props.taxType, 'short') },
+              )}
+              placeholder={intl.formatMessage(
+                { id: 'examples', defaultMessage: 'e.g., {examples}' },
+                { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
+              )}
+              disabled={props.isSubmitting}
+            />
+          </div>
         )}
       </div>
     </div>

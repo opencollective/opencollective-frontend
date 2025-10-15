@@ -78,7 +78,11 @@ export const expensesPageQuery = gql`
 
       stats {
         id
-        balanceWithBlockedFunds {
+        balance {
+          valueInCents
+          currency
+        }
+        balanceWithBlockedFunds: balance(withBlockedFunds: true) {
           valueInCents
           currency
         }

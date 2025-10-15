@@ -1,6 +1,6 @@
 import React from 'react';
 import { pick, uniqBy } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 
@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { Step, StepTitles } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
@@ -33,6 +33,7 @@ function getFormProps(form: ExpenseForm) {
 
 // eslint-disable-next-line prefer-arrow-callback
 export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
+  const intl = useIntl();
   const [isLoading, setIsLoading] = React.useState(true);
   const lastSubmittedExpense = props.recentlySubmittedExpenses?.nodes?.at?.(0);
   const lastSubmittedAccount = lastSubmittedExpense && lastSubmittedExpense.account;
@@ -69,7 +70,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
     <FormSectionContainer
       step={Step.WHO_IS_PAYING}
       inViewChange={props.inViewChange}
-      title={<FormattedMessage defaultMessage="Who is paying" id="NpMPF+" />}
+      title={intl.formatMessage(StepTitles[Step.WHO_IS_PAYING])}
     >
       <RadioGroup
         id="accountSlug"

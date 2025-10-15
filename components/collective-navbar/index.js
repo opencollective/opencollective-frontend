@@ -36,17 +36,22 @@ import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
 import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
+import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { fadeIn } from '../StyledKeyframes';
-import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
+
+// Lazy load the submit expense flow
+const SubmitExpenseFlow = React.lazy(() =>
+  import('../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
+);
 
 const DisableGlobalScrollOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
@@ -480,6 +485,7 @@ const CollectiveNavbar = ({
   onlyInfos = false,
   useAnchorsForCategories = false,
   showSelectedCategoryOnMobile = false,
+  onSubmitExpenseModalOpenChange = undefined,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -494,7 +500,11 @@ const CollectiveNavbar = ({
     skip: !collective?.slug || !LoggedInUser,
   });
 
-  const [isSubmitExpenseModalOpen, setIsSubmitExpenseModalOpen] = React.useState(false);
+  const [isSubmitExpenseModalOpen, _setIsSubmitExpenseModalOpen] = React.useState(false);
+  const setIsSubmitExpenseModalOpen = open => {
+    _setIsSubmitExpenseModalOpen(open);
+    onSubmitExpenseModalOpenChange?.(open);
+  };
 
   const loading = isLoading || dataLoading;
 
@@ -686,15 +696,19 @@ const CollectiveNavbar = ({
         </NavbarContentContainer>
       </NavBarContainer>
       {isSubmitExpenseModalOpen && (
-        <SubmitExpenseFlow
-          onClose={(isSubmitted, hasSelectedViewAll) => {
-            setIsSubmitExpenseModalOpen(false);
-            if (isSubmitted && hasSelectedViewAll) {
-              router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
-            }
-          }}
-          submitExpenseTo={collective?.slug}
-        />
+        <React.Suspense
+          fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setIsSubmitExpenseModalOpen(false)} />}
+        >
+          <SubmitExpenseFlow
+            onClose={(isSubmitted, hasSelectedViewAll) => {
+              setIsSubmitExpenseModalOpen(false);
+              if (isSubmitted && hasSelectedViewAll) {
+                router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+              }
+            }}
+            submitExpenseTo={collective?.slug}
+          />
+        </React.Suspense>
       )}
     </Fragment>
   );

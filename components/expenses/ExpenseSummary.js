@@ -26,6 +26,7 @@ import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
@@ -103,6 +104,7 @@ const ExpenseSummary = ({
   openFileViewer,
   enableKeyboardShortcuts,
   openedItemId,
+  onCloneModalOpenChange = undefined,
   ...props
 }) => {
   const intl = useIntl();
@@ -124,7 +126,7 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const { canEditTitle, canEditType, canEditItems } = LoggedInUser?.hasPreviewFeatureEnabled(
+  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote } = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
   )
     ? expense?.permissions || {}
@@ -149,6 +151,7 @@ const ExpenseSummary = ({
     >
       <ExpenseMoreActionsButton
         onEdit={LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? undefined : onEdit}
+        onCloneModalOpenChange={onCloneModalOpenChange}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}
@@ -273,7 +276,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
+            <Container ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
               {isDraft && expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedBy"
@@ -342,7 +345,7 @@ const ExpenseSummary = ({
                   />
                 </React.Fragment>
               )}
-            </P>
+            </Container>
           </React.Fragment>
         )}
       </Flex>
@@ -634,6 +637,32 @@ const ExpenseSummary = ({
         </Span>
         <StyledHr flex="1 1" borderColor="black.300" ml={2} />
       </Flex>
+
+      {expense?.privateMessage && (
+        <Box mb={3} p={3} borderRadius="8px" backgroundColor="#f9fafb" border="1px solid" borderColor="black.200">
+          <Flex alignItems="center" mb={2} justifyContent="space-between">
+            <Flex alignItems="center" gap={6}>
+              <Span fontSize="13px" fontWeight="500" color="black.700" lineHeight="16px" textTransform="uppercase">
+                <FormattedMessage defaultMessage="Additional notes" id="xqG0ln" />
+              </Span>
+              <PrivateInfoIcon size={12}>
+                <FormattedMessage
+                  defaultMessage="This will only be visible to you, the Collective admins and its Fiscal Host"
+                  id="734IeW"
+                />
+              </PrivateInfoIcon>
+            </Flex>
+            {canUsePrivateNote && (
+              <EditExpenseDialog
+                field="privateMessage"
+                expense={expense}
+                title={intl.formatMessage({ defaultMessage: 'Edit notes', id: 'expense.editNotes' })}
+              />
+            )}
+          </Flex>
+          <HTMLContent content={expense.privateMessage} fontSize="13px" color="black.800" />
+        </Box>
+      )}
 
       <ExpenseSummaryAdditionalInformation
         isLoading={isLoading}

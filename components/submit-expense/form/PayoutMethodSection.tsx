@@ -3,6 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
 import { get, isEmpty, omit, pick, truncate } from 'lodash';
 import { Pencil, Trash2, Undo2 } from 'lucide-react';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -39,6 +40,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type PayoutMethodSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -49,6 +51,7 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.options, [
+      'account',
       'host',
       'isHostAdmin',
       'payee',
@@ -136,7 +139,6 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   ]);
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
-
   const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
 
   const onPaymentMethodDeleted = React.useCallback(
@@ -228,6 +230,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 onPaymentMethodEdited={onPaymentMethodEdited}
                 setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
                 refresh={props.refresh}
+                account={props.account}
               />
             ))}
 
@@ -258,7 +261,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   );
 }, getFormProps);
 
-function generatePayoutMethodName(type, data) {
+function generatePayoutMethodName(intl: IntlShape, type: PayoutMethodType, data) {
   switch (type) {
     case PayoutMethodType.PAYPAL:
       return data.email;
@@ -274,7 +277,7 @@ function generatePayoutMethodName(type, data) {
       } else if (data?.accountHolderName && data?.currency) {
         return `${data.accountHolderName} (${data.currency})`;
       }
-      return `Bank Account`;
+      return intl.formatMessage({ defaultMessage: 'Bank account', id: 'BankAccount' });
     case PayoutMethodType.OTHER:
       return truncate(data?.content, { length: 20 }).replace(/\n|\t/g, ' ');
     default:
@@ -293,7 +296,7 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
-    ...pick(form.options, ['newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
+    ...pick(form.options, ['account', 'newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
   };
 }
 
@@ -348,11 +351,12 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       await refresh();
       setFieldValue('payoutMethodId', newPayoutMethodId);
       setFieldValue('newPayoutMethod', { data: {} });
-      toast({ variant: 'success', message: 'Payout method created' });
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Payout method created', id: 'RHYtWe' }),
+      });
     } catch (e) {
-      if (get(e, 'graphQLErrors.0')) {
-        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-      }
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     } finally {
       setIsCreatingPayoutMethod(false);
     }
@@ -396,10 +400,15 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       ) : (
         <React.Fragment>
           <FormField
+            name="newPayoutMethod.type"
             disabled={props.isSubmitting}
             label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
             isPrivate
-            name="newPayoutMethod.type"
+            privateMessage={
+              props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+                ? privateInfoYouCollectiveAndHost
+                : privateInfoYouAndHost
+            }
           >
             {({ field }) => (
               <ComboSelect
@@ -499,6 +508,7 @@ type PayoutMethodRadioGroupItemProps = {
     subContent: React.ReactNode;
   }>;
   moreActions?: React.ReactNode;
+  account?: ExpenseForm['options']['account'];
 };
 
 export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
@@ -568,7 +578,10 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     try {
       await submitLegalNameMutation();
       setLegalNameUpdated(true);
-      toast({ variant: 'success', message: 'Updated' });
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Legal name updated', id: 'aLu6aT' }),
+      });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
@@ -728,7 +741,11 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       host={props.host}
                     />
                     {values.editingPayoutMethod.name !==
-                      generatePayoutMethodName(values.editingPayoutMethod.type, values.editingPayoutMethod.data) && (
+                      generatePayoutMethodName(
+                        intl,
+                        values.editingPayoutMethod.type,
+                        values.editingPayoutMethod.data,
+                      ) && (
                       <Button
                         disabled={props.isSubmitting}
                         loading={props.isSubmitting}
@@ -738,7 +755,11 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                         onClick={() => {
                           setFieldValue(
                             `editingPayoutMethod.name`,
-                            generatePayoutMethodName(values.editingPayoutMethod.type, values.editingPayoutMethod.data),
+                            generatePayoutMethodName(
+                              intl,
+                              values.editingPayoutMethod.type,
+                              values.editingPayoutMethod.data,
+                            ),
                           );
                           setFieldTouched(`editingPayoutMethod.name`, false);
                         }}
@@ -770,6 +791,11 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                   payoutMethod={props.payoutMethod}
                   maxItems={3}
                   className={props.archived && 'text-gray-500!'}
+                  privateMessage={
+                    props.account?.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+                      ? privateInfoYouCollectiveAndHost
+                      : privateInfoYouAndHost
+                  }
                 />
                 {isMissingCurrency && !props.disableWarningMessages && (
                   <div className="mt-2">

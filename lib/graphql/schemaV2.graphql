@@ -21626,7 +21626,7 @@ type Mutation {
     """
     Edit draft without submiting it
     """
-    isDraftEdit: Boolean
+    isDraftEdit: Boolean! = false
 
     """
     Expense draft key if invited to submit expense. Scope: "expenses".
