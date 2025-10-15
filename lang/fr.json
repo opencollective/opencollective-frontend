@@ -3264,6 +3264,8 @@
   "PricePerAdditionalActiveCollective": "Price per additional active collective",
   "PricePerAdditionalActiveExpense": "Price per additional Expense",
   "PricePerMonth": "Base Monthly Price",
+  "Pricing-Crowdfunding": "Crowdfunded contributions",
+  "Pricing-Crowdfunding-Price": "Free with Platform Tips activated",
   "Pricing-forOrganizations": "Pricing for Organizations",
   "Pricing-OrgDefinition": "An Organization is a legal entity (such as a company, non-profit, cooperative, or similar) that uses the platform to manage its own finances or to act as a Host for Collectives. The pricing below applies to Organizations. Collectives are not subject to this pricing structure.",
   "pricing.accounting": "Fini les feuilles de calcul désordonnées ! Tout est automatisé et votre comptable vous remerciera",
