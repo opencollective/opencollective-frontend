@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { MessageCircle, ReceiptIcon, ShapesIcon, HandCoinsIcon } from 'lucide-react';
+import { HandCoinsIcon, MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import {
