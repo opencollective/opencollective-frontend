@@ -3226,6 +3226,8 @@
   "PricePerAdditionalActiveCollective": "Price per additional active collective",
   "PricePerAdditionalActiveExpense": "Price per additional Expense",
   "PricePerMonth": "Base Monthly Price",
+  "Pricing-Crowdfunding": "Crowdfunded contributions",
+  "Pricing-Crowdfunding-Price": "Free with Platform Tips activated",
   "pricing.accounting": "面倒なスプレッドシートはもう必要ありません。すべて自動化されています。経理担当者から感謝されることでしょう。",
   "pricing.addFunds": "他のサービスから資金を手動で追加",
   "pricing.bankTransfer": "銀行振込による支払い",

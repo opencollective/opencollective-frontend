@@ -3226,6 +3226,8 @@
   "PricePerAdditionalActiveCollective": "Price per additional active collective",
   "PricePerAdditionalActiveExpense": "Price per additional Expense",
   "PricePerMonth": "Base Monthly Price",
+  "Pricing-Crowdfunding": "Crowdfunded contributions",
+  "Pricing-Crowdfunding-Price": "Free with Platform Tips activated",
   "pricing.accounting": "די לטבלאות האקסל! הכל אוטומטי, ומנהל החשבונות שלך יודה לך",
   "pricing.addFunds": "הוספה ידנית של הכנסות ממקורות אחרים",
   "pricing.bankTransfer": "תשלומים בהעברה בנקאית",

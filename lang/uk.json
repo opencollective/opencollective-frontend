@@ -3226,6 +3226,8 @@
   "PricePerAdditionalActiveCollective": "Price per additional active collective",
   "PricePerAdditionalActiveExpense": "Price per additional Expense",
   "PricePerMonth": "Base Monthly Price",
+  "Pricing-Crowdfunding": "Crowdfunded contributions",
+  "Pricing-Crowdfunding-Price": "Free with Platform Tips activated",
   "pricing.accounting": "Більше жодних недоладних електронних таблиць! Усе автоматизовано, а ваш бухгалтер буде вам вдячний",
   "pricing.addFunds": "Додавання фондів вручну з інших каналів",
   "pricing.bankTransfer": "Оплата банківським переказом",
