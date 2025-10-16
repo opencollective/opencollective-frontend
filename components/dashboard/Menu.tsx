@@ -219,7 +219,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           if: isHost || isSelfHosted,
           section: ALL_SECTIONS.HOSTED_GRANTS,
-          label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+          label: intl.formatMessage({ defaultMessage: 'Hosted Grant Requests', id: 'Bt/+M7' }),
         },
         {
           if: showReceivedGrantRequests,
