@@ -330,11 +330,9 @@ const InvoiceSection = React.memo(function InvoiceSection(props: {
         <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
       </Label>
       {props.hasInvoiceOption === YesNoOption.NO ? (
-        <div>
-          <MessageBox type="info">
-            <FormattedMessage defaultMessage="Invoice will be generated once you submit the expense." id="aWQ0X7" />
-          </MessageBox>
-        </div>
+        <MessageBox type="info" mt={2}>
+          <FormattedMessage defaultMessage="Invoice will be generated once you submit the expense." id="aWQ0X7" />
+        </MessageBox>
       ) : (
         <div>
           <div className="mb-2">
