@@ -23,7 +23,7 @@ exports.REWRITES = [
     destination: '/solutions',
   },
   {
-    source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
+    source: '/:pageSlug(widgets|tos|privacypolicy|hiring|about)',
     destination: '/staticPage',
   },
   {
