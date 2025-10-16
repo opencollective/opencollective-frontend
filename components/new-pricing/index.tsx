@@ -224,7 +224,7 @@ export default function Pricing({ data }) {
             <span>
               <FormattedMessage
                 defaultMessage="We’ve updated our pricing model to better support long-term sustainability. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
-                id="pricing.newModel.description"
+                id="pricing.newModel.onNewPricing"
                 values={{
                   LinkLegacyPricing: parts => (
                     <Link href="/legacy-pricing" className="font-medium underline hover:text-blue-900">
