@@ -12,6 +12,7 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import timezones from '@/lib/constants/timezones';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
+import { loadGoogleMaps } from '@/lib/google-maps';
 import type { Account, AccountUpdateInput } from '@/lib/graphql/types/v2/schema';
 import { AccountType, Currency } from '@/lib/graphql/types/v2/schema';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -184,6 +185,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const timezoneInputRef = useRef<HTMLInputElement>(null);
   const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
+  const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const { toast } = useToast();
   const { data, loading } = useQuery(infoSettingsDashboardQuery, {
     context: API_V2_CONTEXT,
@@ -197,6 +199,14 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   });
 
   const account = data?.account;
+
+  // Load Google Maps for address autocomplete. Individuals use a simplified location input.
+  React.useEffect(() => {
+    if (account && account.type !== INDIVIDUAL) {
+      loadGoogleMaps().finally(() => setIsLoadingGoogleMaps(false));
+    }
+  }, [account]);
+
   const initialValues = useMemo(
     () =>
       !account
@@ -535,11 +545,15 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             >
               {({ field }) =>
                 account.type !== INDIVIDUAL ? (
-                  <LocationInput
-                    className="w-full"
-                    {...field}
-                    onChange={location => setFieldValue(field.name, location)}
-                  />
+                  isLoadingGoogleMaps ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <LocationInput
+                      className="w-full"
+                      {...field}
+                      onChange={location => setFieldValue(field.name, location)}
+                    />
+                  )
                 ) : (
                   <UserLocationInput
                     {...field}
