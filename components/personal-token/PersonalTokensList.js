@@ -65,9 +65,10 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
         </StyledButton>
         {showCreatePersonalToken && (
           <CreatePersonalTokenModal
-            account={data.individual}
+            account={data?.individual}
             onClose={() => setShowCreatePersonalTokenModal(false)}
             onSuccess={onPersonalTokenCreated}
+            disabled={!data?.individual}
           />
         )}
       </Flex>
