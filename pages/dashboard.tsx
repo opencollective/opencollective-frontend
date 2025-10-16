@@ -262,7 +262,7 @@ const DashboardPage = () => {
             </div>
           )}
         </Page>
-        <Footer />
+        <Footer className="border-t" />
       </div>
     </DashboardContext.Provider>
   );

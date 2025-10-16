@@ -1,12 +1,11 @@
-import React, { useRef } from 'react';
-import { useInView } from 'framer-motion';
+import React from 'react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import NextIllustration from '../components/collectives/HomeNextIllustration';
 import { MainDescription } from '../components/marketing/Text';
 import Page from '../components/Page';
 import Features from '@/components/home/solutions/Features';
-import { FloatingJoinCTA, JoinCTAButtons } from '@/components/home/solutions/JoinCTAButtons';
+import { JoinCTAButtons } from '@/components/home/solutions/JoinCTAButtons';
 import Testimonials from '@/components/home/solutions/Testimonials';
 import Image from '@/components/Image';
 
@@ -82,10 +81,6 @@ const featureHighlights = [
 ];
 
 const Solutions = () => {
-  const staticButtonsRef = useRef(null);
-  const isStaticButtonsInView = useInView(staticButtonsRef, {
-    amount: 0.1,
-  });
   return (
     <Page>
       <div className="mt-20 flex items-center justify-center px-4">
@@ -104,7 +99,7 @@ const Solutions = () => {
             </MainDescription>
           </div>
 
-          <JoinCTAButtons ref={staticButtonsRef} />
+          <JoinCTAButtons onPage="solutions" />
 
           <div className="mt-4 mb-4">
             <NextIllustration
@@ -144,7 +139,6 @@ const Solutions = () => {
         </div>
       </div>
       <Testimonials />
-      <FloatingJoinCTA isVisible={!isStaticButtonsInView} />
     </Page>
   );
 };
