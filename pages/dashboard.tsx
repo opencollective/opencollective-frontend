@@ -9,7 +9,6 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { isHostAccount } from '@/lib/collective';
-import { loadGoogleMaps } from '@/lib/google-maps';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -196,10 +195,6 @@ const DashboardPage = () => {
       setWorkspace({ slug: undefined });
     }
   }, [account]);
-
-  React.useEffect(() => {
-    loadGoogleMaps();
-  }, []);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
