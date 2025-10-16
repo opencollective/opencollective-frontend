@@ -11,7 +11,6 @@ import type {
 import { parseToBoolean } from '@/lib/utils';
 
 import NewPricing, { pricingPageQuery } from '../components/new-pricing';
-import PricingNavTabs from '../components/new-pricing/NavTabs';
 import Page from '../components/Page';
 import Pricing from '../components/pricing';
 
@@ -31,16 +30,5 @@ export default function PricingPage() {
   const { data } = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(pricingPageQuery, {
     context: API_V2_CONTEXT,
   });
-  return (
-    <Page>
-      {parseToBoolean(getEnvVar('NEW_PRICING')) ? (
-        <Fragment>
-          <PricingNavTabs active="organizations" />
-          <NewPricing data={data} />
-        </Fragment>
-      ) : (
-        <Pricing />
-      )}
-    </Page>
-  );
+  return <Page>{parseToBoolean(getEnvVar('NEW_PRICING')) ? <NewPricing data={data} /> : <Pricing />}</Page>;
 }
