@@ -33,6 +33,7 @@ describe('New expense flow', () => {
           expenseType: 'invoice',
           accountSlug: colSlug,
           payeeSlug: this.userSlug,
+          referenceCurrency: 'USD',
           taxes: {
             hasTax: true,
           },
@@ -104,6 +105,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       expenseType,
       accountSlug: this.e2eHostedCollective.slug,
       payeeSlug: this.userSlug,
+      referenceCurrency: 'USD',
     });
   });
 
@@ -135,6 +137,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       expenseType,
       accountSlug: e2eHostedCollective2.slug,
       payeeSlug: collectiveWhereUserIsAdmin.slug,
+      referenceCurrency: 'USD',
       payoutMethod: {
         type: 'OTHER',
         slug: payoutMethodSlug2,
@@ -149,9 +152,20 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
     submitExpense({
       expenseType,
       accountSlug: e2eHostedCollective2.slug,
+      referenceCurrency: 'USD',
       invitee: {
         slug: 'piamancini',
       },
+    });
+  });
+
+  it('Submit an expense with a single currency', function () {
+    cy.contains('New expense').click();
+    submitExpense({
+      expenseType,
+      accountSlug: this.e2eHostedCollective.slug,
+      payeeSlug: this.userSlug,
+      skipBRLItem: true,
     });
   });
 
@@ -188,6 +202,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       submitExpense({
         expenseType,
         accountSlug: this.e2eHostedCollective2.slug,
+        skipBRLItem: true,
         invitee: {
           slug: existingOrganizationSlug,
         },
@@ -233,6 +248,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       submitExpense({
         expenseType,
         accountSlug: this.e2eHostedCollective2.slug,
+        referenceCurrency: 'USD',
         invitee: {
           slug: existingOrganizationSlug,
         },
@@ -260,6 +276,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       submitExpense({
         expenseType,
         accountSlug: this.e2eHostedCollective2.slug,
+        skipBRLItem: true,
         invitee: {
           name: newUser,
           email: `oc-test-${newUser}@opencollective.com`,
@@ -303,6 +320,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
         accountSlug: this.e2eHostedCollective.slug,
         payeeSlug: this.userSlug,
         isRecurring: true,
+        referenceCurrency: 'USD',
       });
     });
   });
@@ -383,6 +401,7 @@ function submitExpense(options: {
   titleSlug?: string;
   accountSlug: string;
   payeeSlug?: string;
+  skipBRLItem?: boolean;
   payoutMethod?: {
     type?: string;
     exists?: boolean;
@@ -406,6 +425,7 @@ function submitExpense(options: {
     titleSlug: randomSlug(),
     ...options,
     fxRateToReferenceCurrency: options?.fxRateToReferenceCurrency || 1,
+    skipBRLItem: options?.skipBRLItem || false,
     payoutMethod: {
       type: 'OTHER',
       slug: randomSlug(),
@@ -496,22 +516,24 @@ function submitExpense(options: {
         }
       });
 
-    cy.contains('Add item').click();
+    if (!opts.skipBRLItem) {
+      cy.contains('Add item').click();
 
-    cy.get('[role="listitem"]')
-      .eq(1)
-      .within(() => {
-        cy.contains('Item Description').click().type('Second item description');
-        cy.contains('Date').click().type('2024-09-29');
-        cy.contains('Amount').click().type('{selectall}500');
-        cy.contains('USD').click();
-        cy.focused().should('have.attr', 'placeholder', 'Search...').type('BRL{enter}');
-        if (opts.expenseType === 'reimbursement') {
-          cy.contains('Drag & drop').selectFile(getReceiptFixture({ fileName: 'receipt1.jpg' }), {
-            action: 'drag-drop',
-          });
-        }
-      });
+      cy.get('[role="listitem"]')
+        .eq(1)
+        .within(() => {
+          cy.contains('Item Description').click().type('Second item description');
+          cy.contains('Date').click().type('2024-09-29');
+          cy.contains('Amount').click().type('{selectall}500');
+          cy.contains('USD').click();
+          cy.focused().should('have.attr', 'placeholder', 'Search...').type('BRL{enter}');
+          if (opts.expenseType === 'reimbursement') {
+            cy.contains('Drag & drop').selectFile(getReceiptFixture({ fileName: 'receipt1.jpg' }), {
+              action: 'drag-drop',
+            });
+          }
+        });
+    }
 
     cy.contains('Additional Attachments').selectFile([
       getReceiptFixture({ fileName: 'attachment0.jpg' }),
@@ -535,7 +557,9 @@ function submitExpense(options: {
 
   cy.get('#ADDITIONAL_DETAILS').within(() => {
     cy.root().scrollIntoView();
-    cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`);
+    cy.get('input[value="First item description"]').click();
+    cy.wait(100);
+    cy.get('input[value="First item description"]').type(`{selectall}The expense title ${opts.titleSlug}`);
     cy.contains('Add tag').click();
     cy.focused().should('have.attr', 'placeholder', 'Add tag').type('A tag');
     cy.wait(100);
@@ -549,7 +573,7 @@ function submitExpense(options: {
     const expectedMainCurrency = opts.referenceCurrency || 'USD';
     const defaultItemCurrency = opts.payoutMethod.data?.currency || 'USD';
     const expectedFirstItemAmount = Math.round(125_00 * opts.fxRateToReferenceCurrency);
-    const expectedSecondItemAmount = Math.round(500_00 * 1.1); // BRL to default currency is always 1.1
+    const expectedSecondItemAmount = opts.skipBRLItem ? 0 : Math.round(500_00 * 1.1); // BRL to default currency is always 1.1
     const expectedTotalAmount = Math.round(expectedFirstItemAmount + expectedSecondItemAmount);
     const addCurrencyToAmount = (amount: number, currency: string) =>
       `${getSymbolFromCurrency(currency as Currency)}${(amount / 100).toFixed(2)} ${currency}`;
@@ -562,26 +586,29 @@ function submitExpense(options: {
           .closest('[role="listitem"]')
           .within(() => {
             cy.contains(addCurrencyToAmount(125_00, defaultItemCurrency)).should('exist');
-            if (opts.referenceCurrency !== defaultItemCurrency) {
-              cy.contains(addCurrencyToAmount(expectedFirstItemAmount, defaultItemCurrency)).should('exist');
+            if (opts.referenceCurrency && opts.referenceCurrency !== defaultItemCurrency) {
+              cy.contains(addCurrencyToAmount(expectedFirstItemAmount, opts.referenceCurrency)).should('exist');
             }
 
             if (opts.expenseType === 'reimbursement') {
               cy.get('a').should('exist');
             }
           });
-        cy.contains('Second item description')
-          .should('exist')
-          .closest('[role="listitem"]')
-          .within(() => {
-            cy.contains(addCurrencyToAmount(500_00, expectedMainCurrency)).should('exist');
-            cy.contains('R$500.00 BRL').should('exist');
 
-            if (opts.expenseType === 'reimbursement') {
-              cy.get('a').should('exist');
-            }
-          });
-        cy.contains(addCurrencyToAmount(expectedTotalAmount, expectedMainCurrency)).should('exist');
+        if (!opts.skipBRLItem) {
+          cy.contains('Second item description')
+            .should('exist')
+            .closest('[role="listitem"]')
+            .within(() => {
+              cy.contains(addCurrencyToAmount(expectedSecondItemAmount, expectedMainCurrency)).should('exist');
+              cy.contains('R$500.00 BRL').should('exist');
+
+              if (opts.expenseType === 'reimbursement') {
+                cy.get('a').should('exist');
+              }
+            });
+          cy.contains(addCurrencyToAmount(expectedTotalAmount, expectedMainCurrency)).should('exist');
+        }
 
         if (opts.taxes?.hasTax) {
           cy.contains(addCurrencyToAmount(135_00, expectedMainCurrency)).should('exist');

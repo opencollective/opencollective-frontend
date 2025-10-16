@@ -33,11 +33,19 @@ function getFormProps(form: ExpenseForm) {
   };
 }
 
+const shouldDisplayReferenceCurrencySection = (availableReferenceCurrencies: Currency[]) => {
+  return availableReferenceCurrencies && availableReferenceCurrencies.length > 1;
+};
+
 export function ReferenceCurrencySection(
   props: ReferenceCurrencySectionProps & {
     inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
   },
 ) {
+  if (!shouldDisplayReferenceCurrencySection(props.availableReferenceCurrencies)) {
+    return null;
+  }
+
   return (
     <FormSectionContainer
       title={<FormattedMessage defaultMessage="Reference currency" id="Ho3XqF" />}
@@ -64,17 +72,16 @@ export const ReferenceCurrencyForm = memoWithGetFormProps(function ReferenceCurr
     tax,
   } = props;
 
-  // Only show this section if there are multiple currencies in use
-  const hasMultipleCurrencies = availableReferenceCurrencies && availableReferenceCurrencies.length > 1;
-
   const onCurrencyChange = React.useCallback(
     (currency: Currency) => {
-      setFieldValue('referenceCurrency', currency);
+      if (currency) {
+        setFieldValue('referenceCurrency', currency);
+      }
     },
     [setFieldValue],
   );
 
-  if (!hasMultipleCurrencies) {
+  if (!shouldDisplayReferenceCurrencySection(availableReferenceCurrencies)) {
     return null;
   }
 

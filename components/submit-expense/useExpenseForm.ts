@@ -760,6 +760,8 @@ function buildFormSchema(
     privateMessage: z.string().optional().nullable(),
     referenceCurrency: z
       .nativeEnum(Currency)
+      .optional()
+      .nullable()
       .refine(
         v => {
           // If multiple currencies are supported, the reference currency must be set
@@ -769,12 +771,12 @@ function buildFormSchema(
             return !v || v === options.availableReferenceCurrencies[0];
           }
         },
-        () => ({
-          message: intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' }),
+        value => ({
+          message: value
+            ? intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' })
+            : intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }),
         }),
-      )
-      .optional()
-      .nullable(),
+      ),
     expenseAttachedFiles: z
       .array(
         z.object({
@@ -1465,6 +1467,9 @@ async function buildFormOptions(
       }
       if (options.payoutMethod?.data?.currency) {
         availableCurrencies.add(options.payoutMethod.data.currency as Currency);
+      }
+      if (options.expense?.currency) {
+        availableCurrencies.add(options.expense.currency);
       }
       values.expenseItems?.forEach(item => {
         if (item.amount?.currency) {
