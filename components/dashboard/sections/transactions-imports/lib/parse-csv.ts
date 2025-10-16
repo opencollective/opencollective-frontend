@@ -112,12 +112,14 @@ const guessNumberFormat = (numberStr: string): (typeof ACCEPTED_NUMBER_FORMATS)[
   }
 };
 
+type TransactionCSVRow = Record<string, string>;
+
 export const parseTransactionsCSVFile = async (
   file: File,
   intl: IntlShape,
 ): Promise<{
   delimiter: (typeof CSV_DELIMITERS)[number];
-  parsedCSV: Array<Record<string, string>>;
+  parsedCSV: Array<TransactionCSVRow>;
 }> => {
   const reader = new FileReader();
 
@@ -128,7 +130,8 @@ export const parseTransactionsCSVFile = async (
       // Try to parse the CSV with different delimiters
       for (const delimiter of CSV_DELIMITERS) {
         try {
-          const parsedCSV = parseCSV(csvData, { columns: true, skip_empty_lines: true, delimiter });
+          // eslint-disable-next-line camelcase
+          const parsedCSV = parseCSV<TransactionCSVRow>(csvData, { columns: true, skip_empty_lines: true, delimiter });
           resolve({ delimiter, parsedCSV });
           return;
         } catch {
