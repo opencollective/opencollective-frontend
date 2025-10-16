@@ -8605,6 +8605,7 @@ export type MutationEditConversationArgs = {
 export type MutationEditExpenseArgs = {
   draftKey?: InputMaybe<Scalars['String']['input']>;
   expense: ExpenseUpdateInput;
+  isDraftEdit?: Scalars['Boolean']['input'];
 };
 
 
@@ -12046,6 +12047,7 @@ export enum SecurityCheckLevel {
 
 /** All supported SecurityCheck scopes */
 export enum SecurityCheckScope {
+  ATTACHMENTS = 'ATTACHMENTS',
   COLLECTIVE = 'COLLECTIVE',
   PAYEE = 'PAYEE',
   PAYOUT_METHOD = 'PAYOUT_METHOD',

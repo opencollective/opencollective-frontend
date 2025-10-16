@@ -2064,7 +2064,7 @@ export function useExpenseForm(opts: {
         setFieldValue('expenseItems.0.attachment', null);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
       } else {
-        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments?.length ?? 0;
         let count = 0;
 
         expenseForm.values.expenseItems.forEach((item, i) => {

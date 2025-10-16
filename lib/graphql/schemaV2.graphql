@@ -8532,6 +8532,7 @@ enum SecurityCheckScope {
   COLLECTIVE
   PAYEE
   PAYOUT_METHOD
+  ATTACHMENTS
 }
 
 """
@@ -21621,6 +21622,11 @@ type Mutation {
     Expense data
     """
     expense: ExpenseUpdateInput!
+
+    """
+    Edit draft without submiting it
+    """
+    isDraftEdit: Boolean! = false
 
     """
     Expense draft key if invited to submit expense. Scope: "expenses".
