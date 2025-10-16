@@ -328,7 +328,7 @@ const TopBar = ({
                                 <FormattedMessage id="company.blog" defaultMessage="Blog" />
                               </NavItem>
                             </a>
-                            <a href="https://documentation.opencollective.com/our-organization/about">
+                            <a href="/about">
                               <NavItem as={Container} mb={16}>
                                 <FormattedMessage id="collective.about.title" defaultMessage="About" />
                               </NavItem>
