@@ -269,7 +269,7 @@ export default function Pricing({ data }) {
               </h3>
               <p className="text-muted-foreground">
                 <FormattedMessage
-                  defaultMessage="The platform is owned and managed by OFi Technologies (OFiTech) which is a 100% subsidiary of {oficoLink} (OFiCo), a non-profit organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
+                  defaultMessage="The platform is owned and managed by OFi Technologies (OFiTech) which is a 100% subsidiary of {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
                   id="8/YzW7"
                   values={{
                     oficoLink: (
