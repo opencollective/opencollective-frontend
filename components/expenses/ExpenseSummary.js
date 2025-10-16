@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { Download, MessageSquare } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -11,7 +12,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { cn } from '../../lib/utils';
+import { cn, parseToBoolean } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
@@ -109,6 +110,7 @@ const ExpenseSummary = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const router = useRouter();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -139,6 +141,9 @@ const ExpenseSummary = ({
     () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
     [expense?.attachedFiles, expense?.draft?.attachedFiles],
   );
+  const hasNewEditFlow =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    !parseToBoolean(router.query.forceLegacyFlow);
 
   const processButtons = (
     <Flex
@@ -150,7 +155,7 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? undefined : onEdit}
+        onEdit={hasNewEditFlow ? undefined : onEdit}
         onCloneModalOpenChange={onCloneModalOpenChange}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
