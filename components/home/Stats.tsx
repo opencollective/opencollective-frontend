@@ -46,9 +46,9 @@ const Stats = () => {
   const { formatMessage } = useIntl();
 
   return (
-    <section className="px-4 pt-4 pb-16">
+    <section className="px-4 pt-4 pb-8 sm:pb-12 lg:pb-16">
       <div className="mx-auto max-w-6xl">
-        <div className="relative overflow-hidden rounded-2xl px-8 py-10">
+        <div className="relative overflow-hidden rounded-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
           {/* Background Image with 40% opacity */}
           <div className="absolute -inset-20 z-0">
             <Image
@@ -62,37 +62,61 @@ const Stats = () => {
 
           {/* Content with relative positioning to appear above background */}
           <div className="relative z-10">
-            <h2 className="mb-10 text-center text-[2rem] font-semibold text-slate-700">
+            <h2 className="mb-6 text-center text-2xl font-semibold text-slate-700 sm:mb-8 sm:text-3xl lg:mb-10 lg:text-[2rem]">
               {formatMessage(messages.title)}
             </h2>
 
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
               {/* Top Row */}
               <div className="text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.organizations}</div>
-                <div className="text-xl text-slate-700">{formatMessage(messages.organizations)}</div>
+                <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
+                  {stats.organizations}
+                </div>
+                <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
+                  {formatMessage(messages.organizations)}
+                </div>
               </div>
               <div className="text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.collectives}</div>
-                <div className="text-xl text-slate-700">{formatMessage(messages.collectives)}</div>
+                <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
+                  {stats.collectives}
+                </div>
+                <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
+                  {formatMessage(messages.collectives)}
+                </div>
               </div>
               <div className="text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.moneyManaged}</div>
-                <div className="text-xl text-slate-700">{formatMessage(messages.moneyManaged)}</div>
+                <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
+                  {stats.moneyManaged}
+                </div>
+                <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
+                  {formatMessage(messages.moneyManaged)}
+                </div>
               </div>
 
               {/* Bottom Row */}
-              <div className="pt-8 text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.expensesPaid}</div>
-                <div className="text-xl text-slate-700">{formatMessage(messages.expensesPaid)}</div>
+              <div className="text-center lg:pt-8">
+                <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
+                  {stats.expensesPaid}
+                </div>
+                <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
+                  {formatMessage(messages.expensesPaid)}
+                </div>
               </div>
-              <div className="pt-8 text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.contributionsReceived}</div>
-                <div className="text-xl text-slate-700">{formatMessage(messages.contributionsReceived)}</div>
+              <div className="text-center lg:pt-8">
+                <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
+                  {stats.contributionsReceived}
+                </div>
+                <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
+                  {formatMessage(messages.contributionsReceived)}
+                </div>
               </div>
-              <div className="pt-8 text-center">
-                <div className="mb-3 text-6xl font-bold text-slate-700">{stats.transactionsRecorded}</div>
-                <div className="text-xl text-slate-700">{formatMessage(messages.transactionsRecorded)}</div>
+              <div className="text-center lg:pt-8">
+                <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
+                  {stats.transactionsRecorded}
+                </div>
+                <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
+                  {formatMessage(messages.transactionsRecorded)}
+                </div>
               </div>
             </div>
           </div>

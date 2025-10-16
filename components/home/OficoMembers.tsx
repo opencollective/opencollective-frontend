@@ -111,6 +111,13 @@ const OficoMembers = () => {
           {formatMessage(messages.title, {
             OficoLink: () => (
               <Link href="https://openfinanceconsortium.org" className="underline">
+                <Avatar
+                  radius={42}
+                  src={'/static/images/ofico/ofico-logo.png'}
+                  name="Open Finance Consortium"
+                  type="ORGANIZATION"
+                  className="mr-1 !inline-flex bg-white align-text-top"
+                />
                 Open Finance Consortium
               </Link>
             ),
