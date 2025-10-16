@@ -14,10 +14,9 @@ const messages = defineMessages({
 
 const testimonials = [
   {
-    title: 'Streamlining our operations, saving us time and reducing administrative overhead.',
     paragraphs: [
-      'Open Collective keeps our financial records accurate, timely, and transparent, helping us build trust within our community.',
-      "By automating many tasks related to managing financial contributions and expenses, we're able to focus on providing meaningful support to our hosted collectives.",
+      'The Open Collective platform is a critical part of how we operate. It streamlines our operations, saving us time and reducing administrative overhead. By automating many tasks related to managing financial contributions and expenses, we’re able to focus more attention on supporting our hosted collectives’ individual needs.',
+      'The platform keeps our financial records accurate, timely, and transparent, helping us build trust within our community and enabling us to focus more on providing meaningful support.',
     ],
     author: 'Lauren Gardner',
     role: 'Executive Director',
@@ -26,10 +25,9 @@ const testimonials = [
     orgLink: 'https://oscollective.org',
   },
   {
-    title: 'Open Collective is essential to how we operate as a foundation.',
     paragraphs: [
-      'The platform allows us to support hundreds of grassroots and open-source communities with transparent budgets, accessible financial tools, and smooth cross-border grant distribution.',
-      "It's an indispensable partner in making collective financial infrastructure truly work at scale.",
+      'Open Collective is essential to how we operate as a foundation. The platform allows us to support hundreds of grassroots and open-source communities with transparent budgets, accessible financial tools, and smooth cross-border grant distribution.',
+      'Working with Ofico ensures that the platform continues to evolve with the needs of fiscal hosts and the communities they serve — it’s an indispensable partner in making collective financial infrastructure truly work at scale.',
     ],
     author: 'Jean-François De Hertogh',
     role: 'Executive Director',
@@ -78,7 +76,6 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[0
   <Card className="h-full">
     <CardContent className="flex-1 px-6">
       <blockquote>
-        {testimonial.title && <h3 className="mb-3 text-lg font-bold text-slate-900">{testimonial.title}</h3>}
         <div className="space-y-2">
           {testimonial.paragraphs.map(text => (
             <p key={text.slice(0, 12)} className="text-slate-600">

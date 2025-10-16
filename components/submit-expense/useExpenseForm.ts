@@ -148,6 +148,7 @@ export type ExpenseFormValues = {
   privateMessage?: string;
   expenseItems?: ExpenseItem[];
   additionalAttachments?: Attachment[];
+  referenceCurrency?: Currency; // The "payment source" currency to use for conversions
   hasTax?: boolean;
   tax?: {
     rate: number;
@@ -618,6 +619,7 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  availableReferenceCurrencies?: Currency[]; // Available currencies that can be selected as reference
   allowDifferentItemCurrency?: boolean;
   isLongFormItemDescription?: boolean;
   hasExpenseItemDate?: boolean;
@@ -756,6 +758,25 @@ function buildFormSchema(
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     privateMessage: z.string().optional().nullable(),
+    referenceCurrency: z
+      .nativeEnum(Currency)
+      .optional()
+      .nullable()
+      .refine(
+        v => {
+          // If multiple currencies are supported, the reference currency must be set
+          if (options.availableReferenceCurrencies.length > 1) {
+            return v && options.availableReferenceCurrencies.includes(v);
+          } else {
+            return !v || v === options.availableReferenceCurrencies[0];
+          }
+        },
+        value => ({
+          message: value
+            ? intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' })
+            : intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }),
+        }),
+      ),
     expenseAttachedFiles: z
       .array(
         z.object({
@@ -1432,24 +1453,43 @@ async function buildFormOptions(
       options.lockedFields = options.expense.lockedFields;
     }
 
-    if (
-      options.expense &&
-      !startOptions.duplicateExpense &&
-      options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
-    ) {
-      options.expenseCurrency = options.expense.currency;
+    // Compute available reference currencies from all sources
+    const availableCurrencies = new Set<Currency>();
+    if (options.expense && options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)) {
+      availableCurrencies.add(options.expense.currency);
     } else if (expenseType === ExpenseType.GRANT) {
-      options.expenseCurrency = options.account?.currency;
-    } else if (
-      options.account?.currency &&
-      values.expenseItems.length > 0 &&
-      values.expenseItems.every(item => item.amount.currency === options.account?.currency)
-    ) {
-      options.expenseCurrency = options.account.currency;
-    } else if (options.payoutMethod) {
-      options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
+      // Grants are always in the account currency
+      availableCurrencies.add(options.account?.currency);
     } else {
-      options.expenseCurrency = options.expense?.currency ?? options.account?.currency;
+      // For all other expenses, the currency must be either the account currency, the payout method currency, or the items currencies
+      if (options.account?.currency) {
+        availableCurrencies.add(options.account.currency);
+      }
+      if (options.payoutMethod?.data?.currency) {
+        availableCurrencies.add(options.payoutMethod.data.currency as Currency);
+      }
+      if (options.expense?.currency) {
+        availableCurrencies.add(options.expense.currency);
+      }
+      values.expenseItems?.forEach(item => {
+        if (item.amount?.currency) {
+          availableCurrencies.add(item.amount.currency as Currency);
+        }
+      });
+    }
+
+    options.availableReferenceCurrencies = Array.from(availableCurrencies);
+
+    if (options.availableReferenceCurrencies.length === 1) {
+      options.expenseCurrency = options.availableReferenceCurrencies[0]; // If there's only one available currency, use it
+    } else if (options.availableReferenceCurrencies.includes(values.referenceCurrency as Currency)) {
+      options.expenseCurrency = values.referenceCurrency as Currency; // If the user provided a reference currency, use it
+    } else if (options.expense?.currency) {
+      options.expenseCurrency = options.expense.currency; // Use the expense currency if it's set
+    } else if (options.account?.currency) {
+      options.expenseCurrency = options.account.currency; // Use the account currency if it's set
+    } else if (options.payoutMethod?.data?.currency) {
+      options.expenseCurrency = options.payoutMethod.data.currency as Currency; // Use the payout method currency if it's set
     }
 
     options.isLongFormItemDescription = false;
@@ -2024,7 +2064,7 @@ export function useExpenseForm(opts: {
         setFieldValue('expenseItems.0.attachment', null);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
       } else {
-        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments?.length ?? 0;
         let count = 0;
 
         expenseForm.values.expenseItems.forEach((item, i) => {
@@ -2094,6 +2134,16 @@ export function useExpenseForm(opts: {
       setFieldValue('accountingCategoryId', null);
     }
   }, [formOptions.accountingCategories, expenseForm.values.accountingCategoryId, setFieldValue]);
+
+  // Reset reference currency if it's no longer in the available currencies
+  React.useEffect(() => {
+    if (
+      expenseForm.values.referenceCurrency &&
+      !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
+    ) {
+      setFieldValue('referenceCurrency', null);
+    }
+  }, [expenseForm.values.referenceCurrency, formOptions.availableReferenceCurrencies, setFieldValue]);
 
   React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {
@@ -2185,7 +2235,13 @@ export function useExpenseForm(opts: {
         ctrl.abort();
       }
     };
-  }, [apolloClient, formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+  }, [
+    apolloClient,
+    formOptions.expenseCurrency,
+    expenseForm.values.expenseItems,
+    expenseForm.values.expenseTypeOption,
+    setFieldValue,
+  ]);
 
   const setStatus = expenseForm.setStatus;
   React.useEffect(() => {

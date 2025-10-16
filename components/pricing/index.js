@@ -5,6 +5,9 @@ import { throttle } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';
 
+import { getEnvVar } from '@/lib/env-utils';
+import { parseToBoolean } from '@/lib/utils';
+
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import PricingFAQ from '../faqs/PricingFAQ';
@@ -147,6 +150,26 @@ const Pricing = () => {
           alignItems="center"
           width={['288px', '636px', '956px', null, '992px']}
         >
+          {parseToBoolean(getEnvVar('NEW_PRICING')) && (
+            <div className="mb-12 flex items-center justify-center">
+              <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
+                <span>
+                  <FormattedMessage
+                    defaultMessage="We’ve updated our pricing model to better support long-term sustainability. <LinkNewPricing>View new pricing</LinkNewPricing>."
+                    id="pricing.newModel.onLegacyPricing"
+                    values={{
+                      LinkNewPricing: parts => (
+                        <Link href="/pricing" className="font-medium underline hover:text-blue-900">
+                          {parts}
+                        </Link>
+                      ),
+                    }}
+                  />
+                </span>
+              </div>
+            </div>
+          )}
+
           <MainTitle mb="14px">
             <FormattedMessage id="pricing.title" defaultMessage="Our Pricing Structure" />
           </MainTitle>

@@ -32,6 +32,7 @@ import {
   ExpenseItemWrapper,
 } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
+import { ReferenceCurrencyForm } from '../submit-expense/form/ReferenceCurrencySection';
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
@@ -294,6 +295,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
       payoutMethodId: true,
       payee: true,
       payeeLocation: true,
+      referenceCurrency: true,
     },
   });
   const transformedOnSubmit = React.useCallback(
@@ -370,6 +372,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
+        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -389,6 +392,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       invoiceFile: true,
       invoiceNumber: true,
       invoiceInfo: true,
+      referenceCurrency: true,
     },
   });
   const transformedOnSubmit = values => {
@@ -464,6 +468,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
+        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
@@ -692,7 +697,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
         disabled={expenseForm.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE) || expenseForm.isSubmitting}
         value={expenseForm.values.expenseTypeOption}
         onValueChange={newValue => expenseForm.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
-        className="flex"
+        className="mb-4 flex flex-wrap"
       >
         <RadioGroupCard
           className="grow basis-0"
@@ -739,7 +744,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
           </div>
         </RadioGroupCard>
       </RadioGroup>
-      <DialogFooter>
+      <DialogFooter className="gap-2 sm:gap-0">
         <DialogClose asChild>
           <Button variant="outline">
             <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
@@ -811,7 +816,7 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
       )}
 
       <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-      <DialogFooter>
+      <DialogFooter className="mt-4 gap-2 sm:gap-0">
         <Button variant="outline" onClick={prevStep}>
           <FormattedMessage defaultMessage="Back" id="Back" />
         </Button>
@@ -908,7 +913,7 @@ function EditExpenseActionButtons({
   const formik = useFormikContext();
 
   return (
-    <DialogFooter>
+    <DialogFooter className="gap-2 sm:gap-0">
       <DialogClose asChild>
         <Button variant="outline">
           <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
@@ -967,6 +972,7 @@ export default function EditExpenseDialog({
         await editExpense({
           variables: {
             expense: editInput,
+            isDraftEdit: true,
           },
         });
         setOpen(false);

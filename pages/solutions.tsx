@@ -19,7 +19,7 @@ const featureHighlights = [
     }),
     description: defineMessage({
       defaultMessage:
-        'Empower people and teams to manage their finances using our simplified and approachable financial tools.',
+        'Empower your people and teams to manage their finances using our simplified and approachable financial tools.',
       id: 'solutions.features.participatoryFinances.description',
     }),
   },
@@ -41,8 +41,7 @@ const featureHighlights = [
       id: 'solutions.features.crowdfunding',
     }),
     description: defineMessage({
-      defaultMessage:
-        'Launch crowdfunding campaigns to raise support for both one-time and continuously funded projects.',
+      defaultMessage: 'Launch campaigns to raise support for both one-time and continuously funded projects.',
       id: 'solutions.features.crowdfunding.description',
     }),
   },
@@ -53,8 +52,7 @@ const featureHighlights = [
       id: 'solutions.features.realTimeBalances',
     }),
     description: defineMessage({
-      defaultMessage:
-        'Keep track of balances, income and spending using up to the minute balances based on our internal transactions.',
+      defaultMessage: 'Keep track of balances, income and spending using up to the minute balances.',
       id: 'solutions.features.realTimeBalances.description',
     }),
   },
@@ -77,7 +75,7 @@ const featureHighlights = [
       id: 'DkzeEN',
     }),
     description: defineMessage({
-      defaultMessage: 'Provide a fiscal umbrella by safely managing their funds under one organization.',
+      defaultMessage: 'Provide a fiscal umbrella by safely managing the money of unincorporated groups.',
       id: 'solutions.features.hosting.description',
     }),
   },
