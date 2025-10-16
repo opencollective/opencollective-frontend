@@ -7,11 +7,9 @@ import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { getEnvVar } from '../lib/env-utils';
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
-import { parseToBoolean } from '../lib/utils';
 
-import { newMarketingMenu } from './navigation/menu-items';
+import { marketingTopbarItems } from './navigation/menu-items';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/Collapsible';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -40,7 +38,6 @@ const SubListItem = styled(ListItem)`
 `;
 
 const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
-  const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
   const [state, setState] = React.useState({
     viewSolutionsMenu: false,
     viewProductsMenu: false,
@@ -54,7 +51,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
     }
   });
 
-  if (usingNewPricing && !useDashboard) {
+  if (!useDashboard) {
     return (
       <React.Fragment>
         <HideGlobalScroll />
@@ -72,36 +69,42 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
           data-cy="user-menu"
         >
           <Box as="ul" my={2} pl={0} pb={2}>
-            {newMarketingMenu.map((menuItem, index) => (
+            {marketingTopbarItems.map((menuItem, index) => (
               <Fragment key={menuItem.label.id}>
                 <ListItem>
-                  <Collapsible>
-                    <CollapsibleTrigger asChild>
-                      <Flex justifyContent="space-between" style={{ cursor: 'pointer' }}>
-                        <FormattedMessage {...menuItem.label} />
-                        <ChevronDown size={20} />
-                      </Flex>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <Box as="ul" my={2} pl="12px">
-                        {menuItem.items.map(subItem => (
-                          <SubListItem key={subItem.href}>
-                            {subItem.target === '_blank' ? (
-                              <a href={subItem.href} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
-                                <FormattedMessage {...subItem.label} />
-                              </a>
-                            ) : (
-                              <Link href={subItem.href} onClick={closeMenu}>
-                                <FormattedMessage {...subItem.label} />
-                              </Link>
-                            )}
-                          </SubListItem>
-                        ))}
-                      </Box>
-                    </CollapsibleContent>
-                  </Collapsible>
+                  {menuItem.items ? (
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Flex justifyContent="space-between" style={{ cursor: 'pointer' }}>
+                          <FormattedMessage {...menuItem.label} />
+                          <ChevronDown size={20} />
+                        </Flex>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <Box as="ul" my={2} pl="12px">
+                          {menuItem.items.map(subItem => (
+                            <SubListItem key={subItem.href}>
+                              {subItem.target === '_blank' ? (
+                                <a href={subItem.href} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
+                                  <FormattedMessage {...subItem.label} />
+                                </a>
+                              ) : (
+                                <Link href={subItem.href} onClick={closeMenu}>
+                                  <FormattedMessage {...subItem.label} />
+                                </Link>
+                              )}
+                            </SubListItem>
+                          ))}
+                        </Box>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    <Link href={menuItem.href} onClick={closeMenu}>
+                      <FormattedMessage {...menuItem.label} />
+                    </Link>
+                  )}
                 </ListItem>
-                {index < newMarketingMenu.length - 1 && <hr className="my-5" />}
+                {index < marketingTopbarItems.length - 1 && <hr className="my-5" />}
               </Fragment>
             ))}
             <hr className="my-5" />

@@ -19,7 +19,7 @@ import { getEnvVar } from '@/lib/env-utils';
 import { parseToBoolean } from '@/lib/utils';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
-import { newMarketingMenu } from './navigation/menu-items';
+import { marketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
 import NewTopBar from './navigation/TopBar';
 import Container from './Container';
@@ -157,8 +157,6 @@ const TopBar = ({
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
 
-  const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
-
   if (onDashboardRoute || (!onHomeRoute && LoggedInUser)) {
     return <NewTopBar {...{ account }} />;
   }
@@ -191,10 +189,10 @@ const TopBar = ({
             <NavList as="ul" p={0} m={0} justifyContent="center" css="margin: 0;">
               {!whitelabel && (
                 <React.Fragment>
-                  {usingNewPricing ? (
-                    newMarketingMenu.map(section => (
+                  {marketingTopbarItems.map(section =>
+                    section.items ? (
                       <PopupMenu
-                        key={section.id}
+                        key={section.label.id}
                         zIndex={2000}
                         closingEvents={['focusin', 'mouseover']}
                         Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
@@ -222,128 +220,13 @@ const TopBar = ({
                           ))}
                         </NavLinkContainer>
                       </PopupMenu>
-                    ))
-                  ) : (
-                    <React.Fragment>
-                      {menuItems.solutions && (
-                        <PopupMenu
-                          zIndex={2000}
-                          closingEvents={['focusin', 'mouseover']}
-                          Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
-                            <NavButton
-                              isBorderless
-                              onMouseOver={onMouseOver}
-                              onFocus={onFocus}
-                              onClick={onClick}
-                              whiteSpace="nowrap"
-                            >
-                              <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
-                              {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                            </NavButton>
-                          )}
-                          placement="bottom"
-                          popupMarginTop="-10px"
-                        >
-                          <NavLinkContainer>
-                            <Link href="/collectives">
-                              <NavItem as={Container} mt={16} mb={16}>
-                                <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
-                              </NavItem>
-                            </Link>
-                            <Link href="/become-a-sponsor">
-                              <NavItem as={Container} mt={16} mb={16}>
-                                <FormattedMessage defaultMessage="For Sponsors" id="1rESHf" />
-                              </NavItem>
-                            </Link>
-                            <Link href="/become-a-host">
-                              <NavItem as={Container} mt={16} mb={16}>
-                                <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
-                              </NavItem>
-                            </Link>
-                          </NavLinkContainer>
-                        </PopupMenu>
-                      )}
-
-                      {menuItems.product && (
-                        <PopupMenu
-                          zIndex={2000}
-                          closingEvents={['focusin', 'mouseover']}
-                          Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                            <NavButton
-                              isBorderless
-                              onMouseOver={onMouseOver}
-                              onFocus={onFocus}
-                              onClick={onClick}
-                              whiteSpace="nowrap"
-                            >
-                              <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-                              {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                            </NavButton>
-                          )}
-                          placement="bottom"
-                          popupMarginTop="-10px"
-                        >
-                          <NavLinkContainer>
-                            <Link href="/pricing">
-                              <NavItem as={Container} mt={16} mb={16}>
-                                <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-                              </NavItem>
-                            </Link>
-                            <Link href="/how-it-works">
-                              <NavItem as={Container}>
-                                <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-                              </NavItem>
-                            </Link>
-                            <Link href="/fiscal-hosting">
-                              <NavItem as={Container} mt={16} mb={16}>
-                                <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-                              </NavItem>
-                            </Link>
-                          </NavLinkContainer>
-                        </PopupMenu>
-                      )}
-
-                      {menuItems.company && (
-                        <PopupMenu
-                          zIndex={2000}
-                          closingEvents={['focusin', 'mouseover']}
-                          Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                            <NavButton
-                              isBorderless
-                              onMouseOver={onMouseOver}
-                              onFocus={onFocus}
-                              onClick={onClick}
-                              whiteSpace="nowrap"
-                            >
-                              <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
-                              {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                            </NavButton>
-                          )}
-                          placement="bottom"
-                          popupMarginTop="-10px"
-                        >
-                          <NavLinkContainer>
-                            <a href="https://blog.opencollective.com/">
-                              <NavItem as={Container} mt={16} mb={16}>
-                                <FormattedMessage id="company.blog" defaultMessage="Blog" />
-                              </NavItem>
-                            </a>
-                            <a href="https://documentation.opencollective.com/our-organization/about">
-                              <NavItem as={Container} mb={16}>
-                                <FormattedMessage id="collective.about.title" defaultMessage="About" />
-                              </NavItem>
-                            </a>
-                          </NavLinkContainer>
-                        </PopupMenu>
-                      )}
-                      {menuItems.docs && (
-                        <Link href="/help">
-                          <NavButton as={Container} whiteSpace="nowrap">
-                            <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
-                          </NavButton>
-                        </Link>
-                      )}
-                    </React.Fragment>
+                    ) : (
+                      <Link key={section.label.id} href={section.href} target={section.target}>
+                        <NavButton as={Container} whiteSpace="nowrap">
+                          {intl.formatMessage(section.label)}
+                        </NavButton>
+                      </Link>
+                    ),
                   )}
                 </React.Fragment>
               )}
