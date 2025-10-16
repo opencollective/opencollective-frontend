@@ -42,7 +42,7 @@ const landingPageItems: Item[] = [
       },
       {
         label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,
-        href: 'https://documentation.opencollective.com/our-organization/about',
+        href: '/about',
       },
     ],
   },
@@ -141,7 +141,7 @@ export const regularFooterItems: Item[] = [
     items: [
       {
         label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,
-        href: 'https://documentation.opencollective.com/our-organization/about',
+        href: '/about',
       },
       {
         label: <FormattedMessage id="company.blog" defaultMessage="Blog" />,
@@ -219,8 +219,7 @@ export const newMarketingMenu = [
           defaultMessage: 'About Us',
           id: 'ZjDH42',
         }),
-        href: 'https://documentation.opencollective.com/our-organization/about',
-        target: '_blank',
+        href: '/about',
       },
       {
         label: defineMessage({
