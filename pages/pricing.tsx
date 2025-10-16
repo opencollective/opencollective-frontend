@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { useQuery } from '@apollo/client';
 
 import { getSSRQueryHelpers } from '@/lib/apollo-client';
