@@ -1,8 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Link from '@/components/Link';
 import PricingNavTabs from '@/components/new-pricing/NavTabs';
 import Page from '@/components/Page';
+import { Button } from '@/components/ui/Button';
 
 // next.js export
 // ts-unused-exports:disable-next-line
@@ -15,11 +17,29 @@ export default function PricingForCollectivesPage() {
           <div className="text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Pricing for Collectives</h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground">
-              A Collective is a group of people with a shared purpose that uses the platform to raise and manage money
-              together. Collectives rely on a Host Organization, which holds and pays out their funds. The pricing below
-              applies to Collectives, which are free to use. Other fees, like those from Hosts or Payment Processors,
-              may apply.
+              <FormattedMessage
+                defaultMessage="A Collective is a group of people with a shared purpose that uses the platform to raise and manage money together. Collectives rely on a Host Organization, which holds and pays out their funds. Thanks to Platform Tips, Collectives are essentially free to use the platform. Other fees, like those from Hosts or Payment Processors, may apply."
+                id="pricing.collectives.description"
+              />
             </p>
+
+            {/* Compact free pricing box */}
+            <div className="mx-auto mt-8 w-full">
+              <div className="w-full rounded-2xl border bg-slate-50 px-6 py-6 text-center shadow-sm">
+                <div className="text-5xl font-extrabold text-slate-900">
+                  $0
+                  <span className="ml-2 align-middle text-base font-semibold text-slate-700">
+                    <FormattedMessage defaultMessage="Free for Collectives" id="pricing.collectives.free" />
+                  </span>
+                </div>
+                <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="No monthly subscription. Collectives can use the platform at no cost."
+                    id="pricing.collectives.free.desc"
+                  />
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="mt-16">
@@ -33,7 +53,7 @@ export default function PricingForCollectivesPage() {
                       <FormattedMessage defaultMessage="Paid by" id="pricing.table.paidBy" />
                     </th>
                     <th className="px-4 py-3 font-medium text-foreground">
-                      <FormattedMessage defaultMessage="Typical Fee" id="pricing.table.typicalFee" />
+                      <FormattedMessage defaultMessage="Typical Amount" id="pricing.table.typicalAmount" />
                     </th>
                   </tr>
                 </thead>
@@ -86,13 +106,15 @@ export default function PricingForCollectivesPage() {
                   <tr className="border-b border-border">
                     <td className="px-4 py-3 text-foreground">
                       <FormattedMessage
-                        defaultMessage="Payment Processor Fees (Stripe)"
-                        id="pricing.fee.stripeIncoming"
+                        defaultMessage="Payment Processor Fees ({provider})"
+                        id="pricing.fee.processor.title"
+                        values={{ provider: 'Stripe' }}
                       />
                       <div className="text-xs text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Applied to card and wallet payments received by the Collective."
-                          id="pricing.fee.stripeIncoming.desc"
+                          defaultMessage="Charged by {provider} for contributions received by the Collective."
+                          id="pricing.fee.processorIncoming.desc"
+                          values={{ provider: 'Stripe' }}
                         />
                       </div>
                     </td>
@@ -105,13 +127,15 @@ export default function PricingForCollectivesPage() {
                   <tr className="border-b border-border">
                     <td className="px-4 py-3 text-foreground">
                       <FormattedMessage
-                        defaultMessage="Payment Processor Fees (PayPal)"
-                        id="pricing.fee.paypalIncoming"
+                        defaultMessage="Payment Processor Fees ({provider})"
+                        id="pricing.fee.processor.title"
+                        values={{ provider: 'PayPal' }}
                       />
                       <div className="text-xs text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Applied to PayPal donations received by the Collective."
-                          id="pricing.fee.paypalIncoming.desc"
+                          defaultMessage="Charged by {provider} for contributions received by the Collective."
+                          id="pricing.fee.processorIncoming.desc"
+                          values={{ provider: 'PayPal' }}
                         />
                       </div>
                     </td>
@@ -135,11 +159,16 @@ export default function PricingForCollectivesPage() {
                   </tr>
                   <tr className="border-b border-border">
                     <td className="px-4 py-3 text-foreground">
-                      <FormattedMessage defaultMessage="Payment Processor Fees (Wise)" id="pricing.fee.wiseOutgoing" />
+                      <FormattedMessage
+                        defaultMessage="Payment Processor Fees ({provider})"
+                        id="pricing.fee.processor.title"
+                        values={{ provider: 'Wise' }}
+                      />
                       <div className="text-xs text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Applied to bank transfers for expense payouts."
-                          id="pricing.fee.wiseOutgoing.desc"
+                          defaultMessage="Charged by {provider} for outgoing payouts."
+                          id="pricing.fee.processorOutgoing.desc"
+                          values={{ provider: 'Wise' }}
                         />
                       </div>
                     </td>
@@ -152,13 +181,15 @@ export default function PricingForCollectivesPage() {
                   <tr>
                     <td className="px-4 py-3 text-foreground">
                       <FormattedMessage
-                        defaultMessage="Payment Processor Fees (PayPal payouts)"
-                        id="pricing.fee.paypalOutgoing"
+                        defaultMessage="Payment Processor Fees ({provider})"
+                        id="pricing.fee.processor.title"
+                        values={{ provider: 'PayPal' }}
                       />
                       <div className="text-xs text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Applied to PayPal payouts for expense reimbursements."
-                          id="pricing.fee.paypalOutgoing.desc"
+                          defaultMessage="Charged by {provider} for outgoing payouts."
+                          id="pricing.fee.processorOutgoing.desc"
+                          values={{ provider: 'PayPal' }}
                         />
                       </div>
                     </td>
@@ -173,6 +204,14 @@ export default function PricingForCollectivesPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <Button asChild variant="marketing" className="rounded-full" size="lg">
+              <Link href="/create">
+                <FormattedMessage defaultMessage="Join As Collective" id="solutions.hero.joinAsCollective" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
