@@ -68,7 +68,7 @@ const formSchema = z.object({
     name: z.string().min(5).max(255),
     slug: z.string().min(5).max(255),
     legalName: z.string().min(5).max(255),
-    description: z.string().min(10).max(255),
+    description: z.string().max(255).optional(),
     website: z.string().url().optional(),
     currency: z.string().length(3),
   }),
@@ -504,12 +504,20 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                 <FormField
                   name="organization.legalName"
                   label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
-                  hint={<FormattedMessage defaultMessage="As registered with legal entities" id="jQOxmT" />}
+                  hint={
+                    <FormattedMessage defaultMessage="Official name as registered with legal authorities" id="jQOxmT" />
+                  }
                   placeholder="e.g. Open Collective Inc., Open Finance Consortium Inc."
                 />
                 <FormField
                   name="organization.name"
                   label={<FormattedMessage id="PublicName" defaultMessage="Public name" />}
+                  hint={
+                    <FormattedMessage
+                      defaultMessage="Displayed publicly. Can be different from legal name."
+                      id="publicName.hint"
+                    />
+                  }
                   placeholder="e.g. Open Collective, OFiCo"
                   onChange={e => {
                     setFieldValue('organization.name', e.target.value);
