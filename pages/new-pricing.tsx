@@ -10,6 +10,7 @@ import type {
 
 import NewPricing, { pricingPageQuery } from '../components/new-pricing';
 import Page from '../components/Page';
+import PricingNavTabs from '@/components/new-pricing/NavTabs';
 
 const pricingPageQueryHelpers = getSSRQueryHelpers({
   query: pricingPageQuery,
@@ -29,6 +30,7 @@ export default function PricingPage() {
   });
   return (
     <Page>
+      <PricingNavTabs active="organizations" />
       <NewPricing data={data} />
     </Page>
   );
