@@ -104,10 +104,9 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.newExpenseFlowDescription"
       />
     ),
-    alwaysEnableInDev: true,
-    publicBeta: true,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
+    publicBeta: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
@@ -118,10 +117,9 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.inlineEditExpenseDescription"
       />
     ),
-    alwaysEnableInDev: true,
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
+    publicBeta: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
