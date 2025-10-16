@@ -10,9 +10,30 @@ type Item = {
 
 export const marketingTopbarItems: Item[] = [
   {
+    label: defineMessage({ defaultMessage: 'Platform', id: 'Mmuj1R' }),
+    items: [
+      { label: defineMessage({ id: 'home', defaultMessage: 'Home' }), href: '/home' },
+      { label: defineMessage({ defaultMessage: 'Explore', id: '7JlauX' }), href: '/search' },
+      {
+        label: defineMessage({
+          defaultMessage: 'About',
+          id: 'g5pX+a',
+        }),
+        href: 'https://documentation.opencollective.com/our-organization/about',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Contact',
+          id: 'Contact',
+        }),
+        href: '/contact',
+      },
+    ],
+  },
+  {
     label: defineMessage({
-      defaultMessage: 'Product',
-      id: 'ContributionType.Product',
+      defaultMessage: 'Solutions',
+      id: 'asqGnV',
     }),
     items: [
       {
@@ -32,26 +53,7 @@ export const marketingTopbarItems: Item[] = [
       },
     ],
   },
-  {
-    label: defineMessage({ defaultMessage: 'Company', id: '9YazHG' }),
-    items: [
-      { label: defineMessage({ id: 'home', defaultMessage: 'Home' }), href: '/home' },
-      {
-        label: defineMessage({
-          defaultMessage: 'About',
-          id: 'g5pX+a',
-        }),
-        href: 'https://documentation.opencollective.com/our-organization/about',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'Contact',
-          id: 'Contact',
-        }),
-        href: '/contact',
-      },
-    ],
-  },
+
   {
     label: defineMessage({ defaultMessage: 'Resources', id: '7oFrM6' }),
     items: [

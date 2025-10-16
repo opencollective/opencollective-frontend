@@ -83,7 +83,7 @@ const TopBarIcon = ({ provider }) => {
       <Flex alignItems="center">
         {provider?.logo ? (
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
-        ) : parseToBoolean(getEnvVar('NEW_PRICING')) ? (
+        ) : (
           <React.Fragment>
             <NextImage
               width={555}
@@ -99,17 +99,6 @@ const TopBarIcon = ({ provider }) => {
               src="/static/images/oc-logo-watercolor-256.png"
               alt="Open Collective"
             />
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />{' '}
-            {!provider && (
-              <Hide xs sm md>
-                <Box mx={2}>
-                  <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
-                </Box>
-              </Hide>
-            )}
           </React.Fragment>
         )}
       </Flex>

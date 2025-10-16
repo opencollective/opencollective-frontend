@@ -17,6 +17,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 import { footerItems, marketingTopbarItems } from './menu-items';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import SignupLogin from '../SignupLogin';
+import { Separator } from '../ui/Separator';
 
 const SocialLink = ({ href, children, ...props }) => (
   <Link
@@ -64,70 +66,69 @@ const Footer = ({ className }: { className?: string }) => {
   const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   return (
-    <footer className="bg-background antialiased">
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 xl:flex xl:gap-20">
-        <div className="max-w-xs space-y-6">
-          <div className="space-y-4">
-            <Link href="/home" className="block">
-              <Image
-                width={555}
-                height={75}
-                className="!h-7 w-auto"
-                src="/static/images/ofi-opencollective-logo.png"
-                alt="Open Collective"
-              />
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              <FormattedMessage
-                id="footer.OC.description.new"
-                defaultMessage="Collaborative, transparent, financial management tool"
-              />
-            </p>
-          </div>
+    <React.Fragment>
+      <footer className="bg-background antialiased">
+        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+          <Separator className="mb-16" />
+          <div className="xl:flex xl:gap-12">
+            <div className="max-w-xs space-y-6">
+              <div className="space-y-4">
+                <Link href="/home" className="block">
+                  <Image
+                    width={555}
+                    height={75}
+                    className="!h-7 w-auto"
+                    src="/static/images/ofi-opencollective-logo.png"
+                    alt="Open Collective"
+                  />
+                </Link>
+                <p className="text-sm text-muted-foreground">
+                  <FormattedMessage
+                    id="footer.OC.description.new"
+                    defaultMessage="Collaborative, transparent, financial management tool"
+                  />
+                </p>
+              </div>
 
-          <LanguageSwitcher />
-        </div>
-
-        <div className="mt-16 grid flex-1 grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 xl:col-span-2 xl:mt-0">
-          {footerItems.map(({ label, items }) => (
-            <div className="text-sm antialiased" key={label.id}>
-              <p className="mb-4 text-sm/6 font-medium text-slate-900">{intl.formatMessage(label)}</p>
-              <ul className="space-y-4">
-                {items.map(item =>
-                  !LoggedInUser || (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
-                    <li className="text-slate-600 hover:text-foreground" key={item.label.id}>
-                      {item.href[0] === '/' ? (
-                        <Link href={item.href}>{intl.formatMessage(item.label)}</Link>
-                      ) : (
-                        <a href={item.href}>
-                          {intl.formatMessage(item.label)} <ExternalLink className="inline-block" size={12} />
-                        </a>
-                      )}
-                    </li>
-                  ) : null,
-                )}
-              </ul>
+              <LanguageSwitcher />
             </div>
-          ))}
 
-          {/* <div>
-            <h3 className="mb-4 text-sm font-medium text-foreground antialiased">
-              <FormattedMessage defaultMessage="Get started" id="/aBLH2" />
-            </h3>
-            <SignupLogin className="flex-col items-start" />
-          </div> */}
+            <div className="mt-16 grid flex-1 grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 xl:col-span-2 xl:mt-0">
+              {footerItems.map(({ label, items }) => (
+                <div className="text-sm antialiased" key={label.id}>
+                  <p className="mb-4 text-sm/6 font-medium text-slate-900">{intl.formatMessage(label)}</p>
+                  <ul className="space-y-4">
+                    {items.map(item =>
+                      !LoggedInUser ||
+                      (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
+                        <li className="text-slate-600 hover:text-foreground" key={item.label.id}>
+                          {item.href[0] === '/' ? (
+                            <Link href={item.href}>{intl.formatMessage(item.label)}</Link>
+                          ) : (
+                            <a href={item.href}>
+                              {intl.formatMessage(item.label)} <ExternalLink className="inline-block" size={12} />
+                            </a>
+                          )}
+                        </li>
+                      ) : null,
+                    )}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="bg-muted">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
-          <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Open Finance Technologies Inc. All rights reserved.
-          </p>
-          <SocialLinks className="gap-2" iconSize={18} />
+        <div className="bg-muted">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} Open Finance Technologies Inc. All rights reserved.
+            </p>
+            <SocialLinks className="gap-2" iconSize={18} />
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </React.Fragment>
   );
   return (
     <footer className={cn('space-y-8 border-t pt-12', className)}>
