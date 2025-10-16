@@ -18,17 +18,11 @@ export const marketingTopbarItems: Item[] = [
       {
         label: defineMessage({
           defaultMessage: 'For Organizations',
-          id: 'ipKxcj',
+          id: 'X7kjxh',
         }),
         href: '/solutions',
       },
-      {
-        label: defineMessage({
-          defaultMessage: 'For Fiscal Hosts',
-          id: 'pricing.fiscalHost',
-        }),
-        href: '/solutions',
-      },
+
       {
         label: defineMessage({
           defaultMessage: 'For Collectives',
@@ -39,15 +33,13 @@ export const marketingTopbarItems: Item[] = [
     ],
   },
   {
-    label: defineMessage({
-      defaultMessage: 'About',
-      id: 'collective.about.title',
-    }),
+    label: defineMessage({ defaultMessage: 'Company', id: '9YazHG' }),
     items: [
+      { label: defineMessage({ id: 'home', defaultMessage: 'Home' }), href: '/home' },
       {
         label: defineMessage({
-          defaultMessage: 'About Us',
-          id: 'ZjDH42',
+          defaultMessage: 'About',
+          id: 'g5pX+a',
         }),
         href: 'https://documentation.opencollective.com/our-organization/about',
       },
@@ -61,23 +53,40 @@ export const marketingTopbarItems: Item[] = [
     ],
   },
   {
-    label: defineMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' }),
-    href: '/help',
+    label: defineMessage({ defaultMessage: 'Resources', id: '7oFrM6' }),
+    items: [
+      {
+        label: defineMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' }),
+        href: '/help',
+      },
+      {
+        label: defineMessage({ defaultMessage: 'Documentation', id: 'isGKnz' }),
+        href: 'https://documentation.opencollective.com',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Discord community',
+          id: 'x8s10c',
+        }),
+        href: 'https://discord.opencollective.com/',
+      },
+    ],
   },
 ];
 
 export const footerItems: Item[] = [
-  {
-    label: defineMessage({ id: 'home', defaultMessage: 'Home' }),
-    href: '/home',
-  },
   ...marketingTopbarItems,
   {
-    label: defineMessage({ defaultMessage: 'Privacy policy', id: 'cPwv2c' }),
-    href: '/privacypolicy',
-  },
-  {
-    label: defineMessage({ defaultMessage: 'Terms of Service', id: '32rBNK' }),
-    href: '/tos',
+    label: defineMessage({ defaultMessage: 'Legal', id: '7oFrM6' }),
+    items: [
+      {
+        label: defineMessage({ defaultMessage: 'Privacy policy', id: 'cPwv2c' }),
+        href: '/privacypolicy',
+      },
+      {
+        label: defineMessage({ defaultMessage: 'Terms of Service', id: '32rBNK' }),
+        href: '/tos',
+      },
+    ],
   },
 ];
