@@ -43,13 +43,19 @@ export const marketingTopbarItems: Item[] = [
         }),
         href: '/solutions',
       },
-
       {
         label: defineMessage({
           defaultMessage: 'For Collectives',
           id: 'pricing.forCollective',
         }),
         href: '/collectives',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Pricing',
+          id: '5Wwopw',
+        }),
+        href: '/pricing',
       },
     ],
   },

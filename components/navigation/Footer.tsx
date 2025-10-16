@@ -67,9 +67,8 @@ const Footer = ({ className }: { className?: string }) => {
   const { LoggedInUser } = useLoggedInUser();
   return (
     <React.Fragment>
-      <footer className="bg-background antialiased">
-        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-          <Separator className="mb-16" />
+      <footer className={cn('bg-background antialiased', className)}>
+        <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 lg:px-8">
           <div className="xl:flex xl:gap-12">
             <div className="max-w-xs space-y-6">
               <div className="space-y-4">

@@ -17,7 +17,7 @@ import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
 import { getEnvVar } from '@/lib/env-utils';
 import { parseToBoolean } from '@/lib/utils';
-
+import { Button } from '@/components/ui/Button';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import { marketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
@@ -33,6 +33,7 @@ import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
+import { ArrowRight } from 'lucide-react';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -251,9 +252,25 @@ const TopBar = ({
       <Flex alignItems="center" justifyContent="flex-end" css={{ gridArea: 'right' }}>
         {showProfileAndChangelogMenu && (
           <React.Fragment>
-            <div className="mr-2 hidden sm:block">
-              <ChangelogTrigger />
-            </div>
+            {onDashboardRoute ? (
+              <div className="mr-2 hidden sm:block">
+                <ChangelogTrigger />
+              </div>
+            ) : (
+              LoggedInUser && (
+                <Button
+                  asChild
+                  variant="marketing"
+                  className="mr-3 hidden rounded-full whitespace-nowrap sm:flex"
+                  size="sm"
+                >
+                  <Link href="/dashboard">
+                    <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
+                  </Link>
+                </Button>
+              )
+            )}
+
             <ProfileMenu />
           </React.Fragment>
         )}
