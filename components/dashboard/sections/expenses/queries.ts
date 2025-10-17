@@ -14,6 +14,7 @@ export const accountExpensesQuery = gql`
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -38,6 +39,7 @@ export const accountExpensesQuery = gql`
       limit: $limit
       offset: $offset
       type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount
