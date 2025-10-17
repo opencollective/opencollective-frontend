@@ -107,12 +107,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                 {index < marketingTopbarItems.length - 1 && <hr className="my-5" />}
               </Fragment>
             ))}
-            <hr className="my-5" />
-            <ListItem>
-              <Link href="/search" onClick={closeMenu}>
-                <FormattedMessage id="Explore" defaultMessage="Explore" />
-              </Link>
-            </ListItem>
           </Box>
         </Container>
       </React.Fragment>

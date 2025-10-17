@@ -15,9 +15,9 @@ import { styled } from 'styled-components';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
-import { getEnvVar } from '@/lib/env-utils';
-import { parseToBoolean } from '@/lib/utils';
+
 import { Button } from '@/components/ui/Button';
+
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import { marketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
@@ -33,7 +33,6 @@ import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
-import { ArrowRight } from 'lucide-react';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -86,12 +85,13 @@ const TopBarIcon = ({ provider }) => {
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
         ) : (
           <React.Fragment>
-            <NextImage
+            <Image
               width={555}
               height={75}
-              className="hidden h-6 w-auto sm:block"
+              className="hidden !h-6 w-auto sm:block"
               src="/static/images/ofi-opencollective-logo.png"
               alt="Open Collective"
+              style={{ height: undefined }}
             />
             <Image
               width={32}
@@ -230,26 +230,31 @@ const TopBar = ({
               {showSearch && menuItems.docs && (
                 <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />
               )}
+              {showSearch && (
+                <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+                  <div className="flex items-center">
+                    <SearchIcon fill="#75777A" size={18} />
+                    <span className="ml-1 text-base" ml="5px">
+                      <FormattedMessage id="Search" defaultMessage="Search" />
+                    </span>
+                  </div>
+                </NavButton>
+              )}
             </NavList>
           )}
         </Hide>
-        {showSearch && (
-          <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-            <div className="flex items-center">
-              <SearchIcon fill="#75777A" size={18} />
-              <Hide xs sm>
-                <span className="ml-1 text-base" ml="5px">
-                  <FormattedMessage id="Search" defaultMessage="Search" />
-                </span>
-              </Hide>
-            </div>
-          </NavButton>
-        )}
         <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
       </Flex>
 
       {/* Right section - Profile, and Mobile Menu */}
       <Flex alignItems="center" justifyContent="flex-end" css={{ gridArea: 'right' }}>
+        {showSearch && (
+          <Hide md lg>
+            <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+              <SearchIcon fill="#75777A" size={18} />
+            </NavButton>
+          </Hide>
+        )}
         {showProfileAndChangelogMenu && (
           <React.Fragment>
             {onDashboardRoute ? (
@@ -265,7 +270,7 @@ const TopBar = ({
                   size="sm"
                 >
                   <Link href="/dashboard">
-                    <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
+                    <FormattedMessage defaultMessage="Dashboard" id="Dashboard" />
                   </Link>
                 </Button>
               )
