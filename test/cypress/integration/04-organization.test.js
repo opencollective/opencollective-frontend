@@ -80,7 +80,9 @@ describe('Create Organization Form', () => {
     cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff Inc.');
     cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff');
     cy.get('@form').find('input[name="organization.description"]').type('We do super cool stuff');
-    cy.get('@form').find('input[name="invitedAdmins.0"]').type('leo@opencollective.com');
+    cy.get('@form').find('button[data-cy="add-team-member"]').click();
+    cy.get('@form').find('input[name="invitedAdmins.0.name"]').type('Leo');
+    cy.get('@form').find('input[name="invitedAdmins.0.email"]').type('leo@opencollective.com');
 
     cy.get('@form').find('button[type="submit"]').click();
     cy.get('main').contains('Welcome, Cool Stuff!');
