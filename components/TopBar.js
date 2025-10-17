@@ -87,7 +87,7 @@ const TopBarIcon = ({ provider }) => {
             <Image
               width={555}
               height={75}
-              className="hidden !h-6 w-auto sm:block"
+              className="hidden !h-6 w-auto shrink-0 sm:block"
               src="/static/images/ofi-opencollective-logo.png"
               alt="Open Collective"
               style={{ height: undefined }}
@@ -95,7 +95,7 @@ const TopBarIcon = ({ provider }) => {
             <Image
               width={32}
               height={32}
-              className="block sm:hidden"
+              className="block shrink-0 sm:hidden"
               src="/static/images/oc-logo-watercolor-256.png"
               alt="Open Collective"
             />
@@ -134,6 +134,8 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
     '/become-a-sponsor',
     '/become-a-host',
     '/pricing',
+    '/legacy-pricing',
+    '/new-pricing',
     '/how-it-works',
     '/fiscal-hosting',
     '/help',
@@ -223,14 +225,17 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
               ))}
 
               {showSearch && (
-                <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-                  <div className="flex items-center">
-                    <SearchIcon fill="#75777A" size={18} />
-                    <span className="ml-1 text-base" ml="5px">
-                      <FormattedMessage id="Search" defaultMessage="Search" />
-                    </span>
-                  </div>
-                </NavButton>
+                <React.Fragment>
+                  <Container borderRight="1px solid #DCDDE0" height="20px" />
+                  <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+                    <div className="flex items-center">
+                      <SearchIcon fill="#75777A" size={18} />
+                      <span className="ml-1 hidden text-base lg:block">
+                        <FormattedMessage id="Search" defaultMessage="Search" />
+                      </span>
+                    </div>
+                  </NavButton>
+                </React.Fragment>
               )}
             </NavList>
           )}
