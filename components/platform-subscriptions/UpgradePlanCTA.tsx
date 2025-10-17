@@ -91,6 +91,7 @@ const content: Content = {
         defaultMessage: 'Protect your community by avoiding risky data storage.',
       }),
     ],
+    learnMoreUrl: 'https://documentation.opencollective.com/expenses-and-getting-paid/understanding-tax-requirements',
   },
   AGREEMENTS: {
     title: defineMessage({
@@ -145,6 +146,7 @@ const content: Content = {
         defaultMessage: 'Provide your accountants with a consolidated transaction exports.',
       }),
     ],
+    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/bank-account-synchronization',
   },
   TRANSFERWISE: {
     title: defineMessage({
@@ -171,6 +173,13 @@ const content: Content = {
     ],
     learnMoreUrl:
       'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-as-a-fiscal-host',
+  },
+  FUNDS_GRANTS_MANAGEMENT: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.FUNDS_GRANTS_MANAGEMENT.title',
+      defaultMessage: 'Upgrade your plan for managing funds & grants.',
+    }),
+    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/funds-and-grants',
   },
 };
 

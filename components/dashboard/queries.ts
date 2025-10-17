@@ -97,6 +97,7 @@ export const adminPanelQuery = gql`
         PAYPAL_PAYOUTS
         TRANSFERWISE
         AGREEMENTS
+        FUNDS_GRANTS_MANAGEMENT
       }
       policies {
         id

@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { isEmpty, max, min, omit, orderBy, pick, set } from 'lodash';
+import { omit, orderBy, pick, set } from 'lodash';
+import { Plus, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import slugify from 'slugify';
 import { z } from 'zod';
 
 import { suggestSlug } from '@/lib/collective';
@@ -82,7 +82,14 @@ const formSchema = z.object({
   ]),
   TOSAgreement: z.boolean().optional(),
   roleDescription: z.string().max(255).optional(),
-  invitedAdmins: z.array(z.string().email()).optional(),
+  invitedAdmins: z
+    .array(
+      z.object({
+        email: z.string().email(),
+        name: z.string().min(1),
+      }),
+    )
+    .optional(),
 });
 
 type FormValuesSchema = z.infer<typeof formSchema>;
@@ -91,9 +98,8 @@ export type OrganizationFormProps = {
   onSuccess?: (organization: OrganizationSignupMutation['createOrganization']) => void;
 };
 
-const emailToAdmin = email => {
-  const username = email.split('@')?.[0];
-  return { memberInfo: { email, name: username ? slugify(username) : null }, role: 'ADMIN' };
+const invitedAdminToMember = ({ email, name }) => {
+  return { memberInfo: { email, name }, role: 'ADMIN' };
 };
 
 const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
@@ -109,6 +115,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
+  const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
   const getCountryLabel = useCallback(
     (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
     [intl],
@@ -208,7 +215,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         variables: {
           individual: 'id' in individual ? null : omit(individual, ['passwordConfirmation']),
           organization: organization,
-          inviteMembers: invitedAdmins?.length ? invitedAdmins.map(emailToAdmin) : undefined,
+          inviteMembers: invitedAdmins?.length ? invitedAdmins.map(invitedAdminToMember) : undefined,
           captcha: captchaResult,
           roleDescription,
           financiallyActive: router.query?.active === 'true',
@@ -548,37 +555,64 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                     />
                   </p>
                 </header>
-                {Array.from({
-                  length: min([max([1, values.invitedAdmins?.filter(v => !isEmpty(v)).length + 1]), 5]),
-                }).map((_, index) => (
-                  <FormField
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={`invitedAdmins.${index}`}
-                    name={`invitedAdmins.${index}`}
-                    label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                    type="email"
-                    required={false}
-                  >
-                    {({ field }) => (
-                      <div className="flex gap-1">
-                        <Input
-                          {...field}
-                          onChange={e => {
-                            const value = e.target.value;
-                            if (isEmpty(value)) {
-                              setFieldValue(
-                                'invitedAdmins',
-                                values.invitedAdmins.filter((_, i) => i !== index),
-                              );
-                            } else {
-                              setFieldValue(`invitedAdmins.${index}`, e.target.value);
-                            }
+                {inviteFieldsCount > 0 && (
+                  <div className="flex flex-col gap-4">
+                    {Array.from({ length: inviteFieldsCount }).map((_, index) => (
+                      <div
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`invitedAdmin-${index}`}
+                        className="flex items-start gap-2"
+                      >
+                        <div className="flex flex-1 flex-col gap-4 rounded-lg border border-border p-4">
+                          <FormField
+                            name={`invitedAdmins.${index}.name`}
+                            label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
+                          >
+                            {({ field }) => <Input {...field} placeholder="e.g. Jane Smith" />}
+                          </FormField>
+                          <FormField
+                            name={`invitedAdmins.${index}.email`}
+                            label={<FormattedMessage id="Email" defaultMessage="Email" />}
+                            type="email"
+                          >
+                            {({ field }) => <Input {...field} placeholder="e.g. jane@example.com" />}
+                          </FormField>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const newInvitedAdmins = [...(values.invitedAdmins || [])];
+                            newInvitedAdmins.splice(index, 1);
+                            setFieldValue('invitedAdmins', newInvitedAdmins);
+                            setInviteFieldsCount(inviteFieldsCount - 1);
                           }}
-                        />
+                          className="mt-1 h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
-                    )}
-                  </FormField>
-                ))}
+                    ))}
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    if (inviteFieldsCount < 5) {
+                      setInviteFieldsCount(inviteFieldsCount + 1);
+                      const newInvitedAdmins = [...(values.invitedAdmins || [])];
+                      newInvitedAdmins.push({ name: '', email: '' });
+                      setFieldValue('invitedAdmins', newInvitedAdmins);
+                    }
+                  }}
+                  disabled={inviteFieldsCount >= 5}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4" />
+                  <FormattedMessage defaultMessage="Add Team Member" id="InviteTeamMember.add" />
+                </Button>
               </CardContent>
             </Card>
             {isCaptchaEnabled() && (

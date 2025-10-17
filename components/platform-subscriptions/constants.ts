@@ -14,6 +14,7 @@ export const PlatformSubscriptionFeatures = [
   'CHART_OF_ACCOUNTS',
   'TAX_FORMS',
   'OFF_PLATFORM_TRANSACTIONS',
+  'FUNDS_GRANTS_MANAGEMENT',
 ] satisfies PlatformSubscriptionFeaturesType[];
 
 export type PlatformSubscriptionTierType = 'Discover' | 'Basic' | 'Pro';
@@ -82,6 +83,7 @@ export const PlatformSubscriptionTierFeatures: Record<
     PAYPAL_PAYOUTS: false,
     TAX_FORMS: false,
     TRANSFERWISE: false,
+    FUNDS_GRANTS_MANAGEMENT: false,
   },
   Basic: {
     RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
@@ -91,6 +93,7 @@ export const PlatformSubscriptionTierFeatures: Record<
     PAYPAL_PAYOUTS: true,
     TAX_FORMS: false,
     TRANSFERWISE: true,
+    FUNDS_GRANTS_MANAGEMENT: false,
   },
   Pro: {
     RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
@@ -100,6 +103,7 @@ export const PlatformSubscriptionTierFeatures: Record<
     PAYPAL_PAYOUTS: true,
     TAX_FORMS: true,
     TRANSFERWISE: true,
+    FUNDS_GRANTS_MANAGEMENT: true,
   },
 };
 
@@ -131,5 +135,9 @@ export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof Platform
   TRANSFERWISE: {
     defaultMessage: 'Payouts with Wise',
     id: 'QwF3vJ',
+  },
+  FUNDS_GRANTS_MANAGEMENT: {
+    defaultMessage: 'Funds & Grants',
+    id: 'cjQcnL',
   },
 });
