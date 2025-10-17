@@ -29,7 +29,7 @@ interface PageProps {
   metaTitle?: string;
   twitterHandle?: string;
   collective?: object;
-  menuItems?: object;
+  showMenuItems?: boolean;
   showFooter?: boolean;
   showProfileAndChangelogMenu?: boolean;
   loading?: boolean;
@@ -51,7 +51,7 @@ const Page = ({
   showSearch = true,
   canonicalURL,
   collective,
-  menuItems,
+  showMenuItems = true,
   withTopBar = true,
   showFooter = true,
   showProfileAndChangelogMenu = true,
@@ -75,7 +75,7 @@ const Page = ({
         metaTitle={metaTitle}
         canonicalURL={canonicalURL}
         collective={collective}
-        menuItems={menuItems}
+        showMenuItems={showMenuItems}
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
         loading={loading}

@@ -106,12 +106,7 @@ const TopBarIcon = ({ provider }) => {
   );
 };
 
-const TopBar = ({
-  showSearch = true,
-  menuItems = { solutions: true, product: true, company: true, docs: true },
-  showProfileAndChangelogMenu = true,
-  account,
-}) => {
+const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangelogMenu = true, account }) => {
   const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -150,7 +145,7 @@ const TopBar = ({
     return <NewTopBar {...{ account }} />;
   }
 
-  const showMenu = !whitelabel || whitelabel?.links?.length > 0;
+  const showMenu = showMenuItems ?? (!whitelabel || whitelabel?.links?.length > 0);
 
   return (
     <Flex
@@ -226,9 +221,7 @@ const TopBar = ({
                   </NavButton>
                 </a>
               ))}
-              {showSearch && menuItems.docs && (
-                <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />
-              )}
+
               {showSearch && (
                 <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
                   <div className="flex items-center">

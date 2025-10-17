@@ -99,14 +99,6 @@ const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
 };
 
 type TopBarProps = {
-  showSearch?: boolean;
-  showProfileAndChangelogMenu?: boolean;
-  menuItems?: {
-    solutions?: boolean;
-    product?: boolean;
-    company?: boolean;
-    docs?: boolean;
-  };
   account?: {
     parentCollective?: {
       name: string;
@@ -115,7 +107,6 @@ type TopBarProps = {
     name: string;
     slug: string;
   };
-  loading?: boolean;
 };
 
 const TopBar = ({ account }: TopBarProps) => {

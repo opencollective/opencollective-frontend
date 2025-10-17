@@ -30,8 +30,8 @@ class Header extends React.Component {
     metaTitle: PropTypes.string,
     showSearch: PropTypes.bool,
     showProfileAndChangelogMenu: PropTypes.bool,
+    showMenuItems: PropTypes.bool,
     withTopBar: PropTypes.bool,
-    menuItems: PropTypes.object,
     updatesRss: PropTypes.bool,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
@@ -133,7 +133,7 @@ class Header extends React.Component {
           <TopBar
             account={this.props.collective}
             showSearch={this.props.showSearch}
-            menuItems={this.props.menuItems}
+            showMenuItems={this.props.showMenuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
             loading={this.props.loading}
           />
