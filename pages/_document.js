@@ -139,7 +139,6 @@ export default class IntlDocument extends Document {
       'HCAPTCHA_SITEKEY',
       'TURNSTILE_SITEKEY',
       'DISABLE_CONTACT_FORM',
-      'NEW_PRICING',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',

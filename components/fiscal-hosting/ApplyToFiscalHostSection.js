@@ -4,7 +4,7 @@ import { styled } from 'styled-components';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
-import { Box, Flex, Grid } from '../Grid';
+import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import { SectionDescription, SectionTitle } from '../marketing/Text';
@@ -147,20 +147,12 @@ const ApplyToHostDesktopCarousel = ({ display, controllerPosition }) => (
   </StyledCarousel>
 );
 
-export const ApplyToHostMobileCarousel = ({ color }) => (
+const ApplyToHostMobileCarousel = ({ color }) => (
   <StyledCarousel display={[null, 'none']} width={1}>
     {HOSTS.map(host => (
       <Host key={host.id} color={color} {...host} />
     ))}
   </StyledCarousel>
-);
-
-export const ApplyToHostGrid = ({ color }) => (
-  <Grid gridGap={[1, null, null, null, '48px']} gridTemplateColumns={'repeat(3, 1fr)'}>
-    {HOSTS.map(host => (
-      <Host key={host.id} color={color} {...host} />
-    ))}
-  </Grid>
 );
 
 const ApplyToFiscalHosts = () => (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
+import { useInView } from 'framer-motion';
 import { MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,12 +11,11 @@ import {
 import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { FloatingJoinCTA, JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
 import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
-import { useInView } from 'framer-motion';
-import { FloatingJoinCTA, JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
 
 export const pricingPageQuery = gql`
   query PlatformSubscriptionTiers {

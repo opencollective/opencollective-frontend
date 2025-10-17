@@ -40,7 +40,3 @@ export type FloatProps = { float?: 'left' | 'right' | 'none' | 'initial' | 'inhe
 
 export const clear = style({ prop: 'clear' });
 export type ClearProps = { clear?: 'left' | 'right' | 'both' | 'none' | 'initial' | 'inherit' };
-
-export const listStyle = style({ prop: 'listStyle' });
-// ts-unused-exports:disable-next-line
-export type ListStyleProps = { listStyle?: string };
