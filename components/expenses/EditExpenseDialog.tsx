@@ -426,6 +426,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       invoiceInfo: values.invoiceInfo,
       invoiceFile,
       reference: values.invoiceNumber,
+      currency: values.referenceCurrency || undefined,
       tax:
         values.hasTax && values.tax
           ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
@@ -465,10 +466,10 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
+        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
-        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
