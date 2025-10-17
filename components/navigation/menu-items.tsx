@@ -13,11 +13,11 @@ export const marketingTopbarItems: Item[] = [
     label: defineMessage({ defaultMessage: 'Platform', id: 'Mmuj1R' }),
     items: [
       { label: defineMessage({ id: 'home', defaultMessage: 'Home' }), href: '/home' },
-      { label: defineMessage({ defaultMessage: 'Explore', id: '7JlauX' }), href: '/search' },
+      { label: defineMessage({ defaultMessage: 'Explore', id: 'Explore' }), href: '/search' },
       {
         label: defineMessage({
           defaultMessage: 'About',
-          id: 'g5pX+a',
+          id: 'collective.about.title',
         }),
         href: 'https://documentation.opencollective.com/our-organization/about',
       },
@@ -54,14 +54,14 @@ export const marketingTopbarItems: Item[] = [
   },
 
   {
-    label: defineMessage({ defaultMessage: 'Resources', id: '7oFrM6' }),
+    label: defineMessage({ defaultMessage: 'Resources', id: 'c/KktL' }),
     items: [
       {
         label: defineMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' }),
         href: '/help',
       },
       {
-        label: defineMessage({ defaultMessage: 'Documentation', id: 'isGKnz' }),
+        label: defineMessage({ defaultMessage: 'Documentation', id: 'menu.documentation' }),
         href: 'https://documentation.opencollective.com',
       },
     ],
