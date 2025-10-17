@@ -256,25 +256,21 @@ const TopBar = ({
         )}
         {showProfileAndChangelogMenu && (
           <React.Fragment>
-            {onDashboardRoute ? (
-              <div className="mr-2 hidden sm:block">
-                <ChangelogTrigger />
-              </div>
-            ) : (
-              LoggedInUser && (
-                <Button
-                  asChild
-                  variant="marketing"
-                  className="mr-3 hidden rounded-full whitespace-nowrap sm:flex"
-                  size="sm"
-                >
-                  <Link href="/dashboard">
-                    <FormattedMessage defaultMessage="Dashboard" id="Dashboard" />
-                  </Link>
-                </Button>
-              )
+            <div className="mr-2 hidden sm:block">
+              <ChangelogTrigger />
+            </div>
+            {LoggedInUser && (
+              <Button
+                asChild
+                variant="marketing"
+                className="mr-3 hidden rounded-full whitespace-nowrap sm:flex"
+                size="sm"
+              >
+                <Link href="/dashboard">
+                  <FormattedMessage defaultMessage="Dashboard" id="Dashboard" />
+                </Link>
+              </Button>
             )}
-
             <ProfileMenu />
           </React.Fragment>
         )}

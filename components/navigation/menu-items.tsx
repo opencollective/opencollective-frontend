@@ -1,14 +1,18 @@
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessage } from 'react-intl';
 
-type Item = {
+interface MenuItem {
   label: MessageDescriptor;
-  href?: string;
+}
+interface LinkItem extends MenuItem {
+  href: string;
   target?: string;
-  items?: Item[];
-};
+}
+interface MenuGroupItem extends MenuItem {
+  items: LinkItem[];
+}
 
-export const marketingTopbarItems: Item[] = [
+export const marketingTopbarItems: MenuGroupItem[] = [
   {
     label: defineMessage({ defaultMessage: 'Platform', id: 'Mmuj1R' }),
     items: [
@@ -68,7 +72,7 @@ export const marketingTopbarItems: Item[] = [
   },
 ];
 
-export const footerItems: Item[] = [
+export const footerItems: MenuGroupItem[] = [
   ...marketingTopbarItems,
   {
     label: defineMessage({ defaultMessage: 'Legal', id: '7oFrM6' }),
