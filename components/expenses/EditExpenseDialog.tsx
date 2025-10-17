@@ -316,7 +316,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
           slug: formOptions.payee?.slug,
         },
         payeeLocation: values.payeeLocation,
-        currency: formOptions.expenseCurrency,
+        currency: values.referenceCurrency || formOptions.expenseCurrency,
         items: values.expenseItems.map(ei => ({
           id: ei.id,
           description: ei.description,
@@ -347,6 +347,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      referenceCurrency: expense.currency,
       expenseItems: [
         {
           amount: {
@@ -395,7 +396,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       referenceCurrency: true,
     },
   });
-  const transformedOnSubmit = values => {
+  const transformedOnSubmit = (values, h, formOptions) => {
     let invoiceFile;
     if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {
       invoiceFile = { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url };
@@ -426,7 +427,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
       invoiceInfo: values.invoiceInfo,
       invoiceFile,
       reference: values.invoiceNumber,
-      currency: values.referenceCurrency || undefined,
+      currency: values.referenceCurrency || formOptions.expenseCurrency,
       tax:
         values.hasTax && values.tax
           ? [{ type: values.tax.type, rate: values.tax.rate, idNumber: values.tax.idNumber }]
