@@ -408,10 +408,6 @@ exports.REWRITES = [
     destination: '/legacy-pricing',
   },
   {
-    source: '/pricing-old',
-    destination: '/pricing-old',
-  },
-  {
     source: '/become-a-sponsor',
     destination: '/become-a-sponsor',
   },
