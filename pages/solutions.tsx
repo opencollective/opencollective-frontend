@@ -139,7 +139,6 @@ const Solutions = () => {
         </div>
       </div>
       <Testimonials />
-      <FloatingJoinCTA isVisible={!isStaticButtonsInView} />
     </Page>
   );
 };
