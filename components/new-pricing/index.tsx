@@ -14,6 +14,8 @@ import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
+import { useInView } from 'framer-motion';
+import { FloatingJoinCTA, JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
 
 export const pricingPageQuery = gql`
   query PlatformSubscriptionTiers {
@@ -216,6 +218,10 @@ function TierPricePlansDisplay({ tier, packages }) {
 }
 
 export default function Pricing({ data }) {
+  const staticButtonsRef = React.useRef(null);
+  const isStaticButtonsInView = useInView(staticButtonsRef, {
+    amount: 0.1,
+  });
   return (
     <div className="min-h-screen py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -276,13 +282,18 @@ export default function Pricing({ data }) {
           ))}
         </div>
 
-        <div className="mt-12 flex justify-center">
+        {/* <div className="mt-12 flex justify-center">
           <Button asChild variant="marketing" className="rounded-full" size="lg">
             <Link href="/signup/organization?active=true">
               <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
             </Link>
           </Button>
+        </div> */}
+        <div className="mt-16 flex justify-center">
+          <JoinCTAButtons ref={staticButtonsRef} linkToFeatures />
         </div>
+
+        <FloatingJoinCTA isVisible={!isStaticButtonsInView} />
 
         <div className="mt-24 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 p-12 text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">

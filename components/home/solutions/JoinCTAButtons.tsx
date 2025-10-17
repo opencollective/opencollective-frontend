@@ -9,14 +9,18 @@ import { Button } from '@/components/ui/Button';
 export const JoinCTAButtons = React.forwardRef<HTMLDivElement>((props, ref) => {
   return (
     <div ref={ref} className="flex flex-col gap-4 sm:flex-row">
-      <Button asChild variant="marketing" className="rounded-full" size="lg">
+      <Button asChild variant="marketing" className="rounded-full whitespace-nowrap" size="lg">
         <Link href="/signup/organization?active=true">
           <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
         </Link>
       </Button>
-      <Button asChild variant="outline" className="rounded-full" size="lg">
-        <Link href="/pricing" className="flex items-center gap-2">
-          <FormattedMessage defaultMessage="See Pricing" id="solutions.hero.seePricing" />
+      <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
+        <Link href={props.linkToFeatures ? '/solutions' : '/pricing'} className="flex items-center gap-2">
+          {props.linkToFeatures ? (
+            <FormattedMessage defaultMessage="See Features" id="Hm2JMp" />
+          ) : (
+            <FormattedMessage defaultMessage="See Pricing" id="solutions.hero.seePricing" />
+          )}
           <ArrowRight size={16} />
         </Link>
       </Button>
