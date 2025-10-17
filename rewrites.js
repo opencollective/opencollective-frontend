@@ -401,7 +401,7 @@ exports.REWRITES = [
   },
   {
     source: '/new-pricing',
-    destination: '/new-pricing',
+    destination: '/pricing',
   },
   {
     source: '/legacy-pricing',
