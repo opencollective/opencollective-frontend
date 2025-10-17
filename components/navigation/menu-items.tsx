@@ -50,13 +50,6 @@ export const marketingTopbarItems: Item[] = [
         }),
         href: '/collectives',
       },
-      {
-        label: defineMessage({
-          defaultMessage: 'Pricing',
-          id: '5Wwopw',
-        }),
-        href: '/pricing',
-      },
     ],
   },
 
@@ -70,13 +63,6 @@ export const marketingTopbarItems: Item[] = [
       {
         label: defineMessage({ defaultMessage: 'Documentation', id: 'isGKnz' }),
         href: 'https://documentation.opencollective.com',
-      },
-      {
-        label: defineMessage({
-          defaultMessage: 'Discord community',
-          id: 'x8s10c',
-        }),
-        href: 'https://discord.opencollective.com/',
       },
     ],
   },
