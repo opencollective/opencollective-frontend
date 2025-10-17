@@ -609,6 +609,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                   }}
                   disabled={inviteFieldsCount >= 5}
                   className="w-full"
+                  data-cy="add-team-member"
                 >
                   <Plus className="h-4 w-4" />
                   <FormattedMessage defaultMessage="Add Team Member" id="InviteTeamMember.add" />
