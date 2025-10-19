@@ -32,7 +32,7 @@ Behind the scenes it will do the following (so you don't have to do it):
 
 For E2E tests we need to start the [Mailpit](https://mailpit.axllent.org/) mail server to capture test emails. On a separate terminal navigate to the `opencollective-api` project and run:
 
-- `docker-compose -f docker-compose.dev.yml --profile mail up`
+- `docker-compose -f docker-compose/mail.yml up`
 
 ### 3. Frontend: Server
 
