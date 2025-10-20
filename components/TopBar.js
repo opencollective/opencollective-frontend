@@ -14,10 +14,11 @@ import { styled } from 'styled-components';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
-
-import { Button } from '@/components/ui/Button';
 import { getEnvVar } from '@/lib/env-utils';
 import { parseToBoolean } from '@/lib/utils';
+
+import { Button } from '@/components/ui/Button';
+
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';

@@ -4,9 +4,11 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+import { getEnvVar } from '@/lib/env-utils';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { parseToBoolean } from '@/lib/utils';
 
-import { marketingTopbarItems } from './navigation/menu-items';
+import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/Collapsible';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -41,6 +43,8 @@ const TopBarMobileMenu = ({ closeMenu }) => {
     }
   });
 
+  const menuItems = parseToBoolean(getEnvVar('NEW_PRICING')) ? newMarketingTopbarItems : legacyTopBarItems;
+
   return (
     <React.Fragment>
       <HideGlobalScroll />
@@ -65,7 +69,7 @@ const TopBarMobileMenu = ({ closeMenu }) => {
               </Link>
             </ListItem>
           )}
-          {marketingTopbarItems.map((menuItem, index) => (
+          {menuItems.map((menuItem, index) => (
             <Fragment key={menuItem.label.id}>
               <ListItem>
                 {menuItem.items ? (
@@ -100,7 +104,7 @@ const TopBarMobileMenu = ({ closeMenu }) => {
                   </Link>
                 )}
               </ListItem>
-              {index < marketingTopbarItems.length - 1 && <hr className="my-5" />}
+              {index < menuItems.length - 1 && <hr className="my-5" />}
             </Fragment>
           ))}
         </Box>
