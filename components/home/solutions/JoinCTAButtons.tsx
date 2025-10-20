@@ -61,7 +61,7 @@ export const JoinCTAButtons: React.FC<JoinCTAButtonsProps> = ({ onPage }) => {
   return (
     <React.Fragment>
       <StaticJoinCTAButtons ref={staticButtonsRef} onPage={onPage} />
-      <FloatingJoinCTA isVisible={isStaticButtonsInView} onPage={onPage} />
+      <FloatingJoinCTA isVisible={!isStaticButtonsInView} onPage={onPage} />
     </React.Fragment>
   );
 };
