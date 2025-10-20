@@ -16,9 +16,10 @@ import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
 
 import { Button } from '@/components/ui/Button';
-
+import { getEnvVar } from '@/lib/env-utils';
+import { parseToBoolean } from '@/lib/utils';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
-import { marketingTopbarItems } from './navigation/menu-items';
+import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
 import NewTopBar from './navigation/TopBar';
 import Container from './Container';
@@ -84,21 +85,14 @@ const TopBarIcon = ({ provider }) => {
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
         ) : (
           <React.Fragment>
-            <Image
-              width={555}
-              height={75}
-              className="hidden !h-6 w-auto shrink-0 sm:block"
-              src="/static/images/ofi-opencollective-logo.png"
-              alt="Open Collective"
-              style={{ height: undefined }}
-            />
-            <Image
-              width={32}
-              height={32}
-              className="block shrink-0 sm:hidden"
-              src="/static/images/oc-logo-watercolor-256.png"
-              alt="Open Collective"
-            />
+            <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />{' '}
+            {!provider && (
+              <Hide xs sm md>
+                <Box mx={2}>
+                  <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+                </Box>
+              </Hide>
+            )}
           </React.Fragment>
         )}
       </Flex>
@@ -149,6 +143,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
 
   const showMenu = showMenuItems ?? (!whitelabel || whitelabel?.links?.length > 0);
 
+  const menuItems = parseToBoolean(getEnvVar('NEW_PRICING')) ? newMarketingTopbarItems : legacyTopBarItems;
   return (
     <Flex
       px={[3, '24px']}
@@ -175,7 +170,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
             <NavList as="ul" p={0} m={0} justifyContent="center" css="margin: 0;">
               {!whitelabel && (
                 <React.Fragment>
-                  {marketingTopbarItems.map(section =>
+                  {menuItems.map(section =>
                     section.items ? (
                       <PopupMenu
                         key={section.label.id}

@@ -7,7 +7,8 @@ import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { cn } from '../../lib/utils';
+import { cn, parseToBoolean } from '../../lib/utils';
+import { getEnvVar } from '@/lib/env-utils';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
@@ -15,7 +16,7 @@ import Image from '../Image';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import Link from '../Link';
 
-import { footerItems } from './menu-items';
+import { legacyFooterItems, newFooterItems } from './menu-items';
 
 const SocialLink = ({ href, children, ...props }) => (
   <Link
@@ -62,6 +63,9 @@ const Footer = ({ className }: { className?: string }) => {
   const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
+  const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
+
+  const footerItems = usingNewPricing ? newFooterItems : legacyFooterItems;
   return (
     <footer className={cn('bg-background antialiased', className)}>
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 lg:px-8">
@@ -81,11 +85,10 @@ const Footer = ({ className }: { className?: string }) => {
                 <React.Fragment>
                   <Link href="/home" className="block">
                     <Image
-                      width={555}
-                      height={75}
-                      className="!h-7 w-auto"
-                      src="/static/images/ofi-opencollective-logo.png"
+                      src="/static/images/opencollectivelogo-footer-n.svg"
                       alt="Open Collective"
+                      height={28}
+                      width={167}
                     />
                   </Link>
                   <p className="text-sm text-muted-foreground">

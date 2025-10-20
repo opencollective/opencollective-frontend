@@ -12,7 +12,7 @@ interface MenuGroupItem extends MenuItem {
   items: LinkItem[];
 }
 
-export const marketingTopbarItems: MenuGroupItem[] = [
+export const newMarketingTopbarItems: MenuGroupItem[] = [
   {
     label: defineMessage({ defaultMessage: 'Platform', id: 'Mmuj1R' }),
     items: [
@@ -72,8 +72,8 @@ export const marketingTopbarItems: MenuGroupItem[] = [
   },
 ];
 
-export const footerItems: MenuGroupItem[] = [
-  ...marketingTopbarItems,
+export const newFooterItems: MenuGroupItem[] = [
+  ...newMarketingTopbarItems,
   {
     label: defineMessage({ defaultMessage: 'Legal', id: '7oFrM6' }),
     items: [
@@ -84,6 +84,159 @@ export const footerItems: MenuGroupItem[] = [
       {
         label: defineMessage({ defaultMessage: 'Terms of Service', id: '32rBNK' }),
         href: '/tos',
+      },
+    ],
+  },
+];
+
+export const legacyTopBarItems: MenuGroupItem[] = [
+  {
+    label: defineMessage({ defaultMessage: 'Solutions', id: 'asqGnV' }),
+    items: [
+      {
+        label: defineMessage({ id: 'pricing.forCollective', defaultMessage: 'For Collectives' }),
+        href: '/collectives',
+      },
+      {
+        label: defineMessage({ defaultMessage: 'For Sponsors', id: '1rESHf' }),
+        href: '/become-a-sponsor',
+      },
+      {
+        label: defineMessage({ id: 'pricing.fiscalHost', defaultMessage: 'For Fiscal Hosts' }),
+        href: '/become-a-host',
+      },
+    ],
+  },
+  {
+    label: defineMessage({ id: 'ContributionType.Product', defaultMessage: 'Product' }),
+    items: [
+      {
+        label: defineMessage({ id: 'menu.pricing', defaultMessage: 'Pricing' }),
+        href: '/pricing',
+      },
+      {
+        label: defineMessage({ id: 'menu.howItWorks', defaultMessage: 'How it Works' }),
+        href: '/how-it-works',
+      },
+      {
+        label: defineMessage({ id: 'editCollective.fiscalHosting', defaultMessage: 'Fiscal Hosting' }),
+        href: '/fiscal-hosting',
+      },
+    ],
+  },
+  {
+    label: defineMessage({ id: 'Tags.ORGANIZATION', defaultMessage: 'Organization' }),
+    items: [
+      {
+        label: defineMessage({ id: 'company.blog', defaultMessage: 'Blog' }),
+        href: 'https://blog.opencollective.com/',
+      },
+      {
+        label: defineMessage({ id: 'collective.about.title', defaultMessage: 'About' }),
+        href: 'https://documentation.opencollective.com/our-organization/about',
+      },
+    ],
+  },
+];
+
+export const legacyFooterItems: MenuGroupItem[] = [
+  {
+    label: defineMessage({ id: 'platform', defaultMessage: 'Platform' }),
+    items: [
+      {
+        label: defineMessage({ id: 'platform.explainerVideo', defaultMessage: 'Explainer video' }),
+        href: 'https://www.youtube.com/watch?v=IBU5fSILAe8',
+      },
+      {
+        label: defineMessage({ id: 'howItWorks', defaultMessage: 'How it works' }),
+        href: '/how-it-works',
+      },
+      {
+        label: defineMessage({ id: 'platform.useCases', defaultMessage: 'Use cases' }),
+        href: 'https://blog.opencollective.com/tag/case-studies/',
+      },
+      {
+        label: defineMessage({ id: 'platform.signup', defaultMessage: 'Sign up' }),
+        href: '/create-account',
+      },
+      {
+        label: defineMessage({ id: 'platform.login', defaultMessage: 'Log in' }),
+        href: '/signin',
+      },
+    ],
+  },
+  {
+    label: defineMessage({ id: 'join', defaultMessage: 'Join' }),
+    items: [
+      {
+        label: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
+        href: '/create',
+      },
+      {
+        label: defineMessage({ id: 'join.aboutFiscalHosting', defaultMessage: 'About Fiscal Hosting' }),
+        href: '/fiscal-hosting',
+      },
+      {
+        label: defineMessage({ id: 'menu.discover', defaultMessage: 'Discover' }),
+        href: '/search',
+      },
+      {
+        label: defineMessage({ id: 'join.findAFiscalHost', defaultMessage: 'Find a Fiscal Host' }),
+        href: '/search?isHost=true',
+      },
+      {
+        label: defineMessage({ id: 'join.becomeASponsor', defaultMessage: 'Become a sponsor' }),
+        href: '/become-a-sponsor',
+      },
+      {
+        label: defineMessage({ id: 'join.becomeAHost', defaultMessage: 'Become a Host' }),
+        href: '/become-a-host',
+      },
+    ],
+  },
+  {
+    label: defineMessage({ id: 'community', defaultMessage: 'Community' }),
+    items: [
+      {
+        label: defineMessage({ id: 'community.openSource', defaultMessage: 'Open Source' }),
+        href: 'https://github.com/opencollective/opencollective/issues',
+      },
+      {
+        label: defineMessage({ id: 'menu.docs', defaultMessage: 'Docs & Help' }),
+        href: '/help',
+      },
+    ],
+  },
+  {
+    label: defineMessage({ id: 'Tags.ORGANIZATION', defaultMessage: 'Organization' }),
+    items: [
+      {
+        label: defineMessage({ id: 'collective.about.title', defaultMessage: 'About' }),
+        href: 'https://documentation.opencollective.com/our-organization/about',
+      },
+      {
+        label: defineMessage({ id: 'company.blog', defaultMessage: 'Blog' }),
+        href: 'https://blog.opencollective.com/',
+      },
+      {
+        label: defineMessage({ id: 'company.hiring', defaultMessage: 'Hiring' }),
+        href: '/hiring',
+      },
+      {
+        label: defineMessage({ id: 'company.termsOfService', defaultMessage: 'Terms of service' }),
+        href: '/tos',
+      },
+      {
+        label: defineMessage({ id: 'company.privacyPolicy', defaultMessage: 'Privacy Policy' }),
+        href: '/privacypolicy',
+      },
+      {
+        label: defineMessage({ id: 'company.securityPolicy', defaultMessage: 'Security Policy' }),
+        href: 'https://documentation.opencollective.com/advanced/security-for-accounts',
+      },
+      {
+        label: defineMessage({ id: 'contactUs', defaultMessage: 'Contact us' }),
+        href: '/contact',
       },
     ],
   },
