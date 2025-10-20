@@ -42,7 +42,6 @@ import {
   PlatformSubscriptionFeatureTitles,
   PlatformSubscriptionTierDescription,
   PlatformSubscriptionTierFeatures,
-  PlatformSubscriptionTierIcon,
   PlatformSubscriptionTierImage,
   PlatformSubscriptionTiers,
   PlatformSubscriptionTierTagLine,
