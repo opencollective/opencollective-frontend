@@ -14,7 +14,7 @@ interface MenuGroupItem extends MenuItem {
 
 export const newMarketingTopbarItems: MenuGroupItem[] = [
   {
-    label: defineMessage({ defaultMessage: 'Platform', id: 'Mmuj1R' }),
+    label: defineMessage({ defaultMessage: 'Platform', id: 'platform' }),
     items: [
       { label: defineMessage({ id: 'home', defaultMessage: 'Home' }), href: '/home' },
       { label: defineMessage({ defaultMessage: 'Explore', id: 'Explore' }), href: '/search' },
