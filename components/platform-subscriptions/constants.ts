@@ -1,5 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
-import { Building, Crown, Zap } from 'lucide-react';
 import { defineMessages } from 'react-intl';
 
 import type { PlatformSubscriptionFeatures as PlatformSubscriptionFeaturesSchema } from '@/lib/graphql/types/v2/schema';
@@ -64,10 +62,10 @@ export const PlatformSubscriptionTierDescription = defineMessages<(typeof Platfo
   },
 });
 
-export const PlatformSubscriptionTierIcon: Record<(typeof PlatformSubscriptionTiers)[number], LucideIcon> = {
-  Discover: Zap,
-  Basic: Crown,
-  Pro: Building,
+export const PlatformSubscriptionTierImage: Record<(typeof PlatformSubscriptionTiers)[number], string> = {
+  Discover: '/static/images/illustrations/plant-512.png',
+  Basic: '/static/images/illustrations/plants-512.png',
+  Pro: '/static/images/illustrations/greenhouse-512.png',
 };
 
 export const PlatformSubscriptionTierFeatures: Record<
