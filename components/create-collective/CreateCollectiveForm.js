@@ -287,7 +287,7 @@ class CreateCollectiveForm extends React.Component {
                           <Flex mt={1} width="100%">
                             <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 &&
                                 ` (${1 + values.inviteMembers.length}/${
                                   host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                                 })`}
@@ -344,7 +344,7 @@ class CreateCollectiveForm extends React.Component {
                             />
                           </Box>
 
-                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                             <MessageBox type="info" mt={3} fontSize="13px">
                               <FormattedMessage
                                 defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
