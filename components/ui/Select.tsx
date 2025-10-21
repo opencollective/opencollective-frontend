@@ -118,7 +118,7 @@ type DefaultCommandSelectProps = {
   setValue: (value: string) => void;
   options: { value: string; label: string | React.ReactNode }[];
 };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const DefaultCommandSelect = ({
   name,
   placeholder,
@@ -199,6 +199,6 @@ export {
   SelectLabel,
   SelectItem,
   SelectSeparator,
-  // DefaultCommandSelect,
+  DefaultCommandSelect,
   DefaultSelect,
 };

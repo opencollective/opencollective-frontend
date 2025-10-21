@@ -24,6 +24,9 @@ interface LocationProps {
   };
 }
 
+/**
+ * @deprecated Use `@/components/ui/Location` instead.
+ */
 function Location({ location, showTitle = true }: Readonly<LocationProps>) {
   if (!location) {
     return null;
