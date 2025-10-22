@@ -83,6 +83,9 @@ function getExpenseItemFormProps(form: ExpenseForm) {
     ]),
     ...pick(form.values, ['tax', 'hasTax', 'expenseItems', 'referenceCurrency']),
     expenseItemCount: form.values.expenseItems?.length || 0,
+    payoutMethodCurrency:
+      form.options.payoutMethod?.data?.currency || form.options.expense?.payoutMethod?.data?.currency,
+    collectiveCurrency: form.options.account?.currency,
   };
 }
 
@@ -169,6 +172,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           availableReferenceCurrencies={props.availableReferenceCurrencies}
           setFieldValue={setFieldValue}
           isSubmitting={props.isSubmitting}
+          payoutMethodCurrency={props.payoutMethodCurrency}
         />
       )}
 
@@ -182,10 +186,17 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
               ...expenseItems,
               {
                 key: uuid(),
-                amount: { valueInCents: 0, currency: props.expenseCurrency },
                 description: '',
                 incurredAt: new Date().toISOString(),
                 attachment: null,
+                amount: {
+                  valueInCents: 0,
+                  currency:
+                    props.referenceCurrency ||
+                    props.availableReferenceCurrencies[0] ||
+                    props.expenseCurrency ||
+                    props.collectiveCurrency,
+                },
               },
             ])
           }
@@ -449,7 +460,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                     {...field}
                     currencyDisplay="FULL"
                     hasCurrencyPicker={props.allowDifferentItemCurrency}
-                    currency={item.amount.currency || 'USD'}
+                    currency={item.amount.currency}
                     onCurrencyChange={onCurrencyChange}
                     value={item.amount.valueInCents}
                     onChange={onAmountChange}
@@ -603,6 +614,7 @@ const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(
   isSubmitting: ExpenseForm['isSubmitting'];
   referenceCurrency: Currency;
   availableReferenceCurrencies: Currency[];
+  payoutMethodCurrency?: Currency;
 }) {
   const intl = useIntl();
   const { setFieldValue } = props;
@@ -666,6 +678,7 @@ const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(
                   key={option.value}
                   value={option.value}
                   className="cursor-pointer transition-all duration-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:scale-[1.02] hover:bg-muted/50 hover:shadow-sm"
+                  data-cy={`reference-currency-option-${option.value}`}
                 >
                   {option.label}
                 </RadioGroupCard>
@@ -674,6 +687,19 @@ const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(
           )}
         </FormField>
       </div>
+      {props.referenceCurrency &&
+        props.payoutMethodCurrency &&
+        props.payoutMethodCurrency !== props.referenceCurrency && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground italic">
+            <FormattedMessage
+              defaultMessage="Please note that your payout method currency is in {currency}. The actual amount you receive will depend on exchange rates and fees collected by payment processors and banks."
+              id="uzfoYE"
+              values={{
+                currency: props.payoutMethodCurrency,
+              }}
+            />
+          </p>
+        )}
     </MessageBox>
   );
 });

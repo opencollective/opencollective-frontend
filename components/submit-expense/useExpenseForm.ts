@@ -297,6 +297,7 @@ const formSchemaQuery = gql`
       }
       payoutMethod {
         id
+        data
       }
       attachedFiles {
         id
@@ -1467,6 +1468,16 @@ async function buildFormOptions(
           availableCurrencies.add(item.amount.currency as Currency);
         }
       });
+
+      // If we didn't get any currency from the items, default to the account + payout method currencies
+      if (availableCurrencies.size === 0) {
+        if (options.account?.currency) {
+          availableCurrencies.add(options.account.currency);
+        }
+        if (options.payoutMethod?.data?.currency) {
+          availableCurrencies.add(options.payoutMethod.data.currency);
+        }
+      }
     }
 
     options.availableReferenceCurrencies = Array.from(availableCurrencies);
@@ -2132,6 +2143,18 @@ export function useExpenseForm(opts: {
       setFieldValue('referenceCurrency', null);
     }
   }, [expenseForm.values.referenceCurrency, formOptions.availableReferenceCurrencies, setFieldValue]);
+
+  // Set item currency if we're done loading and there's a single available reference currency
+  React.useEffect(() => {
+    if (
+      formOptions.availableReferenceCurrencies &&
+      formOptions.availableReferenceCurrencies.length === 1 &&
+      expenseForm.values.expenseItems.length === 1 &&
+      !expenseForm.values.expenseItems[0].amount?.currency
+    ) {
+      setFieldValue('expenseItems.0.amount.currency', formOptions.availableReferenceCurrencies[0]);
+    }
+  }, [formOptions.availableReferenceCurrencies, setFieldValue, expenseForm.values.expenseItems]);
 
   // If there's an existing expense, assume that reference currency = expense currency
   React.useEffect(() => {
