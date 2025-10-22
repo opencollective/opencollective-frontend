@@ -78,7 +78,13 @@ export const ExchangeRate = ({
             ) : (
               <span>
                 {exchangeRate['isApproximate'] ? '~' : ''}
-                {loading ? <Spinner size="1em" /> : exchangeRate.value ? round(exchangeRate.value, 7) : '?'}{' '}
+                {loading ? (
+                  <Spinner size="1em" />
+                ) : exchangeRate.value ? (
+                  round(exchangeRate.value, 7).toLocaleString(intl.locale)
+                ) : (
+                  '?'
+                )}{' '}
                 {exchangeRate.toCurrency}
               </span>
             )}
