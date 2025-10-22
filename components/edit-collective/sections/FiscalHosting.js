@@ -7,6 +7,8 @@ import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
+import MessageBox from '@/components/MessageBox';
+
 import { adminPanelQuery } from '../../dashboard/queries';
 import { useModal } from '../../ModalContext';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
@@ -119,13 +121,21 @@ const FiscalHosting = ({ collective }) => {
         <FormattedMessage id="FiscalHosting.moneyManagement.deactivate" defaultMessage="Deactivate Money Management" />
       ),
       description: (
-        <p className="my-4 text-sm">
-          {activate ? (
-            <FormattedMessage defaultMessage="Are you sure you want to activate money management?" id="gqr6ok" />
-          ) : (
-            <FormattedMessage defaultMessage="Are you sure you want to deactivate money management?" id="kAso3j" />
+        <div className="my-4 flex flex-col text-sm">
+          <p>
+            {activate ? (
+              <FormattedMessage defaultMessage="Are you sure you want to activate money management?" id="gqr6ok" />
+            ) : (
+              <FormattedMessage defaultMessage="Are you sure you want to deactivate money management?" id="kAso3j" />
+            )}
+          </p>
+          {canHostAccounts && (
+            <FormattedMessage
+              id="FiscalHosting.moneyManagement.deactivate.warning"
+              defaultMessage="Deactivating money management will also deactivate fiscal hosting."
+            />
           )}
-        </p>
+        </div>
       ),
       onConfirm: async () => {
         if (activate) {
@@ -253,7 +263,6 @@ const FiscalHosting = ({ collective }) => {
             defaultMessage="Money management gives you the ability to receive contributions and pay expenses."
           />
         </p>
-
         <Button
           onClick={() => handleMoneyManagementUpdate({ id: collective.id, activate: !isHostAccount })}
           disabled={isHostAccount && collective.plan.hostedCollectives > 0}
@@ -269,16 +278,6 @@ const FiscalHosting = ({ collective }) => {
             <FormattedMessage id="FiscalHosting.moneyManagement.activate" defaultMessage="Activate Money Management" />
           )}
         </Button>
-
-        {collective.plan.hostedCollectives > 0 && (
-          <p className="text-sm">
-            <FormattedMessage
-              values={{ hostedCollectives: collective.plan.hostedCollectives }}
-              id="collective.hostAccount.deactivate.isHost"
-              defaultMessage="You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived."
-            />
-          </p>
-        )}
 
         {isHostAccount && collective.type === 'ORGANIZATION' && !isBudgetActive && (
           <Fragment>
@@ -360,6 +359,15 @@ const FiscalHosting = ({ collective }) => {
             defaultMessage="A Fiscal Host is a legal entity who holds Collective funds in their bank account, manages payouts, and generates invoices and receipts."
           />
         </p>
+        {collective.plan.hostedCollectives > 0 && (
+          <MessageBox type="warning">
+            <FormattedMessage
+              values={{ hostedCollectives: collective.plan.hostedCollectives }}
+              id="collective.hostAccount.deactivate.isHost"
+              defaultMessage="You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived."
+            />
+          </MessageBox>
+        )}
         <Button
           onClick={() => handleFiscalHostUpdate({ id: collective.id, activate: !canHostAccounts })}
           disabled={!isHostAccount || (isHostAccount && collective.plan.hostedCollectives > 0)}
