@@ -2,8 +2,9 @@
 import React, { useId } from 'react';
 import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
-import { get, isNil, pick, round } from 'lodash';
+import { get, isNil, pick, round, truncate } from 'lodash';
 import { ArrowDown, ArrowUp, Coins, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
@@ -12,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
 import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
+import { getIntlDisplayNames } from '../../../lib/i18n';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import {
@@ -27,10 +29,10 @@ import { FormField } from '@/components/FormField';
 import PrivateInfoIcon from '@/components/icons/PrivateInfoIcon';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { RadioGroup, RadioGroupCard } from '@/components/ui/RadioGroup';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
-import CurrencyPicker from '../../CurrencyPicker';
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
@@ -233,7 +235,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
                 amount={
                   props.hasTax && props.tax && isTaxRateValid(props.tax.rate)
                     ? getTaxAmount(props.totalInvoicedInExpenseCurrency, props.tax) +
-                    props.totalInvoicedInExpenseCurrency
+                      props.totalInvoicedInExpenseCurrency
                     : props.totalInvoicedInExpenseCurrency
                 }
                 precision={2}
@@ -456,13 +458,13 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                       (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
                         ? item.amount.referenceExchangeRate.value || 0
                         : 0) *
-                      (1 - FX_RATE_ERROR_THRESHOLD) || undefined
+                        (1 - FX_RATE_ERROR_THRESHOLD) || undefined
                     }
                     maxFxRate={
                       (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
                         ? item.amount.referenceExchangeRate.value || 0
                         : 0) *
-                      (1 + FX_RATE_ERROR_THRESHOLD) || undefined
+                        (1 + FX_RATE_ERROR_THRESHOLD) || undefined
                     }
                     onExchangeRateChange={onExchangeRateChange}
                   />
@@ -473,28 +475,28 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 {Boolean(
                   item.amount?.currency && props.expenseCurrency !== item.amount?.currency && props.expenseCurrency,
                 ) && (
-                    <ExchangeRate
-                      className="mt-2 text-muted-foreground"
-                      {...getExpenseExchangeRateWarningOrError(
-                        intl,
-                        item.amount.exchangeRate,
-                        item.amount.referenceExchangeRate,
-                      )}
-                      exchangeRate={
-                        (item.amount.exchangeRate || {
-                          source: CurrencyExchangeRateSourceType.USER,
-                          fromCurrency: item.amount.currency as Currency,
-                          toCurrency: props.expenseCurrency,
-                        }) as CurrencyExchangeRateInput
-                      }
-                      approximateCustomMessage={
-                        <FormattedMessage
-                          defaultMessage="This value is an estimate. Please set the exact amount received if known."
-                          id="zNBAqh"
-                        />
-                      }
-                    />
-                  )}
+                  <ExchangeRate
+                    className="mt-2 text-muted-foreground"
+                    {...getExpenseExchangeRateWarningOrError(
+                      intl,
+                      item.amount.exchangeRate,
+                      item.amount.referenceExchangeRate,
+                    )}
+                    exchangeRate={
+                      (item.amount.exchangeRate || {
+                        source: CurrencyExchangeRateSourceType.USER,
+                        fromCurrency: item.amount.currency as Currency,
+                        toCurrency: props.expenseCurrency,
+                      }) as CurrencyExchangeRateInput
+                    }
+                    approximateCustomMessage={
+                      <FormattedMessage
+                        defaultMessage="This value is an estimate. Please set the exact amount received if known."
+                        id="zNBAqh"
+                      />
+                    }
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -533,7 +535,7 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
     [toast],
   );
 
-  const onSuccessEmpty = React.useCallback(() => { }, []);
+  const onSuccessEmpty = React.useCallback(() => {}, []);
 
   return (
     <div>
@@ -602,6 +604,7 @@ const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(
   referenceCurrency: Currency;
   availableReferenceCurrencies: Currency[];
 }) {
+  const intl = useIntl();
   const { setFieldValue } = props;
 
   const onCurrencyChange = React.useCallback(
@@ -613,32 +616,64 @@ const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(
     [setFieldValue],
   );
 
+  // Generate currency options for RadioGroup
+  const currencyOptions = React.useMemo(() => {
+    const currencyDisplayNames = getIntlDisplayNames(intl.locale, 'currency');
+    return props.availableReferenceCurrencies.map(currency => {
+      const currencyName = currencyDisplayNames.of(currency);
+      const emoji = getEmojiByCurrencyCode(currency);
+      return {
+        value: currency,
+        label: (
+          <div className="flex flex-col gap-1 py-1">
+            <div className="flex items-center gap-1">
+              {emoji && <span className="flex-shrink-0">{emoji}</span>}
+              <span className="text-sm font-semibold text-foreground">{currency}</span>
+            </div>
+            <span className="text-xs leading-tight text-muted-foreground">
+              {truncate(currencyName, { length: 30 })}
+            </span>
+          </div>
+        ),
+      };
+    });
+  }, [intl.locale, props.availableReferenceCurrencies]);
+
   return (
-    <MessageBox type="info" className="mb-4">
-      <label className="mb-2 flex items-center gap-2 font-bold" htmlFor="input-referenceCurrency">
-        <Coins className="h-4 w-4" />
-        <FormattedMessage defaultMessage="Main currency" id="AwUpx3" />
-      </label>
-      <p className="my-2">
-        <FormattedMessage
-          defaultMessage="Your expense items use multiple currencies. Select the main currency below, other amounts will be converted automatically."
-          id="ir6xNA"
-        />
-      </p>
-      <FormField name="referenceCurrency">
-        {({ field }) => (
-          <CurrencyPicker
-            {...field}
-            inputId="reference-currency"
-            data-cy="reference-currency-picker"
-            className="max-w-40"
-            availableCurrencies={props.availableReferenceCurrencies}
-            value={props.referenceCurrency}
-            onChange={onCurrencyChange}
-            disabled={props.isSubmitting}
+    <MessageBox type="info" className="mb-6">
+      <div className="space-y-3">
+        <label className="flex items-center gap-2 text-sm font-semibold" htmlFor="input-referenceCurrency">
+          <Coins className="h-4 w-4" />
+          <FormattedMessage defaultMessage="Payment currency" id="6uc7kW" />
+        </label>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          <FormattedMessage
+            defaultMessage="Your expense items use multiple currencies. Select the currency in which you wish to get paid, other amounts will be converted automatically."
+            id="okSLzP"
           />
-        )}
-      </FormField>
+        </p>
+        <FormField name="referenceCurrency">
+          {() => (
+            <RadioGroup
+              value={props.referenceCurrency}
+              onValueChange={onCurrencyChange}
+              disabled={props.isSubmitting}
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              data-cy="reference-currency-picker"
+            >
+              {currencyOptions.map(option => (
+                <RadioGroupCard
+                  key={option.value}
+                  value={option.value}
+                  className="cursor-pointer transition-all duration-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:scale-[1.02] hover:bg-muted/50 hover:shadow-sm"
+                >
+                  {option.label}
+                </RadioGroupCard>
+              ))}
+            </RadioGroup>
+          )}
+        </FormField>
+      </div>
     </MessageBox>
   );
 });

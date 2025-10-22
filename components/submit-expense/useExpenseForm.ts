@@ -2133,6 +2133,23 @@ export function useExpenseForm(opts: {
     }
   }, [expenseForm.values.referenceCurrency, formOptions.availableReferenceCurrencies, setFieldValue]);
 
+  // If there's an existing expense, assume that reference currency = expense currency
+  React.useEffect(() => {
+    if (
+      formOptions.expense?.id &&
+      formOptions.expense.currency &&
+      !expenseForm.values.referenceCurrency &&
+      formOptions.availableReferenceCurrencies.length > 1
+    ) {
+      setFieldValue('referenceCurrency', formOptions.expense.currency);
+    }
+  }, [
+    formOptions.expense,
+    expenseForm.values.referenceCurrency,
+    formOptions.availableReferenceCurrencies,
+    setFieldValue,
+  ]);
+
   React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {
       return;
