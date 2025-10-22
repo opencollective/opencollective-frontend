@@ -259,7 +259,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
         <Header
           title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
-          menuItems={{ solutions: false, product: false, company: false, docs: false }}
+          showMenuItems={false}
           showSearch={false}
           showProfileAndChangelogMenu={false}
           withTopBar={!this.props.requestedByWhitelabelProvider}
