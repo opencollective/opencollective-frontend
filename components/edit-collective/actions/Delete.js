@@ -36,7 +36,6 @@ const DeleteCollective = ({ collective, ...props }) => {
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
   const [deleteCollective] = useMutation(deleteCollectiveMutation);
   const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
-  const isSelfHosted = collective.host?.id === collective.id;
 
   const handleDelete = async () => {
     try {
@@ -93,7 +92,7 @@ const DeleteCollective = ({ collective, ...props }) => {
       </Button>
       {collective.isHost && (
         <P color="rgb(224, 183, 0)" my={1}>
-          {isSelfHosted ? (
+          {collective.type === CollectiveType.COLLECTIVE ? (
             <FormattedMessage
               id="collective.delete.selfHost"
               defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
