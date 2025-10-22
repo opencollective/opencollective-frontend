@@ -108,6 +108,7 @@ const ConvertedAmountInput = ({
         name={inputId}
         id={inputId}
         type="number"
+        data-testid={inputId}
         inputMode="decimal"
         step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
         min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
@@ -196,6 +197,7 @@ const InputAmount = ({
   return (
     <InputGroup
       {...props}
+      data-testid={props.id ? `${props.id}-input-amount` : undefined}
       className={cn('w-full overflow-hidden', className)}
       disabled={disabled}
       prepend={
@@ -206,6 +208,7 @@ const InputAmount = ({
         ) : (
           <CurrencyPicker
             data-cy={`${props.id}-currency-picker`}
+            data-testid={`${props.id}-currency-picker`}
             id={`${props.id}-currency-picker`}
             onChange={onCurrencyChange}
             value={currency}
