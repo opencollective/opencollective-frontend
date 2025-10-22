@@ -4,7 +4,7 @@ import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useFormikContext } from 'formik';
 import { get, isNil, pick, round } from 'lodash';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Coins, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -30,9 +30,11 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
+import CurrencyPicker from '../../CurrencyPicker';
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import MessageBox from '../../MessageBox';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -70,8 +72,14 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
 function getExpenseItemFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'initialLoading', 'isSubmitting']),
-    ...pick(form.options, ['expenseCurrency', 'totalInvoicedInExpenseCurrency', 'taxType', 'lockedFields']),
-    ...pick(form.values, ['tax', 'hasTax', 'expenseItems']),
+    ...pick(form.options, [
+      'expenseCurrency',
+      'totalInvoicedInExpenseCurrency',
+      'taxType',
+      'lockedFields',
+      'availableReferenceCurrencies',
+    ]),
+    ...pick(form.values, ['tax', 'hasTax', 'expenseItems', 'referenceCurrency']),
     expenseItemCount: form.values.expenseItems?.length || 0,
   };
 }
@@ -152,6 +160,16 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           <Skeleton className="h-30 w-full" />
         </div>
       )}
+
+      {props.availableReferenceCurrencies && props.availableReferenceCurrencies.length > 1 && (
+        <ReferenceCurrencySelector
+          referenceCurrency={props.referenceCurrency}
+          availableReferenceCurrencies={props.availableReferenceCurrencies}
+          setFieldValue={setFieldValue}
+          isSubmitting={props.isSubmitting}
+        />
+      )}
+
       <div className="flex flex-wrap justify-between gap-2 md:pr-12">
         <Button
           variant="outline"
@@ -215,7 +233,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
                 amount={
                   props.hasTax && props.tax && isTaxRateValid(props.tax.rate)
                     ? getTaxAmount(props.totalInvoicedInExpenseCurrency, props.tax) +
-                      props.totalInvoicedInExpenseCurrency
+                    props.totalInvoicedInExpenseCurrency
                     : props.totalInvoicedInExpenseCurrency
                 }
                 precision={2}
@@ -303,7 +321,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
       setFieldTouched('expenseItems');
       setFieldValue(`expenseItems.${props.index}.amount.currency`, v);
     },
-    [props.index, setFieldValue],
+    [props.index, setFieldValue, setFieldTouched],
   );
 
   const onGraphQLSuccess = React.useCallback(
@@ -438,13 +456,13 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                       (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
                         ? item.amount.referenceExchangeRate.value || 0
                         : 0) *
-                        (1 - FX_RATE_ERROR_THRESHOLD) || undefined
+                      (1 - FX_RATE_ERROR_THRESHOLD) || undefined
                     }
                     maxFxRate={
                       (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
                         ? item.amount.referenceExchangeRate.value || 0
                         : 0) *
-                        (1 + FX_RATE_ERROR_THRESHOLD) || undefined
+                      (1 + FX_RATE_ERROR_THRESHOLD) || undefined
                     }
                     onExchangeRateChange={onExchangeRateChange}
                   />
@@ -452,29 +470,31 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               </FormField>
 
               <div className="self-end">
-                {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
-                  <ExchangeRate
-                    className="mt-2 text-muted-foreground"
-                    {...getExpenseExchangeRateWarningOrError(
-                      intl,
-                      item.amount.exchangeRate,
-                      item.amount.referenceExchangeRate,
-                    )}
-                    exchangeRate={
-                      (item.amount.exchangeRate || {
-                        source: CurrencyExchangeRateSourceType.USER,
-                        fromCurrency: item.amount.currency as Currency,
-                        toCurrency: props.expenseCurrency,
-                      }) as CurrencyExchangeRateInput
-                    }
-                    approximateCustomMessage={
-                      <FormattedMessage
-                        defaultMessage="This value is an estimate. Please set the exact amount received if known."
-                        id="zNBAqh"
-                      />
-                    }
-                  />
-                )}
+                {Boolean(
+                  item.amount?.currency && props.expenseCurrency !== item.amount?.currency && props.expenseCurrency,
+                ) && (
+                    <ExchangeRate
+                      className="mt-2 text-muted-foreground"
+                      {...getExpenseExchangeRateWarningOrError(
+                        intl,
+                        item.amount.exchangeRate,
+                        item.amount.referenceExchangeRate,
+                      )}
+                      exchangeRate={
+                        (item.amount.exchangeRate || {
+                          source: CurrencyExchangeRateSourceType.USER,
+                          fromCurrency: item.amount.currency as Currency,
+                          toCurrency: props.expenseCurrency,
+                        }) as CurrencyExchangeRateInput
+                      }
+                      approximateCustomMessage={
+                        <FormattedMessage
+                          defaultMessage="This value is an estimate. Please set the exact amount received if known."
+                          id="zNBAqh"
+                        />
+                      }
+                    />
+                  )}
               </div>
             </div>
           </div>
@@ -513,7 +533,7 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
     [toast],
   );
 
-  const onSuccessEmpty = React.useCallback(() => {}, []);
+  const onSuccessEmpty = React.useCallback(() => { }, []);
 
   return (
     <div>
@@ -575,6 +595,53 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
     );
   }
 };
+
+const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(props: {
+  setFieldValue: ExpenseForm['setFieldValue'];
+  isSubmitting: ExpenseForm['isSubmitting'];
+  referenceCurrency: Currency;
+  availableReferenceCurrencies: Currency[];
+}) {
+  const { setFieldValue } = props;
+
+  const onCurrencyChange = React.useCallback(
+    (currency: Currency) => {
+      if (currency) {
+        setFieldValue('referenceCurrency', currency);
+      }
+    },
+    [setFieldValue],
+  );
+
+  return (
+    <MessageBox type="info" className="mb-4">
+      <label className="mb-2 flex items-center gap-2 font-bold" htmlFor="input-referenceCurrency">
+        <Coins className="h-4 w-4" />
+        <FormattedMessage defaultMessage="Main currency" id="AwUpx3" />
+      </label>
+      <p className="my-2">
+        <FormattedMessage
+          defaultMessage="Your expense items use multiple currencies. Select the main currency below, other amounts will be converted automatically."
+          id="ir6xNA"
+        />
+      </p>
+      <FormField name="referenceCurrency">
+        {({ field }) => (
+          <CurrencyPicker
+            {...field}
+            inputId="reference-currency"
+            data-cy="reference-currency-picker"
+            className="max-w-40"
+            availableCurrencies={props.availableReferenceCurrencies}
+            value={props.referenceCurrency}
+            onChange={onCurrencyChange}
+            disabled={props.isSubmitting}
+          />
+        )}
+      </FormField>
+    </MessageBox>
+  );
+});
 
 const Taxes = React.memo(function Taxes(props: {
   setFieldValue: ExpenseForm['setFieldValue'];
@@ -670,7 +737,7 @@ const Taxes = React.memo(function Taxes(props: {
                 <InputGroup
                   {...field}
                   value={isNil(field.value) ? '' : round(field.value * 100, 2)}
-                  onChange={e => props.setFieldValue('tax.rate', round((e.target.value as any) / 100, 4))}
+                  onChange={e => props.setFieldValue('tax.rate', round(Number(e.target.value) / 100, 4))}
                   minWidth={65}
                   append="%"
                   min={0}

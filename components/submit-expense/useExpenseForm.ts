@@ -1461,16 +1461,7 @@ async function buildFormOptions(
       // Grants are always in the account currency
       availableCurrencies.add(options.account?.currency);
     } else {
-      // For all other expenses, the currency must be either the account currency, the payout method currency, or the items currencies
-      if (options.account?.currency) {
-        availableCurrencies.add(options.account.currency);
-      }
-      if (options.payoutMethod?.data?.currency) {
-        availableCurrencies.add(options.payoutMethod.data.currency as Currency);
-      }
-      if (options.expense?.currency) {
-        availableCurrencies.add(options.expense.currency);
-      }
+      // For all other expenses one of the items currencies
       values.expenseItems?.forEach(item => {
         if (item.amount?.currency) {
           availableCurrencies.add(item.amount.currency as Currency);
@@ -1486,10 +1477,6 @@ async function buildFormOptions(
       options.expenseCurrency = values.referenceCurrency as Currency; // If the user provided a reference currency, use it
     } else if (options.expense?.currency) {
       options.expenseCurrency = options.expense.currency; // Use the expense currency if it's set
-    } else if (options.account?.currency) {
-      options.expenseCurrency = options.account.currency; // Use the account currency if it's set
-    } else if (options.payoutMethod?.data?.currency) {
-      options.expenseCurrency = options.payoutMethod.data.currency as Currency; // Use the payout method currency if it's set
     }
 
     options.isLongFormItemDescription = false;

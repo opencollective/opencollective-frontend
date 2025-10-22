@@ -32,7 +32,6 @@ import {
   ExpenseItemWrapper,
 } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
-import { ReferenceCurrencyForm } from '../submit-expense/form/ReferenceCurrencySection';
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
@@ -373,7 +372,6 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
-        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -467,7 +465,6 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
-        <ReferenceCurrencyForm {...ReferenceCurrencyForm.getFormProps(expenseForm)} />
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}

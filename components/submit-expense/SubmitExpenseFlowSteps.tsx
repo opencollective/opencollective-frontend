@@ -25,7 +25,6 @@ export enum Step {
   TYPE_OF_EXPENSE = 'TYPE_OF_EXPENSE',
   EXPENSE_CATEGORY = 'EXPENSE_CATEGORY',
   EXPENSE_ITEMS = 'EXPENSE_ITEMS',
-  REFERENCE_CURRENCY = 'REFERENCE_CURRENCY',
   ADDITIONAL_DETAILS = 'ADDITIONAL_DETAILS',
   SUMMARY = 'SUMMARY',
 }
@@ -44,7 +43,7 @@ export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
     'invoiceNumber',
   ],
   [Step.EXPENSE_CATEGORY]: ['accountingCategoryId'],
-  [Step.EXPENSE_ITEMS]: ['expenseItems', 'tax'],
+  [Step.EXPENSE_ITEMS]: ['expenseItems', 'tax', 'referenceCurrency'],
   [Step.ADDITIONAL_DETAILS]: [
     'title',
     'acknowledgedCollectiveTitleExpensePolicy',
@@ -53,7 +52,6 @@ export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   ],
   [Step.SUMMARY]: [],
   [Step.INVITE_WELCOME]: [],
-  [Step.REFERENCE_CURRENCY]: ['referenceCurrency'],
 };
 
 export const StepTitles: Record<Step, MessageDescriptor> = {
@@ -84,10 +82,6 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
   [Step.EXPENSE_ITEMS]: defineMessage({
     defaultMessage: 'Expense items',
     id: '3ldWIL',
-  }),
-  [Step.REFERENCE_CURRENCY]: defineMessage({
-    defaultMessage: 'Reference currency',
-    id: 'Ho3XqF',
   }),
   [Step.ADDITIONAL_DETAILS]: defineMessage({
     defaultMessage: 'Additional details',
@@ -155,13 +149,10 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.TYPE_OF_EXPENSE,
     Step.EXPENSE_CATEGORY,
     Step.EXPENSE_ITEMS,
-    Step.REFERENCE_CURRENCY,
     Step.ADDITIONAL_DETAILS,
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
       return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
-    } else if (step === Step.REFERENCE_CURRENCY) {
-      return form.options.availableReferenceCurrencies && form.options.availableReferenceCurrencies.length > 1;
     }
 
     return true;
