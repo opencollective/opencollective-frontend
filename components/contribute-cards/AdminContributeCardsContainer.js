@@ -63,6 +63,7 @@ const AdminContributeCardsContainer = ({
 
   const [showTierModal, setShowTierModal] = React.useState(false);
   const createContributionTierRoute = `/dashboard/${collective.slug}/tiers`;
+  const closeTierModal = React.useCallback(() => setShowTierModal(false), [setShowTierModal]);
 
   const addNewMessage =
     createNewType === 'TICKET' ? (
@@ -122,7 +123,7 @@ const AdminContributeCardsContainer = ({
             <EditTierModal
               tier={showTierModal === 'new' ? null : showTierModal}
               collective={collective}
-              onClose={() => setShowTierModal(false)}
+              onClose={closeTierModal}
               forcedType={createNewType}
               onUpdate={onTierUpdate}
             />

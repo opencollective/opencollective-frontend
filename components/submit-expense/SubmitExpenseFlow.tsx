@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nGraphqlException } from '@/lib/errors';
+import { useNavigationWarning } from '@/lib/hooks/useNavigationWarning';
 
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
@@ -13,7 +14,6 @@ import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
 import { useToast } from '../ui/useToast';
 
 import { SubmitExpenseFlowForm } from './form/SubmitExpenseFlowForm';
-import { useNavigationWarning } from './hooks';
 import { Step, SubmitExpenseFlowSteps } from './SubmitExpenseFlowSteps';
 import { SubmittedExpense } from './SubmittedExpense';
 import { InviteeAccountType, RecurrenceFrequencyOption, useExpenseForm, YesNoOption } from './useExpenseForm';
