@@ -41,6 +41,10 @@ export const RICH_ERROR_MESSAGES = defineMessages({
     id: 'FormError.InvalidEmail',
     defaultMessage: 'This email address is not valid',
   },
+  invalidUrl: {
+    id: 'FormError.InvalidUrl',
+    defaultMessage: 'This URL is not valid, make sure it starts with its protocol (e.g., https://)',
+  },
   enum: {
     id: 'FormError.enum',
     defaultMessage: 'Must be one of: {options}',

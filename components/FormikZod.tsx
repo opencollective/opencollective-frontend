@@ -75,6 +75,8 @@ export const getCustomZodErrorMap =
     } else if (error.code === 'invalid_string') {
       if (error.validation === 'email') {
         message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidEmail);
+      } else if (error.validation === 'url') {
+        message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidUrl);
       } else {
         message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
       }
