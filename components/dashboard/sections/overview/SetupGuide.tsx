@@ -137,7 +137,7 @@ const SetupStep = (props: Step & { account: SetupGuideQuery['account'] }) => {
             </Tooltip>
           )}
           <p className="text-sm text-slate-800">{props.description}</p>
-          {props.action && (
+          {props.action && !props.completed && (
             <Button variant="outline" onClick={props.action.onClick} disabled={props.action.disabled}>
               {props.action.label}
             </Button>

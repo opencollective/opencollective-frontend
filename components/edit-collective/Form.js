@@ -14,7 +14,7 @@ import { ALL_SECTIONS } from '../dashboard/constants';
 import ActivityLog from '../dashboard/sections/ActivityLog';
 import AuthorizedApps from '../dashboard/sections/AuthorizedApps';
 import ForDevelopers from '../dashboard/sections/ForDevelopers';
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { Button } from '../ui/Button';
@@ -151,7 +151,7 @@ class EditCollectiveForm extends React.Component {
 
       case ALL_SECTIONS.ADVANCED:
         return (
-          <Box>
+          <div>
             {collective.type === USER && <EditUserEmailForm />}
             {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
@@ -159,7 +159,7 @@ class EditCollectiveForm extends React.Component {
             )}
             <Archive collective={collective} />
             <Delete collective={collective} />
-          </Box>
+          </div>
         );
 
       // Fiscal Hosts
