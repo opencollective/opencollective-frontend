@@ -158,6 +158,7 @@
     "commit": "git-cz",
     "cypress:open": "cross-env TZ=UTC cypress open --e2e",
     "cypress:run": "cross-env TZ=UTC cypress run",
+    "cypress:install": "cross-env TZ=UTC cypress install",
     "cypress:coverage": "cross-env TZ=UTC cypress run --reporter cypress-multi-reporters --reporter-options configFile=test/cypress/reporter-config.json",
     "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",

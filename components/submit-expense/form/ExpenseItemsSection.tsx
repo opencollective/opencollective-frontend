@@ -2,9 +2,10 @@
 import React, { useId } from 'react';
 import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
-import { get, isNil, pick, round } from 'lodash';
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { get, isNil, pick, round, truncate } from 'lodash';
+import { ArrowDown, ArrowUp, Coins, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
 import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
+import { getIntlDisplayNames } from '../../../lib/i18n';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import {
@@ -27,12 +29,14 @@ import { FormField } from '@/components/FormField';
 import PrivateInfoIcon from '@/components/icons/PrivateInfoIcon';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { RadioGroup, RadioGroupCard } from '@/components/ui/RadioGroup';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import MessageBox from '../../MessageBox';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -70,9 +74,18 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
 function getExpenseItemFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'initialLoading', 'isSubmitting']),
-    ...pick(form.options, ['expenseCurrency', 'totalInvoicedInExpenseCurrency', 'taxType', 'lockedFields']),
-    ...pick(form.values, ['tax', 'hasTax', 'expenseItems']),
+    ...pick(form.options, [
+      'expenseCurrency',
+      'totalInvoicedInExpenseCurrency',
+      'taxType',
+      'lockedFields',
+      'availableReferenceCurrencies',
+    ]),
+    ...pick(form.values, ['tax', 'hasTax', 'expenseItems', 'referenceCurrency']),
     expenseItemCount: form.values.expenseItems?.length || 0,
+    payoutMethodCurrency:
+      form.options.payoutMethod?.data?.currency || form.options.expense?.payoutMethod?.data?.currency,
+    collectiveCurrency: form.options.account?.currency,
   };
 }
 
@@ -152,6 +165,17 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           <Skeleton className="h-30 w-full" />
         </div>
       )}
+
+      {props.availableReferenceCurrencies && props.availableReferenceCurrencies.length > 1 && (
+        <ReferenceCurrencySelector
+          referenceCurrency={props.referenceCurrency}
+          availableReferenceCurrencies={props.availableReferenceCurrencies}
+          setFieldValue={setFieldValue}
+          isSubmitting={props.isSubmitting}
+          payoutMethodCurrency={props.payoutMethodCurrency}
+        />
+      )}
+
       <div className="flex flex-wrap justify-between gap-2 md:pr-12">
         <Button
           variant="outline"
@@ -162,10 +186,17 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
               ...expenseItems,
               {
                 key: uuid(),
-                amount: { valueInCents: 0, currency: props.expenseCurrency },
                 description: '',
                 incurredAt: new Date().toISOString(),
                 attachment: null,
+                amount: {
+                  valueInCents: 0,
+                  currency:
+                    props.referenceCurrency ||
+                    props.availableReferenceCurrencies[0] ||
+                    props.expenseCurrency ||
+                    props.collectiveCurrency,
+                },
               },
             ])
           }
@@ -303,7 +334,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
       setFieldTouched('expenseItems');
       setFieldValue(`expenseItems.${props.index}.amount.currency`, v);
     },
-    [props.index, setFieldValue],
+    [props.index, setFieldValue, setFieldTouched],
   );
 
   const onGraphQLSuccess = React.useCallback(
@@ -429,7 +460,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                     {...field}
                     currencyDisplay="FULL"
                     hasCurrencyPicker={props.allowDifferentItemCurrency}
-                    currency={item.amount.currency || 'USD'}
+                    currency={item.amount.currency}
                     onCurrencyChange={onCurrencyChange}
                     value={item.amount.valueInCents}
                     onChange={onAmountChange}
@@ -452,7 +483,9 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               </FormField>
 
               <div className="self-end">
-                {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
+                {Boolean(
+                  item.amount?.currency && props.expenseCurrency !== item.amount?.currency && props.expenseCurrency,
+                ) && (
                   <ExchangeRate
                     className="mt-2 text-muted-foreground"
                     {...getExpenseExchangeRateWarningOrError(
@@ -576,6 +609,101 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
   }
 };
 
+const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(props: {
+  setFieldValue: ExpenseForm['setFieldValue'];
+  isSubmitting: ExpenseForm['isSubmitting'];
+  referenceCurrency: Currency;
+  availableReferenceCurrencies: Currency[];
+  payoutMethodCurrency?: Currency;
+}) {
+  const intl = useIntl();
+  const { setFieldValue } = props;
+
+  const onCurrencyChange = React.useCallback(
+    (currency: Currency) => {
+      if (currency) {
+        setFieldValue('referenceCurrency', currency);
+      }
+    },
+    [setFieldValue],
+  );
+
+  // Generate currency options for RadioGroup
+  const currencyOptions = React.useMemo(() => {
+    const currencyDisplayNames = getIntlDisplayNames(intl.locale, 'currency');
+    return props.availableReferenceCurrencies.map(currency => {
+      const currencyName = currencyDisplayNames.of(currency);
+      const emoji = getEmojiByCurrencyCode(currency);
+      return {
+        value: currency,
+        label: (
+          <div className="flex flex-col gap-1 py-1">
+            <div className="flex items-center gap-1">
+              {emoji && <span className="flex-shrink-0">{emoji}</span>}
+              <span className="text-sm font-semibold text-foreground">{currency}</span>
+            </div>
+            <span className="text-xs leading-tight text-muted-foreground">
+              {truncate(currencyName, { length: 30 })}
+            </span>
+          </div>
+        ),
+      };
+    });
+  }, [intl.locale, props.availableReferenceCurrencies]);
+
+  return (
+    <MessageBox type="info" className="mb-6">
+      <div className="space-y-3">
+        <label className="flex items-center gap-2 text-sm font-semibold" htmlFor="input-referenceCurrency">
+          <Coins className="h-4 w-4" />
+          <FormattedMessage defaultMessage="Payment currency" id="6uc7kW" />
+        </label>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          <FormattedMessage
+            defaultMessage="Your expense items use multiple currencies. Select the currency in which you wish to get paid, other amounts will be converted automatically."
+            id="okSLzP"
+          />
+        </p>
+        <FormField name="referenceCurrency">
+          {() => (
+            <RadioGroup
+              value={props.referenceCurrency}
+              onValueChange={onCurrencyChange}
+              disabled={props.isSubmitting}
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              data-cy="reference-currency-picker"
+            >
+              {currencyOptions.map(option => (
+                <RadioGroupCard
+                  key={option.value}
+                  value={option.value}
+                  className="cursor-pointer transition-all duration-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:scale-[1.02] hover:bg-muted/50 hover:shadow-sm"
+                  data-cy={`reference-currency-option-${option.value}`}
+                >
+                  {option.label}
+                </RadioGroupCard>
+              ))}
+            </RadioGroup>
+          )}
+        </FormField>
+      </div>
+      {props.referenceCurrency &&
+        props.payoutMethodCurrency &&
+        props.payoutMethodCurrency !== props.referenceCurrency && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground italic">
+            <FormattedMessage
+              defaultMessage="Please note that your payout method currency is in {currency}. The actual amount you receive will depend on exchange rates and fees collected by payment processors and banks."
+              id="uzfoYE"
+              values={{
+                currency: props.payoutMethodCurrency,
+              }}
+            />
+          </p>
+        )}
+    </MessageBox>
+  );
+});
+
 const Taxes = React.memo(function Taxes(props: {
   setFieldValue: ExpenseForm['setFieldValue'];
   isSubmitting: ExpenseForm['isSubmitting'];
@@ -670,7 +798,7 @@ const Taxes = React.memo(function Taxes(props: {
                 <InputGroup
                   {...field}
                   value={isNil(field.value) ? '' : round(field.value * 100, 2)}
-                  onChange={e => props.setFieldValue('tax.rate', round((e.target.value as any) / 100, 4))}
+                  onChange={e => props.setFieldValue('tax.rate', round(Number(e.target.value) / 100, 4))}
                   minWidth={65}
                   append="%"
                   min={0}

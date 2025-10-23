@@ -16,7 +16,7 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
     return {
       value: currency,
       label: (
-        <span className="@container flex-1 overflow-hidden text-left" title={currencyName}>
+        <span className="@container min-w-[55px] flex-1 overflow-hidden text-left" title={currencyName}>
           {emoji && <span>{emoji}</span>}
           &nbsp;
           <span className="ml-1 whitespace-nowrap">
