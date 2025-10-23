@@ -155,7 +155,7 @@ const Pricing = () => {
               <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
                 <span>
                   <FormattedMessage
-                    defaultMessage="We’ve updated our pricing model to better support long-term sustainability. <LinkNewPricing>View new pricing</LinkNewPricing>."
+                    defaultMessage="We've updated our platform pricing to support our long-term sustainability. <LinkNewPricing>View new pricing</LinkNewPricing>."
                     id="pricing.newModel.onLegacyPricing"
                     values={{
                       LinkNewPricing: parts => (
