@@ -17,6 +17,7 @@ import { ContributionDrawer } from '@/components/contributions/ContributionDrawe
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
+import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
@@ -280,6 +281,7 @@ enum AccountDetailView {
   DETAILS = 'DETAILS',
   EXPENSES = 'EXPENSES',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
+  ACTIVITIES = 'ACTIVITIES',
 }
 
 type ContributionDrawerProps = {
@@ -308,6 +310,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     filters: {},
     skipRouter: true,
   });
+  const activityPagination = useQueryFilter({
+    schema: z.object({ limit: integer.default(10), offset: integer.default(0) }),
+    filters: {},
+    skipRouter: true,
+  });
   const { data: expensesData } = useQuery(communityAccountExpensesDetailQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -330,16 +337,17 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     variables: {
       accountId: props.account.id,
       host: props.host,
-      ...pagination.variables,
+      ...activityPagination.variables,
     },
   });
 
   const handleTabChange = React.useCallback(
     (tab: AccountDetailView) => {
       pagination.setFilter('offset', null);
+      activityPagination.setFilter('offset', null);
       setSelectedTab(tab);
     },
-    [pagination, setSelectedTab],
+    [pagination, activityPagination, setSelectedTab],
   );
 
   const isLoading = !query.called || query.loading || !query.data;
@@ -369,6 +377,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     account?.communityStats?.transactionSummary?.reduce((acc, curr) => acc + (curr.contributionCount || 0), 0) || 0;
   const contributionCount = contributionsData?.account?.orders.totalCount || 0;
   const activities = activitiesData?.account?.communityStats?.activities.nodes || [];
+  const activitiesCount = activitiesData?.account?.communityStats?.activities.totalCount || 0;
 
   const tabs = React.useMemo(
     () => [
@@ -386,8 +395,13 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         label: <FormattedMessage defaultMessage="Contributions" id="Contributions" />,
         count: contributionCount,
       },
+      {
+        id: AccountDetailView.ACTIVITIES,
+        label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
+        count: activitiesCount,
+      },
     ],
-    [expenseCount, contributionCount],
+    [expenseCount, contributionCount, activitiesCount],
   );
 
   return (
@@ -532,14 +546,27 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 data={account?.communityStats?.associatedCollectives || []}
                 columns={associatedCollectiveColumns(intl)}
               />
-              <h1 className="font-medium">
-                <FormattedMessage defaultMessage="Activities" id="Activities" />
+            </div>
+            <div
+              className="flex flex-col gap-4 aria-hidden:hidden"
+              aria-hidden={selectedTab !== AccountDetailView.ACTIVITIES}
+            >
+              <h1 className="flex items-center font-medium">
+                <FormattedMessage defaultMessage="Recent activities" id="RecentActivities" />
+                <InfoTooltipIcon className="ml-2">
+                  <FormattedMessage
+                    defaultMessage="The activities listed here are contextual to your fiscal-host and do not necessarily represent all activities performed by this user on the platform."
+                    id="mTzyCH"
+                  />
+                </InfoTooltipIcon>
               </h1>
-              {activities.map(activity => (
-                <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
-              ))}
+              <div className="group flex flex-col gap-1 space-y-3 divide-y rounded-xl border p-4">
+                {activities.map(activity => (
+                  <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
+                ))}
+              </div>
               <Pagination
-                queryFilter={pagination}
+                queryFilter={activityPagination}
                 total={activitiesData?.account?.communityStats?.activities.totalCount}
               />
             </div>
