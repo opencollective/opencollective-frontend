@@ -42,7 +42,7 @@ import {
 } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
-import { isValidEmail } from '../../lib/utils';
+import { getArrayValuesMemoizer, isValidEmail } from '../../lib/utils';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
@@ -628,6 +628,8 @@ type ExpenseFormOptions = {
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
 };
+
+const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 
 const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
@@ -1480,7 +1482,7 @@ async function buildFormOptions(
       }
     }
 
-    options.availableReferenceCurrencies = Array.from(availableCurrencies);
+    options.availableReferenceCurrencies = memoizeAvailableReferenceCurrencies(Array.from(availableCurrencies));
 
     if (options.availableReferenceCurrencies.length === 1) {
       options.expenseCurrency = options.availableReferenceCurrencies[0]; // If there's only one available currency, use it
