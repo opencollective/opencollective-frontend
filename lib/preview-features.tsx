@@ -184,7 +184,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'People Dashboard',
     description: 'Access a new dashboard to manage and engage with your community members.',
     publicBeta: false,
-    closedBetaAccessFor: PLATFORM_ACCOUNTS,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.HOSTING,
     alwaysEnableInDev: true,
   },
