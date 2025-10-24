@@ -1,7 +1,7 @@
 import React from 'react';
 import type { useFormik } from 'formik';
 import { omit } from 'lodash';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import {
@@ -146,12 +146,12 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
       label: intl.formatMessage(AccountingCategoryAppliesToI18n.ALL),
     },
     {
-      value: AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
-      label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOSTED_COLLECTIVES]),
-    },
-    {
       value: AccountingCategoryAppliesTo.HOST,
       label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOST]),
+    },
+    {
+      value: AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
+      label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOSTED_COLLECTIVES]),
     },
   ];
 
@@ -213,6 +213,13 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         name="friendlyName"
         error={getFieldError('friendlyName')}
         label={intl.formatMessage({ id: 'AccountingCategory.friendlyName', defaultMessage: 'Friendly name' })}
+        hint={
+          <FormattedMessage
+            defaultMessage="An alternative name that's easier to understand for non-accountants"
+            id="AccountingCategory.friendlyName.hint"
+          />
+        }
+        hintPosition="above"
         mt={3}
       >
         <StyledInput
@@ -230,6 +237,13 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           required
           error={getFieldError('appliesTo')}
           label={intl.formatMessage({ defaultMessage: 'Applies To', id: 'M+BG8u' })}
+          hint={
+            <FormattedMessage
+              defaultMessage="Choose whether this category applies to your own transactions or the transactions of your hosted collectives"
+              id="AccountingCategory.appliesTo.hint"
+            />
+          }
+          hintPosition="above"
           mt={3}
         >
           <StyledSelect
@@ -277,6 +291,15 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         required
         error={getFieldError('hostOnly')}
         label={intl.formatMessage({ defaultMessage: 'Visible only to host admins', id: 'NvBPFR' })}
+        hintPosition="above"
+        hint={
+          props.formik.values.kind.value !== AccountingCategoryKind.EXPENSE ? (
+            <FormattedMessage
+              defaultMessage="Only host admins can categorize added funds and contributions"
+              id="AccountingCategory.hostOnly.hint"
+            />
+          ) : undefined
+        }
         mt={3}
       >
         <StyledSelect
@@ -301,6 +324,13 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           required
           error={getFieldError('expensesTypes')}
           label={intl.formatMessage({ defaultMessage: 'Expense Types', id: 'D+aS5Z' })}
+          hintPosition="above"
+          hint={
+            <FormattedMessage
+              defaultMessage="Select specific expense types that this category applies to, or leave empty to apply to all expense types"
+              id="AccountingCategory.expensesTypes.hint"
+            />
+          }
           mt={3}
         >
           <StyledSelect
@@ -327,6 +357,13 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           required
           error={getFieldError('instructions')}
           label={intl.formatMessage({ defaultMessage: 'Instructions', id: 'sV2v5L' })}
+          hintPosition="above"
+          hint={
+            <FormattedMessage
+              defaultMessage="Provide detailed instructions on when and how to use this accounting category, this will be displayed on the expense submission form"
+              id="AccountingCategory.instructions.hint"
+            />
+          }
           mt={3}
         >
           <RichTextEditor
