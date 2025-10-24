@@ -16,12 +16,19 @@ export const searchCommandQuery = gql`
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $limit: Int!
-    $includeTransactions: Boolean!
     $imageHeight: Int
+    $useTopHits: Boolean
+    $includeAccounts: Boolean!
+    $includeComments: Boolean!
+    $includeExpenses: Boolean!
+    $includeTransactions: Boolean!
+    $includeOrders: Boolean!
+    $includeUpdates: Boolean!
+    $offset: Int
   ) {
-    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account) {
+    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account, useTopHits: $useTopHits) {
       results {
-        accounts {
+        accounts(limit: $limit, offset: $offset) @include(if: $includeAccounts) {
           highlights
           collection {
             totalCount
@@ -31,7 +38,7 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        comments {
+        comments(limit: $limit, offset: $offset) @include(if: $includeComments) {
           highlights
           collection {
             totalCount
@@ -85,11 +92,12 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        expenses {
+        expenses(limit: $limit, offset: $offset) @include(if: $includeExpenses) {
           highlights
           collection {
             totalCount
             limit
+            offset
             nodes {
               id
               description
@@ -109,7 +117,7 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        orders @include(if: $includeTransactions) {
+        orders(limit: $limit, offset: $offset) @include(if: $includeOrders) {
           highlights
           collection {
             totalCount
@@ -132,7 +140,7 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        transactions @include(if: $includeTransactions) {
+        transactions(limit: $limit, offset: $offset) @include(if: $includeTransactions) {
           highlights
           collection {
             totalCount
@@ -157,7 +165,7 @@ export const searchCommandQuery = gql`
           }
         }
 
-        updates {
+        updates(limit: $limit, offset: $offset) @include(if: $includeUpdates) {
           highlights
           collection {
             totalCount

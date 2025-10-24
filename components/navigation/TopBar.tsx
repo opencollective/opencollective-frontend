@@ -119,7 +119,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const isMobile = viewport === VIEWPORTS.XSMALL;
 
   const isRouteActive = route => {
-    const regex = new RegExp(`^${route}(/?.*)?$`);
+    const regex = new RegExp(`^${route}($|/|\\?)`);
     return regex.test(router.asPath);
   };
 

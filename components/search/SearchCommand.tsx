@@ -1,31 +1,36 @@
-import React, { useEffect } from 'react';
-import { useLazyQuery } from '@apollo/client';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
-import { SearchIcon } from 'lucide-react';
+import {
+  ArrowRightLeft,
+  Coins,
+  Heart,
+  Megaphone,
+  MessageCircle,
+  Receipt,
+  Search,
+  SearchIcon,
+  Users,
+} from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
-import {
-  getCollectivePageRoute,
-  getCommentUrl,
-  getExpensePageUrl,
-  getOrderUrl,
-  getUpdateUrl,
-} from '../../lib/url-helpers';
-import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/schema';
+import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { cn } from '@/lib/utils';
 
+import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
 import Link from '../Link';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
+import { Skeleton } from '../ui/Skeleton';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { AccountResult } from './result/AccountResult';
@@ -35,75 +40,157 @@ import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
+import { useGetLinkProps } from './lib';
 import { PageResult } from './PageResult';
 import { searchCommandQuery } from './queries';
-import { SearchCommandGroup } from './SearchCommandGroup';
+import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
-
 // TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { workspace } = useWorkspace();
+  const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const { account } = React.useContext(DashboardContext);
-  const defaultContext: { slug: string; type: 'account' | 'host' } | undefined = account?.isHost
-    ? { slug: account.slug, type: 'host' }
-    : account?.slug && account.slug !== 'root-actions'
-      ? { slug: account.slug, type: 'account' }
-      : undefined;
+  const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
+    return workspace?.isHost
+      ? { slug: workspace.slug, type: 'host' }
+      : workspace?.slug && workspace.slug !== 'root-actions'
+        ? { slug: workspace.slug, type: 'account' }
+        : undefined;
+  }, [workspace]);
 
   const [input, setInput] = React.useState('');
   const queryFilter = useQueryFilter({
-    schema: z.object({
-      context: z
-        .object({
-          slug: z.string(),
-          type: z.enum(['account', 'host']),
-        })
-        .nullable()
-        .default(null),
-      limit: z.number().default(5),
-    }),
+    schema,
     filters: {},
     toVariables: {
-      context: context => {
-        if (context?.type === 'account') {
-          return { account: { slug: context.slug }, includeTransactions: true };
-        } else if (context?.type === 'host') {
-          return { host: { slug: context.slug }, includeTransactions: true };
-        } else if (account?.slug === 'root-actions') {
+      workspace: val => {
+        if (val) {
+          const context = defaultContext;
+          if (context?.type === 'account') {
+            return { account: { slug: context.slug }, includeTransactions: true };
+          } else if (context?.type === 'host') {
+            return { host: { slug: context.slug }, includeTransactions: true };
+          } else if (account?.slug === 'root-actions') {
+            return { includeTransactions: true };
+          }
+          return { includeTransactions: false };
+        } else {
           return { includeTransactions: true };
         }
-        return { includeTransactions: false };
+      },
+      entity: val => {
+        switch (val) {
+          case SearchEntity.ALL:
+            return {
+              useTopHits: true,
+              includeAccounts: true,
+              includeTransactions: true,
+              includeExpenses: true,
+              includeOrders: true,
+              includeUpdates: true,
+              includeComments: true,
+              limit: 5, // default is 20 according to schema
+            };
+          case SearchEntity.EXPENSES:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: true,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: false,
+            };
+          case SearchEntity.TRANSACTIONS:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: true,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: false,
+            };
+          case SearchEntity.ACCOUNTS:
+            return {
+              useTopHits: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: false,
+              includeAccounts: true,
+            };
+          case SearchEntity.CONTRIBUTIONS:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: true,
+              includeUpdates: false,
+              includeComments: false,
+            };
+          case SearchEntity.UPDATES:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: true,
+              includeComments: false,
+            };
+          case SearchEntity.COMMENTS:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: true,
+            };
+        }
       },
     },
-    defaultFilterValues: { context: defaultContext },
+    defaultFilterValues: { workspace: account?.slug }, // use account.slug here, as it means we are on a dashboard page
     skipRouter: true,
   });
 
   useEffect(() => {
+    // Maybe remove? To preserve search etc..
     if (open) {
-      queryFilter.setFilter('context', defaultContext);
+      queryFilter.setFilters({ workspace: account?.slug, entity: SearchEntity.ALL });
     }
-  }, [open]);
+  }, [open, account?.slug]);
 
-  const [search, { data, loading }] = useLazyQuery(searchCommandQuery, {
-    variables: { ...queryFilter.variables, imageHeight: 72 },
+  const { data, loading, fetchMore } = useQuery(searchCommandQuery, {
+    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
+    skip: !queryFilter.values.searchTerm,
   });
+
+  // Track if we're loading more results
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  // Determine if infinite scroll should be enabled
+  const isInfiniteScrollEnabled = queryFilter.values.entity !== SearchEntity.ALL;
 
   const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
   useEffect(() => {
     if (debouncedInput?.length > 0) {
-      search({ variables: { searchTerm: debouncedInput } });
+      queryFilter.setFilter('searchTerm', debouncedInput);
     }
-  }, [debouncedInput, search]);
+  }, [debouncedInput]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -111,7 +198,11 @@ export const SearchCommand = ({ open, setOpen }) => {
       if (input) {
         if (e.key === 'Delete' || e.key === 'Backspace') {
           if (input.value === '') {
-            queryFilter.setFilter('context', null);
+            if (queryFilter.values.entity !== SearchEntity.ALL) {
+              queryFilter.setFilter('entity', SearchEntity.ALL);
+            } else {
+              queryFilter.setFilter('workspace', undefined);
+            }
           }
         }
       }
@@ -119,83 +210,173 @@ export const SearchCommand = ({ open, setOpen }) => {
     [queryFilter],
   );
 
-  const { recentlyVisited, addToRecent } = useRecentlyVisited();
-
-  const handleResultSelect = ({
-    type,
-    data,
-  }:
-    | PageVisit
-    | {
-        type: 'page';
-        data: { section: string };
-      }) => {
-    switch (type) {
-      case 'account':
-        if (data.type !== CollectiveType.VENDOR) {
-          // TODO: Fix vendor links
-          router.push(getCollectivePageRoute(data as { slug: string }));
-        }
-        addToRecent({ key: data.slug.toString(), type, data });
-        break;
-      case 'expense':
-        router.push(getExpensePageUrl(data as Expense));
-        addToRecent({ key: data.legacyId.toString(), type, data });
-
-        break;
-      case 'transaction':
-        if (account?.slug === 'root-actions' || account?.isHost) {
-          router.push(`/dashboard/${account.slug}/host-transactions?openTransactionId=${data.legacyId}`);
-        } else if (workspace.slug) {
-          router.push(`/dashboard/${workspace.slug}/transactions?openTransactionId=${data.legacyId}`);
-        }
-        addToRecent({ key: data.legacyId.toString(), type, data });
-        break;
-      case 'comment':
-        router.push(getCommentUrl(data as Comment, LoggedInUser));
-        // Skip adding comments to recent
-        break;
-      case 'order':
-        router.push(getOrderUrl(data as Order, LoggedInUser));
-        addToRecent({ key: data.legacyId.toString(), type, data });
-        break;
-      case 'update':
-        router.push(getUpdateUrl(data as Update, LoggedInUser));
-        addToRecent({ key: data.legacyId.toString(), type, data });
-        break;
-      case 'page':
-        router.push(`/dashboard/${workspace.slug}/${data.section}`);
-        // Skip adding dashboard pages to recent
-        break;
-    }
-    setOpen(false);
-  };
+  const { recentlyVisited } = useRecentlyVisited();
+  const { getLinkProps } = useGetLinkProps();
 
   const isLoading = loading || isDebouncing;
-
+  const hasData = !!data?.search?.results;
+  const isInitialLoading = isLoading && !hasData;
   const flattenedMenuItems = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
 
-    return menuItems.flatMap(menuItem =>
-      'subMenu' in menuItem
-        ? menuItem.subMenu.map(subItem => ({
-            ...subItem,
-            Icon: menuItem.Icon,
-            label: `${menuItem.label} / ${subItem.label}`,
-          }))
-        : menuItem,
-    );
+    return menuItems
+      .flatMap(menuItem =>
+        'subMenu' in menuItem
+          ? menuItem.subMenu.map(subItem => ({
+              ...subItem,
+              Icon: menuItem.Icon,
+              group: menuItem.label,
+            }))
+          : menuItem,
+      )
+      .filter(item => item.section !== ALL_SECTIONS.SEARCH);
   }, [intl, account, LoggedInUser]);
 
+  const entityOptions = [
+    {
+      value: SearchEntity.ACCOUNTS,
+      label: 'Accounts',
+      helpText: "Find any account you've interacted with",
+      icon: Users,
+      className: 'bg-blue-50 text-blue-700',
+    },
+    {
+      value: SearchEntity.EXPENSES,
+      label: 'Expenses',
+      helpText: 'Find expenses submitted to your host, your own account, or that has been paid to you.',
+      icon: Receipt,
+      className: 'bg-green-50 text-green-700',
+    },
+    {
+      value: SearchEntity.CONTRIBUTIONS,
+      label: 'Contributions',
+      helpText: "Find any account you've interacted with",
+      icon: Coins,
+      className: 'bg-amber-50 text-amber-700',
+    },
+    {
+      value: SearchEntity.TRANSACTIONS,
+      label: 'Transactions',
+      helpText: "Find any account you've interacted with",
+      icon: ArrowRightLeft,
+      className: 'bg-purple-50 text-purple-700',
+    },
+    {
+      value: SearchEntity.UPDATES,
+      label: 'Updates',
+      helpText: "Find any account you've interacted with",
+      icon: Megaphone,
+      className: 'bg-sky-50 text-sky-700',
+    },
+    {
+      value: SearchEntity.COMMENTS,
+      label: 'Comments',
+      helpText: "Find any account you've interacted with",
+      icon: MessageCircle,
+      className: 'bg-slate-100 text-slate-700',
+    },
+  ];
+
   const filteredGoToPages = React.useMemo(() => {
-    if (!queryFilter.values.context || !debouncedInput) {
+    if (!queryFilter.values.workspace || !debouncedInput || queryFilter.values.entity !== SearchEntity.ALL) {
       return [];
     }
 
     return flattenedMenuItems.filter(menuItem =>
-      menuItem.label.toString().toLowerCase().includes(debouncedInput.toLowerCase()),
+      (menuItem.group ? `${menuItem.group} ${menuItem.label}` : menuItem.label)
+        .toString()
+        .toLowerCase()
+        .includes(debouncedInput.toLowerCase()),
     );
-  }, [debouncedInput, flattenedMenuItems, queryFilter.values.context]);
+  }, [debouncedInput, flattenedMenuItems, queryFilter.values]);
+
+  const hasSearchResults = React.useMemo(() => {
+    if (!data?.search?.results) {
+      return false;
+    }
+    const results = data.search.results;
+    return (
+      (results.accounts?.collection?.totalCount || 0) > 0 ||
+      (results.expenses?.collection?.totalCount || 0) > 0 ||
+      (results.orders?.collection?.totalCount || 0) > 0 ||
+      (results.transactions?.collection?.totalCount || 0) > 0 ||
+      (results.updates?.collection?.totalCount || 0) > 0 ||
+      (results.comments?.collection?.totalCount || 0) > 0
+    );
+  }, [data]);
+
+  console.log({ data, queryFilter });
+  const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
+
+  // Handle infinite scroll
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (!isInfiniteScrollEnabled || !data || isLoadingMore || loading) {
+        return;
+      }
+
+      const target = e.target as HTMLDivElement;
+      const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+      // Trigger load more when within 100px of bottom
+      if (scrollBottom < 100) {
+        const results = data?.search?.results;
+        if (!results) {
+          return;
+        }
+
+        // Determine which entity collection to load more of
+        let shouldLoadMore = false;
+        let currentOffset = 0;
+        let totalCount = 0;
+
+        switch (queryFilter.values.entity) {
+          case SearchEntity.ACCOUNTS:
+            currentOffset = results.accounts?.collection.nodes.length || 0;
+            totalCount = results.accounts?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.EXPENSES:
+            currentOffset = results.expenses?.collection.nodes.length || 0;
+            totalCount = results.expenses?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.CONTRIBUTIONS:
+            currentOffset = results.orders?.collection.nodes.length || 0;
+            totalCount = results.orders?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.TRANSACTIONS:
+            currentOffset = results.transactions?.collection.nodes.length || 0;
+            totalCount = results.transactions?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.UPDATES:
+            currentOffset = results.updates?.collection.nodes.length || 0;
+            totalCount = results.updates?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.COMMENTS:
+            currentOffset = results.comments?.collection.nodes.length || 0;
+            totalCount = results.comments?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+        }
+
+        if (shouldLoadMore) {
+          setIsLoadingMore(true);
+          fetchMore({
+            variables: {
+              offset: currentOffset,
+            },
+          }).finally(() => {
+            setIsLoadingMore(false);
+          });
+        }
+      }
+    },
+    [isInfiniteScrollEnabled, data, isLoadingMore, loading, fetchMore, queryFilter.values.entity],
+  );
 
   return (
     <CommandDialog
@@ -204,153 +385,413 @@ export const SearchCommand = ({ open, setOpen }) => {
       shouldFilter={false}
       onKeyDown={handleKeyDown}
       description="Search for accounts, expenses, transactions, updates, comments, and more"
+      className="sm:max-w-2xl"
     >
       <DialogTitle className="hidden">
         <FormattedMessage defaultMessage="Search" id="Search" />
       </DialogTitle>
-      {}
       <div className="group flex items-center gap-3 border-b px-3" cmdk-input-wrapper="">
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
-        {queryFilter.values.context && (
+        {queryFilter.values.workspace && (
           <ContextPill
-            slug={queryFilter.values.context.slug}
-            onRemove={() => queryFilter.setFilter('context', undefined)}
+            slug={queryFilter.values.workspace}
+            onRemove={() => queryFilter.setFilter('workspace', undefined)}
           />
         )}
+        {queryFilter.values.entity !== SearchEntity.ALL && <span>{queryFilter.values.entity}</span>}
         <CommandPrimitive.Input
           ref={inputRef}
           onValueChange={setInput}
           value={input}
-          placeholder={queryFilter.values.context ? '' : 'Search...'}
+          placeholder="Search..."
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
         {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
-      <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
+      <CommandList
+        ref={listRef}
+        onScroll={handleScroll}
+        className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2"
+      >
         <CommandItem value="-" className="hidden" />
-        {recentlyVisited.length > 0 && debouncedInput === '' && (
-          <CommandGroup heading="Recent">
-            {recentlyVisited.map(recentVisit => (
-              <CommandItem key={recentVisit.key} className="gap-2" onSelect={() => handleResultSelect(recentVisit)}>
-                {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
-                {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
-                {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
-                {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
-                {recentVisit.type === 'update' && <UpdateResult update={recentVisit.data} />}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-        {filteredGoToPages.length > 0 && (
-          <CommandGroup heading="Dashboard">
-            {filteredGoToPages.map(page => (
-              <CommandItem key={page.section} onSelect={() => handleResultSelect({ type: 'page', data: page })}>
-                <PageResult page={page} />
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-        <SearchCommandGroup
-          label="Accounts"
-          totalCount={data?.search.results.accounts.collection.totalCount}
-          input={debouncedInput}
-          nodes={data?.search.results.accounts.collection.nodes}
-          renderNode={account => (
-            <CommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
-              <Link className="block w-full" href={getCollectivePageRoute(account)} onClick={e => e.preventDefault()}>
-                <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
-              </Link>
-            </CommandItem>
-          )}
-        />
-        <SearchCommandGroup
-          label="Expenses"
-          totalCount={data?.search.results.expenses.collection.totalCount}
-          nodes={data?.search.results.expenses.collection.nodes}
-          input={debouncedInput}
-          renderNode={expense => (
-            <CommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
-              <Link className="block w-full" href={getExpensePageUrl(expense)} onClick={e => e.preventDefault()}>
-                <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
-              </Link>
-            </CommandItem>
-          )}
-        />
-        {data?.search.results.orders && (
-          <SearchCommandGroup
-            label="Contributions"
-            input={debouncedInput}
-            totalCount={data?.search.results.orders.collection.totalCount}
-            nodes={data?.search.results.orders.collection.nodes}
-            renderNode={order => (
-              <CommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
-                <Link
-                  className="block w-full"
-                  href={getOrderUrl(order, LoggedInUser)}
-                  onClick={e => e.preventDefault()}
-                >
-                  <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
-                </Link>
-              </CommandItem>
-            )}
-          />
-        )}
-        {data?.search.results.transactions && (
-          <SearchCommandGroup
-            label="Transactions"
-            input={debouncedInput}
-            totalCount={data?.search.results.transactions.collection.totalCount}
-            nodes={data?.search.results.transactions.collection.nodes}
-            renderNode={transaction => (
-              <CommandItem
-                key={transaction.id}
-                onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
+        {!queryFilter.values.workspace &&
+          defaultContext &&
+          input.length === 0 &&
+          queryFilter.values.entity === SearchEntity.ALL && (
+            <CommandGroup heading="">
+              <SearchCommandItem
+                onSelect={() => {
+                  queryFilter.setFilter('workspace', defaultContext.slug);
+                  setInput('');
+                }}
+                actionLabel={'Search in workspace'}
+                showAction
               >
+                <ContextPill slug={defaultContext.slug} />
+              </SearchCommandItem>
+              <hr className="separator -mx-2 my-2 h-px bg-border" />
+            </CommandGroup>
+          )}
+
+        {input.length === 0 && queryFilter.values.entity === SearchEntity.ALL && (
+          <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
+            {entityOptions.map(opt => (
+              <SearchCommandItem
+                onSelect={() => {
+                  queryFilter.setFilter('entity', opt.value);
+                  // setInput('');
+                }}
+                actionLabel={`Search in ${opt.label.toLowerCase()}`}
+                // showAction
+              >
+                <div className="flex items-center gap-2">
+                  <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
+                    <opt.icon />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground group-hover:text-foreground">{opt.label}</span>
+                    <span className="text-xs text-muted-foreground">{opt.helpText}</span>
+                  </div>
+                </div>
+              </SearchCommandItem>
+            ))}
+            <hr className="separator -mx-2 my-2 h-px bg-border" />
+          </CommandGroup>
+        )}
+
+        {input.length > 0 && isUsingSearchResultsPage && (
+          <React.Fragment>
+            <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
+              {defaultContext && (
+                <SearchCommandItem
+                  onSelect={() => {
+                    queryFilter.resetFilters(
+                      { searchTerm: input, workspace: defaultContext.slug },
+                      getDashboardRoute(workspace, ALL_SECTIONS.SEARCH),
+                    );
+                    setOpen(false);
+                  }}
+                  actionLabel={'Search in this workspace'}
+                  showAction
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                      <SearchIcon />
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 text-sm">
+                        <ContextPill slug={defaultContext.slug} /> {input}
+                      </div>
+                    </div>
+                  </div>
+                </SearchCommandItem>
+              )}
+
+              <SearchCommandItem
+                onSelect={() => {
+                  queryFilter.resetFilters({ searchTerm: input, workspace: 'ALL' }, '/search-results');
+                  setOpen(false);
+                }}
+                actionLabel={'Search all of Open Collective'}
+                showAction
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                    <SearchIcon />
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="">{input}</div>
+                  </div>
+                </div>
+              </SearchCommandItem>
+              <hr className="separator -mx-2 my-2 h-px bg-border" />
+            </CommandGroup>
+          </React.Fragment>
+        )}
+
+        {recentlyVisited.length > 0 && input === '' && (
+          <CommandGroup heading="Recent">
+            {recentlyVisited.map(recentVisit => {
+              const { href, onClick } = getLinkProps(recentVisit);
+              return (
+                <SearchCommandItem
+                  key={recentVisit.key}
+                  onSelect={() => {
+                    router.push(href);
+                    setOpen(false);
+                    onClick?.();
+                  }}
+                >
+                  <Link href={href} className="block w-full">
+                    {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
+                    {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
+                    {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
+                    {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
+                    {recentVisit.type === 'update' && <UpdateResult update={recentVisit.data} />}
+                  </Link>
+                </SearchCommandItem>
+              );
+            })}
+          </CommandGroup>
+        )}
+
+        {filteredGoToPages.length > 0 && (
+          <CommandGroup heading="Go to" className="[&:last-child_.separator]:hidden">
+            {filteredGoToPages.map(page => {
+              const { href, onClick } = getLinkProps({ type: 'page', data: page });
+              return (
+                <SearchCommandItem
+                  key={page.section}
+                  onSelect={() => {
+                    router.push(href);
+                    setOpen(false);
+                    onClick?.();
+                  }}
+                >
+                  <Link href={href} className="block w-full">
+                    <PageResult page={page} />
+                  </Link>
+                </SearchCommandItem>
+              );
+            })}
+            <hr className="separator -mx-2 my-2 h-px bg-border" />
+          </CommandGroup>
+        )}
+        {isInitialLoading && input !== '' && (
+          <CommandGroup heading="Loading...">
+            {[1, 2, 3, 4, 5].map(id => (
+              <div key={`skeleton-${id}`} className="flex items-center gap-2 px-2 py-3">
+                <Skeleton className="size-9 shrink-0 rounded-md" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </CommandGroup>
+        )}
+        {(isLoading || hasData) && (
+          <React.Fragment>
+            <SearchCommandGroup
+              label="Accounts"
+              entity={SearchEntity.ACCOUNTS}
+              type="account"
+              totalCount={data?.search.results.accounts?.collection.totalCount}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              nodes={data?.search.results.accounts?.collection.nodes}
+              renderNode={account => (
+                <AccountResult account={account} highlights={data?.search.results.accounts?.highlights[account.id]} />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+            <SearchCommandGroup
+              label="Expenses"
+              entity={SearchEntity.EXPENSES}
+              type="expense"
+              totalCount={data?.search.results.expenses?.collection.totalCount}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              nodes={data?.search.results.expenses?.collection.nodes}
+              renderNode={expense => (
+                <ExpenseResult expense={expense} highlights={data?.search.results.expenses?.highlights[expense.id]} />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+            <SearchCommandGroup
+              label="Contributions"
+              entity={SearchEntity.CONTRIBUTIONS}
+              type="order"
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.orders?.collection.totalCount}
+              nodes={data?.search.results.orders?.collection.nodes}
+              renderNode={order => (
+                <OrderResult order={order} highlights={data?.search.results.orders?.highlights[order.id]} />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+
+            <SearchCommandGroup
+              label="Transactions"
+              entity={SearchEntity.TRANSACTIONS}
+              type="transaction"
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.transactions?.collection.totalCount}
+              nodes={data?.search.results.transactions?.collection.nodes}
+              renderNode={transaction => (
                 <TransactionResult
                   transaction={transaction}
-                  highlights={data.search.results.transactions.highlights[transaction.id]}
+                  highlights={data?.search.results.transactions?.highlights[transaction.id]}
                 />
-              </CommandItem>
-            )}
-          />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+
+            <SearchCommandGroup
+              label="Updates"
+              entity={SearchEntity.UPDATES}
+              type="update"
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.updates?.collection.totalCount}
+              nodes={data?.search.results.updates?.collection.nodes}
+              renderNode={update => (
+                <UpdateResult update={update} highlights={data?.search.results.updates?.highlights[update.id]} />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+            <SearchCommandGroup
+              label="Comments"
+              entity={SearchEntity.COMMENTS}
+              type="comment"
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              totalCount={data?.search.results.comments?.collection.totalCount}
+              nodes={data?.search.results.comments?.collection.nodes.filter(comment =>
+                getCommentUrl(comment, LoggedInUser),
+              )} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
+              renderNode={comment => (
+                <CommentResult comment={comment} highlights={data?.search.results.comments?.highlights[comment.id]} />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+          </React.Fragment>
         )}
-        <SearchCommandGroup
-          label="Updates"
-          input={debouncedInput}
-          totalCount={data?.search.results.updates.collection.totalCount}
-          nodes={data?.search.results.updates.collection.nodes}
-          renderNode={update => (
-            <CommandItem key={update.id} onSelect={() => handleResultSelect({ type: 'update', data: update })}>
-              <Link
-                className="block w-full"
-                href={getUpdateUrl(update, LoggedInUser)}
-                onClick={e => e.preventDefault()}
-              >
-                <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
-              </Link>
-            </CommandItem>
-          )}
-        />
-        <SearchCommandGroup
-          label="Comments"
-          input={debouncedInput}
-          totalCount={data?.search.results.comments.collection.totalCount}
-          nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
-          renderNode={comment => (
-            <CommandItem key={comment.id} onSelect={() => handleResultSelect({ type: 'comment', data: comment })}>
-              <Link
-                className="block w-full"
-                href={getCommentUrl(comment, LoggedInUser)}
-                onClick={e => e.preventDefault()}
-              >
-                <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
-              </Link>
-            </CommandItem>
-          )}
-        />
+
+        {/* Loading indicator for infinite scroll */}
+        {isLoadingMore && (
+          <div className="flex items-center justify-center gap-2 py-4">
+            <Spinner size={16} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Loading more...</span>
+          </div>
+        )}
+
+        {showNoResults && (
+          <div className="py-6 text-center text-sm text-muted-foreground">
+            <FormattedMessage defaultMessage="No results" id="search.noResults" />
+          </div>
+        )}
       </CommandList>
       <SearchCommandLegend />
     </CommandDialog>
   );
 };
+
+function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAction = false, className = undefined }) {
+  return (
+    <CommandItem
+      onSelect={onSelect}
+      className={cn(
+        'justify-between gap-2',
+        '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
+        '[&[data-selected=true]_.action]:text-foreground',
+        showAction ? '' : '[&[data-selected=false]_.action]:hidden',
+        className,
+      )}
+    >
+      {children}
+      <div
+        className={cn(
+          'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
+          showAction ? '' : 'absolute right-2',
+        )}
+      >
+        {actionLabel}
+      </div>
+    </CommandItem>
+  );
+}
+
+function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
+  if (totalCount > limit) {
+    return (
+      <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
+        <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <SearchIcon />
+        </div>
+        <span>
+          See {Number(totalCount - limit).toLocaleString()} more {label}
+        </span>
+      </SearchCommandItem>
+    );
+  }
+}
+
+function SearchCommandGroup({
+  totalCount,
+  label,
+  nodes,
+  renderNode,
+  input,
+  queryFilter,
+  entity,
+  setOpen,
+  type,
+  isInfiniteScrollEnabled = false,
+}) {
+  const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
+  const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
+
+  const { workspace } = useWorkspace();
+  const router = useRouter();
+  const { getLinkProps } = useGetLinkProps();
+
+  if (!totalCount || input === '') {
+    return null;
+  }
+
+  const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
+
+  return (
+    <CommandGroup heading={label} className="[&:last-child_.separator]:hidden">
+      {nodes.map(node => {
+        const { href, onClick } = getLinkProps({ type, data: node });
+        return (
+          <SearchCommandItem
+            key={node.id}
+            onSelect={() => {
+              router.push(href);
+              setOpen(false);
+              onClick?.();
+            }}
+          >
+            <Link href={href} className="block w-full">
+              {renderNode(node)}
+            </Link>
+          </SearchCommandItem>
+        );
+      })}
+      {showSeeMore && (
+        <SeeMoreItemsCommandItem
+          onSelect={() => {
+            if (isUsingSearchResultsPage) {
+              queryFilter.resetFilters(
+                { ...queryFilter.values, entity },
+
+                queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
+              );
+              setOpen(false);
+            } else {
+              queryFilter.setFilter('entity', entity);
+            }
+          }}
+          key={`more-${entity}`}
+          totalCount={totalCount}
+          limit={queryFilter.values.limit}
+          label={label}
+        />
+      )}
+      <hr className="separator -mx-2 my-2 h-px bg-border" />
+    </CommandGroup>
+  );
+}

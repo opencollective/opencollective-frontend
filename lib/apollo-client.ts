@@ -266,6 +266,101 @@ function createInMemoryCache() {
           },
         },
       },
+      // Add this for search results pagination
+      SearchResults: {
+        fields: {
+          accounts: {
+            keyArgs: false, // Don't separate cache by any args, we handle it manually
+            merge(existing, incoming, { args }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+              return {
+                ...incoming,
+                collection: {
+                  ...incoming.collection,
+                  nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                },
+              };
+            },
+          },
+          expenses: {
+            keyArgs: false,
+            merge(existing, incoming, { args }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+              return {
+                ...incoming,
+                collection: {
+                  ...incoming.collection,
+                  nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                },
+              };
+            },
+          },
+          orders: {
+            keyArgs: false,
+            merge(existing, incoming, { args }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+              return {
+                ...incoming,
+                collection: {
+                  ...incoming.collection,
+                  nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                },
+              };
+            },
+          },
+          transactions: {
+            keyArgs: false,
+            merge(existing, incoming, { args }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+              return {
+                ...incoming,
+                collection: {
+                  ...incoming.collection,
+                  nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                },
+              };
+            },
+          },
+          updates: {
+            keyArgs: false,
+            merge(existing, incoming, { args }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+              return {
+                ...incoming,
+                collection: {
+                  ...incoming.collection,
+                  nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                },
+              };
+            },
+          },
+          comments: {
+            keyArgs: false,
+            merge(existing, incoming, { args }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+              return {
+                ...incoming,
+                collection: {
+                  ...incoming.collection,
+                  nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                },
+              };
+            },
+          },
+        },
+      },
     },
   });
 
