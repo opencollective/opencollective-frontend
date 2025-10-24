@@ -35,12 +35,14 @@ import { searchCommandQuery } from './queries';
 import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { useRecentlyVisited } from './useRecentlyVisited';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 // TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { workspace } = useWorkspace();
+  const isUsingSearchResultsPage = LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { account } = React.useContext(DashboardContext);
   const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
@@ -318,7 +320,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           </CommandGroup>
         )}
 
-        {input.length > 0 && (
+        {input.length > 0 && isUsingSearchResultsPage && (
           <React.Fragment>
             <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
               {defaultContext && (
