@@ -29,6 +29,12 @@ export enum Step {
   SUMMARY = 'SUMMARY',
 }
 
+/**
+ * Maps each step to the form fields that need validation for that step.
+ * Used for step-based validation and auto-scroll to error functionality.
+ *
+ * @see README.md - Validation section
+ */
 export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   [Step.WHO_IS_PAYING]: ['accountSlug'],
   [Step.WHO_IS_GETTING_PAID]: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
@@ -136,6 +142,14 @@ function isExpenseFormStepTouched(form: ExpenseForm, step: Step): boolean {
   return valueKeys.map(valueKey => get(form.touched, valueKey)).some(Boolean);
 }
 
+/**
+ * Step navigation component that manages form progress and validation.
+ *
+ * Handles auto-scroll to first incomplete section on form submission,
+ * displays step indicators with error states, and manages step completion status.
+ *
+ * @param props Component props including active step and completion state
+ */
 export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   const form = useFormikContext() as ExpenseForm;
   const hasErrors = Object.values(Step).some(step => expenseFormStepHasError(form, step));
@@ -164,6 +178,10 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   const firstIncompleteSection = stepOrder.find(s => !isExpenseFormStepCompleted(form, s));
   const submitCount = form.submitCount;
 
+  /**
+   * Auto-scroll to first incomplete section on form submission.
+   * Falls back to toast notification if errors can't be mapped to steps.
+   */
   React.useEffect(() => {
     if (submitCount > 0) {
       if (firstIncompleteSection) {

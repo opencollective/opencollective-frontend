@@ -28,10 +28,24 @@ type SubmitExpenseFlowFormProps = {
   onExpenseInviteDeclined: () => void;
 };
 
+/**
+ * Main form layout component that orchestrates all expense form sections.
+ *
+ * Renders form sections in order, handles intersection observer for step tracking,
+ * and manages the submit button. Each section uses the getFormProps pattern for
+ * memoization and prop extraction.
+ *
+ * @see README.md - Key Design Patterns section for getFormProps pattern
+ */
 export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
   const form = useFormikContext() as ExpenseForm;
 
   const { onVisibleSectionChange } = props;
+
+  /**
+   * Intersection observer callback for tracking which section is currently visible.
+   * Used by SubmitExpenseFlowSteps to highlight the active step in the sidebar.
+   */
   const onInViewChange = React.useCallback(
     (visible, entry) => {
       if (visible) {
