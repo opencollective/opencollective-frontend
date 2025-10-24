@@ -990,7 +990,7 @@ export default function EditExpenseDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DialogTrigger asChild>
+          <DialogTrigger asChild data-cy={`edit-expense-${field}-btn`}>
             {trigger || (
               <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
                 <Pen size={16} />
