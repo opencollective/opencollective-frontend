@@ -157,7 +157,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.SEARCH,
       Icon: Search,
       label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search' }),
-      if: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND),
+      if: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE),
     },
     {
       if: isIndividual,
