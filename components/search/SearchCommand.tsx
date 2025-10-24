@@ -1,7 +1,17 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
-import { SearchIcon, Users, Receipt, ArrowRightLeft, Heart, Megaphone, MessageCircle, Search } from 'lucide-react';
+import {
+  ArrowRightLeft,
+  Coins,
+  Heart,
+  Megaphone,
+  MessageCircle,
+  Receipt,
+  Search,
+  SearchIcon,
+  Users,
+} from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -10,6 +20,7 @@ import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { cn } from '@/lib/utils';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
@@ -35,15 +46,15 @@ import { searchCommandQuery } from './queries';
 import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { useRecentlyVisited } from './useRecentlyVisited';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 // TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { workspace } = useWorkspace();
-  const isUsingSearchResultsPage = LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
+  const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const { account } = React.useContext(DashboardContext);
   const defaultContext = useMemo((): { slug: string; type: 'account' | 'host' } | undefined => {
     return workspace?.isHost
@@ -156,18 +167,23 @@ export const SearchCommand = ({ open, setOpen }) => {
   useEffect(() => {
     // Maybe remove? To preserve search etc..
     if (open) {
-      queryFilter.setFilter('workspace', account?.slug);
-      queryFilter.setFilter('entity', SearchEntity.ALL);
+      queryFilter.setFilters({ workspace: account?.slug, entity: SearchEntity.ALL });
     }
   }, [open, account?.slug]);
 
-  const { data, loading } = useQuery(searchCommandQuery, {
-    variables: { includeTransactions: true, ...queryFilter.variables, useTopHits: true, imageHeight: 72 },
+  const { data, loading, fetchMore } = useQuery(searchCommandQuery, {
+    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm,
   });
+
+  // Track if we're loading more results
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  // Determine if infinite scroll should be enabled
+  const isInfiniteScrollEnabled = queryFilter.values.entity !== SearchEntity.ALL;
 
   const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
   useEffect(() => {
@@ -198,6 +214,8 @@ export const SearchCommand = ({ open, setOpen }) => {
   const { getLinkProps } = useGetLinkProps();
 
   const isLoading = loading || isDebouncing;
+  const hasData = !!data?.search?.results;
+  const isInitialLoading = isLoading && !hasData;
   const flattenedMenuItems = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
 
@@ -215,12 +233,48 @@ export const SearchCommand = ({ open, setOpen }) => {
   }, [intl, account, LoggedInUser]);
 
   const entityOptions = [
-    { value: SearchEntity.ACCOUNTS, label: 'Accounts', icon: Users },
-    { value: SearchEntity.EXPENSES, label: 'Expenses', icon: Receipt },
-    { value: SearchEntity.CONTRIBUTIONS, label: 'Contributions', icon: Heart },
-    { value: SearchEntity.TRANSACTIONS, label: 'Transactions', icon: ArrowRightLeft },
-    { value: SearchEntity.UPDATES, label: 'Updates', icon: Megaphone },
-    { value: SearchEntity.COMMENTS, label: 'Comments', icon: MessageCircle },
+    {
+      value: SearchEntity.ACCOUNTS,
+      label: 'Accounts',
+      helpText: "Find any account you've interacted with",
+      icon: Users,
+      className: 'bg-blue-50 text-blue-700',
+    },
+    {
+      value: SearchEntity.EXPENSES,
+      label: 'Expenses',
+      helpText: 'Find expenses submitted to your host, your own account, or that has been paid to you.',
+      icon: Receipt,
+      className: 'bg-green-50 text-green-700',
+    },
+    {
+      value: SearchEntity.CONTRIBUTIONS,
+      label: 'Contributions',
+      helpText: "Find any account you've interacted with",
+      icon: Coins,
+      className: 'bg-amber-50 text-amber-700',
+    },
+    {
+      value: SearchEntity.TRANSACTIONS,
+      label: 'Transactions',
+      helpText: "Find any account you've interacted with",
+      icon: ArrowRightLeft,
+      className: 'bg-purple-50 text-purple-700',
+    },
+    {
+      value: SearchEntity.UPDATES,
+      label: 'Updates',
+      helpText: "Find any account you've interacted with",
+      icon: Megaphone,
+      className: 'bg-sky-50 text-sky-700',
+    },
+    {
+      value: SearchEntity.COMMENTS,
+      label: 'Comments',
+      helpText: "Find any account you've interacted with",
+      icon: MessageCircle,
+      className: 'bg-slate-100 text-slate-700',
+    },
   ];
 
   const filteredGoToPages = React.useMemo(() => {
@@ -254,6 +308,76 @@ export const SearchCommand = ({ open, setOpen }) => {
   console.log({ data, queryFilter });
   const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
 
+  // Handle infinite scroll
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (!isInfiniteScrollEnabled || !data || isLoadingMore || loading) {
+        return;
+      }
+
+      const target = e.target as HTMLDivElement;
+      const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+      // Trigger load more when within 100px of bottom
+      if (scrollBottom < 100) {
+        const results = data?.search?.results;
+        if (!results) {
+          return;
+        }
+
+        // Determine which entity collection to load more of
+        let shouldLoadMore = false;
+        let currentOffset = 0;
+        let totalCount = 0;
+
+        switch (queryFilter.values.entity) {
+          case SearchEntity.ACCOUNTS:
+            currentOffset = results.accounts?.collection.nodes.length || 0;
+            totalCount = results.accounts?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.EXPENSES:
+            currentOffset = results.expenses?.collection.nodes.length || 0;
+            totalCount = results.expenses?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.CONTRIBUTIONS:
+            currentOffset = results.orders?.collection.nodes.length || 0;
+            totalCount = results.orders?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.TRANSACTIONS:
+            currentOffset = results.transactions?.collection.nodes.length || 0;
+            totalCount = results.transactions?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.UPDATES:
+            currentOffset = results.updates?.collection.nodes.length || 0;
+            totalCount = results.updates?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+          case SearchEntity.COMMENTS:
+            currentOffset = results.comments?.collection.nodes.length || 0;
+            totalCount = results.comments?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
+        }
+
+        if (shouldLoadMore) {
+          setIsLoadingMore(true);
+          fetchMore({
+            variables: {
+              offset: currentOffset,
+            },
+          }).finally(() => {
+            setIsLoadingMore(false);
+          });
+        }
+      }
+    },
+    [isInfiniteScrollEnabled, data, isLoadingMore, loading, fetchMore, queryFilter.values.entity],
+  );
+
   return (
     <CommandDialog
       open={open}
@@ -285,38 +409,54 @@ export const SearchCommand = ({ open, setOpen }) => {
         {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
-      <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
+      <CommandList
+        ref={listRef}
+        onScroll={handleScroll}
+        className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2"
+      >
         <CommandItem value="-" className="hidden" />
-        {!queryFilter.values.workspace && defaultContext && input.length === 0 && (
-          <CommandGroup heading="">
-            <SearchCommandItem
-              onSelect={() => {
-                queryFilter.setFilter('workspace', defaultContext.slug);
-                setInput('');
-              }}
-              actionLabel={'Add current workspace'}
-              showAction
-            >
-              <ContextPill slug={defaultContext.slug} />
-            </SearchCommandItem>
-            <hr className="separator -mx-2 my-2 h-px bg-border" />
-          </CommandGroup>
-        )}
+        {!queryFilter.values.workspace &&
+          defaultContext &&
+          input.length === 0 &&
+          queryFilter.values.entity === SearchEntity.ALL && (
+            <CommandGroup heading="">
+              <SearchCommandItem
+                onSelect={() => {
+                  queryFilter.setFilter('workspace', defaultContext.slug);
+                  setInput('');
+                }}
+                actionLabel={'Search in workspace'}
+                showAction
+              >
+                <ContextPill slug={defaultContext.slug} />
+              </SearchCommandItem>
+              <hr className="separator -mx-2 my-2 h-px bg-border" />
+            </CommandGroup>
+          )}
 
         {input.length === 0 && queryFilter.values.entity === SearchEntity.ALL && (
-          <CommandGroup heading="">
+          <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
             {entityOptions.map(opt => (
               <SearchCommandItem
                 onSelect={() => {
                   queryFilter.setFilter('entity', opt.value);
                   // setInput('');
                 }}
-                actionLabel={'Add'}
+                actionLabel={`Search in ${opt.label.toLowerCase()}`}
                 // showAction
               >
-                Find {opt.label}
+                <div className="flex items-center gap-2">
+                  <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
+                    <opt.icon />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground group-hover:text-foreground">{opt.label}</span>
+                    <span className="text-xs text-muted-foreground">{opt.helpText}</span>
+                  </div>
+                </div>
               </SearchCommandItem>
             ))}
+            <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
 
@@ -418,7 +558,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
-        {isLoading && input !== '' && (
+        {isInitialLoading && input !== '' && (
           <CommandGroup heading="Loading...">
             {[1, 2, 3, 4, 5].map(id => (
               <div key={`skeleton-${id}`} className="flex items-center gap-2 px-2 py-3">
@@ -431,7 +571,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             ))}
           </CommandGroup>
         )}
-        {!isLoading && (
+        {(isLoading || hasData) && (
           <React.Fragment>
             <SearchCommandGroup
               label="Accounts"
@@ -445,6 +585,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               renderNode={account => (
                 <AccountResult account={account} highlights={data?.search.results.accounts?.highlights[account.id]} />
               )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
               label="Expenses"
@@ -458,6 +599,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               renderNode={expense => (
                 <ExpenseResult expense={expense} highlights={data?.search.results.expenses?.highlights[expense.id]} />
               )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
               label="Contributions"
@@ -471,6 +613,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               renderNode={order => (
                 <OrderResult order={order} highlights={data?.search.results.orders?.highlights[order.id]} />
               )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
 
             <SearchCommandGroup
@@ -488,6 +631,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                   highlights={data?.search.results.transactions?.highlights[transaction.id]}
                 />
               )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
 
             <SearchCommandGroup
@@ -502,6 +646,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               renderNode={update => (
                 <UpdateResult update={update} highlights={data?.search.results.updates?.highlights[update.id]} />
               )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
               label="Comments"
@@ -517,9 +662,19 @@ export const SearchCommand = ({ open, setOpen }) => {
               renderNode={comment => (
                 <CommentResult comment={comment} highlights={data?.search.results.comments?.highlights[comment.id]} />
               )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
           </React.Fragment>
         )}
+
+        {/* Loading indicator for infinite scroll */}
+        {isLoadingMore && (
+          <div className="flex items-center justify-center gap-2 py-4">
+            <Spinner size={16} className="text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Loading more...</span>
+          </div>
+        )}
+
         {showNoResults && (
           <div className="py-6 text-center text-sm text-muted-foreground">
             <FormattedMessage defaultMessage="No results" id="search.noResults" />
@@ -571,14 +726,31 @@ function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
   }
 }
 
-function SearchCommandGroup({ totalCount, label, nodes, renderNode, input, queryFilter, entity, setOpen, type }) {
+function SearchCommandGroup({
+  totalCount,
+  label,
+  nodes,
+  renderNode,
+  input,
+  queryFilter,
+  entity,
+  setOpen,
+  type,
+  isInfiniteScrollEnabled = false,
+}) {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
+  const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
+
   const { workspace } = useWorkspace();
   const router = useRouter();
   const { getLinkProps } = useGetLinkProps();
+
   if (!totalCount || input === '') {
     return null;
   }
+
+  const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
 
   return (
     <CommandGroup heading={label} className="[&:last-child_.separator]:hidden">
@@ -599,19 +771,26 @@ function SearchCommandGroup({ totalCount, label, nodes, renderNode, input, query
           </SearchCommandItem>
         );
       })}
-      <SeeMoreItemsCommandItem
-        onSelect={() => {
-          queryFilter.resetFilters(
-            { ...queryFilter.values, entity },
-            queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
-          );
-          setOpen(false);
-        }}
-        key={`more-${entity}`}
-        totalCount={totalCount}
-        limit={queryFilter.values.limit}
-        label={label}
-      />
+      {showSeeMore && (
+        <SeeMoreItemsCommandItem
+          onSelect={() => {
+            if (isUsingSearchResultsPage) {
+              queryFilter.resetFilters(
+                { ...queryFilter.values, entity },
+
+                queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
+              );
+              setOpen(false);
+            } else {
+              queryFilter.setFilter('entity', entity);
+            }
+          }}
+          key={`more-${entity}`}
+          totalCount={totalCount}
+          limit={queryFilter.values.limit}
+          label={label}
+        />
+      )}
       <hr className="separator -mx-2 my-2 h-px bg-border" />
     </CommandGroup>
   );
