@@ -16,6 +16,7 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
+  SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
 }
@@ -134,6 +135,20 @@ export const previewFeatures: PreviewFeature[] = [
     alwaysEnableInDev: true,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    category: Categories.GENERAL,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE,
+    title: <FormattedMessage defaultMessage="Search Results Page" id="PreviewFeatures.searchResultsPage" />,
+    // description: (
+    //   <FormattedMessage
+    //     defaultMessage="Discover a new way to search for collectives, transactions, expenses, and more through an intuitive command menu interface. Access information faster with powerful search capabilities."
+    //     id="PreviewFeatures.searchCommandDescription"
+    //   />
+    // ),
+    alwaysEnableInDev: false,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
     category: Categories.GENERAL,
   },
   {
