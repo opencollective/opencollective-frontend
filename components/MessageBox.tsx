@@ -45,6 +45,7 @@ type MessageBoxProps = MessageProps & {
   children: React.ReactNode;
   icon?: React.ReactNode;
   alignIcon?: 'start' | 'center';
+  css?: any;
 };
 
 const Message = styled.div<MessageProps>`

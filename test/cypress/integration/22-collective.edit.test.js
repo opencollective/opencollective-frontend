@@ -104,7 +104,7 @@ describe('edit collective', () => {
       .invoke('prop', 'validity')
       .should('deep.include', { valid: false, valueMissing: true });
     cy.getByDataCy('select-type').click();
-    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy=select-option]', 'Product').click();
     cy.get('[data-cy=name]').click();
     cy.get('[data-cy=name]').type('Tshirt');
     cy.get('[data-cy=description]').type('Made with love');
@@ -164,7 +164,7 @@ describe('edit collective', () => {
     cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
-    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy=select-option]', 'Product').click();
     cy.contains('[data-cy="edit-tier-modal-form"]:first', 'Value-added tax (VAT): 21%');
     // TODO save and make sure it's enabled
   });

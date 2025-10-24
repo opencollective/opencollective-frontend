@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { isNil, omit } from 'lodash';
+import { capitalize, isNil, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -14,6 +14,7 @@ import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
@@ -22,15 +23,15 @@ import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputFormikField from '../../StyledInputFormikField';
 import StyledLink from '../../StyledLink';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Span } from '../../Text';
+import { Button } from '../../ui/Button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from '../../ui/Dialog';
 import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/useToast';
 
@@ -42,21 +43,24 @@ const { FIXED, FLEXIBLE } = AmountTypes;
 
 function getTierTypeOptions(intl, collectiveType) {
   const simplifiedTierTypes = [
-    { value: TIER, label: intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' }) },
+    { value: TIER, label: capitalize(intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' })) },
     {
       value: SERVICE,
-      label: intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' }),
+      label: capitalize(intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' })),
     },
     {
       value: PRODUCT,
-      label: intl.formatMessage({ id: 'tier.type.product', defaultMessage: 'product (e.g., t-shirt)' }),
+      label: capitalize(intl.formatMessage({ id: 'tier.type.product', defaultMessage: 'product (e.g., t-shirt)' })),
     },
-    { value: DONATION, label: intl.formatMessage({ id: 'tier.type.donation', defaultMessage: 'donation (gift)' }) },
+    {
+      value: DONATION,
+      label: capitalize(intl.formatMessage({ id: 'tier.type.donation', defaultMessage: 'donation (gift)' })),
+    },
   ];
 
   const membershipTierType = {
     value: MEMBERSHIP,
-    label: intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' }),
+    label: capitalize(intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' })),
   };
 
   if (collectiveType === PROJECT) {
@@ -549,18 +553,19 @@ function FormFields({ collective, values, hideTypeSelect }) {
 const EditSectionContainer = styled(Flex)`
   overflow-y: scroll;
   flex-grow: 1;
+  min-height: 200px;
   flex-direction: column;
   padding-right: 0.65rem;
   min-width: 250px;
 
   @media (min-width: 700px) {
-    max-height: 600px;
+    max-height: 400px;
   }
 `;
 
 const PreviewSectionContainer = styled(Flex)`
   overflow: hidden;
-  max-height: 600px;
+  max-height: 400px;
   flex-grow: 1;
   min-width: 300px;
   justify-content: center;
@@ -580,7 +585,7 @@ const ModalSectionContainer = styled(Flex)`
 const EditModalActionsContainer = styled(Flex)`
   justify-content: right;
   flex-wrap: wrap;
-  gap: 1em;
+  gap: 12px;
 
   @media (max-width: 700px) {
     & > button {
@@ -589,24 +594,6 @@ const EditModalActionsContainer = styled(Flex)`
     justify-content: center;
     flex-wrap: wrap;
     align-items: center;
-  }
-`;
-
-const ConfirmModalButton = styled(StyledButton)`
-  @media (max-width: 700px) {
-    order: 1;
-  }
-`;
-
-const DeleteModalButton = styled(StyledButton)`
-  @media (max-width: 700px) {
-    order: 2;
-  }
-`;
-
-const CancelModalButton = styled(StyledButton)`
-  @media (max-width: 700px) {
-    order: 3;
   }
 `;
 
@@ -623,10 +610,54 @@ const ContributeCardPreviewContainer = styled.div`
 `;
 
 export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
+  const [formDirty, setFormDirty] = React.useState(false);
+  const intl = useIntl();
+
+  const handleClose = React.useCallback(() => {
+    if (formDirty) {
+      const confirmed = confirm(
+        intl.formatMessage({
+          id: 'WarningUnsavedChanges',
+          defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
+        }),
+      );
+      if (!confirmed) {
+        return; // Don't close if user cancels
+      }
+    }
+    onClose();
+  }, [formDirty, intl, onClose]);
+
   return (
-    <StyledModal className="sm:max-w-4xl" onClose={onClose} ignoreEscapeKey>
-      <EditTierForm tier={tier} collective={collective} onClose={onClose} forcedType={forcedType} onUpdate={onUpdate} />
-    </StyledModal>
+    <Dialog open={true} onOpenChange={open => !open && handleClose()}>
+      <DialogContent className="sm:max-w-4xl" onEscapeKeyDown={e => e.preventDefault()}>
+        <DialogHeader>
+          <h2 className="text-lg font-semibold">
+            {tier ? (
+              <FormattedMessage
+                defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                id="/CCt2w"
+                values={{ type: tier.type }}
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Create {type, select, TICKET {Ticket} other {Tier}}"
+                id="/XDuMs"
+                values={{ type: forcedType }}
+              />
+            )}
+          </h2>
+        </DialogHeader>
+        <EditTierForm
+          tier={tier}
+          collective={collective}
+          onClose={handleClose}
+          forcedType={forcedType}
+          onUpdate={onUpdate}
+          onFormDirtyChange={setFormDirty}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -754,9 +785,94 @@ const getRequiredFields = values => {
   return fields;
 };
 
-function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
+function EditTierFormInner({
+  formik,
+  tier,
+  collective,
+  onClose,
+  forcedType,
+  onDeleteTierClick,
+  isDeleting,
+  isConfirmingDelete,
+  onFormDirtyChange,
+}) {
   const intl = useIntl();
-  const isEditing = React.useMemo(() => !!tier?.id);
+  const { values, isSubmitting, dirty } = formik;
+
+  // Use navigation warning when form has unsaved changes
+  useNavigationWarning({
+    enabled: dirty,
+    confirmationMessage: intl.formatMessage({
+      id: 'WarningUnsavedChanges',
+      defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
+    }),
+  });
+
+  // Notify parent component when dirty state changes
+  React.useEffect(() => {
+    onFormDirtyChange?.(dirty);
+  }, [dirty, onFormDirtyChange]);
+
+  return (
+    <Form data-cy="edit-tier-modal-form">
+      <div className="flex-1">
+        <ModalSectionContainer>
+          <EditSectionContainer>
+            <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
+          </EditSectionContainer>
+          <PreviewSectionContainer>
+            <ContributeCardPreview collective={collective} tier={values} />
+          </PreviewSectionContainer>
+        </ModalSectionContainer>
+      </div>
+      <DialogFooter className="flex-col-reverse border-t border-gray-200 pt-4 sm:flex-row sm:justify-end sm:space-x-2">
+        <EditModalActionsContainer>
+          {Boolean(tier) && (
+            <Button
+              type="button"
+              data-cy="delete-btn"
+              variant="outlineDestructive"
+              onClick={onDeleteTierClick}
+              loading={isDeleting}
+              disabled={isSubmitting || isConfirmingDelete}
+              className="min-w-32"
+            >
+              <FormattedMessage id="actions.delete" defaultMessage="Delete" />
+            </Button>
+          )}
+          <Button
+            type="button"
+            data-cy="cancel-btn"
+            variant="outline"
+            disabled={isSubmitting || isDeleting || isConfirmingDelete}
+            onClick={onClose}
+            className="min-w-24"
+          >
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+          </Button>
+          <Button
+            type="submit"
+            data-cy="confirm-btn"
+            variant="default"
+            disabled={isDeleting || isConfirmingDelete}
+            loading={isSubmitting}
+            className="min-w-32"
+          >
+            {tier ? (
+              <FormattedMessage id="save" defaultMessage="Save" />
+            ) : (
+              <FormattedMessage id="create" defaultMessage="Create" />
+            )}
+          </Button>
+        </EditModalActionsContainer>
+      </DialogFooter>
+    </Form>
+  );
+}
+
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormDirtyChange }) {
+  const intl = useIntl();
+  const isEditing = Boolean(tier?.id);
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
@@ -767,7 +883,6 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
         presets: tier.presets || [1000],
-        invoiceTemplate: tier.invoiceTemplate,
       };
     } else {
       return {
@@ -779,9 +894,12 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         interval: collectiveSupportsInterval(collective) ? INTERVALS.month : null,
         description: '',
         presets: [1000],
+        maxQuantity: null,
+        singleTicket: false,
+        goal: null,
       };
     }
-  }, [isEditing, tier]);
+  }, [collective, forcedType, isEditing, tier]);
 
   const formMutation = isEditing ? editTierMutation : createTierMutation;
 
@@ -839,7 +957,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         setIsConfirmingDelete(false);
       }
     },
-    [deleteTier],
+    [deleteTier, intl, onClose, tier, toast],
   );
 
   return (
@@ -852,10 +970,10 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
             ...omit(values, ['interval', 'legacyId', 'slug']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
-            goal: !isNil(values?.goal?.valueInCents) ? values.goal : null,
-            amount: !isNil(values?.amount?.valueInCents) ? values.amount : null,
-            minimumAmount: !isNil(values?.minimumAmount?.valueInCents) ? values.minimumAmount : null,
-            singleTicket: values?.singleTicket,
+            goal: !isNil(values.goal?.valueInCents) ? values.goal : null,
+            amount: !isNil(values.amount?.valueInCents) ? values.amount : null,
+            minimumAmount: !isNil(values.minimumAmount?.valueInCents) ? values.minimumAmount : null,
+            singleTicket: values.singleTicket,
           };
 
           try {
@@ -879,81 +997,19 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
           }
         }}
       >
-        {({ values, isSubmitting }) => {
+        {formik => {
           return (
-            <Form data-cy="edit-tier-modal-form">
-              <ModalHeader onClose={onClose} hideCloseIcon>
-                {isEditing ? (
-                  <FormattedMessage
-                    defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
-                    id="/CCt2w"
-                    values={{ type: tier.type }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="Create {type, select, TICKET {Ticket} other {Tier}}"
-                    id="/XDuMs"
-                    values={{ type: forcedType }}
-                  />
-                )}
-              </ModalHeader>
-              <ModalBody>
-                <ModalSectionContainer>
-                  <EditSectionContainer>
-                    <FormFields
-                      collective={collective}
-                      values={values}
-                      tier={tier}
-                      hideTypeSelect={Boolean(forcedType)}
-                    />
-                  </EditSectionContainer>
-                  <PreviewSectionContainer>
-                    <ContributeCardPreview collective={collective} tier={values} />
-                  </PreviewSectionContainer>
-                </ModalSectionContainer>
-              </ModalBody>
-              <ModalFooter isFullWidth dividerMargin="0.65rem 0">
-                <EditModalActionsContainer>
-                  {isEditing && (
-                    <DeleteModalButton
-                      type="button"
-                      data-cy="delete-btn"
-                      buttonStyle="dangerSecondary"
-                      minWidth={120}
-                      onClick={onDeleteTierClick}
-                      loading={isDeleting}
-                      disabled={isSubmitting || isConfirmingDelete}
-                      marginRight="auto"
-                    >
-                      <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-                    </DeleteModalButton>
-                  )}
-                  <ConfirmModalButton
-                    type="submit"
-                    data-cy="confirm-btn"
-                    buttonStyle="primary"
-                    minWidth={120}
-                    disabled={isDeleting || isConfirmingDelete}
-                    loading={isSubmitting}
-                  >
-                    {isEditing ? (
-                      <FormattedMessage id="save" defaultMessage="Save" />
-                    ) : (
-                      <FormattedMessage id="create" defaultMessage="Create" />
-                    )}
-                  </ConfirmModalButton>
-                  <CancelModalButton
-                    type="button"
-                    data-cy="cancel-btn"
-                    disabled={isSubmitting || isDeleting || isConfirmingDelete}
-                    minWidth={100}
-                    onClick={onClose}
-                  >
-                    <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                  </CancelModalButton>
-                </EditModalActionsContainer>
-              </ModalFooter>
-            </Form>
+            <EditTierFormInner
+              formik={formik}
+              tier={tier}
+              collective={collective}
+              onClose={onClose}
+              forcedType={forcedType}
+              onDeleteTierClick={onDeleteTierClick}
+              isDeleting={isDeleting}
+              isConfirmingDelete={isConfirmingDelete}
+              onFormDirtyChange={onFormDirtyChange}
+            />
           );
         }}
       </Formik>
