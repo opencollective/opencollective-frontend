@@ -631,6 +631,12 @@ type ExpenseFormOptions = {
 
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 
+/**
+ * Memoized GraphQL query for expense form schema data.
+ *
+ * Uses memoizeOne to cache query results and prevent redundant network requests.
+ * Only refetches when variables change or refresh is explicitly requested.
+ */
 const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
@@ -657,6 +663,20 @@ type RecursivePartial<T> = {
       : T[P];
 };
 
+/**
+ * Builds dynamic Zod validation schema based on form options and context.
+ *
+ * This function creates different validation rules depending on:
+ * - Expense type (INVOICE vs RECEIPT vs GRANT)
+ * - Account settings (VAT/GST requirements, accounting categories)
+ * - Form state (invite vs direct submission)
+ *
+ * @param values Current form values
+ * @param options Form configuration options
+ * @param intl Internationalization context for error messages
+ * @param pickSchemaFields Optional field filtering for partial validation
+ * @returns Zod schema for form validation
+ */
 function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
@@ -1571,6 +1591,18 @@ type ExpenseFormStartOptions = {
   pickSchemaFields?: Record<string, boolean>;
 };
 
+/**
+ * Central hook for managing expense form state, validation, data fetching, and submission.
+ *
+ * This hook integrates Formik for form management, Zod for validation, Apollo Client for
+ * data fetching/mutations, and handles complex initialization workflows for both expense
+ * creation and editing scenarios.
+ *
+ * @param opts Configuration options including form ref, initial values, and callbacks
+ * @returns ExpenseForm object with form state, validation, and submission methods
+ *
+ * @see README.md for detailed architecture documentation
+ */
 export function useExpenseForm(opts: {
   formRef?: React.RefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
@@ -1602,6 +1634,7 @@ export function useExpenseForm(opts: {
   const initialValues = React.useRef(opts.initialValues);
   const initialStatus = React.useRef({ schema: formOptions.schema });
 
+  // GraphQL mutations for expense operations
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
     gql`
       mutation CreateExpenseFromDashboard(
@@ -2201,6 +2234,11 @@ export function useExpenseForm(opts: {
 
     const ctrl = new AbortController();
     let queryComplete = false;
+
+    /**
+     * Fetches exchange rates for expense items with different currencies.
+     * Uses AbortController to cancel in-flight requests on component unmount.
+     */
     async function updateExchangeRates() {
       try {
         const res = await apolloClient.query<ExpenseFormExchangeRatesQuery, ExpenseFormExchangeRatesQueryVariables>({

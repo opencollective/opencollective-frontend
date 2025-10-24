@@ -34,6 +34,16 @@ const I18nMessages = defineMessages({
   },
 });
 
+/**
+ * Main container component for the expense submission flow.
+ *
+ * Manages the dialog lifecycle, handles success/error callbacks, and orchestrates
+ * the overall expense creation/editing workflow. Acts as the entry point for both
+ * expense and grant submission flows.
+ *
+ * @param props Configuration including expense ID, draft key, and callbacks
+ * @see README.md for detailed architecture documentation
+ */
 export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -61,6 +71,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     onClose(true, false);
   }, [onClose]);
 
+  /**
+   * Handles successful expense submission with appropriate success messages.
+   * Shows different toast notifications based on submission type (edit/new/invite).
+   *
+   * @see README.md - API Error Handling section for error handling patterns
+   */
   const onSuccess = React.useCallback(
     (result, type: 'edit' | 'new' | 'invite') => {
       setSubmittedExpenseId(result.data.expense.legacyId);
@@ -97,6 +113,11 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     [LoggedInUser, toast],
   );
 
+  /**
+   * Handles API errors from mutations with internationalized error messages.
+   *
+   * @see README.md - API Error Handling section for error handling patterns
+   */
   const onError = React.useCallback(
     err => {
       toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
@@ -229,6 +250,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   );
 }
 
+/**
+ * Internal component that wraps the expense form with FormikProvider.
+ *
+ * Manages form state initialization, step navigation, and integrates with
+ * the useExpenseForm hook for form logic and validation.
+ */
 function ExpenseFormikContainer(props: {
   submitExpenseTo?: string;
   draftKey?: string;
