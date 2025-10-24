@@ -17,9 +17,9 @@ describe('Chart of Accounts', () => {
     cy.contains('button', 'Create category').click();
 
     // Fill form
-    cy.get('[data-cy=InputField-code]').type('007');
-    cy.get('[data-cy=InputField-name]').type('Workspace');
-    cy.get('[data-cy=InputField-friendlyName]').type('Workspace Expenses');
+    cy.get('[data-cy=InputField-code] input').type('007');
+    cy.get('[data-cy=InputField-name] input').type('Workspace');
+    cy.get('[data-cy=InputField-friendlyName] input').type('Workspace Expenses');
 
     // Submit form
     cy.get('[data-cy=create-category-button]').contains('Create category').click();
@@ -28,9 +28,9 @@ describe('Chart of Accounts', () => {
     cy.contains('button', 'Create category').click();
 
     // Fill form
-    cy.get('[data-cy=InputField-code]').type('008');
-    cy.get('[data-cy=InputField-name]').type('Contractors');
-    cy.get('[data-cy=InputField-friendlyName]').type('Contractor Expenses');
+    cy.get('[data-cy=InputField-code] input').type('008');
+    cy.get('[data-cy=InputField-name] input').type('Contractors');
+    cy.get('[data-cy=InputField-friendlyName] input').type('Contractor Expenses');
 
     // Submit form
     cy.get('[data-cy=create-category-button]').contains('Create category').click();
