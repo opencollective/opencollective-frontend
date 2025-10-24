@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
-import { SearchIcon } from 'lucide-react';
+import { SearchIcon, Users, Receipt, ArrowRightLeft, Heart, Megaphone, MessageCircle, Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -71,19 +71,96 @@ export const SearchCommand = ({ open, setOpen }) => {
           return { includeTransactions: true };
         }
       },
+      entity: val => {
+        switch (val) {
+          case SearchEntity.ALL:
+            return {
+              useTopHits: true,
+              includeAccounts: true,
+              includeTransactions: true,
+              includeExpenses: true,
+              includeOrders: true,
+              includeUpdates: true,
+              includeComments: true,
+              limit: 5, // default is 20 according to schema
+            };
+          case SearchEntity.EXPENSES:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: true,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: false,
+            };
+          case SearchEntity.TRANSACTIONS:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: true,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: false,
+            };
+          case SearchEntity.ACCOUNTS:
+            return {
+              useTopHits: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: false,
+              includeAccounts: true,
+            };
+          case SearchEntity.CONTRIBUTIONS:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: true,
+              includeUpdates: false,
+              includeComments: false,
+            };
+          case SearchEntity.UPDATES:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: true,
+              includeComments: false,
+            };
+          case SearchEntity.COMMENTS:
+            return {
+              useTopHits: false,
+              includeAccounts: false,
+              includeTransactions: false,
+              includeExpenses: false,
+              includeOrders: false,
+              includeUpdates: false,
+              includeComments: true,
+            };
+        }
+      },
     },
     defaultFilterValues: { workspace: account?.slug }, // use account.slug here, as it means we are on a dashboard page
     skipRouter: true,
   });
 
   useEffect(() => {
+    // Maybe remove? To preserve search etc..
     if (open) {
       queryFilter.setFilter('workspace', account?.slug);
+      queryFilter.setFilter('entity', SearchEntity.ALL);
     }
   }, [open, account?.slug]);
 
   const { data, loading } = useQuery(searchCommandQuery, {
-    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
+    variables: { includeTransactions: true, ...queryFilter.variables, useTopHits: true, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -103,7 +180,11 @@ export const SearchCommand = ({ open, setOpen }) => {
       if (input) {
         if (e.key === 'Delete' || e.key === 'Backspace') {
           if (input.value === '') {
-            queryFilter.setFilter('workspace', undefined);
+            if (queryFilter.values.entity !== SearchEntity.ALL) {
+              queryFilter.setFilter('entity', SearchEntity.ALL);
+            } else {
+              queryFilter.setFilter('workspace', undefined);
+            }
           }
         }
       }
@@ -131,8 +212,17 @@ export const SearchCommand = ({ open, setOpen }) => {
       .filter(item => item.section !== ALL_SECTIONS.SEARCH);
   }, [intl, account, LoggedInUser]);
 
+  const entityOptions = [
+    { value: SearchEntity.ACCOUNTS, label: 'Accounts', icon: Users },
+    { value: SearchEntity.EXPENSES, label: 'Expenses', icon: Receipt },
+    { value: SearchEntity.CONTRIBUTIONS, label: 'Contributions', icon: Heart },
+    { value: SearchEntity.TRANSACTIONS, label: 'Transactions', icon: ArrowRightLeft },
+    { value: SearchEntity.UPDATES, label: 'Updates', icon: Megaphone },
+    { value: SearchEntity.COMMENTS, label: 'Comments', icon: MessageCircle },
+  ];
+
   const filteredGoToPages = React.useMemo(() => {
-    if (!queryFilter.values.workspace || !debouncedInput) {
+    if (!queryFilter.values.workspace || !debouncedInput || queryFilter.values.entity !== SearchEntity.ALL) {
       return [];
     }
 
@@ -142,7 +232,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         .toLowerCase()
         .includes(debouncedInput.toLowerCase()),
     );
-  }, [debouncedInput, flattenedMenuItems, queryFilter.values.workspace]);
+  }, [debouncedInput, flattenedMenuItems, queryFilter.values]);
 
   const hasSearchResults = React.useMemo(() => {
     if (!data?.search?.results) {
@@ -159,6 +249,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     );
   }, [data]);
 
+  console.log({ data, queryFilter });
   const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
 
   return (
@@ -181,6 +272,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             onRemove={() => queryFilter.setFilter('workspace', undefined)}
           />
         )}
+        {queryFilter.values.entity !== SearchEntity.ALL && <span>{queryFilter.values.entity}</span>}
         <CommandPrimitive.Input
           ref={inputRef}
           onValueChange={setInput}
@@ -193,7 +285,6 @@ export const SearchCommand = ({ open, setOpen }) => {
 
       <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <CommandItem value="-" className="hidden" />
-
         {!queryFilter.values.workspace && defaultContext && input.length === 0 && (
           <CommandGroup heading="">
             <SearchCommandItem
@@ -206,8 +297,27 @@ export const SearchCommand = ({ open, setOpen }) => {
             >
               <ContextPill slug={defaultContext.slug} />
             </SearchCommandItem>
+            <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
+
+        {input.length === 0 && queryFilter.values.entity === SearchEntity.ALL && (
+          <CommandGroup heading="">
+            {entityOptions.map(opt => (
+              <SearchCommandItem
+                onSelect={() => {
+                  queryFilter.setFilter('entity', opt.value);
+                  // setInput('');
+                }}
+                actionLabel={'Add'}
+                // showAction
+              >
+                Find {opt.label}
+              </SearchCommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
         {input.length > 0 && (
           <React.Fragment>
             <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
@@ -325,26 +435,26 @@ export const SearchCommand = ({ open, setOpen }) => {
               label="Accounts"
               entity={SearchEntity.ACCOUNTS}
               type="account"
-              totalCount={data?.search.results.accounts.collection.totalCount}
+              totalCount={data?.search.results.accounts?.collection.totalCount}
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
-              nodes={data?.search.results.accounts.collection.nodes}
+              nodes={data?.search.results.accounts?.collection.nodes}
               renderNode={account => (
-                <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
+                <AccountResult account={account} highlights={data?.search.results.accounts?.highlights[account.id]} />
               )}
             />
             <SearchCommandGroup
               label="Expenses"
               entity={SearchEntity.EXPENSES}
               type="expense"
-              totalCount={data?.search.results.expenses.collection.totalCount}
+              totalCount={data?.search.results.expenses?.collection.totalCount}
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
-              nodes={data?.search.results.expenses.collection.nodes}
+              nodes={data?.search.results.expenses?.collection.nodes}
               renderNode={expense => (
-                <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
+                <ExpenseResult expense={expense} highlights={data?.search.results.expenses?.highlights[expense.id]} />
               )}
             />
             <SearchCommandGroup
@@ -354,10 +464,10 @@ export const SearchCommand = ({ open, setOpen }) => {
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
-              totalCount={data?.search.results.orders.collection.totalCount}
-              nodes={data?.search.results.orders.collection.nodes}
+              totalCount={data?.search.results.orders?.collection.totalCount}
+              nodes={data?.search.results.orders?.collection.nodes}
               renderNode={order => (
-                <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
+                <OrderResult order={order} highlights={data?.search.results.orders?.highlights[order.id]} />
               )}
             />
 
@@ -368,12 +478,12 @@ export const SearchCommand = ({ open, setOpen }) => {
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
-              totalCount={data?.search.results.transactions.collection.totalCount}
-              nodes={data?.search.results.transactions.collection.nodes}
+              totalCount={data?.search.results.transactions?.collection.totalCount}
+              nodes={data?.search.results.transactions?.collection.nodes}
               renderNode={transaction => (
                 <TransactionResult
                   transaction={transaction}
-                  highlights={data.search.results.transactions.highlights[transaction.id]}
+                  highlights={data?.search.results.transactions?.highlights[transaction.id]}
                 />
               )}
             />
@@ -385,10 +495,10 @@ export const SearchCommand = ({ open, setOpen }) => {
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
-              totalCount={data?.search.results.updates.collection.totalCount}
-              nodes={data?.search.results.updates.collection.nodes}
+              totalCount={data?.search.results.updates?.collection.totalCount}
+              nodes={data?.search.results.updates?.collection.nodes}
               renderNode={update => (
-                <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
+                <UpdateResult update={update} highlights={data?.search.results.updates?.highlights[update.id]} />
               )}
             />
             <SearchCommandGroup
@@ -398,12 +508,12 @@ export const SearchCommand = ({ open, setOpen }) => {
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
-              totalCount={data?.search.results.comments.collection.totalCount}
-              nodes={data?.search.results.comments.collection.nodes.filter(comment =>
+              totalCount={data?.search.results.comments?.collection.totalCount}
+              nodes={data?.search.results.comments?.collection.nodes.filter(comment =>
                 getCommentUrl(comment, LoggedInUser),
               )} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
               renderNode={comment => (
-                <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
+                <CommentResult comment={comment} highlights={data?.search.results.comments?.highlights[comment.id]} />
               )}
             />
           </React.Fragment>
