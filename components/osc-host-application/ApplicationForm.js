@@ -135,7 +135,6 @@ const ApplicationForm = ({
       'collective.name',
       'collective.slug',
       'message',
-      'collective.description',
       'applicationData.typeOfProject',
     ]);
 
@@ -636,7 +635,7 @@ const ApplicationForm = ({
                       <Box mb={2}>
                         <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
                           <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                             <Span fontWeight="300" fontSize="11px" color="black.700" letterSpacing="0.06em">
                               {` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
@@ -692,7 +691,7 @@ const ApplicationForm = ({
                             }}
                           />
                         </Box>
-                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                           <MessageBox type="info" mt={3} fontSize="13px">
                             <FormattedMessage
                               defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."

@@ -309,6 +309,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
+      if: (isHost || isSelfHosted) && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
+      label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
+      section: ALL_SECTIONS.PEOPLE,
+      Icon: Users2,
+    },
+    {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
       Icon: FileText,
       label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),

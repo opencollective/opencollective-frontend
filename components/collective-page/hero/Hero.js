@@ -125,6 +125,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
   const numberOfHiddenTags = hiddenTags?.length;
+  const canHostAccounts = collective.isHost && collective.settings?.canHostAccounts !== false;
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -378,7 +379,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {collective.isHost && (
+                {canHostAccounts && (
                   <Fragment>
                     {collective.type !== CollectiveType.COLLECTIVE && (
                       <Fragment>

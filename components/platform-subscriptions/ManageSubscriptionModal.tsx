@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { useFormik } from 'formik';
 import { omit } from 'lodash';
 import { ArrowLeft, ArrowRight, Check, Info, Minus, Receipt, Shapes } from 'lucide-react';
+import Image from 'next/image';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
@@ -16,6 +17,7 @@ import type {
   UpdatePlatformSubscriptionMutation,
   UpdatePlatformSubscriptionMutationVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import { cn } from '@/lib/utils';
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/Dialog';
 
@@ -40,7 +42,7 @@ import {
   PlatformSubscriptionFeatureTitles,
   PlatformSubscriptionTierDescription,
   PlatformSubscriptionTierFeatures,
-  PlatformSubscriptionTierIcon,
+  PlatformSubscriptionTierImage,
   PlatformSubscriptionTiers,
   PlatformSubscriptionTierTagLine,
   PlatformSubscriptionTierTitles,
@@ -388,18 +390,15 @@ type PlatformSubscriptionTierCardProps = {
 };
 
 export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCardProps) {
-  const Icon = PlatformSubscriptionTierIcon[props.tier];
+  const imgSrc = PlatformSubscriptionTierImage[props.tier];
   const titleMessage = PlatformSubscriptionTierTitles[props.tier];
   const tagLineMessage = PlatformSubscriptionTierTagLine[props.tier];
   const descriptionMessage = PlatformSubscriptionTierDescription[props.tier];
   const features = PlatformSubscriptionTierFeatures[props.tier];
-
   return (
-    <div className="pt-2 pb-5">
-      <div className="mb-6 flex justify-center">
-        <div className="rounded-full bg-muted p-3">
-          <Icon className="size-6 text-muted-foreground" />
-        </div>
+    <div className="pt-0 pb-5">
+      <div className={cn('relative mx-auto flex justify-center')}>
+        <Image src={imgSrc} height={512} width={512} className="!size-40" alt="" aria-hidden />
       </div>
       <div className="flex justify-center text-2xl font-bold">
         <FormattedMessage {...titleMessage} />

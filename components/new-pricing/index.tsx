@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
 import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
@@ -223,7 +224,7 @@ export default function Pricing({ data }) {
           <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
             <span>
               <FormattedMessage
-                defaultMessage="We’ve updated our pricing model to better support long-term sustainability. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
+                defaultMessage="We've updated our platform pricing to support our long-term sustainability. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
                 id="pricing.newModel.onNewPricing"
                 values={{
                   LinkLegacyPricing: parts => (
@@ -276,12 +277,8 @@ export default function Pricing({ data }) {
           ))}
         </div>
 
-        <div className="mt-12 flex justify-center">
-          <Button asChild variant="marketing" className="rounded-full" size="lg">
-            <Link href="/signup/organization?active=true">
-              <FormattedMessage defaultMessage="Join As Organization" id="solutions.hero.joinAsOrg" />
-            </Link>
-          </Button>
+        <div className="mt-16 flex justify-center">
+          <JoinCTAButtons onPage="pricing" />
         </div>
 
         <div className="mt-24 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 p-12 text-center">

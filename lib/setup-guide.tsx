@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty, isNil, orderBy } from 'lodash';
+import { compact, isEmpty, isNil, orderBy } from 'lodash';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -29,7 +29,7 @@ export type Category = {
 };
 
 const sortSteps = (steps: Step[]) =>
-  orderBy(steps, step => (step.requiresUpgrade ? -1 : step.completed ? 1 : 0), ['desc', 'desc']);
+  orderBy(compact(steps), step => (step.requiresUpgrade ? -1 : step.completed ? 1 : 0), ['desc', 'desc']);
 
 export const generateSetupGuideSteps = ({
   account,
@@ -172,7 +172,7 @@ export const generateSetupGuideSteps = ({
             />
           ),
           id: 'enable-hosting',
-          completed: account.isHost,
+          completed: account.isHost && account.settings?.canHostAccounts !== false,
           action: {
             label: <FormattedMessage defaultMessage="Enable hosting" id="SetupGuide.EnableHosting" />,
             onClick: () => {
@@ -265,7 +265,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
           },
         },
-        {
+        (!account.isHost || account.settings?.canHostAccounts !== false) && {
           title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
           description: (
             <FormattedMessage
@@ -282,7 +282,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
           },
         },
-        {
+        (!account.isHost || account.settings?.canHostAccounts !== false) && {
           title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
           description: (
             <FormattedMessage

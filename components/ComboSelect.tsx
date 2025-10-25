@@ -46,6 +46,7 @@ type ComboSelectProps = {
   inputPlaceholder?: string;
   isSearchable?: boolean;
   'data-cy'?: string;
+  name?: string;
 };
 
 // eslint-disable-next-line prefer-arrow-callback
@@ -85,6 +86,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           id={props.id}
           data-cy={props['data-cy']}
           data-testid={props['data-testid']}
+          name={props.name}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

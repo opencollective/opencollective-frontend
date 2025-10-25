@@ -670,6 +670,11 @@ interface Account {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -1091,6 +1096,11 @@ interface Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
 }
 
 """
@@ -3343,6 +3353,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -3749,6 +3764,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5879,6 +5899,11 @@ type PaymentMethod {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection
 }
 
@@ -7191,6 +7216,58 @@ type TransactionsAmountGroup {
   isRefund: Boolean
   isHost: Boolean
   expenseType: ExpenseType
+}
+
+type CommunityStats {
+  associatedCollectives: [CommunityAssociatedCollective]
+  relations: [CommunityRelationType]!
+  transactionSummary: [CommunityTransactionSummary!]!
+  lastInteractionAt: DateTime
+  firstInteractionAt: DateTime
+  activities(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): ActivityCollection
+}
+
+type CommunityAssociatedCollective {
+  account: Account
+  relations: [CommunityRelationType]
+}
+
+enum CommunityRelationType {
+  ADMIN
+  ATTENDEE
+  PAYEE
+  GRANTEE
+  CONTRIBUTOR
+  EXPENSE_SUBMITTER
+  EXPENSE_APPROVER
+}
+
+type CommunityTransactionSummary {
+  year: Int!
+  expenseTotal: Amount!
+  expenseCount: Int!
+  contributionTotal: Amount!
+  contributionCount: Int!
+}
+
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity!]
 }
 
 """
@@ -8649,16 +8726,6 @@ type OrderPermissions {
   canResume: Boolean!
 }
 
-"""
-A collection of "Activities"
-"""
-type ActivityCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Activity!]
-}
-
 type PendingOrderData {
   expectedAt: DateTime
   paymentMethod: String
@@ -9263,6 +9330,11 @@ type Bot implements Account {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9669,6 +9741,11 @@ type Bot implements Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10216,6 +10293,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10622,6 +10704,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11727,6 +11814,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -12133,6 +12225,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12954,6 +13051,11 @@ type Individual implements Account {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -13358,6 +13460,11 @@ type Individual implements Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14159,6 +14266,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14563,6 +14675,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15232,6 +15349,11 @@ type Vendor implements Account & AccountWithContributions {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15638,6 +15760,11 @@ type Vendor implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -16110,6 +16237,31 @@ type Query {
     """
     id: String!
   ): Conversation
+
+  """
+  Return accounts that have interacted with a given account or host
+  """
+  community(
+    """
+    Account filter
+    """
+    account: AccountReferenceInput
+
+    """
+    Host context filter
+    """
+    host: AccountReferenceInput
+    type: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+    searchTerm: String
+    relation: [CommunityRelationType!]
+    limit: Int! = 100
+    offset: Int! = 0
+  ): AccountCollection!
 
   """
   Get exchange rates from Open Collective
@@ -16601,6 +16753,11 @@ type Query {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   organization(
     """
@@ -16663,6 +16820,11 @@ type Query {
     Limit the scope of the search to this host and its hosted accounts
     """
     host: AccountReferenceInput
+
+    """
+    Set this to true if you are displaying all the results in the same list, and want a consistent sorting order across different types. (!) Paginating wih `offset` will not be supported
+    """
+    useTopHits: Boolean! = false
 
     """
     The maximum amount of time in millisecond to wait for a single entity type query to complete (for SQL search)
@@ -19089,6 +19251,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -19495,6 +19662,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -20189,6 +20361,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -20595,6 +20772,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -20767,6 +20949,16 @@ type SearchResults {
   """
   accounts(
     """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
     Type of account
     """
     type: AccountType
@@ -20785,37 +20977,107 @@ type SearchResults {
   """
   Search results for Comments
   """
-  comments: SearchResultsComments
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsComments
 
   """
   Search results for Expenses
   """
-  expenses: SearchResultsExpenses
+  expenses(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsExpenses
 
   """
   Search results for HostApplications
   """
-  hostApplications: SearchResultsHostApplications
+  hostApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsHostApplications
 
   """
   Search results for Orders
   """
-  orders: SearchResultsOrders
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsOrders
 
   """
   Search results for Tiers
   """
-  tiers: SearchResultsTiers
+  tiers(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsTiers
 
   """
   Search results for Transactions
   """
-  transactions: SearchResultsTransactions
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsTransactions
 
   """
   Search results for Updates
   """
-  updates: SearchResultsUpdates
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsUpdates
 }
 
 type SearchResultsAccounts {

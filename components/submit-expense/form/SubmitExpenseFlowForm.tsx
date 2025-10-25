@@ -16,7 +16,6 @@ import { ExpenseCategorySection } from './ExpenseCategorySection';
 import { ExpenseItemsSection } from './ExpenseItemsSection';
 import { FormSectionContainer } from './FormSectionContainer';
 import { PayoutMethodSection } from './PayoutMethodSection';
-import { ReferenceCurrencyForm, ReferenceCurrencySection } from './ReferenceCurrencySection';
 import { SummarySection } from './SummarySection';
 import { TypeOfExpenseSection } from './TypeOfExpenseSection';
 import { WhoIsGettingPaidSection } from './WhoIsGettingPaidSection';
@@ -59,7 +58,6 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
         <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
       )}
       <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
-      <ReferenceCurrencySection inViewChange={onInViewChange} {...ReferenceCurrencyForm.getFormProps(form)} />
       <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
       <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-center sm:justify-end">

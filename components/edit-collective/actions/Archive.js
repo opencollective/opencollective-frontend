@@ -6,7 +6,6 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 
-import Container from '../../Container';
 import { adminPanelQuery } from '../../dashboard/queries';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
@@ -87,7 +86,7 @@ const ArchiveCollective = ({ collective }) => {
   const closeModal = () => setModal({ ...modal, show: false });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+    <div className="mb-8 flex flex-col items-start gap-2">
       <SettingsSectionTitle>
         <FormattedMessage
           id="collective.archive.title"
@@ -96,7 +95,7 @@ const ArchiveCollective = ({ collective }) => {
         />
       </SettingsSectionTitle>
       {!isArchived && (
-        <P mb={3} lineHeight="16px" fontSize="14px">
+        <p className="text-sm">
           <FormattedMessage
             id="collective.archive.description"
             defaultMessage="Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed."
@@ -109,12 +108,40 @@ const ArchiveCollective = ({ collective }) => {
               defaultMessage="Recurring financial contributions will be automatically canceled, and all pending expenses will be marked as canceled."
             />
           )}
-        </P>
+        </p>
       )}
-      {error && (
-        <P my={3} color="#ff5252">
-          {error}
-        </P>
+      {error && <MessageBox type="error">{error}</MessageBox>}
+
+      {!isArchived && hasBalance && (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.archive.availableBalance"
+            defaultMessage="Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
+      )}
+      {!isArchived && collective.isHost && (
+        <MessageBox type="warning">
+          {collective.type === CollectiveType.COLLECTIVE ? (
+            <FormattedMessage
+              id="collective.archive.selfHosted"
+              defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
+              values={{ SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}/host` }) }}
+            />
+          ) : (
+            <FormattedMessage
+              id="collective.archive.balance.warning"
+              defaultMessage="You can't archive {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+              values={{ type: collective.type }}
+            />
+          )}
+        </MessageBox>
+      )}
+      {isArchived && confirmationMsg && (
+        <MessageBox withIcon type="info" mb={4}>
+          {confirmationMsg}
+        </MessageBox>
       )}
       {!isArchived && (
         <Button
@@ -129,37 +156,6 @@ const ArchiveCollective = ({ collective }) => {
             values={{ type: collective.type }}
           />
         </Button>
-      )}
-      {!isArchived && hasBalance && (
-        <P color="rgb(224, 183, 0)" my={1}>
-          <FormattedMessage
-            id="collective.archive.availableBalance"
-            defaultMessage="Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
-            values={{ type: collective.type }}
-          />
-        </P>
-      )}
-      {!isArchived && collective.isHost && (
-        <P color="rgb(224, 183, 0)" my={1}>
-          {collective.type === CollectiveType.COLLECTIVE ? (
-            <FormattedMessage
-              id="collective.archive.selfHosted"
-              defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.archive.isHost"
-              defaultMessage="You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-              values={{ type: collective.type }}
-            />
-          )}
-        </P>
-      )}
-      {isArchived && confirmationMsg && (
-        <MessageBox withIcon type="info" mb={4}>
-          {confirmationMsg}
-        </MessageBox>
       )}
 
       {isArchived && (
@@ -241,7 +237,7 @@ const ArchiveCollective = ({ collective }) => {
           </ModalFooter>
         </StyledModal>
       )}
-    </Container>
+    </div>
   );
 };
 

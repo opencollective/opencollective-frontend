@@ -42,7 +42,7 @@ import {
 } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
-import { isValidEmail } from '../../lib/utils';
+import { getArrayValuesMemoizer, isValidEmail } from '../../lib/utils';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
@@ -297,6 +297,7 @@ const formSchemaQuery = gql`
       }
       payoutMethod {
         id
+        data
       }
       attachedFiles {
         id
@@ -627,6 +628,8 @@ type ExpenseFormOptions = {
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
 };
+
+const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 
 const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
@@ -1461,24 +1464,25 @@ async function buildFormOptions(
       // Grants are always in the account currency
       availableCurrencies.add(options.account?.currency);
     } else {
-      // For all other expenses, the currency must be either the account currency, the payout method currency, or the items currencies
-      if (options.account?.currency) {
-        availableCurrencies.add(options.account.currency);
-      }
-      if (options.payoutMethod?.data?.currency) {
-        availableCurrencies.add(options.payoutMethod.data.currency as Currency);
-      }
-      if (options.expense?.currency) {
-        availableCurrencies.add(options.expense.currency);
-      }
+      // For all other expenses one of the items currencies
       values.expenseItems?.forEach(item => {
         if (item.amount?.currency) {
           availableCurrencies.add(item.amount.currency as Currency);
         }
       });
+
+      // If we didn't get any currency from the items, default to the account + payout method currencies
+      if (availableCurrencies.size === 0) {
+        if (options.account?.currency) {
+          availableCurrencies.add(options.account.currency);
+        }
+        if (options.payoutMethod?.data?.currency) {
+          availableCurrencies.add(options.payoutMethod.data.currency);
+        }
+      }
     }
 
-    options.availableReferenceCurrencies = Array.from(availableCurrencies);
+    options.availableReferenceCurrencies = memoizeAvailableReferenceCurrencies(Array.from(availableCurrencies));
 
     if (options.availableReferenceCurrencies.length === 1) {
       options.expenseCurrency = options.availableReferenceCurrencies[0]; // If there's only one available currency, use it
@@ -1486,10 +1490,6 @@ async function buildFormOptions(
       options.expenseCurrency = values.referenceCurrency as Currency; // If the user provided a reference currency, use it
     } else if (options.expense?.currency) {
       options.expenseCurrency = options.expense.currency; // Use the expense currency if it's set
-    } else if (options.account?.currency) {
-      options.expenseCurrency = options.account.currency; // Use the account currency if it's set
-    } else if (options.payoutMethod?.data?.currency) {
-      options.expenseCurrency = options.payoutMethod.data.currency as Currency; // Use the payout method currency if it's set
     }
 
     options.isLongFormItemDescription = false;
@@ -2145,6 +2145,35 @@ export function useExpenseForm(opts: {
       setFieldValue('referenceCurrency', null);
     }
   }, [expenseForm.values.referenceCurrency, formOptions.availableReferenceCurrencies, setFieldValue]);
+
+  // Set item currency if we're done loading and there's a single available reference currency
+  React.useEffect(() => {
+    if (
+      formOptions.availableReferenceCurrencies &&
+      formOptions.availableReferenceCurrencies.length === 1 &&
+      expenseForm.values.expenseItems.length === 1 &&
+      !expenseForm.values.expenseItems[0].amount?.currency
+    ) {
+      setFieldValue('expenseItems.0.amount.currency', formOptions.availableReferenceCurrencies[0]);
+    }
+  }, [formOptions.availableReferenceCurrencies, setFieldValue, expenseForm.values.expenseItems]);
+
+  // If there's an existing expense, assume that reference currency = expense currency
+  React.useEffect(() => {
+    if (
+      formOptions.expense?.id &&
+      formOptions.expense.currency &&
+      !expenseForm.values.referenceCurrency &&
+      formOptions.availableReferenceCurrencies.length > 1
+    ) {
+      setFieldValue('referenceCurrency', formOptions.expense.currency);
+    }
+  }, [
+    formOptions.expense,
+    expenseForm.values.referenceCurrency,
+    formOptions.availableReferenceCurrencies,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {

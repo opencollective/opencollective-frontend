@@ -15,18 +15,19 @@ describe('event.create.test.js', () => {
   });
 
   it('create an event', () => {
-    cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
-    cy.get('.inputField.endsAt input').type('2050-01-20T13:00');
+    cy.get('input[name="name"]', { timeout: 20000 }).type(title);
+    cy.get('input[name="endsAt"]').type('2050-01-20T13:00');
+    cy.get('input[name="description"]').type('We are going to the Eiffel Tower');
     cy.get('.geosuggest__input').type('Eiffel Tower');
     cy.contains('.geosuggest__suggests > :nth-child(1)', 'Gustave').click();
-    cy.get('#location .address').contains('Gustave');
-    cy.get('#location .address').contains('Eiffel');
-    cy.get('#location .address').contains('75007');
-    cy.get('#location .address').contains('Paris');
-    cy.get('#location .address').contains('FR');
+    cy.get('#location [data-cy="location-address"]').contains('Gustave');
+    cy.get('#location [data-cy="location-address"]').contains('Eiffel');
+    cy.get('#location [data-cy="location-address"]').contains('75007');
+    cy.get('#location [data-cy="location-address"]').contains('Paris');
+    cy.get('#location [data-cy="location-address"]').contains('FR');
     cy.contains('button', 'Create Event').click();
     cy.getByDataCy('notification-bar').contains('Your Event has been created');
-    cy.get('#location .address').contains('Paris');
+    cy.get('#location .address').contains('Paris'); // The collective page is still using the legacy Location component
     cy.get('#location .address').contains('75007');
 
     // Go to "Edit Tickets"

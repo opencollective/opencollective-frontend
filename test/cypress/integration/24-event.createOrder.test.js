@@ -5,15 +5,16 @@ describe('event.createOrder page', () => {
 
   const createEvent = name => {
     cy.login({ redirect: `${collective.slug}/events/new` });
-    cy.get('.inputs input[name="name"]').type(name);
-    cy.get('.inputs .startsAt input[type="datetime-local"]')
+    cy.get('input[name="name"]').type(name);
+    cy.get('input[name="startsAt"]')
       .clear()
       .type(`${dayjs().format('YYYY-MM-DD')}T19:00`)
       .blur();
-    cy.get('.inputs .endsAt input[type="datetime-local"]')
+    cy.get('input[name="endsAt"]')
       .clear()
       .type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}T19:00`)
       .blur();
+    cy.get('input[name="description"]').type('We are going to the Eiffel Tower');
     cy.contains('button', 'Create Event').click();
   };
 
