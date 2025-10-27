@@ -1,25 +1,26 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
+import { pick } from 'lodash';
 import {
   ArrowRightLeft,
+  ChevronRight,
   Coins,
-  Heart,
   Megaphone,
   MessageCircle,
   Receipt,
-  Search,
   SearchIcon,
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
+import { i18nSearchEntity } from '@/lib/i18n/search';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +47,40 @@ import { searchCommandQuery } from './queries';
 import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { useRecentlyVisited } from './useRecentlyVisited';
-// TODO i18n
+
+const entityOptions = {
+  [SearchEntity.ACCOUNTS]: {
+    value: SearchEntity.ACCOUNTS,
+    icon: Users,
+    className: 'bg-blue-50 text-blue-700',
+  },
+  [SearchEntity.EXPENSES]: {
+    value: SearchEntity.EXPENSES,
+    icon: Receipt,
+    className: 'bg-green-50 text-green-700',
+  },
+  [SearchEntity.CONTRIBUTIONS]: {
+    value: SearchEntity.CONTRIBUTIONS,
+    icon: Coins,
+    className: 'bg-amber-50 text-amber-700',
+  },
+  [SearchEntity.TRANSACTIONS]: {
+    value: SearchEntity.TRANSACTIONS,
+    icon: ArrowRightLeft,
+    className: 'bg-purple-50 text-purple-700',
+  },
+  [SearchEntity.UPDATES]: {
+    value: SearchEntity.UPDATES,
+    icon: Megaphone,
+    className: 'bg-sky-50 text-sky-700',
+  },
+  [SearchEntity.COMMENTS]: {
+    value: SearchEntity.COMMENTS,
+    icon: MessageCircle,
+    className: 'bg-slate-100 text-slate-700',
+  },
+};
+
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -171,7 +205,12 @@ export const SearchCommand = ({ open, setOpen }) => {
     }
   }, [open, account?.slug]);
 
-  const { data, loading, fetchMore } = useQuery(searchCommandQuery, {
+  const {
+    data,
+    loading,
+    fetchMore,
+    variables: usedVariables,
+  } = useQuery(searchCommandQuery, {
     variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
@@ -189,6 +228,8 @@ export const SearchCommand = ({ open, setOpen }) => {
   useEffect(() => {
     if (debouncedInput?.length > 0) {
       queryFilter.setFilter('searchTerm', debouncedInput);
+    } else {
+      queryFilter.setFilter('searchTerm', undefined);
     }
   }, [debouncedInput]);
 
@@ -214,11 +255,13 @@ export const SearchCommand = ({ open, setOpen }) => {
   const { getLinkProps } = useGetLinkProps();
 
   const isLoading = loading || isDebouncing;
-  const hasData = !!data?.search?.results;
-  const isInitialLoading = isLoading && !hasData;
+  const hasSearchTerm = !!input;
+  const dataMatchesCurrentSearch = data?.search?.results && input === usedVariables.searchTerm;
+  const hasData = hasSearchTerm && dataMatchesCurrentSearch;
+  const isInitialLoading = isLoading && !hasData && hasSearchTerm;
+
   const flattenedMenuItems = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
-
     return menuItems
       .flatMap(menuItem =>
         'subMenu' in menuItem
@@ -232,63 +275,35 @@ export const SearchCommand = ({ open, setOpen }) => {
       .filter(item => item.section !== ALL_SECTIONS.SEARCH);
   }, [intl, account, LoggedInUser]);
 
-  const entityOptions = [
-    {
-      value: SearchEntity.ACCOUNTS,
-      label: 'Accounts',
-      helpText: "Find any account you've interacted with",
-      icon: Users,
-      className: 'bg-blue-50 text-blue-700',
-    },
-    {
-      value: SearchEntity.EXPENSES,
-      label: 'Expenses',
-      helpText: 'Find expenses submitted to your host, your own account, or that has been paid to you.',
-      icon: Receipt,
-      className: 'bg-green-50 text-green-700',
-    },
-    {
-      value: SearchEntity.CONTRIBUTIONS,
-      label: 'Contributions',
-      helpText: "Find any account you've interacted with",
-      icon: Coins,
-      className: 'bg-amber-50 text-amber-700',
-    },
-    {
-      value: SearchEntity.TRANSACTIONS,
-      label: 'Transactions',
-      helpText: "Find any account you've interacted with",
-      icon: ArrowRightLeft,
-      className: 'bg-purple-50 text-purple-700',
-    },
-    {
-      value: SearchEntity.UPDATES,
-      label: 'Updates',
-      helpText: "Find any account you've interacted with",
-      icon: Megaphone,
-      className: 'bg-sky-50 text-sky-700',
-    },
-    {
-      value: SearchEntity.COMMENTS,
-      label: 'Comments',
-      helpText: "Find any account you've interacted with",
-      icon: MessageCircle,
-      className: 'bg-slate-100 text-slate-700',
-    },
-  ];
+  const filteredEntityOptions = React.useMemo(() => {
+    if (queryFilter.values.workspace) {
+      return Object.values(
+        pick(entityOptions, [
+          SearchEntity.ACCOUNTS,
+          SearchEntity.EXPENSES,
+          SearchEntity.CONTRIBUTIONS,
+          SearchEntity.TRANSACTIONS,
+          SearchEntity.UPDATES,
+        ]),
+      );
+    }
+    return Object.values(pick(entityOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
+  }, [queryFilter.values.workspace]);
 
   const filteredGoToPages = React.useMemo(() => {
-    if (!queryFilter.values.workspace || !debouncedInput || queryFilter.values.entity !== SearchEntity.ALL) {
+    if (!queryFilter.values.workspace || !input || queryFilter.values.entity !== SearchEntity.ALL) {
       return [];
     }
 
-    return flattenedMenuItems.filter(menuItem =>
-      (menuItem.group ? `${menuItem.group} ${menuItem.label}` : menuItem.label)
-        .toString()
-        .toLowerCase()
-        .includes(debouncedInput.toLowerCase()),
-    );
-  }, [debouncedInput, flattenedMenuItems, queryFilter.values]);
+    return flattenedMenuItems
+      .filter(menuItem =>
+        (menuItem.group ? `${menuItem.group} ${menuItem.label}` : menuItem.label)
+          .toString()
+          .toLowerCase()
+          .includes(input.toLowerCase()),
+      )
+      .slice(0, 5);
+  }, [input, flattenedMenuItems, queryFilter.values]);
 
   const hasSearchResults = React.useMemo(() => {
     if (!data?.search?.results) {
@@ -305,7 +320,6 @@ export const SearchCommand = ({ open, setOpen }) => {
     );
   }, [data]);
 
-  console.log({ data, queryFilter });
   const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
 
   // Handle infinite scroll
@@ -398,7 +412,11 @@ export const SearchCommand = ({ open, setOpen }) => {
             onRemove={() => queryFilter.setFilter('workspace', undefined)}
           />
         )}
-        {queryFilter.values.entity !== SearchEntity.ALL && <span>{queryFilter.values.entity}</span>}
+        {queryFilter.values.entity !== SearchEntity.ALL && (
+          <span className="flex items-center gap-1 text-sm text-muted-foreground">
+            {i18nSearchEntity(intl, queryFilter.values.entity)} <ChevronRight size={10} className="!size-4" />
+          </span>
+        )}
         <CommandPrimitive.Input
           ref={inputRef}
           onValueChange={setInput}
@@ -436,26 +454,47 @@ export const SearchCommand = ({ open, setOpen }) => {
 
         {input.length === 0 && queryFilter.values.entity === SearchEntity.ALL && (
           <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
-            {entityOptions.map(opt => (
-              <SearchCommandItem
-                onSelect={() => {
-                  queryFilter.setFilter('entity', opt.value);
-                  // setInput('');
-                }}
-                actionLabel={`Search in ${opt.label.toLowerCase()}`}
-                // showAction
-              >
-                <div className="flex items-center gap-2">
-                  <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
-                    <opt.icon />
+            {filteredEntityOptions.map(opt => {
+              const entityLabel = i18nSearchEntity(intl, opt.value);
+              return (
+                <SearchCommandItem
+                  key={opt.value}
+                  onSelect={() => {
+                    queryFilter.setFilter('entity', opt.value);
+                    // setInput('');
+                  }}
+                  value={opt.value}
+                  actionLabel={`Search in ${opt.value.toLowerCase()}`}
+                  // showAction
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
+                      <opt.icon />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-foreground group-hover:text-foreground">
+                        {entityLabel}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {queryFilter.values.workspace ? (
+                          <FormattedMessage
+                            defaultMessage="Find {entities} in your workspace."
+                            id="SnHGJH"
+                            values={{ entities: entityLabel }}
+                          />
+                        ) : (
+                          <FormattedMessage
+                            defaultMessage="Find any {entities} on the platform."
+                            id="HplALu"
+                            values={{ entities: entityLabel }}
+                          />
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-foreground group-hover:text-foreground">{opt.label}</span>
-                    <span className="text-xs text-muted-foreground">{opt.helpText}</span>
-                  </div>
-                </div>
-              </SearchCommandItem>
-            ))}
+                </SearchCommandItem>
+              );
+            })}
             <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
@@ -510,7 +549,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           </React.Fragment>
         )}
 
-        {recentlyVisited.length > 0 && input === '' && (
+        {recentlyVisited.length > 0 && input === '' && queryFilter.values.entity === SearchEntity.ALL && (
           <CommandGroup heading="Recent">
             {recentlyVisited.map(recentVisit => {
               const { href, onClick } = getLinkProps(recentVisit);
@@ -571,7 +610,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             ))}
           </CommandGroup>
         )}
-        {(isLoading || hasData) && (
+        {hasData && (
           <React.Fragment>
             <SearchCommandGroup
               label="Accounts"
@@ -686,32 +725,52 @@ export const SearchCommand = ({ open, setOpen }) => {
   );
 };
 
-function SearchCommandItem({ onSelect, actionLabel = 'Jump to', children, showAction = false, className = undefined }) {
-  return (
-    <CommandItem
-      onSelect={onSelect}
-      className={cn(
-        'justify-between gap-2',
-        '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
-        '[&[data-selected=true]_.action]:text-foreground',
-        showAction ? '' : '[&[data-selected=false]_.action]:hidden',
-        className,
-      )}
-    >
-      {children}
-      <div
-        className={cn(
-          'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
-          showAction ? '' : 'absolute right-2',
-        )}
-      >
-        {actionLabel}
-      </div>
-    </CommandItem>
-  );
+interface SearchCommandItemProps {
+  onSelect?: () => void;
+  actionLabel?: string;
+  children: React.ReactNode;
+  showAction?: boolean;
+  className?: string;
+  value?: string;
+  [key: string]: any;
 }
 
-function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
+const SearchCommandItem = React.memo<SearchCommandItemProps>(
+  ({ onSelect, actionLabel = 'Jump to', children, showAction = false, className = undefined, ...props }) => {
+    return (
+      <CommandItem
+        onSelect={onSelect}
+        className={cn(
+          'justify-between gap-2',
+          '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
+          '[&[data-selected=true]_.action]:text-foreground',
+          showAction ? '' : '[&[data-selected=false]_.action]:hidden',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <div
+          className={cn(
+            'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
+            showAction ? '' : 'absolute right-2',
+          )}
+        >
+          {actionLabel}
+        </div>
+      </CommandItem>
+    );
+  },
+);
+
+interface SeeMoreItemsCommandItemProps {
+  onSelect: () => void;
+  totalCount: number;
+  limit: number;
+  label: string;
+}
+
+const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSelect, totalCount, limit, label }) => {
   if (totalCount > limit) {
     return (
       <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
@@ -724,74 +783,88 @@ function SeeMoreItemsCommandItem({ onSelect, totalCount, limit, label }) {
       </SearchCommandItem>
     );
   }
+  return null;
+});
+
+interface SearchCommandGroupProps {
+  totalCount?: number;
+  label: string;
+  nodes?: any[];
+  renderNode: (node: any) => React.ReactNode;
+  input: string;
+  queryFilter: any;
+  entity: SearchEntity;
+  setOpen: (open: boolean) => void;
+  type: string;
+  isInfiniteScrollEnabled?: boolean;
 }
 
-function SearchCommandGroup({
-  totalCount,
-  label,
-  nodes,
-  renderNode,
-  input,
-  queryFilter,
-  entity,
-  setOpen,
-  type,
-  isInfiniteScrollEnabled = false,
-}) {
-  const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-  const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
+const SearchCommandGroup = React.memo<SearchCommandGroupProps>(
+  ({
+    totalCount,
+    label,
+    nodes,
+    renderNode,
+    input,
+    queryFilter,
+    entity,
+    setOpen,
+    type,
+    isInfiniteScrollEnabled = false,
+  }) => {
+    const { LoggedInUser } = useLoggedInUser();
+    const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
 
-  const { workspace } = useWorkspace();
-  const router = useRouter();
-  const { getLinkProps } = useGetLinkProps();
+    const { workspace } = useWorkspace();
+    const router = useRouter();
+    const { getLinkProps } = useGetLinkProps();
 
-  if (!totalCount || input === '') {
-    return null;
-  }
+    if (!totalCount || input === '') {
+      return null;
+    }
 
-  const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
-
-  return (
-    <CommandGroup heading={label} className="[&:last-child_.separator]:hidden">
-      {nodes.map(node => {
-        const { href, onClick } = getLinkProps({ type, data: node });
-        return (
-          <SearchCommandItem
-            key={node.id}
+    const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
+    return (
+      <CommandGroup heading={label} className="[&:last-child_.separator]:hidden">
+        {nodes?.map(node => {
+          const { href, onClick } = getLinkProps({ type, data: node });
+          return (
+            <SearchCommandItem
+              key={node.id}
+              onSelect={() => {
+                router.push(href);
+                setOpen(false);
+                onClick?.();
+              }}
+            >
+              <Link href={href} className="block w-full">
+                {renderNode(node)}
+              </Link>
+            </SearchCommandItem>
+          );
+        })}
+        {showSeeMore && (
+          <SeeMoreItemsCommandItem
             onSelect={() => {
-              router.push(href);
-              setOpen(false);
-              onClick?.();
-            }}
-          >
-            <Link href={href} className="block w-full">
-              {renderNode(node)}
-            </Link>
-          </SearchCommandItem>
-        );
-      })}
-      {showSeeMore && (
-        <SeeMoreItemsCommandItem
-          onSelect={() => {
-            if (isUsingSearchResultsPage) {
-              queryFilter.resetFilters(
-                { ...queryFilter.values, entity },
+              if (isUsingSearchResultsPage) {
+                queryFilter.resetFilters(
+                  { ...queryFilter.values, entity },
 
-                queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
-              );
-              setOpen(false);
-            } else {
-              queryFilter.setFilter('entity', entity);
-            }
-          }}
-          key={`more-${entity}`}
-          totalCount={totalCount}
-          limit={queryFilter.values.limit}
-          label={label}
-        />
-      )}
-      <hr className="separator -mx-2 my-2 h-px bg-border" />
-    </CommandGroup>
-  );
-}
+                  queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
+                );
+                setOpen(false);
+              } else {
+                queryFilter.setFilter('entity', entity);
+              }
+            }}
+            key={`more-${entity}`}
+            totalCount={totalCount}
+            limit={queryFilter.variables.limit}
+            label={label}
+          />
+        )}
+        <hr className="separator -mx-2 my-2 h-px bg-border" />
+      </CommandGroup>
+    );
+  },
+);
