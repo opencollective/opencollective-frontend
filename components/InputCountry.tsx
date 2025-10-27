@@ -40,6 +40,7 @@ const InputCountry = (props: InputCountryProps) => {
       return {
         value: code,
         label: generateCountryLabel(code),
+        country: countryNames.of(code),
         keywords: [code, countryNames.of(code)],
       };
     });
