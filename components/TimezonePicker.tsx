@@ -22,6 +22,9 @@ export function TimezonePicker(props: TimezonePickerProps) {
       })),
     [],
   );
+
+  const noOptions = React.useMemo(() => <FormattedMessage defaultMessage="No timezone found." id="GTBZLL" />, []);
+
   return (
     <ComboSelect
       data-cy={props['data-cy']}
@@ -34,7 +37,7 @@ export function TimezonePicker(props: TimezonePickerProps) {
       disabled={props.disabled}
       onChange={props.onChange}
       isSearchable
-      noOptions={<FormattedMessage defaultMessage="No timezone found." id="GTBZLL" />}
+      noOptions={noOptions}
       options={timezoneOptions}
     />
   );
