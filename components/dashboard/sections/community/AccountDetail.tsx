@@ -76,7 +76,6 @@ const associatedCollectiveColumns = intl => [
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     cell: ({ row }) => {
       const { account } = row.original;
-      const legalName = account.legalName !== account.name && account.legalName;
       return (
         <div className="flex items-center text-nowrap">
           {account.isFrozen && (
@@ -87,7 +86,6 @@ const associatedCollectiveColumns = intl => [
           <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
             <Avatar size={24} collective={account} mr={2} />
             {account.name}
-            {legalName && <span className="ml-1 text-muted-foreground">{`(${legalName})`}</span>}
           </LinkCollective>
         </div>
       );
@@ -378,6 +376,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const contributionCount = contributionsData?.account?.orders.totalCount || 0;
   const activities = activitiesData?.account?.communityStats?.activities.nodes || [];
   const activitiesCount = activitiesData?.account?.communityStats?.activities.totalCount || 0;
+  const legalName = account?.legalName !== account?.name && account?.legalName;
 
   const tabs = React.useMemo(
     () => [
@@ -422,6 +421,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               <React.Fragment>
                 <Avatar collective={account} size={36} />
                 {account.name}
+                {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
                 <div className="flex flex-wrap gap-1 align-middle">
                   {relations.map(role => (
                     <div
@@ -567,7 +567,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   </div>
                 ) : (
                   activities.map(activity => (
-                  <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
+                    <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
                   ))
                 )}
               </div>
