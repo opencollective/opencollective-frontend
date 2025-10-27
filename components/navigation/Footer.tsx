@@ -143,9 +143,7 @@ const Footer = ({ className }: { className?: string }) => {
 
       <div className="bg-muted">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
-          <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Open Finance Technologies Inc. All rights reserved.
-          </p>
+          <p className="text-sm text-muted-foreground">&nbsp;</p>
           <SocialLinks className="gap-2" iconSize={18} />
         </div>
       </div>
