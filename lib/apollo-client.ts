@@ -277,6 +277,7 @@ function createInMemoryCache() {
               }
               return {
                 ...incoming,
+                highlights: { ...existing.highlights, ...incoming.highlights },
                 collection: {
                   ...incoming.collection,
                   nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -292,6 +293,7 @@ function createInMemoryCache() {
               }
               return {
                 ...incoming,
+                highlights: { ...existing.highlights, ...incoming.highlights },
                 collection: {
                   ...incoming.collection,
                   nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -307,6 +309,7 @@ function createInMemoryCache() {
               }
               return {
                 ...incoming,
+                highlights: { ...existing.highlights, ...incoming.highlights },
                 collection: {
                   ...incoming.collection,
                   nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -322,6 +325,7 @@ function createInMemoryCache() {
               }
               return {
                 ...incoming,
+                highlights: { ...existing.highlights, ...incoming.highlights },
                 collection: {
                   ...incoming.collection,
                   nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -337,6 +341,7 @@ function createInMemoryCache() {
               }
               return {
                 ...incoming,
+                highlights: { ...existing.highlights, ...incoming.highlights },
                 collection: {
                   ...incoming.collection,
                   nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
@@ -352,6 +357,7 @@ function createInMemoryCache() {
               }
               return {
                 ...incoming,
+                highlights: { ...existing.highlights, ...incoming.highlights },
                 collection: {
                   ...incoming.collection,
                   nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
