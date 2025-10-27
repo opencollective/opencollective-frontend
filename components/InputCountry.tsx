@@ -46,6 +46,14 @@ const InputCountry = (props: InputCountryProps) => {
     return orderBy(options, 'country');
   }, [countryNames, generateCountryLabel]);
 
+  const { onChange: onChangeCallback } = props;
+  const onChange = React.useCallback(
+    value => {
+      onChangeCallback(value);
+    },
+    [onChangeCallback],
+  );
+
   return (
     <ComboSelect
       inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search countries...', id: '37zpJw' })}
@@ -55,7 +63,7 @@ const InputCountry = (props: InputCountryProps) => {
       })}
       value={props.value}
       disabled={props.disabled}
-      onChange={value => props.onChange(value)}
+      onChange={onChange}
       isSearchable
       options={options}
     />

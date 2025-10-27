@@ -10,7 +10,6 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Currency as CurrencyOptions } from '@/lib/constants/currency';
-import timezones from '@/lib/constants/timezones';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
 import { loadGoogleMaps } from '@/lib/google-maps';
@@ -20,7 +19,6 @@ import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from '@/components/collective-page/graphql/queries';
-import { ComboSelect } from '@/components/ComboSelect';
 import CurrencyPicker from '@/components/CurrencyPicker';
 import EditTags from '@/components/EditTags';
 import { FormField } from '@/components/FormField';
@@ -28,6 +26,7 @@ import { FormikZod } from '@/components/FormikZod';
 import { I18nSupportLink } from '@/components/I18nFormatters';
 import { useModal } from '@/components/ModalContext';
 import RichTextEditor from '@/components/RichTextEditor';
+import { TimezonePicker } from '@/components/TimezonePicker';
 import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
@@ -221,15 +220,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
           },
     [account],
-  );
-
-  const timezoneOptions = useMemo(
-    () =>
-      timezones.map(tz => ({
-        label: tz.replace('_', ' '),
-        value: tz,
-      })),
-    [],
   );
 
   const onSubmit = async (values: FormValuesSchema) => {
@@ -438,17 +428,11 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   }
                 >
                   {({ field }) => (
-                    <ComboSelect
-                      inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search timezones...', id: 'VzPJtr' })}
-                      placeholder={intl.formatMessage({
-                        defaultMessage: 'Select timezone',
-                        id: 'collective.timezone.placeholder',
-                      })}
+                    <TimezonePicker
+                      data-cy="organization-timezone-trigger"
                       value={field.value}
                       disabled={field.disabled}
                       onChange={value => setFieldValue(field.name, value)}
-                      isSearchable
-                      options={timezoneOptions}
                     />
                   )}
                 </FormField>
@@ -520,9 +504,11 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               >
                 {({ field }) => (
                   <CurrencyPicker
+                    data-cy="organization-currency-trigger"
                     disabled={field.disabled}
                     availableCurrencies={CurrencyOptions}
                     value={field.value}
+                    // deepscan-disable-next-line
                     onChange={value => {
                       setFieldValue(field.name, value as Currency);
                     }}
