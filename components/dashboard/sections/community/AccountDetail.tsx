@@ -561,9 +561,15 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </InfoTooltipIcon>
               </h1>
               <div className="group flex flex-col gap-1 space-y-3 divide-y rounded-xl border p-4">
-                {activities.map(activity => (
+                {activities.length === 0 ? (
+                  <div className="text-center text-sm text-muted-foreground">
+                    <FormattedMessage defaultMessage="No recent activities" id="NoRecentActivities" />
+                  </div>
+                ) : (
+                  activities.map(activity => (
                   <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
-                ))}
+                  ))
+                )}
               </div>
               <Pagination
                 queryFilter={activityPagination}
