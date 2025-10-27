@@ -244,7 +244,7 @@ export default function Pricing({ data }) {
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground">
             <FormattedMessage
-              defaultMessage="An Organization is a legal entity (such as a company, non-profit, cooperative, or similar) that uses the platform to manage its own finances or to act as a Host for Collectives. The pricing below applies to Organizations, Collectives are not subject to this pricing structure."
+              defaultMessage="An Organization is a legal entity (such as a company, non-profit, cooperative, or similar) that uses the platform to manage its own finances or to act as a Host for Collectives. The pricing below applies to Organizations. Collectives are not subject to this pricing structure."
               id="Pricing-OrgDefinition"
             />
           </p>
@@ -278,7 +278,7 @@ export default function Pricing({ data }) {
             <div className="p-6">
               <h3 className="mb-2 text-xl font-medium text-foreground">
                 <FormattedMessage
-                  defaultMessage="Who manages the platform and how is pricing set?"
+                  defaultMessage="Who manages the platform and how is the pricing set?"
                   id="pricing.new.faq.governance.question"
                 />
               </h3>
