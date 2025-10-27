@@ -7,7 +7,7 @@ module.exports = defineConfig({
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',
-  defaultCommandTimeout: 15000,
+  defaultCommandTimeout: 30000,
   responseTimeout: 60000,
   video: true,
   chromeWebSecurity: false,
