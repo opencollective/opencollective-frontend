@@ -244,7 +244,7 @@ export default function Pricing({ data }) {
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground">
             <FormattedMessage
-              defaultMessage="An Organization is a legal entity (such as a company, non-profit, cooperative, or similar) that uses the platform to manage its own finances or to act as a Host for Collectives. The pricing below applies to Organizations. Collectives are subject to a separate pricing structure, which is essentially free."
+              defaultMessage="An Organization is a legal entity (such as a company, non-profit, cooperative, or similar) that uses the platform to manage its own finances or to act as a Host for Collectives. The pricing below applies to Organizations, Collectives are not subject to this pricing structure."
               id="Pricing-OrgDefinition"
             />
           </p>
@@ -284,7 +284,7 @@ export default function Pricing({ data }) {
               </h3>
               <p className="text-muted-foreground">
                 <FormattedMessage
-                  defaultMessage="The platform is owned and managed by OFi Technologies (OFiTech) which is a 100% subsidiary of {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
+                  defaultMessage="Since October 2024, the platform is managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
                   id="8/YzW7"
                   values={{
                     oficoLink: (
