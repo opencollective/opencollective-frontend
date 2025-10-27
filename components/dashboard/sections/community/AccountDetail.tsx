@@ -505,7 +505,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               aria-hidden={selectedTab !== AccountDetailView.DETAILS}
             >
               <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {account?.location && (
+                {(account?.location?.address || account?.location?.country) && (
                   <SummaryCard
                     title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
                     isLoading={isLoading}
