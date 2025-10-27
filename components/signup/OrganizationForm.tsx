@@ -507,7 +507,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                   hint={
                     <FormattedMessage defaultMessage="Official name as registered with legal authorities" id="jQOxmT" />
                   }
-                  placeholder="e.g. Open Collective Inc., Open Finance Consortium Inc."
+                  placeholder="e.g. Green Horizon Foundation, Inc."
                 />
                 <FormField
                   name="organization.name"
@@ -518,7 +518,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                       id="publicName.hint"
                     />
                   }
-                  placeholder="e.g. Open Collective, OFiCo"
+                  placeholder="e.g. Green Horizon"
                   onChange={e => {
                     setFieldValue('organization.name', e.target.value);
                     if (!touched.organization?.slug) {
