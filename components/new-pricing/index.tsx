@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { HandCoinsIcon, MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
+import { HandCoinsIcon, Info, MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -15,6 +15,7 @@ import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 export const pricingPageQuery = gql`
   query PlatformSubscriptionTiers {
@@ -71,10 +72,21 @@ function TierPricePlansDisplay({ tier, packages }) {
             <HandCoinsIcon size={24} className="text-slate-800" />
             <div className="space-y-1">
               <p className="font-medium text-slate-900">
-                <FormattedMessage defaultMessage="Crowdfunded contributions" id="Pricing-Crowdfunding" />
+                <FormattedMessage defaultMessage="Crowdfunding contributions" id="Pricing-Crowdfunding" />
               </p>
-              <p className="text-xs text-slate-600">
+              <p className="flex items-center gap-1 text-xs text-slate-600">
                 <FormattedMessage defaultMessage="Free with Platform Tips activated" id="Pricing-Crowdfunding-Price" />
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info size={14} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <FormattedMessage
+                      defaultMessage="or alternatively: 5% Platform Fee"
+                      id="Pricing-Crowdfunding-Alternative"
+                    />
+                  </TooltipContent>
+                </Tooltip>
               </p>
             </div>
           </div>
