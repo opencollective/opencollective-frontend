@@ -41,6 +41,7 @@ export const generateSetupGuideSteps = ({
   LoggedInUser: LoggedInUser;
 }): Category[] => {
   const planFeatures = 'platformSubscription' in account && account.platformSubscription?.plan?.features;
+  const isHost = account.isHost && account.settings?.canHostAccounts !== false;
   return [
     {
       id: 'verification',
@@ -172,7 +173,7 @@ export const generateSetupGuideSteps = ({
             />
           ),
           id: 'enable-hosting',
-          completed: account.isHost && account.settings?.canHostAccounts !== false,
+          completed: isHost,
           action: {
             label: <FormattedMessage defaultMessage="Enable hosting" id="SetupGuide.EnableHosting" />,
             onClick: () => {
@@ -202,7 +203,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'security')),
           },
         },
-        {
+        isHost && {
           title: (
             <FormattedMessage
               defaultMessage="Extend chart of accounts to managed funds"
@@ -265,7 +266,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
           },
         },
-        (!account.isHost || account.settings?.canHostAccounts !== false) && {
+        isHost && {
           title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
           description: (
             <FormattedMessage
@@ -282,7 +283,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
           },
         },
-        (!account.isHost || account.settings?.canHostAccounts !== false) && {
+        isHost && {
           title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
           description: (
             <FormattedMessage
