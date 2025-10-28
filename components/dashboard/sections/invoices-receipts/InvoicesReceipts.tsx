@@ -7,18 +7,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { editCollectiveSettingsMutation } from '../../../../lib/graphql/v1/mutations';
+import type { Account } from '@/lib/graphql/types/v2/schema';
 
-import Container from '../../../Container';
 import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';
-import { Box, Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
-import StyledInputField from '../../../StyledInputField';
-import StyledSelect from '../../../StyledSelect';
-import { H2, Span } from '../../../Text';
 import { Button } from '../../../ui/Button';
+import { Label } from '../../../ui/Label';
+import { DefaultSelect } from '../../../ui/Select';
 import { useToast } from '../../../ui/useToast';
 
-import { useReceipt } from './hooks/useReceipt';
+import { ReceiptTemplate, useReceipt } from './hooks/useReceipt';
 import ReceiptTemplateForm from './ReceiptTemplateForm';
 
 const BILL_TO_OPTIONS = [
@@ -33,15 +31,15 @@ const BILL_TO_OPTIONS = [
     ),
   },
   { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
-];
+] as const;
 
-const InvoicesReceipts = ({ account }) => {
+const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'settings'> }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const defaultReceipt = useReceipt({ template: 'default', settings: account.settings });
-  const alternativeReceipt = useReceipt({ template: 'alternative', settings: account.settings });
+  const defaultReceipt = useReceipt({ template: ReceiptTemplate.Default, settings: account.settings });
+  const alternativeReceipt = useReceipt({ template: ReceiptTemplate.Alternative, settings: account.settings });
   const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
-  const [showAlternativeReceiptsSection, setShowAlternativeReceiptsSection] = React.useState(
+  const [hasAlternativeReceipt, setHasAlternativeReceipt] = React.useState(
     alternativeReceipt.values.title !== undefined,
   );
   const [isFieldChanged, setIsFieldChanged] = React.useState(false);
@@ -53,20 +51,20 @@ const InvoicesReceipts = ({ account }) => {
     get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeReceipt.values.info;
 
   // For Bill To
-  const getBillToOption = value => BILL_TO_OPTIONS.find(option => option.value === value) || BILL_TO_OPTIONS[0];
-  const getInExpenseTemplate = (account, field) => get(account, `settings.invoice.expenseTemplates.default.${field}`);
-  const [billTo, setBillTo] = React.useState(getInExpenseTemplate(account, 'billTo'));
+  const getInExpenseTemplate = (account, field: string) =>
+    get(account, `settings.invoice.expenseTemplates.default.${field}`);
+  const [billTo, setBillTo] = React.useState<string | undefined>(getInExpenseTemplate(account, 'billTo'));
   const billToIsSaved = getInExpenseTemplate(account, 'billTo') === billTo;
 
   const deleteAlternativeReceipt = () => {
     alternativeReceipt.changeValues({ title: undefined, info: undefined });
-    setShowAlternativeReceiptsSection(false);
+    setHasAlternativeReceipt(false);
     setIsFieldChanged(true);
   };
 
   const getInvoiceTemplatesObj = () => {
     const expenseTemplates = { default: { billTo } };
-    const templates = {};
+    const templates: Record<string, { title?: string; info?: string }> = {};
 
     templates.default = { title: defaultReceipt.values.title, info: defaultReceipt.values.info };
 
@@ -83,41 +81,43 @@ const InvoicesReceipts = ({ account }) => {
     setIsFieldChanged(true);
   };
 
-  const onChange = (value, stateFunction) => {
+  const onChange = (value: string, stateFunction: (value: string) => void) => {
     stateFunction(value);
     setIsFieldChanged(true);
   };
 
   return (
-    <Container>
-      <H2 mb={3} fontSize="24px" lineHeight="32px" fontWeight="700">
+    <div className="w-full">
+      <h2 className="mb-3 text-2xl leading-8 font-bold">
         <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
-      </H2>
-      <Box mb={4}>
+      </h2>
+      <div className="mb-6">
         <SettingsSectionTitle>
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </SettingsSectionTitle>
 
-        <StyledInputField
-          name="expense-bill-to-select"
-          labelProps={{ fontSize: '16px', fontWeight: '700', lineHeight: '24px', color: 'black.800' }}
-          label={intl.formatMessage({ defaultMessage: 'Bill To', id: 'izhuHE' })}
-          hint={intl.formatMessage({
-            defaultMessage:
-              'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
-            id: 'yMFA0e',
-          })}
-        >
-          {({ id }) => (
-            <StyledSelect
-              inputId={id}
-              options={BILL_TO_OPTIONS}
-              value={getBillToOption(billTo)}
-              onChange={({ value }) => onChange(value, setBillTo)}
+        <div className="mt-4">
+          <Label htmlFor="expense-bill-to-select" className="text-black-800 text-base leading-6 font-bold">
+            {intl.formatMessage({ defaultMessage: 'Bill To', id: 'izhuHE' })}
+          </Label>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {intl.formatMessage({
+              defaultMessage:
+                'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
+              id: 'yMFA0e',
+            })}
+          </p>
+          <div className="mt-2">
+            <DefaultSelect
+              name="expense-bill-to-select"
+              placeholder={intl.formatMessage({ defaultMessage: 'Select...', id: 'Select.Placeholder' })}
+              value={billTo || ''}
+              setValue={value => onChange(value, setBillTo)}
+              options={BILL_TO_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
             />
-          )}
-        </StyledInputField>
-      </Box>
+          </div>
+        </div>
+      </div>
       <SettingsSectionTitle>
         <FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
@@ -130,14 +130,21 @@ const InvoicesReceipts = ({ account }) => {
         &nbsp;<i>{defaultReceipt.placeholders.title}</i>.
       </p>
       {error && (
-        <MessageBox type="error" fontSize="14px" withIcon mb={3}>
+        <MessageBox type="error" fontSize="14px" withIcon className="mb-3">
           {i18nGraphqlException(intl, error)}
         </MessageBox>
       )}
       <div className="flex flex-col">
         <ReceiptTemplateForm receipt={defaultReceipt} onChange={onChangeField} />
-        <div>
-          <SettingsSectionTitle>
+        <div className="mt-8">
+          <SettingsSectionTitle
+            actions={
+              <Button onClick={() => deleteAlternativeReceipt()} variant="outlineDestructive" size="xs" className="">
+                <Trash size={17} />
+                <FormattedMessage defaultMessage="Delete alternative receipt" id="aXAB2R" />
+              </Button>
+            }
+          >
             <FormattedMessage defaultMessage="Alternative receipt template" id="CJtvlX" />
           </SettingsSectionTitle>
           <p className="text-sm">
@@ -147,33 +154,24 @@ const InvoicesReceipts = ({ account }) => {
             />
           </p>
         </div>
-        <div className="mt-5 mb-10">
-          {!showAlternativeReceiptsSection && (
-            <Button size="sm" onClick={() => setShowAlternativeReceiptsSection(true)}>
+        <div className="my-5">
+          {!hasAlternativeReceipt ? (
+            <Button size="sm" onClick={() => setHasAlternativeReceipt(true)}>
               <Plus size={16} />
               <FormattedMessage defaultMessage="Add alternative receipt" id="7It+w9" />
             </Button>
-          )}
-          {showAlternativeReceiptsSection && (
-            <React.Fragment>
-              <Flex flexWrap="wrap" flexDirection="column" width="100%">
-                <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
-              </Flex>
-              <Button onClick={() => deleteAlternativeReceipt()} variant="outlineDestructive" size="sm" className="">
-                <Trash size={17} />
-                <FormattedMessage defaultMessage="Delete alternative receipt" id="aXAB2R" />
-              </Button>
-            </React.Fragment>
+          ) : (
+            <div className="flex w-full flex-col flex-wrap">
+              <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
+            </div>
           )}
         </div>
-        {showAlternativeReceiptsSection && (
-          <MessageBox type="info" mb={2}>
-            <Span fontSize="13px" fontWeight={400} lineHeight="20px">
-              <FormattedMessage
-                defaultMessage="Please advise your Collectives to select the correct receipt setting for any tiers where the alternative receipt should be used, or manage related contributions through the Add Funds process, where you as the Host Admin can select the correct receipt."
-                id="nYrU4E"
-              />
-            </Span>
+        {hasAlternativeReceipt && (
+          <MessageBox type="info" className="mb-6">
+            <FormattedMessage
+              defaultMessage="Please advise your Collectives to select the correct receipt setting for any tiers where the alternative receipt should be used, or manage related contributions through the Add Funds process, where you as the Host Admin can select the correct receipt."
+              id="nYrU4E"
+            />
           </MessageBox>
         )}
         <Button
@@ -203,7 +201,7 @@ const InvoicesReceipts = ({ account }) => {
           )}
         </Button>
       </div>
-    </Container>
+    </div>
   );
 };
 

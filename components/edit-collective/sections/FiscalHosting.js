@@ -281,7 +281,7 @@ const FiscalHosting = ({ collective }) => {
 
         {isHostAccount && collective.type === 'ORGANIZATION' && !isBudgetActive && (
           <Fragment>
-            <SettingsSectionTitle mt={4}>
+            <SettingsSectionTitle className="mt-4">
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
             </SettingsSectionTitle>
             <p className="text-sm">
