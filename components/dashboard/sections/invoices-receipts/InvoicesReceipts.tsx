@@ -3,6 +3,7 @@ import { useMutation } from '@apollo/client';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { get } from 'lodash';
+import { Eye } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -17,6 +18,7 @@ import { DefaultSelect } from '../../../ui/Select';
 import { useToast } from '../../../ui/useToast';
 
 import { ReceiptTemplate, useReceipt } from './hooks/useReceipt';
+import ReceiptPreviewDialog from './ReceiptPreviewDialog';
 import ReceiptTemplateForm from './ReceiptTemplateForm';
 
 const BILL_TO_OPTIONS = [
@@ -43,12 +45,19 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
     alternativeReceipt.values.title !== undefined,
   );
   const [isFieldChanged, setIsFieldChanged] = React.useState(false);
+  const [previewDialogOpen, setPreviewDialogOpen] = React.useState(false);
+  const [previewTemplate, setPreviewTemplate] = React.useState<ReceiptTemplate>(ReceiptTemplate.Default);
   const isSaved =
     get(data, 'editCollective.settings.invoice.templates.default.title') === defaultReceipt.values.title &&
     get(data, 'editCollective.settings.invoice.templates.alternative.title') === alternativeReceipt.values.title;
   const infoIsSaved =
     get(data, 'editCollective.settings.invoice.templates.default.info') === defaultReceipt.values.info &&
     get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeReceipt.values.info;
+  const embeddedImageIsSaved =
+    get(data, 'editCollective.settings.invoice.templates.default.embeddedImage') ===
+      defaultReceipt.values.embeddedImage &&
+    get(data, 'editCollective.settings.invoice.templates.alternative.embeddedImage') ===
+      alternativeReceipt.values.embeddedImage;
 
   // For Bill To
   const getInExpenseTemplate = (account, field: string) =>
@@ -64,14 +73,26 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
 
   const getInvoiceTemplatesObj = () => {
     const expenseTemplates = { default: { billTo } };
-    const templates: Record<string, { title?: string; info?: string }> = {};
+    const templates: Record<string, { title?: string; info?: string; embeddedImage?: string }> = {};
 
-    templates.default = { title: defaultReceipt.values.title, info: defaultReceipt.values.info };
+    templates.default = {
+      title: defaultReceipt.values.title,
+      info: defaultReceipt.values.info,
+      embeddedImage: defaultReceipt.values.embeddedImage,
+    };
 
-    const { title: alternativeTitle, info: alternativeInfo } = alternativeReceipt.values;
+    const {
+      title: alternativeTitle,
+      info: alternativeInfo,
+      embeddedImage: alternativeEmbeddedImage,
+    } = alternativeReceipt.values;
 
-    if (alternativeTitle || alternativeInfo) {
-      templates.alternative = { title: alternativeTitle, info: alternativeInfo };
+    if (alternativeTitle || alternativeInfo || alternativeEmbeddedImage) {
+      templates.alternative = {
+        title: alternativeTitle,
+        info: alternativeInfo,
+        embeddedImage: alternativeEmbeddedImage,
+      };
     }
 
     return { templates, expenseTemplates };
@@ -84,6 +105,15 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
   const onChange = (value: string, stateFunction: (value: string) => void) => {
     stateFunction(value);
     setIsFieldChanged(true);
+  };
+
+  const handlePreviewClick = (template: ReceiptTemplate) => {
+    setPreviewTemplate(template);
+    setPreviewDialogOpen(true);
+  };
+
+  const getCurrentReceiptValues = () => {
+    return previewTemplate === ReceiptTemplate.Default ? defaultReceipt : alternativeReceipt;
   };
 
   return (
@@ -110,7 +140,7 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
           <div className="mt-2">
             <DefaultSelect
               name="expense-bill-to-select"
-              placeholder={intl.formatMessage({ defaultMessage: 'Select...', id: 'Select.Placeholder' })}
+              placeholder={intl.formatMessage({ defaultMessage: 'No selection', id: 'Select.Placeholder' })}
               value={billTo || ''}
               setValue={value => onChange(value, setBillTo)}
               options={BILL_TO_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
@@ -118,7 +148,14 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
           </div>
         </div>
       </div>
-      <SettingsSectionTitle>
+      <SettingsSectionTitle
+        actions={
+          <Button onClick={() => handlePreviewClick(ReceiptTemplate.Default)} variant="outline" size="xs" className="">
+            <Eye size={17} />
+            <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
+          </Button>
+        }
+      >
         <FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
       <p className="mb-6 text-sm">
@@ -139,10 +176,33 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
         <div className="mt-8">
           <SettingsSectionTitle
             actions={
-              <Button onClick={() => deleteAlternativeReceipt()} variant="outlineDestructive" size="xs" className="">
-                <Trash size={17} />
-                <FormattedMessage defaultMessage="Delete alternative receipt" id="aXAB2R" />
-              </Button>
+              !hasAlternativeReceipt ? (
+                <Button size="xs" variant="outline" onClick={() => setHasAlternativeReceipt(true)}>
+                  <Plus size={16} />
+                  <FormattedMessage defaultMessage="Add alternative receipt" id="7It+w9" />
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => deleteAlternativeReceipt()}
+                    variant="outlineDestructive"
+                    size="xs"
+                    className=""
+                  >
+                    <Trash size={17} />
+                    <FormattedMessage defaultMessage="Delete alternative receipt" id="aXAB2R" />
+                  </Button>
+                  <Button
+                    onClick={() => handlePreviewClick(ReceiptTemplate.Alternative)}
+                    variant="outline"
+                    size="xs"
+                    className=""
+                  >
+                    <Eye size={17} />
+                    <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
+                  </Button>
+                </div>
+              )
             }
           >
             <FormattedMessage defaultMessage="Alternative receipt template" id="CJtvlX" />
@@ -154,20 +214,13 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
             />
           </p>
         </div>
-        <div className="my-5">
-          {!hasAlternativeReceipt ? (
-            <Button size="sm" onClick={() => setHasAlternativeReceipt(true)}>
-              <Plus size={16} />
-              <FormattedMessage defaultMessage="Add alternative receipt" id="7It+w9" />
-            </Button>
-          ) : (
-            <div className="flex w-full flex-col flex-wrap">
-              <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
-            </div>
-          )}
-        </div>
         {hasAlternativeReceipt && (
-          <MessageBox type="info" className="mb-6">
+          <div className="my-5 flex w-full flex-col flex-wrap">
+            <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
+          </div>
+        )}
+        {hasAlternativeReceipt && (
+          <MessageBox type="info">
             <FormattedMessage
               defaultMessage="Please advise your Collectives to select the correct receipt setting for any tiers where the alternative receipt should be used, or manage related contributions through the Add Funds process, where you as the Host Admin can select the correct receipt."
               id="nYrU4E"
@@ -177,6 +230,7 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
         <Button
           loading={loading}
           disabled={!isFieldChanged}
+          className="mt-8"
           onClick={() => {
             setSettings({
               variables: {
@@ -194,13 +248,21 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
             });
           }}
         >
-          {isSaved && infoIsSaved && billToIsSaved ? (
+          {isSaved && infoIsSaved && billToIsSaved && embeddedImageIsSaved ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
           )}
         </Button>
       </div>
+
+      <ReceiptPreviewDialog
+        open={previewDialogOpen}
+        onOpenChange={setPreviewDialogOpen}
+        title={getCurrentReceiptValues().values.title || getCurrentReceiptValues().placeholders.title}
+        info={getCurrentReceiptValues().values.info || ''}
+        embeddedImage={getCurrentReceiptValues().values.embeddedImage || ''}
+      />
     </div>
   );
 };
