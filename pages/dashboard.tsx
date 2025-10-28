@@ -9,6 +9,11 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { isHostAccount } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type LoggedInUser from '@/lib/LoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -84,6 +89,30 @@ const getNotification = (intl, account) => {
       };
     }
   }
+};
+
+/**
+ * Get the People dashboard detail URL for an individual account within the context of a dashboard account
+ * If the user is not an admin of the host account, return the public profile URL instead
+ */
+const getProfileUrl = (
+  loggedInUser: LoggedInUser,
+  contextAccount: DashboardQuery['account'],
+  account: { id: string; slug: string; type: string },
+) => {
+  const context =
+    'host' in contextAccount && loggedInUser?.isAdminOfCollective(contextAccount.host)
+      ? contextAccount.host
+      : contextAccount.isHost
+        ? contextAccount
+        : null;
+
+  return context &&
+    loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
+    account.type === CollectiveType.INDIVIDUAL &&
+    typeof account.id === 'string'
+    ? getDashboardRoute({ slug: context.slug }, `people/${account.id}`)
+    : null;
 };
 
 function getBlocker(LoggedInUser, account, section) {
@@ -215,6 +244,7 @@ const DashboardPage = () => {
         activeSlug,
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
+        getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
       <div className="flex min-h-screen flex-col justify-between">

@@ -13,6 +13,7 @@ import formatMemberRole from '../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import type { MemberFieldsFragment, TeamSectionQuery } from '@/lib/graphql/types/v2/graphql';
 
+import LinkCollective from '@/components/LinkCollective';
 import { DataTable } from '@/components/table/DataTable';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 import { useToast } from '@/components/ui/useToast';
@@ -83,8 +84,10 @@ const MembersTable = ({
         const isInherited = member.inherited;
         return (
           <div className="flex items-center">
-            <Avatar collective={memberAccount} radius={32} className="mr-4" />
-            {memberAccount.name}
+            <LinkCollective collective={memberAccount} className="flex items-center hover:underline">
+              <Avatar collective={memberAccount} radius={32} className="mr-4" />
+              {memberAccount.name}
+            </LinkCollective>
             {memberAccount.email && <span className="ml-1 text-slate-500">{`<${memberAccount.email}>`}</span>}
             {isInvitation && (
               <span className="ml-2 rounded-sm bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
