@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, flatten } from 'lodash';
+import { compact, flatten, orderBy } from 'lodash';
 import { Mail, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
@@ -182,6 +182,22 @@ const MembersTable = ({
   return <DataTable loading={loading} columns={columns} data={members} mobileTableView {...props} />;
 };
 
+const roleSorter = (member: MemberTableRecord) => {
+  if (member.__typename === 'MemberInvitation') {
+    return 1;
+  }
+  switch (member.role) {
+    case roles.ADMIN:
+      return 2;
+    case roles.ACCOUNTANT:
+      return 3;
+    case roles.COMMUNITY_MANAGER:
+      return 4;
+    default:
+      return 5;
+  }
+};
+
 const Team = ({ accountSlug }: DashboardSectionProps) => {
   const [showInviteModal, setShowInviteModal] = React.useState(false);
   const [showEditModal, setShowEditModal] = React.useState<MemberTableRecord | null>(null);
@@ -192,9 +208,11 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
   });
   const host = data?.account && 'host' in data.account && data.account.host;
   const injectAccount = account => member => ({ ...member, accountContext: account });
-  const members = [...(data?.account?.members?.nodes || []), ...(data?.memberInvitations || [])].map(
-    injectAccount(data?.account),
-  );
+  const members = orderBy(
+    [...(data?.account?.members?.nodes || []), ...(data?.memberInvitations || [])].map(injectAccount(data?.account)),
+    [roleSorter, 'since'],
+    ['asc', 'asc'],
+  ) as MemberTableRecord[];
   const nbAdmins = members.filter(m => m.role === roles.ADMIN && m.id).length;
   const childrenAccountsWithMembers =
     data?.account?.childrenAccounts?.nodes?.filter(child => child.members?.nodes?.length > 0) || [];
