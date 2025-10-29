@@ -230,7 +230,7 @@
   "6GrAmA": "{expensesPaid} additional {expensesPaid, plural, one {expense} other {expenses}} paid",
   "6hAx2q": "Число с плавающей точкой, отражающее процентную ставку налога (например: 20% = 0.2).",
   "6hEUR9": "Первоначальная сумма составляла {amount}.",
-  "6J42kW": "<Individual></Individual> removed <FromAccount></FromAccount> as an <MemberRole></MemberRole> for <Account></Account>",
+  "6J42kW": "<Individual></Individual> удалён из <FromAccount></FromAccount> как <MemberRole></MemberRole> для <Account></Account>",
   "6LYnXr": "Незакрытые скобки",
   "6MC5jw": "Идентификационная система",
   "6mlPiP": "Новый комментарий к обсуждению",
