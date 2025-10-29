@@ -290,7 +290,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
       if ('endsAt' in values && values.endsAt) {
         variables.account.endsAt = parseLocalDateTime(values.endsAt);
       }
-      if ('startsAt' in values && values.endsAt) {
+      if ('startsAt' in values && values.startsAt) {
         variables.account.startsAt = parseLocalDateTime(values.startsAt);
       }
 
