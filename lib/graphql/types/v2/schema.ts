@@ -4676,7 +4676,9 @@ export type EventCreateInput = {
   endsAt: Scalars['DateTime']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
+  location?: InputMaybe<LocationInput>;
   name: Scalars['String']['input'];
+  privateInstructions?: InputMaybe<Scalars['String']['input']>;
   settings?: InputMaybe<Scalars['JSON']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   /** The Event start date and time */

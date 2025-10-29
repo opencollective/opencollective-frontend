@@ -45,7 +45,7 @@ describe('edit collective', () => {
     // Re-send the invitation email
     cy.mailpitDeleteAllEmails();
     cy.get('[data-cy="members-table"]')
-      .find('tr:nth-child(2) ')
+      .find('tr:nth-child(1) ')
       .find('[data-cy="member-actions-btn"]')
       .should('exist')
       .click({ force: true });

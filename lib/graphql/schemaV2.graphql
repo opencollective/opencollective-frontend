@@ -23523,6 +23523,8 @@ input EventCreateInput {
   description: String
   tags: [String]
   settings: JSON
+  location: LocationInput
+  privateInstructions: String
 
   """
   The Event start date and time

@@ -13,6 +13,7 @@ import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } f
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import type { Amount } from '@/lib/graphql/types/v2/schema';
 
+import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
@@ -273,6 +274,7 @@ export const AccountHoverCard = ({
   displayFollowButton,
 }: AccountHoverCardProps) => {
   const [open, setOpen] = React.useState(false);
+  const context = React.useContext(DashboardContext);
 
   const isIndividual = account ? isIndividualAccount(account) : false;
   const isVendor = account?.type === 'VENDOR';
@@ -317,6 +319,7 @@ export const AccountHoverCard = ({
 
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
+  const accountUrl = context?.getProfileUrl?.(account) || getCollectivePageRoute(account);
   return (
     // HoverCard currently disabled for Vendors (need to fix styling, appropriate links, etc)
     <HoverCard open={open && !isVendor} onOpenChange={setOpen}>
@@ -331,7 +334,7 @@ export const AccountHoverCard = ({
         <div className="relative flex flex-col gap-4 text-sm">
           <div className="flex flex-col gap-3 overflow-hidden break-words">
             <div className="flex justify-between">
-              <Link href={getCollectivePageRoute(account)}>
+              <Link href={accountUrl}>
                 <Avatar collective={account} radius={64} />
               </Link>
 
@@ -340,7 +343,7 @@ export const AccountHoverCard = ({
 
             <div className="overflow-hidden">
               <div className="flex items-center gap-1">
-                <Link href={getCollectivePageRoute(account)}>
+                <Link href={accountUrl}>
                   <span className="block truncate font-medium hover:underline">{account.name}</span>
                 </Link>
                 <AccountTrustBadge account={account} />

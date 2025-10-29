@@ -106,6 +106,9 @@ export const adminPanelQuery = gql`
       ... on Organization {
         host {
           id
+          type
+          slug
+          legacyId
           requiredLegalDocuments
           hostFeePercent
         }
@@ -127,6 +130,7 @@ export const adminPanelQuery = gql`
           id
           requiredLegalDocuments
           legacyId
+          type
           slug
           name
           settings
