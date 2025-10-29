@@ -19,8 +19,6 @@ const InputFieldPresetsContainer = styled.div`
 class InputFieldPresets extends React.Component {
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.number),
-    pre: PropTypes.string,
-    options: PropTypes.object,
     onChange: PropTypes.func,
     min: PropTypes.number,
     currency: PropTypes.currency,
@@ -52,6 +50,7 @@ class InputFieldPresets extends React.Component {
       <InputAmount
         key={`currency${index}`}
         name={`currency${index}`}
+        id={`currency${index}`}
         currency={this.props.currency}
         currencyDisplay="CODE"
         value={this.state.values[index] ?? 0}
