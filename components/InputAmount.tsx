@@ -1,7 +1,6 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
-import { useIntl } from 'react-intl';
 
 import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
@@ -193,7 +192,6 @@ const InputAmount = ({
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);
   const [isEditing, setEditing] = React.useState(false);
-  const intl = useIntl();
 
   const dispatchValue = (e, parsedValue) => {
     setRawValue(e.target.value);
@@ -263,16 +261,7 @@ const InputAmount = ({
       name={name}
       min={minAmount}
       max={max / 100}
-      value={
-        isEditing
-          ? rawValue
-          : !value || isNaN(value)
-            ? rawValue
-            : (value / 100).toLocaleString(intl.locale, {
-                minimumFractionDigits: precision,
-                maximumFractionDigits: precision,
-              })
-      }
+      value={isEditing ? rawValue : !value || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
       onWheel={ignoreOnWheel}
       onChange={e => {
         setEditing(true);
