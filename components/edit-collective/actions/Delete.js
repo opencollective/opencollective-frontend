@@ -55,6 +55,7 @@ const DeleteCollective = ({ collective, ...props }) => {
   };
 
   const { deleting, error } = deleteStatus;
+  const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
 
   const closeModal = () => setShowModal(false);
 
@@ -75,7 +76,17 @@ const DeleteCollective = ({ collective, ...props }) => {
         />
       </p>
       {error && <MessageBox type="error">{error}</MessageBox>}
-      {collective.isHost && (
+      {!collective.isDeletable &&
+      collective.type !== CollectiveType.EVENT &&
+      collective.type !== CollectiveType.PROJECT ? (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.delete.isNotDeletable-message"
+            defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, contributions, events or paid expenses cannot be deleted. Please archive it instead."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
+      ) : collective.isHost ? (
         <MessageBox type="warning">
           {collective.type === CollectiveType.COLLECTIVE ? (
             <FormattedMessage
@@ -91,28 +102,17 @@ const DeleteCollective = ({ collective, ...props }) => {
             />
           )}
         </MessageBox>
-      )}
-      {!collective.isDeletable &&
-        collective.type !== CollectiveType.EVENT &&
-        collective.type !== CollectiveType.PROJECT && (
-          <MessageBox type="warning">
-            <FormattedMessage
-              id="collective.delete.isNotDeletable-message"
-              defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, contributions, events or paid expenses cannot be deleted. Please archive it instead."
-              values={{ type: collective.type }}
-            />
-          </MessageBox>
-        )}
-      {!collective.isDeletable &&
-        (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) && (
-          <MessageBox type="warning">
-            <FormattedMessage
-              id="collective.event.delete.isNotDeletable-message"
-              defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, contributions or paid expenses cannot be deleted. Please archive it instead."
-              values={{ type: collective.type }}
-            />
-          </MessageBox>
-        )}
+      ) : hasBalance &&
+        !collective.isDeletable &&
+        (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) ? (
+        <MessageBox type="warning">
+          <FormattedMessage
+            id="collective.event.delete.isNotDeletable-message"
+            defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, contributions or paid expenses cannot be deleted. Please archive it instead."
+            values={{ type: collective.type }}
+          />
+        </MessageBox>
+      ) : null}
       <Button
         onClick={() => setShowModal(true)}
         loading={deleting}
