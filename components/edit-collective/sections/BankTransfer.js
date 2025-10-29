@@ -258,7 +258,7 @@ const BankTransfer = props => {
               </Flex>
               {useStructuredForm && (
                 <React.Fragment>
-                  <SettingsSectionTitle mt={4}>
+                  <SettingsSectionTitle className="mt-4">
                     <FormattedMessage
                       id="paymentMethods.manual.bankInfo.title"
                       defaultMessage="Add your bank account information"
@@ -276,7 +276,7 @@ const BankTransfer = props => {
                 </React.Fragment>
               )}
 
-              <SettingsSectionTitle mt={4}>
+              <SettingsSectionTitle className="mt-4">
                 <FormattedMessage id="paymentMethods.manual.instructions.title" defaultMessage="Define instructions" />
               </SettingsSectionTitle>
               <Box mr={2} flexGrow={1}>
