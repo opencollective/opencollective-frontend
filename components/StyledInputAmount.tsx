@@ -175,6 +175,7 @@ const CURRENCY_PICKER_STYLES = {
 
 /**
  * An input for amount inputs. Accepts all props from [StyledInputGroup](/#!/StyledInputGroup).
+ * @deprecated use [InputAmount](./InputAmount.tsx)
  */
 const StyledInputAmount = ({
   currency,
