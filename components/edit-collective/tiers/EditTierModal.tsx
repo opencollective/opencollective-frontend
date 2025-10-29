@@ -18,13 +18,14 @@ import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
+import InputAmount from '@/components/InputAmount';
+
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledInput from '../../StyledInput';
-import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputFormikField from '../../StyledInputFormikField';
 import StyledLink from '../../StyledLink';
 import StyledSelect from '../../StyledSelect';
@@ -258,7 +259,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           mt="3"
         >
           {({ field, form }) => (
-            <StyledInputAmount
+            <InputAmount
               id={field.id}
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
@@ -292,6 +293,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           {({ field, form }) => (
             <InputFieldPresets
               {...field}
+              currency={collective.currency}
               min={values.minimumAmount?.valueInCents || 0}
               defaultValue={field.value}
               onChange={value => form.setFieldValue(field.name, value)}
@@ -307,7 +309,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           mt="3"
         >
           {({ field, form }) => (
-            <StyledInputAmount
+            <InputAmount
               id={field.id}
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
@@ -337,7 +339,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           required
         >
           {({ field, form }) => (
-            <StyledInputAmount
+            <InputAmount
               id={field.id}
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
@@ -406,7 +408,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         required={false}
       >
         {({ field, form }) => (
-          <StyledInputAmount
+          <InputAmount
             id={field.id}
             data-cy={field.name}
             currency={field.value?.currency ?? collective.currency}
