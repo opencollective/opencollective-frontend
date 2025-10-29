@@ -129,7 +129,7 @@ const ReceiptPreviewDialog = ({ open, onOpenChange, title, info, embeddedImage }
             {/* Embedded Image Section */}
             {embeddedImage && (
               <div className="mb-4">
-                <img src={embeddedImage} alt="Embedded in receipt" className="max-h-32 max-w-[50%] object-contain" />
+                <img src={embeddedImage} alt="Embedded in receipt" className="max-h-32 max-w-[33%] object-contain" />
               </div>
             )}
 
