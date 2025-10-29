@@ -24,11 +24,11 @@ In 2022, Open Collective Inc. announced its commitment to an "exit to community,
 
 That vision became reality in 2024, when stewardship of the platform transitioned to a new nonprofit: the **Open Finance Consortium Inc. (OFiCo)**, a U.S. 501(c)(6) association created by and for the fiscal hosts and communities who rely on it.
 
-OFiCo now governs the platform collectively, while its subsidiary **OFi Technologies (OFiTech)** operates and develops the software. Together, they continue the original Open Collective mission: enabling transparent, collaborative finance for communities everywhere.
+OFiCo now governs the platform collectively, while its subsidiary **OFi Technologies (OFiTech)** operates the platform. Together, they continue the original Open Collective mission: enabling transparent, collaborative finance for communities everywhere.
 
 ### Our future
 
-Today, the Open Collective Platform, operated by OFiTech under OFiCo’s stewardship, powers thousands of collectives and organizations managing millions in contributions across currencies, countries, and causes.
+Today, the Open Collective Platform, operated by OFiTech under OFiCo's stewardship, powers thousands of collectives and organizations managing millions in contributions across currencies, countries, and causes.
 
 Our work continues to evolve, but the core principle remains unchanged: **money should move in the open, in service of communities**.
 
