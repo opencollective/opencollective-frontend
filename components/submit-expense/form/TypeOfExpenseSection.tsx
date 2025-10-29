@@ -50,8 +50,11 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
   props: TypeOfExpenseSectionProps,
 ) {
   const expenseTypeOption = props.expenseTypeOption;
-
   const isTypeLocked = props.lockedFields?.includes?.(ExpenseLockableFields.TYPE);
+  const isHostAccount = props.host?.slug === props.account?.slug;
+  const isCollective = props.account?.type === CollectiveType.COLLECTIVE;
+  const showHostInstructions = !isHostAccount || !isCollective;
+  const showCollectiveInstructions = !isHostAccount || isCollective;
 
   return (
     <FormSectionContainer
@@ -99,7 +102,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
 
         {!props.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div>
-            {props.host?.slug !== props.account?.slug && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+            {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
@@ -110,7 +113,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
               </div>
             )}
 
-            {props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+            {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />}
@@ -125,7 +128,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
 
         {!props.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
           <div>
-            {props.host?.slug !== props.account?.slug && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+            {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
@@ -136,7 +139,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
               </div>
             )}
 
-            {props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+            {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
