@@ -240,24 +240,12 @@ export default function Pricing({ data }) {
 
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            <FormattedMessage defaultMessage="Platform Pricing" id="1LgC28" />
+            <FormattedMessage defaultMessage="Pricing for Organizations" id="Pricing-forOrganizations" />
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground">
             <FormattedMessage
-              defaultMessage="The platform is managed by {oficoLink}, a non-profit organization. Pricing is set by its <MembersLink>members</MembersLink> - who are also its main users - and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives."
-              id="8/YzW7"
-              values={{
-                oficoLink: (
-                  <a href="https://oficonsortium.org" className="underline" target="_blank">
-                    OFiCo
-                  </a>
-                ),
-                MembersLink: parts => (
-                  <a href="https://oficonsortium.org/#members" className="underline" target="_blank">
-                    {parts}
-                  </a>
-                ),
-              }}
+              defaultMessage="An Organization is a legal entity (such as a company, non-profit, cooperative, or similar) that uses the platform to manage its own finances or to act as a Host for Collectives. The pricing below applies to Organizations. Collectives are not subject to this pricing structure."
+              id="Pricing-OrgDefinition"
             />
           </p>
         </div>
@@ -279,6 +267,41 @@ export default function Pricing({ data }) {
 
         <div className="mt-16 flex justify-center">
           <JoinCTAButtons onPage="pricing" />
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mx-auto mt-24 max-w-3xl px-4">
+          <h2 className="mb-6 text-center text-3xl font-semibold">
+            <FormattedMessage defaultMessage="FAQ" id="FAQ" />
+          </h2>
+          <div className="divide-y rounded-lg border">
+            <div className="p-6">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage
+                  defaultMessage="Who manages the platform and how is the pricing set?"
+                  id="pricing.new.faq.governance.question"
+                />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="Since October 2024, the platform is managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
+                  id="8/YzW7"
+                  values={{
+                    oficoLink: (
+                      <a href="https://oficonsortium.org" className="underline" target="_blank">
+                        OFi Consortium
+                      </a>
+                    ),
+                    MembersLink: parts => (
+                      <a href="https://oficonsortium.org/#members" className="underline" target="_blank">
+                        {parts}
+                      </a>
+                    ),
+                  }}
+                />
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="mt-24 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 p-12 text-center">
