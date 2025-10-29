@@ -66,7 +66,7 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
   const billToIsSaved = getInExpenseTemplate(account, 'billTo') === billTo;
 
   const deleteAlternativeReceipt = () => {
-    alternativeReceipt.changeValues({ title: undefined, info: undefined });
+    alternativeReceipt.changeValues({ title: undefined, info: undefined, embeddedImage: undefined });
     setHasAlternativeReceipt(false);
     setIsFieldChanged(true);
   };
