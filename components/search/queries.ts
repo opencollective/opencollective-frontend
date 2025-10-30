@@ -14,6 +14,13 @@ const searchAccountFieldsFragment = gql`
         slug
       }
     }
+    ... on AccountWithParent {
+      parent {
+        id
+        name
+        slug
+      }
+    }
   }
 `;
 
@@ -22,6 +29,7 @@ const searchCommentFieldsFragment = gql`
     id
     html
     createdAt
+    type
     fromAccount {
       ...SearchAccountFields
     }
@@ -125,6 +133,10 @@ const searchTransactionFieldsFragment = gql`
     }
     oppositeAccount {
       ...SearchAccountFields
+    }
+    host {
+      id
+      slug
     }
   }
   ${searchAccountFieldsFragment}
