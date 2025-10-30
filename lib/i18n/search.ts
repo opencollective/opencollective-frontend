@@ -13,19 +13,19 @@ const i18nEntity = defineMessages({
   },
   [SearchEntity.EXPENSES]: {
     defaultMessage: 'Expenses',
-    id: 'k2VBcF',
+    id: 'Expenses',
   },
   [SearchEntity.CONTRIBUTIONS]: {
     defaultMessage: 'Contributions',
-    id: 'oVDe1D',
+    id: 'Contributions',
   },
   [SearchEntity.TRANSACTIONS]: {
     defaultMessage: 'Transactions',
-    id: '/jJLYy',
+    id: 'menu.transactions',
   },
   [SearchEntity.UPDATES]: {
     defaultMessage: 'Updates',
-    id: 'recCg9',
+    id: 'updates',
   },
   [SearchEntity.COMMENTS]: {
     defaultMessage: 'Comments',
