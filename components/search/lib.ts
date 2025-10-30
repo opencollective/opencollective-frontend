@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import type {
@@ -20,15 +20,13 @@ import {
   getUpdateUrl,
 } from '@/lib/url-helpers';
 
+import { DashboardContext } from '../dashboard/DashboardContext';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import type { SearchHighlights } from './types';
 import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
-import { ALL_SECTIONS } from '../dashboard/constants';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import { DashboardContext } from '../dashboard/DashboardContext';
-import React from 'react';
+
 export function getHighlightsFields<T extends string>(
   highlights: SearchHighlights,
   topFields: readonly T[],
