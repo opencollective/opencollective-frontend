@@ -187,6 +187,195 @@ export const searchCommandQuery = gql`
   ${searchAccountFieldsFragment}
 `;
 
+export const searchPageQuery = gql`
+  query SearchPage(
+    $searchTerm: String!
+    $host: AccountReferenceInput
+    $account: AccountReferenceInput
+    $defaultLimit: Int!
+    $accountsLimit: Int
+    $commentsLimit: Int
+    $expensesLimit: Int
+    $ordersLimit: Int
+    $updatesLimit: Int
+    $transactionsLimit: Int
+    $imageHeight: Int
+    $useTopHits: Boolean
+    $includeAccounts: Boolean!
+    $includeComments: Boolean!
+    $includeExpenses: Boolean!
+    $includeTransactions: Boolean!
+    $includeOrders: Boolean!
+    $includeUpdates: Boolean!
+    $offset: Int
+  ) {
+    search(
+      searchTerm: $searchTerm
+      defaultLimit: $defaultLimit
+      host: $host
+      account: $account
+      useTopHits: $useTopHits
+    ) {
+      results {
+        accounts(limit: $accountsLimit, offset: $offset) @include(if: $includeAccounts) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchAccountFields
+            }
+          }
+        }
+        comments(limit: $commentsLimit, offset: $offset) @include(if: $includeComments) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              id
+              html
+              createdAt
+              fromAccount {
+                ...SearchAccountFields
+              }
+              expense {
+                id
+                legacyId
+                description
+                account {
+                  ...SearchAccountFields
+                }
+              }
+              update {
+                id
+                legacyId
+                title
+                account {
+                  ...SearchAccountFields
+                }
+              }
+              order {
+                id
+                legacyId
+                toAccount {
+                  ...SearchAccountFields
+                }
+              }
+              hostApplication {
+                id
+                account {
+                  ...SearchAccountFields
+                }
+                host {
+                  ...SearchAccountFields
+                }
+              }
+              conversation {
+                id
+                slug
+                account {
+                  ...SearchAccountFields
+                }
+              }
+            }
+          }
+        }
+        expenses(limit: $expensesLimit, offset: $offset) @include(if: $includeExpenses) {
+          highlights
+          collection {
+            totalCount
+            limit
+            offset
+            nodes {
+              id
+              description
+              legacyId
+              type
+              status
+              amountV2 {
+                valueInCents
+                currency
+              }
+              payee {
+                ...SearchAccountFields
+              }
+              account {
+                ...SearchAccountFields
+              }
+            }
+          }
+        }
+        orders(limit: $ordersLimit, offset: $offset) @include(if: $includeOrders) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              id
+              legacyId
+              description
+              status
+              amount {
+                valueInCents
+                currency
+              }
+              toAccount {
+                ...SearchAccountFields
+              }
+              fromAccount {
+                ...SearchAccountFields
+              }
+            }
+          }
+        }
+        transactions(limit: $transactionsLimit, offset: $offset) @include(if: $includeTransactions) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              id
+              legacyId
+              description
+              type
+              kind
+              netAmount {
+                valueInCents
+                currency
+              }
+              account {
+                ...SearchAccountFields
+              }
+              oppositeAccount {
+                ...SearchAccountFields
+              }
+            }
+          }
+        }
+
+        updates(limit: $updatesLimit, offset: $offset) @include(if: $includeUpdates) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              id
+              legacyId
+              slug
+              title
+              account {
+                ...SearchAccountFields
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
 export const contextQuery = gql`
   query SearchContext($slug: String!) {
     account(slug: $slug) {

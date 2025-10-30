@@ -3,6 +3,10 @@ import { defineMessages } from 'react-intl';
 import { SearchEntity } from '@/components/search/schema';
 
 const i18nEntity = defineMessages({
+  [SearchEntity.ALL]: {
+    id: 'All',
+    defaultMessage: 'All',
+  },
   [SearchEntity.ACCOUNTS]: {
     defaultMessage: 'Accounts',
     id: 'FvanT6',

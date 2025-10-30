@@ -11,9 +11,10 @@ import {
   Receipt,
   SearchIcon,
   Users,
+  X,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
@@ -194,12 +195,11 @@ export const SearchCommand = ({ open, setOpen }) => {
         }
       },
     },
-    defaultFilterValues: { workspace: account?.slug }, // use account.slug here, as it means we are on a dashboard page
+    defaultFilterValues: { workspace: account?.slug },
     skipRouter: true,
   });
 
   useEffect(() => {
-    // Maybe remove? To preserve search etc..
     if (open) {
       queryFilter.setFilters({ workspace: account?.slug, entity: SearchEntity.ALL });
     }
@@ -211,7 +211,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     fetchMore,
     variables: usedVariables,
   } = useQuery(searchCommandQuery, {
-    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72 },
+    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72, __infiniteScroll: true },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -398,7 +398,10 @@ export const SearchCommand = ({ open, setOpen }) => {
       onOpenChange={setOpen}
       shouldFilter={false}
       onKeyDown={handleKeyDown}
-      description="Search for accounts, expenses, transactions, updates, comments, and more"
+      description={intl.formatMessage({
+        defaultMessage: 'Search for accounts, expenses, transactions, updates, comments, and more',
+        id: 'wdsjMO',
+      })}
       className="sm:max-w-2xl"
     >
       <DialogTitle className="hidden">
@@ -443,7 +446,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                   queryFilter.setFilter('workspace', defaultContext.slug);
                   setInput('');
                 }}
-                actionLabel={'Search in workspace'}
+                actionLabel={intl.formatMessage({ defaultMessage: 'Search in workspace', id: 'idTzf7' })}
                 showAction
               >
                 <ContextPill slug={defaultContext.slug} />
@@ -461,11 +464,9 @@ export const SearchCommand = ({ open, setOpen }) => {
                   key={opt.value}
                   onSelect={() => {
                     queryFilter.setFilter('entity', opt.value);
-                    // setInput('');
                   }}
                   value={opt.value}
                   actionLabel={`Search in ${opt.value.toLowerCase()}`}
-                  // showAction
                 >
                   <div className="flex items-center gap-2">
                     <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
@@ -561,6 +562,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                     setOpen(false);
                     onClick?.();
                   }}
+                  onDelete={() => console.log('delete this')}
                 >
                   <Link href={href} className="block w-full">
                     {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
@@ -736,7 +738,7 @@ interface SearchCommandItemProps {
 }
 
 const SearchCommandItem = React.memo<SearchCommandItemProps>(
-  ({ onSelect, actionLabel = 'Jump to', children, showAction = false, className = undefined, ...props }) => {
+  ({ onSelect, onDelete, actionLabel = 'Jump to', children, showAction = false, className = undefined, ...props }) => {
     return (
       <CommandItem
         onSelect={onSelect}
@@ -750,13 +752,21 @@ const SearchCommandItem = React.memo<SearchCommandItemProps>(
         {...props}
       >
         {children}
-        <div
-          className={cn(
-            'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
-            showAction ? '' : 'absolute right-2',
-          )}
-        >
-          {actionLabel}
+        <div className="absolute right-2">
+          {/* {onDelete && (
+            <div className="">
+              <X />
+            </div>
+          )} */}
+
+          <div
+            className={cn(
+              'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
+              // showAction ? '' : 'absolute right-2',
+            )}
+          >
+            {actionLabel}
+          </div>
         </div>
       </CommandItem>
     );

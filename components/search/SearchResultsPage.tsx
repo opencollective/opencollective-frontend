@@ -1,18 +1,22 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { Search, SearchIcon } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
+import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import useQueryFilter, { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl } from '../../lib/url-helpers';
+import { i18nSearchEntity } from '@/lib/i18n/search';
 import { cn } from '@/lib/utils';
 
 import Tabs from '@/components/Tabs';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { EmptyResults } from '../dashboard/EmptyResults';
+import { Pagination } from '../dashboard/filters/Pagination';
 import Link from '../Link';
 import Spinner from '../Spinner';
 import { BASE_INPUT_CLASS } from '../ui/Input';
@@ -25,12 +29,12 @@ import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { useGetLinkProps } from './lib';
-import { searchCommandQuery } from './queries';
+import { searchPageQuery } from './queries';
 import { SearchEntity } from './schema';
 import type { PageVisit } from './useRecentlyVisited';
-// TODO i18n
 
 export const SearchResults = () => {
+  const intl = useIntl();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { account } = React.useContext(DashboardContext);
   const defaultContext: { slug: string; type: 'account' | 'host' } | undefined = account?.isHost
@@ -42,7 +46,8 @@ export const SearchResults = () => {
   const queryFilter = useQueryFilter({
     schema: z.object({
       workspace: z.string().optional(),
-      limit: z.number().default(5),
+      limit: z.coerce.number().default(10),
+      offset: z.coerce.number().default(0),
       searchTerm: z.string().optional(),
       entity: z.nativeEnum(SearchEntity).default(SearchEntity.ALL),
     }),
@@ -63,17 +68,70 @@ export const SearchResults = () => {
           return { includeTransactions: true };
         }
       },
-      entity: value => {
-        if (value !== SearchEntity.ALL) {
-          return { limit: 20 };
-        } else {
-          return { limit: 5 };
+      limit: (limit, key, meta, values) => {
+        const defaultEntityLimit = {
+          defaultLimit: 0, // TODO: should be enough? Seems to be a bug with defaultLimit
+          accountsLimit: 0,
+          expensesLimit: 0,
+          transactionsLimit: 0,
+          contributionsLimit: 0,
+          updatesLimit: 0,
+          commentsLimit: 0,
+        };
+        switch (values.entity) {
+          case SearchEntity.ALL:
+            return {
+              defaultLimit: 5,
+            };
+          case SearchEntity.EXPENSES:
+            return {
+              ...defaultEntityLimit,
+              expensesLimit: limit,
+            };
+          case SearchEntity.TRANSACTIONS:
+            return {
+              ...defaultEntityLimit,
+              transactionsLimit: limit,
+            };
+          case SearchEntity.ACCOUNTS:
+            return {
+              ...defaultEntityLimit,
+              accountsLimit: limit,
+            };
+          case SearchEntity.CONTRIBUTIONS:
+            return {
+              ...defaultEntityLimit,
+              contributionsLimit: limit,
+            };
+          case SearchEntity.UPDATES:
+            return {
+              ...defaultEntityLimit,
+              updatesLimit: limit,
+            };
+          case SearchEntity.COMMENTS:
+            return {
+              ...defaultEntityLimit,
+              commentsLimit: limit,
+            };
+        }
+      },
+      entity: val => {
+        switch (val) {
+          case SearchEntity.ALL:
+            return {
+              useTopHits: true,
+            };
+          default:
+            return {
+              useTopHits: false,
+            };
         }
       },
     },
     defaultFilterValues: { workspace: account?.slug },
     shallow: true,
   });
+
   const [input, setInput] = React.useState(queryFilter.values.searchTerm);
 
   // Sync input state with URL changes (e.g., from SearchCommand navigation)
@@ -81,8 +139,17 @@ export const SearchResults = () => {
     setInput(queryFilter.values.searchTerm || '');
   }, [queryFilter.values.searchTerm]);
 
-  const { data, loading } = useQuery(searchCommandQuery, {
-    variables: { ...queryFilter.variables, imageHeight: 72 },
+  const { data, loading } = useQuery(searchPageQuery, {
+    variables: {
+      ...queryFilter.variables,
+      imageHeight: 72,
+      includeAccounts: true,
+      includeTransactions: true,
+      includeExpenses: true,
+      includeOrders: true,
+      includeUpdates: true,
+      includeComments: true,
+    },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -93,11 +160,6 @@ export const SearchResults = () => {
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       const input = inputRef.current;
       if (input) {
-        // if (e.key === 'Delete' || e.key === 'Backspace') {
-        //   if (input.value === '') {
-        //     queryFilter.setFilter('workspace', undefined);
-        //   }
-        // }
         if (e.key === 'Enter') {
           queryFilter.setFilter('searchTerm', input.value);
         }
@@ -126,7 +188,7 @@ export const SearchResults = () => {
           ref={inputRef}
           onChange={e => setInput(e.target.value)}
           value={input}
-          placeholder={queryFilter.values.workspace ? '' : 'Search...'}
+          placeholder={intl.formatMessage({ id: 'search.placeholder', defaultMessage: 'Search...' })}
           className="flex-1 focus:outline-none"
           autoFocus
           onKeyDown={handleKeyDown}
@@ -140,37 +202,37 @@ export const SearchResults = () => {
           tabs={[
             {
               id: SearchEntity.ALL,
-              label: 'All',
+              label: i18nSearchEntity(intl, SearchEntity.ALL),
               count: totalCount,
             },
             {
               id: SearchEntity.ACCOUNTS,
-              label: 'Accounts',
+              label: i18nSearchEntity(intl, SearchEntity.ACCOUNTS),
               count: data?.search.results.accounts.collection.totalCount,
             },
             {
               id: SearchEntity.EXPENSES,
-              label: 'Expenses',
+              label: i18nSearchEntity(intl, SearchEntity.EXPENSES),
               count: data?.search.results.expenses.collection.totalCount,
             },
             {
               id: SearchEntity.CONTRIBUTIONS,
-              label: 'Contributions',
+              label: i18nSearchEntity(intl, SearchEntity.CONTRIBUTIONS),
               count: data?.search.results.orders?.collection.totalCount,
             },
             {
               id: SearchEntity.TRANSACTIONS,
-              label: 'Transactions',
+              label: i18nSearchEntity(intl, SearchEntity.TRANSACTIONS),
               count: data?.search.results.transactions?.collection.totalCount,
             },
             {
               id: SearchEntity.COMMENTS,
-              label: 'Comments',
+              label: i18nSearchEntity(intl, SearchEntity.COMMENTS),
               count: data?.search.results.comments?.collection.totalCount,
             },
             {
               id: SearchEntity.UPDATES,
-              label: 'Updates',
+              label: i18nSearchEntity(intl, SearchEntity.UPDATES),
               count: data?.search.results.updates?.collection.totalCount,
             },
           ]}
@@ -193,7 +255,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           <div className="space-y-3 text-sm">
             <p className="font-medium text-muted-foreground"> </p>
             <div className="flex flex-col gap-2">
-              {[1, 2, 3, 4, 5].map(id => (
+              {Array.from({ length: queryFilter.values.limit }, (_, i) => i + 1).map(id => (
                 <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
                   <Skeleton className="size-9 shrink-0 rounded-md" />
                   <div className="flex flex-1 flex-col gap-2">
@@ -212,7 +274,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
       return (
         <div className="space-y-8">
           <SearchResultsGroup
-            label="Accounts"
             type="account"
             entity={SearchEntity.ACCOUNTS}
             totalCount={data?.search.results.accounts.collection.totalCount}
@@ -224,7 +285,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           />
           <SearchResultsGroup
             type="expense"
-            label="Expenses"
             entity={SearchEntity.EXPENSES}
             totalCount={data?.search.results.expenses.collection.totalCount}
             nodes={data?.search.results.expenses.collection.nodes}
@@ -236,7 +296,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
 
           <SearchResultsGroup
             type="order"
-            label="Contributions"
             entity={SearchEntity.CONTRIBUTIONS}
             totalCount={data?.search.results.orders.collection.totalCount}
             nodes={data?.search.results.orders.collection.nodes}
@@ -248,7 +307,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
 
           <SearchResultsGroup
             type="transaction"
-            label="Transactions"
             entity={SearchEntity.TRANSACTIONS}
             totalCount={data?.search.results.transactions.collection.totalCount}
             nodes={data?.search.results.transactions.collection.nodes}
@@ -262,7 +320,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           />
 
           <SearchResultsGroup
-            label="Updates"
             type="update"
             entity={SearchEntity.UPDATES}
             totalCount={data?.search.results.updates.collection.totalCount}
@@ -275,7 +332,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           <SearchResultsGroup
             type="comment"
             entity={SearchEntity.COMMENTS}
-            label="Comments"
             totalCount={data?.search.results.comments.collection.totalCount}
             nodes={data?.search.results.comments.collection.nodes.filter(comment =>
               getCommentUrl(comment, LoggedInUser),
@@ -291,61 +347,70 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
       return (
         <SearchResultsGroup
           type="account"
+          entity={SearchEntity.ACCOUNTS}
           totalCount={data?.search.results.accounts.collection.totalCount}
           nodes={data?.search.results.accounts.collection.nodes}
-          showEmpty
+          onStandaloneTab
           loading={loading}
           renderNode={account => (
             <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
           )}
+          queryFilter={queryFilter}
         />
       );
     case SearchEntity.EXPENSES:
       return (
         <SearchResultsGroup
           type="expense"
+          entity={SearchEntity.EXPENSES}
           totalCount={data?.search.results.expenses.collection.totalCount}
           nodes={data?.search.results.expenses.collection.nodes}
-          showEmpty
+          onStandaloneTab
           loading={loading}
           renderNode={expense => (
             <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
           )}
+          queryFilter={queryFilter}
         />
       );
     case SearchEntity.CONTRIBUTIONS:
       return (
         <SearchResultsGroup
           type="order"
+          entity={SearchEntity.CONTRIBUTIONS}
           totalCount={data?.search.results.orders.collection.totalCount}
           nodes={data?.search.results.orders.collection.nodes}
-          showEmpty
+          onStandaloneTab
           loading={loading}
           renderNode={order => (
             <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
           )}
+          queryFilter={queryFilter}
         />
       );
     case SearchEntity.COMMENTS:
       return (
         <SearchResultsGroup
           type="comment"
+          entity={SearchEntity.COMMENTS}
           totalCount={data?.search.results.comments.collection.totalCount}
           nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
-          showEmpty
+          onStandaloneTab
           loading={loading}
           renderNode={comment => (
             <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
           )}
+          queryFilter={queryFilter}
         />
       );
     case SearchEntity.TRANSACTIONS:
       return (
         <SearchResultsGroup
           type="transaction"
+          entity={SearchEntity.TRANSACTIONS}
           totalCount={data?.search.results.transactions.collection.totalCount}
           nodes={data?.search.results.transactions.collection.nodes}
-          showEmpty
+          onStandaloneTab
           loading={loading}
           renderNode={transaction => (
             <TransactionResult
@@ -353,19 +418,22 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
               highlights={data.search.results.transactions.highlights[transaction.id]}
             />
           )}
+          queryFilter={queryFilter}
         />
       );
     case SearchEntity.UPDATES:
       return (
         <SearchResultsGroup
-          type="account"
+          type="update"
+          entity={SearchEntity.UPDATES}
           totalCount={data?.search.results.updates.collection.totalCount}
           nodes={data?.search.results.updates.collection.nodes}
-          showEmpty
+          onStandaloneTab
           loading={loading}
           renderNode={update => (
             <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
           )}
+          queryFilter={queryFilter}
         />
       );
     default:
@@ -374,29 +442,32 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
 }
 
 function SearchResultsGroup({
-  label,
   totalCount,
   nodes,
   renderNode,
-  showEmpty = false,
+  onStandaloneTab = false,
   type,
   entity,
   loading,
   queryFilter,
 }: {
-  label?: string;
   totalCount?: number;
-  nodes: unknown[];
-  renderNode: (node: unknown) => React.ReactNode;
-  showEmpty?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  nodes: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  renderNode: (node: any) => React.ReactNode;
+  onStandaloneTab?: boolean;
   type: PageVisit['type'];
-  entity?: SearchEntity;
+  entity: SearchEntity;
   loading?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   queryFilter?: useQueryFilterReturnType<any, any>;
 }) {
+  const intl = useIntl();
   const { getLinkProps } = useGetLinkProps();
+  const label = i18nSearchEntity(intl, entity);
 
-  if (showEmpty && !totalCount && !loading) {
+  if (onStandaloneTab && !totalCount && !loading) {
     return <EmptyResults hasFilters={false} isEmptySearch={totalCount !== 0} />;
   } else if (!totalCount && !loading) {
     return null;
@@ -407,7 +478,7 @@ function SearchResultsGroup({
       {label && <p className="font-medium text-muted-foreground">{label}</p>}
       <div className="flex flex-col gap-2">
         {loading
-          ? [1, 2, 3, 4, 5].map(id => (
+          ? Array.from({ length: queryFilter.values.limit }, (_, i) => i + 1).map(id => (
               <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
                 <Skeleton className="size-9 shrink-0 rounded-md" />
                 <div className="flex flex-1 flex-col gap-2">
@@ -430,7 +501,7 @@ function SearchResultsGroup({
                 </Link>
               );
             })}
-        {moreCount > 0 && entity && (
+        {!onStandaloneTab && moreCount > 0 && (
           <button
             onClick={() => queryFilter.setFilter('entity', entity)}
             className="-mx-2 flex w-full items-center gap-2 rounded-sm px-2 py-1.5 hover:bg-muted"
@@ -439,10 +510,17 @@ function SearchResultsGroup({
               <SearchIcon />
             </div>
             <span>
-              See {moreCount.toLocaleString()} more {label}
+              {intl.formatMessage(
+                { id: 'SearchResults.SeeMore', defaultMessage: 'See {count} more {label}' },
+                {
+                  count: moreCount.toLocaleString(),
+                  label: label.toLowerCase(),
+                },
+              )}
             </span>
           </button>
         )}
+        {onStandaloneTab && <Pagination className="mt-4" total={totalCount} queryFilter={queryFilter} />}
       </div>
     </div>
   );
