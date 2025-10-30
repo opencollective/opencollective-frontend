@@ -60,7 +60,7 @@ export function getSSRVariablesFromQuery<S extends z.ZodObject<z.ZodRawShape>, G
     if (toVariables?.[key]) {
       apiVariables = {
         ...apiVariables,
-        ...toVariables[key](value, key, meta),
+        ...toVariables[key](value, key, meta, values),
       };
     } else {
       apiVariables = {
@@ -149,7 +149,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
       if (opts.toVariables?.[key]) {
         apiVariables = {
           ...apiVariables,
-          ...opts.toVariables[key](value, key, opts.meta),
+          ...opts.toVariables[key](value, key, opts.meta, values),
         };
       } else {
         apiVariables = {
