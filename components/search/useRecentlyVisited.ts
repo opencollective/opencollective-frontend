@@ -14,6 +14,7 @@ import useLocalStorage from '../../lib/hooks/useLocalStorage';
 import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import { useWorkspace } from '../WorkspaceProvider';
+import { HostApplicationStatus } from '@/lib/graphql/types/v2/graphql';
 
 const BaseAccountSchema = z.object({
   name: z.string(),
@@ -72,15 +73,22 @@ const CommentSchema = z.object({
   fromAccount: AccountSchema,
 });
 
+const HostApplicationSchema = z.object({
+  id: z.string(),
+  account: AccountSchema,
+  status: z.nativeEnum(HostApplicationStatus),
+});
+
 export type AccountResultData = z.infer<typeof AccountSchema>;
 export type CommentResultData = z.infer<typeof CommentSchema>;
 export type ExpenseResultData = z.infer<typeof ExpenseSchema>;
 export type OrderResultData = z.infer<typeof OrderSchema>;
 export type TransactionResultData = z.infer<typeof TransactionSchema>;
 export type UpdateResultData = z.infer<typeof UpdateSchema>;
+export type HostApplicationResultData = z.infer<typeof HostApplicationSchema>;
 
 const basePageVisitSchema = z.object({
-  type: z.enum(['account', 'comment', 'expense', 'order', 'transaction', 'update']),
+  type: z.enum(['account', 'comment', 'expense', 'order', 'transaction', 'update', 'hostApplication']),
   key: z.string(),
 });
 
@@ -108,6 +116,10 @@ const PageVisitSchema = z.discriminatedUnion('type', [
   basePageVisitSchema.extend({
     type: z.literal('comment'),
     data: CommentSchema,
+  }),
+  basePageVisitSchema.extend({
+    type: z.literal('hostApplication'),
+    data: HostApplicationSchema,
   }),
 ]);
 

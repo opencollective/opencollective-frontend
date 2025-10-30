@@ -5,17 +5,19 @@ import type {
   SearchAccountFieldsFragment,
   SearchCommentFieldsFragment,
   SearchExpenseFieldsFragment,
+  SearchHostApplicationFieldsFragment,
   SearchOrderFieldsFragment,
   SearchTransactionFieldsFragment,
   SearchUpdateFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
-import type { Comment, Order, Update } from '@/lib/graphql/types/v2/schema';
+import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import {
   getCollectivePageRoute,
   getCommentUrl,
   getDashboardRoute,
   getExpensePageUrl,
+  getHostApplicationDashboardUrl,
   getOrderUrl,
   getUpdateUrl,
 } from '@/lib/url-helpers';
@@ -131,6 +133,12 @@ export function useGetLinkProps() {
           const update = data as SearchUpdateFieldsFragment;
           href = getUpdateUrl(update as Update, LoggedInUser);
           onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
+          break;
+        }
+        case 'hostApplication': {
+          const hostApplication = data as SearchHostApplicationFieldsFragment;
+          href = getHostApplicationDashboardUrl(hostApplication as HostApplication, LoggedInUser);
+          onClick = () => addToRecent({ key: data.id.toString(), type, data });
           break;
         }
         case 'page':

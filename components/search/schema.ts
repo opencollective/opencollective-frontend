@@ -8,7 +8,9 @@ export enum SearchEntity {
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   UPDATES = 'UPDATES',
   COMMENTS = 'COMMENTS',
+  HOST_APPLICATIONS = 'HOST_APPLICATIONS',
 }
+
 export const schema = z.object({
   workspace: z.string().optional(),
   limit: z.number().default(20),

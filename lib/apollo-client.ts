@@ -412,6 +412,29 @@ function createInMemoryCache() {
               return incoming;
             },
           },
+          hostApplications: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
         },
       },
     },

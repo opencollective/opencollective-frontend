@@ -6,6 +6,7 @@ import {
   ArrowRightLeft,
   ChevronRight,
   Coins,
+  FileText,
   Megaphone,
   MessageCircle,
   Receipt,
@@ -38,6 +39,7 @@ import { useWorkspace } from '../WorkspaceProvider';
 import { AccountResult } from './result/AccountResult';
 import { CommentResult } from './result/CommentResult';
 import { ExpenseResult } from './result/ExpenseResult';
+import { HostApplicationResult } from './result/HostApplicationResult';
 import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
@@ -65,6 +67,11 @@ const entityOptions = {
     value: SearchEntity.CONTRIBUTIONS,
     icon: Coins,
     className: 'bg-amber-50 text-amber-700',
+  },
+  [SearchEntity.HOST_APPLICATIONS]: {
+    value: SearchEntity.HOST_APPLICATIONS,
+    icon: FileText,
+    className: 'bg-indigo-50 text-indigo-700',
   },
   [SearchEntity.TRANSACTIONS]: {
     value: SearchEntity.TRANSACTIONS,
@@ -129,6 +136,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           includeOrders: false,
           includeUpdates: false,
           includeComments: false,
+          includeHostApplications: false,
         };
 
         switch (val) {
@@ -141,6 +149,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               includeOrders: true,
               includeUpdates: true,
               includeComments: true,
+              includeHostApplications: true,
               limit: 5,
             };
           case SearchEntity.EXPENSES:
@@ -173,10 +182,15 @@ export const SearchCommand = ({ open, setOpen }) => {
               ...defaultForEntity,
               includeComments: true,
             };
+          case SearchEntity.HOST_APPLICATIONS:
+            return {
+              ...defaultForEntity,
+              includeHostApplications: true,
+            };
         }
       },
     },
-    defaultFilterValues: { workspace: account?.slug },
+    defaultFilterValues: { workspace: account?.slug, entity: SearchEntity.ALL },
     skipRouter: true,
   });
 
@@ -258,18 +272,16 @@ export const SearchCommand = ({ open, setOpen }) => {
 
   const filteredEntityOptions = React.useMemo(() => {
     if (queryFilter.values.workspace) {
-      return Object.values(
-        pick(entityOptions, [
-          SearchEntity.ACCOUNTS,
-          SearchEntity.EXPENSES,
-          SearchEntity.CONTRIBUTIONS,
-          SearchEntity.TRANSACTIONS,
-          SearchEntity.UPDATES,
-        ]),
-      );
+      const entities = [SearchEntity.ACCOUNTS, SearchEntity.EXPENSES, SearchEntity.TRANSACTIONS, SearchEntity.UPDATES];
+
+      if (defaultContext?.type === 'host') {
+        entities.push(SearchEntity.HOST_APPLICATIONS, SearchEntity.CONTRIBUTIONS);
+      }
+
+      return Object.values(pick(entityOptions, entities));
     }
     return Object.values(pick(entityOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
-  }, [queryFilter.values.workspace]);
+  }, [queryFilter.values.workspace, defaultContext?.type]);
 
   const filteredGoToPages = React.useMemo(() => {
     if (!queryFilter.values.workspace || !input || queryFilter.values.entity !== SearchEntity.ALL) {
@@ -297,6 +309,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       (results.orders?.collection?.totalCount || 0) > 0 ||
       (results.transactions?.collection?.totalCount || 0) > 0 ||
       (results.updates?.collection?.totalCount || 0) > 0 ||
+      (results.hostApplications?.collection?.totalCount || 0) > 0 ||
       (results.comments?.collection?.totalCount || 0) > 0
     );
   }, [data]);
@@ -356,6 +369,11 @@ export const SearchCommand = ({ open, setOpen }) => {
             totalCount = results.comments?.collection.totalCount || 0;
             shouldLoadMore = currentOffset < totalCount;
             break;
+          case SearchEntity.HOST_APPLICATIONS:
+            currentOffset = results.hostApplications?.collection.nodes.length || 0;
+            totalCount = results.hostApplications?.collection.totalCount || 0;
+            shouldLoadMore = currentOffset < totalCount;
+            break;
         }
 
         if (shouldLoadMore) {
@@ -397,7 +415,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           />
         )}
         {queryFilter.values.entity !== SearchEntity.ALL && (
-          <span className="flex items-center gap-1 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1 text-sm whitespace-nowrap text-muted-foreground">
             {i18nSearchEntity(intl, queryFilter.values.entity)} <ChevronRight size={10} className="!size-4" />
           </span>
         )}
@@ -538,6 +556,9 @@ export const SearchCommand = ({ open, setOpen }) => {
           <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Recent', id: 'rrfdNu' })}>
             {recentlyVisited.map(recentVisit => {
               const { href, onClick } = getLinkProps(recentVisit);
+              if (!href) {
+                return null;
+              }
               return (
                 <SearchCommandItem
                   key={recentVisit.key}
@@ -554,6 +575,9 @@ export const SearchCommand = ({ open, setOpen }) => {
                     {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
                     {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
                     {recentVisit.type === 'update' && <UpdateResult update={recentVisit.data} />}
+                    {recentVisit.type === 'hostApplication' && (
+                      <HostApplicationResult hostApplication={recentVisit.data} />
+                    )}
                   </Link>
                 </SearchCommandItem>
               );
@@ -602,7 +626,6 @@ export const SearchCommand = ({ open, setOpen }) => {
         {hasData && (
           <React.Fragment>
             <SearchCommandGroup
-              label="Accounts"
               entity={SearchEntity.ACCOUNTS}
               type="account"
               totalCount={data?.search.results.accounts?.collection.totalCount}
@@ -616,7 +639,6 @@ export const SearchCommand = ({ open, setOpen }) => {
               isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
-              label="Expenses"
               entity={SearchEntity.EXPENSES}
               type="expense"
               totalCount={data?.search.results.expenses?.collection.totalCount}
@@ -630,7 +652,22 @@ export const SearchCommand = ({ open, setOpen }) => {
               isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
-              label="Contributions"
+              entity={SearchEntity.HOST_APPLICATIONS}
+              type="hostApplication"
+              totalCount={data?.search.results.hostApplications?.collection.totalCount}
+              input={debouncedInput}
+              queryFilter={queryFilter}
+              setOpen={setOpen}
+              nodes={data?.search.results.hostApplications?.collection.nodes}
+              renderNode={hostApplication => (
+                <HostApplicationResult
+                  hostApplication={hostApplication}
+                  highlights={data?.search.results.hostApplications?.highlights[hostApplication.id]}
+                />
+              )}
+              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+            />
+            <SearchCommandGroup
               entity={SearchEntity.CONTRIBUTIONS}
               type="order"
               input={debouncedInput}
@@ -645,7 +682,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             />
 
             <SearchCommandGroup
-              label="Transactions"
               entity={SearchEntity.TRANSACTIONS}
               type="transaction"
               input={debouncedInput}
@@ -663,7 +699,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             />
 
             <SearchCommandGroup
-              label="Updates"
               entity={SearchEntity.UPDATES}
               type="update"
               input={debouncedInput}
@@ -677,7 +712,6 @@ export const SearchCommand = ({ open, setOpen }) => {
               isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
-              label="Comments"
               entity={SearchEntity.COMMENTS}
               type="comment"
               input={debouncedInput}
@@ -723,7 +757,7 @@ interface SearchCommandItemProps {
   showAction?: boolean;
   className?: string;
   value?: string;
-  [key: string]: any;
+  onDelete?: () => void;
 }
 
 const SearchCommandItem = React.memo<SearchCommandItemProps>(
@@ -803,7 +837,6 @@ const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSe
 
 interface SearchCommandGroupProps {
   totalCount?: number;
-  label: string;
   nodes?: any[];
   renderNode: (node: any) => React.ReactNode;
   input: string;
@@ -815,18 +848,8 @@ interface SearchCommandGroupProps {
 }
 
 const SearchCommandGroup = React.memo<SearchCommandGroupProps>(
-  ({
-    totalCount,
-    label,
-    nodes,
-    renderNode,
-    input,
-    queryFilter,
-    entity,
-    setOpen,
-    type,
-    isInfiniteScrollEnabled = false,
-  }) => {
+  ({ totalCount, nodes, renderNode, input, queryFilter, entity, setOpen, type, isInfiniteScrollEnabled = false }) => {
+    const intl = useIntl();
     const { LoggedInUser } = useLoggedInUser();
     const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
 
@@ -840,7 +863,7 @@ const SearchCommandGroup = React.memo<SearchCommandGroupProps>(
 
     const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
     return (
-      <CommandGroup heading={label} className="[&:last-child_.separator]:hidden">
+      <CommandGroup heading={i18nSearchEntity(intl, entity)} className="[&:last-child_.separator]:hidden">
         {nodes?.map(node => {
           const { href, onClick } = getLinkProps({ type, data: node });
           return (
@@ -875,7 +898,7 @@ const SearchCommandGroup = React.memo<SearchCommandGroupProps>(
             key={`more-${entity}`}
             totalCount={totalCount}
             limit={queryFilter.variables.limit}
-            label={label}
+            label={i18nSearchEntity(intl, entity)}
           />
         )}
         <hr className="separator -mx-2 my-2 h-px bg-border" />

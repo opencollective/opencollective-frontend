@@ -100,6 +100,9 @@ const getProfileUrl = (
   contextAccount: DashboardQuery['account'],
   account: { id: string; slug: string; type: string },
 ) => {
+  if (!contextAccount) {
+    return null;
+  }
   const context =
     'host' in contextAccount && loggedInUser?.isAdminOfCollective(contextAccount.host)
       ? contextAccount.host
