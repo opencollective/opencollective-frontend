@@ -41,6 +41,9 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
       }
     }
   };
+  const handleImageUploadClear = () => {
+    handleChange({ [ReceiptField.EmbeddedImage]: null });
+  };
 
   return (
     <React.Fragment>
@@ -92,6 +95,7 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
           useGraphQL={true}
           kind="RECEIPT_EMBEDDED_IMAGE"
           onGraphQLSuccess={handleImageUploadSuccess}
+          onClear={handleImageUploadClear}
           isMulti={false}
           value={values.embeddedImage}
           className="w-full"

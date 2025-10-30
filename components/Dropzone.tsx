@@ -118,6 +118,7 @@ const Dropzone = ({
   parseDocument = false,
   parsingOptions = {},
   onGraphQLSuccess = undefined,
+  onClear = undefined,
   UploadingComponent = undefined,
   showInstructions = false,
   showIcon = false,
@@ -413,14 +414,11 @@ const Dropzone = ({
             variant="outline"
             size="xs"
             onClick={() => {
-              if (useGraphQL) {
-                onGraphQLSuccess?.([]);
+              onClear?.();
+              if (isMulti) {
+                (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)?.([], []);
               } else {
-                if (isMulti) {
-                  (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)?.([], []);
-                } else {
-                  (onSuccess as (file: UploadedFile) => void)?.(null);
-                }
+                (onSuccess as (file: UploadedFile) => void)?.(null);
               }
             }}
             disabled={isLoading}
@@ -480,6 +478,7 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
   useGraphQL?: boolean;
   showActions?: boolean;
   onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
+  onClear?: () => void;
   parseDocument?: boolean;
   parsingOptions?: OcrParsingOptionsInput;
   UploadingComponent?: React.ComponentType;
