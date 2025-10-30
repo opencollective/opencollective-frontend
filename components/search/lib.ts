@@ -1,7 +1,9 @@
+import { useCallback } from 'react';
+
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { SearchHighlights } from './types';
-import { PageVisit, useRecentlyVisited } from './useRecentlyVisited';
-import { useRouter } from 'next/router';
+import type { SearchAccountFieldsFragment, SearchExpenseFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { Comment, Order, Update } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import {
   getCollectivePageRoute,
   getCommentUrl,
@@ -10,12 +12,14 @@ import {
   getOrderUrl,
   getUpdateUrl,
 } from '@/lib/url-helpers';
-import { DashboardContext } from '../dashboard/DashboardContext';
-import React, { useCallback } from 'react';
-import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/schema';
-import { useWorkspace } from '../WorkspaceProvider';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import { useWorkspace } from '../WorkspaceProvider';
+
+import type { SearchHighlights } from './types';
+import type { PageVisit } from './useRecentlyVisited';
+import { useRecentlyVisited } from './useRecentlyVisited';
+import { ALL_SECTIONS } from '../dashboard/constants';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 export function getHighlightsFields<T extends string>(
   highlights: SearchHighlights,
   topFields: readonly T[],
@@ -56,27 +60,39 @@ export function useGetLinkProps() {
       let href: string;
       let onClick: () => void;
       switch (type) {
-        case 'account':
-          if (data.type === CollectiveType.VENDOR) {
+        case 'account': {
+          const account = data as SearchAccountFieldsFragment;
+          if (account.type === CollectiveType.VENDOR) {
             if (data.parentCollective.slug === workspace.slug) {
               // TODO: missing query param for vendor drawer
               href = getDashboardRoute(workspace, `vendors/${data.slug}`);
             }
             // missing general pattern, maybe never occurs?
             href = '';
+          } else if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD)) {
+            href = getDashboardRoute(workspace); // TODO: people link
           } else {
             href = getCollectivePageRoute(data as { slug: string });
           }
           onClick = () => addToRecent({ key: data.slug.toString(), type, data });
           break;
-        case 'expense':
-          // TODO: handle within dashboard:
-          // - host-expenses
-          // - received expenses
-          // - submitted expenses
-          href = getExpensePageUrl(data as Expense);
-          onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
+        }
+        case 'expense': {
+          const expense = data as SearchExpenseFieldsFragment;
+
+          if (workspace.slug === expense.account.slug) {
+            href = getDashboardRoute(workspace, `expenses?openExpenseId=${expense.legacyId}`);
+          } else if (workspace.slug === expense.payee?.slug) {
+            href = getDashboardRoute(workspace, `submitted-expenses?openExpenseId=${expense.legacyId}`);
+          } else if (workspace.isHost && 'host' in expense.account && workspace.slug === expense.account?.host?.slug) {
+            href = getDashboardRoute(workspace, `host-expenses?openExpenseId=${expense.legacyId}`);
+          } else {
+            href = getExpensePageUrl(expense);
+          }
+
+          onClick = () => addToRecent({ key: expense.legacyId.toString(), type, data: expense });
           break;
+        }
         case 'transaction':
           if (workspace?.slug === 'root-actions' || workspace?.isHost) {
             href = `/dashboard/${workspace.slug}/host-transactions?openTransactionId=${data.legacyId}`;

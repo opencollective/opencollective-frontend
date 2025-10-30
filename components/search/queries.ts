@@ -7,7 +7,140 @@ const searchAccountFieldsFragment = gql`
     slug
     imageUrl(height: $imageHeight)
     type
+    ... on AccountWithHost {
+      host {
+        id
+        name
+        slug
+      }
+    }
   }
+`;
+
+const searchCommentFieldsFragment = gql`
+  fragment SearchCommentFields on Comment {
+    id
+    html
+    createdAt
+    fromAccount {
+      ...SearchAccountFields
+    }
+    expense {
+      id
+      legacyId
+      description
+      account {
+        ...SearchAccountFields
+      }
+    }
+    update {
+      id
+      legacyId
+      title
+      account {
+        ...SearchAccountFields
+      }
+    }
+    order {
+      id
+      legacyId
+      toAccount {
+        ...SearchAccountFields
+      }
+    }
+    hostApplication {
+      id
+      account {
+        ...SearchAccountFields
+      }
+      host {
+        ...SearchAccountFields
+      }
+    }
+    conversation {
+      id
+      slug
+      account {
+        ...SearchAccountFields
+      }
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+const searchExpenseFieldsFragment = gql`
+  fragment SearchExpenseFields on Expense {
+    id
+    description
+    legacyId
+    type
+    status
+    amountV2 {
+      valueInCents
+      currency
+    }
+    payee {
+      ...SearchAccountFields
+    }
+    account {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+const searchOrderFieldsFragment = gql`
+  fragment SearchOrderFields on Order {
+    id
+    legacyId
+    description
+    status
+    amount {
+      valueInCents
+      currency
+    }
+    toAccount {
+      ...SearchAccountFields
+    }
+    fromAccount {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+const searchTransactionFieldsFragment = gql`
+  fragment SearchTransactionFields on Transaction {
+    id
+    legacyId
+    description
+    type
+    kind
+    netAmount {
+      valueInCents
+      currency
+    }
+    account {
+      ...SearchAccountFields
+    }
+    oppositeAccount {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+const searchUpdateFieldsFragment = gql`
+  fragment SearchUpdateFields on Update {
+    id
+    legacyId
+    slug
+    title
+    account {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
 `;
 
 export const searchCommandQuery = gql`
@@ -44,51 +177,7 @@ export const searchCommandQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              html
-              createdAt
-              fromAccount {
-                ...SearchAccountFields
-              }
-              expense {
-                id
-                legacyId
-                description
-                account {
-                  ...SearchAccountFields
-                }
-              }
-              update {
-                id
-                legacyId
-                title
-                account {
-                  ...SearchAccountFields
-                }
-              }
-              order {
-                id
-                legacyId
-                toAccount {
-                  ...SearchAccountFields
-                }
-              }
-              hostApplication {
-                id
-                account {
-                  ...SearchAccountFields
-                }
-                host {
-                  ...SearchAccountFields
-                }
-              }
-              conversation {
-                id
-                slug
-                account {
-                  ...SearchAccountFields
-                }
-              }
+              ...SearchCommentFields
             }
           }
         }
@@ -99,21 +188,7 @@ export const searchCommandQuery = gql`
             limit
             offset
             nodes {
-              id
-              description
-              legacyId
-              type
-              status
-              amountV2 {
-                valueInCents
-                currency
-              }
-              payee {
-                ...SearchAccountFields
-              }
-              account {
-                ...SearchAccountFields
-              }
+              ...SearchExpenseFields
             }
           }
         }
@@ -123,20 +198,7 @@ export const searchCommandQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              description
-              status
-              amount {
-                valueInCents
-                currency
-              }
-              toAccount {
-                ...SearchAccountFields
-              }
-              fromAccount {
-                ...SearchAccountFields
-              }
+              ...SearchOrderFields
             }
           }
         }
@@ -146,21 +208,7 @@ export const searchCommandQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              description
-              type
-              kind
-              netAmount {
-                valueInCents
-                currency
-              }
-              account {
-                ...SearchAccountFields
-              }
-              oppositeAccount {
-                ...SearchAccountFields
-              }
+              ...SearchTransactionFields
             }
           }
         }
@@ -171,20 +219,18 @@ export const searchCommandQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              slug
-              title
-              account {
-                ...SearchAccountFields
-              }
+              ...SearchUpdateFields
             }
           }
         }
       }
     }
   }
-  ${searchAccountFieldsFragment}
+  ${searchCommentFieldsFragment}
+  ${searchExpenseFieldsFragment}
+  ${searchOrderFieldsFragment}
+  ${searchTransactionFieldsFragment}
+  ${searchUpdateFieldsFragment}
 `;
 
 export const searchPageQuery = gql`
@@ -233,51 +279,7 @@ export const searchPageQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              html
-              createdAt
-              fromAccount {
-                ...SearchAccountFields
-              }
-              expense {
-                id
-                legacyId
-                description
-                account {
-                  ...SearchAccountFields
-                }
-              }
-              update {
-                id
-                legacyId
-                title
-                account {
-                  ...SearchAccountFields
-                }
-              }
-              order {
-                id
-                legacyId
-                toAccount {
-                  ...SearchAccountFields
-                }
-              }
-              hostApplication {
-                id
-                account {
-                  ...SearchAccountFields
-                }
-                host {
-                  ...SearchAccountFields
-                }
-              }
-              conversation {
-                id
-                slug
-                account {
-                  ...SearchAccountFields
-                }
-              }
+              ...SearchCommentFields
             }
           }
         }
@@ -288,21 +290,7 @@ export const searchPageQuery = gql`
             limit
             offset
             nodes {
-              id
-              description
-              legacyId
-              type
-              status
-              amountV2 {
-                valueInCents
-                currency
-              }
-              payee {
-                ...SearchAccountFields
-              }
-              account {
-                ...SearchAccountFields
-              }
+              ...SearchExpenseFields
             }
           }
         }
@@ -312,20 +300,7 @@ export const searchPageQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              description
-              status
-              amount {
-                valueInCents
-                currency
-              }
-              toAccount {
-                ...SearchAccountFields
-              }
-              fromAccount {
-                ...SearchAccountFields
-              }
+              ...SearchOrderFields
             }
           }
         }
@@ -335,21 +310,7 @@ export const searchPageQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              description
-              type
-              kind
-              netAmount {
-                valueInCents
-                currency
-              }
-              account {
-                ...SearchAccountFields
-              }
-              oppositeAccount {
-                ...SearchAccountFields
-              }
+              ...SearchTransactionFields
             }
           }
         }
@@ -360,20 +321,18 @@ export const searchPageQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              slug
-              title
-              account {
-                ...SearchAccountFields
-              }
+              ...SearchUpdateFields
             }
           }
         }
       }
     }
   }
-  ${searchAccountFieldsFragment}
+  ${searchCommentFieldsFragment}
+  ${searchExpenseFieldsFragment}
+  ${searchOrderFieldsFragment}
+  ${searchTransactionFieldsFragment}
+  ${searchUpdateFieldsFragment}
 `;
 
 export const contextQuery = gql`
