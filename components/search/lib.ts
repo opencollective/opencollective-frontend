@@ -1,7 +1,14 @@
 import { useCallback } from 'react';
 
 import { CollectiveType } from '@/lib/constants/collectives';
-import type { SearchAccountFieldsFragment, SearchExpenseFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type {
+  SearchAccountFieldsFragment,
+  SearchCommentFieldsFragment,
+  SearchExpenseFieldsFragment,
+  SearchOrderFieldsFragment,
+  SearchTransactionFieldsFragment,
+  SearchUpdateFieldsFragment,
+} from '@/lib/graphql/types/v2/graphql';
 import type { Comment, Order, Update } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import {
@@ -20,6 +27,8 @@ import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { DashboardContext } from '../dashboard/DashboardContext';
+import React from 'react';
 export function getHighlightsFields<T extends string>(
   highlights: SearchHighlights,
   topFields: readonly T[],
@@ -47,6 +56,7 @@ export function useGetLinkProps() {
   const { addToRecent } = useRecentlyVisited();
   const { LoggedInUser } = useLoggedInUser();
   const { workspace } = useWorkspace();
+  const { getProfileUrl } = React.useContext(DashboardContext);
   const getLinkProps = useCallback(
     ({
       type,
@@ -62,15 +72,13 @@ export function useGetLinkProps() {
       switch (type) {
         case 'account': {
           const account = data as SearchAccountFieldsFragment;
-          if (account.type === CollectiveType.VENDOR) {
-            if (data.parentCollective.slug === workspace.slug) {
-              // TODO: missing query param for vendor drawer
-              href = getDashboardRoute(workspace, `vendors/${data.slug}`);
-            }
-            // missing general pattern, maybe never occurs?
-            href = '';
-          } else if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD)) {
-            href = getDashboardRoute(workspace); // TODO: people link
+          const peopleProfileLink = getProfileUrl(account);
+          if (account.type === CollectiveType.VENDOR && 'parent' in account && account.parent.slug === workspace.slug) {
+            href = getDashboardRoute(workspace, `vendors/${account.id}`);
+          } else if (peopleProfileLink) {
+            href = peopleProfileLink;
+          } else if (workspace.isHost && 'host' in account && workspace.slug === account.host.slug) {
+            href = getDashboardRoute(workspace, `hosted-collectives/${account.id}`);
           } else {
             href = getCollectivePageRoute(data as { slug: string });
           }
@@ -90,39 +98,50 @@ export function useGetLinkProps() {
             href = getExpensePageUrl(expense);
           }
 
-          onClick = () => addToRecent({ key: expense.legacyId.toString(), type, data: expense });
+          onClick = () => addToRecent({ key: expense.legacyId.toString(), type, data });
           break;
         }
-        case 'transaction':
-          if (workspace?.slug === 'root-actions' || workspace?.isHost) {
-            href = `/dashboard/${workspace.slug}/host-transactions?openTransactionId=${data.legacyId}`;
-          } else if (workspace.slug) {
-            href = `/dashboard/${workspace.slug}/transactions?openTransactionId=${data.legacyId}`;
+        case 'transaction': {
+          const transaction = data as SearchTransactionFieldsFragment;
+          if (
+            workspace?.slug === 'root-actions' ||
+            (workspace?.isHost && 'host' in transaction && transaction.host.slug === workspace.slug)
+          ) {
+            href = getDashboardRoute(workspace, `host-transactions?openTransactionId=${transaction.legacyId}`);
+          } else if (transaction.account.slug === workspace.slug) {
+            href = getDashboardRoute(workspace, `transactions?openTransactionId=${transaction.legacyId}`);
           } else {
-            // handle platform transactions?
+            // No URL for platform transactions yet, however these should not appear
             href = undefined;
           }
 
+          onClick = () => addToRecent({ key: transaction.legacyId.toString(), type, data });
+          break;
+        }
+        case 'comment': {
+          const comment = data as SearchCommentFieldsFragment;
+          href = getCommentUrl(comment as Comment, LoggedInUser);
+          break;
+        }
+        case 'order': {
+          const order = data as SearchOrderFieldsFragment;
+          href = getOrderUrl(order as Order, LoggedInUser);
           onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
           break;
-        case 'comment':
-          href = getCommentUrl(data as Comment, LoggedInUser);
-          break;
-        case 'order':
-          href = getOrderUrl(data as Order, LoggedInUser);
+        }
+        case 'update': {
+          const update = data as SearchUpdateFieldsFragment;
+          href = getUpdateUrl(update as Update, LoggedInUser);
           onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
           break;
-        case 'update':
-          href = getUpdateUrl(data as Update, LoggedInUser);
-          onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
-          break;
+        }
         case 'page':
           href = `/dashboard/${workspace.slug}/${data.section}`;
           break;
       }
       return { href, onClick };
     },
-    [LoggedInUser, workspace, addToRecent],
+    [LoggedInUser, workspace, addToRecent, getProfileUrl],
   );
 
   return { getLinkProps };
