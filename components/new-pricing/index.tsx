@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
+import I18nFormatters from '../I18nFormatters';
 import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
@@ -330,8 +331,9 @@ export default function Pricing({ data }) {
               </h3>
               <p className="text-muted-foreground">
                 <FormattedMessage
-                  defaultMessage="Platform Tips are optional contributions that financial contributors can add when they contribute on the platform. These tips support the Open Collective Platform, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your Organization or the Collectives you host receive, because they are added on top of the intended support. If you prefer a more traditional pricing model, you can opt for a simple 5% platform fee instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over."
+                  defaultMessage="<strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.{newLine}{newLine}If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over."
                   id="pricing.new.faq.tips.answer"
+                  values={I18nFormatters}
                 />
               </p>
             </div>
