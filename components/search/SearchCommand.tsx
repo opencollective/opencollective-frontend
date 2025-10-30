@@ -251,7 +251,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     [queryFilter],
   );
 
-  const { recentlyVisited } = useRecentlyVisited();
+  const { recentlyVisited, removeFromRecent } = useRecentlyVisited();
   const { getLinkProps } = useGetLinkProps();
 
   const isLoading = loading || isDebouncing;
@@ -562,7 +562,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                     setOpen(false);
                     onClick?.();
                   }}
-                  onDelete={() => console.log('delete this')}
+                  onDelete={() => removeFromRecent(recentVisit.key)}
                 >
                   <Link href={href} className="block w-full">
                     {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
@@ -747,26 +747,32 @@ const SearchCommandItem = React.memo<SearchCommandItemProps>(
           '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
           '[&[data-selected=true]_.action]:text-foreground',
           showAction ? '' : '[&[data-selected=false]_.action]:hidden',
+          '[&[data-selected=false]_.actions]:hidden',
           className,
         )}
         {...props}
       >
         {children}
-        <div className="absolute right-2">
-          {/* {onDelete && (
-            <div className="">
-              <X />
-            </div>
-          )} */}
-
+        <div className={cn('actions absolute right-2 flex items-center gap-1', showAction ? '' : 'absolute right-2')}>
           <div
             className={cn(
               'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
-              // showAction ? '' : 'absolute right-2',
             )}
           >
             {actionLabel}
           </div>
+          {onDelete && (
+            <button
+              className="flex size-7 items-center justify-center rounded-md p-1 ring-border transition-colors hover:bg-background hover:shadow-xs hover:ring"
+              onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete();
+              }}
+            >
+              <X className="!size-4" />
+            </button>
+          )}
         </div>
       </CommandItem>
     );

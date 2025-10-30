@@ -160,7 +160,23 @@ export function useRecentlyVisited() {
     [dashboardSlug, setRecentlyVisitedRaw],
   );
 
+  const removeFromRecent = useCallback(
+    (key: string) => {
+      setRecentlyVisitedRaw(prevRecentlyVisited => {
+        if (!dashboardSlug) {
+          return prevRecentlyVisited;
+        }
+        const dashboardVisits = (prevRecentlyVisited[dashboardSlug] || []).filter(result => result.key !== key);
+        return {
+          ...prevRecentlyVisited,
+          [dashboardSlug]: dashboardVisits,
+        };
+      });
+    },
+    [dashboardSlug, setRecentlyVisitedRaw],
+  );
+
   const currentRecentlyVisited = dashboardSlug ? (recentlyVisited[dashboardSlug] ?? []) : [];
 
-  return { recentlyVisited: currentRecentlyVisited, addToRecent };
+  return { recentlyVisited: currentRecentlyVisited, addToRecent, removeFromRecent };
 }
