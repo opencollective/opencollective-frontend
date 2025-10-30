@@ -266,7 +266,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cypress-recordings-${{ github.run_id }}-${{ strategy.job-index }}
           path: |
@@ -275,7 +275,7 @@ jobs:
         if: ${{ failure() }}
 
       - name: Archive download folder
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: downloads-${{ github.run_id }}-${{ strategy.job-index }}
           path: test/cypress/downloads
