@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
-import { getMenuItems } from '../dashboard/Menu';
+import { getMenuItems, type PageMenuItem } from '../dashboard/Menu';
 import Link from '../Link';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
@@ -47,6 +47,7 @@ import { PageResult } from './PageResult';
 import { searchCommandQuery } from './queries';
 import { schema, SearchEntity } from './schema';
 import { SearchCommandLegend } from './SearchCommandLegend';
+import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
 const entityOptions = {
@@ -120,6 +121,16 @@ export const SearchCommand = ({ open, setOpen }) => {
         }
       },
       entity: val => {
+        const defaultForEntity = {
+          useTopHits: false,
+          includeAccounts: false,
+          includeTransactions: false,
+          includeExpenses: false,
+          includeOrders: false,
+          includeUpdates: false,
+          includeComments: false,
+        };
+
         switch (val) {
           case SearchEntity.ALL:
             return {
@@ -130,66 +141,36 @@ export const SearchCommand = ({ open, setOpen }) => {
               includeOrders: true,
               includeUpdates: true,
               includeComments: true,
-              limit: 5, // default is 20 according to schema
+              limit: 5,
             };
           case SearchEntity.EXPENSES:
             return {
-              useTopHits: false,
-              includeAccounts: false,
-              includeTransactions: false,
+              ...defaultForEntity,
               includeExpenses: true,
-              includeOrders: false,
-              includeUpdates: false,
-              includeComments: false,
             };
           case SearchEntity.TRANSACTIONS:
             return {
-              useTopHits: false,
-              includeAccounts: false,
+              ...defaultForEntity,
               includeTransactions: true,
-              includeExpenses: false,
-              includeOrders: false,
-              includeUpdates: false,
-              includeComments: false,
             };
           case SearchEntity.ACCOUNTS:
             return {
-              useTopHits: false,
-              includeTransactions: false,
-              includeExpenses: false,
-              includeOrders: false,
-              includeUpdates: false,
-              includeComments: false,
+              ...defaultForEntity,
               includeAccounts: true,
             };
           case SearchEntity.CONTRIBUTIONS:
             return {
-              useTopHits: false,
-              includeAccounts: false,
-              includeTransactions: false,
-              includeExpenses: false,
+              ...defaultForEntity,
               includeOrders: true,
-              includeUpdates: false,
-              includeComments: false,
             };
           case SearchEntity.UPDATES:
             return {
-              useTopHits: false,
-              includeAccounts: false,
-              includeTransactions: false,
-              includeExpenses: false,
-              includeOrders: false,
+              ...defaultForEntity,
               includeUpdates: true,
-              includeComments: false,
             };
           case SearchEntity.COMMENTS:
             return {
-              useTopHits: false,
-              includeAccounts: false,
-              includeTransactions: false,
-              includeExpenses: false,
-              includeOrders: false,
-              includeUpdates: false,
+              ...defaultForEntity,
               includeComments: true,
             };
         }
@@ -260,7 +241,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   const hasData = hasSearchTerm && dataMatchesCurrentSearch;
   const isInitialLoading = isLoading && !hasData && hasSearchTerm;
 
-  const flattenedMenuItems = React.useMemo(() => {
+  const flattenedMenuItems: (PageMenuItem & { group?: string })[] = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
     return menuItems
       .flatMap(menuItem =>
@@ -811,7 +792,7 @@ interface SearchCommandGroupProps {
   queryFilter: any;
   entity: SearchEntity;
   setOpen: (open: boolean) => void;
-  type: string;
+  type: PageVisit['type'];
   isInfiniteScrollEnabled?: boolean;
 }
 
