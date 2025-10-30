@@ -31,6 +31,10 @@ const i18nEntity = defineMessages({
     defaultMessage: 'Comments',
     id: 'wCgTu5',
   },
+  [SearchEntity.HOST_APPLICATIONS]: {
+    defaultMessage: 'Host Applications',
+    id: 'Menu.HostApplications',
+  },
 });
 
 export const i18nSearchEntity = (intl, entity) => {

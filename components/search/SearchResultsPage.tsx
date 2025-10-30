@@ -149,6 +149,7 @@ export const SearchResults = () => {
       includeOrders: true,
       includeUpdates: true,
       includeComments: true,
+      includeHostApplications: true,
     },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,

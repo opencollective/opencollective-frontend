@@ -155,6 +155,21 @@ const searchUpdateFieldsFragment = gql`
   ${searchAccountFieldsFragment}
 `;
 
+const searchHostApplicationFieldsFragment = gql`
+  fragment SearchHostApplicationFields on HostApplication {
+    id
+    status
+    createdAt
+    account {
+      ...SearchAccountFields
+    }
+    host {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
 export const searchCommandQuery = gql`
   query SearchCommand(
     $searchTerm: String!
@@ -169,6 +184,7 @@ export const searchCommandQuery = gql`
     $includeTransactions: Boolean!
     $includeOrders: Boolean!
     $includeUpdates: Boolean!
+    $includeHostApplications: Boolean!
     $offset: Int
   ) {
     search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account, useTopHits: $useTopHits) {
@@ -235,6 +251,16 @@ export const searchCommandQuery = gql`
             }
           }
         }
+        hostApplications(limit: $limit, offset: $offset) @include(if: $includeHostApplications) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchHostApplicationFields
+            }
+          }
+        }
       }
     }
   }
@@ -243,6 +269,7 @@ export const searchCommandQuery = gql`
   ${searchOrderFieldsFragment}
   ${searchTransactionFieldsFragment}
   ${searchUpdateFieldsFragment}
+  ${searchHostApplicationFieldsFragment}
 `;
 
 export const searchPageQuery = gql`
@@ -257,6 +284,7 @@ export const searchPageQuery = gql`
     $ordersLimit: Int
     $updatesLimit: Int
     $transactionsLimit: Int
+    $hostApplicationsLimit: Int
     $imageHeight: Int
     $useTopHits: Boolean
     $includeAccounts: Boolean!
@@ -265,6 +293,7 @@ export const searchPageQuery = gql`
     $includeTransactions: Boolean!
     $includeOrders: Boolean!
     $includeUpdates: Boolean!
+    $includeHostApplications: Boolean!
     $offset: Int
   ) {
     search(
@@ -337,6 +366,16 @@ export const searchPageQuery = gql`
             }
           }
         }
+        hostApplications(limit: $hostApplicationsLimit, offset: $offset) @include(if: $includeHostApplications) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchHostApplicationFields
+            }
+          }
+        }
       }
     }
   }
@@ -345,6 +384,7 @@ export const searchPageQuery = gql`
   ${searchOrderFieldsFragment}
   ${searchTransactionFieldsFragment}
   ${searchUpdateFieldsFragment}
+  ${searchHostApplicationFieldsFragment}
 `;
 
 export const contextQuery = gql`
