@@ -405,7 +405,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           ref={inputRef}
           onValueChange={setInput}
           value={input}
-          placeholder="Search..."
+          placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
         {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
@@ -447,7 +447,10 @@ export const SearchCommand = ({ open, setOpen }) => {
                     queryFilter.setFilter('entity', opt.value);
                   }}
                   value={opt.value}
-                  actionLabel={`Search in ${opt.value.toLowerCase()}`}
+                  actionLabel={intl.formatMessage(
+                    { defaultMessage: 'Search in {entity}', id: 'UHj+h/' },
+                    { entity: entityLabel.toLowerCase() },
+                  )}
                 >
                   <div className="flex items-center gap-2">
                     <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
@@ -493,7 +496,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                     );
                     setOpen(false);
                   }}
-                  actionLabel={'Search in this workspace'}
+                  actionLabel={intl.formatMessage({ defaultMessage: 'Search in this workspace', id: 'qT2PNg' })}
                   showAction
                 >
                   <div className="flex items-center gap-2">
@@ -514,7 +517,7 @@ export const SearchCommand = ({ open, setOpen }) => {
                   queryFilter.resetFilters({ searchTerm: input, workspace: 'ALL' }, '/search-results');
                   setOpen(false);
                 }}
-                actionLabel={'Search all of Open Collective'}
+                actionLabel={intl.formatMessage({ defaultMessage: 'Search all of Open Collective', id: 'LoB4cg' })}
                 showAction
               >
                 <div className="flex items-center gap-2">
@@ -532,7 +535,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
 
         {recentlyVisited.length > 0 && input === '' && queryFilter.values.entity === SearchEntity.ALL && (
-          <CommandGroup heading="Recent">
+          <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Recent', id: 'rrfdNu' })}>
             {recentlyVisited.map(recentVisit => {
               const { href, onClick } = getLinkProps(recentVisit);
               return (
@@ -559,7 +562,10 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
 
         {filteredGoToPages.length > 0 && (
-          <CommandGroup heading="Go to" className="[&:last-child_.separator]:hidden">
+          <CommandGroup
+            heading={intl.formatMessage({ defaultMessage: 'Go to', id: 'D6x+uj' })}
+            className="[&:last-child_.separator]:hidden"
+          >
             {filteredGoToPages.map(page => {
               const { href, onClick } = getLinkProps({ type: 'page', data: page });
               return (
@@ -581,7 +587,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           </CommandGroup>
         )}
         {isInitialLoading && input !== '' && (
-          <CommandGroup heading="Loading...">
+          <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Loading...', id: 'Select.Loading' })}>
             {[1, 2, 3, 4, 5].map(id => (
               <div key={`skeleton-${id}`} className="flex items-center gap-2 px-2 py-3">
                 <Skeleton className="size-9 shrink-0 rounded-md" />
@@ -693,7 +699,9 @@ export const SearchCommand = ({ open, setOpen }) => {
         {isLoadingMore && (
           <div className="flex items-center justify-center gap-2 py-4">
             <Spinner size={16} className="text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Loading more...</span>
+            <span className="text-sm text-muted-foreground">
+              <FormattedMessage defaultMessage="Loading more..." id="jZ5QcA" />
+            </span>
           </div>
         )}
 
@@ -719,7 +727,9 @@ interface SearchCommandItemProps {
 }
 
 const SearchCommandItem = React.memo<SearchCommandItemProps>(
-  ({ onSelect, onDelete, actionLabel = 'Jump to', children, showAction = false, className = undefined, ...props }) => {
+  ({ onSelect, onDelete, actionLabel, children, showAction = false, className = undefined, ...props }) => {
+    const intl = useIntl();
+    const defaultActionLabel = intl.formatMessage({ defaultMessage: 'Jump to', id: 'u8j6vX' });
     return (
       <CommandItem
         onSelect={onSelect}
@@ -740,7 +750,7 @@ const SearchCommandItem = React.memo<SearchCommandItemProps>(
               'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
             )}
           >
-            {actionLabel}
+            {actionLabel ?? defaultActionLabel}
           </div>
           {onDelete && (
             <button
@@ -768,6 +778,7 @@ interface SeeMoreItemsCommandItemProps {
 }
 
 const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSelect, totalCount, limit, label }) => {
+  const intl = useIntl();
   if (totalCount > limit) {
     return (
       <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
@@ -775,7 +786,14 @@ const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSe
           <SearchIcon />
         </div>
         <span>
-          See {Number(totalCount - limit).toLocaleString()} more {label}
+          <FormattedMessage
+            defaultMessage="See {count} more {label}"
+            id="SearchResults.SeeMore"
+            values={{
+              count: Number(totalCount - limit).toLocaleString(intl.locale),
+              label: label.toLowerCase(),
+            }}
+          />
         </span>
       </SearchCommandItem>
     );
