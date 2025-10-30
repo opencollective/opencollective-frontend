@@ -10,7 +10,7 @@ describe('Expense flow', () => {
   describe('new expense when logged out', () => {
     it('shows the login screen', () => {
       cy.createHostedCollective().then(collective => {
-        cy.visit(`/${collective.slug}/expenses/new`);
+        cy.visit(`/${collective.slug}/expenses/new?forceLegacyFlow=true`);
         cy.getByDataCy('signIn-form');
       });
     });
@@ -24,13 +24,16 @@ describe('Expense flow', () => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
-          redirect: `/${collective.slug}/expenses/new?ocr=false`,
+          redirect: encodeURIComponent(`/${collective.slug}/expenses/new?ocr=false&forceLegacyFlow=true`),
         }).then(u => (user = u));
       });
     });
 
     beforeEach(() => {
-      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new?ocr=false` });
+      cy.login({
+        email: user.email,
+        redirect: encodeURIComponent(`/${collective.slug}/expenses/new?ocr=false&forceLegacyFlow=true`),
+      });
     });
 
     it('has a dismissible help message', () => {
@@ -152,7 +155,9 @@ describe('Expense flow', () => {
     it('can use OCR', () => {
       cy.login({
         email: user.email,
-        redirect: encodeURIComponent(`/${collective.slug}/expenses/new?ocr=true&mockImageUpload=false`), // Add query param to enable OCR and disable mock image upload (since they don't have OCR)
+        redirect: encodeURIComponent(
+          `/${collective.slug}/expenses/new?ocr=true&mockImageUpload=false&forceLegacyFlow=true`,
+        ), // Add query param to enable OCR and disable mock image upload (since they don't have OCR)
       });
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('payout-method-select').click();
@@ -234,7 +239,9 @@ describe('Expense flow', () => {
     it('can play with the exchange rate', () => {
       cy.login({
         email: user.email,
-        redirect: encodeURIComponent(`/${collective.slug}/expenses/new?ocr=true&mockImageUpload=false`), // Add query param to enable OCR and disable mock image upload (since they don't have OCR)
+        redirect: encodeURIComponent(
+          `/${collective.slug}/expenses/new?ocr=true&mockImageUpload=false&forceLegacyFlow=true`,
+        ), // Add query param to enable OCR and disable mock image upload (since they don't have OCR)
       });
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('payout-method-select').click();
@@ -487,7 +494,7 @@ describe('Expense flow', () => {
         // Log out and submit as invitee...
         cy.url({ log: true })
           .then(_url => {
-            const [, collective, expenseId] = _url.match(/\/([\w-]+)\/expenses\/(\w+)$/);
+            const [, collective, expenseId] = _url.match(/\/([\w-]+)\/expenses\/(\w+)/);
             return { collective, expenseId };
           })
           .as('createdExpense');
@@ -570,7 +577,7 @@ describe('Expense flow', () => {
         // Log out and submit as invitee...
         cy.url({ log: true })
           .then(_url => {
-            const [, collective, expenseId] = _url.match(/\/([\w-]+)\/expenses\/(\w+)$/);
+            const [, collective, expenseId] = _url.match(/\/([\w-]+)\/expenses\/(\w+)/);
             return { collective, expenseId };
           })
           .as('createdExpense');
@@ -638,7 +645,7 @@ describe('Expense flow', () => {
         settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
       });
 
-      cy.login({ redirect: `/${collective.slug}/expenses/new` });
+      cy.login({ redirect: encodeURIComponent(`/${collective.slug}/expenses/new?forceLegacyFlow=true`) });
       cy.getByDataCy('radio-expense-type-INVOICE').click();
 
       // ---- 1. Submit expense with VAT ----
@@ -832,7 +839,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
-      cy.visit(expenseUrl);
+      cy.visit(`${expenseUrl}?forceLegacyFlow=true`);
       cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
       cy.getByDataCy('submit-expense-dropdown').click();
       cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
@@ -844,7 +851,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.createProject({ userEmail: user.email, collective }).then(project => {
-        cy.visit(`/${project.slug}/expenses/new`);
+        cy.visit(`/${project.slug}/expenses/new?forceLegacyFlow=true`);
         cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
       });
     });
