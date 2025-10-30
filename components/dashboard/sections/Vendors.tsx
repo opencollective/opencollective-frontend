@@ -1,7 +1,8 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { isEmpty, pick } from 'lodash';
+import { isEmpty, isString, pick } from 'lodash';
 import { Archive, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -42,6 +43,7 @@ import { Filterbar } from '../filters/Filterbar';
 import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
 import type { DashboardSectionProps } from '../types';
+import { makePushSubpath } from '../utils';
 
 enum VendorsTab {
   ALL = 'ALL',
@@ -303,8 +305,9 @@ const filters: FilterComponentConfigs<FilterValues> = {
   },
 };
 
-const Vendors = ({ accountSlug }: DashboardSectionProps) => {
+const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
+  const router = useRouter();
   const views: Views<FilterValues> = [
     {
       id: VendorsTab.ALL,
@@ -355,12 +358,26 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
   const [createEditVendor, setCreateEditVendor] = React.useState<VendorFieldsFragment | boolean>(false);
   const [vendorDetail, setVendorDetail] = React.useState(null);
   const [orgDetail, setOrgDetail] = React.useState(null);
+  const pushSubpath = makePushSubpath(router);
 
-  const closeDrawer = () => {
-    setCreateEditVendor(false);
-    setVendorDetail(null);
-    setOrgDetail(null);
+  React.useEffect(() => {
+    if (subpath[0] !== ((vendorDetail as VendorFieldsFragment)?.id || vendorDetail)) {
+      handleDrawer(subpath[0]);
+    }
+  }, [subpath[0]]);
+
+  const handleDrawer = (vendor: VendorFieldsFragment | string | undefined) => {
+    if (vendor) {
+      pushSubpath(typeof vendor === 'string' ? vendor : vendor.id);
+      setVendorDetail(vendor);
+    } else {
+      pushSubpath(undefined);
+      setVendorDetail(null);
+      setOrgDetail(null);
+      setCreateEditVendor(false);
+    }
   };
+
   const handleSetArchive = async vendor =>
     archiveVendor({ variables: { vendor: pick(vendor, ['id']), archive: !vendor.isArchived } });
 
@@ -426,7 +443,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
               vendors={host?.['vendors']?.nodes}
               loading={loading}
               editVendor={setCreateEditVendor}
-              openVendor={setVendorDetail}
+              openVendor={handleDrawer}
               handleSetArchive={handleSetArchive}
             />
             <Pagination queryFilter={queryFilter} total={host?.vendors?.totalCount} />
@@ -435,7 +452,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
       </div>
 
       {createEditVendor === true && (
-        <StyledModal onClose={closeDrawer}>
+        <StyledModal onClose={() => handleDrawer(null)}>
           <VendorForm
             host={host}
             supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
@@ -450,7 +467,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
       )}
       <Drawer
         open={isDrawerOpen}
-        onClose={closeDrawer}
+        onClose={() => handleDrawer(null)}
         className={vendorDetail || orgDetail ? 'max-w-2xl' : 'max-w-xl'}
         showActionsContainer
         showCloseButton
@@ -482,13 +499,13 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
 
         {vendorDetail && (
           <VendorDetails
-            host={host}
-            vendor={vendorDetail}
-            editVendor={() => {
-              setCreateEditVendor(vendorDetail);
+            vendor={isString(vendorDetail) ? null : vendorDetail}
+            vendorId={isString(vendorDetail) ? vendorDetail : null}
+            editVendor={vendor => {
+              setCreateEditVendor(vendor);
               setVendorDetail(null);
             }}
-            onCancel={() => setVendorDetail(null)}
+            onCancel={() => handleDrawer(null)}
           />
         )}
       </Drawer>
