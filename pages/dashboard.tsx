@@ -109,9 +109,9 @@ const getProfileUrl = (
 
   return context &&
     loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
-    account.type === CollectiveType.INDIVIDUAL &&
-    typeof account.id === 'string'
-    ? getDashboardRoute({ slug: context.slug }, `people/${account.id}`)
+    account?.type === CollectiveType.INDIVIDUAL &&
+    typeof account?.id === 'string'
+    ? getDashboardRoute({ slug: context.slug }, `people/${account?.id}`)
     : null;
 };
 
