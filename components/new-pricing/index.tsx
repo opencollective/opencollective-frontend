@@ -75,18 +75,17 @@ function TierPricePlansDisplay({ tier, packages }) {
                 <FormattedMessage defaultMessage="Crowdfunding contributions" id="Pricing-Crowdfunding" />
               </p>
               <p className="flex items-center gap-1 text-xs text-slate-600">
-                <FormattedMessage defaultMessage="Free with Platform Tips activated" id="Pricing-Crowdfunding-Price" />
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info size={14} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <FormattedMessage
-                      defaultMessage="or alternatively: 5% Platform Fee"
-                      id="Pricing-Crowdfunding-Alternative"
-                    />
-                  </TooltipContent>
-                </Tooltip>
+                <FormattedMessage
+                  id="Pricing-Crowdfunding-Price"
+                  defaultMessage="Free with <PlatformTipsLink>Platform Tips</PlatformTipsLink> activated"
+                  values={{
+                    PlatformTipsLink: parts => (
+                      <Link href="#platform-tips" className="underline">
+                        {parts}
+                      </Link>
+                    ),
+                  }}
+                />
               </p>
             </div>
           </div>
@@ -322,6 +321,18 @@ export default function Pricing({ data }) {
                       </a>
                     ),
                   }}
+                />
+              </p>
+            </div>
+
+            <div className="p-6" id="platform-tips">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage defaultMessage="What are Platform Tips?" id="pricing.new.faq.tips.question" />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="Platform Tips are optional contributions that financial contributors can add when they contribute on the platform. These tips support the Open Collective Platform, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your Organization or the Collectives you host receive, because they are added on top of the intended support. If you prefer a more traditional pricing model, you can opt for a simple 5% platform fee instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over."
+                  id="pricing.new.faq.tips.answer"
                 />
               </p>
             </div>
