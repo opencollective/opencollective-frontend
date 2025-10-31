@@ -15,7 +15,7 @@ const i18nEntity = defineMessages({
     defaultMessage: 'Expenses',
     id: 'Expenses',
   },
-  [SearchEntity.CONTRIBUTIONS]: {
+  [SearchEntity.ORDERS]: {
     defaultMessage: 'Contributions',
     id: 'Contributions',
   },

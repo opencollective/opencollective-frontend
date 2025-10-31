@@ -1,15 +1,6 @@
 import React, { useCallback } from 'react';
 
 import { CollectiveType } from '@/lib/constants/collectives';
-import type {
-  SearchAccountFieldsFragment,
-  SearchCommentFieldsFragment,
-  SearchExpenseFieldsFragment,
-  SearchHostApplicationFieldsFragment,
-  SearchOrderFieldsFragment,
-  SearchTransactionFieldsFragment,
-  SearchUpdateFieldsFragment,
-} from '@/lib/graphql/types/v2/graphql';
 import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import {
@@ -25,8 +16,8 @@ import {
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useWorkspace } from '../WorkspaceProvider';
 
-import type { SearchHighlights } from './types';
-import type { PageVisit } from './useRecentlyVisited';
+import { SearchEntity } from './schema';
+import type { SearchEntityNodeMap, SearchHighlights } from './types';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
 export function getHighlightsFields<T extends string>(
@@ -52,27 +43,31 @@ export function getHighlightsFields<T extends string>(
   return { top: top as Record<T, string[]>, others };
 }
 
+type SearchResultType<E extends keyof SearchEntityNodeMap = keyof SearchEntityNodeMap> = {
+  entity: E;
+  data: SearchEntityNodeMap[E];
+};
+
+type LinkPropsResult = {
+  href: string;
+  onClick?: () => void;
+};
+
 export function useGetLinkProps() {
   const { addToRecent } = useRecentlyVisited();
   const { LoggedInUser } = useLoggedInUser();
   const { workspace } = useWorkspace();
   const { getProfileUrl } = React.useContext(DashboardContext);
+
   const getLinkProps = useCallback(
-    ({
-      type,
-      data,
-    }:
-      | PageVisit
-      | {
-          type: 'page';
-          data: { section: string };
-        }) => {
-      let href: string;
-      let onClick: () => void;
-      switch (type) {
-        case 'account': {
-          const account = data as SearchAccountFieldsFragment;
+    <E extends keyof SearchEntityNodeMap>({ entity, data }: SearchResultType<E>): LinkPropsResult => {
+      const handlers: {
+        [E in keyof SearchEntityNodeMap]: (data: SearchEntityNodeMap[E], entity: E) => LinkPropsResult;
+      } = {
+        [SearchEntity.ACCOUNTS]: (data, entity) => {
+          const account = data;
           const peopleProfileLink = getProfileUrl(account);
+          let href: string;
           if (account.type === CollectiveType.VENDOR && 'parent' in account && account.parent.slug === workspace.slug) {
             href = getDashboardRoute(workspace, `vendors/${account.id}`);
           } else if (peopleProfileLink) {
@@ -80,14 +75,13 @@ export function useGetLinkProps() {
           } else if (workspace.isHost && 'host' in account && workspace.slug === account.host.slug) {
             href = getDashboardRoute(workspace, `hosted-collectives/${account.id}`);
           } else {
-            href = getCollectivePageRoute(data as { slug: string });
+            href = getCollectivePageRoute(account);
           }
-          onClick = () => addToRecent({ key: data.slug.toString(), type, data });
-          break;
-        }
-        case 'expense': {
-          const expense = data as SearchExpenseFieldsFragment;
-
+          return { href, onClick: () => addToRecent({ id: account.id, entity }) };
+        },
+        [SearchEntity.EXPENSES]: (data, entity) => {
+          const expense = data;
+          let href: string;
           if (workspace.slug === expense.account.slug) {
             href = getDashboardRoute(workspace, `expenses?openExpenseId=${expense.legacyId}`);
           } else if (workspace.slug === expense.payee?.slug) {
@@ -97,12 +91,11 @@ export function useGetLinkProps() {
           } else {
             href = getExpensePageUrl(expense);
           }
-
-          onClick = () => addToRecent({ key: expense.legacyId.toString(), type, data });
-          break;
-        }
-        case 'transaction': {
-          const transaction = data as SearchTransactionFieldsFragment;
+          return { href, onClick: () => addToRecent({ id: expense.id, entity }) };
+        },
+        [SearchEntity.TRANSACTIONS]: (data, entity) => {
+          const transaction = data;
+          let href: string;
           if (
             workspace?.slug === 'root-actions' ||
             (workspace?.isHost && 'host' in transaction && transaction.host.slug === workspace.slug)
@@ -114,38 +107,41 @@ export function useGetLinkProps() {
             // No URL for platform transactions yet, however these should not appear
             href = undefined;
           }
+          return { href, onClick: () => addToRecent({ id: transaction.id, entity }) };
+        },
+        [SearchEntity.COMMENTS]: data => {
+          const comment = data;
+          return { href: getCommentUrl(comment as Comment, LoggedInUser) };
+        },
+        [SearchEntity.ORDERS]: (data, entity) => {
+          const order = data;
+          return {
+            href: getOrderUrl(order as Order, LoggedInUser),
+            onClick: () => addToRecent({ id: order.id, entity }),
+          };
+        },
+        [SearchEntity.UPDATES]: (data, entity) => {
+          const update = data;
+          return {
+            href: getUpdateUrl(update as Update, LoggedInUser),
+            onClick: () => addToRecent({ id: update.id, entity }),
+          };
+        },
+        [SearchEntity.HOST_APPLICATIONS]: (data, entity) => {
+          const hostApplication = data;
+          return {
+            href: getHostApplicationDashboardUrl(hostApplication as HostApplication, LoggedInUser),
+            onClick: () => addToRecent({ id: hostApplication.id, entity }),
+          };
+        },
+        [SearchEntity.DASHBOARD_TOOL]: data => {
+          const dashboardTool = data;
+          return { href: getDashboardRoute(workspace, dashboardTool.section) };
+        },
+      };
 
-          onClick = () => addToRecent({ key: transaction.legacyId.toString(), type, data });
-          break;
-        }
-        case 'comment': {
-          const comment = data as SearchCommentFieldsFragment;
-          href = getCommentUrl(comment as Comment, LoggedInUser);
-          break;
-        }
-        case 'order': {
-          const order = data as SearchOrderFieldsFragment;
-          href = getOrderUrl(order as Order, LoggedInUser);
-          onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
-          break;
-        }
-        case 'update': {
-          const update = data as SearchUpdateFieldsFragment;
-          href = getUpdateUrl(update as Update, LoggedInUser);
-          onClick = () => addToRecent({ key: data.legacyId.toString(), type, data });
-          break;
-        }
-        case 'hostApplication': {
-          const hostApplication = data as SearchHostApplicationFieldsFragment;
-          href = getHostApplicationDashboardUrl(hostApplication as HostApplication, LoggedInUser);
-          onClick = () => addToRecent({ key: data.id.toString(), type, data });
-          break;
-        }
-        case 'page':
-          href = `/dashboard/${workspace.slug}/${data.section}`;
-          break;
-      }
-      return { href, onClick };
+      const handler = handlers[entity];
+      return handler(data, entity);
     },
     [LoggedInUser, workspace, addToRecent, getProfileUrl],
   );

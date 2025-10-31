@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-const searchAccountFieldsFragment = gql`
+export const searchAccountFieldsFragment = gql`
   fragment SearchAccountFields on Account {
     id
     name
@@ -76,7 +76,7 @@ const searchCommentFieldsFragment = gql`
   ${searchAccountFieldsFragment}
 `;
 
-const searchExpenseFieldsFragment = gql`
+export const searchExpenseFieldsFragment = gql`
   fragment SearchExpenseFields on Expense {
     id
     description
@@ -97,7 +97,7 @@ const searchExpenseFieldsFragment = gql`
   ${searchAccountFieldsFragment}
 `;
 
-const searchOrderFieldsFragment = gql`
+export const searchOrderFieldsFragment = gql`
   fragment SearchOrderFields on Order {
     id
     legacyId
@@ -117,7 +117,7 @@ const searchOrderFieldsFragment = gql`
   ${searchAccountFieldsFragment}
 `;
 
-const searchTransactionFieldsFragment = gql`
+export const searchTransactionFieldsFragment = gql`
   fragment SearchTransactionFields on Transaction {
     id
     legacyId
@@ -142,12 +142,13 @@ const searchTransactionFieldsFragment = gql`
   ${searchAccountFieldsFragment}
 `;
 
-const searchUpdateFieldsFragment = gql`
+export const searchUpdateFieldsFragment = gql`
   fragment SearchUpdateFields on Update {
     id
     legacyId
     slug
     title
+    html
     account {
       ...SearchAccountFields
     }
@@ -155,7 +156,7 @@ const searchUpdateFieldsFragment = gql`
   ${searchAccountFieldsFragment}
 `;
 
-const searchHostApplicationFieldsFragment = gql`
+export const searchHostApplicationFieldsFragment = gql`
   fragment SearchHostApplicationFields on HostApplication {
     id
     status

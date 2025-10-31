@@ -5,19 +5,18 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
+import type { SearchTransactionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import type { TransactionResultData } from '../useRecentlyVisited';
 
-// TODO: i18n
 export function TransactionResult({
   transaction,
   highlights,
 }: {
-  transaction: TransactionResultData;
+  transaction: SearchTransactionFieldsFragment;
   highlights?: SearchHighlights;
 }) {
   const intl = useIntl();
