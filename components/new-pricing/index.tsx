@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
+import { HandCoinsIcon, MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
+import I18nFormatters from '../I18nFormatters';
 import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
@@ -67,6 +68,28 @@ function TierPricePlansDisplay({ tier, packages }) {
 
       <div className="mt-6 mb-6 rounded-lg border bg-slate-50 p-4 text-sm">
         <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <HandCoinsIcon size={24} className="text-slate-800" />
+            <div className="space-y-1">
+              <p className="font-medium text-slate-900">
+                <FormattedMessage defaultMessage="Crowdfunding contributions" id="Pricing-Crowdfunding" />
+              </p>
+              <p className="flex items-center gap-1 text-xs text-slate-600">
+                <FormattedMessage
+                  id="Pricing-Crowdfunding-Price"
+                  defaultMessage="Free with <PlatformTipsLink>Platform Tips</PlatformTipsLink> activated"
+                  values={{
+                    PlatformTipsLink: parts => (
+                      <Link href="#platform-tips" className="underline">
+                        {parts}
+                      </Link>
+                    ),
+                  }}
+                />
+              </p>
+            </div>
+          </div>
+
           <div className="flex items-center gap-3">
             <ShapesIcon size={24} className="text-slate-800" />
             <div className="space-y-1">
@@ -224,7 +247,7 @@ export default function Pricing({ data }) {
           <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
             <span>
               <FormattedMessage
-                defaultMessage="We've updated our platform pricing to support our long-term sustainability. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
+                defaultMessage="This is our updated pricing for Organizations, applying to all in 2026 and new sign-ups now. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
                 id="pricing.newModel.onNewPricing"
                 values={{
                   LinkLegacyPricing: parts => (
@@ -298,6 +321,67 @@ export default function Pricing({ data }) {
                       </a>
                     ),
                   }}
+                />
+              </p>
+            </div>
+
+            <div className="p-6">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage
+                  defaultMessage="What changed in the new pricing?"
+                  id="pricing.new.faq.change.question"
+                />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="The previous pricing model included a <strong>15% Revenue Share</strong> on Host Fees collected on the platform. The updated pricing replaces that with a <strong>non-percentage model</strong> based on measurable activity, such as the number of <strong>Collectives</strong> and the <strong>Expenses</strong> you process.{newLine}{newLine}This approach makes costs clearer and more predictable. Instead of paying a share of your revenue, your price now scales with how you use the platform. <strong>Collectives remain free to use</strong>, supported by optional <strong>Platform Tips</strong>, while <strong>Organizations</strong> select a plan that fits their activity level and needs."
+                  id="pricing.new.faq.change.answer"
+                  values={I18nFormatters}
+                />
+              </p>
+            </div>
+
+            <div className="p-6" id="platform-tips">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage defaultMessage="What are Platform Tips?" id="pricing.new.faq.tips.question" />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="<strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.{newLine}{newLine}If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over."
+                  id="pricing.new.faq.tips.answer"
+                  values={I18nFormatters}
+                />
+              </p>
+            </div>
+
+            <div className="p-6">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage
+                  defaultMessage="What is the difference between a Collective and an Organization?"
+                  id="pricing.new.faq.organizationcollective.question"
+                />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="An <strong>Organization</strong> is a legal entity, such as a company, nonprofit, or cooperative, that uses the platform to manage its own funds or to act as a <strong>Host</strong> for other groups. Hosts receive and hold contributions on behalf of the <strong>Collectives</strong> they support and ensure that funds are used in line with their purpose and policies.{newLine}{newLine}A <strong>Collective</strong> is a group of people with a shared purpose who raise and spend money together through a Host. Collectives do not directly hold funds, as their Host, which is an Organization, manages the money for them.{newLine}{newLine}In short, Organizations have <strong>legal and financial control</strong>, while Collectives focus on their <strong>mission and community activities</strong>."
+                  id="pricing.new.faq.organizationcollective.answer"
+                  values={I18nFormatters}
+                />
+              </p>
+            </div>
+
+            <div className="p-6">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage
+                  defaultMessage="What's happening to Independent Collectives?"
+                  id="pricing.new.faq.independentcollective.question"
+                />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="<strong>Independent Collectives</strong> are being converted to <strong>Organizations</strong>.{newLine}{newLine}This change removes a confusing account type and makes the platform more consistent. <strong>Collectives</strong> are always hosted, while <strong>Organizations</strong> represent legal entities that can hold and manage money themselves.{newLine}{newLine}If you previously had an <strong>Independent Collective</strong>, it is now being converted to an <strong>Organization</strong>. You can continue using the same tools to receive contributions, pay expenses, and manage your budget.{newLine}{newLine}<strong>Independent Collectives</strong> converted to <strong>Organizations</strong> are subject to the updated pricing, and fees may apply if you process many expenses or need advanced features."
+                  id="pricing.new.faq.independentcollective.answer"
+                  values={I18nFormatters}
                 />
               </p>
             </div>
