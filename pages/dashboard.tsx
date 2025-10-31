@@ -144,8 +144,8 @@ function getBlocker(LoggedInUser, account, section) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.COMMUNITY_MANAGER, account)) {
       return (
         <FormattedMessage
-          defaultMessage="You need to be logged in as a community manager to view this page"
-          id="dnkxQ8"
+          defaultMessage="You need to be logged in as an admin or a community manager to view this page"
+          id="BduqMQ"
         />
       );
     }
