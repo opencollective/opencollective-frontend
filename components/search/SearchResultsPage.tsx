@@ -31,7 +31,7 @@ import { UpdateResult } from './result/UpdateResult';
 import { useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
 import { SearchEntity } from './schema';
-import type { PageVisit } from './useRecentlyVisited';
+import type { SearchEntityNodeMap } from './types';
 
 export const SearchResults = () => {
   const intl = useIntl();
@@ -98,7 +98,7 @@ export const SearchResults = () => {
               ...defaultEntityLimit,
               accountsLimit: limit,
             };
-          case SearchEntity.CONTRIBUTIONS:
+          case SearchEntity.ORDERS:
             return {
               ...defaultEntityLimit,
               contributionsLimit: limit,
@@ -217,8 +217,8 @@ export const SearchResults = () => {
               count: data?.search.results.expenses.collection.totalCount,
             },
             {
-              id: SearchEntity.CONTRIBUTIONS,
-              label: i18nSearchEntity(intl, SearchEntity.CONTRIBUTIONS),
+              id: SearchEntity.ORDERS,
+              label: i18nSearchEntity(intl, SearchEntity.ORDERS),
               count: data?.search.results.orders?.collection.totalCount,
             },
             {
@@ -275,7 +275,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
       return (
         <div className="space-y-8">
           <SearchResultsGroup
-            type="account"
             entity={SearchEntity.ACCOUNTS}
             totalCount={data?.search.results.accounts.collection.totalCount}
             nodes={data?.search.results.accounts.collection.nodes}
@@ -285,7 +284,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
             queryFilter={queryFilter}
           />
           <SearchResultsGroup
-            type="expense"
             entity={SearchEntity.EXPENSES}
             totalCount={data?.search.results.expenses.collection.totalCount}
             nodes={data?.search.results.expenses.collection.nodes}
@@ -296,8 +294,7 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           />
 
           <SearchResultsGroup
-            type="order"
-            entity={SearchEntity.CONTRIBUTIONS}
+            entity={SearchEntity.ORDERS}
             totalCount={data?.search.results.orders.collection.totalCount}
             nodes={data?.search.results.orders.collection.nodes}
             renderNode={order => (
@@ -307,7 +304,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           />
 
           <SearchResultsGroup
-            type="transaction"
             entity={SearchEntity.TRANSACTIONS}
             totalCount={data?.search.results.transactions.collection.totalCount}
             nodes={data?.search.results.transactions.collection.nodes}
@@ -321,7 +317,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           />
 
           <SearchResultsGroup
-            type="update"
             entity={SearchEntity.UPDATES}
             totalCount={data?.search.results.updates.collection.totalCount}
             nodes={data?.search.results.updates.collection.nodes}
@@ -331,7 +326,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
             queryFilter={queryFilter}
           />
           <SearchResultsGroup
-            type="comment"
             entity={SearchEntity.COMMENTS}
             totalCount={data?.search.results.comments.collection.totalCount}
             nodes={data?.search.results.comments.collection.nodes.filter(comment =>
@@ -347,7 +341,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
     case SearchEntity.ACCOUNTS:
       return (
         <SearchResultsGroup
-          type="account"
           entity={SearchEntity.ACCOUNTS}
           totalCount={data?.search.results.accounts.collection.totalCount}
           nodes={data?.search.results.accounts.collection.nodes}
@@ -362,7 +355,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
     case SearchEntity.EXPENSES:
       return (
         <SearchResultsGroup
-          type="expense"
           entity={SearchEntity.EXPENSES}
           totalCount={data?.search.results.expenses.collection.totalCount}
           nodes={data?.search.results.expenses.collection.nodes}
@@ -374,11 +366,10 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
           queryFilter={queryFilter}
         />
       );
-    case SearchEntity.CONTRIBUTIONS:
+    case SearchEntity.ORDERS:
       return (
         <SearchResultsGroup
-          type="order"
-          entity={SearchEntity.CONTRIBUTIONS}
+          entity={SearchEntity.ORDERS}
           totalCount={data?.search.results.orders.collection.totalCount}
           nodes={data?.search.results.orders.collection.nodes}
           onStandaloneTab
@@ -392,7 +383,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
     case SearchEntity.COMMENTS:
       return (
         <SearchResultsGroup
-          type="comment"
           entity={SearchEntity.COMMENTS}
           totalCount={data?.search.results.comments.collection.totalCount}
           nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
@@ -407,7 +397,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
     case SearchEntity.TRANSACTIONS:
       return (
         <SearchResultsGroup
-          type="transaction"
           entity={SearchEntity.TRANSACTIONS}
           totalCount={data?.search.results.transactions.collection.totalCount}
           nodes={data?.search.results.transactions.collection.nodes}
@@ -425,7 +414,6 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
     case SearchEntity.UPDATES:
       return (
         <SearchResultsGroup
-          type="update"
           entity={SearchEntity.UPDATES}
           totalCount={data?.search.results.updates.collection.totalCount}
           nodes={data?.search.results.updates.collection.nodes}
@@ -442,28 +430,30 @@ function SearchResultsList({ data, queryFilter, totalCount, loading }) {
   }
 }
 
-function SearchResultsGroup({
+type SearchResultsGroupProps<
+  E extends Exclude<keyof SearchEntityNodeMap, SearchEntity.DASHBOARD_TOOL> = Exclude<
+    keyof SearchEntityNodeMap,
+    SearchEntity.DASHBOARD_TOOL
+  >,
+> = {
+  totalCount?: number;
+  nodes?: SearchEntityNodeMap[E][];
+  renderNode: (node: SearchEntityNodeMap[E]) => React.ReactNode;
+  onStandaloneTab?: boolean;
+  entity: E;
+  loading?: boolean;
+  queryFilter: useQueryFilterReturnType<any, any>;
+};
+
+function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchEntity.DASHBOARD_TOOL>>({
   totalCount,
   nodes,
   renderNode,
   onStandaloneTab = false,
-  type,
   entity,
   loading,
   queryFilter,
-}: {
-  totalCount?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  nodes: any[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  renderNode: (node: any) => React.ReactNode;
-  onStandaloneTab?: boolean;
-  type: PageVisit['type'];
-  entity: SearchEntity;
-  loading?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  queryFilter?: useQueryFilterReturnType<any, any>;
-}) {
+}: SearchResultsGroupProps<E>) {
   const intl = useIntl();
   const { getLinkProps } = useGetLinkProps();
   const label = i18nSearchEntity(intl, entity);
@@ -489,7 +479,7 @@ function SearchResultsGroup({
               </div>
             ))
           : nodes.map(node => {
-              const { href, onClick } = getLinkProps({ type, data: node });
+              const { href, onClick } = getLinkProps({ entity, data: node });
 
               return (
                 <Link

@@ -4,6 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import Page from '@/components/Page';
 import { SearchResults } from '@/components/search/SearchResultsPage';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function GlobalSearchResultsPage() {
   return (
     <Page showSearch={false}>

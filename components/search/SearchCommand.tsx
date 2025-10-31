@@ -12,7 +12,6 @@ import {
   Receipt,
   SearchIcon,
   Users,
-  X,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -33,14 +32,15 @@ import Link from '../Link';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
-import { Skeleton } from '../ui/Skeleton';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { AccountResult } from './result/AccountResult';
 import { CommentResult } from './result/CommentResult';
 import { ExpenseResult } from './result/ExpenseResult';
 import { HostApplicationResult } from './result/HostApplicationResult';
+import { LoadingResult } from './result/LoadingResult';
 import { OrderResult } from './result/OrderResult';
+import { RecentVisit } from './result/RecentVisit';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
@@ -48,8 +48,9 @@ import { useGetLinkProps } from './lib';
 import { PageResult } from './PageResult';
 import { searchCommandQuery } from './queries';
 import { schema, SearchEntity } from './schema';
+import { SearchCommandGroup } from './SearchCommandGroup';
+import { SearchCommandItem } from './SearchCommandItem';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
 const entityOptions = {
@@ -63,8 +64,8 @@ const entityOptions = {
     icon: Receipt,
     className: 'bg-green-50 text-green-700',
   },
-  [SearchEntity.CONTRIBUTIONS]: {
-    value: SearchEntity.CONTRIBUTIONS,
+  [SearchEntity.ORDERS]: {
+    value: SearchEntity.ORDERS,
     icon: Coins,
     className: 'bg-amber-50 text-amber-700',
   },
@@ -167,7 +168,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               ...defaultForEntity,
               includeAccounts: true,
             };
-          case SearchEntity.CONTRIBUTIONS:
+          case SearchEntity.ORDERS:
             return {
               ...defaultForEntity,
               includeOrders: true,
@@ -206,7 +207,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     fetchMore,
     variables: usedVariables,
   } = useQuery(searchCommandQuery, {
-    variables: { includeTransactions: true, ...queryFilter.variables, imageHeight: 72, __infiniteScroll: true },
+    variables: { ...queryFilter.variables, imageHeight: 72, __infiniteScroll: true },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -272,10 +273,16 @@ export const SearchCommand = ({ open, setOpen }) => {
 
   const filteredEntityOptions = React.useMemo(() => {
     if (queryFilter.values.workspace) {
-      const entities = [SearchEntity.ACCOUNTS, SearchEntity.EXPENSES, SearchEntity.TRANSACTIONS, SearchEntity.UPDATES];
+      const entities = [
+        SearchEntity.ACCOUNTS,
+        SearchEntity.EXPENSES,
+        SearchEntity.ORDERS,
+        SearchEntity.TRANSACTIONS,
+        SearchEntity.UPDATES,
+      ];
 
       if (defaultContext?.type === 'host') {
-        entities.push(SearchEntity.HOST_APPLICATIONS, SearchEntity.CONTRIBUTIONS);
+        entities.push(SearchEntity.HOST_APPLICATIONS);
       }
 
       return Object.values(pick(entityOptions, entities));
@@ -333,48 +340,21 @@ export const SearchCommand = ({ open, setOpen }) => {
           return;
         }
 
-        // Determine which entity collection to load more of
-        let shouldLoadMore = false;
-        let currentOffset = 0;
-        let totalCount = 0;
+        const entityToResultKey = {
+          [SearchEntity.ACCOUNTS]: 'accounts',
+          [SearchEntity.EXPENSES]: 'expenses',
+          [SearchEntity.ORDERS]: 'orders',
+          [SearchEntity.TRANSACTIONS]: 'transactions',
+          [SearchEntity.UPDATES]: 'updates',
+          [SearchEntity.COMMENTS]: 'comments',
+          [SearchEntity.HOST_APPLICATIONS]: 'hostApplications',
+        } as const;
 
-        switch (queryFilter.values.entity) {
-          case SearchEntity.ACCOUNTS:
-            currentOffset = results.accounts?.collection.nodes.length || 0;
-            totalCount = results.accounts?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-          case SearchEntity.EXPENSES:
-            currentOffset = results.expenses?.collection.nodes.length || 0;
-            totalCount = results.expenses?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-          case SearchEntity.CONTRIBUTIONS:
-            currentOffset = results.orders?.collection.nodes.length || 0;
-            totalCount = results.orders?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-          case SearchEntity.TRANSACTIONS:
-            currentOffset = results.transactions?.collection.nodes.length || 0;
-            totalCount = results.transactions?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-          case SearchEntity.UPDATES:
-            currentOffset = results.updates?.collection.nodes.length || 0;
-            totalCount = results.updates?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-          case SearchEntity.COMMENTS:
-            currentOffset = results.comments?.collection.nodes.length || 0;
-            totalCount = results.comments?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-          case SearchEntity.HOST_APPLICATIONS:
-            currentOffset = results.hostApplications?.collection.nodes.length || 0;
-            totalCount = results.hostApplications?.collection.totalCount || 0;
-            shouldLoadMore = currentOffset < totalCount;
-            break;
-        }
+        const resultKey = entityToResultKey[queryFilter.values.entity];
+        const collection = results[resultKey]?.collection;
+        const currentOffset = collection?.nodes.length || 0;
+        const totalCount = collection?.totalCount || 0;
+        const shouldLoadMore = currentOffset < totalCount;
 
         if (shouldLoadMore) {
           setIsLoadingMore(true);
@@ -408,7 +388,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       </DialogTitle>
       <div className="group flex items-center gap-3 border-b px-3" cmdk-input-wrapper="">
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
-        {queryFilter.values.workspace && (
+        {queryFilter.values.workspace && queryFilter.values.workspace !== 'root-actions' && (
           <ContextPill
             slug={queryFilter.values.workspace}
             onRemove={() => queryFilter.setFilter('workspace', undefined)}
@@ -554,34 +534,15 @@ export const SearchCommand = ({ open, setOpen }) => {
 
         {recentlyVisited.length > 0 && input === '' && queryFilter.values.entity === SearchEntity.ALL && (
           <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Recent', id: 'rrfdNu' })}>
-            {recentlyVisited.map(recentVisit => {
-              const { href, onClick } = getLinkProps(recentVisit);
-              if (!href) {
-                return null;
-              }
-              return (
-                <SearchCommandItem
-                  key={recentVisit.key}
-                  onSelect={() => {
-                    router.push(href);
-                    setOpen(false);
-                    onClick?.();
-                  }}
-                  onDelete={() => removeFromRecent(recentVisit.key)}
-                >
-                  <Link href={href} className="block w-full">
-                    {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
-                    {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
-                    {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
-                    {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
-                    {recentVisit.type === 'update' && <UpdateResult update={recentVisit.data} />}
-                    {recentVisit.type === 'hostApplication' && (
-                      <HostApplicationResult hostApplication={recentVisit.data} />
-                    )}
-                  </Link>
-                </SearchCommandItem>
-              );
-            })}
+            {recentlyVisited.map(recentVisit => (
+              <RecentVisit
+                key={recentVisit.id}
+                entity={recentVisit.entity}
+                id={recentVisit.id}
+                setOpen={setOpen}
+                removeFromRecent={removeFromRecent}
+              />
+            ))}
           </CommandGroup>
         )}
 
@@ -591,7 +552,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             className="[&:last-child_.separator]:hidden"
           >
             {filteredGoToPages.map(page => {
-              const { href, onClick } = getLinkProps({ type: 'page', data: page });
+              const { href, onClick } = getLinkProps({ entity: SearchEntity.DASHBOARD_TOOL, data: page });
               return (
                 <SearchCommandItem
                   key={page.section}
@@ -613,13 +574,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         {isInitialLoading && input !== '' && (
           <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Loading...', id: 'Select.Loading' })}>
             {[1, 2, 3, 4, 5].map(id => (
-              <div key={`skeleton-${id}`} className="flex items-center gap-2 px-2 py-3">
-                <Skeleton className="size-9 shrink-0 rounded-md" />
-                <div className="flex flex-1 flex-col gap-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              </div>
+              <LoadingResult key={`skeleton-${id}`} />
             ))}
           </CommandGroup>
         )}
@@ -627,7 +582,6 @@ export const SearchCommand = ({ open, setOpen }) => {
           <React.Fragment>
             <SearchCommandGroup
               entity={SearchEntity.ACCOUNTS}
-              type="account"
               totalCount={data?.search.results.accounts?.collection.totalCount}
               input={debouncedInput}
               queryFilter={queryFilter}
@@ -640,7 +594,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             />
             <SearchCommandGroup
               entity={SearchEntity.EXPENSES}
-              type="expense"
               totalCount={data?.search.results.expenses?.collection.totalCount}
               input={debouncedInput}
               queryFilter={queryFilter}
@@ -653,7 +606,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             />
             <SearchCommandGroup
               entity={SearchEntity.HOST_APPLICATIONS}
-              type="hostApplication"
               totalCount={data?.search.results.hostApplications?.collection.totalCount}
               input={debouncedInput}
               queryFilter={queryFilter}
@@ -668,8 +620,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               isInfiniteScrollEnabled={isInfiniteScrollEnabled}
             />
             <SearchCommandGroup
-              entity={SearchEntity.CONTRIBUTIONS}
-              type="order"
+              entity={SearchEntity.ORDERS}
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
@@ -683,7 +634,6 @@ export const SearchCommand = ({ open, setOpen }) => {
 
             <SearchCommandGroup
               entity={SearchEntity.TRANSACTIONS}
-              type="transaction"
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
@@ -700,7 +650,6 @@ export const SearchCommand = ({ open, setOpen }) => {
 
             <SearchCommandGroup
               entity={SearchEntity.UPDATES}
-              type="update"
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
@@ -713,7 +662,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             />
             <SearchCommandGroup
               entity={SearchEntity.COMMENTS}
-              type="comment"
               input={debouncedInput}
               queryFilter={queryFilter}
               setOpen={setOpen}
@@ -749,160 +697,3 @@ export const SearchCommand = ({ open, setOpen }) => {
     </CommandDialog>
   );
 };
-
-interface SearchCommandItemProps {
-  onSelect?: () => void;
-  actionLabel?: string;
-  children: React.ReactNode;
-  showAction?: boolean;
-  className?: string;
-  value?: string;
-  onDelete?: () => void;
-}
-
-const SearchCommandItem = React.memo<SearchCommandItemProps>(
-  ({ onSelect, onDelete, actionLabel, children, showAction = false, className = undefined, ...props }) => {
-    const intl = useIntl();
-    const defaultActionLabel = intl.formatMessage({ defaultMessage: 'Jump to', id: 'u8j6vX' });
-    return (
-      <CommandItem
-        onSelect={onSelect}
-        className={cn(
-          'justify-between gap-2',
-          '[&[data-selected=true]_.action]:bg-background [&[data-selected=true]_.action]:shadow-xs [&[data-selected=true]_.action]:ring [&[data-selected=true]_.action]:ring-border',
-          '[&[data-selected=true]_.action]:text-foreground',
-          showAction ? '' : '[&[data-selected=false]_.action]:hidden',
-          '[&[data-selected=false]_.actions]:hidden',
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        <div className={cn('actions absolute right-2 flex items-center gap-1', showAction ? '' : 'absolute right-2')}>
-          <div
-            className={cn(
-              'action flex items-center gap-1 rounded-md p-1 whitespace-nowrap text-muted-foreground shadow-none transition-colors',
-            )}
-          >
-            {actionLabel ?? defaultActionLabel}
-          </div>
-          {onDelete && (
-            <button
-              className="flex size-7 items-center justify-center rounded-md p-1 ring-border transition-colors hover:bg-background hover:shadow-xs hover:ring"
-              onClick={e => {
-                e.preventDefault();
-                e.stopPropagation();
-                onDelete();
-              }}
-            >
-              <X className="!size-4" />
-            </button>
-          )}
-        </div>
-      </CommandItem>
-    );
-  },
-);
-
-interface SeeMoreItemsCommandItemProps {
-  onSelect: () => void;
-  totalCount: number;
-  limit: number;
-  label: string;
-}
-
-const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSelect, totalCount, limit, label }) => {
-  const intl = useIntl();
-  if (totalCount > limit) {
-    return (
-      <SearchCommandItem onSelect={onSelect} className="items-center justify-start">
-        <div className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
-          <SearchIcon />
-        </div>
-        <span>
-          <FormattedMessage
-            defaultMessage="See {count} more {label}"
-            id="SearchResults.SeeMore"
-            values={{
-              count: Number(totalCount - limit).toLocaleString(intl.locale),
-              label: label.toLowerCase(),
-            }}
-          />
-        </span>
-      </SearchCommandItem>
-    );
-  }
-  return null;
-});
-
-interface SearchCommandGroupProps {
-  totalCount?: number;
-  nodes?: any[];
-  renderNode: (node: any) => React.ReactNode;
-  input: string;
-  queryFilter: any;
-  entity: SearchEntity;
-  setOpen: (open: boolean) => void;
-  type: PageVisit['type'];
-  isInfiniteScrollEnabled?: boolean;
-}
-
-const SearchCommandGroup = React.memo<SearchCommandGroupProps>(
-  ({ totalCount, nodes, renderNode, input, queryFilter, entity, setOpen, type, isInfiniteScrollEnabled = false }) => {
-    const intl = useIntl();
-    const { LoggedInUser } = useLoggedInUser();
-    const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
-
-    const { workspace } = useWorkspace();
-    const router = useRouter();
-    const { getLinkProps } = useGetLinkProps();
-
-    if (!totalCount || input === '') {
-      return null;
-    }
-
-    const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
-    return (
-      <CommandGroup heading={i18nSearchEntity(intl, entity)} className="[&:last-child_.separator]:hidden">
-        {nodes?.map(node => {
-          const { href, onClick } = getLinkProps({ type, data: node });
-          return (
-            <SearchCommandItem
-              key={node.id}
-              onSelect={() => {
-                router.push(href);
-                setOpen(false);
-                onClick?.();
-              }}
-            >
-              <Link href={href} className="block w-full">
-                {renderNode(node)}
-              </Link>
-            </SearchCommandItem>
-          );
-        })}
-        {showSeeMore && (
-          <SeeMoreItemsCommandItem
-            onSelect={() => {
-              if (isUsingSearchResultsPage) {
-                queryFilter.resetFilters(
-                  { ...queryFilter.values, entity },
-
-                  queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
-                );
-                setOpen(false);
-              } else {
-                queryFilter.setFilter('entity', entity);
-              }
-            }}
-            key={`more-${entity}`}
-            totalCount={totalCount}
-            limit={queryFilter.variables.limit}
-            label={i18nSearchEntity(intl, entity)}
-          />
-        )}
-        <hr className="separator -mx-2 my-2 h-px bg-border" />
-      </CommandGroup>
-    );
-  },
-);

@@ -1,13 +1,20 @@
 import React from 'react';
 import { Markup } from 'interweave';
 
+import type { SearchCommentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+
 import Avatar from '../../Avatar';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import type { CommentResultData } from '../useRecentlyVisited';
 
 // TODO i18n
-export function CommentResult({ comment, highlights }: { comment: CommentResultData; highlights?: SearchHighlights }) {
+export function CommentResult({
+  comment,
+  highlights,
+}: {
+  comment: SearchCommentFieldsFragment;
+  highlights?: SearchHighlights;
+}) {
   const highlightFields = getHighlightsFields(highlights, ['html']);
   const otherHighlight = Object.values(highlightFields.others)[0]?.[0];
   return (
