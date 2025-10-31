@@ -45,7 +45,7 @@ export const newMarketingTopbarItems: MenuGroupItem[] = [
           defaultMessage: 'For Organizations',
           id: 'X7kjxh',
         }),
-        href: '/solutions',
+        href: '/organizations',
       },
       {
         label: defineMessage({

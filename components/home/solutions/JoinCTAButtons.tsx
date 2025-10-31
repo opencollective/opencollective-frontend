@@ -19,7 +19,10 @@ const StaticJoinCTAButtons = React.forwardRef<HTMLDivElement, JoinCTAButtonsProp
         </Link>
       </Button>
       <Button asChild variant="outline" className="rounded-full whitespace-nowrap" size="lg">
-        <Link href={props.onPage === 'pricing' ? '/solutions' : '/pricing'} className="flex items-center gap-2">
+        <Link
+          href={props.onPage === 'pricing' ? '/organizations' : '/organizations/pricing'}
+          className="flex items-center gap-2"
+        >
           {props.onPage === 'pricing' ? (
             <FormattedMessage defaultMessage="See Features" id="Hm2JMp" />
           ) : (
