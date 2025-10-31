@@ -72,7 +72,7 @@ export function useGetLinkProps() {
             href = getDashboardRoute(workspace, `vendors/${account.id}`);
           } else if (peopleProfileLink) {
             href = peopleProfileLink;
-          } else if (workspace.isHost && 'host' in account && workspace.slug === account.host.slug) {
+          } else if (workspace.isHost && 'host' in account && workspace.slug === account.host?.slug) {
             href = getDashboardRoute(workspace, `hosted-collectives/${account.id}`);
           } else {
             href = getCollectivePageRoute(account);
@@ -98,14 +98,14 @@ export function useGetLinkProps() {
           let href: string;
           if (
             workspace?.slug === 'root-actions' ||
-            (workspace?.isHost && 'host' in transaction && transaction.host.slug === workspace.slug)
+            (workspace?.isHost && 'host' in transaction && transaction.host?.slug === workspace.slug)
           ) {
             href = getDashboardRoute(workspace, `host-transactions?openTransactionId=${transaction.legacyId}`);
           } else if (transaction.account.slug === workspace.slug) {
             href = getDashboardRoute(workspace, `transactions?openTransactionId=${transaction.legacyId}`);
           } else {
-            // No URL for platform transactions yet, however these should not appear
-            href = undefined;
+            // TODO: Make sure we can have a link for all transactions that are returned by the API
+            href = '#';
           }
           return { href, onClick: () => addToRecent({ id: transaction.id, entity }) };
         },

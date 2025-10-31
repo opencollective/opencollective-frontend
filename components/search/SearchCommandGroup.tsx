@@ -16,7 +16,6 @@ import { ALL_SECTIONS } from '../dashboard/constants';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { useGetLinkProps } from './lib';
-import type { SearchEntity } from './filters';
 import { SearchCommandItem } from './SearchCommandItem';
 import type { SearchEntityNodeMap } from './types';
 
@@ -72,9 +71,9 @@ function SearchResultItemInner<E extends SearchCommandGroupEntity>({
   const { href, onClick } = getLinkProps({ entity, data: node });
 
   const handleSelect = useCallback(() => {
+    onClick?.();
     router.push(href);
     setOpen(false);
-    onClick?.();
   }, [router, href, setOpen, onClick]);
 
   return (

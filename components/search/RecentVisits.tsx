@@ -1,13 +1,23 @@
 import React, { useCallback } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 
 import Link from '@/components/Link';
 
-import { SearchEntity } from '../filters';
-import { useGetLinkProps } from '../lib';
+import { CommandGroup } from '../ui/Command';
+
+import { AccountResult } from './result/AccountResult';
+import { ExpenseResult } from './result/ExpenseResult';
+import { HostApplicationResult } from './result/HostApplicationResult';
+import { LoadingResult } from './result/LoadingResult';
+import { OrderResult } from './result/OrderResult';
+import { TransactionResult } from './result/TransactionResult';
+import { UpdateResult } from './result/UpdateResult';
+import { SearchEntity } from './filters';
+import { useGetLinkProps } from './lib';
 import {
   searchAccountFieldsFragment,
   searchExpenseFieldsFragment,
@@ -15,17 +25,9 @@ import {
   searchOrderFieldsFragment,
   searchTransactionFieldsFragment,
   searchUpdateFieldsFragment,
-} from '../queries';
-import { SearchCommandItem } from '../SearchCommandItem';
-import type { PageVisit } from '../useRecentlyVisited';
-
-import { AccountResult } from './AccountResult';
-import { ExpenseResult } from './ExpenseResult';
-import { HostApplicationResult } from './HostApplicationResult';
-import { LoadingResult } from './LoadingResult';
-import { OrderResult } from './OrderResult';
-import { TransactionResult } from './TransactionResult';
-import { UpdateResult } from './UpdateResult';
+} from './queries';
+import { SearchCommandItem } from './SearchCommandItem';
+import { type PageVisit, useRecentlyVisited } from './useRecentlyVisited';
 
 const entities = {
   [SearchEntity.ACCOUNTS]: {
@@ -110,7 +112,7 @@ const entities = {
   },
 };
 
-export function RecentVisit({
+function RecentVisit({
   entity,
   id,
   setOpen,
@@ -154,4 +156,25 @@ export function RecentVisit({
     );
   }
   return null;
+}
+
+export function RecentVisits({ queryFilter, input, setOpen }) {
+  const intl = useIntl();
+  const { recentlyVisited, removeFromRecent } = useRecentlyVisited();
+
+  if (recentlyVisited.length > 0 && input === '' && queryFilter.values.entity === SearchEntity.ALL) {
+    return (
+      <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Recent', id: 'rrfdNu' })}>
+        {recentlyVisited.map(recentVisit => (
+          <RecentVisit
+            key={recentVisit.id}
+            entity={recentVisit.entity}
+            id={recentVisit.id}
+            setOpen={setOpen}
+            removeFromRecent={removeFromRecent}
+          />
+        ))}
+      </CommandGroup>
+    );
+  }
 }

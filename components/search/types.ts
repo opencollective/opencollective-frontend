@@ -8,8 +8,9 @@ import type {
   SearchUpdateFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 
+import type { PageMenuItem } from '../dashboard/Menu';
+
 import type { SearchEntity } from './filters';
-import { PageMenuItem } from '../dashboard/Menu';
 
 export type SearchHighlights = {
   score: number;

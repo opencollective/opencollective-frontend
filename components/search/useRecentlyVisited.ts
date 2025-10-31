@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import * as Sentry from '@sentry/browser';
 import { z } from 'zod';
 
@@ -35,7 +35,7 @@ export function useRecentlyVisited() {
   const dashboardSlug = workspace?.slug;
 
   // Parse the recently visited data using the zod schema
-  const recentlyVisited: RecentlyVisited = (() => {
+  const recentlyVisited: RecentlyVisited = useMemo(() => {
     try {
       return RecentlyVisitedSchema.parse(recentlyVisitedRaw);
     } catch (error) {
@@ -43,7 +43,7 @@ export function useRecentlyVisited() {
       setRecentlyVisitedRaw({});
       return {};
     }
-  })();
+  }, [recentlyVisitedRaw, setRecentlyVisitedRaw]);
 
   const addToRecent = useCallback(
     (pageVisit: PageVisit) => {
