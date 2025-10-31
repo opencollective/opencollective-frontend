@@ -6,6 +6,7 @@ import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 
 import Link from '@/components/Link';
 
+import { SearchEntity } from '../filters';
 import { useGetLinkProps } from '../lib';
 import {
   searchAccountFieldsFragment,
@@ -15,7 +16,6 @@ import {
   searchTransactionFieldsFragment,
   searchUpdateFieldsFragment,
 } from '../queries';
-import { SearchEntity } from '../schema';
 import { SearchCommandItem } from '../SearchCommandItem';
 import type { PageVisit } from '../useRecentlyVisited';
 

@@ -16,7 +16,7 @@ import { ALL_SECTIONS } from '../dashboard/constants';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { useGetLinkProps } from './lib';
-import type { SearchEntity } from './schema';
+import type { SearchEntity } from './filters';
 import { SearchCommandItem } from './SearchCommandItem';
 import type { SearchEntityNodeMap } from './types';
 
@@ -51,7 +51,7 @@ const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSe
   return null;
 });
 
-type SearchCommandGroupEntity = Exclude<keyof SearchEntityNodeMap, SearchEntity.DASHBOARD_TOOL>;
+type SearchCommandGroupEntity = keyof SearchEntityNodeMap;
 
 interface SearchResultItemProps<E extends SearchCommandGroupEntity> {
   node: SearchEntityNodeMap[E];
