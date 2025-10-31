@@ -21,6 +21,8 @@ import StyledHr from '../../../StyledHr';
 import { Button } from '../../../ui/Button';
 import { LeaveHostModal } from '../../LeaveHostModal';
 
+import { HostConversations } from '../../../dashboard/sections/HostConversations';
+
 type ActiveFiscalHostProps = {
   collectiveSlug: string;
   showLegalNameInfoBox: boolean;
@@ -232,6 +234,12 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
         <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
       </h2>
       <HostApplicationRequests accountSlug={collective?.slug} />
+
+      <StyledHr my={4} />
+      <h2 className="mb-3 font-bold">
+        <FormattedMessage defaultMessage="Conversations" id="conversations" />
+      </h2>
+      <HostConversations accountSlug={collective?.slug} hostSlug={host?.slug} />
     </div>
   );
 }
