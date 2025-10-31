@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
@@ -126,22 +126,28 @@ export function RecentVisit({
 
   const { query, Component, pickData } = entities[entity];
   const { data, loading, error } = useQuery(query, { context: API_V2_CONTEXT, variables: { imageHeight: 72, id } });
+
+  const linkProps = data && !error ? getLinkProps({ entity, data: pickData(data) }) : null;
+
+  const handleDelete = useCallback(() => {
+    removeFromRecent(id);
+  }, [removeFromRecent, id]);
+
+  const handleSelect = useCallback(() => {
+    if (linkProps) {
+      router.push(linkProps.href);
+      setOpen(false);
+      linkProps.onClick?.();
+    }
+  }, [router, setOpen, linkProps]);
+
   if (loading) {
     return <LoadingResult />;
   }
-  if (data && !error) {
-    const { href, onClick } = getLinkProps({ entity, data: pickData(data) });
-
+  if (data && !error && linkProps) {
     return (
-      <SearchCommandItem
-        onSelect={() => {
-          router.push(href);
-          setOpen(false);
-          onClick?.();
-        }}
-        onDelete={() => removeFromRecent(id)}
-      >
-        <Link href={href} className="block w-full">
+      <SearchCommandItem onSelect={handleSelect} onDelete={handleDelete}>
+        <Link href={linkProps.href} className="block w-full">
           <Component data={pickData(data)} />
         </Link>
       </SearchCommandItem>

@@ -250,6 +250,25 @@ export const SearchCommand = ({ open, setOpen }) => {
   const { recentlyVisited, removeFromRecent } = useRecentlyVisited();
   const { getLinkProps } = useGetLinkProps();
 
+  // Memoized callbacks for SearchCommandItem to avoid unnecessary re-renders
+  const handleSelectWorkspace = useCallback(() => {
+    queryFilter.setFilter('workspace', defaultContext.slug);
+    setInput('');
+  }, [queryFilter, defaultContext, setInput]);
+
+  const handleSearchInWorkspace = useCallback(() => {
+    queryFilter.resetFilters(
+      { searchTerm: input, workspace: defaultContext.slug },
+      getDashboardRoute(workspace, ALL_SECTIONS.SEARCH),
+    );
+    setOpen(false);
+  }, [queryFilter, input, defaultContext, workspace, setOpen]);
+
+  const handleSearchAll = useCallback(() => {
+    queryFilter.resetFilters({ searchTerm: input, workspace: 'ALL' }, '/search-results');
+    setOpen(false);
+  }, [queryFilter, input, setOpen]);
+
   const isLoading = loading || isDebouncing;
   const hasSearchTerm = !!input;
   const dataMatchesCurrentSearch = data?.search?.results && input === usedVariables.searchTerm;
@@ -421,10 +440,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           queryFilter.values.entity === SearchEntity.ALL && (
             <CommandGroup heading="">
               <SearchCommandItem
-                onSelect={() => {
-                  queryFilter.setFilter('workspace', defaultContext.slug);
-                  setInput('');
-                }}
+                onSelect={handleSelectWorkspace}
                 actionLabel={intl.formatMessage({ defaultMessage: 'Search in workspace', id: 'idTzf7' })}
                 showAction
               >
@@ -487,13 +503,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
               {defaultContext && (
                 <SearchCommandItem
-                  onSelect={() => {
-                    queryFilter.resetFilters(
-                      { searchTerm: input, workspace: defaultContext.slug },
-                      getDashboardRoute(workspace, ALL_SECTIONS.SEARCH),
-                    );
-                    setOpen(false);
-                  }}
+                  onSelect={handleSearchInWorkspace}
                   actionLabel={intl.formatMessage({ defaultMessage: 'Search in this workspace', id: 'qT2PNg' })}
                   showAction
                 >
@@ -511,10 +521,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               )}
 
               <SearchCommandItem
-                onSelect={() => {
-                  queryFilter.resetFilters({ searchTerm: input, workspace: 'ALL' }, '/search-results');
-                  setOpen(false);
-                }}
+                onSelect={handleSearchAll}
                 actionLabel={intl.formatMessage({ defaultMessage: 'Search all of Open Collective', id: 'LoB4cg' })}
                 showAction
               >
