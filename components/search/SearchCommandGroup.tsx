@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -53,6 +53,41 @@ const SeeMoreItemsCommandItem = React.memo<SeeMoreItemsCommandItemProps>(({ onSe
 
 type SearchCommandGroupEntity = Exclude<keyof SearchEntityNodeMap, SearchEntity.DASHBOARD_TOOL>;
 
+interface SearchResultItemProps<E extends SearchCommandGroupEntity> {
+  node: SearchEntityNodeMap[E];
+  entity: E;
+  renderNode: (node: SearchEntityNodeMap[E]) => React.ReactNode;
+  setOpen: (open: boolean) => void;
+  getLinkProps: (params: { entity: E; data: SearchEntityNodeMap[E] }) => { href: string; onClick?: () => void };
+}
+
+function SearchResultItemInner<E extends SearchCommandGroupEntity>({
+  node,
+  entity,
+  renderNode,
+  setOpen,
+  getLinkProps,
+}: SearchResultItemProps<E>) {
+  const router = useRouter();
+  const { href, onClick } = getLinkProps({ entity, data: node });
+
+  const handleSelect = useCallback(() => {
+    router.push(href);
+    setOpen(false);
+    onClick?.();
+  }, [router, href, setOpen, onClick]);
+
+  return (
+    <SearchCommandItem onSelect={handleSelect}>
+      <Link href={href} className="block w-full">
+        {renderNode(node)}
+      </Link>
+    </SearchCommandItem>
+  );
+}
+
+const SearchResultItem = React.memo(SearchResultItemInner) as typeof SearchResultItemInner;
+
 type SearchCommandGroupProps<E extends SearchCommandGroupEntity = SearchCommandGroupEntity> = {
   totalCount?: number;
   nodes?: SearchEntityNodeMap[E][];
@@ -79,8 +114,19 @@ function SearchCommandGroupComponent<E extends SearchCommandGroupEntity>({
   const isUsingSearchResultsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE);
 
   const { workspace } = useWorkspace();
-  const router = useRouter();
   const { getLinkProps } = useGetLinkProps();
+
+  const handleSeeMoreSelect = useCallback(() => {
+    if (isUsingSearchResultsPage) {
+      queryFilter.resetFilters(
+        { ...queryFilter.values, entity },
+        queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
+      );
+      setOpen(false);
+    } else {
+      queryFilter.setFilter('entity', entity);
+    }
+  }, [isUsingSearchResultsPage, queryFilter, entity, workspace, setOpen]);
 
   if (!totalCount || input === '') {
     return null;
@@ -89,37 +135,19 @@ function SearchCommandGroupComponent<E extends SearchCommandGroupEntity>({
   const showSeeMore = !isInfiniteScrollEnabled && (nodes?.length || 0) < totalCount;
   return (
     <CommandGroup heading={i18nSearchEntity(intl, entity)} className="[&:last-child_.separator]:hidden">
-      {nodes?.map(node => {
-        const { href, onClick } = getLinkProps({ entity, data: node });
-        return (
-          <SearchCommandItem
-            key={node.id}
-            onSelect={() => {
-              router.push(href);
-              setOpen(false);
-              onClick?.();
-            }}
-          >
-            <Link href={href} className="block w-full">
-              {renderNode(node)}
-            </Link>
-          </SearchCommandItem>
-        );
-      })}
+      {nodes?.map(node => (
+        <SearchResultItem
+          key={node.id}
+          node={node}
+          entity={entity}
+          renderNode={renderNode}
+          setOpen={setOpen}
+          getLinkProps={getLinkProps}
+        />
+      ))}
       {showSeeMore && (
         <SeeMoreItemsCommandItem
-          onSelect={() => {
-            if (isUsingSearchResultsPage) {
-              queryFilter.resetFilters(
-                { ...queryFilter.values, entity },
-
-                queryFilter.values.workspace ? getDashboardRoute(workspace, ALL_SECTIONS.SEARCH) : '/search-results',
-              );
-              setOpen(false);
-            } else {
-              queryFilter.setFilter('entity', entity);
-            }
-          }}
+          onSelect={handleSeeMoreSelect}
           key={`more-${String(entity)}`}
           totalCount={totalCount}
           limit={queryFilter.variables.limit}
