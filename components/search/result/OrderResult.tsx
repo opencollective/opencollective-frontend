@@ -1,13 +1,20 @@
 import React from 'react';
 import { Markup } from 'interweave';
 
+import type { SearchOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+
 import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import type { OrderResultData } from '../useRecentlyVisited';
 
-export function OrderResult({ order, highlights }: { order: OrderResultData; highlights?: SearchHighlights }) {
+export function OrderResult({
+  order,
+  highlights,
+}: {
+  order: SearchOrderFieldsFragment;
+  highlights?: SearchHighlights;
+}) {
   const highlightFields = getHighlightsFields(highlights, ['id', 'description']);
   const otherHighlight = Object.values(highlightFields.others)[0]?.[0];
   return (

@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Megaphone,
   Receipt,
+  Search,
   Settings,
   Signature,
   Store,
@@ -151,6 +152,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
       if: !isAccountantOnly,
+    },
+    {
+      section: ALL_SECTIONS.SEARCH,
+      Icon: Search,
+      label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search' }),
+      if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE),
     },
     {
       if: isIndividual,

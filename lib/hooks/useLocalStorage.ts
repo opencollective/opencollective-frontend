@@ -5,6 +5,7 @@ import { getFromLocalStorage, setLocalStorage } from '../local-storage';
 export default function useLocalStorage<T>(key: string, defaultValue?: T) {
   const get = useCallback((): T => {
     const jsonValue = getFromLocalStorage(key);
+
     if (jsonValue !== null) {
       return JSON.parse(jsonValue) as T;
     } else {
