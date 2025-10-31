@@ -13,13 +13,13 @@ import {
   SearchIcon,
   Users,
 } from 'lucide-react';
-import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { type NextRouter, useRouter } from 'next/router';
+import { FormattedMessage, type IntlShape, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import useQueryFilter from '../../lib/hooks/useQueryFilter';
+import useQueryFilter, { type useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
 import { i18nSearchEntity } from '@/lib/i18n/search';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
@@ -45,54 +45,17 @@ import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
 import { useGetLinkProps } from './lib';
-import { PageResult } from './PageResult';
+import { PageResult } from './result/PageResult';
 import { searchCommandQuery } from './queries';
-import { schema, SearchEntity } from './schema';
+import { schema, SearchEntity, entityFilterOptions } from './filters';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandItem } from './SearchCommandItem';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { useRecentlyVisited } from './useRecentlyVisited';
-
-const entityOptions = {
-  [SearchEntity.ACCOUNTS]: {
-    value: SearchEntity.ACCOUNTS,
-    icon: Users,
-    className: 'bg-blue-50 text-blue-700',
-  },
-  [SearchEntity.EXPENSES]: {
-    value: SearchEntity.EXPENSES,
-    icon: Receipt,
-    className: 'bg-green-50 text-green-700',
-  },
-  [SearchEntity.ORDERS]: {
-    value: SearchEntity.ORDERS,
-    icon: Coins,
-    className: 'bg-amber-50 text-amber-700',
-  },
-  [SearchEntity.HOST_APPLICATIONS]: {
-    value: SearchEntity.HOST_APPLICATIONS,
-    icon: FileText,
-    className: 'bg-indigo-50 text-indigo-700',
-  },
-  [SearchEntity.TRANSACTIONS]: {
-    value: SearchEntity.TRANSACTIONS,
-    icon: ArrowRightLeft,
-    className: 'bg-purple-50 text-purple-700',
-  },
-  [SearchEntity.UPDATES]: {
-    value: SearchEntity.UPDATES,
-    icon: Megaphone,
-    className: 'bg-sky-50 text-sky-700',
-  },
-  [SearchEntity.COMMENTS]: {
-    value: SearchEntity.COMMENTS,
-    icon: MessageCircle,
-    className: 'bg-slate-100 text-slate-700',
-  },
-};
+import { EntityFilterItem } from './EntityFilterItem';
+import { DashboardPage } from './types';
 
 export const SearchCommand = ({ open, setOpen }) => {
-  const router = useRouter();
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { workspace } = useWorkspace();
@@ -248,7 +211,6 @@ export const SearchCommand = ({ open, setOpen }) => {
   );
 
   const { recentlyVisited, removeFromRecent } = useRecentlyVisited();
-  const { getLinkProps } = useGetLinkProps();
 
   // Memoized callbacks for SearchCommandItem to avoid unnecessary re-renders
   const handleSelectWorkspace = useCallback(() => {
@@ -275,17 +237,18 @@ export const SearchCommand = ({ open, setOpen }) => {
   const hasData = hasSearchTerm && dataMatchesCurrentSearch;
   const isInitialLoading = isLoading && !hasData && hasSearchTerm;
 
-  const flattenedMenuItems: (PageMenuItem & { group?: string })[] = React.useMemo(() => {
+  const flattenedMenuItems: DashboardPage[] = React.useMemo(() => {
     const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
     return menuItems
       .flatMap(menuItem =>
         'subMenu' in menuItem
           ? menuItem.subMenu.map(subItem => ({
               ...subItem,
+              id: subItem.section,
               Icon: menuItem.Icon,
               group: menuItem.label,
             }))
-          : menuItem,
+          : { ...menuItem, id: menuItem.section },
       )
       .filter(item => item.section !== ALL_SECTIONS.SEARCH);
   }, [intl, account, LoggedInUser]);
@@ -304,9 +267,9 @@ export const SearchCommand = ({ open, setOpen }) => {
         entities.push(SearchEntity.HOST_APPLICATIONS);
       }
 
-      return Object.values(pick(entityOptions, entities));
+      return Object.values(pick(entityFilterOptions, entities));
     }
-    return Object.values(pick(entityOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
+    return Object.values(pick(entityFilterOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
   }, [queryFilter.values.workspace, defaultContext?.type]);
 
   const filteredGoToPages = React.useMemo(() => {
@@ -452,48 +415,9 @@ export const SearchCommand = ({ open, setOpen }) => {
 
         {input.length === 0 && queryFilter.values.entity === SearchEntity.ALL && (
           <CommandGroup heading="" className="[&:last-child_.separator]:hidden">
-            {filteredEntityOptions.map(opt => {
-              const entityLabel = i18nSearchEntity(intl, opt.value);
-              return (
-                <SearchCommandItem
-                  key={opt.value}
-                  onSelect={() => {
-                    queryFilter.setFilter('entity', opt.value);
-                  }}
-                  value={opt.value}
-                  actionLabel={intl.formatMessage(
-                    { defaultMessage: 'Search in {entity}', id: 'UHj+h/' },
-                    { entity: entityLabel.toLowerCase() },
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={cn('flex size-9 items-center justify-center rounded-md', opt.className)}>
-                      <opt.icon />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-foreground group-hover:text-foreground">
-                        {entityLabel}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {queryFilter.values.workspace ? (
-                          <FormattedMessage
-                            defaultMessage="Find {entities} in your workspace."
-                            id="SnHGJH"
-                            values={{ entities: entityLabel }}
-                          />
-                        ) : (
-                          <FormattedMessage
-                            defaultMessage="Find any {entities} on the platform."
-                            id="HplALu"
-                            values={{ entities: entityLabel }}
-                          />
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </SearchCommandItem>
-              );
-            })}
+            {filteredEntityOptions.map(opt => (
+              <EntityFilterItem key={opt.value} opt={opt} queryFilter={queryFilter} intl={intl} />
+            ))}
             <hr className="separator -mx-2 my-2 h-px bg-border" />
           </CommandGroup>
         )}
@@ -554,29 +478,15 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
 
         {filteredGoToPages.length > 0 && (
-          <CommandGroup
-            heading={intl.formatMessage({ defaultMessage: 'Go to', id: 'D6x+uj' })}
-            className="[&:last-child_.separator]:hidden"
-          >
-            {filteredGoToPages.map(page => {
-              const { href, onClick } = getLinkProps({ entity: SearchEntity.DASHBOARD_TOOL, data: page });
-              return (
-                <SearchCommandItem
-                  key={page.section}
-                  onSelect={() => {
-                    router.push(href);
-                    setOpen(false);
-                    onClick?.();
-                  }}
-                >
-                  <Link href={href} className="block w-full">
-                    <PageResult page={page} />
-                  </Link>
-                </SearchCommandItem>
-              );
-            })}
-            <hr className="separator -mx-2 my-2 h-px bg-border" />
-          </CommandGroup>
+          <SearchCommandGroup
+            entity={SearchEntity.DASHBOARD_TOOL}
+            totalCount={filteredGoToPages.length}
+            input={debouncedInput}
+            queryFilter={queryFilter}
+            setOpen={setOpen}
+            nodes={filteredGoToPages}
+            renderNode={page => <PageResult page={page} />}
+          />
         )}
         {isInitialLoading && input !== '' && (
           <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Loading...', id: 'Select.Loading' })}>

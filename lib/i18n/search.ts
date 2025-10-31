@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { SearchEntity } from '@/components/search/schema';
+import { SearchEntity } from '@/components/search/filters';
 
 const i18nEntity = defineMessages({
   [SearchEntity.ALL]: {
@@ -34,6 +34,10 @@ const i18nEntity = defineMessages({
   [SearchEntity.HOST_APPLICATIONS]: {
     defaultMessage: 'Host Applications',
     id: 'Menu.HostApplications',
+  },
+  [SearchEntity.DASHBOARD_TOOL]: {
+    defaultMessage: 'Dashboard',
+    id: 'Dashboard',
   },
 });
 

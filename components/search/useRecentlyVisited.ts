@@ -7,7 +7,7 @@ import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import { useWorkspace } from '../WorkspaceProvider';
 
-import { SearchEntity } from './schema';
+import { SearchEntity } from './filters';
 
 const PageVisitSchema = z.object({
   entity: z.enum([

@@ -30,7 +30,7 @@ import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
-import { SearchEntity } from './schema';
+import { SearchEntity } from './filters';
 import type { SearchEntityNodeMap } from './types';
 
 export const SearchResults = () => {

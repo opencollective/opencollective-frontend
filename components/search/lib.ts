@@ -16,7 +16,7 @@ import {
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useWorkspace } from '../WorkspaceProvider';
 
-import { SearchEntity } from './schema';
+import { SearchEntity } from './filters';
 import type { SearchEntityNodeMap, SearchHighlights } from './types';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
