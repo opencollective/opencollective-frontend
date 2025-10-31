@@ -2,33 +2,20 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@apollo/client';
 import { Command as CommandPrimitive } from 'cmdk';
 import { pick } from 'lodash';
-import {
-  ArrowRightLeft,
-  ChevronRight,
-  Coins,
-  FileText,
-  Megaphone,
-  MessageCircle,
-  Receipt,
-  SearchIcon,
-  Users,
-} from 'lucide-react';
-import { type NextRouter, useRouter } from 'next/router';
-import { FormattedMessage, type IntlShape, useIntl } from 'react-intl';
+import { ChevronRight, SearchIcon } from 'lucide-react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import useQueryFilter, { type useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import useQueryFilter from '../../lib/hooks/useQueryFilter';
 import { getCommentUrl, getDashboardRoute } from '../../lib/url-helpers';
 import { i18nSearchEntity } from '@/lib/i18n/search';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import { cn } from '@/lib/utils';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
-import { getMenuItems, type PageMenuItem } from '../dashboard/Menu';
-import Link from '../Link';
+import { getMenuItems } from '../dashboard/Menu';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
@@ -40,20 +27,18 @@ import { ExpenseResult } from './result/ExpenseResult';
 import { HostApplicationResult } from './result/HostApplicationResult';
 import { LoadingResult } from './result/LoadingResult';
 import { OrderResult } from './result/OrderResult';
-import { RecentVisit } from './result/RecentVisit';
+import { PageResult } from './result/PageResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
-import { useGetLinkProps } from './lib';
-import { PageResult } from './result/PageResult';
+import { EntityFilterItem } from './EntityFilterItem';
+import { entityFilterOptions, schema, SearchEntity } from './filters';
 import { searchCommandQuery } from './queries';
-import { schema, SearchEntity, entityFilterOptions } from './filters';
+import { RecentVisits } from './RecentVisits';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandItem } from './SearchCommandItem';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import { useRecentlyVisited } from './useRecentlyVisited';
-import { EntityFilterItem } from './EntityFilterItem';
-import { DashboardPage } from './types';
+import type { DashboardPage } from './types';
 
 export const SearchCommand = ({ open, setOpen }) => {
   const intl = useIntl();
@@ -80,19 +65,15 @@ export const SearchCommand = ({ open, setOpen }) => {
         if (val) {
           const context = defaultContext;
           if (context?.type === 'account') {
-            return { account: { slug: context.slug }, includeTransactions: true };
+            return { account: { slug: context.slug } };
           } else if (context?.type === 'host') {
-            return { host: { slug: context.slug }, includeTransactions: true };
-          } else if (account?.slug === 'root-actions') {
-            return { includeTransactions: true };
+            return { host: { slug: context.slug } };
           }
-          return { includeTransactions: false };
-        } else {
-          return { includeTransactions: true };
         }
       },
       entity: val => {
         const defaultForEntity = {
+          limit: 20,
           useTopHits: false,
           includeAccounts: false,
           includeTransactions: false,
@@ -106,6 +87,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         switch (val) {
           case SearchEntity.ALL:
             return {
+              limit: 5,
               useTopHits: true,
               includeAccounts: true,
               includeTransactions: true,
@@ -114,7 +96,6 @@ export const SearchCommand = ({ open, setOpen }) => {
               includeUpdates: true,
               includeComments: true,
               includeHostApplications: true,
-              limit: 5,
             };
           case SearchEntity.EXPENSES:
             return {
@@ -210,9 +191,6 @@ export const SearchCommand = ({ open, setOpen }) => {
     [queryFilter],
   );
 
-  const { recentlyVisited, removeFromRecent } = useRecentlyVisited();
-
-  // Memoized callbacks for SearchCommandItem to avoid unnecessary re-renders
   const handleSelectWorkspace = useCallback(() => {
     queryFilter.setFilter('workspace', defaultContext.slug);
     setInput('');
@@ -463,25 +441,13 @@ export const SearchCommand = ({ open, setOpen }) => {
           </React.Fragment>
         )}
 
-        {recentlyVisited.length > 0 && input === '' && queryFilter.values.entity === SearchEntity.ALL && (
-          <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Recent', id: 'rrfdNu' })}>
-            {recentlyVisited.map(recentVisit => (
-              <RecentVisit
-                key={recentVisit.id}
-                entity={recentVisit.entity}
-                id={recentVisit.id}
-                setOpen={setOpen}
-                removeFromRecent={removeFromRecent}
-              />
-            ))}
-          </CommandGroup>
-        )}
+        <RecentVisits queryFilter={queryFilter} setOpen={setOpen} input={input} />
 
         {filteredGoToPages.length > 0 && (
           <SearchCommandGroup
             entity={SearchEntity.DASHBOARD_TOOL}
             totalCount={filteredGoToPages.length}
-            input={debouncedInput}
+            input={input}
             queryFilter={queryFilter}
             setOpen={setOpen}
             nodes={filteredGoToPages}

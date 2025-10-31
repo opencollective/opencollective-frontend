@@ -25,12 +25,13 @@ import { Skeleton } from '../ui/Skeleton';
 import { AccountResult } from './result/AccountResult';
 import { CommentResult } from './result/CommentResult';
 import { ExpenseResult } from './result/ExpenseResult';
+import { LoadingResult } from './result/LoadingResult';
 import { OrderResult } from './result/OrderResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
+import { SearchEntity } from './filters';
 import { useGetLinkProps } from './lib';
 import { searchPageQuery } from './queries';
-import { SearchEntity } from './filters';
 import type { SearchEntityNodeMap } from './types';
 
 export const SearchResults = () => {
@@ -57,15 +58,10 @@ export const SearchResults = () => {
         if (val) {
           const context = defaultContext;
           if (context?.type === 'account') {
-            return { account: { slug: context.slug }, includeTransactions: true };
+            return { account: { slug: context.slug } };
           } else if (context?.type === 'host') {
-            return { host: { slug: context.slug }, includeTransactions: true };
-          } else if (account?.slug === 'root-actions') {
-            return { includeTransactions: true };
+            return { host: { slug: context.slug } };
           }
-          return { includeTransactions: false };
-        } else {
-          return { includeTransactions: true };
         }
       },
       limit: (limit, key, meta, values) => {
@@ -470,13 +466,7 @@ function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchE
       <div className="flex flex-col gap-2">
         {loading
           ? Array.from({ length: queryFilter.values.limit }, (_, i) => i + 1).map(id => (
-              <div key={`skeleton-${id}`} className="flex items-center gap-2 py-2">
-                <Skeleton className="size-9 shrink-0 rounded-md" />
-                <div className="flex flex-1 flex-col gap-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              </div>
+              <LoadingResult key={`skeleton-${id}`} />
             ))
           : nodes.map(node => {
               const { href, onClick } = getLinkProps({ entity, data: node });
