@@ -30,5 +30,9 @@ export default function PricingPage() {
   const { data } = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(pricingPageQuery, {
     context: API_V2_CONTEXT,
   });
-  return <Page>{parseToBoolean(getEnvVar('NEW_PRICING')) ? <NewPricing data={data} /> : <Pricing />}</Page>;
+  return (
+    <Page>
+      <Pricing />
+    </Page>
+  );
 }

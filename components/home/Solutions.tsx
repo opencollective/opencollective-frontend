@@ -126,7 +126,7 @@ const Solutions = () => {
             </div>
 
             <Button asChild variant="marketing" className="h-12 w-full rounded-full text-base" size="lg">
-              <Link href="/solutions">
+              <Link href="/organizations">
                 <div className="flex items-center justify-center gap-2">
                   <FormattedMessage {...messages['home.solutions.legallyIncorporated.button']} />
                   <ArrowRight size={16} />

@@ -228,7 +228,7 @@ export default function Pricing({ data }) {
                 id="pricing.newModel.onNewPricing"
                 values={{
                   LinkLegacyPricing: parts => (
-                    <Link href="/legacy-pricing" className="font-medium underline hover:text-blue-900">
+                    <Link href="/pricing" className="font-medium underline hover:text-blue-900">
                       {parts}
                     </Link>
                   ),

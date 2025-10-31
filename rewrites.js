@@ -19,6 +19,10 @@ exports.REWRITES = [
     destination: '/welcome',
   },
   {
+    source: '/organizations',
+    destination: '/solutions',
+  },
+  {
     source: '/solutions',
     destination: '/solutions',
   },
@@ -398,6 +402,10 @@ exports.REWRITES = [
   {
     source: '/pricing',
     destination: '/pricing',
+  },
+  {
+    source: '/organizations/pricing',
+    destination: '/new-pricing',
   },
   {
     source: '/new-pricing',
