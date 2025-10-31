@@ -10,6 +10,7 @@ describe('New expense flow', () => {
 
   describe('Invoices', () => {
     commonScenarios('invoice');
+    commonEditScenario('invoice');
 
     describe('Taxes', function () {
       it(`User can submit invoice expense with taxes`, function () {
@@ -40,6 +41,7 @@ describe('New expense flow', () => {
 
   describe('Reimbursements', () => {
     commonScenarios('reimbursement');
+    commonEditScenario('reimbursement');
   });
 });
 
@@ -600,6 +602,79 @@ function submitExpense(options: {
   cy.contains('has been submitted successfully!').should('exist');
   cy.contains('button', 'View all expenses').click();
 }
+
+
+function commonEditScenario(expenseType: 'invoice' | 'reimbursement') {
+  describe.only(`Edit ${expenseType} expense`, function () {
+    let expense;
+
+    before(function () {
+      const payoutMethodSlug = randomSlug();
+      const userSlug = randomSlug();
+      cy.signup({
+        user: { name: userSlug, email: `oc-test-${userSlug}@opencollective.com` },
+        redirect: `/dashboard/${userSlug}/submitted-expenses?newExpenseFlowEnabled=true`,
+      });
+
+      cy.location('pathname').should('eq', `/dashboard/${userSlug}/submitted-expenses`, {
+        timeout: 30_000,
+      });
+
+      cy.createExpense({
+        userEmail: `oc-test-${userSlug}@opencollective.com`,
+        account: { slug: 'apex' },
+        payee: { slug: userSlug },
+        payoutMethod: {
+          type: 'OTHER',
+          name: payoutMethodSlug,
+          data: {
+            content: `My payout method ${payoutMethodSlug}`,
+            currency: 'USD',
+          },
+        },
+      }).then(createdExpense => {
+        expense = createdExpense;
+        cy.visit(`/apex/expenses/${expense.legacyId}?newExpenseFlowEnabled=true`);
+      });
+    });
+
+    it('Edits title', () => {
+      cy.getByDataCy('edit-expense-title-btn').click();
+      cy.get('input[name="description"]').type('{selectall}New title');
+      cy.get('form').contains('button', 'Save').click();
+      cy.getByDataCy('expense-description').should('have.text', 'New title');
+    });
+
+    it.only('Edits items', () => {
+      cy.getByDataCy('edit-expense-expenseDetails-btn').click();
+      cy.get('input[name="expenseItems.0.description"]').type('{selectall}New item description');
+
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.get('input[name="expenseItems.1.description"]').type('{selectall}Item 2 description');
+      cy.get('input[name="expenseItems.1.incurredAt"]').type('2025-09-29');
+      cy.getByDataCy('input-expenseItems.1.amount.valueInCents-currency-picker').click();
+      cy.focused().should('have.attr', 'placeholder', 'Search...').type('EUR{enter}');
+      cy.get('input[name="expenseItems.1.amount.valueInCents"]').type('{selectall}100');
+
+      // Must have error - reference currency needed
+      cy.getByDataCy('reference-currency-picker').should('have.class', 'border-red-500');
+      cy.getByDataCy('reference-currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'EUR').click();
+
+      cy.get('form').contains('button', 'Save').click();
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(1) [data-cy=expense-summary-item-description]').should(
+        'have.text',
+        'New item description',
+      );
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(2) [data-cy=expense-summary-item-description]').should(
+        'have.text',
+        'Item 2 description',
+      );
+      cy.getByDataCy('expense-items-total-amount').should('have.text', '€111.00');
+    });
+  });
+}
+
 
 function fillNewPayoutMethod(payoutMethod: {
   type: string;

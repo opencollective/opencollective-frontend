@@ -474,9 +474,10 @@ const ExpenseSummary = ({
                           fontWeight="500"
                           maxCollapsedHeight={100}
                           collapsePadding={22}
+                          data-cy="expense-summary-item-description"
                         />
                       ) : (
-                        <Span color="black.600" fontStyle="italic">
+                        <Span color="black.600" fontStyle="italic" data-cy="expense-summary-item-description">
                           <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
                         </Span>
                       )}

@@ -49,6 +49,8 @@ Cypress.on('uncaught:exception', (err, runnable, promise) => {
     err.message.includes(`Cannot read properties of undefined (reading 'dispatch')`)
   ) {
     return false;
+  } else if (err.stack?.includes('https://maps.googleapis.com')) {
+    return false;
   } else {
     throw err;
   }
