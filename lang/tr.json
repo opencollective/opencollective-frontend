@@ -1,7 +1,7 @@
 {
   "++1FQ+": "<Account></Account> adlı hesabı, zamanı geçen kredi kartları ilgili hatırlatma yap",
   "+1HAHt": "Profil URL'si",
-  "+2hntI": "{perMonth} / Month",
+  "+2hntI": "{perMonth} / Ay",
   "+5Kafe": "Gider Detayları",
   "+5KHJy": "Delete token",
   "+5TQLy": "<Individual></Individual> <Expense>{expenseDescription}</Expense> için yeniden onay talep etti",
@@ -13,7 +13,7 @@
   "+cQ6YM": "Kapak güncellendi",
   "+cR4M7": "{service} üzerinde kimliğinizi doğrulayın",
   "+Ct+Nd": "Mevcut alanlar",
-  "+EJXC5": "The initial amount was {amount}",
+  "+EJXC5": "İlk miktar {amount} idi",
   "+H8kCF": "We konden geen betalingsmethode vinden om deze transactie te voltooien",
   "+H9kRE": "Değiştirilmiş şifre",
   "+j9z3T": "Faturayı İndir",
