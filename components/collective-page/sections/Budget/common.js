@@ -129,7 +129,7 @@ export const makeApexOptions = (currency, timeUnit, intl) => ({
       width: 6,
       height: 24,
       radius: 8,
-      offsetY: 6,
+      offsetY: 0,
     },
   },
   colors: COLORS,
