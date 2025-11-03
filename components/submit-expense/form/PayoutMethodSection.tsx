@@ -24,7 +24,6 @@ import { ComboSelect } from '@/components/ComboSelect';
 import { FormField } from '@/components/FormField';
 import { useModal } from '@/components/ModalContext';
 import { Badge } from '@/components/ui/Badge';
-import { Input } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
@@ -380,9 +379,9 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   );
 
   const isLegalNameFuzzyMatched = React.useMemo(() => {
-    const accountHolderName: string = props.newPayoutMethod.data?.accountHolderName ?? '';
+    const accountHolderName: string = (props.newPayoutMethod.data?.accountHolderName ?? '')?.trim();
     const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
-    return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
+    return !accountHolderName || accountHolderName.toLowerCase() === payeeLegalName.trim().toLowerCase();
   }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
@@ -444,7 +443,11 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
               defaultMessage="The legal name in the payee profile is: {legalName}."
               id="NSammt"
               values={{
-                legalName: props.payee?.legalName,
+                legalName: props.payee?.legalName || (
+                  <i>
+                    <FormattedMessage defaultMessage="Unknown" id="Unknown" />
+                  </i>
+                ),
               }}
             />
           </div>
@@ -458,14 +461,22 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
             />
           </div>
 
-          <FormField
+          <p className="mt-4">
+            <FormattedMessage
+              defaultMessage="This mismatch might prevent the host from paying the expense. If needed, please provide a reason for the discrepancy in the Additional Information section or as a comment on the expense."
+              id="9ssyMG"
+            />
+          </p>
+
+          {/* See https://github.com/opencollective/opencollective/issues/8306 */}
+          {/* <FormField
             className="mt-4"
             label={intl.formatMessage({
               defaultMessage: 'Please explain why they are different',
               id: 'bzGbkJ',
             })}
             name="payoutMethodNameDiscrepancyReason"
-          />
+          /> */}
         </MessageBox>
       )}
 
@@ -805,8 +816,19 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       </div>
                       <div>
                         <FormattedMessage
-                          defaultMessage="Your payout method is missing a currency. Please edit your payout method to update it."
-                          id="nrG4vz"
+                          defaultMessage="Your payout method is missing a currency. Please <EditLink>edit</EditLink> your payout method to update it."
+                          id="A1di0H"
+                          values={{
+                            EditLink: chunks => (
+                              <Button
+                                variant="link"
+                                className="inline h-auto p-0 text-xs text-neutral-700 underline"
+                                onClick={onEditClick}
+                              >
+                                {chunks}
+                              </Button>
+                            ),
+                          }}
                         />
                       </div>
                     </MessageBox>
@@ -863,7 +885,15 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                       </React.Fragment>
                     )}
                     {keepNameDifferent && (
-                      <FormField
+                      <React.Fragment>
+                        <p className="mt-4">
+                          <FormattedMessage
+                            defaultMessage="This mismatch might prevent the host from paying the expense. If needed, please provide a reason for the discrepancy in the Additional Information section or as a comment on the expense."
+                            id="9ssyMG"
+                          />
+                        </p>
+                        {/* See https://github.com/opencollective/opencollective/issues/8306 */}
+                        {/* <FormField
                         className="mt-4"
                         label={intl.formatMessage({
                           defaultMessage: 'Please explain why they are different',
@@ -874,7 +904,8 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                         {({ field }) => (
                           <Input {...field} onChange={e => props.setNameMismatchReason(e.target.value)} />
                         )}
-                      </FormField>
+                      </FormField> */}
+                      </React.Fragment>
                     )}
                   </MessageBox>
                 )}
