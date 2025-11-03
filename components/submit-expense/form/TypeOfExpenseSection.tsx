@@ -108,7 +108,12 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                   title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedHostInvoiceExpensePolicy}
-                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
+                  onAcknowledgedChanged={v => {
+                    props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v);
+                    if (isHostAccount) {
+                      props.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v);
+                    }
+                  }}
                 />
               </div>
             )}
@@ -134,7 +139,12 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                   title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedHostReceiptExpensePolicy}
-                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
+                  onAcknowledgedChanged={v => {
+                    props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v);
+                    if (isHostAccount) {
+                      props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v);
+                    }
+                  }}
                 />
               </div>
             )}
