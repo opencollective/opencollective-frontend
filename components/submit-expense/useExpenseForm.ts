@@ -1070,20 +1070,19 @@ function buildFormSchema(
             : true,
         requiredMessage,
       ),
-    payoutMethodNameDiscrepancyReason: z
-      .string()
-      .nullish()
-      .refine(v => {
-        if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
-          const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
-          const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
-          if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
-            return !!v;
-          }
-        }
+    payoutMethodNameDiscrepancyReason: z.string().nullish().optional(),
+    // See https://github.com/opencollective/opencollective/issues/8306
+    // .refine(v => {
+    //   if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
+    //     const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
+    //     const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
+    //     if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
+    //       return !!v;
+    //     }
+    //   }
 
-        return true;
-      }, requiredMessage),
+    //   return true;
+    // }, requiredMessage)
     newPayoutMethod: z.object({
       type: z
         .nativeEnum(PayoutMethodType)
@@ -1641,14 +1640,8 @@ export function useExpenseForm(opts: {
         $expenseCreateInput: ExpenseCreateInput!
         $account: AccountReferenceInput!
         $recurring: RecurringExpenseInput
-        $privateComment: String
       ) {
-        expense: createExpense(
-          expense: $expenseCreateInput
-          account: $account
-          privateComment: $privateComment
-          recurring: $recurring
-        ) {
+        expense: createExpense(expense: $expenseCreateInput, account: $account, recurring: $recurring) {
           id
           legacyId
         }
@@ -1832,11 +1825,6 @@ export function useExpenseForm(opts: {
                       },
                     }
                   : {}),
-                privateComment:
-                  formOptions.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT &&
-                  formOptions.payoutMethod?.data?.accountHolderName !== formOptions.payee?.legalName
-                    ? values.payoutMethodNameDiscrepancyReason
-                    : null,
               },
             });
 
