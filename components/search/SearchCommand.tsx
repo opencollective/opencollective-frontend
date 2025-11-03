@@ -38,7 +38,15 @@ import { RecentVisits } from './RecentVisits';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandItem } from './SearchCommandItem';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import type { DashboardPage } from './types';
+import type { DashboardPage, SearchHighlights } from './types';
+
+const getMaxScore = (highlights: Record<string, SearchHighlights> | undefined): number => {
+  if (!highlights) {
+    return 0;
+  }
+  const scores = Object.values(highlights).map(h => h.score);
+  return scores.length > 0 ? Math.max(...scores) : 0;
+};
 
 export const SearchCommand = ({ open, setOpen }) => {
   const intl = useIntl();
@@ -281,6 +289,86 @@ export const SearchCommand = ({ open, setOpen }) => {
     );
   }, [data]);
 
+  const sortedEntityResultGroups = useMemo(() => {
+    if (!hasData) {
+      return [];
+    }
+
+    const entityResultGroups = [
+      {
+        entity: SearchEntity.ACCOUNTS,
+        totalCount: data?.search.results.accounts?.collection.totalCount,
+        nodes: data?.search.results.accounts?.collection.nodes,
+        maxScore: getMaxScore(data?.search.results.accounts?.highlights),
+        renderNode: account => (
+          <AccountResult account={account} highlights={data?.search.results.accounts?.highlights[account.id]} />
+        ),
+      },
+      {
+        entity: SearchEntity.EXPENSES,
+        totalCount: data?.search.results.expenses?.collection.totalCount,
+        nodes: data?.search.results.expenses?.collection.nodes,
+        maxScore: getMaxScore(data?.search.results.expenses?.highlights),
+        renderNode: expense => (
+          <ExpenseResult expense={expense} highlights={data?.search.results.expenses?.highlights[expense.id]} />
+        ),
+      },
+      {
+        entity: SearchEntity.HOST_APPLICATIONS,
+        totalCount: data?.search.results.hostApplications?.collection.totalCount,
+        nodes: data?.search.results.hostApplications?.collection.nodes,
+        maxScore: getMaxScore(data?.search.results.hostApplications?.highlights),
+        renderNode: hostApplication => (
+          <HostApplicationResult
+            hostApplication={hostApplication}
+            highlights={data?.search.results.hostApplications?.highlights[hostApplication.id]}
+          />
+        ),
+      },
+      {
+        entity: SearchEntity.ORDERS,
+        totalCount: data?.search.results.orders?.collection.totalCount,
+        nodes: data?.search.results.orders?.collection.nodes,
+        maxScore: getMaxScore(data?.search.results.orders?.highlights),
+        renderNode: order => (
+          <OrderResult order={order} highlights={data?.search.results.orders?.highlights[order.id]} />
+        ),
+      },
+      {
+        entity: SearchEntity.TRANSACTIONS,
+        totalCount: data?.search.results.transactions?.collection.totalCount,
+        nodes: data?.search.results.transactions?.collection.nodes,
+        maxScore: getMaxScore(data?.search.results.transactions?.highlights),
+        renderNode: transaction => (
+          <TransactionResult
+            transaction={transaction}
+            highlights={data?.search.results.transactions?.highlights[transaction.id]}
+          />
+        ),
+      },
+      {
+        entity: SearchEntity.UPDATES,
+        totalCount: data?.search.results.updates?.collection.totalCount,
+        nodes: data?.search.results.updates?.collection.nodes,
+        maxScore: getMaxScore(data?.search.results.updates?.highlights),
+        renderNode: update => (
+          <UpdateResult update={update} highlights={data?.search.results.updates?.highlights[update.id]} />
+        ),
+      },
+      {
+        entity: SearchEntity.COMMENTS,
+        totalCount: data?.search.results.comments?.collection.totalCount,
+        nodes: data?.search.results.comments?.collection.nodes?.filter(comment => getCommentUrl(comment, LoggedInUser)),
+        maxScore: getMaxScore(data?.search.results.comments?.highlights),
+        renderNode: comment => (
+          <CommentResult comment={comment} highlights={data?.search.results.comments?.highlights[comment.id]} />
+        ),
+      },
+    ] as const;
+
+    return [...entityResultGroups].sort((a, b) => b.maxScore - a.maxScore);
+  }, [hasData, data, LoggedInUser]);
+
   const showNoResults = debouncedInput !== '' && !isLoading && filteredGoToPages.length === 0 && !hasSearchResults;
 
   // Handle infinite scroll
@@ -463,100 +551,19 @@ export const SearchCommand = ({ open, setOpen }) => {
         )}
         {hasData && (
           <React.Fragment>
-            <SearchCommandGroup
-              entity={SearchEntity.ACCOUNTS}
-              totalCount={data?.search.results.accounts?.collection.totalCount}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              nodes={data?.search.results.accounts?.collection.nodes}
-              renderNode={account => (
-                <AccountResult account={account} highlights={data?.search.results.accounts?.highlights[account.id]} />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
-            <SearchCommandGroup
-              entity={SearchEntity.EXPENSES}
-              totalCount={data?.search.results.expenses?.collection.totalCount}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              nodes={data?.search.results.expenses?.collection.nodes}
-              renderNode={expense => (
-                <ExpenseResult expense={expense} highlights={data?.search.results.expenses?.highlights[expense.id]} />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
-            <SearchCommandGroup
-              entity={SearchEntity.HOST_APPLICATIONS}
-              totalCount={data?.search.results.hostApplications?.collection.totalCount}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              nodes={data?.search.results.hostApplications?.collection.nodes}
-              renderNode={hostApplication => (
-                <HostApplicationResult
-                  hostApplication={hostApplication}
-                  highlights={data?.search.results.hostApplications?.highlights[hostApplication.id]}
-                />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
-            <SearchCommandGroup
-              entity={SearchEntity.ORDERS}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              totalCount={data?.search.results.orders?.collection.totalCount}
-              nodes={data?.search.results.orders?.collection.nodes}
-              renderNode={order => (
-                <OrderResult order={order} highlights={data?.search.results.orders?.highlights[order.id]} />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
-
-            <SearchCommandGroup
-              entity={SearchEntity.TRANSACTIONS}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              totalCount={data?.search.results.transactions?.collection.totalCount}
-              nodes={data?.search.results.transactions?.collection.nodes}
-              renderNode={transaction => (
-                <TransactionResult
-                  transaction={transaction}
-                  highlights={data?.search.results.transactions?.highlights[transaction.id]}
-                />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
-
-            <SearchCommandGroup
-              entity={SearchEntity.UPDATES}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              totalCount={data?.search.results.updates?.collection.totalCount}
-              nodes={data?.search.results.updates?.collection.nodes}
-              renderNode={update => (
-                <UpdateResult update={update} highlights={data?.search.results.updates?.highlights[update.id]} />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
-            <SearchCommandGroup
-              entity={SearchEntity.COMMENTS}
-              input={debouncedInput}
-              queryFilter={queryFilter}
-              setOpen={setOpen}
-              totalCount={data?.search.results.comments?.collection.totalCount}
-              nodes={data?.search.results.comments?.collection.nodes.filter(comment =>
-                getCommentUrl(comment, LoggedInUser),
-              )} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
-              renderNode={comment => (
-                <CommentResult comment={comment} highlights={data?.search.results.comments?.highlights[comment.id]} />
-              )}
-              isInfiniteScrollEnabled={isInfiniteScrollEnabled}
-            />
+            {sortedEntityResultGroups.map(group => (
+              <SearchCommandGroup
+                key={group.entity}
+                entity={group.entity}
+                totalCount={group.totalCount}
+                input={debouncedInput}
+                queryFilter={queryFilter}
+                setOpen={setOpen}
+                nodes={group.nodes}
+                renderNode={group.renderNode}
+                isInfiniteScrollEnabled={isInfiniteScrollEnabled}
+              />
+            ))}
           </React.Fragment>
         )}
 
