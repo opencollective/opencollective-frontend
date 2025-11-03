@@ -536,8 +536,8 @@ function PlanStep(props: PlanStepProps) {
                 {props.plans.map(plan => (
                   <SelectItem key={plan.id} value={plan.id}>
                     <FormattedMessage
-                      defaultMessage="{includedExpensesPerMonth} Active {includedExpensesPerMonth, plural, one {collective} other {collectives}} / {includedExpensesPerMonth} paid {includedExpensesPerMonth, plural, one {expense} other {expenses}}"
-                      id="N4RH9E"
+                      defaultMessage="{includedCollectives} Active {includedCollectives, plural, one {collective} other {collectives}} / {includedExpensesPerMonth} paid {includedExpensesPerMonth, plural, one {expense} other {expenses}}"
+                      id="aQEXoc"
                       values={{
                         includedCollectives: plan.pricing.includedCollectives,
                         includedExpensesPerMonth: plan.pricing.includedExpensesPerMonth,
