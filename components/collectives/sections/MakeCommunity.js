@@ -46,13 +46,9 @@ const MakeCommunity = () => {
             <MainTitle my={[3, null, 3]} textAlign={['center', 'left']}>
               <FormattedMessage
                 id="home.makeCommunitySection.title.makeYourCommunity"
-                defaultMessage="Make your community {sustainable}"
+                defaultMessage="Make your community <SustainTextWrapper>sustainable</SustainTextWrapper>"
                 values={{
-                  sustainable: (
-                    <SustainTextWrapper>
-                      <FormattedMessage id="home.makeCommunitySection.title.sustain" defaultMessage="sustainable" />
-                    </SustainTextWrapper>
-                  ),
+                  SustainTextWrapper: chunks => <SustainTextWrapper>{chunks}</SustainTextWrapper>,
                 }}
               />
             </MainTitle>
