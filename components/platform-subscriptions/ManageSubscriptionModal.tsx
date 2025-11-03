@@ -263,7 +263,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         </Button>
         {props.step < Step.SUMMARY && (
           <Button variant="outline" onClick={() => props.setStep(s => s + 1)} loading={props.form.isSubmitting}>
-            <FormattedMessage {...StepTitles[props.step]} />
+            <FormattedMessage defaultMessage="Next Step" id="8cv9D4" />
             <ArrowRight />
           </Button>
         )}

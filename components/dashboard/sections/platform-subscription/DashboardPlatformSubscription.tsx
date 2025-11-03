@@ -61,6 +61,8 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const billing = query.data?.host?.platformBilling;
   const isLoading = query.loading;
 
+  const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+
   return (
     <div>
       <DashboardHeader
@@ -105,17 +107,19 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
                     <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
                   </Button>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Button
-                    disabled={isLoading}
-                    onClick={() => showModal(CancelSubscriptionModal)}
-                    variant="ghost"
-                    size="xs"
-                  >
-                    <X size={14} />
-                    <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
-                  </Button>
-                </DropdownMenuItem>
+                {!isFreeDiscoverTier && (
+                  <DropdownMenuItem asChild>
+                    <Button
+                      disabled={isLoading}
+                      onClick={() => showModal(CancelSubscriptionModal)}
+                      variant="ghost"
+                      size="xs"
+                    >
+                      <X size={14} />
+                      <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
+                    </Button>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           )
