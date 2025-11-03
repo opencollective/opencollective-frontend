@@ -22,9 +22,9 @@ const getProvider = url => {
 };
 
 /** An iframe that grows with its content */
-const ResponsiveIframe = styled(({ src, ...props }) => (
+const ResponsiveIframe = styled(({ src, iframeProps, ...props }) => (
   <div {...props}>
-    <iframe title="Responsive Frame" src={src} allowFullScreen frameBorder="0" allow="fullscreen" />
+    <iframe title="Responsive Frame" src={src} allowFullScreen frameBorder="0" allow="fullscreen" {...iframeProps} />
   </div>
 ))`
   position: relative;
@@ -48,6 +48,10 @@ interface VideoPlayerProps {
   placeholder?: React.ReactNode;
 }
 
+const YOUTUBE_IFRAME_PROPS = {
+  referrerpolicy: 'strict-origin-when-cross-origin',
+} as const;
+
 /**
  * A video player that supports YouTube and Vimeo.
  * Implemented as a pure component to avoid re-checking the URL and re-rendering
@@ -63,7 +67,12 @@ const VideoPlayer = React.memo(({ url, placeholder = null }: VideoPlayerProps) =
       // users until they actually start playing the video. It's better for privacy
       // and lighter for users. The service is officially supported by Google.
       // See https://support.google.com/youtube/answer/171780?hl=en > "Turn on privacy-enhanced mode"
-      return <ResponsiveIframe src={`https://www.youtube-nocookie.com/embed/${youtubeId}`} />;
+      return (
+        <ResponsiveIframe
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+          iframeProps={YOUTUBE_IFRAME_PROPS}
+        />
+      );
     }
   } else if (provider === 'Vimeo') {
     const vimeoId = ProvidersRegexs.Vimeo.exec(url)[3];
