@@ -11,6 +11,7 @@ import type {
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { getI18nLink } from '@/components/I18nFormatters';
+import Link from '@/components/Link';
 import MessageBox from '@/components/MessageBox';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
@@ -131,16 +132,16 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             id="S3DC9x"
             values={{
               LegacyPricingLink: getI18nLink({
-                href: 'https://opencollective.com/pricing',
-                openInNewTabNoFollow: true,
+                as: Link,
+                href: '/pricing',
               }),
               ContactLink: getI18nLink({
-                href: 'https://opencollective.com/contact',
-                openInNewTabNoFollow: true,
+                as: Link,
+                href: '/contact',
               }),
               NewPricingLink: getI18nLink({
-                href: 'https://pricing-2026.opencollective.com',
-                openInNewTabNoFollow: true,
+                as: Link,
+                href: '/organizations/pricing',
               }),
             }}
           />

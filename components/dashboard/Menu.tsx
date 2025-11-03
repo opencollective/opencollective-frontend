@@ -466,7 +466,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           ? [
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
-                label: intl.formatMessage({ defaultMessage: 'Platform Subscription', id: '28toyD' }),
+                label: intl.formatMessage({ defaultMessage: 'Platform Billing', id: 'beRXFK' }),
                 if: hasPlatformBillingEnabled,
               },
               {
