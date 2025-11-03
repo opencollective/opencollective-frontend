@@ -223,7 +223,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
   return (
     <div className="mt-4 rounded-md border border-gray-300 p-4">
       <Label>
-        {props.isAdminOfPayee || !LoggedInUser ? (
+        {props.isAdminOfPayee || !LoggedInUser || props.payee?.type === CollectiveType.VENDOR ? (
           <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
         ) : props.expenseTypeOption === ExpenseType.GRANT ? (
           <FormattedMessage
