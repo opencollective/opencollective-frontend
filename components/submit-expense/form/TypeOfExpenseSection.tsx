@@ -108,7 +108,12 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                   title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedHostInvoiceExpensePolicy}
-                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
+                  onAcknowledgedChanged={v => {
+                    props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v);
+                    if (isHostAccount) {
+                      props.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v);
+                    }
+                  }}
                 />
               </div>
             )}
@@ -134,7 +139,12 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                   title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedHostReceiptExpensePolicy}
-                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
+                  onAcknowledgedChanged={v => {
+                    props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v);
+                    if (isHostAccount) {
+                      props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v);
+                    }
+                  }}
                 />
               </div>
             )}
@@ -213,7 +223,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
   return (
     <div className="mt-4 rounded-md border border-gray-300 p-4">
       <Label>
-        {props.isAdminOfPayee || !LoggedInUser ? (
+        {props.isAdminOfPayee || !LoggedInUser || props.payee?.type === CollectiveType.VENDOR ? (
           <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
         ) : props.expenseTypeOption === ExpenseType.GRANT ? (
           <FormattedMessage
