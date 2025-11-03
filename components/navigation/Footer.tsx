@@ -67,7 +67,7 @@ const Footer = ({ className }: { className?: string }) => {
 
   const footerItems = usingNewPricing ? newFooterItems : legacyFooterItems;
   return (
-    <footer className={cn('bg-background antialiased', className)}>
+    <footer className={cn('border-t bg-background antialiased', className)}>
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 lg:px-8">
         <div className="xl:flex xl:gap-12">
           <div className="max-w-xs space-y-6">

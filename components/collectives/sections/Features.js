@@ -222,7 +222,14 @@ const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
     <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, 'none']} />
     <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
-      <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="primary.900" my={3}>
+      <H4
+        fontSize="24px"
+        display={['none', 'block']}
+        letterSpacing="-0.4px"
+        fontWeight="bold"
+        color="primary.900"
+        my={3}
+      >
         {intl.formatMessage(messages[`home.feature.${id}`])}
       </H4>
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
