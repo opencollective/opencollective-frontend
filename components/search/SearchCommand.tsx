@@ -165,7 +165,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm,
   });
-  console.log({ data, queryFilter });
+
   // Track if we're loading more results
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 

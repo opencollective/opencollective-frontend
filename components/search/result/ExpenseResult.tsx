@@ -1,5 +1,4 @@
 import React from 'react';
-import { Markup } from 'interweave';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nExpenseType } from '../../../lib/i18n/expense';
@@ -7,9 +6,9 @@ import type { SearchExpenseFieldsFragment } from '@/lib/graphql/types/v2/graphql
 
 import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import { Highlight } from '../Highlight';
 
 export function ExpenseResult({
   expense,

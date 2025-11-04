@@ -1,13 +1,12 @@
 import React from 'react';
-import { Markup } from 'interweave';
 import { FormattedMessage } from 'react-intl';
 
 import type { SearchCommentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Avatar from '../../Avatar';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import { Highlight } from '../Highlight';
 
 export function CommentResult({
   comment,

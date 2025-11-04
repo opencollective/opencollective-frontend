@@ -1,6 +1,5 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { Markup } from 'interweave';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
@@ -9,9 +8,9 @@ import type { SearchTransactionFieldsFragment } from '@/lib/graphql/types/v2/gra
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Badge } from '../../ui/Badge';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import { Highlight } from '../Highlight';
 
 export function TransactionResult({
   transaction,

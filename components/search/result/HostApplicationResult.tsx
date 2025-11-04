@@ -1,5 +1,4 @@
 import React from 'react';
-import { Markup } from 'interweave';
 import { useIntl } from 'react-intl';
 
 import i18nHostApplicationStatus from '../../../lib/i18n/host-application-status';
@@ -7,9 +6,9 @@ import type { SearchHostApplicationFieldsFragment } from '@/lib/graphql/types/v2
 
 import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import { Highlight } from '../Highlight';
 
 export function HostApplicationResult({
   hostApplication,

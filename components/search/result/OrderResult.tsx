@@ -1,14 +1,13 @@
 import React from 'react';
-import { Markup } from 'interweave';
 import { FormattedMessage } from 'react-intl';
 
 import type { SearchOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import { Highlight } from '../Highlight';
 
 export function OrderResult({
   order,
