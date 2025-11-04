@@ -102,7 +102,7 @@ const HTMLContent = styled(
                   return (
                     <iframe
                       allowFullScreen
-                      referrerpolicy={isYouTube ? 'strict-origin-when-cross-origin' : undefined}
+                      referrerPolicy={isYouTube ? 'strict-origin-when-cross-origin' : undefined}
                       width={node.getAttribute('width')}
                       height={node.getAttribute('height')}
                       title={node.getAttribute('title') || 'Embed content'}

@@ -98,6 +98,7 @@ export default function ContributePage() {
                             allowFullScreen={node.getAttribute('allowfullscreen') as unknown as boolean}
                             title={node.getAttribute('title') || 'Embed content'}
                             src={src}
+                            referrerPolicy="strict-origin-when-cross-origin"
                           />
                         );
                       }
