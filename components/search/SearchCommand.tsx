@@ -165,7 +165,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm,
   });
-
+  console.log({ data, queryFilter });
   // Track if we're loading more results
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
@@ -457,11 +457,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
-      <CommandList
-        ref={listRef}
-        onScroll={handleScroll}
-        className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2"
-      >
+      <CommandList ref={listRef} onScroll={handleScroll} className="max-h-[600px] border-t-0 border-b">
         <CommandItem value="-" className="hidden" />
         {!queryFilter.values.workspace &&
           defaultContext &&

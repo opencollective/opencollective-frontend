@@ -7,6 +7,7 @@ import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
+import { Highlight } from '../Highlight';
 
 export function OrderResult({
   order,
@@ -24,11 +25,7 @@ export function OrderResult({
       <div className="overflow-hidden">
         <div className="mb-1 flex gap-1">
           <Badge type="outline" size="xs">
-            {highlightFields.top.id ? (
-              <Markup allowList={['mark']} content={`#${highlightFields.top.id[0]}`} />
-            ) : (
-              `#${order.legacyId}`
-            )}
+            {highlightFields.top.id ? <Highlight content={`#${highlightFields.top.id[0]}`} /> : `#${order.legacyId}`}
           </Badge>
           <div className="truncate">
             Order from <span className="text-foreground">{order.fromAccount.name}</span>
@@ -36,11 +33,11 @@ export function OrderResult({
           </div>
         </div>
         <div className="truncate font-medium text-muted-foreground">
-          <Markup allowList={['mark']} content={highlightFields.top.description?.[0] || order.description} />
+          <Highlight content={highlightFields.top.description?.[0] || order.description} />
         </div>
         {otherHighlight && (
           <div className="truncate">
-            <Markup className="text-muted-foreground italic" allowList={['mark']} content={otherHighlight} />
+            <Highlight className="text-muted-foreground italic" content={otherHighlight} />
           </div>
         )}
       </div>

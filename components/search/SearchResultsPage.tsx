@@ -235,7 +235,7 @@ export const SearchResults = () => {
           ]}
         />
       </div>
-      <div className="py-1 [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
+      <div className="py-1">
         <SearchResultsList data={data} queryFilter={queryFilter} totalCount={totalCount} loading={loading} />
       </div>
     </div>

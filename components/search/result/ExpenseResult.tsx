@@ -9,6 +9,7 @@ import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
+import { Highlight } from '../Highlight';
 
 export function ExpenseResult({
   expense,
@@ -27,15 +28,11 @@ export function ExpenseResult({
       <div className="overflow-hidden">
         <div className="mb-1 flex gap-1">
           <Badge type="outline" size="xs">
-            {highlightFields.top.id ? (
-              <Markup allowList={['mark']} content={`#${highlightFields.top.id[0]}`} />
-            ) : (
-              `#${expense.legacyId}`
-            )}
+            {highlightFields.top.id ? <Highlight content={`#${highlightFields.top.id[0]}`} /> : `#${expense.legacyId}`}
           </Badge>
           <div className="truncate font-medium">
             {highlightFields.top.description ? (
-              <Markup allowList={['mark']} content={highlightFields.top.description[0]} />
+              <Highlight content={highlightFields.top.description[0]} />
             ) : (
               expense.description
             )}
@@ -54,7 +51,7 @@ export function ExpenseResult({
         </div>
         {otherHighlight && (
           <div className="truncate">
-            <Markup className="text-muted-foreground italic" allowList={['mark']} content={otherHighlight} />
+            <Highlight className="text-muted-foreground italic" content={otherHighlight} />
           </div>
         )}
       </div>

@@ -9,6 +9,7 @@ import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
+import { Highlight } from '../Highlight';
 
 export function HostApplicationResult({
   hostApplication,
@@ -29,7 +30,7 @@ export function HostApplicationResult({
         <div className="flex items-center gap-2">
           <div className="truncate font-medium">
             {highlightFields.top.name ? (
-              <Markup allowList={['mark']} content={highlightFields.top.name[0]} />
+              <Highlight content={highlightFields.top.name[0]} />
             ) : (
               hostApplication.account.name
             )}
@@ -41,14 +42,14 @@ export function HostApplicationResult({
         <div className="mt-1 truncate text-muted-foreground">
           @
           {highlightFields.top.slug ? (
-            <Markup allowList={['mark']} content={highlightFields.top.slug[0]} />
+            <Highlight content={highlightFields.top.slug[0]} />
           ) : (
             hostApplication.account.slug
           )}
           {otherHighlight && (
             <React.Fragment>
               {' · '}
-              <Markup allowList={['mark']} className="italic" content={otherHighlight} />
+              <Highlight className="italic" content={otherHighlight} />
             </React.Fragment>
           )}
         </div>

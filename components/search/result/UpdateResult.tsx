@@ -6,6 +6,7 @@ import type { SearchUpdateFieldsFragment } from '@/lib/graphql/types/v2/graphql'
 import Avatar from '../../Avatar';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
+import { Highlight } from '../Highlight';
 
 export function UpdateResult({
   update,
@@ -21,10 +22,10 @@ export function UpdateResult({
 
       <div className="overflow-hidden">
         <div className="truncate font-medium">
-          <Markup allowList={['mark']} content={highlightFields.top.title?.[0] || update.title} />
+          <Highlight content={highlightFields.top.title?.[0] || update.title} />
         </div>
         <div className="truncate text-muted-foreground italic">
-          <Markup allowList={['mark']} content={highlightFields.top.html?.[0] || update.html} />
+          <Highlight content={highlightFields.top.html?.[0] || update.html} />
         </div>
       </div>
     </div>

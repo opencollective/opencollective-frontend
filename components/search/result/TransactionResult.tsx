@@ -11,6 +11,7 @@ import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
+import { Highlight } from '../Highlight';
 
 export function TransactionResult({
   transaction,
@@ -37,7 +38,7 @@ export function TransactionResult({
           <div className="flex gap-1">
             <Badge type="outline" size="xs">
               {highlightFields.top.id ? (
-                <Markup allowList={['mark']} content={`#${highlightFields.top.id[0]}`} />
+                <Highlight content={`#${highlightFields.top.id[0]}`} />
               ) : (
                 `#${transaction.legacyId}`
               )}
@@ -68,7 +69,7 @@ export function TransactionResult({
         {otherHighlight && (
           <div className="overflow-hidden">
             <div className="truncate">
-              <Markup className="text-muted-foreground italic" allowList={['mark']} content={otherHighlight} />
+              <Highlight className="text-muted-foreground italic" content={otherHighlight} />
             </div>
           </div>
         )}

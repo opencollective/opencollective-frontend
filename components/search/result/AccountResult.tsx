@@ -1,5 +1,4 @@
 import React from 'react';
-import { Markup } from 'interweave';
 import { useIntl } from 'react-intl';
 
 import formatCollectiveType from '../../../lib/i18n/collective-type';
@@ -7,6 +6,7 @@ import type { SearchAccountFieldsFragment } from '@/lib/graphql/types/v2/graphql
 
 import Avatar from '../../Avatar';
 import { Badge } from '../../ui/Badge';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
 
@@ -28,27 +28,18 @@ export function AccountResult({
       <div className="flex-1 overflow-hidden">
         <div className="flex items-center gap-2">
           <div className="truncate font-medium">
-            {highlightFields.top.name ? (
-              <Markup allowList={['mark']} content={highlightFields.top.name[0]} />
-            ) : (
-              account.name
-            )}
+            {highlightFields.top.name ? <Highlight content={highlightFields.top.name[0]} /> : account.name}
           </div>
           <Badge type="outline" size="xs">
             {formatCollectiveType(intl, account.type)}
           </Badge>
         </div>
         <div className="mt-1 truncate text-muted-foreground">
-          @
-          {highlightFields.top.slug ? (
-            <Markup allowList={['mark']} content={highlightFields.top.slug[0]} />
-          ) : (
-            account.slug
-          )}
+          @{highlightFields.top.slug ? <Highlight content={highlightFields.top.slug[0]} /> : account.slug}
           {otherHighlight && (
             <React.Fragment>
               {' · '}
-              <Markup allowList={['mark']} className="italic" content={otherHighlight} />
+              <Highlight className="italic" content={otherHighlight} />
             </React.Fragment>
           )}
         </div>

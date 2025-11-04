@@ -7,6 +7,7 @@ import type { SearchCommentFieldsFragment } from '@/lib/graphql/types/v2/graphql
 import Avatar from '../../Avatar';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
+import { Highlight } from '../Highlight';
 
 export function CommentResult({
   comment,
@@ -57,11 +58,11 @@ export function CommentResult({
           />
         </div>
         <div className="truncate font-medium text-muted-foreground">
-          <Markup allowList={['mark']} content={highlightFields.top.html?.[0] || comment.html} />
+          <Highlight content={highlightFields.top.html?.[0] || comment.html} />
         </div>
         {otherHighlight && (
           <div className="truncate">
-            <Markup className="text-muted-foreground italic" allowList={['mark']} content={otherHighlight} />
+            <Highlight className="text-muted-foreground italic" content={otherHighlight} />
           </div>
         )}
       </div>
