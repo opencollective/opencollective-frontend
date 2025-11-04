@@ -233,7 +233,11 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
           {featureAccess === 'DISABLED' && (
             <div className="flex gap-2">
               <Button asChild size="sm" className="">
-                <Link href={getDashboardRoute(account, 'platform-subscription')}>
+                <Link
+                  href={getDashboardRoute(account, 'platform-subscription', {
+                    params: new URLSearchParams({ feature: featureKey }),
+                  })}
+                >
                   <FormattedMessage id="UpgradePlanCTA.upgradeButton" defaultMessage="Upgrade your plan" />
                 </Link>
               </Button>
@@ -279,7 +283,11 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
           {featureAccess === 'DISABLED' && (
             <div className="flex gap-3 pt-2">
               <Button asChild size="sm">
-                <Link href={getDashboardRoute(account, 'platform-subscription')}>
+                <Link
+                  href={getDashboardRoute(account, 'platform-subscription', {
+                    params: new URLSearchParams({ feature: featureKey }),
+                  })}
+                >
                   <FormattedMessage id="UpgradePlanCTA.upgradeButton" defaultMessage="Upgrade your plan" />
                 </Link>
               </Button>

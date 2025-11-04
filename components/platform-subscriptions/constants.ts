@@ -10,9 +10,13 @@ export const PlatformSubscriptionFeatures = [
   'TRANSFERWISE',
   'PAYPAL_PAYOUTS',
   'CHART_OF_ACCOUNTS',
+  'EXPENSE_SECURITY_CHECKS',
+  'EXPECTED_FUNDS',
+  'CHARGE_HOSTING_FEES',
   'TAX_FORMS',
   'OFF_PLATFORM_TRANSACTIONS',
   'FUNDS_GRANTS_MANAGEMENT',
+  'AGREEMENTS',
 ] satisfies PlatformSubscriptionFeaturesType[];
 
 export type PlatformSubscriptionTierType = 'Discover' | 'Basic' | 'Pro';
@@ -82,6 +86,10 @@ export const PlatformSubscriptionTierFeatures: Record<
     TAX_FORMS: false,
     TRANSFERWISE: false,
     FUNDS_GRANTS_MANAGEMENT: false,
+    EXPENSE_SECURITY_CHECKS: false,
+    EXPECTED_FUNDS: false,
+    CHARGE_HOSTING_FEES: false,
+    AGREEMENTS: false,
   },
   Basic: {
     RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
@@ -92,6 +100,10 @@ export const PlatformSubscriptionTierFeatures: Record<
     TAX_FORMS: false,
     TRANSFERWISE: true,
     FUNDS_GRANTS_MANAGEMENT: false,
+    EXPENSE_SECURITY_CHECKS: true,
+    EXPECTED_FUNDS: true,
+    CHARGE_HOSTING_FEES: true,
+    AGREEMENTS: false,
   },
   Pro: {
     RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
@@ -102,6 +114,10 @@ export const PlatformSubscriptionTierFeatures: Record<
     TAX_FORMS: true,
     TRANSFERWISE: true,
     FUNDS_GRANTS_MANAGEMENT: true,
+    EXPENSE_SECURITY_CHECKS: true,
+    EXPECTED_FUNDS: true,
+    CHARGE_HOSTING_FEES: true,
+    AGREEMENTS: true,
   },
 };
 
@@ -137,5 +153,21 @@ export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof Platform
   FUNDS_GRANTS_MANAGEMENT: {
     defaultMessage: 'Funds & Grants',
     id: 'cjQcnL',
+  },
+  EXPENSE_SECURITY_CHECKS: {
+    defaultMessage: 'Antifraud security checks',
+    id: 'pRYe3y',
+  },
+  AGREEMENTS: {
+    defaultMessage: 'Agreements',
+    id: 'Agreements',
+  },
+  EXPECTED_FUNDS: {
+    defaultMessage: 'Expected funds',
+    id: 'expectedFunds',
+  },
+  CHARGE_HOSTING_FEES: {
+    defaultMessage: 'Charge hosting fees',
+    id: 'solutions.features.item.charge-hosting-fees.title',
   },
 });

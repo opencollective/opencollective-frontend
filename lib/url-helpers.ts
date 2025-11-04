@@ -130,11 +130,16 @@ export const mailToURL = (address = '', opts) => {
   return `mailto://${address}${objectToQueryString(opts)}`;
 };
 
-export const getDashboardRoute = (account, section = null) => {
+export const getDashboardRoute = (account, section = null, { params }: { params?: URLSearchParams } = {}) => {
   if (!account) {
     return '';
   }
-  return `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+
+  const route = `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+  if (params) {
+    return `${route}?${params.toString()}`;
+  }
+  return route;
 };
 
 export const getDashboardTransactionsRoute = (account, queryParams: { openTransactionId?: number } = {}) => {

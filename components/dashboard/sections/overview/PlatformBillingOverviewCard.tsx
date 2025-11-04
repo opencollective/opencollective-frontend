@@ -79,7 +79,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
       </div>
       <Button asChild variant="outline">
         <Link className="!no-underline" href={getDashboardRoute({ slug: props.accountSlug }, 'platform-subscription')}>
-          <FormattedMessage defaultMessage="Upgrade Now" id="2LslN1" />
+          <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
         </Link>
       </Button>
     </MessageBox>
