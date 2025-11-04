@@ -29,9 +29,9 @@ export function ExpenseResult({
           <Badge type="outline" size="xs">
             {highlightFields.top.id ? <Highlight content={`#${highlightFields.top.id[0]}`} /> : `#${expense.legacyId}`}
           </Badge>
-          <div className="truncate font-medium">
+          <div className="relative overflow-hidden font-medium">
             {highlightFields.top.description ? (
-              <Highlight content={highlightFields.top.description[0]} />
+              <Highlight content={highlightFields.top.description[0]} className="truncate" />
             ) : (
               expense.description
             )}

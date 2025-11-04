@@ -36,11 +36,7 @@ export function TransactionResult({
         <div className="flex justify-between gap-2">
           <div className="flex gap-1">
             <Badge type="outline" size="xs">
-              {highlightFields.top.id ? (
-                <Highlight content={`#${highlightFields.top.id[0]}`} />
-              ) : (
-                `#${transaction.legacyId}`
-              )}
+              <Highlight content={`#${highlightFields.top.id?.[0] ?? transaction.legacyId}`} />
             </Badge>
             <div>{i18nTransactionKind(intl, transaction.kind)}</div>
           </div>
@@ -63,15 +59,12 @@ export function TransactionResult({
             )}
             <span className="text-foreground">{transaction.oppositeAccount.name}</span>
           </div>
-        </div>
-
-        {otherHighlight && (
-          <div className="overflow-hidden">
+          {otherHighlight && (
             <div className="truncate">
               <Highlight className="text-muted-foreground italic" content={otherHighlight} />
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

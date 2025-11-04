@@ -27,28 +27,25 @@ export function HostApplicationResult({
 
       <div className="flex-1 overflow-hidden">
         <div className="flex items-center gap-2">
-          <div className="truncate font-medium">
-            {highlightFields.top.name ? (
-              <Highlight content={highlightFields.top.name[0]} />
-            ) : (
-              hostApplication.account.name
-            )}
-          </div>
+          <Highlight
+            content={highlightFields.top.name?.[0] ?? hostApplication.account.name}
+            className="truncate font-medium"
+          />
           <Badge type="outline" size="xs">
             {i18nHostApplicationStatus(intl, hostApplication.status)}
           </Badge>
         </div>
-        <div className="mt-1 truncate text-muted-foreground">
+        <div className="mt-1 text-muted-foreground">
           @
           {highlightFields.top.slug ? (
-            <Highlight content={highlightFields.top.slug[0]} />
+            <Highlight content={highlightFields.top.slug[0]} className="truncate" />
           ) : (
             hostApplication.account.slug
           )}
           {otherHighlight && (
             <React.Fragment>
               {' · '}
-              <Highlight className="italic" content={otherHighlight} />
+              <Highlight className="truncate italic" content={otherHighlight} />
             </React.Fragment>
           )}
         </div>

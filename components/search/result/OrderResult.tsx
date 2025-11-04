@@ -25,7 +25,7 @@ export function OrderResult({
       <div className="overflow-hidden">
         <div className="mb-1 flex gap-1">
           <Badge type="outline" size="xs">
-            {highlightFields.top.id ? <Highlight content={`#${highlightFields.top.id[0]}`} /> : `#${order.legacyId}`}
+            <Highlight content={`#${highlightFields.top.id?.[0] || order.legacyId}`} />
           </Badge>
           <div className="truncate">
             <FormattedMessage
@@ -38,13 +38,13 @@ export function OrderResult({
             />
           </div>
         </div>
-        <div className="truncate font-medium text-muted-foreground">
-          <Highlight content={highlightFields.top.description?.[0] || order.description} />
-        </div>
+
+        <Highlight
+          content={highlightFields.top.description?.[0] || order.description}
+          className="block truncate font-medium text-muted-foreground"
+        />
         {otherHighlight && (
-          <div className="truncate">
-            <Highlight className="text-muted-foreground italic" content={otherHighlight} />
-          </div>
+          <Highlight className="block truncate text-muted-foreground italic" content={otherHighlight} />
         )}
       </div>
     </div>

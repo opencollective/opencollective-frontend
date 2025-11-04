@@ -27,15 +27,14 @@ export function AccountResult({
 
       <div className="flex-1 overflow-hidden">
         <div className="flex items-center gap-2">
-          <div className="truncate font-medium">
-            {highlightFields.top.name ? <Highlight content={highlightFields.top.name[0]} /> : account.name}
-          </div>
-          <Badge type="outline" size="xs">
+          <Highlight content={highlightFields.top.name?.[0] ?? account.name} className="block truncate font-medium" />
+
+          <Badge type="outline" size="xs" className="flex-shrink-0">
             {formatCollectiveType(intl, account.type)}
           </Badge>
         </div>
         <div className="mt-1 truncate text-muted-foreground">
-          @{highlightFields.top.slug ? <Highlight content={highlightFields.top.slug[0]} /> : account.slug}
+          @<Highlight content={highlightFields.top.slug?.[0] ?? account.slug} />
           {otherHighlight && (
             <React.Fragment>
               {' · '}
