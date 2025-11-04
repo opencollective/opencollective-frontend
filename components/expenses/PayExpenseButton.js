@@ -29,7 +29,10 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
     return (
       <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
     );
-  } else if (expense.type !== expenseTypes.SETTLEMENT && balance < expenseAmountInAccountCurrency) {
+  } else if (
+    ![expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(expense.type) &&
+    balance < expenseAmountInAccountCurrency
+  ) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (

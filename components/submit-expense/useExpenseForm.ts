@@ -861,7 +861,11 @@ function buildFormSchema(
             ])
             .nullish()
             .refine(attachment => {
-              if ([ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.SETTLEMENT].includes(values.expenseTypeOption)) {
+              if (
+                [ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.SETTLEMENT, ExpenseType.PLATFORM_BILLING].includes(
+                  values.expenseTypeOption,
+                )
+              ) {
                 return true;
               }
 

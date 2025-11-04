@@ -398,7 +398,7 @@ class CreateExpensePage extends React.Component {
                       ) : (
                         <FormattedMessage
                           id="ExpenseSummaryTitle"
-                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} PLATFORM_BILLING {Platform bill} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
                           values={{
                             type: this.state.expense?.type,
                             collectiveName: collective?.name,

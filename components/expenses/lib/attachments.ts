@@ -14,6 +14,7 @@ export const expenseTypeSupportsAttachments = (type: ExpenseType) => {
     type === ExpenseType.INVOICE ||
     type === ExpenseType.GRANT ||
     type === ExpenseType.SETTLEMENT ||
+    type === ExpenseType.PLATFORM_BILLING ||
     type === ExpenseType.RECEIPT
   );
 };

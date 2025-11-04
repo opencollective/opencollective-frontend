@@ -296,7 +296,9 @@ const ExpenseMoreActionsButton = ({
             )}
             {!props.hasAttachedInvoiceFile &&
               permissions.canSeeInvoiceInfo &&
-              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
+              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(
+                expense?.type,
+              ) && (
                 <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
                   {({ isLoading, downloadInvoice }) => (
                     <Action

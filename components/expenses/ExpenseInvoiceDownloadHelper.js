@@ -50,7 +50,7 @@ const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disable
   const [error, setError] = React.useState(null);
   const { toast } = useToast();
 
-  if (![expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense.type)) {
+  if (![expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(expense.type)) {
     return { error: null, isLoading: false, filename: '', downloadInvoice: null };
   }
 
