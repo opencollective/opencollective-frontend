@@ -103,9 +103,13 @@ export function useGetLinkProps() {
             href = getDashboardRoute(workspace, `host-transactions?openTransactionId=${transaction.legacyId}`);
           } else if (transaction.account.slug === workspace.slug) {
             href = getDashboardRoute(workspace, `transactions?openTransactionId=${transaction.legacyId}`);
+          } else if (LoggedInUser?.isRoot) {
+            href = getDashboardRoute(
+              { slug: 'root-actions' },
+              `host-transactions?date=ALL&openTransactionId=${transaction.legacyId}`,
+            );
           } else {
-            // TODO: Make sure we can have a link for all transactions that are returned by the API
-            href = '#';
+            href = `${getCollectivePageRoute(transaction.account)}/transactions?searchTerm=%23${transaction.legacyId}`;
           }
           return { href, onClick: () => addToRecent({ id: transaction.id, entity }) };
         },
