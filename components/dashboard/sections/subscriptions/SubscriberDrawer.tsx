@@ -187,7 +187,7 @@ const SubscriberDrawer = ({ id, openPlanModal }) => {
     primary: [
       {
         key: 'edit',
-        label: intl.formatMessage({ defaultMessage: 'Edit Subscription Plan', id: 'cDXQHx' }),
+        label: intl.formatMessage({ defaultMessage: 'Update Subscription Plan', id: 'd3Ox2g' }),
         onClick: () => {
           openPlanModal(subscriber);
         },
