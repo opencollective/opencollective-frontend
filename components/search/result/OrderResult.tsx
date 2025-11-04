@@ -1,5 +1,6 @@
 import React from 'react';
 import { Markup } from 'interweave';
+import { FormattedMessage } from 'react-intl';
 
 import type { SearchOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
@@ -28,8 +29,14 @@ export function OrderResult({
             {highlightFields.top.id ? <Highlight content={`#${highlightFields.top.id[0]}`} /> : `#${order.legacyId}`}
           </Badge>
           <div className="truncate">
-            Order from <span className="text-foreground">{order.fromAccount.name}</span>
-            to <span className="text-foreground">{order.toAccount.name}</span>
+            <FormattedMessage
+              defaultMessage="Contribution from {fromAccount} to {toAccount}"
+              id="HV6RkT"
+              values={{
+                fromAccount: <span className="text-foreground">{order.fromAccount.name}</span>,
+                toAccount: <span className="text-foreground">{order.toAccount.name}</span>,
+              }}
+            />
           </div>
         </div>
         <div className="truncate font-medium text-muted-foreground">

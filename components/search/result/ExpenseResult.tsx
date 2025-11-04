@@ -40,8 +40,8 @@ export function ExpenseResult({
         </div>
         <div className="truncate text-muted-foreground">
           <FormattedMessage
-            id="expense.result.description"
             defaultMessage="{expenseType} from {payeeName} to {accountName}"
+            id="uYdPRG"
             values={{
               expenseType: i18nExpenseType(intl, expense.type),
               accountName: <span className="text-foreground">{expense.account.name}</span>,
