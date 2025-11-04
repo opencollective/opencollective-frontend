@@ -243,7 +243,6 @@ export const AVAILABLE_FEATURES = [
   'EXPENSE_SECURITY_CHECKS',
   'EXPECTED_FUNDS',
   'CHARGE_HOSTING_FEES',
-  'RESTRICTED_FUNDS',
   'AGREEMENTS',
   'TAX_FORMS',
   'OFF_PLATFORM_TRANSACTIONS',
@@ -274,7 +273,6 @@ export const AVAILABLE_FEATURES_LABELS: Record<(typeof AVAILABLE_FEATURES)[numbe
   EXPENSE_SECURITY_CHECKS: 'Antifraud security checks',
   EXPECTED_FUNDS: 'Expected funds',
   CHARGE_HOSTING_FEES: 'Charge hosting fees',
-  RESTRICTED_FUNDS: 'Restricted funds',
 
   // Pro tier features
   AGREEMENTS: 'Agreements',
