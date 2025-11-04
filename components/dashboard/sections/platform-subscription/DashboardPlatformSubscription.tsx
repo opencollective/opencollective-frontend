@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, Pencil, X } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
@@ -16,6 +17,7 @@ import MessageBox from '@/components/MessageBox';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
 import { CancelSubscriptionModal } from '@/components/platform-subscriptions/CancelSubscriptionModal';
+import type { PlatformSubscriptionFeatures } from '@/components/platform-subscriptions/constants';
 import { ManageSubscriptionModal } from '@/components/platform-subscriptions/ManageSubscriptionModal';
 import { Button } from '@/components/ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
@@ -56,12 +58,32 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
     },
   );
 
+  const router = useRouter();
+  const desiredFeature = router.query?.feature as unknown as (typeof PlatformSubscriptionFeatures)[number];
+
   const queryError = query.error;
   const activeSubscription = query.data?.host?.platformSubscription;
   const billing = query.data?.host?.platformBilling;
   const isLoading = query.loading;
 
   const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+
+  React.useEffect(() => {
+    if (!desiredFeature || !activeSubscription?.plan || !billing) {
+      return;
+    }
+
+    if (activeSubscription.plan.features[desiredFeature]) {
+      return;
+    }
+
+    showModal(ManageSubscriptionModal, {
+      currentPlan: activeSubscription.plan,
+      accountSlug: props.accountSlug,
+      billing: billing,
+      desiredFeature,
+    });
+  }, [desiredFeature, activeSubscription?.plan, billing, props.accountSlug, showModal]);
 
   return (
     <div>

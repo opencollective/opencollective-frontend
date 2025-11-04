@@ -53,6 +53,7 @@ type ManageSubscriptionModalProps = {
   currentPlan?: PlatformSubscriptionFieldsFragment['plan'];
   accountSlug: string;
   billing?: PlatformBillingFieldsFragment;
+  desiredFeature?: (typeof PlatformSubscriptionFeatures)[number];
 } & BaseModalProps;
 
 export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
@@ -120,9 +121,17 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
     },
   );
 
+  const initialTierSelection = props.desiredFeature
+    ? PlatformSubscriptionTierFeatures.Discover[props.desiredFeature]
+      ? 'Discover'
+      : PlatformSubscriptionTierFeatures.Basic[props.desiredFeature]
+        ? 'Basic'
+        : 'Pro'
+    : props.currentPlan?.type || 'Discover';
+
   const form = useFormik({
     initialValues: {
-      tier: (props.currentPlan?.type as PlatformSubscriptionTierType) ?? ('Discover' as PlatformSubscriptionTierType),
+      tier: initialTierSelection as PlatformSubscriptionTierType,
       planId: '',
     },
     async onSubmit(values) {
@@ -263,7 +272,7 @@ function PlatformSubscriptionForm(props: PlatformSubscriptionFormProps) {
         </Button>
         {props.step < Step.SUMMARY && (
           <Button variant="outline" onClick={() => props.setStep(s => s + 1)} loading={props.form.isSubmitting}>
-            <FormattedMessage defaultMessage="Next Step" id="8cv9D4" />
+            <FormattedMessage defaultMessage="Next" id="Pagination.Next" />
             <ArrowRight />
           </Button>
         )}
