@@ -85,7 +85,7 @@ function SearchResultItemInner<E extends SearchCommandGroupEntity>({
   );
 }
 
-const SearchResultItem = React.memo(SearchResultItemInner) as typeof SearchResultItemInner;
+const SearchResultItem = React.memo(SearchResultItemInner);
 
 type SearchCommandGroupProps<E extends SearchCommandGroupEntity = SearchCommandGroupEntity> = {
   totalCount?: number;
@@ -98,7 +98,7 @@ type SearchCommandGroupProps<E extends SearchCommandGroupEntity = SearchCommandG
   isInfiniteScrollEnabled?: boolean;
 };
 
-function SearchCommandGroupComponent<E extends SearchCommandGroupEntity>({
+export function SearchCommandGroup<E extends SearchCommandGroupEntity>({
   totalCount,
   nodes,
   renderNode,
@@ -157,5 +157,3 @@ function SearchCommandGroupComponent<E extends SearchCommandGroupEntity>({
     </CommandGroup>
   );
 }
-
-export const SearchCommandGroup = SearchCommandGroupComponent as typeof SearchCommandGroupComponent;
