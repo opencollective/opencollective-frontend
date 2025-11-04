@@ -132,8 +132,8 @@ describe('edit collective', () => {
     cy.get('[data-cy=description]').type('!');
     cy.get('[data-cy=amountType]').click();
     cy.contains('[data-cy=select-option]', 'Flexible').click();
-    cy.get('.currency1.inputField input').type('{selectall}25');
-    cy.get('.currency2.inputField input').type('{selectall}50');
+    cy.get('[data-testid=currency1-input-amount]').type('{selectall}25');
+    cy.get('[data-testid=currency2-input-amount]').type('{selectall}50');
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.getByDataCy('contribute-card-tier')

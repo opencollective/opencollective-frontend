@@ -85,6 +85,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           )}
           id={props.id}
           data-cy={props['data-cy']}
+          data-testid={props['data-testid']}
           name={props.name}
         >
           <SelectValue placeholder={placeholder} />
@@ -106,6 +107,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           id={props.id}
           disabled={props.disabled}
           data-cy={props['data-cy']}
+          data-testid={props['data-testid']}
           variant="outline"
           role="combobox"
           aria-expanded={open}
