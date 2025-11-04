@@ -63,6 +63,7 @@ export function FundraisingPage() {
                       height={node.getAttribute('height')}
                       allowFullScreen={node.getAttribute('allowfullscreen') as any}
                       title={node.getAttribute('title') || 'Embed content'}
+                      referrerPolicy="strict-origin-when-cross-origin"
                       src={src}
                     />
                   );

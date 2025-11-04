@@ -164,7 +164,8 @@ const MakeCommunity = () => {
               title="YouTube video"
               width="100%"
               height="400px"
-              src="https://www.youtube.com/embed/IBU5fSILAe8"
+              src="https://www.youtube-nocookie.com/embed/IBU5fSILAe8"
+              referrerPolicy="strict-origin-when-cross-origin"
               frameBorder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
