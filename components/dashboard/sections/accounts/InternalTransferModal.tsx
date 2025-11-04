@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountsDashboardQuery,
   DashboardAccountsQueryFieldsFragment,
@@ -15,7 +15,7 @@ import type {
 import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import { Currency } from '../../../../lib/graphql/types/v2/schema';
 
-import CollectivePickerAsync from '@/components/CollectivePickerAsync';
+import AccountPickerAsync from '@/components/AccountPickerAsync';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { FormField } from '../../../FormField';
@@ -47,55 +47,6 @@ const internalTransferMutation = gql`
               valueInCents
             }
           }
-        }
-      }
-    }
-  }
-`;
-
-const fromCollectiveSearchQuery = gqlV1 /* GraphQL */ `
-  query CollectivePickerSearch(
-    $term: String!
-    $types: [TypeOfCollective]
-    $limit: Int
-    $hostCollectiveIds: [Int]
-    $parentCollectiveIds: [Int]
-    $skipGuests: Boolean
-    $includeArchived: Boolean
-    $includeVendorsForHostId: Int
-  ) {
-    search(
-      term: $term
-      types: $types
-      limit: $limit
-      hostCollectiveIds: $hostCollectiveIds
-      parentCollectiveIds: $parentCollectiveIds
-      skipGuests: $skipGuests
-      includeArchived: $includeArchived
-      includeVendorsForHostId: $includeVendorsForHostId
-    ) {
-      id
-      collectives {
-        id
-        type
-        slug
-        name
-        currency
-        location {
-          id
-          address
-          country
-        }
-        imageUrl(height: 64)
-        hostFeePercent
-        isActive
-        isArchived
-        isHost
-        stats {
-          balanceWithBlockedFunds
-        }
-        ... on Organization {
-          isTrustedHost
         }
       }
     }
@@ -235,13 +186,12 @@ export default function InternalTransferModal({
                     label={intl.formatMessage({ defaultMessage: 'From account', id: 'F4xg6X' })}
                   >
                     {({ field, form }) => (
-                      <CollectivePickerAsync
+                      <AccountPickerAsync
                         inputId={field.id}
                         collective={field.value}
                         defaultCollectives={activeAccounts}
                         includeArchived={true}
-                        parentCollectiveIds={[parentAccount?.legacyId]}
-                        searchQuery={fromCollectiveSearchQuery}
+                        parentCollectiveIds={[parentAccount?.id]}
                         onChange={({ value }) => {
                           setFieldValue('fromAccount', value);
                           if (form.values?.toAccount?.id === value?.id) {
@@ -257,15 +207,12 @@ export default function InternalTransferModal({
                     label={intl.formatMessage({ defaultMessage: 'To account', id: 'gCOFay' })}
                   >
                     {({ field, form }) => (
-                      <CollectivePickerAsync
+                      <AccountPickerAsync
                         inputId={field.id}
                         collective={field.value}
-                        defaultCollectives={activeAccounts.filter(
-                          a =>
-                            (a.legacyId || a.id) !== (form.values.fromAccount?.legacyId || form.values.fromAccount?.id),
-                        )}
+                        defaultCollectives={activeAccounts.filter(a => a.id !== form.values.fromAccount?.id)}
                         includeArchived={true}
-                        parentCollectiveIds={[parentAccount?.legacyId]}
+                        parentCollectiveIds={[parentAccount?.id]}
                         onChange={({ value }) => {
                           setFieldValue('toAccount', value);
                         }}
