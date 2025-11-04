@@ -109,6 +109,11 @@ export const predefinedGroups: Group[] = [
   },
   {
     section: ReportSection.FEES_TIPS,
+    label: 'Paid Platform Billings',
+    filter: { kind: TransactionKind.EXPENSE, type: TransactionType.DEBIT, expenseType: ExpenseType.PLATFORM_BILLING },
+  },
+  {
+    section: ReportSection.FEES_TIPS,
     label: 'Platform Fees Paid',
     filter: { kind: TransactionKind.HOST_FEE_SHARE },
   },
