@@ -1569,6 +1569,7 @@
   "Expense.RequestDetails": "Details aanvragen",
   "Expense.RequestedBy": "Uitgenodigd door {name}",
   "expense.requestReApproval.btn": "Request re-approval",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Save Expense",
   "Expense.SaveReceipt": "Ontvangstbewijs opslaan",
   "expense.schedule.btn": "Plan om te betalen met {paymentMethod}",

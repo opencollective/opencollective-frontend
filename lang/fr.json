@@ -1570,6 +1570,7 @@
   "Expense.RequestDetails": "Détails de la requête",
   "Expense.RequestedBy": "Invité par {name}",
   "expense.requestReApproval.btn": "Demander une nouvelle approbation",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Enregistrer la dépense",
   "Expense.SaveReceipt": "Enregistrer le reçu",
   "expense.schedule.btn": "Planifier pour payer avec {paymentMethod}",

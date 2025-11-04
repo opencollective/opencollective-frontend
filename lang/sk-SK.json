@@ -1569,6 +1569,7 @@
   "Expense.RequestDetails": "Vyžiadať podrobnosti",
   "Expense.RequestedBy": "Invited by {name}",
   "expense.requestReApproval.btn": "Request re-approval",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Save Expense",
   "Expense.SaveReceipt": "Uložiť príjmový doklad",
   "expense.schedule.btn": "Plánovať platbu pomocou {paymentMethod}",

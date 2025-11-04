@@ -1569,6 +1569,7 @@
   "Expense.RequestDetails": "Solicitar Detalhes",
   "Expense.RequestedBy": "Convidado por {name}",
   "expense.requestReApproval.btn": "Solicitar nova aprovação",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Salvar Despesa",
   "Expense.SaveReceipt": "Salvar recibo",
   "expense.schedule.btn": "Agendar para pagar com {paymentMethod}",

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Markup } from 'interweave';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
 import type { SearchExpenseFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
@@ -43,10 +42,15 @@ export function ExpenseResult({
           </div>
         </div>
         <div className="truncate text-muted-foreground">
-          {expense.type !== ExpenseType.UNCLASSIFIED && i18nExpenseType(intl, expense.type)}
-          {expense.type === ExpenseType.RECEIPT && ' request'} to{' '}
-          <span className="text-foreground">{expense.account.name}</span> from{' '}
-          <span className="text-foreground">{expense.payee.name}</span>
+          <FormattedMessage
+            id="expense.result.description"
+            defaultMessage="{expenseType} from {payeeName} to {accountName}"
+            values={{
+              expenseType: i18nExpenseType(intl, expense.type),
+              accountName: <span className="text-foreground">{expense.account.name}</span>,
+              payeeName: <span className="text-foreground">{expense.payee.name}</span>,
+            }}
+          />
         </div>
         {otherHighlight && (
           <div className="truncate">

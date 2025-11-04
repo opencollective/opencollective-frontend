@@ -1569,6 +1569,7 @@
   "Expense.RequestDetails": "请求细节",
   "Expense.RequestedBy": "由 {name} 邀请",
   "expense.requestReApproval.btn": "请求重新批准",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "保存支出",
   "Expense.SaveReceipt": "保存发票",
   "expense.schedule.btn": "使用 {paymentMethod} 定期付款。",

@@ -1570,6 +1570,7 @@
   "Expense.RequestDetails": "Information om begäran",
   "Expense.RequestedBy": "Invited by {name}",
   "expense.requestReApproval.btn": "Request re-approval",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Save Expense",
   "Expense.SaveReceipt": "Spara kvitto",
   "expense.schedule.btn": "Schemalägg att betala med {paymentMethod}",

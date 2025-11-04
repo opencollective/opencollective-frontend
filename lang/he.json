@@ -1569,6 +1569,7 @@
   "Expense.RequestDetails": "פרטי הבקשה",
   "Expense.RequestedBy": "Invited by {name}",
   "expense.requestReApproval.btn": "Request re-approval",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Save Expense",
   "Expense.SaveReceipt": "שמירת קבלה",
   "expense.schedule.btn": "תשלום מתוזמן באמצעות {paymentMethod}",

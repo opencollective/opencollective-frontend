@@ -1570,6 +1570,7 @@
   "Expense.RequestDetails": "Подробности запроса",
   "Expense.RequestedBy": "Invited by {name}",
   "expense.requestReApproval.btn": "Request re-approval",
+  "expense.result.description": "{expenseType} from {payeeName} to {accountName}",
   "Expense.SaveExpense": "Save Expense",
   "Expense.SaveReceipt": "Сохранить квитанцию",
   "expense.schedule.btn": "Schedule to Pay with {paymentMethod}",
