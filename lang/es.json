@@ -654,7 +654,7 @@
   "bFSM5Q": "Solicitud de inscripción",
   "bgl/3/": "Para Organizaciones en crecimiento",
   "bHcyqz": "Esto desactivará tus códigos de recuperación anteriores.",
-  "billing.additionalActiveCollectives": "",
+  "billing.additionalActiveCollectives": "{count} active Collectives: {amount}",
   "billing.additionalExpensesPaid": "{count} Gastos pagados: {amount}",
   "BIYvoI": "Instrucciones del Colectivo para presentar una solicitud de subvención",
   "bjXbg/": "Mensaje adicional para los colaboradores",
