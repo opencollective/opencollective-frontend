@@ -203,15 +203,17 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
               )}
             </div>
           </div>
-          <div className="mb-4 text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="Base subscription will renew on the {dueDate}"
-              id="28oT0p"
-              values={{
-                dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
-              }}
-            />
-          </div>
+          {!isFreeDiscoverTier && (
+            <div className="mb-4 text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Subscription will renew on {dueDate}"
+                id="28oT0p"
+                values={{
+                  dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 

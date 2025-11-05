@@ -127,7 +127,7 @@ export function BillingProjection(props: BillingProjectionProps) {
           <div>
             <div className="text-sm leading-5 font-medium">
               <FormattedMessage
-                defaultMessage="{expensesPaid} additional {expensesPaid, plural, one {expense} other {expenses}} paid"
+                defaultMessage="{expensesPaid} additional paid {expensesPaid, plural, one {expense} other {expenses}}"
                 id="6GrAmA"
                 values={{
                   expensesPaid: billing.additional.utilization.expensesPaid ?? 0,
