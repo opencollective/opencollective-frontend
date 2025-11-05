@@ -2163,6 +2163,7 @@ export function useExpenseForm(opts: {
   // Reset reference currency if it's no longer in the available currencies
   React.useEffect(() => {
     if (
+      !initialLoading.current &&
       formOptions.availableReferenceCurrencies &&
       expenseForm.values.referenceCurrency &&
       !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
@@ -2174,6 +2175,7 @@ export function useExpenseForm(opts: {
   // Set item currency if we're done loading and there's a single available reference currency
   React.useEffect(() => {
     if (
+      !initialLoading.current &&
       formOptions.availableReferenceCurrencies &&
       formOptions.availableReferenceCurrencies.length === 1 &&
       expenseForm.values.expenseItems.length === 1 &&
