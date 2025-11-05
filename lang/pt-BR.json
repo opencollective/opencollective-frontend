@@ -1133,7 +1133,7 @@
   "CreateConversationForm.Submit": "Criar uma conversa",
   "createCustomTiers": "Crie seus próprios níveis",
   "created": "Criado",
-  "CreatedAt": "Criado Em",
+  "CreatedAt": "Created At",
   "CreatedBy": "por {name}",
   "CreateEvent": "Criar evento",
   "CreateExpense.HelpCreateInfo": "Solicitar pagamento de {collective}. As despesas serão processadas assim que forem aprovadas por um administrador do coletivo. A quantia, a descrição e o seu nome de perfil são públicos, mas os anexos, dados de pagamento e outras informações pessoais são mantidos como privados.",
