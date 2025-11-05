@@ -3197,7 +3197,7 @@
   "PendingApplication.RepoInfo.StarsCount": "{count} 个 star",
   "PendingContributionSummary": "给 {account} 的 {status, select, PENDING {待定贡献} other {贡献}}",
   "People": "People",
-  "People.Description": "People that interacted with your Fiscal Host",
+  "People.Description": "People that interacted with your organization.",
   "PEp9t9": "预计总金额",
   "Period": "时期",
   "Period.days": "天",

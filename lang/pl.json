@@ -3197,7 +3197,7 @@
   "PendingApplication.RepoInfo.StarsCount": "{count} gwiazdek",
   "PendingContributionSummary": "{status, select, PENDING {Wkład oczekujący} other {Wkład}} do {account}",
   "People": "People",
-  "People.Description": "People that interacted with your Fiscal Host",
+  "People.Description": "People that interacted with your organization.",
   "PEp9t9": "Expected Total Amount",
   "Period": "Okres",
   "Period.days": "dni",
