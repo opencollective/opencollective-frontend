@@ -19,5 +19,33 @@ const config: StorybookConfig = {
       propFilter: prop => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
     },
   },
+  core: {
+    disableTelemetry: true,
+  },
+  viteFinal: async config => {
+    // Improve error visibility and debugging
+    if (config.server) {
+      config.server.hmr = {
+        overlay: true, // Show error overlay on HMR errors
+      };
+    }
+
+    // Better source maps for debugging
+    config.build = config.build || {};
+    config.build.sourcemap = true;
+
+    // Optimize dependency handling
+    config.optimizeDeps = config.optimizeDeps || {};
+    config.optimizeDeps.include = [
+      ...(config.optimizeDeps.include || []),
+      'react',
+      'react-dom',
+      'react-intl',
+      'styled-components',
+      '@emotion/is-prop-valid',
+    ];
+
+    return config;
+  },
 };
 export default config;

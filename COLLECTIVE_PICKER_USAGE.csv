@@ -1,0 +1,28 @@
+Component,Picker Type,Instance,Data Source,Invitable,Creatable,Multi,Types,Notes
+AddFundsModal.tsx,CollectivePickerAsync,source,"Query + Custom Options (vendors + host)",No,"['USER' 'VENDOR']",No,"['USER' 'ORGANIZATION' 'VENDOR']",Uses custom options for recommended vendors + host
+AddFundsModal.tsx,CollectivePicker,recipient,Prefetched (account + children),No,No,No,-,For selecting recipient account from parent/children
+AddFundsModal.tsx,CollectivePickerAsync,collective selector,Query,No,No,No,"['COLLECTIVE' 'PROJECT' 'EVENT' 'FUND']",With custom host option and hostCollectiveIds filter
+InternalTransferModal.tsx,CollectivePickerAsync,from account,Query + Default (activeAccounts),No,No,No,-,Custom search query with includeArchived=true and parentCollectiveIds filter
+InternalTransferModal.tsx,CollectivePickerAsync,to account,Query + Default (activeAccounts),No,No,No,-,Filters out selected fromAccount
+WhoIsPayingSection.tsx,CollectivePickerAsync,account selection,Query,No,No,No,"[COLLECTIVE EVENT FUND ORGANIZATION PROJECT]",Filters to show only HOST organizations; used in radio card
+WhoIsGettingPaidSection.tsx,CollectivePicker,other profiles,Prefetched (myProfiles),No,No,No,-,For selecting from user's other administered accounts
+WhoIsGettingPaidSection.tsx,CollectivePickerAsync,invite someone,Query,Yes,No,No,"[COLLECTIVE EVENT FUND ORGANIZATION PROJECT USER]",Invitable for expense payee selection
+WhoIsGettingPaidSection.tsx,CollectivePickerAsync,vendor selection,Query + Default (vendorsForAccount),No,['VENDOR'] (if admin),No,['VENDOR'],includeVendorsForHostId with handleCreateForm option
+VendorForm.tsx,CollectivePickerAsync,visible to accounts,Query,No,No,Yes,-,Multi-select for vendor visibility with hostCollectiveIds filter and filterResults
+EditExpenseDialog.tsx,CollectivePicker,move destination,Prefetched (activeAccounts),No,No,No,-,For moving expense between accounts
+AssignVirtualCardModal.js,CollectivePickerAsync,collective,Query + Custom (host),No,No,No,-,hostCollectiveIds filter with filterResults for active only
+AssignVirtualCardModal.js,CollectivePicker,assignee,Prefetched (collectiveUsers),No,No,No,-,groupByType=false
+EditVirtualCardModal.tsx,CollectivePickerAsync,collective,Query + Custom (host),No,No,No,-,hostCollectiveIds filter with filterResults for active only
+EditVirtualCardModal.tsx,CollectivePicker,assignee,Prefetched (collectiveUsers),No,No,No,-,groupByType=false
+ApplyToHostModal.js,CollectivePicker,collective selection,Prefetched (user's admin collectives),No,Yes,No,['COLLECTIVE'],renderNewCollectiveOption custom for host application
+ApplyToHostModal.js,CollectivePickerAsync,invite admins,Query,No,Yes,No,['USER'],Creatable for inviting team members with filterResults to exclude existing
+CreateGiftCardsForm.js,CollectivePicker,limit to hosts,Prefetched (hosts),No,No,Yes,-,"Multi-select with sortFunc bypassed and groupByType=false; useCompactMode when 3+ selected"
+CreatePendingOrderModal.tsx,CollectivePickerAsync,recipient,Query,No,No,No,"['COLLECTIVE' 'ORGANIZATION' 'FUND']",hostCollectiveIds with preload=true
+CreatePendingOrderModal.tsx,CollectivePicker,child account,Prefetched (childrenAccounts),No,No,No,-,With custom None option
+CreatePendingOrderModal.tsx,CollectivePickerAsync,source,Query + Custom (vendors + host),No,"['USER' 'VENDOR']",No,"['USER' 'ORGANIZATION' 'VENDOR']",includeVendorsForHostId with custom options for recommended vendors
+HostCreateExpenseModal.tsx,CollectivePicker,account,Prefetched (array of accounts),No,No,No,-,When multiple accounts provided
+HostCreateExpenseModal.tsx,CollectivePickerAsync,account,Query,No,No,No,-,When no accounts or single account; hostCollectiveIds with preload=true
+HostCreateExpenseModal.tsx,CollectivePickerAsync,payee,Query + Custom (vendors + host),No,"['USER' 'VENDOR']",No,"['USER' 'ORGANIZATION' 'VENDOR' 'PROJECT']",Custom PayeeSelect wrapper with includeVendorsForHostId
+ExpenseFormPayeeStep.js,CollectivePickerAsync,payee,Query + Custom (payoutProfiles + vendors),Yes,No,No,-,"emptyCustomOptions organized by type; customOptionsPosition=BOTTOM; invitable; custom searchQuery; filterResults; includeVendorsForHostId"
+ContributeProfilePicker.js,CollectivePicker,profile,Prefetched (profiles),No,Yes,No,[ORGANIZATION],"addLoggedInUserAsAdmin with excludeAdminFields; custom formatOptionLabel; includes incognito option"
+InviteMemberModal.js,CollectivePickerAsync,member,Query,No,Yes,No,[USER],filterResults to exclude existing members with menuPortalTarget=null

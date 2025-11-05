@@ -1,7 +1,9 @@
 import type { Preview } from '@storybook/nextjs-vite';
-import { ThemeProvider } from 'styled-components';
+import { StyleSheetManager, ThemeProvider } from 'styled-components';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
+import isPropValid from '@emotion/is-prop-valid';
+import { MockedProvider } from '@apollo/client/testing';
 
 // Import global styles
 import '../public/static/styles/app.css';
@@ -36,12 +38,30 @@ const preview: Preview = {
   decorators: [
     Story =>
       React.createElement(
-        IntlProvider,
-        { locale: 'en', defaultLocale: 'en', messages: enMessages },
+        MockedProvider,
+        { addTypename: false, mocks: [] },
         React.createElement(
-          ThemeProvider,
-          { theme },
-          React.createElement('div', { className: 'font-sans' }, React.createElement(Story)),
+          IntlProvider,
+          { locale: 'en', defaultLocale: 'en', messages: enMessages },
+          React.createElement(
+            StyleSheetManager,
+            {
+              shouldForwardProp: (propName, elementToBeRendered) => {
+                // Forward all props for custom components (string checks for HTML elements)
+                if (typeof elementToBeRendered === 'string') {
+                  // For HTML elements, use isPropValid to filter out style props
+                  return isPropValid(propName);
+                }
+                // For custom components, forward all props
+                return true;
+              },
+            },
+            React.createElement(
+              ThemeProvider,
+              { theme },
+              React.createElement('div', { className: 'font-sans' }, React.createElement(Story)),
+            ),
+          ),
         ),
       ),
   ],

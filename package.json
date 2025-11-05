@@ -202,7 +202,8 @@
     "type:check": "tsc",
     "jest": "cross-env NODE_ENV=test TZ=UTC jest",
     "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build"
+    "storybook:build": "storybook build",
+    "storybook:clean": "shx rm -rf node_modules/.cache/storybook"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
