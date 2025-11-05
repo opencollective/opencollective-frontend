@@ -213,7 +213,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       <DashboardHeader
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
-          <FormattedMessage id="People.Description" defaultMessage="People that interacted with your Fiscal Host" />
+          <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
         }
       />
       <Filterbar {...queryFilter} />
