@@ -111,9 +111,9 @@ const BankTransfer = props => {
     return <Loading />;
   }
 
-  const existingManualPaymentMethod = !!get(data.host, 'settings.paymentMethods.manual');
-  const showEditManualPaymentMethod = !showForm && data.host;
   const existingPayoutMethod = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
+  const existingManualPaymentMethod = !!get(data.host, 'settings.paymentMethods.manual') && existingPayoutMethod;
+  const showEditManualPaymentMethod = !showForm && data.host;
   const useStructuredForm =
     !existingManualPaymentMethod || (existingManualPaymentMethod && existingPayoutMethod) ? true : false;
   const instructions = data.host.settings?.paymentMethods?.manual?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
