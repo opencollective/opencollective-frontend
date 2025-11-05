@@ -1,7 +1,7 @@
 import React from 'react';
 import { size } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import formatMemberRole from '../../lib/i18n/member-role';
 

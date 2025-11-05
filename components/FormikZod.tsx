@@ -75,6 +75,8 @@ export const getCustomZodErrorMap =
     } else if (error.code === 'invalid_string') {
       if (error.validation === 'email') {
         message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidEmail);
+      } else if (error.validation === 'url') {
+        message = intl.formatMessage(RICH_ERROR_MESSAGES.invalidUrl);
       } else {
         message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
       }
@@ -350,7 +352,10 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   const intl = useIntl();
   const context = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
-    values => defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), _validate?.(values) || {}),
+    async values => {
+      const validationError = _validate ? await Promise.resolve(_validate(values)) : {};
+      return defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), validationError);
+    },
     [intl, schema, _validate],
   );
   return (

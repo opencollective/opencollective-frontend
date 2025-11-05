@@ -305,6 +305,9 @@ const Policies = ({ collective }) => {
   React.useEffect(() => {
     if (data) {
       formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename', 'id']));
+      if (typeof window !== 'undefined' && window.location.hash !== '') {
+        document.querySelector(window.location.hash)?.scrollIntoView();
+      }
     }
   }, [data]);
 
@@ -475,7 +478,7 @@ const Policies = ({ collective }) => {
             )}
           </Container>
 
-          <SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
+          <SettingsSectionTitle id="expenses">{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
 
           <StyledInputField
             name="policies.EXPENSE_POLICIES.invoicePolicy"
@@ -640,7 +643,7 @@ const Policies = ({ collective }) => {
 
         {collective.isHost && !isSelfHosted && (
           <Container>
-            <SettingsSectionTitle mt={4}>
+            <SettingsSectionTitle className="mt-4">
               <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
             </SettingsSectionTitle>
             <P mb={2}>
@@ -732,7 +735,7 @@ const Policies = ({ collective }) => {
           </Container>
         )}
         <Container>
-          <SettingsSectionTitle mt={4}>
+          <SettingsSectionTitle className="mt-4">
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
           </SettingsSectionTitle>
           <StyledCheckbox
@@ -888,7 +891,7 @@ const Policies = ({ collective }) => {
         {collective.isHost && (
           <React.Fragment>
             <Container>
-              <SettingsSectionTitle mt={4}>
+              <SettingsSectionTitle className="mt-4">
                 <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
               </SettingsSectionTitle>
               <P mb={2}>
@@ -927,7 +930,7 @@ const Policies = ({ collective }) => {
               ))}
             </Container>
             <Container>
-              <SettingsSectionTitle mt={4}>
+              <SettingsSectionTitle className="mt-4">
                 <FormattedMessage defaultMessage="Vendors" id="RilevA" />
               </SettingsSectionTitle>
               <div className="mb-1">
@@ -966,7 +969,7 @@ const Policies = ({ collective }) => {
             </Container>
             {collective.isHost && (
               <Container>
-                <SettingsSectionTitle mt={4}>
+                <SettingsSectionTitle className="mt-4">
                   <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
                 </SettingsSectionTitle>
                 <P mb={3}>
@@ -1021,7 +1024,7 @@ const Policies = ({ collective }) => {
           </React.Fragment>
         )}
         <Container>
-          <SettingsSectionTitle mt={4}>
+          <SettingsSectionTitle className="mt-4">
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
           </SettingsSectionTitle>
           <P mb={2}>
@@ -1045,7 +1048,7 @@ const Policies = ({ collective }) => {
         </Container>
         {collective.isHost && (
           <Container>
-            <SettingsSectionTitle mt={4}>
+            <SettingsSectionTitle className="mt-4">
               <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
             </SettingsSectionTitle>
 

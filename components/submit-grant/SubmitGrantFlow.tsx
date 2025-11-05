@@ -15,10 +15,8 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { objectKeys } from '@/lib/utils';
 
-import { I18nBold } from '../I18nFormatters';
 import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
 import { SummarySectionContent } from '../submit-expense/form/SummarySection';
@@ -47,6 +45,7 @@ type SubmitGrantFlowProps = {
   draftKey?: string;
   handleOnClose: () => void;
   onGrantSubmitted?: (grantId: number) => void;
+  duplicateGrant?: boolean;
 };
 
 export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
@@ -57,6 +56,7 @@ export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
       account={props.account}
       handleOnClose={props.handleOnClose}
       onGrantSubmitted={props.onGrantSubmitted}
+      duplicateGrant={props.duplicateGrant}
     />
   );
 }
@@ -79,6 +79,7 @@ type SubmitGrantDialogProps = {
   expenseId?: number;
   draftKey?: string;
   account: { slug: string; name?: string };
+  duplicateGrant?: boolean;
   onGrantSubmitted?: (grantId: number) => void;
 };
 
@@ -87,19 +88,13 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [submittedGrantId, setSubmittedGrantId] = React.useState(null);
 
-  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
   const onViewAllGrantRequestsClick = React.useCallback(() => {
     if (LoggedInUser) {
-      router.replace(
-        `/dashboard/${LoggedInUser.collective.slug}/${hasGrantAndFundsReorgEnabled ? 'submitted-grants' : 'submitted-expenses'}`,
-      );
+      router.replace(`/dashboard/${LoggedInUser.collective.slug}/submitted-grants`);
     } else {
       router.replace(`${props.account.slug}/expenses?type=GRANT`);
     }
-  }, [LoggedInUser, props.account.slug, router, hasGrantAndFundsReorgEnabled]);
+  }, [LoggedInUser, props.account.slug, router]);
 
   const { onGrantSubmitted: onGrantSubmittedCallback } = props;
   const onGrantSubmitted = React.useCallback(
@@ -130,7 +125,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
+        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl leading-7 font-bold text-slate-800">
               {!submittedGrantId && (
@@ -182,6 +177,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
                 draftKey={props.draftKey}
                 expenseId={props.expenseId}
                 accountSlug={props.account.slug}
+                duplicateGrant={props.duplicateGrant}
                 onGrantSubmitted={onGrantSubmitted}
               />
             )}
@@ -195,49 +191,24 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           </main>
           {submittedGrantId && (
             <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
-              {hasGrantAndFundsReorgEnabled ? (
-                <FormattedMessage
-                  defaultMessage="To view your request,<link>View All Grants</link>"
-                  id="bPzQ2t"
-                  values={{
-                    link: c => {
-                      return (
-                        <Button
-                          className="h-5 px-0 leading-5"
-                          size="xs"
-                          variant="link"
-                          onClick={onViewAllGrantRequestsClick}
-                        >
-                          {c}
-                        </Button>
-                      );
-                    },
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="<b>Grants are processed as 'expenses'.</b> To view your application, <link>View All Expenses</link>"
-                  id="oAwTV8"
-                  values={{
-                    b: I18nBold,
-                    link: c => {
-                      return (
-                        <React.Fragment>
-                          &nbsp;
-                          <Button
-                            className="h-5 px-0 leading-5"
-                            size="xs"
-                            variant="link"
-                            onClick={onViewAllGrantRequestsClick}
-                          >
-                            {c}
-                          </Button>
-                        </React.Fragment>
-                      );
-                    },
-                  }}
-                />
-              )}
+              <FormattedMessage
+                defaultMessage="To view your requests: <link>View All Grants</link>"
+                id="aomx++"
+                values={{
+                  link: content => {
+                    return (
+                      <Button
+                        className="ml-1 h-5 px-0 leading-5"
+                        size="xs"
+                        variant="link"
+                        onClick={onViewAllGrantRequestsClick}
+                      >
+                        {content}
+                      </Button>
+                    );
+                  },
+                }}
+              />
             </DialogFooter>
           )}
         </div>
@@ -250,6 +221,7 @@ type SubmitGrantDialogContentProps = {
   accountSlug: string;
   expenseId?: number;
   draftKey?: string;
+  duplicateGrant?: boolean;
   onGrantSubmitted: (expenseId: number) => void;
 };
 
@@ -263,6 +235,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,
     draftKey: props.draftKey,
+    duplicateExpense: props.duplicateGrant,
   });
 
   const onError = React.useCallback(
@@ -298,7 +271,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
           key: 'initial', // "key" is only used for enabling FlipMove animations
           amount: {
             valueInCents: 0,
-            currency: 'USD',
           },
           description: '',
         },
@@ -443,7 +415,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
             <div className="px-4 pb-4">
               <FormContainer activeHeader={steps.activeHeaderName} onVisibleSectionChange={onVisibleSectionChange} />
             </div>
-            <div className="sticky bottom-0 z-20 bg-[#F8FAFC]">
+            <div className="sticky bottom-0 z-20 sm:bg-[#F8FAFC]">
               <div className="flex justify-between px-4 py-4">
                 {steps.activeHeader.previousButtonMessage ? (
                   <Button variant="outline" onClick={onBackStepClick} disabled={expenseForm.isSubmitting}>
@@ -600,7 +572,7 @@ function FormSectionContainer(props: FormSectionContainerProps) {
 
   return (
     <div ref={ref} id={props.id} className="scroll-m-8">
-      <div className="rounded-lg border border-white bg-white p-6">
+      <div className="rounded-lg border border-white bg-white p-4 sm:p-6">
         {props.title && (
           <div className="mb-4">
             <div className="text-xl font-bold text-[#0F1729]">{props.title}</div>

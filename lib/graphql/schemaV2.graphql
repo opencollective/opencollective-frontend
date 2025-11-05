@@ -670,6 +670,11 @@ interface Account {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -1091,6 +1096,11 @@ interface Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
 }
 
 """
@@ -2725,6 +2735,7 @@ type Expense {
   [Host admins only] If the expense associated with a transactions import row, this field will reference it
   """
   transactionImportRow: TransactionsImportRow
+  platformBillingData: JSON
 }
 
 """
@@ -2812,7 +2823,7 @@ type AccountingCategory {
 """
 This represents an Host account
 """
-type Host implements Account & AccountWithContributions {
+type Host implements Account & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
 
@@ -2932,7 +2943,7 @@ type Host implements Account & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -3342,6 +3353,11 @@ type Host implements Account & AccountWithContributions {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -3748,6 +3764,11 @@ type Host implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -3836,6 +3857,13 @@ type Host implements Account & AccountWithContributions {
   Returns true if the account has started the process to resume contributions
   """
   hasResumeContributionsProcessStarted: Boolean!
+
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
 
   """
   List of accounting categories for this host
@@ -4559,6 +4587,262 @@ type AccountCollection implements Collection {
 }
 
 """
+An account that can be hosted by a Host
+"""
+interface AccountWithPlatformSubscription {
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
+}
+
+type PlatformSubscription {
+  """
+  Start date (inclusive)
+  """
+  startDate: DateTime!
+
+  """
+  End date (inclusive), null if not set
+  """
+  endDate: DateTime
+  isCurrent: Boolean!
+  plan: PlatformSubscriptionTier!
+}
+
+"""
+Type for Platform Subscription Tier
+"""
+type PlatformSubscriptionTier {
+  """
+  The title of the subscription tier
+  """
+  id: String
+
+  """
+  The title of the subscription tier
+  """
+  title: String!
+
+  """
+  The type of the subscription tier (e.g., "basic", "premium")
+  """
+  type: String!
+
+  """
+  The ID of the base plan for this subscription tier
+  """
+  basePlanId: String
+  pricing: PlatformSubscriptionTierPricing!
+  features: PlatformSubscriptionFeatures!
+}
+
+type PlatformSubscriptionTierPricing {
+  """
+  The price of the subscription tier per month
+  """
+  pricePerMonth: Amount!
+
+  """
+  Price for each additional collective beyond the included limit
+  """
+  pricePerAdditionalCollective: Amount!
+
+  """
+  Price for each additional expense beyond the included limit
+  """
+  pricePerAdditionalExpense: Amount!
+
+  """
+  Number of collectives included in this subscription tier
+  """
+  includedCollectives: Int!
+
+  """
+  Number of expenses included in this subscription tier per month
+  """
+  includedExpensesPerMonth: Int!
+}
+
+type PlatformSubscriptionFeatures {
+  TRANSFERWISE: Boolean!
+  PAYPAL_PAYOUTS: Boolean!
+  RECEIVE_HOST_APPLICATIONS: Boolean!
+  CHART_OF_ACCOUNTS: Boolean!
+  EXPENSE_SECURITY_CHECKS: Boolean!
+  EXPECTED_FUNDS: Boolean!
+  CHARGE_HOSTING_FEES: Boolean!
+  RESTRICTED_FUNDS: Boolean!
+  AGREEMENTS: Boolean!
+  TAX_FORMS: Boolean!
+  FUNDS_GRANTS_MANAGEMENT: Boolean!
+  VENDORS: Boolean!
+  USE_EXPENSES: Boolean!
+  UPDATES: Boolean!
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
+  RECEIVE_EXPENSES: Boolean!
+  ACCOUNT_MANAGEMENT: Boolean!
+  OFF_PLATFORM_TRANSACTIONS: Boolean!
+}
+
+type PlatformBilling {
+  billingPeriod: PlatformBillingPeriod!
+  subscriptions: [PlatformSubscription!]!
+  utilization: PlatformUtilization!
+  dueDate: DateTime!
+  base: PlatformBillingBase!
+  additional: PlatformBillingAdditional!
+  totalAmount: Amount!
+  expenses: [Expense!]!
+}
+
+type PlatformBillingPeriod {
+  year: Int!
+  month: PlatformBillingMonth!
+  startDate: DateTime!
+  endDate: DateTime!
+  isCurrent: Boolean!
+}
+
+enum PlatformBillingMonth {
+  JANUARY
+  FEBRUARY
+  MARCH
+  APRIL
+  MAY
+  JUNE
+  JULY
+  AUGUST
+  SEPTEMBER
+  OCTOBER
+  NOVEMBER
+  DECEMBER
+}
+
+type PlatformUtilization {
+  activeCollectives: Int!
+  expensesPaid: Int!
+}
+
+type PlatformBillingBase {
+  total: Amount!
+  subscriptions: [PlatformBillingBaseCharges]!
+}
+
+type PlatformBillingBaseCharges {
+  title: String!
+  amount: Amount!
+
+  """
+  Start date (inclusive)
+  """
+  startDate: DateTime!
+
+  """
+  End date (inclusive)
+  """
+  endDate: DateTime!
+}
+
+type PlatformBillingAdditional {
+  total: Amount!
+  amounts: PlatformBillingAdditionalUtilizationCharges
+  utilization: PlatformUtilization!
+}
+
+type PlatformBillingAdditionalUtilizationCharges {
+  activeCollectives: Amount!
+  expensesPaid: Amount!
+}
+
+input PlatformBillingPeriodInput {
+  year: Int!
+  month: PlatformBillingMonth!
+}
+
+"""
+The name of the current plan and its characteristics.
+"""
+type HostPlan {
+  """
+  The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
+  """
+  id: String
+
+  """
+  The name of the plan
+  """
+  name: String
+
+  """
+  Number of collectives hosted
+  """
+  hostedCollectives: Int
+
+  """
+  Max number of collectives than can be hosted
+  """
+  hostedCollectivesLimit: Int
+
+  """
+  Whether this plan allows to use the added funds feature
+  """
+  addedFunds: Int
+
+  """
+  Amount limit for the added funds feature under this plan
+  """
+  addedFundsLimit: Int
+
+  """
+  Whether this plan allows to use the host dashboard
+  """
+  hostDashboard: Boolean
+
+  """
+  Whether this plan allows to use the manual payments feature
+  """
+  manualPayments: Boolean
+
+  """
+  Whether this plan allows to use the bank transfers feature
+  """
+  bankTransfers: Int
+
+  """
+  Amount limit for the bank transfers feature under this plan
+  """
+  bankTransfersLimit: Int
+
+  """
+  Whether this plan allows to use the transferwise payouts feature
+  """
+  transferwisePayouts: Int
+
+  """
+  Amount limit for the transferwise payouts feature under this plan
+  """
+  transferwisePayoutsLimit: Int
+
+  """
+  Ability to charge Host Fees.
+  """
+  hostFees: Boolean
+
+  """
+  Charge on revenues made through Host Fees.
+  """
+  hostFeeSharePercent: Float
+
+  """
+  Ability to collect Platform Tips.
+  """
+  platformTips: Boolean
+}
+
+"""
 A legal document (e.g. W9, W8BEN, W8BEN-E)
 """
 type LegalDocument {
@@ -4730,6 +5014,16 @@ enum OrderByFieldType {
   Order by the date the collective was unhosted
   """
   UNHOSTED_AT
+
+  """
+  Order by the total amount managed by the Organization on the platform
+  """
+  MONEY_MANAGED
+
+  """
+  Order by the date of the last transaction. Using CollectiveTransactionStats.LatestTransactionCreatedAt.
+  """
+  LAST_TRANSACTION_CREATED_AT
 }
 
 """
@@ -4940,6 +5234,11 @@ enum ExpenseType {
   Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
   """
   SETTLEMENT
+
+  """
+  Platform billing: expense generated by Open Collective to charge for platform subscriptions
+  """
+  PLATFORM_BILLING
 }
 
 input OrderReferenceInput {
@@ -5600,6 +5899,11 @@ type PaymentMethod {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection
 }
 
@@ -6233,6 +6537,11 @@ type AccountStats {
     """
     kind: [TransactionKind]
   ): TimeSeriesAmount!
+
+  """
+  The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account.
+  """
+  managedAmount: Amount
 }
 
 """
@@ -6372,7 +6681,6 @@ type CollectiveFeatures {
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
-  RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
   CONVERSATIONS: CollectiveFeatureStatus
@@ -6383,8 +6691,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  TRANSFERWISE: CollectiveFeatureStatus
-  PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
@@ -6396,6 +6702,19 @@ type CollectiveFeatures {
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
   OFF_PLATFORM_TRANSACTIONS: CollectiveFeatureStatus
+  TRANSFERWISE: CollectiveFeatureStatus
+  PAYPAL_PAYOUTS: CollectiveFeatureStatus
+  RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
+  CHART_OF_ACCOUNTS: CollectiveFeatureStatus
+  EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
+  EXPECTED_FUNDS: CollectiveFeatureStatus
+  CHARGE_HOSTING_FEES: CollectiveFeatureStatus
+  RESTRICTED_FUNDS: CollectiveFeatureStatus
+  AGREEMENTS: CollectiveFeatureStatus
+  TAX_FORMS: CollectiveFeatureStatus
+  FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
+  VENDORS: CollectiveFeatureStatus
+  ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -6791,6 +7110,9 @@ enum ActivityType {
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
+  PLATFORM_SUBSCRIPTION_UPDATED
+  PLATFORM_BILLING_OVERDUE_REMINDER
+  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -6896,6 +7218,58 @@ type TransactionsAmountGroup {
   expenseType: ExpenseType
 }
 
+type CommunityStats {
+  associatedCollectives: [CommunityAssociatedCollective]
+  relations: [CommunityRelationType]!
+  transactionSummary: [CommunityTransactionSummary!]!
+  lastInteractionAt: DateTime
+  firstInteractionAt: DateTime
+  activities(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): ActivityCollection
+}
+
+type CommunityAssociatedCollective {
+  account: Account
+  relations: [CommunityRelationType]
+}
+
+enum CommunityRelationType {
+  ADMIN
+  ATTENDEE
+  PAYEE
+  GRANTEE
+  CONTRIBUTOR
+  EXPENSE_SUBMITTER
+  EXPENSE_APPROVER
+}
+
+type CommunityTransactionSummary {
+  year: Int!
+  expenseTotal: Amount!
+  expenseCount: Int!
+  contributionTotal: Amount!
+  contributionCount: Int!
+}
+
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity!]
+}
+
 """
 A collection of webhooks
 """
@@ -6935,86 +7309,6 @@ enum AccountingCategoryKind {
   ADDED_FUNDS
   CONTRIBUTION
   EXPENSE
-}
-
-"""
-The name of the current plan and its characteristics.
-"""
-type HostPlan {
-  """
-  The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
-  """
-  id: String
-
-  """
-  The name of the plan
-  """
-  name: String
-
-  """
-  Number of collectives hosted
-  """
-  hostedCollectives: Int
-
-  """
-  Max number of collectives than can be hosted
-  """
-  hostedCollectivesLimit: Int
-
-  """
-  Whether this plan allows to use the added funds feature
-  """
-  addedFunds: Int
-
-  """
-  Amount limit for the added funds feature under this plan
-  """
-  addedFundsLimit: Int
-
-  """
-  Whether this plan allows to use the host dashboard
-  """
-  hostDashboard: Boolean
-
-  """
-  Whether this plan allows to use the manual payments feature
-  """
-  manualPayments: Boolean
-
-  """
-  Whether this plan allows to use the bank transfers feature
-  """
-  bankTransfers: Int
-
-  """
-  Amount limit for the bank transfers feature under this plan
-  """
-  bankTransfersLimit: Int
-
-  """
-  Whether this plan allows to use the transferwise payouts feature
-  """
-  transferwisePayouts: Int
-
-  """
-  Amount limit for the transferwise payouts feature under this plan
-  """
-  transferwisePayoutsLimit: Int
-
-  """
-  Ability to charge Host Fees.
-  """
-  hostFees: Boolean
-
-  """
-  Charge on revenues made through Host Fees.
-  """
-  hostFeeSharePercent: Float
-
-  """
-  Ability to collect Platform Tips.
-  """
-  platformTips: Boolean
 }
 
 """
@@ -8172,7 +8466,7 @@ type ExpensePermissions {
   """
   Whether the current user can edit the expense accounting category
   """
-  editAccountingCategory: Boolean!
+  editAccountingCategory: Permission!
   editTags: Permission!
   delete: Permission!
   seeInvoiceInfo: Permission!
@@ -8315,6 +8609,7 @@ enum SecurityCheckScope {
   COLLECTIVE
   PAYEE
   PAYOUT_METHOD
+  ATTACHMENTS
 }
 
 """
@@ -8429,16 +8724,6 @@ type OrderPermissions {
   If paused, whether the current user can resume this order
   """
   canResume: Boolean!
-}
-
-"""
-A collection of "Activities"
-"""
-type ActivityCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Activity!]
 }
 
 type PendingOrderData {
@@ -8635,7 +8920,7 @@ type Bot implements Account {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -9045,6 +9330,11 @@ type Bot implements Account {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9451,6 +9741,11 @@ type Bot implements Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9468,7 +9763,7 @@ type Bot implements Account {
 """
 This represents a Collective account
 """
-type Collective implements Account & AccountWithHost & AccountWithContributions {
+type Collective implements Account & AccountWithHost & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
 
@@ -9588,7 +9883,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -9998,6 +10293,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10404,6 +10704,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10553,6 +10858,13 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns true if the account has started the process to resume contributions
   """
   hasResumeContributionsProcessStarted: Boolean!
+
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
 }
 
 """
@@ -11092,7 +11404,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -11502,6 +11814,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -11908,6 +12225,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12319,7 +12641,7 @@ type Individual implements Account {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -12729,6 +13051,11 @@ type Individual implements Account {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -13133,6 +13460,11 @@ type Individual implements Account {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13404,7 +13736,7 @@ type MemberOf {
 """
 This represents an Organization account
 """
-type Organization implements Account & AccountWithContributions {
+type Organization implements Account & AccountWithContributions & AccountWithPlatformSubscription {
   id: String!
   legacyId: Int!
 
@@ -13524,7 +13856,7 @@ type Organization implements Account & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -13934,6 +14266,11 @@ type Organization implements Account & AccountWithContributions {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14338,6 +14675,11 @@ type Organization implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14426,6 +14768,13 @@ type Organization implements Account & AccountWithContributions {
   Returns true if the account has started the process to resume contributions
   """
   hasResumeContributionsProcessStarted: Boolean!
+
+  """
+  Returns the current platform subscription
+  """
+  platformSubscription: PlatformSubscription
+  platformBilling(billingPeriod: PlatformBillingPeriodInput): PlatformBilling!
+  legacyPlan: HostPlan!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
@@ -14590,7 +14939,7 @@ type Vendor implements Account & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -15000,6 +15349,11 @@ type Vendor implements Account & AccountWithContributions {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15406,6 +15760,11 @@ type Vendor implements Account & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15753,6 +16112,36 @@ type Query {
     Filter by the balance of the account and its children accounts (events and projects)
     """
     consolidatedBalance: AmountRangeInput
+
+    """
+    Filter by the plan slug of the account
+    """
+    plan: [String]
+
+    """
+    Filter accounts that are subscribers to the platform
+    """
+    isPlatformSubscriber: Boolean
+
+    """
+    Filter accounts that are verified
+    """
+    isVerified: Boolean
+
+    """
+    Filter accounts that are first party hosts
+    """
+    isFirstPartyHost: Boolean
+
+    """
+    Filter accounts that have a last transaction after this date
+    """
+    lastTransactionFrom: DateTime
+
+    """
+    Filter accounts that have a last transaction before this date
+    """
+    lastTransactionTo: DateTime
   ): AccountCollection!
   activities(
     """
@@ -15848,6 +16237,31 @@ type Query {
     """
     id: String!
   ): Conversation
+
+  """
+  Return accounts that have interacted with a given account or host
+  """
+  community(
+    """
+    Account filter
+    """
+    account: AccountReferenceInput
+
+    """
+    Host context filter
+    """
+    host: AccountReferenceInput
+    type: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+    searchTerm: String
+    relation: [CommunityRelationType!]
+    limit: Int! = 100
+    offset: Int! = 0
+  ): AccountCollection!
 
   """
   Get exchange rates from Open Collective
@@ -16172,7 +16586,7 @@ type Query {
   ): Individual
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -16339,6 +16753,11 @@ type Query {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   organization(
     """
@@ -16401,6 +16820,11 @@ type Query {
     Limit the scope of the search to this host and its hosted accounts
     """
     host: AccountReferenceInput
+
+    """
+    Set this to true if you are displaying all the results in the same list, and want a consistent sorting order across different types. (!) Paginating wih `offset` will not be supported
+    """
+    useTopHits: Boolean! = false
 
     """
     The maximum amount of time in millisecond to wait for a single entity type query to complete (for SQL search)
@@ -16856,6 +17280,7 @@ type Query {
   ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
+  platformSubscriptionTiers: [PlatformSubscriptionTier]
 }
 
 """
@@ -18242,6 +18667,9 @@ enum ActivityAndClassesType {
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
+  PLATFORM_SUBSCRIPTION_UPDATED
+  PLATFORM_BILLING_OVERDUE_REMINDER
+  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -18413,7 +18841,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -18823,6 +19251,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -19229,6 +19662,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -19513,7 +19951,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   ): MemberCollection!
 
   """
-  [AUTHENTICATED] Returns the pending invitations
+  Returns the pending invitations, or null if not allowed.
   """
   memberInvitations(
     """
@@ -19923,6 +20361,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return only orders made from/to these hosted accounts
     """
     hostedAccounts: [AccountReferenceInput]
+
+    """
+    Return orders only for this host
+    """
+    host: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -20329,6 +20772,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
+
+  """
+  Various stats about how this account is connected to the rest of the community
+  """
+  communityStats(host: AccountReferenceInput!): CommunityStats
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -20501,6 +20949,16 @@ type SearchResults {
   """
   accounts(
     """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
     Type of account
     """
     type: AccountType
@@ -20519,37 +20977,107 @@ type SearchResults {
   """
   Search results for Comments
   """
-  comments: SearchResultsComments
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsComments
 
   """
   Search results for Expenses
   """
-  expenses: SearchResultsExpenses
+  expenses(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsExpenses
 
   """
   Search results for HostApplications
   """
-  hostApplications: SearchResultsHostApplications
+  hostApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsHostApplications
 
   """
   Search results for Orders
   """
-  orders: SearchResultsOrders
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsOrders
 
   """
   Search results for Tiers
   """
-  tiers: SearchResultsTiers
+  tiers(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsTiers
 
   """
   Search results for Transactions
   """
-  transactions: SearchResultsTransactions
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsTransactions
 
   """
   Search results for Updates
   """
-  updates: SearchResultsUpdates
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): SearchResultsUpdates
 }
 
 type SearchResultsAccounts {
@@ -21358,6 +21886,11 @@ type Mutation {
     expense: ExpenseUpdateInput!
 
     """
+    Edit draft without submiting it
+    """
+    isDraftEdit: Boolean! = false
+
+    """
     Expense draft key if invited to submit expense. Scope: "expenses".
     """
     draftKey: String
@@ -22008,6 +22541,11 @@ type Mutation {
     """
     roleDescription: String
     captcha: CaptchaInputType
+
+    """
+    If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
+    """
+    financiallyActive: Boolean = false
   ): Organization
 
   """
@@ -22161,7 +22699,7 @@ type Mutation {
     The connected account to refresh
     """
     connectedAccount: ConnectedAccountReferenceInput!
-  ): TransactionsImport!
+  ): TransactionsImport! @deprecated(reason: "2025-07-23: Use `syncTransactionsImport` instead")
 
   """
   Refresh the list of sub-accounts & other metadata by re-fetching the account info
@@ -22874,6 +23412,18 @@ type Mutation {
     """
     host: AccountReferenceInput!
   ): Vendor!
+  updateAccountPlatformSubscription(
+    """
+    Account to update the platform subscription for
+    """
+    account: AccountReferenceInput!
+    planId: String
+
+    """
+    The new platform subscription tier to apply to the account
+    """
+    subscription: PlatformSubscriptionInput
+  ): Account!
 
   """
   Send In-App Survey response
@@ -22973,6 +23523,8 @@ input EventCreateInput {
   description: String
   tags: [String]
   settings: JSON
+  location: LocationInput
+  privateInstructions: String
 
   """
   The Event start date and time
@@ -24686,6 +25238,7 @@ input OrganizationCreateInput {
   Two-letters country code following ISO31661
   """
   countryISO: String
+  currency: Currency
 
   """
   The profile avatar image
@@ -25390,4 +25943,91 @@ input VendorEditInput {
   The profile background image, for the banner and social media sharing
   """
   backgroundImage: Upload
+}
+
+input PlatformSubscriptionInput {
+  """
+  The ID of the platform subscription to update
+  """
+  id: String
+
+  """
+  The new platform subscription plan to apply to the account
+  """
+  plan: PlatformSubscriptionPlanInput!
+}
+
+input PlatformSubscriptionPlanInput {
+  """
+  The title of the subscription plan
+  """
+  title: String!
+
+  """
+  The type of the subscription plan (e.g., "basic", "premium")
+  """
+  type: String!
+
+  """
+  The ID of the base plan for this subscription tier
+  """
+  basePlanId: String!
+
+  """
+  Features included in this subscription plan
+  """
+  features: PlatformSubscriptionFeaturesFeatures
+
+  """
+  Pricing details for the subscription plan
+  """
+  pricing: PlatformSubscriptionPlanPricing!
+}
+
+input PlatformSubscriptionFeaturesFeatures {
+  TRANSFERWISE: Boolean!
+  PAYPAL_PAYOUTS: Boolean!
+  RECEIVE_HOST_APPLICATIONS: Boolean!
+  CHART_OF_ACCOUNTS: Boolean!
+  EXPENSE_SECURITY_CHECKS: Boolean!
+  EXPECTED_FUNDS: Boolean!
+  CHARGE_HOSTING_FEES: Boolean!
+  RESTRICTED_FUNDS: Boolean!
+  AGREEMENTS: Boolean!
+  TAX_FORMS: Boolean!
+  FUNDS_GRANTS_MANAGEMENT: Boolean!
+  VENDORS: Boolean!
+  USE_EXPENSES: Boolean!
+  UPDATES: Boolean!
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Boolean!
+  RECEIVE_EXPENSES: Boolean!
+  ACCOUNT_MANAGEMENT: Boolean!
+  OFF_PLATFORM_TRANSACTIONS: Boolean!
+}
+
+input PlatformSubscriptionPlanPricing {
+  """
+  The price of the subscription plan per month
+  """
+  pricePerMonth: AmountInput!
+
+  """
+  Price for each additional collective beyond the included limit
+  """
+  pricePerAdditionalCollective: AmountInput!
+
+  """
+  Price for each additional expense beyond the included limit
+  """
+  pricePerAdditionalExpense: AmountInput!
+
+  """
+  Number of collectives included in this subscription plan
+  """
+  includedCollectives: Int!
+
+  """
+  Number of expenses included in this subscription plan per month
+  """
+  includedExpensesPerMonth: Int!
 }

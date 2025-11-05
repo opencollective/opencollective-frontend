@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { FormattedMessage } from 'react-intl';

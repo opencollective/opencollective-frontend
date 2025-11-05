@@ -2,11 +2,6 @@
 
 We use [Cypress](https://www.cypress.io/) for E2E (end-to-end) tests.
 
-## Writing E2E tests
-
-See the following guide in our documentation:
-https://docs.opencollective.com/help/contributing/development/testing-with-cypress
-
 ## Running the E2E tests in development environment
 
 In dev environment, to execute the E2E tests, you will need to open 4 different terminals in 2 different projects.
@@ -37,7 +32,7 @@ Behind the scenes it will do the following (so you don't have to do it):
 
 For E2E tests we need to start the [Mailpit](https://mailpit.axllent.org/) mail server to capture test emails. On a separate terminal navigate to the `opencollective-api` project and run:
 
-- `docker-compose -f docker-compose.dev.yml --profile mail up`
+- `docker-compose -f docker-compose/mail.yml up`
 
 ### 3. Frontend: Server
 

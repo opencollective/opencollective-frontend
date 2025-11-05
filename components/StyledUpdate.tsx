@@ -4,7 +4,7 @@ import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';

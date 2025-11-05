@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import type { Account, Host } from '../../lib/graphql/types/v2/schema';

@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
 import { isArray, isEmpty, isObject, omit, omitBy } from 'lodash';
+import memoizeOne from 'memoize-one';
 import { twMerge } from 'tailwind-merge';
 
 import * as whitelabel from './constants/whitelabel-providers';
@@ -326,3 +327,16 @@ export const sortSelectOptions = (option1, option2) => {
   }
   return option1.label.localeCompare(option2.label);
 };
+
+/**
+ * @returns An array memoizer (one-time, using memoize-one) that, given array of values, returns the same array if all the values are the same.
+ * @example
+ *  const memoizer = getArrayValuesMemoizer();
+ *  memoizer([1, 2, 3]); // [1, 2, 3]
+ *  memoizer([1, 2, 3]); // [1, 2, 3] (memoized)
+ *  memoizer([1, 2, 4]); // [1, 2, 4]
+ */
+export function getArrayValuesMemoizer<T>(): (array: T[]) => T[] {
+  const memoizer = memoizeOne((...values) => values);
+  return (array: T[]) => memoizer(...array);
+}

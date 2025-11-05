@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
@@ -18,9 +19,11 @@ import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 import { Drawer } from '@/components/Drawer';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import { DataTable } from '@/components/table/DataTable';
 import { Button } from '@/components/ui/Button';
 
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportHostedCollectivesCSVModal from '../../ExportHostedCollectivesCSVModal';
@@ -107,6 +110,10 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<
     HostedCollectiveFieldsFragment | undefined | string
   >(subpath[0]);
+
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.FUNDS_GRANTS_MANAGEMENT);
+
   const { data: metadata, refetch: refetchMetadata } = useQuery(
     gql`
       query HostedFundsMetadata($hostSlug: String!) {
@@ -133,6 +140,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
       variables: { hostSlug },
       fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
       context: API_V2_CONTEXT,
+      skip: isUpgradeRequired,
     },
   );
 
@@ -188,6 +196,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+    skip: isUpgradeRequired,
   });
 
   useEffect(() => {
@@ -225,7 +234,12 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
               account={data?.host}
               isHostReport
               trigger={
-                <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                <Button
+                  size="sm"
+                  disabled={isUpgradeRequired}
+                  variant="outline"
+                  onClick={() => setDisplayExportCSVModal(true)}
+                >
                   <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
                 </Button>
               }
@@ -236,55 +250,63 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
               }}
               size="sm"
               variant="outline"
+              disabled={isUpgradeRequired}
             >
               <FormattedMessage defaultMessage="Create fund" id="0frjVr" />
             </Button>
           </React.Fragment>
         }
       />
-      <Filterbar {...queryFilter} />
-      {error && <MessageBoxGraphqlError error={error} mb={2} />}
-      {!error && !loading && !hostedAccounts?.nodes.length ? (
-        <EmptyResults
-          hasFilters={queryFilter.hasFilters}
-          entityType="FUNDS"
-          onResetFilters={() => queryFilter.resetFilters({})}
-        />
+      {isUpgradeRequired ? (
+        <UpgradePlanCTA featureKey={FEATURES.FUNDS_GRANTS_MANAGEMENT} />
       ) : (
         <React.Fragment>
-          <DataTable
-            data-cy="funds-table"
-            innerClassName="text-muted-foreground"
-            columns={compact([
-              {
-                ...cols.collective,
-                header: () => <FormattedMessage defaultMessage="Fund name" id="nPLfxb" />,
-              } as ColumnDef<any, any>,
-              cols.team,
-              !isUnhosted && cols.fee,
-              !isUnhosted && cols.hostedSince,
-              cols.totalAmountRaised,
-              cols.totalAmountSpent,
-              cols.consolidatedBalance,
-              cols.actions,
-            ])}
-            data={hostedAccounts?.nodes || []}
-            loading={loading}
-            mobileTableView
-            compact
-            meta={
-              {
-                intl,
-                onClickRow,
-                onEdit: handleEdit,
-                host: data?.host,
-                openCollectiveDetails: handleDrawer,
-              } as HostedCollectivesDataTableMeta
-            }
-            onClickRow={onClickRow}
-            getRowDataCy={row => `collective-${row.original.slug}`}
-          />
-          <Pagination queryFilter={queryFilter} total={hostedAccounts?.totalCount} />
+          <Filterbar {...queryFilter} />
+
+          {error && <MessageBoxGraphqlError error={error} mb={2} />}
+          {!error && !loading && !hostedAccounts?.nodes.length ? (
+            <EmptyResults
+              hasFilters={queryFilter.hasFilters}
+              entityType="FUNDS"
+              onResetFilters={() => queryFilter.resetFilters({})}
+            />
+          ) : (
+            <React.Fragment>
+              <DataTable
+                data-cy="funds-table"
+                innerClassName="text-muted-foreground"
+                columns={compact([
+                  {
+                    ...cols.collective,
+                    header: () => <FormattedMessage defaultMessage="Fund name" id="nPLfxb" />,
+                  } as ColumnDef<any, any>,
+                  cols.team,
+                  !isUnhosted && cols.fee,
+                  !isUnhosted && cols.hostedSince,
+                  cols.totalAmountRaised,
+                  cols.totalAmountSpent,
+                  cols.consolidatedBalance,
+                  cols.actions,
+                ])}
+                data={hostedAccounts?.nodes || []}
+                loading={loading}
+                mobileTableView
+                compact
+                meta={
+                  {
+                    intl,
+                    onClickRow,
+                    onEdit: handleEdit,
+                    host: data?.host,
+                    openCollectiveDetails: handleDrawer,
+                  } as HostedCollectivesDataTableMeta
+                }
+                onClickRow={onClickRow}
+                getRowDataCy={row => `collective-${row.original.slug}`}
+              />
+              <Pagination queryFilter={queryFilter} total={hostedAccounts?.totalCount} />
+            </React.Fragment>
+          )}
         </React.Fragment>
       )}
 

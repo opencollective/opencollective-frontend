@@ -12,6 +12,7 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import timezones from '@/lib/constants/timezones';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
+import { loadGoogleMaps } from '@/lib/google-maps';
 import type { Account, AccountUpdateInput } from '@/lib/graphql/types/v2/schema';
 import { AccountType, Currency } from '@/lib/graphql/types/v2/schema';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -27,7 +28,7 @@ import RichTextEditor from '@/components/RichTextEditor';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/Command';
 import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
@@ -46,6 +47,7 @@ const editAccountFragment = gql`
     legalName
     description
     longDescription
+    isActive
     isHost
     tags
     location {
@@ -94,8 +96,8 @@ const editAccountMutation = gql`
   ${editAccountFragment}
 `;
 
-const editAccountQuery = gql`
-  query EditAccount($id: String!) {
+export const infoSettingsDashboardQuery = gql`
+  query InfoSettingsDashboard($id: String!) {
     account(id: $id) {
       id
       ...EditAccountFragment
@@ -135,8 +137,9 @@ const baseInfo = z.object({
     .object({
       VAT: z
         .object({
-          type: z.string().max(255).optional(),
-          number: z.string().max(255).optional(),
+          type: z.string().max(255).optional().nullable(),
+          number: z.string().max(255).optional().nullable(),
+          disabled: z.boolean().optional().nullable(),
         })
         .optional(),
       GST: z
@@ -183,8 +186,9 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const timezoneInputRef = useRef<HTMLInputElement>(null);
   const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
+  const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const { toast } = useToast();
-  const { data, loading } = useQuery(editAccountQuery, {
+  const { data, loading } = useQuery(infoSettingsDashboardQuery, {
     context: API_V2_CONTEXT,
     variables: { id: accountFromParent.id },
   });
@@ -196,6 +200,14 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   });
 
   const account = data?.account;
+
+  // Load Google Maps for address autocomplete. Individuals use a simplified location input.
+  React.useEffect(() => {
+    if (account && account.type !== INDIVIDUAL) {
+      loadGoogleMaps().finally(() => setIsLoadingGoogleMaps(false));
+    }
+  }, [account]);
+
   const initialValues = useMemo(
     () =>
       !account
@@ -263,7 +275,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
 
     try {
       const parseLocalDateTime = (date: string | null) =>
-        isNil(date) ? null : dayjs.tz(date, 'timezone' in values ? values.timezone : 'UTC').toISOString();
+        isNil(date)
+          ? null
+          : dayjs
+              .tz(date, values['timezone'] || 'UTC')
+              .utc()
+              .toISOString();
       const variables: { account: AccountUpdateInput } = {
         account: {
           id: account.id,
@@ -273,7 +290,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
       if ('endsAt' in values && values.endsAt) {
         variables.account.endsAt = parseLocalDateTime(values.endsAt);
       }
-      if ('startsAt' in values && values.endsAt) {
+      if ('startsAt' in values && values.startsAt) {
         variables.account.startsAt = parseLocalDateTime(values.startsAt);
       }
 
@@ -430,12 +447,10 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   onChange={e => setFieldValue('longDescription', e.target.value)}
                   videoEmbedEnabled
                   withBorders
-                  placeholder={
-                    <FormattedMessage
-                      defaultMessage="Tell your story and explain your purpose."
-                      id="SectionAbout.Why"
-                    />
-                  }
+                  placeholder={intl.formatMessage({
+                    defaultMessage: 'Tell your story and explain your purpose.',
+                    id: 'SectionAbout.Why',
+                  })}
                 />
               )}
             </FormField>
@@ -536,11 +551,15 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             >
               {({ field }) =>
                 account.type !== INDIVIDUAL ? (
-                  <LocationInput
-                    className="w-full"
-                    {...field}
-                    onChange={location => setFieldValue(field.name, location)}
-                  />
+                  isLoadingGoogleMaps ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <LocationInput
+                      className="w-full"
+                      {...field}
+                      onChange={location => setFieldValue(field.name, location)}
+                    />
+                  )
                 ) : (
                   <UserLocationInput
                     {...field}
@@ -564,7 +583,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                       defaultMessage="Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue."
                       values={{ SupportLink: I18nSupportLink }}
                     />
-                  ) : null
+                  ) : (
+                    <FormattedMessage
+                      id="collective.currency.info"
+                      defaultMessage="Select the preferred currency used in your profile page."
+                    />
+                  )
                 }
               >
                 {({ field }) => (
@@ -576,7 +600,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   >
                     <SelectTrigger
                       className={cn(!field.value && 'text-muted-foreground')}
-                      data-cy="organization-currency-trigger"
+                      data-testid="organization-currency-trigger"
                     >
                       {field.value ? (
                         field.value
@@ -629,44 +653,91 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             {taxes.includes(TaxType.VAT) && (
               <React.Fragment>
                 <FormField
-                  name="settings.VAT.type"
+                  name="settings.VAT"
                   label={<FormattedMessage defaultMessage="VAT settings" id="EditCollective.VAT" />}
-                >
-                  {({ field }) => (
-                    <Select value={field.value} onValueChange={value => setFieldValue(field.name, value)}>
-                      <SelectTrigger
-                        id={field.name}
-                        data-cy="VAT"
-                        className={cn('truncate', { 'border-red-500': field.error })}
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={null} data-cy="select-option">
-                          <FormattedMessage defaultMessage="Not subject to VAT" id="EditCollective.VAT.None" />
-                        </SelectItem>
-                        <SelectItem value={VAT_OPTIONS.OWN} data-cy="select-option">
-                          <FormattedMessage defaultMessage="Use my own VAT number" id="EditCollective.VAT.Own" />
-                        </SelectItem>
-                        {(!account.isHost || field.value === VAT_OPTIONS.HOST) && (
-                          <SelectItem value={VAT_OPTIONS.HOST} data-cy="select-option">
-                            <FormattedMessage defaultMessage="Use the host VAT settings" id="EditCollective.VAT.Host" />
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </FormField>
-                <FormField
-                  name="settings.VAT.number"
-                  label={<FormattedMessage defaultMessage="VAT number" id="EditCollective.VATNumber" />}
                   hint={
-                    <FormattedMessage
-                      id="EditCollective.VATNumber.Description"
-                      defaultMessage="Your European Value Added Tax (VAT) number"
-                    />
+                    values.settings?.VAT?.disabled && (
+                      <FormattedMessage
+                        id="EditCollective.VAT.Disabled.Warning"
+                        defaultMessage="Caution: Disabling VAT requires approval from your fiscal host. Please ensure you have discussed this with your host before saving."
+                      />
+                    )
                   }
-                />
+                >
+                  {({ field }) => {
+                    const isDisabled = field.value?.disabled;
+                    const currentType = isDisabled ? 'DISABLED' : field.value?.type;
+                    // Use 'HOST' to represent using host VAT settings (null in the form field)
+                    const displayType = currentType === null ? 'HOST' : currentType;
+                    const options = [
+                      {
+                        value: VAT_OPTIONS.HOST,
+                        label: (
+                          <FormattedMessage defaultMessage="Use the host VAT settings" id="EditCollective.VAT.Host" />
+                        ),
+                      },
+                      {
+                        value: VAT_OPTIONS.OWN,
+                        label: (
+                          <FormattedMessage
+                            defaultMessage="Use my own VAT number"
+                            id="EditCollective.VAT.OwnSettings"
+                          />
+                        ),
+                      },
+                      {
+                        value: 'DISABLED',
+                        label: <FormattedMessage defaultMessage="Disable VAT" id="EditCollective.VAT.Disabled" />,
+                      },
+                    ];
+                    return (
+                      <Select
+                        name="settings.VAT.type"
+                        value={displayType}
+                        onValueChange={value => {
+                          if (value === 'DISABLED') {
+                            setFieldValue('settings.VAT.type', VAT_OPTIONS.OWN);
+                            setFieldValue('settings.VAT.disabled', true);
+                          } else if (value === 'HOST') {
+                            setFieldValue('settings.VAT.type', VAT_OPTIONS.HOST);
+                            setFieldValue('settings.VAT.disabled', false);
+                          } else {
+                            setFieldValue('settings.VAT.type', value);
+                            setFieldValue('settings.VAT.disabled', false);
+                          }
+                        }}
+                      >
+                        <SelectTrigger
+                          id={field.name}
+                          data-cy="VAT"
+                          className={cn('truncate', { 'border-red-500': field.error })}
+                        >
+                          {options.find(opt => opt.value === displayType)?.label || <span>&nbsp;</span>}
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value} data-cy="select-option">
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    );
+                  }}
+                </FormField>
+                {values.settings?.VAT?.type === VAT_OPTIONS.OWN && !values.settings?.VAT?.disabled && (
+                  <FormField
+                    name="settings.VAT.number"
+                    label={<FormattedMessage defaultMessage="VAT number" id="EditCollective.VATNumber" />}
+                    required
+                    hint={
+                      <FormattedMessage
+                        id="EditCollective.VATNumber.Description"
+                        defaultMessage="Your European Value Added Tax (VAT) number"
+                      />
+                    }
+                  />
+                )}
               </React.Fragment>
             )}{' '}
             {taxes.includes(TaxType.GST) && account.isHost && (

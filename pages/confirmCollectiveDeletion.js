@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';

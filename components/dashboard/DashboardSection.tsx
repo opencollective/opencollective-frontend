@@ -29,6 +29,7 @@ import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
+import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
@@ -49,7 +50,10 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
+import { DashboardPlatformSubscription } from './sections/platform-subscription/DashboardPlatformSubscription';
 import Reports from './sections/reports/Reports';
+import LegacyPlatformSubscribers from './sections/subscriptions/LegacyPlatformSubscribers';
+import PlatformSubscribers from './sections/subscriptions/PlatformSubscribers';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
@@ -97,6 +101,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.APPROVE_GRANT_REQUESTS]: ApproveGrantRequests,
   [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
   [SECTIONS.CONTRIBUTORS]: Contributors,
+  [SECTIONS.PEOPLE]: PeopleRouter,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
@@ -107,6 +112,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
   [SECTIONS.ACCOUNTS]: Accounts,
+  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
 };
 
 const SETTINGS_COMPONENTS = {
@@ -132,6 +138,8 @@ const ROOT_COMPONENTS = {
   [ROOT_SECTIONS.ACCOUNT_SETTINGS]: AccountSettingsForm,
   [ROOT_SECTIONS.ACCOUNT_TYPE]: AccountType,
   [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
+  [ROOT_SECTIONS.LEGACY_SUBSCRIBERS]: LegacyPlatformSubscribers,
+  [ROOT_SECTIONS.SUBSCRIBERS]: PlatformSubscribers,
 };
 
 interface DashboardSectionProps {

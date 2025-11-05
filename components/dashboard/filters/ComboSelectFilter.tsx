@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { isUndefined, uniqBy } from 'lodash';
 import { CheckIcon, PlusIcon } from 'lucide-react';
 import type { IntlShape, MessageDescriptor } from 'react-intl';
@@ -20,7 +20,7 @@ import {
   CommandLoading,
 } from '../../ui/Command';
 
-const SelectItem = ({
+function SelectItem({
   isSelected,
   value,
   label,
@@ -29,9 +29,9 @@ const SelectItem = ({
   keywords,
 }: {
   isSelected: boolean;
-  value: any;
+  value: string;
   label?: React.ReactNode | string;
-  onSelect: (value: any) => void;
+  onSelect: (value: string) => void;
   valueRenderer?: ({
     intl,
     value,
@@ -39,10 +39,10 @@ const SelectItem = ({
   }: {
     intl: IntlShape;
     value: string;
-    meta: Record<string, any>;
+    meta: Record<string, unknown>;
   }) => React.ReactNode | string;
   keywords?: string[];
-}) => {
+}) {
   const intl = useIntl();
 
   if (!label && valueRenderer) {
@@ -75,7 +75,7 @@ const SelectItem = ({
       </div>
     </CommandItem>
   );
-};
+}
 
 function getSelectItems({ input, selected, options, creatable, isCreatableOrAsync }) {
   let items = [];
@@ -105,6 +105,8 @@ function getSelectItems({ input, selected, options, creatable, isCreatableOrAsyn
   return [{ label: undefined, options: uniqBy(items, 'value') }];
 }
 
+type SelectValue = string | number | string[] | number[] | boolean;
+
 function ComboSelectFilter({
   value,
   isMulti = false,
@@ -117,17 +119,17 @@ function ComboSelectFilter({
   searchFunc,
   valueRenderer,
 }: {
-  value: any;
+  value: SelectValue;
   isMulti?: boolean;
   selected?: string[];
-  options?: { label: React.ReactNode; value: any; keywords?: string[] }[];
-  groupedOptions?: { label: string; options: { label: React.ReactNode; value: any }[] }[];
-  onChange: (value: any) => void;
+  options?: { label: React.ReactNode; value: SelectValue; keywords?: string[] }[];
+  groupedOptions?: { label: string; options: { label: React.ReactNode; value: SelectValue }[] }[];
+  onChange: (value: SelectValue) => void;
   labelMsg?: MessageDescriptor;
   loading?: boolean;
   creatable?: boolean;
   searchFunc?: (term?: string) => void;
-  valueRenderer?: ({ value }: { value: any }) => React.ReactNode;
+  valueRenderer?: ({ value }: { value: SelectValue }) => React.ReactNode;
 }) {
   const intl = useIntl();
   const [input, setInput] = React.useState('');

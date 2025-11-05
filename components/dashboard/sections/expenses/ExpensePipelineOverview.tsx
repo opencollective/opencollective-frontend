@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Paypal } from '@styled-icons/remix-line/Paypal';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../../../../lib/api';
@@ -245,7 +245,7 @@ function WiseStatus(props: WiseStatusProps) {
           href={
             isConnected
               ? 'https://wise.com/user/account'
-              : 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise#connecting-transferwise'
+              : 'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-with-wise#connecting-transferwise'
           }
         >
           <StyledButton buttonSize="tiny" width="100%">

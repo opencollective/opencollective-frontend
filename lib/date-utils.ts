@@ -146,14 +146,6 @@ export const encodeDateInterval = interval => {
   return interval.timezoneType === 'UTC' ? `${baseResult}~UTC` : baseResult;
 };
 
-export const convertDateToApiUtc = (date, timezone) => {
-  return dayjs.tz(date, timezone).utc().format('YYYY-MM-DD HH:mm:ss+00');
-};
-
-export const convertDateFromApiUtc = (date, timezone) => {
-  return dayjs(date).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
-};
-
 export const getDayjsIsoUnit = (timeUnit: TimeUnit): OpUnitType | 'isoWeek' => {
   // Use "isoWeek" to have the week start on Monday, in accordance with the behavior from the API returning time series data
   // Note: "isoWeek" should only be used when finding the startOf or endOf a period, for regular adding and subtracting, "week" should be used.

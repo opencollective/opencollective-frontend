@@ -13,6 +13,7 @@ export const adminPanelQuery = gql`
       name
       isHost
       type
+      supportedExpenseTypes
       settings
       isArchived
       isActive
@@ -45,10 +46,20 @@ export const adminPanelQuery = gql`
       ) {
         totalCount
       }
+      receivedGrantRequests: expenses(direction: RECEIVED, limit: 0, type: GRANT) {
+        totalCount
+      }
       issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
         totalCount
       }
-      pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
+      pausedResumableIncomingContributions: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: false
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
+      ) {
         totalCount
       }
       pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
@@ -57,6 +68,13 @@ export const adminPanelQuery = gql`
       ... on AccountWithContributions {
         canStartResumeContributionsProcess
         hasResumeContributionsProcessStarted
+      }
+      ... on AccountWithPlatformSubscription {
+        platformSubscription {
+          plan {
+            title
+          }
+        }
       }
       childrenAccounts {
         totalCount
@@ -74,6 +92,12 @@ export const adminPanelQuery = gql`
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
         OFF_PLATFORM_TRANSACTIONS
+        TAX_FORMS
+        CHART_OF_ACCOUNTS
+        PAYPAL_PAYOUTS
+        TRANSFERWISE
+        AGREEMENTS
+        FUNDS_GRANTS_MANAGEMENT
       }
       policies {
         id
@@ -82,6 +106,9 @@ export const adminPanelQuery = gql`
       ... on Organization {
         host {
           id
+          type
+          slug
+          legacyId
           requiredLegalDocuments
           hostFeePercent
         }
@@ -103,6 +130,7 @@ export const adminPanelQuery = gql`
           id
           requiredLegalDocuments
           legacyId
+          type
           slug
           name
           settings

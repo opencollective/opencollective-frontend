@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { WebhookEvents } from '../../../lib/constants/notificationEvents';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';

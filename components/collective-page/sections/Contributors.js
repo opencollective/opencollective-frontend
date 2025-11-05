@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import * as ContributorsFilter from '../../ContributorsFilter';

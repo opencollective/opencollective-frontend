@@ -9,9 +9,9 @@ import { cn } from '../lib/utils';
 import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 
 import { Separator } from './ui/Separator';
+import Spinner from './Spinner';
 import { StyledCurrencyPicker } from './StyledCurrencyPicker';
 import StyledInput from './StyledInput';
-import StyledSpinner from './StyledSpinner';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
@@ -32,7 +32,7 @@ const parseValueFromEvent = (e, precision, ignoreComma = false) => {
   }
 };
 
-/** Formats value is valid, fallbacks on rawValue otherwise */
+/** Formats value if valid, fallbacks on rawValue otherwise */
 const getValue = (value, rawValue, isEmpty) => {
   if (isEmpty) {
     return '';
@@ -112,7 +112,15 @@ const ConvertedAmountInput = ({
         step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
         min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
         max={maxFxRate ? getLimitAmountFromFxRate(maxFxRate) : undefined}
-        value={isBaseAmountInvalid ? '' : isEditing ? value : value.toFixed(precision)}
+        value={
+          isBaseAmountInvalid
+            ? ''
+            : isEditing
+              ? rawValue
+              : typeof value === 'number' && !isNaN(value)
+                ? value.toFixed(precision)
+                : value
+        }
         onWheel={ignoreOnWheel}
         required
         placeholder={!precision ? '--' : `--.${'-'.repeat(precision)}`}
@@ -176,7 +184,7 @@ const StyledInputAmount = ({
   max = 100000000000,
   precision = getDefaultCurrencyPrecision(currency),
   defaultValue = undefined,
-  value,
+  value = undefined,
   onBlur = undefined,
   onChange,
   isEmpty = false,
@@ -236,6 +244,7 @@ const StyledInputAmount = ({
           <div className="bg-neutral-50 text-neutral-800">
             <StyledCurrencyPicker
               data-cy={`${props.id}-currency-picker`}
+              data-testid={`${props.id}-currency-picker`}
               inputId={`${props.id}-currency-picker`}
               onChange={onCurrencyChange}
               value={currency}
@@ -248,6 +257,7 @@ const StyledInputAmount = ({
         )}
         <StyledInput
           {...props}
+          placeholder={props.placeholder ?? (!precision ? '--' : `--.${'-'.repeat(precision)}`)}
           disabled={disabled}
           width="100%"
           type="number"
@@ -306,7 +316,7 @@ const StyledInputAmount = ({
           />
         </div>
       )}
-      {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
+      {loadingExchangeRate && <Spinner size={16} className="absolute right-8 text-slate-700" />}
       {suffix && (
         <div className="pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs text-muted-foreground">
           {suffix}

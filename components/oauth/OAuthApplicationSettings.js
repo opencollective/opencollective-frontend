@@ -4,7 +4,7 @@ import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
@@ -149,7 +149,7 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
               },
               {
                 Link: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/developers/oauth',
+                  href: 'https://documentation.opencollective.com/development/oauth',
                   openInNewTab: true,
                 }),
               },

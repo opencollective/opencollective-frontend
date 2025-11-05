@@ -58,7 +58,7 @@ const AddFundsModalContainer = styled(StyledModal)<{ $showSuccessModal: boolean 
   ${props =>
     props.$showSuccessModal &&
     css`
-      background-image: url('/static/images/platform-tip-background.svg');
+      background-image: url('/static/images/platform-tip-background.png');
       background-repeat: no-repeat;
       background-size: 100%;
       background-position: left 0 top 0;
@@ -758,7 +758,7 @@ const AddFundsModalContentWithCollective = ({
                 >
                   {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
                 </Field>
-                <Flex mt={3} flexWrap="wrap" alignItems="flex-end">
+                <Flex mt={3} flexWrap="wrap" alignItems="flex-start">
                   <Field
                     name="amount"
                     htmlFor="addFunds-amount"
@@ -773,7 +773,6 @@ const AddFundsModalContentWithCollective = ({
                             id={field.id}
                             data-cy="add-funds-amount"
                             currency={currency}
-                            placeholder="0.00"
                             error={field.error}
                             value={field.value}
                             maxWidth="100%"
@@ -877,7 +876,6 @@ const AddFundsModalContentWithCollective = ({
                         id={field.id}
                         data-cy="add-funds-paymentProcessorFee"
                         currency={currency}
-                        placeholder="0.00"
                         error={field.error}
                         value={field.value}
                         maxWidth="100%"

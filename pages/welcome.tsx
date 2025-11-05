@@ -18,7 +18,7 @@ const Welcome = () => {
       showFooter={false}
       showProfileAndChangelogMenu={false}
       showSearch={false}
-      menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
+      showMenuItems={false}
     >
       <div className="mt-28 flex flex-col items-center justify-center pb-16 lg:flex-row">
         <div className="flex flex-col text-center lg:pr-12">

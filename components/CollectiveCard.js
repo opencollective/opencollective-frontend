@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { width } from 'styled-system';
 
 import { defaultBackgroundImage } from '../lib/constants/collectives';

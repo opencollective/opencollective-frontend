@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
@@ -60,7 +60,7 @@ const GiftOFGiving = () => (
         </SectionDescription>
       </Box>
       <Box alignSelf={['center', null, 'flex-start']}>
-        <a href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards">
+        <a href="https://documentation.opencollective.com/giving-to-collectives/giving-as-a-company/gift-cards">
           <StyledButton whiteSpace="nowrap" letterSpacing="normal">
             <FormattedMessage defaultMessage="Learn More" id="7DIW6+" />
           </StyledButton>

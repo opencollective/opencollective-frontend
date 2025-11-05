@@ -11,10 +11,10 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
-import Container from '../../../Container';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
-import StyledTooltip from '../../../StyledTooltip';
+import { Dialog, DialogContent, DialogHeader, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
+
 import { Button } from '../../../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
@@ -271,12 +271,16 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
   };
 
   return (
-    <Container>
-      <StyledModal onClose={cancelHandler}>
-        <ModalHeader>
-          <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
-        </ModalHeader>
-        <ModalBody>
+    <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
+      <DialogPortal>
+        <DialogContent onClose={cancelHandler}>
+          <DialogHeader>
+            <DialogTitle>
+              <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
+              <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+            </DialogTitle>
+          </DialogHeader>
+
           <MemberForm
             intl={intl}
             collectiveImg={get(collective, 'imageUrl')}
@@ -284,9 +288,7 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
             bindSubmitForm={bindSubmitForm}
             triggerSubmit={isInvitation ? handleEditMemberInvitationMutation : handleEditMemberMutation}
           />
-        </ModalBody>
-        <ModalFooter showDivider={false}>
-          <div className="flex justify-between gap-2">
+          <div className="mt-4 flex justify-between gap-2">
             <Button
               autoFocus
               onClick={cancelHandler}
@@ -298,17 +300,20 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
             </Button>
             <div className="flex gap-2">
               {isLastAdmin && member.role === roles.ADMIN ? (
-                <StyledTooltip place="bottom" content={() => intl.formatMessage(messages.cantRemoveLast)}>
-                  <Button
-                    disabled={true}
-                    data-cy="remove-member"
-                    variant="outlineDestructive"
-                    onClick={handleRemoveMemberMutation}
-                  >
-                    <Trash size="18px" />
-                    <FormattedMessage id="Remove" defaultMessage="Remove" />
-                  </Button>
-                </StyledTooltip>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      disabled={true}
+                      data-cy="remove-member"
+                      variant="outlineDestructive"
+                      onClick={handleRemoveMemberMutation}
+                    >
+                      <Trash size="18px" />
+                      <FormattedMessage id="Remove" defaultMessage="Remove" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{intl.formatMessage(messages.cantRemoveLast)}</TooltipContent>
+                </Tooltip>
               ) : (
                 <Button
                   variant="outlineDestructive"
@@ -332,9 +337,9 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
               </Button>
             </div>
           </div>
-        </ModalFooter>
-      </StyledModal>
-    </Container>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 };
 

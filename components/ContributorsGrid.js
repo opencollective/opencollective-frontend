@@ -1,7 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
 import { FixedSizeGrid } from 'react-window';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 import withViewport, { VIEWPORTS } from '../lib/withViewport';

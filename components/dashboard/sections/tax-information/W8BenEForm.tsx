@@ -471,10 +471,6 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
       <StyledInputFormikField name="reference" label="Reference" />
 
       <div className="mt-2">
-        <p className="text-lg font-bold">Tax treaty benefits</p>
-      </div>
-
-      <div className="mt-2">
         <p className="text-lg font-bold">Signature</p>
       </div>
 

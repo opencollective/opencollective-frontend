@@ -3,7 +3,7 @@ import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { max } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
 import { getFileExtensionFromUrl } from '../lib/url-helpers';
@@ -12,9 +12,9 @@ import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
 import Link from './Link';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import Spinner from './Spinner';
 import { fadeInDown } from './StyledKeyframes';
 import StyledLink from './StyledLink';
-import StyledSpinner from './StyledSpinner';
 import { P } from './Text';
 
 const FileTextIcon = styled(FileText)`
@@ -109,7 +109,7 @@ const UploadedFilePreview = ({
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;
   } else if (isDownloading) {
-    content = <StyledSpinner size="50%" />;
+    content = <Spinner size="50%" />;
   } else if (isPrivate) {
     content = (
       <PrivateInfoIcon size="60%" className="mx-auto text-slate-200">

@@ -11,6 +11,7 @@ import { isUndefined, omitBy, pick } from 'lodash';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
+import type { OCError } from './errors';
 import { getErrorFromGraphqlException, isNotFoundGraphQLException } from './errors';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
 import { parseToBoolean } from './utils';
@@ -101,11 +102,11 @@ const logRequest = (action = 'Fetched', start, options, result?) => {
   }
 };
 
-const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
+async function serverSideFetch(url: RequestInfo | URL, options: RequestInit = {}) {
   if (typeof window === 'undefined') {
     const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-require-imports
 
-    options.agent = getCustomAgent();
+    options['agent'] = getCustomAgent();
 
     // Add headers to help the API identify origin of requests
     options.headers = options.headers || {};
@@ -134,7 +135,7 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
       throw error;
     }
   }
-};
+}
 
 function createLink({ twoFactorAuthContext, accessToken = null }) {
   const authLink = setContext((_, { headers }) => {
@@ -251,6 +252,7 @@ function createInMemoryCache() {
       AccountWithHost: ['Collective', 'Event', 'Fund', 'Project'],
       AccountWithParent: ['Event', 'Project'],
       AccountWithContributions: ['Collective', 'Organization', 'Event', 'Fund', 'Project', 'Host'],
+      AccountWithPlatformSubscription: ['Organization', 'Collective'],
     },
     // Documentation:
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#merging-non-normalized-objects
@@ -270,7 +272,7 @@ function createInMemoryCache() {
   return inMemoryCache;
 }
 
-function createClient({ initialState, twoFactorAuthContext, accessToken }: any = {}) {
+function createClient({ initialState = null, twoFactorAuthContext = null, accessToken = null }) {
   const cache = createInMemoryCache();
   if (initialState) {
     cache.restore(initialState);
@@ -287,7 +289,7 @@ function createClient({ initialState, twoFactorAuthContext, accessToken }: any =
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext, accessToken }: any = {}): ReturnType<
+export function initClient({ initialState = null, twoFactorAuthContext = null, accessToken = null } = {}): ReturnType<
   typeof createClient
 > {
   // Make sure to create a new client for every server-side request so that data
@@ -320,7 +322,7 @@ export function initClient({ initialState, twoFactorAuthContext, accessToken }: 
 type SSRQueryHelperProps<TVariables, TQueryData> = {
   [APOLLO_STATE_PROP_NAME]: NormalizedCacheObject;
   [APOLLO_VARIABLES_PROP_NAME]: Partial<TVariables>;
-  [APOLLO_ERROR_PROP_NAME]: any;
+  [APOLLO_ERROR_PROP_NAME]: string;
   [APOLLO_QUERY_DATA_PROP_NAME]: TQueryData;
 };
 
@@ -384,7 +386,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
     getVariablesFromPageProps: (pageProps: ServerSideProps): Partial<TVariables> => {
       return pageProps[APOLLO_VARIABLES_PROP_NAME];
     },
-    getSSRErrorFromPageProps: (pageProps: ServerSideProps): any => {
+    getSSRErrorFromPageProps: (pageProps: ServerSideProps): OCError => {
       return pageProps[APOLLO_ERROR_PROP_NAME] && getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]);
     },
   };

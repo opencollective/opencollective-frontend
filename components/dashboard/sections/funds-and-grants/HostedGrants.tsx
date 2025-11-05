@@ -14,12 +14,15 @@ import type {
 import type { Expense } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import { DataTable } from '@/components/table/DataTable';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
@@ -83,7 +86,8 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   const router = useRouter();
   const intl = useIntl();
   const pageRoute = `/dashboard/${hostSlug}/hosted-grants`;
-
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.FUNDS_GRANTS_MANAGEMENT);
   const { data: metaData } = useQuery(
     gql`
       query HostedGrantsMetadata($hostSlug: String!) {
@@ -130,6 +134,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     {
       variables: { hostSlug, withHoverCard: true },
       context: API_V2_CONTEXT,
+      skip: isUpgradeRequired,
     },
   );
 
@@ -189,9 +194,10 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
     context: API_V2_CONTEXT,
+    skip: isUpgradeRequired,
   });
 
-  const { data, error, loading } = expenses;
+  const { data, error, loading, refetch } = expenses;
 
   const onViewDetailsClick = React.useCallback(
     (grant: Expense) => {
@@ -230,46 +236,56 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
         title={<FormattedMessage defaultMessage="Grants" id="Csh2rX" />}
         description={<FormattedMessage defaultMessage="Grant requests submitted to your hosted funds" id="TPbcKk" />}
       />
-
-      <Filterbar {...queryFilter} />
-
-      {error && <MessageBoxGraphqlError error={error} mb={2} />}
-      {!loading && !data.expenses?.nodes.length ? (
-        <EmptyResults
-          entityType="GRANTS"
-          onResetFilters={() => queryFilter.resetFilters({})}
-          hasFilters={queryFilter.hasFilters}
-        />
+      {isUpgradeRequired ? (
+        <UpgradePlanCTA featureKey={FEATURES.FUNDS_GRANTS_MANAGEMENT} />
       ) : (
         <React.Fragment>
-          <DataTable
-            data-cy="grants-table"
-            innerClassName="text-muted-foreground"
-            meta={
-              {
-                enableViewGrantsByBeneficiary: true,
-                onViewDetailsClick,
-              } as GrantsTableMeta
-            }
-            columns={compact([
-              grantColumns.account,
-              grantColumns.beneficiary,
-              grantColumns.createdAt,
-              grantColumns.amount,
-              grantColumns.status,
-              grantColumns.actions,
-            ])}
-            data={data?.expenses?.nodes || []}
-            loading={loading}
-            mobileTableView
-            compact
-            onClickRow={onClickRow}
-            getRowDataCy={row => `grant-${row.original.legacyId}`}
+          <Filterbar {...queryFilter} />
+
+          {error && <MessageBoxGraphqlError error={error} mb={2} />}
+          {!loading && !data.expenses?.nodes.length ? (
+            <EmptyResults
+              entityType="GRANTS"
+              onResetFilters={() => queryFilter.resetFilters({})}
+              hasFilters={queryFilter.hasFilters}
+            />
+          ) : (
+            <React.Fragment>
+              <DataTable
+                data-cy="grants-table"
+                innerClassName="text-muted-foreground"
+                meta={
+                  {
+                    enableViewGrantsByBeneficiary: true,
+                    onViewDetailsClick,
+                    refetch,
+                  } as GrantsTableMeta
+                }
+                columns={compact([
+                  grantColumns.account,
+                  grantColumns.beneficiary,
+                  grantColumns.createdAt,
+                  grantColumns.amount,
+                  grantColumns.status,
+                  grantColumns.actions,
+                ])}
+                data={data?.expenses?.nodes || []}
+                loading={loading}
+                mobileTableView
+                compact
+                onClickRow={onClickRow}
+                getRowDataCy={row => `grant-${row.original.legacyId}`}
+              />
+              <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
+            </React.Fragment>
+          )}
+          <ExpenseDrawer
+            openExpenseLegacyId={openGrantId}
+            handleClose={onCloseDetails}
+            initialExpenseValues={openGrant}
           />
-          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
-      <ExpenseDrawer openExpenseLegacyId={openGrantId} handleClose={onCloseDetails} initialExpenseValues={openGrant} />
     </div>
   );
 }

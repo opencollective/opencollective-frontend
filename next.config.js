@@ -52,7 +52,7 @@ const nextConfig = {
         OC_ENV: null,
         API_KEY: null,
         API_URL: null,
-        PDF_SERVICE_V2_URL: null,
+        PDF_SERVICE_URL: null,
         ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
@@ -130,6 +130,18 @@ const nextConfig = {
         },
       }),
     );
+
+    // Put the Codecov webpack plugin after all other plugins
+    if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
+      const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
+      config.plugins.push(
+        codecovWebpackPlugin({
+          enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+          bundleName: 'opencollective-frontend',
+          uploadToken: process.env.CODECOV_TOKEN,
+        }),
+      );
+    }
 
     config.module.rules.push({
       test: /\.md$/,

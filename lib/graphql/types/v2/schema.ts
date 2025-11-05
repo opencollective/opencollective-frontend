@@ -46,6 +46,8 @@ export type Account = {
   /** Categories set by Open Collective to help moderation. */
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...) */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   conversations: ConversationCollection;
@@ -186,6 +188,12 @@ export type AccountChildrenAccountsArgs = {
 
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountCommunityStatsArgs = {
+  host: AccountReferenceInput;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountConnectedAccountsArgs = {
   service?: InputMaybe<ConnectedAccountService>;
 };
@@ -311,6 +319,7 @@ export type AccountMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -333,6 +342,7 @@ export type AccountOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -556,6 +566,8 @@ export type AccountStats = {
   /** History of the expense tags used by this collective. */
   expensesTagsTimeSeries: TimeSeriesAmount;
   id?: Maybe<Scalars['String']['output']>;
+  /** The total amount managed by the account, including all its children accounts (events and projects), calculated using existing balance checkpoint. This is not a real-time value and may not reflect the current state of the account. */
+  managedAmount?: Maybe<Amount>;
   /** Average amount spent per month based on the last 90 days */
   monthlySpending: Amount;
   /** Total amount received */
@@ -902,6 +914,20 @@ export type AccountWithParent = {
   parent?: Maybe<Account>;
 };
 
+/** An account that can be hosted by a Host */
+export type AccountWithPlatformSubscription = {
+  legacyPlan: HostPlan;
+  platformBilling: PlatformBilling;
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
+};
+
+
+/** An account that can be hosted by a Host */
+export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
+};
+
 /** Fields for an accounting category */
 export type AccountingCategory = {
   __typename?: 'AccountingCategory';
@@ -1115,6 +1141,9 @@ export enum ActivityAndClassesType {
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
+  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION = 'PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION',
+  PLATFORM_BILLING_OVERDUE_REMINDER = 'PLATFORM_BILLING_OVERDUE_REMINDER',
+  PLATFORM_SUBSCRIPTION_UPDATED = 'PLATFORM_SUBSCRIPTION_UPDATED',
   REPORTS = 'REPORTS',
   SUBSCRIPTION_ACTIVATED = 'SUBSCRIPTION_ACTIVATED',
   SUBSCRIPTION_CANCELED = 'SUBSCRIPTION_CANCELED',
@@ -1300,6 +1329,9 @@ export enum ActivityType {
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
+  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION = 'PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION',
+  PLATFORM_BILLING_OVERDUE_REMINDER = 'PLATFORM_BILLING_OVERDUE_REMINDER',
+  PLATFORM_SUBSCRIPTION_UPDATED = 'PLATFORM_SUBSCRIPTION_UPDATED',
   SUBSCRIPTION_ACTIVATED = 'SUBSCRIPTION_ACTIVATED',
   SUBSCRIPTION_CANCELED = 'SUBSCRIPTION_CANCELED',
   SUBSCRIPTION_CONFIRMED = 'SUBSCRIPTION_CONFIRMED',
@@ -1501,6 +1533,8 @@ export type Bot = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   conversations: ConversationCollection;
@@ -1555,7 +1589,7 @@ export type Bot = Account & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -1632,6 +1666,12 @@ export type BotChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Bot account */
+export type BotCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -1755,6 +1795,7 @@ export type BotMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -1767,6 +1808,7 @@ export type BotMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -1789,6 +1831,7 @@ export type BotOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1986,7 +2029,7 @@ export type Collection = {
 };
 
 /** This represents a Collective account */
-export type Collective = Account & AccountWithContributions & AccountWithHost & {
+export type Collective = Account & AccountWithContributions & AccountWithHost & AccountWithPlatformSubscription & {
   __typename?: 'Collective';
   /** [!] Warning: this query is currently in beta and the API might change */
   activeContributors: AccountCollection;
@@ -2001,6 +2044,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -2065,6 +2110,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -2072,7 +2118,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -2092,10 +2138,13 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
   /** How much platform fees are charged for this account */
   platformFeePercent: Scalars['Float']['output'];
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
@@ -2169,6 +2218,12 @@ export type CollectiveChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Collective account */
+export type CollectiveCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -2314,6 +2369,7 @@ export type CollectiveMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -2326,6 +2382,7 @@ export type CollectiveMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -2348,6 +2405,7 @@ export type CollectiveOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2383,6 +2441,12 @@ export type CollectivePaymentMethodsArgs = {
 /** This represents a Collective account */
 export type CollectivePayoutMethodsArgs = {
   includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** This represents a Collective account */
+export type CollectivePlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
 
 
@@ -2545,8 +2609,12 @@ export enum CollectiveFeatureStatus {
 export type CollectiveFeatures = {
   __typename?: 'CollectiveFeatures';
   ABOUT?: Maybe<CollectiveFeatureStatus>;
+  ACCOUNT_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
+  AGREEMENTS?: Maybe<CollectiveFeatureStatus>;
   ALIPAY?: Maybe<CollectiveFeatureStatus>;
   ALL?: Maybe<CollectiveFeatureStatus>;
+  CHARGE_HOSTING_FEES?: Maybe<CollectiveFeatureStatus>;
+  CHART_OF_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   COLLECTIVE_GOALS?: Maybe<CollectiveFeatureStatus>;
   CONNECTED_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
   CONTACT_COLLECTIVE?: Maybe<CollectiveFeatureStatus>;
@@ -2556,6 +2624,9 @@ export type CollectiveFeatures = {
   EMAIL_NOTIFICATIONS_PANEL?: Maybe<CollectiveFeatureStatus>;
   EMIT_GIFT_CARDS?: Maybe<CollectiveFeatureStatus>;
   EVENTS?: Maybe<CollectiveFeatureStatus>;
+  EXPECTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
+  EXPENSE_SECURITY_CHECKS?: Maybe<CollectiveFeatureStatus>;
+  FUNDS_GRANTS_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2568,7 +2639,9 @@ export type CollectiveFeatures = {
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
+  RESTRICTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
   STRIPE_PAYMENT_INTENT?: Maybe<CollectiveFeatureStatus>;
+  TAX_FORMS?: Maybe<CollectiveFeatureStatus>;
   TEAM?: Maybe<CollectiveFeatureStatus>;
   TOP_FINANCIAL_CONTRIBUTORS?: Maybe<CollectiveFeatureStatus>;
   TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2576,6 +2649,7 @@ export type CollectiveFeatures = {
   UPDATES?: Maybe<CollectiveFeatureStatus>;
   USE_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   USE_PAYMENT_METHODS?: Maybe<CollectiveFeatureStatus>;
+  VENDORS?: Maybe<CollectiveFeatureStatus>;
   VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
   /** The id of the account */
   id: Scalars['String']['output'];
@@ -2644,6 +2718,47 @@ export enum CommentType {
 export type CommentUpdateInput = {
   html?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
+};
+
+export type CommunityAssociatedCollective = {
+  __typename?: 'CommunityAssociatedCollective';
+  account?: Maybe<Account>;
+  relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
+};
+
+export enum CommunityRelationType {
+  ADMIN = 'ADMIN',
+  ATTENDEE = 'ATTENDEE',
+  CONTRIBUTOR = 'CONTRIBUTOR',
+  EXPENSE_APPROVER = 'EXPENSE_APPROVER',
+  EXPENSE_SUBMITTER = 'EXPENSE_SUBMITTER',
+  GRANTEE = 'GRANTEE',
+  PAYEE = 'PAYEE'
+}
+
+export type CommunityStats = {
+  __typename?: 'CommunityStats';
+  activities?: Maybe<ActivityCollection>;
+  associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedCollective>>>;
+  firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
+  lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
+  relations: Array<Maybe<CommunityRelationType>>;
+  transactionSummary: Array<CommunityTransactionSummary>;
+};
+
+
+export type CommunityStatsActivitiesArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+export type CommunityTransactionSummary = {
+  __typename?: 'CommunityTransactionSummary';
+  contributionCount: Scalars['Int']['output'];
+  contributionTotal: Amount;
+  expenseCount: Scalars['Int']['output'];
+  expenseTotal: Amount;
+  year: Scalars['Int']['output'];
 };
 
 /** Response for the confirmGuestAccount mutation */
@@ -4020,6 +4135,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -4093,7 +4210,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -4198,6 +4315,12 @@ export type EventChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Event account */
+export type EventCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -4343,6 +4466,7 @@ export type EventMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -4355,6 +4479,7 @@ export type EventMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -4377,6 +4502,7 @@ export type EventOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -4550,7 +4676,9 @@ export type EventCreateInput = {
   endsAt: Scalars['DateTime']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
+  location?: InputMaybe<LocationInput>;
   name: Scalars['String']['input'];
+  privateInstructions?: InputMaybe<Scalars['String']['input']>;
   settings?: InputMaybe<Scalars['JSON']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   /** The Event start date and time */
@@ -4643,6 +4771,7 @@ export type Expense = {
   payoutMethod?: Maybe<PayoutMethod>;
   /** The permissions given to current logged in user for this expense */
   permissions: ExpensePermissions;
+  platformBillingData?: Maybe<Scalars['JSON']['output']>;
   /** Additional information about the payment as HTML. Only visible to user and admins. */
   privateMessage?: Maybe<Scalars['String']['output']>;
   quote?: Maybe<ExpenseQuote>;
@@ -5019,7 +5148,7 @@ export type ExpensePermissions = {
   downloadTaxForm: Permission;
   edit: Permission;
   /** Whether the current user can edit the expense accounting category */
-  editAccountingCategory: Scalars['Boolean']['output'];
+  editAccountingCategory: Permission;
   editItemDescription: Permission;
   editItems: Permission;
   editPaidBy: Permission;
@@ -5169,6 +5298,8 @@ export enum ExpenseType {
   GRANT = 'GRANT',
   /** Invoice: Charge for your time or get paid in advance. */
   INVOICE = 'INVOICE',
+  /** Platform billing: expense generated by Open Collective to charge for platform subscriptions */
+  PLATFORM_BILLING = 'PLATFORM_BILLING',
   /** Receipt: Get paid back for a purchase already made. */
   RECEIPT = 'RECEIPT',
   /** Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts. */
@@ -5280,6 +5411,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -5351,7 +5484,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -5448,6 +5581,12 @@ export type FundChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Project account */
+export type FundCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -5593,6 +5732,7 @@ export type FundMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -5605,6 +5745,7 @@ export type FundMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -5627,6 +5768,7 @@ export type FundOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5874,7 +6016,7 @@ export type GuestInfoInput = {
 };
 
 /** This represents an Host account */
-export type Host = Account & AccountWithContributions & {
+export type Host = Account & AccountWithContributions & AccountWithPlatformSubscription & {
   __typename?: 'Host';
   /** List of accounting categories for this host */
   accountingCategories: AccountingCategoryCollection;
@@ -5890,6 +6032,8 @@ export type Host = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -5973,6 +6117,7 @@ export type Host = Account & AccountWithContributions & {
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -5980,7 +6125,7 @@ export type Host = Account & AccountWithContributions & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -6013,10 +6158,13 @@ export type Host = Account & AccountWithContributions & {
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
   plan: HostPlan;
+  platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
   /** How much platform fees are charged for this account */
   platformFeePercent: Scalars['Float']['output'];
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   /** Returns a list of organizations that only transacted with this host and all its admins are also admins of this host. */
@@ -6114,6 +6262,12 @@ export type HostChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Host account */
+export type HostCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -6384,6 +6538,7 @@ export type HostMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -6396,6 +6551,7 @@ export type HostMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -6431,6 +6587,7 @@ export type HostOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6475,6 +6632,12 @@ export type HostPendingApplicationsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Host account */
+export type HostPlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
 
 
@@ -6966,6 +7129,8 @@ export type Individual = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** Company slugs the user is part of. */
   company?: Maybe<Scalars['String']['output']>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
@@ -7039,7 +7204,7 @@ export type Individual = Account & {
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -7122,6 +7287,12 @@ export type IndividualChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -7257,6 +7428,7 @@ export type IndividualMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -7269,6 +7441,7 @@ export type IndividualMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -7298,6 +7471,7 @@ export type IndividualOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7961,7 +8135,10 @@ export type Mutation = {
   startResumeOrdersProcess: Account;
   /** Submit a legal document */
   submitLegalDocument: LegalDocument;
-  /** Manually request a sync for Plaid account */
+  /**
+   * Manually request a sync for Plaid account
+   * @deprecated 2025-07-23: Use `syncTransactionsImport` instead
+   */
   syncPlaidAccount: TransactionsImport;
   /** Manually request a sync for a transactions import (works for both Plaid and GoCardless) */
   syncTransactionsImport: TransactionsImport;
@@ -7969,6 +8146,7 @@ export type Mutation = {
   unfollowAccount: UnfollowAccountResult;
   /** Unpublish update. Scope: "updates". */
   unpublishUpdate: Update;
+  updateAccountPlatformSubscription: Account;
   updateApplication?: Maybe<Application>;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
@@ -8231,6 +8409,7 @@ export type MutationCreateOrderArgs = {
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
   captcha?: InputMaybe<CaptchaInputType>;
+  financiallyActive?: InputMaybe<Scalars['Boolean']['input']>;
   individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;
@@ -8532,6 +8711,7 @@ export type MutationEditConversationArgs = {
 export type MutationEditExpenseArgs = {
   draftKey?: InputMaybe<Scalars['String']['input']>;
   expense: ExpenseUpdateInput;
+  isDraftEdit?: Scalars['Boolean']['input'];
 };
 
 
@@ -8979,6 +9159,14 @@ export type MutationUnpublishUpdateArgs = {
 
 
 /** This is the root mutation */
+export type MutationUpdateAccountPlatformSubscriptionArgs = {
+  account: AccountReferenceInput;
+  planId?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<PlatformSubscriptionInput>;
+};
+
+
+/** This is the root mutation */
 export type MutationUpdateApplicationArgs = {
   application: ApplicationUpdateInput;
 };
@@ -9253,7 +9441,11 @@ export enum OrderByFieldType {
   HOSTED_COLLECTIVES_COUNT = 'HOSTED_COLLECTIVES_COUNT',
   HOST_RANK = 'HOST_RANK',
   LAST_CHARGED_AT = 'LAST_CHARGED_AT',
+  /** Order by the date of the last transaction. Using CollectiveTransactionStats.LatestTransactionCreatedAt. */
+  LAST_TRANSACTION_CREATED_AT = 'LAST_TRANSACTION_CREATED_AT',
   MEMBER_COUNT = 'MEMBER_COUNT',
+  /** Order by the total amount managed by the Organization on the platform */
+  MONEY_MANAGED = 'MONEY_MANAGED',
   NAME = 'NAME',
   RANK = 'RANK',
   /** Order by start date */
@@ -9452,7 +9644,7 @@ export type OrderWithPayment = {
 };
 
 /** This represents an Organization account */
-export type Organization = Account & AccountWithContributions & {
+export type Organization = Account & AccountWithContributions & AccountWithPlatformSubscription & {
   __typename?: 'Organization';
   /** [!] Warning: this query is currently in beta and the API might change */
   activeContributors: AccountCollection;
@@ -9465,6 +9657,8 @@ export type Organization = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -9521,6 +9715,7 @@ export type Organization = Account & AccountWithContributions & {
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
+  legacyPlan: HostPlan;
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
@@ -9534,7 +9729,7 @@ export type Organization = Account & AccountWithContributions & {
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -9554,10 +9749,13 @@ export type Organization = Account & AccountWithContributions & {
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  platformBilling: PlatformBilling;
   /** Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account */
   platformContributionAvailable: Scalars['Boolean']['output'];
   /** How much platform fees are charged for this account */
   platformFeePercent: Scalars['Float']['output'];
+  /** Returns the current platform subscription */
+  platformSubscription?: Maybe<PlatformSubscription>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
@@ -9628,6 +9826,12 @@ export type OrganizationChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Organization account */
+export type OrganizationCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -9759,6 +9963,7 @@ export type OrganizationMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -9771,6 +9976,7 @@ export type OrganizationMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -9793,6 +9999,7 @@ export type OrganizationOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -9828,6 +10035,12 @@ export type OrganizationPaymentMethodsArgs = {
 /** This represents an Organization account */
 export type OrganizationPayoutMethodsArgs = {
   includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** This represents an Organization account */
+export type OrganizationPlatformBillingArgs = {
+  billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
 
 
@@ -9956,6 +10169,7 @@ export type OrganizationCreateInput = {
   backgroundImage?: InputMaybe<Scalars['Upload']['input']>;
   /** Two-letters country code following ISO31661 */
   countryISO?: InputMaybe<Scalars['String']['input']>;
+  currency?: InputMaybe<Currency>;
   description: Scalars['String']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
@@ -10035,6 +10249,7 @@ export type PaymentMethodOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10437,6 +10652,197 @@ export type PlaidLinkTokenCreateResponse = {
   requestId: Scalars['String']['output'];
 };
 
+export type PlatformBilling = {
+  __typename?: 'PlatformBilling';
+  additional: PlatformBillingAdditional;
+  base: PlatformBillingBase;
+  billingPeriod: PlatformBillingPeriod;
+  dueDate: Scalars['DateTime']['output'];
+  expenses: Array<Expense>;
+  subscriptions: Array<PlatformSubscription>;
+  totalAmount: Amount;
+  utilization: PlatformUtilization;
+};
+
+export type PlatformBillingAdditional = {
+  __typename?: 'PlatformBillingAdditional';
+  amounts?: Maybe<PlatformBillingAdditionalUtilizationCharges>;
+  total: Amount;
+  utilization: PlatformUtilization;
+};
+
+export type PlatformBillingAdditionalUtilizationCharges = {
+  __typename?: 'PlatformBillingAdditionalUtilizationCharges';
+  activeCollectives: Amount;
+  expensesPaid: Amount;
+};
+
+export type PlatformBillingBase = {
+  __typename?: 'PlatformBillingBase';
+  subscriptions: Array<Maybe<PlatformBillingBaseCharges>>;
+  total: Amount;
+};
+
+export type PlatformBillingBaseCharges = {
+  __typename?: 'PlatformBillingBaseCharges';
+  amount: Amount;
+  /** End date (inclusive) */
+  endDate: Scalars['DateTime']['output'];
+  /** Start date (inclusive) */
+  startDate: Scalars['DateTime']['output'];
+  title: Scalars['String']['output'];
+};
+
+export enum PlatformBillingMonth {
+  APRIL = 'APRIL',
+  AUGUST = 'AUGUST',
+  DECEMBER = 'DECEMBER',
+  FEBRUARY = 'FEBRUARY',
+  JANUARY = 'JANUARY',
+  JULY = 'JULY',
+  JUNE = 'JUNE',
+  MARCH = 'MARCH',
+  MAY = 'MAY',
+  NOVEMBER = 'NOVEMBER',
+  OCTOBER = 'OCTOBER',
+  SEPTEMBER = 'SEPTEMBER'
+}
+
+export type PlatformBillingPeriod = {
+  __typename?: 'PlatformBillingPeriod';
+  endDate: Scalars['DateTime']['output'];
+  isCurrent: Scalars['Boolean']['output'];
+  month: PlatformBillingMonth;
+  startDate: Scalars['DateTime']['output'];
+  year: Scalars['Int']['output'];
+};
+
+export type PlatformBillingPeriodInput = {
+  month: PlatformBillingMonth;
+  year: Scalars['Int']['input'];
+};
+
+export type PlatformSubscription = {
+  __typename?: 'PlatformSubscription';
+  /** End date (inclusive), null if not set */
+  endDate?: Maybe<Scalars['DateTime']['output']>;
+  isCurrent: Scalars['Boolean']['output'];
+  plan: PlatformSubscriptionTier;
+  /** Start date (inclusive) */
+  startDate: Scalars['DateTime']['output'];
+};
+
+export type PlatformSubscriptionFeatures = {
+  __typename?: 'PlatformSubscriptionFeatures';
+  ACCOUNT_MANAGEMENT: Scalars['Boolean']['output'];
+  AGREEMENTS: Scalars['Boolean']['output'];
+  CHARGE_HOSTING_FEES: Scalars['Boolean']['output'];
+  CHART_OF_ACCOUNTS: Scalars['Boolean']['output'];
+  EXPECTED_FUNDS: Scalars['Boolean']['output'];
+  EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['output'];
+  FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['output'];
+  OFF_PLATFORM_TRANSACTIONS: Scalars['Boolean']['output'];
+  PAYPAL_PAYOUTS: Scalars['Boolean']['output'];
+  RECEIVE_EXPENSES: Scalars['Boolean']['output'];
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
+  RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['output'];
+  RESTRICTED_FUNDS: Scalars['Boolean']['output'];
+  TAX_FORMS: Scalars['Boolean']['output'];
+  TRANSFERWISE: Scalars['Boolean']['output'];
+  UPDATES: Scalars['Boolean']['output'];
+  USE_EXPENSES: Scalars['Boolean']['output'];
+  VENDORS: Scalars['Boolean']['output'];
+};
+
+export type PlatformSubscriptionFeaturesFeatures = {
+  ACCOUNT_MANAGEMENT: Scalars['Boolean']['input'];
+  AGREEMENTS: Scalars['Boolean']['input'];
+  CHARGE_HOSTING_FEES: Scalars['Boolean']['input'];
+  CHART_OF_ACCOUNTS: Scalars['Boolean']['input'];
+  EXPECTED_FUNDS: Scalars['Boolean']['input'];
+  EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['input'];
+  FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['input'];
+  OFF_PLATFORM_TRANSACTIONS: Scalars['Boolean']['input'];
+  PAYPAL_PAYOUTS: Scalars['Boolean']['input'];
+  RECEIVE_EXPENSES: Scalars['Boolean']['input'];
+  RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];
+  RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['input'];
+  RESTRICTED_FUNDS: Scalars['Boolean']['input'];
+  TAX_FORMS: Scalars['Boolean']['input'];
+  TRANSFERWISE: Scalars['Boolean']['input'];
+  UPDATES: Scalars['Boolean']['input'];
+  USE_EXPENSES: Scalars['Boolean']['input'];
+  VENDORS: Scalars['Boolean']['input'];
+};
+
+export type PlatformSubscriptionInput = {
+  /** The ID of the platform subscription to update */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** The new platform subscription plan to apply to the account */
+  plan: PlatformSubscriptionPlanInput;
+};
+
+export type PlatformSubscriptionPlanInput = {
+  /** The ID of the base plan for this subscription tier */
+  basePlanId: Scalars['String']['input'];
+  /** Features included in this subscription plan */
+  features?: InputMaybe<PlatformSubscriptionFeaturesFeatures>;
+  /** Pricing details for the subscription plan */
+  pricing: PlatformSubscriptionPlanPricing;
+  /** The title of the subscription plan */
+  title: Scalars['String']['input'];
+  /** The type of the subscription plan (e.g., "basic", "premium") */
+  type: Scalars['String']['input'];
+};
+
+export type PlatformSubscriptionPlanPricing = {
+  /** Number of collectives included in this subscription plan */
+  includedCollectives: Scalars['Int']['input'];
+  /** Number of expenses included in this subscription plan per month */
+  includedExpensesPerMonth: Scalars['Int']['input'];
+  /** Price for each additional collective beyond the included limit */
+  pricePerAdditionalCollective: AmountInput;
+  /** Price for each additional expense beyond the included limit */
+  pricePerAdditionalExpense: AmountInput;
+  /** The price of the subscription plan per month */
+  pricePerMonth: AmountInput;
+};
+
+/** Type for Platform Subscription Tier */
+export type PlatformSubscriptionTier = {
+  __typename?: 'PlatformSubscriptionTier';
+  /** The ID of the base plan for this subscription tier */
+  basePlanId?: Maybe<Scalars['String']['output']>;
+  features: PlatformSubscriptionFeatures;
+  /** The title of the subscription tier */
+  id?: Maybe<Scalars['String']['output']>;
+  pricing: PlatformSubscriptionTierPricing;
+  /** The title of the subscription tier */
+  title: Scalars['String']['output'];
+  /** The type of the subscription tier (e.g., "basic", "premium") */
+  type: Scalars['String']['output'];
+};
+
+export type PlatformSubscriptionTierPricing = {
+  __typename?: 'PlatformSubscriptionTierPricing';
+  /** Number of collectives included in this subscription tier */
+  includedCollectives: Scalars['Int']['output'];
+  /** Number of expenses included in this subscription tier per month */
+  includedExpensesPerMonth: Scalars['Int']['output'];
+  /** Price for each additional collective beyond the included limit */
+  pricePerAdditionalCollective: Amount;
+  /** Price for each additional expense beyond the included limit */
+  pricePerAdditionalExpense: Amount;
+  /** The price of the subscription tier per month */
+  pricePerMonth: Amount;
+};
+
+export type PlatformUtilization = {
+  __typename?: 'PlatformUtilization';
+  activeCollectives: Scalars['Int']['output'];
+  expensesPaid: Scalars['Int']['output'];
+};
+
 export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_ADMINS_CAN_REFUND?: Maybe<Scalars['Boolean']['output']>;
@@ -10573,6 +10979,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -10644,7 +11052,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -10743,6 +11151,12 @@ export type ProjectChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Project account */
+export type ProjectCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -10888,6 +11302,7 @@ export type ProjectMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -10900,6 +11315,7 @@ export type ProjectMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -10922,6 +11338,7 @@ export type ProjectOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11109,6 +11526,8 @@ export type Query = {
   activities: ActivityCollection;
   application?: Maybe<Application>;
   collective?: Maybe<Collective>;
+  /** Return accounts that have interacted with a given account or host */
+  community: AccountCollection;
   conversation?: Maybe<Conversation>;
   /** Get exchange rates from Open Collective */
   currencyExchangeRate: Array<CurrencyExchangeRate>;
@@ -11123,7 +11542,7 @@ export type Query = {
   individual?: Maybe<Individual>;
   loggedInAccount?: Maybe<Individual>;
   me?: Maybe<Individual>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   /** Get financial institutions for off-platform transactions */
   offPlatformTransactionsInstitutions: Array<OffPlatformTransactionsInstitution>;
@@ -11133,6 +11552,7 @@ export type Query = {
   paypalPlan: PaypalPlan;
   /** Get a personal token by reference */
   personalToken?: Maybe<PersonalToken>;
+  platformSubscriptionTiers?: Maybe<Array<Maybe<PlatformSubscriptionTier>>>;
   project?: Maybe<Project>;
   /** [!] Warning: this query is currently in beta and the API might change */
   search: SearchResponse;
@@ -11174,12 +11594,18 @@ export type QueryAccountsArgs = {
   includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
   includeVendorsForHost?: InputMaybe<AccountReferenceInput>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  isFirstPartyHost?: InputMaybe<Scalars['Boolean']['input']>;
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
+  isPlatformSubscriber?: InputMaybe<Scalars['Boolean']['input']>;
+  isVerified?: InputMaybe<Scalars['Boolean']['input']>;
+  lastTransactionFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  lastTransactionTo?: InputMaybe<Scalars['DateTime']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   onlyOpenToApplications?: InputMaybe<Scalars['Boolean']['input']>;
   orderBy?: InputMaybe<OrderByInput>;
   parent?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  plan?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   skipGuests?: InputMaybe<Scalars['Boolean']['input']>;
   skipRecentAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11218,6 +11644,19 @@ export type QueryCollectiveArgs = {
   id?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   throwIfMissing?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** This is the root query */
+export type QueryCommunityArgs = {
+  account?: InputMaybe<AccountReferenceInput>;
+  email?: InputMaybe<Scalars['EmailAddress']['input']>;
+  host?: InputMaybe<AccountReferenceInput>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  relation?: InputMaybe<Array<CommunityRelationType>>;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 
 
@@ -11377,6 +11816,7 @@ export type QueryOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11442,6 +11882,7 @@ export type QuerySearchArgs = {
   host?: InputMaybe<AccountReferenceInput>;
   searchTerm: Scalars['String']['input'];
   timeout?: Scalars['Int']['input'];
+  useTopHits?: Scalars['Boolean']['input'];
 };
 
 
@@ -11658,8 +12099,59 @@ export type SearchResults = {
 /** Search results for all types */
 export type SearchResultsAccountsArgs = {
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<AccountType>;
+};
+
+
+/** Search results for all types */
+export type SearchResultsCommentsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Search results for all types */
+export type SearchResultsExpensesArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Search results for all types */
+export type SearchResultsHostApplicationsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Search results for all types */
+export type SearchResultsOrdersArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Search results for all types */
+export type SearchResultsTiersArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Search results for all types */
+export type SearchResultsTransactionsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Search results for all types */
+export type SearchResultsUpdatesArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 export type SearchResultsAccounts = {
@@ -11748,6 +12240,7 @@ export enum SecurityCheckLevel {
 
 /** All supported SecurityCheck scopes */
 export enum SecurityCheckScope {
+  ATTACHMENTS = 'ATTACHMENTS',
   COLLECTIVE = 'COLLECTIVE',
   PAYEE = 'PAYEE',
   PAYOUT_METHOD = 'PAYOUT_METHOD',
@@ -12856,6 +13349,7 @@ export enum UploadedFileKind {
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
   EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
+  RECEIPT_EMBEDDED_IMAGE = 'RECEIPT_EMBEDDED_IMAGE',
   TIER_LONG_DESCRIPTION = 'TIER_LONG_DESCRIPTION',
   TRANSACTIONS_IMPORT = 'TRANSACTIONS_IMPORT',
   UPDATE = 'UPDATE'
@@ -12891,6 +13385,8 @@ export type Vendor = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
+  /** Various stats about how this account is connected to the rest of the community */
+  communityStats?: Maybe<CommunityStats>;
   /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
@@ -12954,7 +13450,7 @@ export type Vendor = Account & AccountWithContributions & {
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
-  /** [AUTHENTICATED] Returns the pending invitations */
+  /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
   /** Get all members (admins, members, backers, followers) */
@@ -13051,6 +13547,12 @@ export type VendorChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Vendor account */
+export type VendorCommunityStatsArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -13182,6 +13684,7 @@ export type VendorMemberOfArgs = {
   orderByRoles?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -13194,6 +13697,7 @@ export type VendorMembersArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   role?: InputMaybe<Array<InputMaybe<MemberRole>>>;
+  tier?: InputMaybe<TierReferenceInput>;
 };
 
 
@@ -13216,6 +13720,7 @@ export type VendorOrdersArgs = {
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
+  host?: InputMaybe<AccountReferenceInput>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { gqlV1 } from '../lib/graphql/helpers';
 

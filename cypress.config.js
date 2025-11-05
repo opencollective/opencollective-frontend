@@ -7,7 +7,7 @@ module.exports = defineConfig({
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',
-  defaultCommandTimeout: 15000,
+  defaultCommandTimeout: 30000,
   responseTimeout: 60000,
   video: true,
   chromeWebSecurity: false,
@@ -27,9 +27,12 @@ module.exports = defineConfig({
     'local.opencollective': '127.0.0.1',
     'local.crooked': '127.0.0.1',
   },
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    configFile: 'test/cypress/reporter-config.json',
+  },
   e2e: {
     setupNodeEvents(on, config) {
-      require('@cypress/code-coverage/task')(on, config);
       require('cypress-terminal-report/src/installLogsPrinter')(on, {
         printLogsToConsole: 'onFail',
       });

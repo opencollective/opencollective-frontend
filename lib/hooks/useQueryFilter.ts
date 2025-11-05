@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import type { z } from 'zod';
 
+import type { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+
 import { toast } from '../../components/ui/useToast';
 
 import type {
@@ -26,18 +28,14 @@ import { omitDeepBy } from '../utils';
 /**
  * Helper function to extract filter variables from the query using server-side rendering context.
  */
-export function getSSRVariablesFromQuery<
-  S extends z.ZodObject<z.ZodRawShape, any, any>,
-  GQLQueryVars,
-  FilterMeta = any,
->({
+export function getSSRVariablesFromQuery<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta = unknown>({
   query,
   schema,
   toVariables,
   meta,
   defaultFilterValues = {},
 }: {
-  query: any;
+  query: NextParsedUrlQuery;
   schema: S;
   meta?: FilterMeta;
   toVariables: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
@@ -74,7 +72,7 @@ export function getSSRVariablesFromQuery<
   return omitDeepBy(apiVariables, isUndefined);
 }
 
-export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars> = {
+export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta = unknown> = {
   values: z.infer<S>;
   variables: Partial<GQLQueryVars>;
   resetFilters: resetFilters<z.infer<S>>;
@@ -84,11 +82,11 @@ export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, a
   activeViewId?: string;
   filters: FilterComponentConfigs<z.infer<S>>;
   views?: readonly View<z.infer<S>>[];
-  meta?: any;
+  meta?: FilterMeta;
   defaultSchemaValues: Partial<z.infer<S>>;
 };
 
-type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any> = {
+type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta> = {
   schema: S; // Schema for all query filters (both those which are available to the user in Query and those which are not)
   filters: FilterComponentConfigs<z.infer<S>, FilterMeta>; // Configuration of filters available to the user in the `Filter` component (used in this hook to determine `hasFilters` and `activeViewId`)
   toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
@@ -100,9 +98,9 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQu
   shallow?: boolean; // If true, the router will not reload the page when updating the query
 };
 
-export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any>(
+export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta = unknown>(
   opts: useQueryFilterOptions<S, GQLQueryVars, FilterMeta>,
-): useQueryFilterReturnType<S, GQLQueryVars> {
+): useQueryFilterReturnType<S, GQLQueryVars, FilterMeta> {
   const intl = useIntl();
   const router = useRouter();
   const [stateQuery, setStateQuery] = React.useState({}); // Only used together with skipRouter
@@ -220,7 +218,10 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
   );
 
   const hasFilters = React.useMemo(
-    () => !isEmpty(omitBy(opts.filters, (v, key) => values[key] === defaultSchemaValues[key] || key === 'orderBy')),
+    () =>
+      !isEmpty(
+        omitBy(opts.filters, (v, key) => values[key] === defaultSchemaValues[key] || ['orderBy', 'sort'].includes(key)),
+      ),
     [values, opts.filters, defaultSchemaValues],
   );
 

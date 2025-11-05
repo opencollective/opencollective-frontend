@@ -4,7 +4,7 @@ import { Mutation } from '@apollo/client/react/components';
 import { PencilAlt } from '@styled-icons/fa-solid/PencilAlt';
 import { get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';

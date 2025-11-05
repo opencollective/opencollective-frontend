@@ -1,9 +1,10 @@
 import React from 'react';
 import { get, groupBy, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { exportRSVPs } from '../../../lib/export_file';
+import { TierType } from '@/lib/graphql/types/v2/schema';
 
 import { Box } from '../../Grid';
 import Responses from '../../Responses';
@@ -36,14 +37,9 @@ const StyledAdminActions = styled.div`
 
 const Participants = ({ collective: event, LoggedInUser, refetch }) => {
   const [isRefetched, setIsRefetched] = React.useState(false);
-
-  // const ticketOrders = event.orders
-  //   .filter(order => (order.tier && order.tier.type === TierTypes.TICKET))
-  //   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-  // Logic from old Event component, (filter away tiers with 'sponsor in the name')
-  // to handle orders where there is no tier to check for TICKET:
-  const orders = [...event.orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const orders = [...event.orders]
+    .filter(order => order.tier && order.tier.type === TierType.TICKET)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const guestOrders = [];
   const sponsorOrders = [];

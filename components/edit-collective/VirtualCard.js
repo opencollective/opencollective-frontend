@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -18,8 +18,8 @@ import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import Link from '../Link';
+import Spinner from '../Spinner';
 import StyledLink from '../StyledLink';
-import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import {
   DropdownMenu,
@@ -201,7 +201,7 @@ export const ActionsButton = props => {
               ) : (
                 <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
               )}
-              {isLoading && <StyledSpinner ml={2} size="0.9em" mb="2px" />}
+              {isLoading && <Spinner ml={2} size="0.9em" mb="2px" />}
             </DropdownMenuItem>
           )}
           {canDeleteVirtualCard && (

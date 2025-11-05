@@ -18,6 +18,7 @@ export const SECTIONS = {
   HOST_APPLICATIONS: 'host-applications',
   HOST_TAX_FORMS: 'host-tax-forms',
   CONTRIBUTORS: 'contributors',
+  PEOPLE: 'people',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
   HOST_EXPECTED_FUNDS: 'expected-funds',
@@ -38,6 +39,7 @@ export const SECTIONS = {
   GRANTS: 'grants',
   SUBMITTED_GRANTS: 'submitted-grants',
   APPROVE_GRANT_REQUESTS: 'approve-grant-requests',
+  PLATFORM_SUBSCRIPTION: 'platform-subscription',
 };
 
 export const ROOT_SECTIONS = {
@@ -55,6 +57,8 @@ export const ROOT_SECTIONS = {
   ACCOUNT_TYPE: 'account-type',
   ANONYMIZE_ACCOUNT: 'anonymize-account',
   RECURRING_CONTRIBUTIONS: 'recurring-contributions',
+  SUBSCRIBERS: 'subscribers',
+  LEGACY_SUBSCRIBERS: 'legacy-subscribers',
 };
 
 export const SETTINGS_SECTIONS = {
@@ -168,8 +172,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Profile Sections',
   },
   [ALL_SECTIONS.EXPORT]: {
-    id: 'editCollective.menu.export',
-    defaultMessage: 'Export',
+    defaultMessage: 'Widgets',
+    id: 'jgOqxt',
   },
   [ALL_SECTIONS.POLICIES]: {
     id: 'editCollective.menu.policies',
@@ -282,6 +286,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.CONTRIBUTORS]: {
     id: 'Contributors',
     defaultMessage: 'Contributors',
+  },
+  [ALL_SECTIONS.PEOPLE]: {
+    id: 'HostContributors',
+    defaultMessage: 'Host Contributors',
   },
   [ALL_SECTIONS.OUTGOING_CONTRIBUTIONS]: {
     id: 'OutgoingContributions',

@@ -7,7 +7,7 @@ import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { paginationElements } from '../lib/pagination';
 

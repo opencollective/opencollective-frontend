@@ -11,10 +11,12 @@ import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -22,6 +24,7 @@ import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
 
@@ -62,6 +65,8 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const router = useRouter();
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
   const [selectedImport, setSelectedImport] = React.useState(null);
@@ -70,6 +75,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
+    skip: isUpgradeRequired,
   });
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
@@ -144,7 +150,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               size="sm"
               variant="outline"
               onClick={handleNewConnection}
-              disabled={!['idle', 'success'].includes(plaidConnectDialog.status)}
+              disabled={!['idle', 'success'].includes(plaidConnectDialog.status) || isUpgradeRequired}
               loading={plaidConnectDialog.status === 'loading'}
             >
               <Plus size={16} />
@@ -153,7 +159,9 @@ export const OffPlatformConnections = ({ accountSlug }) => {
           </React.Fragment>
         }
       />
-      {error ? (
+      {isUpgradeRequired ? (
+        <UpgradePlanCTA featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
+      ) : error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (
         <div>

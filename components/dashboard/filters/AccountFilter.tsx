@@ -13,7 +13,7 @@ import Avatar from '../../Avatar';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-const accountQuery = gql`
+export const accountFilterQuery = gql`
   query AccountFilter($slug: String!) {
     account(slug: $slug) {
       id
@@ -44,7 +44,7 @@ const AccountRenderer = ({
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
-  const { data } = useQuery<AccountFilterQuery>(accountQuery, {
+  const { data } = useQuery<AccountFilterQuery>(accountFilterQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
     context: API_V2_CONTEXT,

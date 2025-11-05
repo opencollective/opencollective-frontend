@@ -1,6 +1,6 @@
 import React from 'react';
-import clsx from 'clsx';
-import { includes } from 'lodash';
+import { clsx } from 'clsx';
+import { includes, truncate } from 'lodash';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -102,7 +102,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
                   <AccountHoverCard
                     account={props.expense.payee}
                     trigger={
-                      <span className="inline-flex">
+                      <span className="inline-flex" title={props.expense.payee.name}>
                         &nbsp;
                         <LinkCollective
                           noTitle
@@ -111,7 +111,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
                         >
                           <Avatar collective={props.expense.payee} radius={16} />
                           &nbsp;
-                          {props.expense.payee.name}
+                          {truncate(props.expense.payee.name, { length: 40 })}
                         </LinkCollective>
                         &nbsp;
                       </span>

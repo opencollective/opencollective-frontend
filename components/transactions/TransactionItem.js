@@ -4,7 +4,7 @@ import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
 import { truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
@@ -135,7 +135,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   );
 };
 
-const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
+const TransactionItem = ({ displayActions, collective, transaction }) => {
   const {
     toAccount,
     fromAccount,
@@ -341,11 +341,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         )}
       </Box>
       {isExpanded && (hasOrder || isExpense) && (
-        <TransactionDetails
-          displayActions={displayActions}
-          transaction={transaction}
-          onMutationSuccess={onMutationSuccess}
-        />
+        <TransactionDetails displayActions={displayActions} transaction={transaction} />
       )}
     </Item>
   );

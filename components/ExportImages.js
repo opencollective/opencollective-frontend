@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getWebsiteUrl } from '../lib/utils';
 
@@ -169,7 +169,7 @@ class ExportImages extends React.Component {
             ))}
           </ul>
         )}
-        <SettingsSectionTitle mt={4}>
+        <SettingsSectionTitle className="mt-4">
           <FormattedMessage id="ExportImages.AllFinancial" defaultMessage="All financial contributors badge" />
         </SettingsSectionTitle>
         <Box mb={2}>

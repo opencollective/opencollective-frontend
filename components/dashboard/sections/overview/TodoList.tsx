@@ -5,8 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -285,18 +283,11 @@ export const HostTodoList = () => {
 };
 
 export const AccountTodoList = () => {
-  const { LoggedInUser } = useLoggedInUser();
   const { account } = React.useContext(DashboardContext);
 
-  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
-  const pendingExpenseCount = hasGrantAndFundsReorgEnabled
-    ? account?.pendingExpenses.totalCount
-    : account?.pendingExpenses.totalCount + account?.pendingGrants.totalCount;
-  const pendingGrantCount = hasGrantAndFundsReorgEnabled ? account?.pendingGrants.totalCount : 0;
-  const pausedIncomingContributionsCount = account?.pausedIncomingContributions.totalCount;
+  const pendingExpenseCount = account?.pendingExpenses.totalCount;
+  const pendingGrantCount = account?.pendingGrants.totalCount;
+  const pausedIncomingContributionsCount = account?.pausedResumableIncomingContributions.totalCount;
   const pausedOutgoingContributions = account?.pausedOutgoingContributions.totalCount;
   const canStartResumeContributionsProcess = account?.canStartResumeContributionsProcess;
   const canActOnPausedIncomingContributions =

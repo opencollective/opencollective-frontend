@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { formatAmountForLegend } from '../../../../lib/charts';
@@ -129,7 +129,7 @@ export const makeApexOptions = (currency, timeUnit, intl) => ({
       width: 6,
       height: 24,
       radius: 8,
-      offsetY: 6,
+      offsetY: 0,
     },
   },
   colors: COLORS,

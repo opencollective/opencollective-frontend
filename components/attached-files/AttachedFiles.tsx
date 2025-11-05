@@ -10,7 +10,7 @@ import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 type AttachedFilesProps = {
-  files: Array<File | FileInfo>;
+  files: Array<File | Partial<FileInfo>>;
   onRemove?: (idx: number) => void;
   openFileViewer?: (url: string) => void;
   size?: number;

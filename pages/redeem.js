@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';

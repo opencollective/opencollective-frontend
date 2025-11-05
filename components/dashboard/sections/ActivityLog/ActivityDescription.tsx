@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -16,7 +16,7 @@ import LinkExpense from '../../../LinkExpense';
 const ResourceTag = ({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) => (
   <div
     className={clsx(
-      'inline-block truncate rounded-full bg-muted px-2 py-0.5 text-sm',
+      'inline-block min-w-16 truncate rounded-full bg-muted px-2 py-0.5 text-sm',
       disabled ? 'text-muted-foreground' : 'hover:underline',
     )}
   >
@@ -40,6 +40,7 @@ export const getActivityVariables = (
       collective={activity.individual}
       withHoverCard
       className="font-medium hover:underline"
+      truncateNameLength={15}
       hoverCardProps={{
         includeAdminMembership: {
           hostSlug: activity.host?.slug,
@@ -52,6 +53,7 @@ export const getActivityVariables = (
     <LinkCollective
       collective={activity.individual || activity.account}
       withHoverCard
+      truncateNameLength={15}
       className="font-medium hover:underline"
       {...(activity.individual && {
         hoverCardProps: {
@@ -64,7 +66,12 @@ export const getActivityVariables = (
     />
   ),
   FromAccount: () => (
-    <LinkCollective collective={activity.fromAccount} withHoverCard className="font-medium hover:underline" />
+    <LinkCollective
+      collective={activity.fromAccount}
+      truncateNameLength={15}
+      withHoverCard
+      className="font-medium hover:underline"
+    />
   ),
   Account: () => (
     <LinkCollective
@@ -76,7 +83,12 @@ export const getActivityVariables = (
   ),
   AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
   AccountParent: () => (
-    <LinkCollective collective={activity.account?.parent} withHoverCard className="font-medium hover:underline" />
+    <LinkCollective
+      collective={activity.account?.parent}
+      truncateNameLength={15}
+      withHoverCard
+      className="font-medium hover:underline"
+    />
   ),
   Amount: msg => {
     if (!activity.expense) {
@@ -95,7 +107,12 @@ export const getActivityVariables = (
     !activity.expense ? (
       msg
     ) : (
-      <LinkCollective collective={activity.expense.payee} withHoverCard className="font-medium hover:underline" />
+      <LinkCollective
+        collective={activity.expense.payee}
+        truncateNameLength={15}
+        withHoverCard
+        className="font-medium hover:underline"
+      />
     ),
   Expense: msg =>
     !activity.expense ? (
@@ -114,9 +131,21 @@ export const getActivityVariables = (
         </LinkExpense>
       </ResourceTag>
     ),
-  Host: () => <LinkCollective collective={activity.host} withHoverCard className="font-medium hover:underline" />,
+  Host: () => (
+    <LinkCollective
+      collective={activity.host}
+      truncateNameLength={15}
+      withHoverCard
+      className="font-medium hover:underline"
+    />
+  ),
   Vendor: () => (
-    <LinkCollective collective={activity.data?.vendor} withHoverCard className="font-medium hover:underline" />
+    <LinkCollective
+      collective={activity.data?.vendor}
+      truncateNameLength={15}
+      withHoverCard
+      className="font-medium hover:underline"
+    />
   ),
   CommentEntity: () => {
     if (activity.expense) {
@@ -134,7 +163,14 @@ export const getActivityVariables = (
       );
     } else {
       // We're not yet linking conversations & updates to comments in the activity table
-      return <LinkCollective collective={activity.account} withHoverCard className="font-medium hover:underline" />;
+      return (
+        <LinkCollective
+          collective={activity.account}
+          truncateNameLength={15}
+          withHoverCard
+          className="font-medium hover:underline"
+        />
+      );
     }
   },
   Order: msg =>

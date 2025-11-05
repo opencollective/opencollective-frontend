@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { isURL } from 'validator';
 
 import Container from './Container';
@@ -24,6 +24,9 @@ interface LocationProps {
   };
 }
 
+/**
+ * @deprecated Use `@/components/ui/Location` instead.
+ */
 function Location({ location, showTitle = true }: Readonly<LocationProps>) {
   if (!location) {
     return null;

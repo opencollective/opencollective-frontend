@@ -55,6 +55,15 @@ export const i18nWithColon = item => <FormattedMessage id="withColon" defaultMes
 
 export const WebsiteName = 'Open Collective';
 
+/**
+ * Allows some basic formatting of the message.
+ *
+ * @example
+ * <FormattedMessage
+ *   defaultMessage="A rich message with <strong>bold</strong>, <i>italic</i>, <code>code</code>, <u>underline</u>.{newLine}See props for more!"
+ *   values={I18nFormatters}
+ * />
+ */
 const I18nFormatters = {
   strong: I18nBold,
   i: I18nItalic,

@@ -26,7 +26,7 @@ const defaults = {
   IMAGES_URL: 'https://images-staging.opencollective.com',
   WEBSITE_URL: 'http://localhost:3000',
   REST_URL: 'https://rest-staging.opencollective.com',
-  PDF_SERVICE_V2_URL: 'https://pdf-staging.opencollective.com',
+  PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
   ML_SERVICE_URL: 'https://ml.opencollective.com',
   DISABLE_MOCK_UPLOADS: false,
   PAYPAL_ENVIRONMENT: 'sandbox',
@@ -49,6 +49,7 @@ const defaults = {
   SENTRY_TRACES_SAMPLE_RATE: null,
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
   DISABLE_CONTACT_FORM: false,
+  NEW_PRICING: false,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

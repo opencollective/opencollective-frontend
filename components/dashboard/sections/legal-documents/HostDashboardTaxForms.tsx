@@ -11,8 +11,12 @@ import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/sch
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
@@ -129,6 +133,9 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 };
 
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.TAX_FORMS);
+
   const [focusedLegalDocumentId, setFocusedLegalDocumentId] = React.useState(null);
   const queryFilter = useQueryFilter({
     filters,
@@ -140,12 +147,12 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
-  const getActions = useLegalDocumentActions(data?.host, refetch);
+  const getActions = useLegalDocumentActions(data?.host, refetch, isUpgradeRequired);
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
-
+      {isUpgradeRequired && <UpgradePlanCTA featureKey="TAX_FORMS" />}
       <Filterbar {...queryFilter} />
 
       {error ? (

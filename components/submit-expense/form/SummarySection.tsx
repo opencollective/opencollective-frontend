@@ -78,13 +78,11 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
         />
         {props.form.options.payoutMethod &&
           props.form.options.expenseCurrency !== props.form.options.payoutMethod.data?.currency && (
-            <MessageBox className="mt-4" type="warning">
-              <PayoutMethodExchangeRateWarning
-                expenseCurrency={props.form.options.expenseCurrency}
-                payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
-                totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
-              />
-            </MessageBox>
+            <PayoutMethodExchangeRateWarning
+              expenseCurrency={props.form.options.expenseCurrency}
+              payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
+              totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
+            />
           )}
       </div>
 
@@ -332,11 +330,9 @@ const InvoiceSection = React.memo(function InvoiceSection(props: {
         <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
       </Label>
       {props.hasInvoiceOption === YesNoOption.NO ? (
-        <div>
-          <MessageBox type="info">
-            <FormattedMessage defaultMessage="Invoice will be generated once you submit the expense." id="aWQ0X7" />
-          </MessageBox>
-        </div>
+        <MessageBox type="info" mt={2}>
+          <FormattedMessage defaultMessage="Invoice will be generated once you submit the expense." id="aWQ0X7" />
+        </MessageBox>
       ) : (
         <div>
           <div className="mb-2">
@@ -782,7 +778,7 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
   const exchangeRate = exchangeRateQuery.data?.currencyExchangeRate?.at(0);
 
   if (!exchangeRate) {
-    return <Skeleton className="h-12" />;
+    return null;
   }
 
   const amount = {
@@ -793,7 +789,7 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
   };
 
   return (
-    <div>
+    <MessageBox className="mt-4" type="warning">
       <FormattedMessage
         defaultMessage="Amount in your payout method currency: <b>{amountInPayoutMethodCurrency}</b>. This is only an <b>estimate</b> based on today's exchange rate. <b>Payment processor fees can be applied and exchange rate is subject to change until payout.</b>"
         id="GSrr51"
@@ -806,6 +802,6 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
           ),
         }}
       />
-    </div>
+    </MessageBox>
   );
 }

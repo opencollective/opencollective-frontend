@@ -140,7 +140,7 @@ class NewContributionFlowPage extends React.Component {
       <Page
         {...this.getPageMetadata()}
         showFooter={false}
-        menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
+        showMenuItems={false}
         showSearch={false}
         collective={data.account}
         noRobots={this.getNoRobots()}

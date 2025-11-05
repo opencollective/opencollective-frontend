@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { Box, Flex } from './Grid';
 import { H5, P } from './Text';

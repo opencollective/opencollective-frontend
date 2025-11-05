@@ -2,7 +2,7 @@ import React from 'react';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import type LoggedInUser from '../../lib/LoggedInUser';
@@ -133,7 +133,7 @@ const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
 
 const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
-    if (!['ADMIN', 'ACCOUNTANT', 'HOST'].includes(m.role) || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST', 'COMMUNITY_MANAGER'].includes(m.role) || m.collective.isArchived) {
       return false;
     } else if (['EVENT', 'PROJECT'].includes(m.collective.type)) {
       return false;

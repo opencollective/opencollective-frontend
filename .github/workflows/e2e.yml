@@ -9,7 +9,7 @@ env:
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   IMAGES_URL: http://localhost:3001
-  PDF_SERVICE_V2_URL: http://localhost:3002
+  PDF_SERVICE_URL: http://localhost:3002
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
@@ -111,10 +111,10 @@ jobs:
           ./mc mb --ignore-existing minio/opencollective-e2e
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
           cache: 'npm'
@@ -139,7 +139,7 @@ jobs:
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
@@ -147,19 +147,19 @@ jobs:
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
 
       - name: Checkout (PDF)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: opencollective/opencollective-pdf
           path: opencollective-pdf
@@ -266,7 +266,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: cypress-recordings-${{ github.run_id }}-${{ strategy.job-index }}
           path: |
@@ -275,13 +275,14 @@ jobs:
         if: ${{ failure() }}
 
       - name: Archive download folder
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: downloads-${{ github.run_id }}-${{ strategy.job-index }}
           path: test/cypress/downloads
         if: ${{ failure() }}
 
-      - name: Report coverage
-        uses: codecov/codecov-action@v5
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

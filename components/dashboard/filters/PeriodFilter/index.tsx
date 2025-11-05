@@ -5,7 +5,7 @@
 
 import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import type { Dayjs } from 'dayjs';
 import { isEqual, omit } from 'lodash';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';
@@ -272,9 +272,11 @@ function RangeSelector({
 function toVariables(value: PeriodCompareFilterValueType) {
   const { dateFrom, dateTo } = getPeriodDates(value);
 
+  const dateFromIso = dateFrom?.toISOString();
+  const dateToIso = dateTo?.toISOString();
   return {
-    dateFrom: dateFrom?.toISOString(),
-    dateTo: dateTo?.toISOString(),
+    dateFrom: dateFromIso,
+    dateTo: dateToIso === dayjs().endOf('day').toISOString() ? undefined : dateTo?.toISOString(),
   };
 }
 

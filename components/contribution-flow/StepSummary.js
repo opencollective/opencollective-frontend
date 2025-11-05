@@ -9,7 +9,7 @@ import {
 import { Close } from '@styled-icons/material/Close';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';

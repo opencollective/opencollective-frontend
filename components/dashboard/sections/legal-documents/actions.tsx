@@ -14,7 +14,11 @@ import { useToast } from '../../../ui/useToast';
 import { InvalidateTaxFormModal } from './InvalidateTaxFormModal';
 import { UploadTaxFormModal } from './UploadTaxFormModal';
 
-export function useLegalDocumentActions(host: Host, refetch: () => void): GetActions<LegalDocument> {
+export function useLegalDocumentActions(
+  host: Host,
+  refetch: () => void,
+  isUpgradeRequired: boolean,
+): GetActions<LegalDocument> {
   const intl = useIntl();
   const { showModal } = useModal();
   const { toast } = useToast();
@@ -48,6 +52,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
         key: 'invalidate',
         label: intl.formatMessage({ defaultMessage: 'Invalidate', id: 'TaxForm.Invalidate' }),
         Icon: FileX,
+        disabled: isUpgradeRequired,
         onClick: () => {
           showModal(
             InvalidateTaxFormModal,
@@ -61,6 +66,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
         key: 'manual-upload',
         label: intl.formatMessage({ defaultMessage: 'Manual upload', id: 'TaxForm.ManualUpload' }),
         Icon: Upload,
+        disabled: isUpgradeRequired,
         onClick: () => {
           showModal(UploadTaxFormModal, { legalDocument, host }, `upload-tax-form-${legalDocument.id}`);
         },

@@ -2,7 +2,7 @@ import React from 'react';
 import { CheckShield } from '@styled-icons/boxicons-regular/CheckShield';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -40,7 +40,7 @@ const SafeTransactionMessage = () => {
               defaultMessage="Open Collective keeps your transaction safe. <link>Learn more</link>."
               values={{
                 link: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/product/security#payments-security',
+                  href: 'https://documentation.opencollective.com/advanced/security-for-accounts',
                   openInNewTab: true,
                 }),
               }}

@@ -11,6 +11,7 @@ import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
@@ -35,18 +36,22 @@ import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
 import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
+import { FullscreenFlowLoadingPlaceholder } from '../FullscreenFlowLoadingPlaceholder';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
-import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
+
+// Lazy load the submit expense flow
+const SubmitExpenseFlow = React.lazy(() =>
+  import('../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
+);
 
 const DisableGlobalScrollOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
@@ -79,7 +84,30 @@ const NavBarContainerGlobalStyle = createGlobalStyle`
 const NavbarContentContainer = styled(Container)`
   background: white;
   display: flex;
+  justify-content: space-between;
+
+  @media (min-width: 40em) {
+    align-items: center;
+  }
+
+  @media (min-width: 64em) {
+    justify-content: flex-start;
+  }
+`;
+
+const StyledContainer = styled.div`
+  display: flex;
+  width: auto;
+  flex-direction: column;
+  overflow-y: auto;
   justify-content: flex-start;
+
+  @media (min-width: 64em) {
+    flex-direction: row;
+    width: 100%;
+    overflow-y: none;
+    justify-content: center;
+  }
 `;
 
 const AvatarBox = styled(Box)`
@@ -276,7 +304,15 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds) => {
+const getDefaultCallsToActions = (
+  collective,
+  sections,
+  isAdmin,
+  isAccountant,
+  LoggedInUser,
+  isAllowedAddFunds,
+  isHostAdmin,
+) => {
   if (!collective) {
     return {};
   }
@@ -284,7 +320,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, L
   const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
-    hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
+    hasContact: isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM'),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
@@ -447,10 +483,11 @@ const CollectiveNavbar = ({
   onCollectiveClick = undefined,
   isInHero = false,
   onlyInfos = false,
-  showBackButton = true,
   useAnchorsForCategories = false,
   showSelectedCategoryOnMobile = false,
+  onSubmitExpenseModalOpenChange = undefined,
 }) => {
+  const router = useRouter();
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
@@ -463,7 +500,11 @@ const CollectiveNavbar = ({
     skip: !collective?.slug || !LoggedInUser,
   });
 
-  const [isSubmitExpenseModalOpen, setIsSubmitExpenseModalOpen] = React.useState(false);
+  const [isSubmitExpenseModalOpen, _setIsSubmitExpenseModalOpen] = React.useState(false);
+  const setIsSubmitExpenseModalOpen = open => {
+    _setIsSubmitExpenseModalOpen(open);
+    onSubmitExpenseModalOpenChange?.(open);
+  };
 
   const loading = isLoading || dataLoading;
 
@@ -478,7 +519,15 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds),
+    ...getDefaultCallsToActions(
+      collective,
+      sections,
+      isAdmin,
+      isAccountant,
+      LoggedInUser,
+      isAllowedAddFunds,
+      isHostAdmin,
+    ),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
@@ -529,17 +578,6 @@ const CollectiveNavbar = ({
           <InfosContainer px={[3, 0]} py={[2, 1]}>
             <Flex alignItems="center" maxWidth={['90%', '100%']} flex="1 1">
               <BackButtonAndAvatar data-hide-on-desktop={isInHero}>
-                {showBackButton && (
-                  <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
-                    {collective && (
-                      <Link href={getCollectivePageRoute(collective)}>
-                        <StyledButton px={1} isBorderless>
-                          &larr;
-                        </StyledButton>
-                      </Link>
-                    )}
-                  </Container>
-                )}
                 <AvatarBox>
                   <LinkCollective collective={collective} onClick={onCollectiveClick}>
                     <Container borderRadius="25%" mr={2}>
@@ -590,13 +628,7 @@ const CollectiveNavbar = ({
           {/** Main navbar items */}
 
           {!onlyInfos && (
-            <Container
-              display={['block', 'flex']}
-              width="100%"
-              justifyContent="space-between"
-              flexDirection={['column', 'row']}
-              overflowY="auto"
-            >
+            <StyledContainer>
               {isExpanded && <DisableGlobalScrollOnMobile />}
               <CategoriesContainer
                 ref={navbarRef}
@@ -659,17 +691,24 @@ const CollectiveNavbar = ({
                   )}
                 </Container>
               </Container>
-            </Container>
+            </StyledContainer>
           )}
         </NavbarContentContainer>
       </NavBarContainer>
       {isSubmitExpenseModalOpen && (
-        <SubmitExpenseFlow
-          onClose={() => {
-            setIsSubmitExpenseModalOpen(false);
-          }}
-          submitExpenseTo={collective?.slug}
-        />
+        <React.Suspense
+          fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setIsSubmitExpenseModalOpen(false)} />}
+        >
+          <SubmitExpenseFlow
+            onClose={(isSubmitted, hasSelectedViewAll) => {
+              setIsSubmitExpenseModalOpen(false);
+              if (isSubmitted && hasSelectedViewAll) {
+                router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+              }
+            }}
+            submitExpenseTo={collective?.slug}
+          />
+        </React.Suspense>
       )}
     </Fragment>
   );

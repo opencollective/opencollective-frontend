@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { addAuthTokenToHeader } from '../../lib/api';
 import { ERROR, formatErrorType } from '../../lib/errors';
@@ -132,7 +132,8 @@ const fetchAuthorize = (
     }
 
     if (scopes && scopes.length > 0) {
-      authorizeParams.set('scope', scopes.join(','));
+      // OAuth 2.0 specifies space-delimited scopes
+      authorizeParams.set('scope', scopes.join(' '));
     }
   }
 
@@ -149,7 +150,8 @@ const fetchAuthorize = (
 const prepareScopes = scopes => {
   return (
     scopes
-      ?.split(',')
+      // Accept whitespace (OAuth 2.0 compliance) or comma (retro-compatibility)
+      ?.split(/[\s,]+/)
       .filter(scope => has(SCOPES_INFO, scope))
       .sort() || []
   );

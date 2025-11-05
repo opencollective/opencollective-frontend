@@ -4,18 +4,6 @@
 
 import { keyframes } from 'styled-components';
 
-// utility library
-
-export const rotating = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-// ts-unused-exports:disable-next-line
 export const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -30,18 +18,6 @@ export const slideInUp = keyframes`
     transform: translate3d(0,40px,0);
   }
   to {
-    transform: translate3d(0,0,0);
-  }
-`;
-
-// ts-unused-exports:disable-next-line
-export const fadeInUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translate3d(0,40px,0);
-  }
-  to {
-    opacity: 1;
     transform: translate3d(0,0,0);
   }
 `;

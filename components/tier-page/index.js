@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 // Open Collective Frontend imports
 import INTERVALS from '../../lib/constants/intervals';

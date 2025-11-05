@@ -12,13 +12,14 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
-import { AccountHoverCard, accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import { CopyID } from '../CopyId';
 import DateTime from '../DateTime';
 import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
+import LinkCollective from '../LinkCollective';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
@@ -334,18 +335,16 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                       isLoading ? (
                         <Skeleton className="h-6 w-48" />
                       ) : (
-                        <AccountHoverCard
-                          account={query.data.order.fromAccount}
-                          trigger={
-                            <Link
-                              className="flex items-center gap-1 hover:text-primary hover:underline"
-                              href={`/${query.data.order.fromAccount.slug}`}
-                            >
-                              <Avatar radius={20} collective={query.data.order.fromAccount} />
-                              {query.data.order.fromAccount.name}
-                            </Link>
-                          }
-                        />
+                        <LinkCollective
+                          collective={query.data.order.fromAccount}
+                          className="hover:text-primary hover:underline"
+                          withHoverCard
+                        >
+                          <div className="flex items-center gap-1">
+                            <Avatar radius={20} collective={query.data.order.fromAccount} />
+                            {query.data.order.fromAccount.name}
+                          </div>
+                        </LinkCollective>
                       )
                     }
                   />
@@ -357,18 +356,16 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                       isLoading ? (
                         <Skeleton className="h-6 w-48" />
                       ) : (
-                        <AccountHoverCard
-                          account={query.data.order.toAccount}
-                          trigger={
-                            <Link
-                              className="flex items-center gap-1 hover:text-primary hover:underline"
-                              href={`/${query.data.order.toAccount.slug}`}
-                            >
-                              <Avatar radius={20} collective={query.data.order.toAccount} />
-                              {query.data.order.toAccount.name}
-                            </Link>
-                          }
-                        />
+                        <LinkCollective
+                          className="hover:text-primary hover:underline"
+                          collective={query.data.order.toAccount}
+                          withHoverCard
+                        >
+                          <div className="flex items-center gap-1">
+                            <Avatar radius={20} collective={query.data.order.toAccount} />
+                            {query.data.order.toAccount.name}
+                          </div>
+                        </LinkCollective>
                       )
                     }
                   />

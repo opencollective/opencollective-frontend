@@ -9,7 +9,7 @@ import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lod
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { css, styled } from 'styled-components';
 
 import { getCollectiveTypeForUrl } from '../../lib/collective';
 import CommentType from '../../lib/constants/commentTypes';
@@ -24,21 +24,19 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
 import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
-import HTMLContent from '../HTMLContent';
 import { WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
-import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -47,7 +45,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
-import { H1, H5, Span } from '../Text';
+import { H1, Span } from '../Text';
 
 import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
@@ -98,17 +96,8 @@ const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
   }
 `;
 
-const PrivateNoteLabel = () => {
-  return (
-    <Span fontSize="12px" color="black.700" fontWeight="bold">
-      <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
-      &nbsp;&nbsp;
-      <PrivateInfoIcon size={12} className="text-muted-foreground" />
-    </Span>
-  );
-};
-
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
+export const EXPENSE_PAGE_POLLING_INTERVAL = 60 * 1000;
 
 interface ExpenseProps {
   collectiveSlug?: string;
@@ -221,7 +210,6 @@ function Expense(props: ExpenseProps) {
   const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
   const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
   const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
-  const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
@@ -251,7 +239,7 @@ function Expense(props: ExpenseProps) {
   }, []);
 
   // Disable polling while editing
-  React.useEffect(() => {
+  useEffect(() => {
     if ([PAGE_STATUS.EDIT, PAGE_STATUS.EDIT_SUMMARY].includes(state.status)) {
       if (state.isPollingEnabled) {
         setState(state => ({ ...state, isPollingEnabled: false }));
@@ -357,7 +345,10 @@ function Expense(props: ExpenseProps) {
   }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
-  const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
+  const showTaxFormMsg =
+    isFeatureEnabled(expense?.account, 'TAX_FORMS') &&
+    includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') &&
+    !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
 
   const handlePolling = debounce(() => {
@@ -368,7 +359,7 @@ function Expense(props: ExpenseProps) {
           props.refetch?.();
           pollingPaused = false;
         }
-        props.startPolling?.(pollingInterval * 1000);
+        props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
         pollingStarted = true;
       }
 
@@ -378,7 +369,7 @@ function Expense(props: ExpenseProps) {
         props.stopPolling?.();
         pollingStarted = false;
         pollingPaused = true;
-      }, pollingInterval * 1000);
+      }, EXPENSE_PAGE_POLLING_INTERVAL);
     }
   }, 100);
 
@@ -396,7 +387,7 @@ function Expense(props: ExpenseProps) {
   };
 
   const onCancel = () => {
-    props.startPolling?.(pollingInterval * 1000);
+    props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
     return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
   };
 
@@ -429,7 +420,7 @@ function Expense(props: ExpenseProps) {
         await refetch();
       }
       const createdUser = editedExpense.payee;
-      props.startPolling?.(pollingInterval * 1000);
+      props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
@@ -477,7 +468,7 @@ function Expense(props: ExpenseProps) {
     await refetch();
     await fetchMore({
       variables: { legacyExpenseId, draftKey, offset: get(data, 'expense.comments.nodes', []).length },
-      updateQuery: (prev: any, { fetchMoreResult }) => {
+      updateQuery: (prev: unknown, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
         }
@@ -485,10 +476,10 @@ function Expense(props: ExpenseProps) {
         const resultExpense = fetchMoreResult['expense'] as { comments: { nodes: Comment[] } };
         const newValues = {
           expense: {
-            ...prev.expense,
+            ...prev['expense'],
             comments: {
               ...resultExpense.comments,
-              nodes: [...prev.expense.comments.nodes, ...resultExpense.comments.nodes],
+              nodes: [...prev['expense'].comments.nodes, ...resultExpense.comments.nodes],
             },
           },
         };
@@ -584,7 +575,7 @@ function Expense(props: ExpenseProps) {
         {expense?.type && expense?.account ? (
           <FormattedMessage
             id="ExpenseTitle"
-            defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
+            defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} PLATFORM_BILLING {Platform bill} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
             values={{
               type: expense?.type,
               id: expense?.legacyId,
@@ -654,21 +645,15 @@ function Expense(props: ExpenseProps) {
             openFileViewer={openFileViewer}
             enableKeyboardShortcuts={enableKeyboardShortcuts}
             openedItemId={openUrl && state.showFilesViewerModal && files?.find?.(file => file.url === openUrl)?.id}
+            onCloneModalOpenChange={isOpen => {
+              if (isOpen) {
+                props.stopPolling?.();
+              } else {
+                props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
+              }
+            }}
           />
 
-          {status !== PAGE_STATUS.EDIT_SUMMARY && (
-            <React.Fragment>
-              {expense?.privateMessage && (
-                <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                  <H5 fontSize="16px" mb={3}>
-                    <FormattedMessage id="expense.notes" defaultMessage="Notes" />
-                  </H5>
-                  <PrivateNoteLabel />
-                  <HTMLContent color="black.700" mt={1} fontSize="13px" content={expense.privateMessage} />
-                </Container>
-              )}
-            </React.Fragment>
-          )}
           {status === PAGE_STATUS.EDIT_SUMMARY && (
             <Box mt={24}>
               {isDraft && !loggedInAccount && (

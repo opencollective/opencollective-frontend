@@ -61,27 +61,26 @@ export function EmptyResults({
         )}
       </h3>
 
+      <p className="text-center text-balance text-muted-foreground">
+        <FormattedMessage
+          id="filter.NoMatchingResults.subtitle"
+          defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."
+          values={{ type: entityType }}
+        />
+      </p>
+
       {hasFilters && (
-        <React.Fragment>
-          <p className="text-center text-balance text-muted-foreground">
-            <FormattedMessage
-              id="filter.NoMatchingResults.subtitle"
-              defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."
-              values={{ type: entityType }}
-            />
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {otherActions}
-            {onResetFilters && (
-              <Button data-cy="reset-filters" variant="outline" className="gap-2" onClick={onResetFilters}>
-                <ListX size={16} />
-                <span>
-                  <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
-                </span>
-              </Button>
-            )}
-          </div>
-        </React.Fragment>
+        <div className="flex flex-wrap gap-3">
+          {otherActions}
+          {onResetFilters && (
+            <Button data-cy="reset-filters" variant="outline" className="gap-2" onClick={onResetFilters}>
+              <ListX size={16} />
+              <span>
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
+              </span>
+            </Button>
+          )}
+        </div>
       )}
     </div>
   );

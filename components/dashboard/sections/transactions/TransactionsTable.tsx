@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 

@@ -3,14 +3,17 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount, isIndividualAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
-import { loadGoogleMaps } from '@/lib/google-maps';
+import { isHostAccount } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type LoggedInUser from '@/lib/LoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -59,18 +62,12 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (
-    isIndividualAccount(account) ||
-    !isHostAccount(account) ||
-    (isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_OVERVIEW))
-  ) {
-    return ALL_SECTIONS.OVERVIEW;
-  } else if (isHostAccount(account)) {
+  } else if (loggedInUser?.isAccountantOnly(account) && isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
+  } else if (loggedInUser?.isAccountantOnly(account)) {
+    return ALL_SECTIONS.PAYMENT_RECEIPTS;
   } else {
-    const isAdmin = loggedInUser?.isAdminOfCollective(account);
-    const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.EXPENSES;
+    return ALL_SECTIONS.OVERVIEW;
   }
 };
 
@@ -92,6 +89,30 @@ const getNotification = (intl, account) => {
       };
     }
   }
+};
+
+/**
+ * Get the People dashboard detail URL for an individual account within the context of a dashboard account
+ * If the user is not an admin of the host account, return the public profile URL instead
+ */
+const getProfileUrl = (
+  loggedInUser: LoggedInUser,
+  contextAccount: DashboardQuery['account'],
+  account: { id: string; slug: string; type: string },
+) => {
+  const context =
+    'host' in contextAccount && loggedInUser?.isAdminOfCollective(contextAccount.host)
+      ? contextAccount.host
+      : contextAccount.isHost
+        ? contextAccount
+        : null;
+
+  return context &&
+    loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
+    account?.type === CollectiveType.INDIVIDUAL &&
+    typeof account?.id === 'string'
+    ? getDashboardRoute({ slug: context.slug }, `people/${account?.id}`)
+    : null;
 };
 
 function getBlocker(LoggedInUser, account, section) {
@@ -204,10 +225,6 @@ const DashboardPage = () => {
     }
   }, [account]);
 
-  React.useEffect(() => {
-    loadGoogleMaps();
-  }, []);
-
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
@@ -227,6 +244,7 @@ const DashboardPage = () => {
         activeSlug,
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
+        getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
       <div className="flex min-h-screen flex-col justify-between">

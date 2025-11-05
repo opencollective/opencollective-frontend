@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { uniqWith } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import CollectiveRoles from '../../../lib/constants/roles';

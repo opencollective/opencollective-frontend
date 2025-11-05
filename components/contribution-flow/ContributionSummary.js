@@ -2,7 +2,7 @@ import React from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { get } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { color, flex, typography } from 'styled-system';
 
 import INTERVALS from '../../lib/constants/intervals';

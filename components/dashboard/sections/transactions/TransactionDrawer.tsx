@@ -12,7 +12,9 @@ import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import LinkCollective from '@/components/LinkCollective';
+
+import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { getCategoryLabel } from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
 import ExpenseBudgetItem from '../../../budget/ExpenseBudgetItem';
@@ -357,18 +359,16 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                     className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                     value={
-                      <AccountHoverCard
-                        account={transaction?.account}
-                        trigger={
-                          <Link
-                            className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
-                            href={`/${transaction?.account.slug}`}
-                          >
-                            <Avatar radius={20} collective={transaction?.account} />
-                            {transaction?.account.name}
-                          </Link>
-                        }
-                      />
+                      <LinkCollective
+                        className="font-medium hover:text-primary"
+                        collective={transaction?.account}
+                        withHoverCard
+                      >
+                        <div className="flex items-center gap-1">
+                          <Avatar radius={20} collective={transaction?.account} />
+                          {transaction?.account.name}
+                        </div>
+                      </LinkCollective>
                     }
                   />
 
@@ -382,23 +382,21 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       )
                     }
                     value={
-                      <AccountHoverCard
-                        account={transaction?.oppositeAccount}
-                        trigger={
-                          <Link
-                            className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
-                            href={`/${transaction?.oppositeAccount?.slug}`}
-                          >
-                            {transaction.type === 'CREDIT' ? (
-                              <ArrowLeft className="inline-block shrink-0 text-green-600" size={16} />
-                            ) : (
-                              <ArrowRight className="inline-block shrink-0" size={16} />
-                            )}
-                            <Avatar radius={20} collective={transaction?.oppositeAccount} />
-                            {transaction?.oppositeAccount?.name}
-                          </Link>
-                        }
-                      />
+                      <LinkCollective
+                        className="font-medium hover:text-primary"
+                        collective={transaction?.oppositeAccount}
+                        withHoverCard
+                      >
+                        <div className="flex items-center gap-1">
+                          {transaction.type === 'CREDIT' ? (
+                            <ArrowLeft className="inline-block shrink-0 text-green-600" size={16} />
+                          ) : (
+                            <ArrowRight className="inline-block shrink-0" size={16} />
+                          )}
+                          <Avatar radius={20} collective={transaction?.oppositeAccount} />
+                          {transaction?.oppositeAccount?.name}
+                        </div>
+                      </LinkCollective>
                     }
                   />
                 </InfoList>

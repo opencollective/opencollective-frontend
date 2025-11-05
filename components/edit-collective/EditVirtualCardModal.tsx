@@ -486,7 +486,7 @@ export default function EditVirtualCardModal({
                           link: getI18nLink({
                             as: Link,
                             openInNewTab: true,
-                            href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                            href: 'https://documentation.opencollective.com/fiscal-hosts/virtual-cards',
                           }),
                         }}
                       />
@@ -518,7 +518,6 @@ export default function EditVirtualCardModal({
                       <StyledInputAmount
                         {...inputProps}
                         id="limitAmount"
-                        placeholder="0.00"
                         error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}
                         currency={currency}
                         prepend={currency}

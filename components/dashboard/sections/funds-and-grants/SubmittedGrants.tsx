@@ -54,7 +54,7 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
     type: ExpenseType.GRANT,
   };
 
-  const { data, loading, error } = useQuery(accountExpensesQuery, {
+  const { data, loading, error, refetch } = useQuery(accountExpensesQuery, {
     variables,
     context: API_V2_CONTEXT,
   });
@@ -129,6 +129,7 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
               meta={
                 {
                   onViewDetailsClick,
+                  refetch,
                 } as GrantsTableMeta
               }
               columns={compact([

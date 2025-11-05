@@ -7,12 +7,11 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 
+import { Dialog, DialogContent, DialogHeader, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
+
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
-import Container from '../../../Container';
 import { Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
-import { P } from '../../../Text';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
@@ -113,12 +112,14 @@ const InviteMemberModal = props => {
   };
 
   return (
-    <Container>
-      <StyledModal onClose={cancelHandler}>
-        <ModalHeader mb={2}>
-          <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
-        </ModalHeader>
-        <ModalBody>
+    <Dialog onOpenChange={show => !show && cancelHandler()} open={true}>
+      <DialogPortal>
+        <DialogContent onClose={cancelHandler}>
+          <DialogHeader>
+            <DialogTitle>
+              <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+            </DialogTitle>
+          </DialogHeader>
           {inviteError && (
             <Flex alignItems="center" justifyContent="center">
               <MessageBox type="error" withIcon m={[1, 3]} data-cy="cof-error-message">
@@ -126,10 +127,10 @@ const InviteMemberModal = props => {
               </MessageBox>
             </Flex>
           )}
-          <Flex m={1} flexDirection="column" mb={2}>
-            <P fontSize="14px" lineHeight="20px" fontWeight={700} mb={1}>
+          <div className="flex flex-col">
+            <p className="text-sm font-bold">
               <FormattedMessage id="Tags.USER" defaultMessage="User" />
-            </P>
+            </p>
             <CollectivePickerAsync
               inputId="member-collective-picker"
               creatable
@@ -142,16 +143,14 @@ const InviteMemberModal = props => {
               data-cy="member-collective-picker"
               menuPortalTarget={null}
             />
-          </Flex>
+          </div>
           <MemberForm
             intl={intl}
             collectiveImg={get(collective, 'imageUrl')}
             bindSubmitForm={bindSubmitForm}
             triggerSubmit={handleInviteMemberMutation}
           />
-        </ModalBody>
-        <ModalFooter showDivider={false}>
-          <div className="flex justify-between gap-2">
+          <div className="mt-2 flex justify-between gap-4">
             <Button
               autoFocus
               variant="outline"
@@ -171,9 +170,9 @@ const InviteMemberModal = props => {
               <FormattedMessage id="save" defaultMessage="Save" />
             </Button>
           </div>
-        </ModalFooter>
-      </StyledModal>
-    </Container>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 };
 

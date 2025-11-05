@@ -96,10 +96,10 @@ export const TransactionsImportAssignmentsForm = ({
   plaidStatus: PlaidDialogStatus;
   onOpenChange: (isOpen: boolean) => void;
   showPlaidDialog: ({
-    accountsSelectionEnabled,
+    accountSelectionEnabled,
     transactionImportId,
   }: {
-    accountsSelectionEnabled?: boolean;
+    accountSelectionEnabled?: boolean;
     transactionImportId: string;
   }) => void;
   isDeleting: boolean;
@@ -156,7 +156,7 @@ export const TransactionsImportAssignmentsForm = ({
                       disabled={plaidStatus === 'disabled' || isDeleting || isSubmitting}
                       onClick={() =>
                         showPlaidDialog({
-                          accountsSelectionEnabled: true,
+                          accountSelectionEnabled: true,
                           transactionImportId: transactionsImport.id,
                         })
                       }

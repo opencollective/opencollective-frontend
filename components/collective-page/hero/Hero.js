@@ -8,7 +8,7 @@ import { first } from 'lodash';
 import { Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
@@ -125,6 +125,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
   const numberOfHiddenTags = hiddenTags?.length;
+  const canHostAccounts = collective.isHost && collective.settings?.canHostAccounts !== false;
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -378,7 +379,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {collective.isHost && (
+                {canHostAccounts && (
                   <Fragment>
                     {collective.type !== CollectiveType.COLLECTIVE && (
                       <Fragment>

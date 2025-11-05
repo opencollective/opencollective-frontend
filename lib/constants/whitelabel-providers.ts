@@ -35,7 +35,7 @@ const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
         href: '/home',
         icon: ProfileMenuIcons.Home,
       },
-      { label: 'About', href: 'https://docs.opencollective.com/help/about/introduction' },
+      { label: 'About', href: 'https://documentation.opencollective.com/our-organization' },
       { label: 'Help & Support', href: '/help', icon: ProfileMenuIcons.LifeBuoy },
       { label: 'Terms of Service', href: '/tos', icon: ProfileMenuIcons.FileText },
     ],

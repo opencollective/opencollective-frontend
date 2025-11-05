@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
 
+import { BASE_INPUT_ERROR_CLASS } from './ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
 
 const Messages = defineMessages({
@@ -45,6 +46,7 @@ type ComboSelectProps = {
   inputPlaceholder?: string;
   isSearchable?: boolean;
   'data-cy'?: string;
+  name?: string;
 };
 
 // eslint-disable-next-line prefer-arrow-callback
@@ -76,9 +78,14 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
         disabled={props.disabled}
       >
         <SelectTrigger
-          className={cn({ 'text-muted-foreground': !props.value }, props.className)}
+          className={cn(
+            { 'text-muted-foreground': !props.value },
+            props.error && BASE_INPUT_ERROR_CLASS,
+            props.className,
+          )}
           id={props.id}
           data-cy={props['data-cy']}
+          name={props.name}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -102,7 +109,12 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn('justify-between font-normal', { 'text-muted-foreground': !props.value }, props.className)}
+          className={cn(
+            'justify-between font-normal',
+            { 'text-muted-foreground': !props.value },
+            props.error && BASE_INPUT_ERROR_CLASS,
+            props.className,
+          )}
         >
           {selectedOption?.label ?? placeholder ?? intl.formatMessage(Messages.placeholder)}
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

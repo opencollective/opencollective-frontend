@@ -4,7 +4,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
@@ -30,7 +30,7 @@ import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
 
-export const BackButton = styled(StyledButton)`
+const BackButton = styled(StyledButton)`
   color: ${themeGet('colors.black.600')};
   font-size: 14px;
 `;
@@ -287,7 +287,7 @@ class CreateCollectiveForm extends React.Component {
                           <Flex mt={1} width="100%">
                             <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 &&
                                 ` (${1 + values.inviteMembers.length}/${
                                   host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                                 })`}
@@ -344,7 +344,7 @@ class CreateCollectiveForm extends React.Component {
                             />
                           </Box>
 
-                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                             <MessageBox type="info" mt={3} fontSize="13px">
                               <FormattedMessage
                                 defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."

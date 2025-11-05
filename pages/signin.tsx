@@ -1,6 +1,7 @@
 import React from 'react';
 import { mapValues } from 'lodash';
 import type { NextPageContext } from 'next';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
@@ -9,6 +10,7 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils';
 import { getEnvVar } from '@/lib/env-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
+import type LoggedInUser from '@/lib/LoggedInUser';
 import { getWhitelabelProviderFromRedirectionUrl, type WhitelabelProps } from '@/lib/whitelabel';
 
 import Body from '../components/Body';
@@ -27,11 +29,11 @@ type SigninPageProps = {
   form: 'signin' | 'create-account';
   isSuspiciousUserAgent: boolean;
   email: string;
-  login: (token?: string) => Promise<any>;
+  login: (token?: string) => Promise<LoggedInUser>;
   errorLoggedInUser: string;
-  LoggedInUser: any;
+  LoggedInUser: LoggedInUser;
   loadingLoggedInUser: boolean;
-  router: any;
+  router: Router;
   whitelabel: WhitelabelProps;
   untrustedDomainRedirection: boolean;
   requestedByWhitelabelProvider: WhitelabelProps['provider'];
@@ -257,7 +259,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
         <Header
           title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
-          menuItems={{ solutions: false, product: false, company: false, docs: false }}
+          showMenuItems={false}
           showSearch={false}
           showProfileAndChangelogMenu={false}
           withTopBar={!this.props.requestedByWhitelabelProvider}

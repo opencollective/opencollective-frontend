@@ -5,7 +5,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { compact, find, first, uniq, upperCase } from 'lodash';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import useKeyboardKey, { S } from '../../lib/hooks/useKeyboardKey';
 
@@ -35,6 +35,7 @@ const Scope = {
   COLLECTIVE: 'COLLECTIVE',
   PAYEE: 'PAYEE',
   PAYOUT_METHOD: 'PAYOUT_METHOD',
+  ATTACHMENTS: 'ATTACHMENTS',
 };
 
 export const expenseRequiresSecurityConfirmation = expense =>
@@ -112,6 +113,10 @@ const I18nScopes = defineMessages({
   [Scope.PAYOUT_METHOD]: {
     id: 'PayoutMethod',
     defaultMessage: 'Payout Method',
+  },
+  [Scope.ATTACHMENTS]: {
+    id: 'Expense.Attachments',
+    defaultMessage: 'Attachments',
   },
 });
 const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => {

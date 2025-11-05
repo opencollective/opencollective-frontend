@@ -481,12 +481,16 @@ function submitExpense(options: {
         cy.contains('Amount').click().type('{selectall}500');
         cy.contains('USD').click();
         cy.focused().should('have.attr', 'placeholder', 'Search...').type('BRL{enter}');
+
         if (opts.expenseType === 'reimbursement') {
           cy.contains('Drag & drop').selectFile(getReceiptFixture({ fileName: 'receipt1.jpg' }), {
             action: 'drag-drop',
           });
         }
       });
+
+    // 2 currencies involved: need to pick the main one (reference currency)
+    cy.getByDataCy('reference-currency-option-USD').click();
 
     cy.contains('Additional Attachments').selectFile([
       getReceiptFixture({ fileName: 'attachment0.jpg' }),
@@ -502,7 +506,7 @@ function submitExpense(options: {
     }
   });
 
-  cy.get('#EXPENSE_TITLE').within(() => {
+  cy.get('#ADDITIONAL_DETAILS').within(() => {
     cy.root().scrollIntoView();
     cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`);
     cy.contains('Add tag').click();

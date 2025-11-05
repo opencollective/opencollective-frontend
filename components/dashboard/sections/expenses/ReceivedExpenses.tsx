@@ -14,14 +14,16 @@ import {
   ExpenseType,
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/schema';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { i18nExpenseType } from '@/lib/i18n/expense';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import StyledButton from '../../../StyledButton';
+import { SubmitExpenseFlow } from '../../../submit-expense/SubmitExpenseFlow';
+import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -103,6 +105,8 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
+  const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
+  const { LoggedInUser } = useLoggedInUser();
 
   const {
     data: metadata,
@@ -116,12 +120,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
-  const { LoggedInUser } = useLoggedInUser();
-  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-  );
-
-  const omitExpenseTypesInFilter = hasGrantAndFundsReorgEnabled ? [ExpenseType.GRANT] : [];
+  const omitExpenseTypesInFilter = [ExpenseType.GRANT];
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
@@ -156,75 +155,99 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     context: API_V2_CONTEXT,
   });
 
+  const hasNewSubmitExpenseFlow =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
+
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
-      <DashboardHeader
-        title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
-        description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
-      />
-      {isSelfHosted && (
-        <ScheduledExpensesBanner
-          hostSlug={hostSlug}
-          onSubmit={() => {
-            refetch();
-            refetchMetadata();
-          }}
-          secondButton={
-            !(
-              queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
-              queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
-            ) ? (
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="successSecondary"
-                onClick={() =>
-                  queryFilter.resetFilters({
-                    status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
-                    payout: PayoutMethodType.BANK_ACCOUNT,
-                  })
-                }
-              >
-                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
-              </StyledButton>
+    <React.Fragment>
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+        <DashboardHeader
+          title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
+          description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
+          actions={
+            hasNewSubmitExpenseFlow ? (
+              <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
+                <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
+              </Button>
             ) : null
           }
         />
-      )}
-      <Filterbar {...queryFilter} />
-
-      {!loading && !data.expenses?.nodes.length ? (
-        <EmptyResults
-          entityType="EXPENSES"
-          onResetFilters={() => queryFilter.resetFilters({})}
-          hasFilters={queryFilter.hasFilters}
-        />
-      ) : (
-        <React.Fragment>
-          <ExpensesList
-            isLoading={loading || loadingMetaData}
-            collective={metadata?.account}
-            host={metadata?.account?.host}
-            expenses={data?.expenses?.nodes}
-            nbPlaceholders={queryFilter.values.limit}
-            useDrawer
-            openExpenseLegacyId={Number(router.query.openExpenseId)}
-            setOpenExpenseLegacyId={legacyId => {
-              router.push(
-                {
-                  pathname: pageRoute,
-                  query: { ...omit(router.query, ROUTE_PARAMS), openExpenseId: legacyId },
-                },
-                undefined,
-                { shallow: true },
-              );
+        {isSelfHosted && (
+          <ScheduledExpensesBanner
+            hostSlug={hostSlug}
+            onSubmit={() => {
+              refetch();
+              refetchMetadata();
             }}
+            secondButton={
+              !(
+                queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
+                queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
+              ) ? (
+                <StyledButton
+                  buttonSize="tiny"
+                  buttonStyle="successSecondary"
+                  onClick={() =>
+                    queryFilter.resetFilters({
+                      status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+                      payout: PayoutMethodType.BANK_ACCOUNT,
+                    })
+                  }
+                >
+                  <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+                </StyledButton>
+              ) : null
+            }
           />
-          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
-        </React.Fragment>
+        )}
+        <Filterbar {...queryFilter} />
+
+        {!loading && !data.expenses?.nodes.length ? (
+          <EmptyResults
+            entityType="EXPENSES"
+            onResetFilters={() => queryFilter.resetFilters({})}
+            hasFilters={queryFilter.hasFilters}
+          />
+        ) : (
+          <React.Fragment>
+            <ExpensesList
+              isLoading={loading || loadingMetaData}
+              collective={metadata?.account}
+              host={metadata?.account?.host}
+              expenses={data?.expenses?.nodes}
+              nbPlaceholders={queryFilter.values.limit}
+              useDrawer
+              openExpenseLegacyId={Number(router.query.openExpenseId)}
+              setOpenExpenseLegacyId={legacyId => {
+                router.push(
+                  {
+                    pathname: pageRoute,
+                    query: { ...omit(router.query, ROUTE_PARAMS), openExpenseId: legacyId },
+                  },
+                  undefined,
+                  { shallow: true },
+                );
+              }}
+            />
+            <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
+          </React.Fragment>
+        )}
+      </div>
+      {isExpenseFlowOpen && (
+        <SubmitExpenseFlow
+          onClose={submittedExpense => {
+            setIsExpenseFlowOpen(false);
+            if (submittedExpense) {
+              refetch();
+              refetchMetadata();
+            }
+          }}
+          submitExpenseTo={accountSlug}
+        />
       )}
-    </div>
+    </React.Fragment>
   );
 };
 

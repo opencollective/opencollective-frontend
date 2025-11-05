@@ -545,7 +545,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                       }}
                                     />
                                   </Box>
-                                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
                                     <MessageBox type="info" mt={3} fontSize="13px">
                                       <FormattedMessage
                                         defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."

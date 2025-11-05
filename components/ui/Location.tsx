@@ -26,13 +26,15 @@ export const Location = ({ location, className }: { location: Readonly<LocationT
   return (
     <div id="location" className={cn('relative h-full w-full overflow-hidden rounded-lg border', className)}>
       {lat && long && (
-        <div className="relative h-80">
+        <div className="relative h-80" data-cy="location-map">
           <Map lat={lat} long={long} />
         </div>
       )}
       <div className="absolute bottom-2 left-2 max-w-1/2 rounded-lg bg-background px-3 py-2">
-        <h1 className="font-semibold">{name}</h1>
-        <p className="text-sm">
+        <h1 className="font-semibold" data-cy="location-name">
+          {name}
+        </h1>
+        <p className="text-sm" data-cy="location-address">
           <Link
             href={openStreetMapLink}
             openInNewTab

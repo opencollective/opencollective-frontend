@@ -4,7 +4,7 @@ import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type {
   BordersProps,
   ColorProps,
@@ -23,7 +23,7 @@ import type { MessageType } from '../lib/theme/variants/message';
 import { messageType } from '../lib/theme/variants/message';
 
 import { Box, Flex } from './Grid';
-import StyledSpinner from './StyledSpinner';
+import Spinner from './Spinner';
 
 type MessageProps = BordersProps &
   ShadowProps &
@@ -45,6 +45,7 @@ type MessageBoxProps = MessageProps & {
   children: React.ReactNode;
   icon?: React.ReactNode;
   alignIcon?: 'start' | 'center';
+  css?: any;
 };
 
 const Message = styled.div<MessageProps>`
@@ -118,7 +119,7 @@ const MessageBox = ({
       <Flex gap="16px">
         {(finalIcon || isLoading) && (
           <Box flexShrink={0} alignSelf={alignIcon} color={!icon && iconColors[type]}>
-            {isLoading ? <StyledSpinner size="1.2em" /> : finalIcon}
+            {isLoading ? <Spinner size="1.2em" /> : finalIcon}
           </Box>
         )}
 

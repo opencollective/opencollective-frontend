@@ -2,15 +2,18 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { isEmpty, max, min, omit, orderBy, pick, set } from 'lodash';
+import { omit, orderBy, pick, set } from 'lodash';
+import { Plus, X } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { suggestSlug } from '@/lib/collective';
+import { getCurrencyForCountry } from '@/lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { OrganizationSignupMutation } from '@/lib/graphql/types/v2/graphql';
-import { CountryIso } from '@/lib/graphql/types/v2/graphql';
+import { CountryIso, Currency } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nCountryName } from '@/lib/i18n';
 import { getCountryCodeFromLocalBrowserLanguage, getFlagEmoji } from '@/lib/i18n/countries';
@@ -39,6 +42,7 @@ const createOrganizationMutation = gql`
     $inviteMembers: [InviteMemberInput]
     $captcha: CaptchaInputType
     $roleDescription: String
+    $financiallyActive: Boolean
   ) {
     createOrganization(
       individual: $individual
@@ -46,6 +50,7 @@ const createOrganizationMutation = gql`
       inviteMembers: $inviteMembers
       captcha: $captcha
       roleDescription: $roleDescription
+      financiallyActive: $financiallyActive
     ) {
       id
       name
@@ -63,8 +68,9 @@ const formSchema = z.object({
     name: z.string().min(5).max(255),
     slug: z.string().min(5).max(255),
     legalName: z.string().min(5).max(255),
-    description: z.string().min(10).max(255),
+    description: z.string().max(255).optional(),
     website: z.string().url().optional(),
+    currency: z.string().length(3),
   }),
   individual: z.union([
     z.object({
@@ -76,7 +82,14 @@ const formSchema = z.object({
   ]),
   TOSAgreement: z.boolean().optional(),
   roleDescription: z.string().max(255).optional(),
-  invitedAdmins: z.array(z.string().email()).optional(),
+  invitedAdmins: z
+    .array(
+      z.object({
+        email: z.string().email(),
+        name: z.string().min(1),
+      }),
+    )
+    .optional(),
 });
 
 type FormValuesSchema = z.infer<typeof formSchema>;
@@ -85,16 +98,24 @@ export type OrganizationFormProps = {
   onSuccess?: (organization: OrganizationSignupMutation['createOrganization']) => void;
 };
 
+const invitedAdminToMember = ({ email, name }) => {
+  return { memberInfo: { email, name }, role: 'ADMIN' };
+};
+
 const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
   const countryInputRef = useRef<HTMLInputElement>(null);
+  const currencyInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const [createOrganization, { loading }] = useMutation(createOrganizationMutation, { context: API_V2_CONTEXT });
   const [userForm, setUserForm] = useState<'LOGIN' | 'NEW_USER' | string>('NEW_USER');
   const [showSignInPopup, setShowSignInPopup] = useState(false);
   const [showCountrySelect, setShowCountrySelect] = useState(false);
+  const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
+  const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
   const getCountryLabel = useCallback(
     (countryISO: string) => `${getFlagEmoji(countryISO)} ${i18nCountryName(intl, countryISO)}`,
     [intl],
@@ -111,6 +132,14 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
       ),
     [getCountryLabel],
   );
+  const currencyOptions = useMemo(
+    () =>
+      Object.keys(Currency).map(code => ({
+        value: code,
+        label: code,
+      })),
+    [],
+  );
   const handleOpenCountrySelect = useCallback(
     open => {
       setShowCountrySelect(open);
@@ -121,6 +150,17 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
       }
     },
     [countryInputRef],
+  );
+  const openCurrencySelect = useCallback(
+    open => {
+      setShowCurrencySelect(open);
+      if (open) {
+        setTimeout(() => {
+          currencyInputRef.current?.focus();
+        }, 100);
+      }
+    },
+    [currencyInputRef],
   );
 
   useEffect(() => {
@@ -144,6 +184,7 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         const countryISO = countryCode && CountryIso[countryCode];
         if (countryISO) {
           formik.setFieldValue('organization.countryISO', countryISO);
+          formik.setFieldValue('organization.currency', getCurrencyForCountry(countryISO));
         }
       }
     }
@@ -174,11 +215,10 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
         variables: {
           individual: 'id' in individual ? null : omit(individual, ['passwordConfirmation']),
           organization: organization,
-          inviteMembers: invitedAdmins?.length
-            ? invitedAdmins.map(email => ({ memberInfo: { email }, role: 'ADMIN' }))
-            : undefined,
+          inviteMembers: invitedAdmins?.length ? invitedAdmins.map(invitedAdminToMember) : undefined,
           captcha: captchaResult,
           roleDescription,
+          financiallyActive: router.query?.active === 'true',
         },
       });
       onSuccess?.(result.data.createOrganization);
@@ -384,7 +424,71 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                                   data-cy={`organization-country-${value}`}
                                   onSelect={() => {
                                     setFieldValue(field.name, value as CountryIso);
+                                    if (!touched.organization?.currency) {
+                                      setFieldValue(
+                                        'organization.currency',
+                                        getCurrencyForCountry(value as CountryIso),
+                                      );
+                                    }
                                     setShowCountrySelect(false);
+                                  }}
+                                >
+                                  <span>{label}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </FormField>
+                <FormField
+                  name="organization.currency"
+                  label={<FormattedMessage id="Currency" defaultMessage="Currency" />}
+                  hint={
+                    <FormattedMessage
+                      defaultMessage="Select the main currency for your organization's financial transactions and reporting."
+                      id="currency.hint"
+                    />
+                  }
+                >
+                  {({ field }) => (
+                    <Select
+                      value={field.value}
+                      open={showCurrencySelect}
+                      onOpenChange={openCurrencySelect}
+                      disabled={field.disabled}
+                    >
+                      <SelectTrigger
+                        className={cn(!field.value && 'text-muted-foreground')}
+                        data-cy="organization-currency-trigger"
+                      >
+                        {field.value ? (
+                          field.value
+                        ) : (
+                          <FormattedMessage defaultMessage="Select currency" id="collective.curency.placeholder" />
+                        )}
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[50vh]">
+                        <Command>
+                          <CommandInput
+                            placeholder={intl.formatMessage({ defaultMessage: 'Search currencies...', id: 'fDMc8k' })}
+                            data-cy="organization-currency-search"
+                            ref={currencyInputRef}
+                          />
+                          <CommandList data-cy="organization-currency-list">
+                            <CommandEmpty>
+                              <FormattedMessage defaultMessage="No currency found." id="moOGSq" />
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {currencyOptions.map(({ value, label }) => (
+                                <CommandItem
+                                  key={value}
+                                  data-cy={`organization-country-${value}`}
+                                  onSelect={() => {
+                                    setFieldValue(field.name, value as Currency);
+                                    setShowCurrencySelect(false);
                                   }}
                                 >
                                   <span>{label}</span>
@@ -400,13 +504,21 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                 <FormField
                   name="organization.legalName"
                   label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
-                  hint={<FormattedMessage defaultMessage="As registered with legal entities" id="jQOxmT" />}
-                  placeholder="e.g. Open Collective Inc., Open Finance Consortium Inc."
+                  hint={
+                    <FormattedMessage defaultMessage="Official name as registered with legal authorities" id="jQOxmT" />
+                  }
+                  placeholder="e.g. Green Horizon Foundation, Inc."
                 />
                 <FormField
                   name="organization.name"
                   label={<FormattedMessage id="PublicName" defaultMessage="Public name" />}
-                  placeholder="e.g. Open Collective, OFiCo"
+                  hint={
+                    <FormattedMessage
+                      defaultMessage="Displayed publicly. Can be different from legal name."
+                      id="publicName.hint"
+                    />
+                  }
+                  placeholder="e.g. Green Horizon"
                   onChange={e => {
                     setFieldValue('organization.name', e.target.value);
                     if (!touched.organization?.slug) {
@@ -451,36 +563,65 @@ const OrganizationForm = ({ onSuccess }: OrganizationFormProps) => {
                     />
                   </p>
                 </header>
-                {Array.from({
-                  length: min([max([1, values.invitedAdmins?.filter(v => !isEmpty(v)).length + 1]), 5]),
-                }).map((_, index) => (
-                  <FormField
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={`invitedAdmins.${index}`}
-                    name={`invitedAdmins.${index}`}
-                    label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                    type="email"
-                  >
-                    {({ field }) => (
-                      <div className="flex gap-1">
-                        <Input
-                          {...field}
-                          onChange={e => {
-                            const value = e.target.value;
-                            if (isEmpty(value)) {
-                              setFieldValue(
-                                'invitedAdmins',
-                                values.invitedAdmins.filter((_, i) => i !== index),
-                              );
-                            } else {
-                              setFieldValue(`invitedAdmins.${index}`, e.target.value);
-                            }
+                {inviteFieldsCount > 0 && (
+                  <div className="flex flex-col gap-4">
+                    {Array.from({ length: inviteFieldsCount }).map((_, index) => (
+                      <div
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`invitedAdmin-${index}`}
+                        className="flex items-start gap-2"
+                      >
+                        <div className="flex flex-1 flex-col gap-4 rounded-lg border border-border p-4">
+                          <FormField
+                            name={`invitedAdmins.${index}.name`}
+                            label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
+                          >
+                            {({ field }) => <Input {...field} placeholder="e.g. Jane Smith" />}
+                          </FormField>
+                          <FormField
+                            name={`invitedAdmins.${index}.email`}
+                            label={<FormattedMessage id="Email" defaultMessage="Email" />}
+                            type="email"
+                          >
+                            {({ field }) => <Input {...field} placeholder="e.g. jane@example.com" />}
+                          </FormField>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const newInvitedAdmins = [...(values.invitedAdmins || [])];
+                            newInvitedAdmins.splice(index, 1);
+                            setFieldValue('invitedAdmins', newInvitedAdmins);
+                            setInviteFieldsCount(inviteFieldsCount - 1);
                           }}
-                        />
+                          className="mt-1 h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
-                    )}
-                  </FormField>
-                ))}
+                    ))}
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    if (inviteFieldsCount < 5) {
+                      setInviteFieldsCount(inviteFieldsCount + 1);
+                      const newInvitedAdmins = [...(values.invitedAdmins || [])];
+                      newInvitedAdmins.push({ name: '', email: '' });
+                      setFieldValue('invitedAdmins', newInvitedAdmins);
+                    }
+                  }}
+                  disabled={inviteFieldsCount >= 5}
+                  className="w-full"
+                  data-cy="add-team-member"
+                >
+                  <Plus className="h-4 w-4" />
+                  <FormattedMessage defaultMessage="Add Team Member" id="InviteTeamMember.add" />
+                </Button>
               </CardContent>
             </Card>
             {isCaptchaEnabled() && (

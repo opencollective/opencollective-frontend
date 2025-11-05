@@ -1,4 +1,4 @@
-import { find, isEmpty, isUndefined, omit, pickBy } from 'lodash';
+import { find, isEmpty, isUndefined, mapValues, omit, pickBy } from 'lodash';
 
 import type { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 
@@ -9,7 +9,7 @@ import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
 
-export const PDF_SERVICE_V2_URL = process.env.PDF_SERVICE_V2_URL;
+export const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL;
 
 // ---- Utils ----
 
@@ -44,15 +44,15 @@ const objectToQueryString = options => {
 // ---- Routes to other Open Collective services ----
 
 export const collectiveInvoiceURL = (collectiveSlug, hostSlug, startDate, endDate, format = 'pdf') => {
-  return `${PDF_SERVICE_V2_URL}/receipts/period/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
+  return `${PDF_SERVICE_URL}/receipts/period/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
 };
 
 export const transactionInvoiceURL = transactionUUID => {
-  return `${PDF_SERVICE_V2_URL}/receipts/transaction/${transactionUUID}/receipt.pdf`;
+  return `${PDF_SERVICE_URL}/receipts/transaction/${transactionUUID}/receipt.pdf`;
 };
 
 export const expenseInvoiceUrl = expenseId => {
-  return `${PDF_SERVICE_V2_URL}/expenses/${expenseId}/invoice.pdf`;
+  return `${PDF_SERVICE_URL}/expenses/${expenseId}/invoice.pdf`;
 };
 
 /**
@@ -61,7 +61,7 @@ export const expenseInvoiceUrl = expenseId => {
  * @param {string} filename - filename **with** extension
  */
 export const giftCardsDownloadUrl = filename => {
-  return `${PDF_SERVICE_V2_URL}/gift-cards/${filename}`;
+  return `${PDF_SERVICE_URL}/gift-cards/${filename}`;
 };
 
 // ---- Routes to external services ----
@@ -130,11 +130,39 @@ export const mailToURL = (address = '', opts) => {
   return `mailto://${address}${objectToQueryString(opts)}`;
 };
 
-export const getDashboardRoute = (account, section = null) => {
+export const getDashboardRoute = (account, section = null, { params }: { params?: URLSearchParams } = {}) => {
   if (!account) {
     return '';
   }
-  return `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+
+  const route = `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+  if (params) {
+    return `${route}?${params.toString()}`;
+  }
+  return route;
+};
+
+export const getDashboardTransactionsRoute = (account, queryParams: { openTransactionId?: number } = {}) => {
+  const baseRoute = getDashboardRoute(account, 'transactions');
+  const params = new URLSearchParams(mapValues(queryParams, value => value?.toString()));
+  if (params.size > 0) {
+    return `${baseRoute}?${params.toString()}`;
+  } else {
+    return baseRoute;
+  }
+};
+
+export const getHostDashboardTransactionsRoute = (
+  host,
+  queryParams: { openTransactionId?: number; account?: string } = {},
+) => {
+  const baseRoute = getDashboardRoute(host, 'host-transactions');
+  const params = new URLSearchParams(mapValues(queryParams, value => value?.toString()));
+  if (params.size > 0) {
+    return `${baseRoute}?${params.toString()}`;
+  } else {
+    return baseRoute;
+  }
 };
 
 export const getOauthAppSettingsRoute = (account, app) => {
@@ -309,7 +337,7 @@ export const getFileExtensionFromUrl = url => {
 };
 
 export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = false } = {}): string => {
-  const url = new URL(`${PDF_SERVICE_V2_URL}/tax-forms/${type}.pdf`);
+  const url = new URL(`${PDF_SERVICE_URL}/tax-forms/${type}.pdf`);
   const base64Values = Buffer.from(JSON.stringify(values)).toString('base64');
   url.searchParams.set('formType', type);
   url.searchParams.set('values', base64Values);

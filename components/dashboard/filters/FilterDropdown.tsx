@@ -1,5 +1,5 @@
 import * as React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { isEmpty, isEqual, isNil } from 'lodash';
 import { Plus, X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

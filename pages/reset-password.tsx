@@ -92,11 +92,7 @@ const ResetPasswordPage = ({ token }: { token: string }) => {
 
   return (
     <React.Fragment>
-      <Header
-        menuItems={{ solutions: false, product: false, company: false, docs: false }}
-        showSearch={false}
-        showProfileAndChangelogMenu={false}
-      />
+      <Header showMenuItems={false} showSearch={false} showProfileAndChangelogMenu={false} />
       <Body>
         <Flex flexDirection="column" alignItems="center" my={[4, 6]}>
           <Card className="w-full max-w-md px-4 py-5">

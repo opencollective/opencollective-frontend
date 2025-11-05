@@ -2,7 +2,7 @@ import React from 'react';
 import { Info } from '@styled-icons/feather/Info';
 import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getSectionsCategoryDetails } from '../../lib/collective-sections';
 

@@ -16,8 +16,8 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
-  GRANT_AND_FUNDS_REORG = 'GRANT_AND_FUNDS_REORG',
-  HOST_OVERVIEW = 'HOST_OVERVIEW',
+  PLATFORM_BILLING = 'PLATFORM_BILLING',
+  PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
 }
 
 enum Categories {
@@ -76,6 +76,15 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.GENERAL,
   },
   {
+    key: PREVIEW_FEATURE_KEYS.PLATFORM_BILLING,
+    title: 'Platform billing',
+    description: 'New platform billing dashboard',
+    alwaysEnableInDev: true,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    category: Categories.GENERAL,
+  },
+  {
     key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
     title: <FormattedMessage defaultMessage="Keyboard Shortcuts" id="PreviewFeatures.keyboardShortcutsTitle" />,
     description: (
@@ -96,10 +105,9 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.newExpenseFlowDescription"
       />
     ),
-    alwaysEnableInDev: true,
-    publicBeta: true,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
+    publicBeta: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
@@ -110,10 +118,9 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.inlineEditExpenseDescription"
       />
     ),
-    alwaysEnableInDev: true,
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
+    publicBeta: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
@@ -129,45 +136,18 @@ export const previewFeatures: PreviewFeature[] = [
     category: Categories.GENERAL,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
-    title: (
-      <FormattedMessage defaultMessage="Funds & Grants Dashboard Tools" id="PreviewFeatures.grantAndFundsReorgTitle" />
-    ),
-    description: (
-      <FormattedMessage
-        defaultMessage="Access dedicated Dashboard sections for Grants and Funds management. Better organization and specialized tools for managing grant programs and fund allocations."
-        id="PreviewFeatures.grantAndFundsReorgDescription"
-      />
-    ),
-    alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-    publicBeta: false,
-    category: Categories.HOSTING,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.HOST_OVERVIEW,
-    title: <FormattedMessage defaultMessage="Host Dashboard Overview" id="PreviewFeatures.hostOverviewTitle" />,
-    description: (
-      <FormattedMessage
-        defaultMessage="A comprehensive dashboard landing page for Host accounts that provides an overview of your organization's activities, metrics, and key information at a glance."
-        id="PreviewFeatures.hostOverviewDescription"
-      />
-    ),
-    alwaysEnableInDev: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
-    publicBeta: false,
-    category: Categories.HOSTING,
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,
     title: 'Authenticated SSR',
     description: 'Uses cookie based authentication to generate initial page loads on the server.',
     closedBetaAccessFor: ENGINEERS,
     publicBeta: false,
     isEnabled() {
-      return document.cookie.indexOf('enableAuthSsr') !== -1;
+      return typeof document !== 'undefined' && document.cookie.indexOf('enableAuthSsr') !== -1;
     },
     setIsEnabled(enabled) {
+      if (typeof document === 'undefined') {
+        return;
+      }
       if (!enabled) {
         document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
       } else {
@@ -183,9 +163,12 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ENGINEERS,
     isEnabled() {
-      return document.cookie.indexOf('backend=vercel') !== -1;
+      return typeof document !== 'undefined' && document.cookie.indexOf('backend=vercel') !== -1;
     },
     setIsEnabled(enabled) {
+      if (typeof document === 'undefined') {
+        return;
+      }
       if (!enabled) {
         document.cookie = 'backend=; Path=/; Max-Age=0';
       } else {
@@ -193,5 +176,14 @@ export const previewFeatures: PreviewFeature[] = [
       }
     },
     category: Categories.FOR_NERDS,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD,
+    title: 'People Dashboard',
+    description: 'Access a new dashboard to manage and engage with your community members.',
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    category: Categories.HOSTING,
+    alwaysEnableInDev: true,
   },
 ];

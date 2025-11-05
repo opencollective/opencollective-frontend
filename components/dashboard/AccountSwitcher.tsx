@@ -5,7 +5,7 @@ import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-re
 import memoizeOne from 'memoize-one';
 import type { ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { space } from 'styled-system';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -268,7 +268,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click" className="grow">
+    <Dropdown trigger="click" className="min-w-0 grow">
       {({ triggerProps, dropdownProps }) => (
         <React.Fragment>
           <Flex alignItems="center" flex={0}>
@@ -340,7 +340,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           </p>
                           <Link
                             className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-xs transition-colors hover:bg-gray-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                            href="/create"
+                            href={CREATE_NEW_LINKS[collectiveType] || '/create'}
                           >
                             <div className="mr-3 rounded-full border bg-white p-2 text-muted-foreground">
                               <Plus size={12} />

@@ -6,7 +6,7 @@ import { Form, Formik } from 'formik';
 import { uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';

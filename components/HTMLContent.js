@@ -98,9 +98,11 @@ const HTMLContent = styled(
                 const parsedUrl = new URL(src);
                 const hostname = parsedUrl.hostname;
                 if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
+                  const isYouTube = hostname.includes('youtube');
                   return (
                     <iframe
                       allowFullScreen
+                      referrerPolicy={isYouTube ? 'strict-origin-when-cross-origin' : undefined}
                       width={node.getAttribute('width')}
                       height={node.getAttribute('height')}
                       title={node.getAttribute('title') || 'Embed content'}

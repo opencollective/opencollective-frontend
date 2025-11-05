@@ -1,20 +1,19 @@
 import React, { Fragment } from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { Discord } from '@styled-icons/fa-brands/Discord';
-import { Github } from '@styled-icons/fa-brands/Github';
-import { Blog } from '@styled-icons/icomoon/Blog';
-import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+import { getEnvVar } from '@/lib/env-utils';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { parseToBoolean } from '@/lib/utils';
 
+import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/Collapsible';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
-import StyledLink from './StyledLink';
-import StyledRoundButton from './StyledRoundButton';
 import { withUser } from './UserProvider';
 
 const ListItem = styled.li`
@@ -35,22 +34,17 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
-/**
- * @deprecated Will be replaced by `components/navigation/SiteMenu` when Workspace moves out of preview feature
- */
-const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
-  const [state, setState] = React.useState({
-    viewSolutionsMenu: false,
-    viewProductsMenu: false,
-    viewCompanyMenu: false,
-  });
+const TopBarMobileMenu = ({ closeMenu }) => {
   const innerRef = React.useRef(undefined);
-
+  const { LoggedInUser } = useLoggedInUser();
   useGlobalBlur(innerRef, isOutside => {
     if (isOutside) {
       closeMenu();
     }
   });
+
+  const menuItems = parseToBoolean(getEnvVar('NEW_PRICING')) ? newMarketingTopbarItems : legacyTopBarItems;
+
   return (
     <React.Fragment>
       <HideGlobalScroll />
@@ -68,157 +62,52 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
         data-cy="user-menu"
       >
         <Box as="ul" my={2} pl={0} pb={2}>
-          {useDashboard && !onHomeRoute ? (
-            <Fragment>
-              <ListItem>
-                <Link href="/dashboard" onClick={closeMenu}>
-                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-                </Link>
-              </ListItem>
-              <hr className="my-5" />
-              <ListItem>
-                <Link href="/search" onClick={closeMenu}>
-                  <FormattedMessage id="Explore" defaultMessage="Explore" />
-                </Link>
-              </ListItem>
-              <hr className="my-5" />
-              <ListItem>
-                <Link href="/help" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
-                </Link>
-              </ListItem>
-            </Fragment>
-          ) : (
-            <Fragment>
-              <ListItem>
-                <Flex
-                  justifyContent="space-between"
-                  onClick={() => setState({ ...state, viewSolutionsMenu: !state.viewSolutionsMenu })}
-                >
-                  <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
-                  <ChevronDown size={20} />
-                </Flex>
-                {state.viewSolutionsMenu && (
-                  <Box as="ul" my={2} pl="12px">
-                    <SubListItem>
-                      <Link href={'/collectives'} onClick={closeMenu}>
-                        <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
-                      </Link>
-                    </SubListItem>
-                    <SubListItem>
-                      <Link href={'/become-a-sponsor'} onClick={closeMenu}>
-                        <FormattedMessage defaultMessage="For Contributors" id="CPlDGt" />
-                      </Link>
-                    </SubListItem>
-                    <SubListItem>
-                      <Link href={'/become-a-host'} onClick={closeMenu}>
-                        <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
-                      </Link>
-                    </SubListItem>
-                  </Box>
-                )}
-              </ListItem>
-              <hr className="my-5" />
-              <ListItem>
-                <Flex
-                  justifyContent="space-between"
-                  onClick={() => setState({ ...state, viewProductsMenu: !state.viewProductsMenu })}
-                >
-                  <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-                  <ChevronDown size={20} />
-                </Flex>
-                {state.viewProductsMenu && (
-                  <Box as="ul" my={2} pl="12px">
-                    <SubListItem>
-                      <Link href={'/pricing'} onClick={closeMenu}>
-                        <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-                      </Link>
-                    </SubListItem>
-                    <SubListItem>
-                      <Link href={'/how-it-works'} onClick={closeMenu}>
-                        <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-                      </Link>
-                    </SubListItem>
-                    <SubListItem>
-                      <Link href={'/fiscal-hosting'} onClick={closeMenu}>
-                        <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-                      </Link>
-                    </SubListItem>
-                  </Box>
-                )}
-              </ListItem>
-              <hr className="my-5" />
-              <ListItem>
-                <Flex
-                  justifyContent="space-between"
-                  onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
-                >
-                  <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
-                  <ChevronDown size={20} />
-                </Flex>
-                {state.viewCompanyMenu && (
-                  <Box as="ul" my={2} pl="12px">
-                    <SubListItem>
-                      <a href="https://blog.opencollective.com/" onClick={closeMenu}>
-                        <FormattedMessage id="company.blog" defaultMessage="Blog" />
-                      </a>
-                    </SubListItem>
-                  </Box>
-                )}
-              </ListItem>
-              <hr className="my-5" />
-              <ListItem>
-                <Link href={'/help'} onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
-                </Link>
-              </ListItem>
-              {useDashboard && (
-                <Fragment>
-                  <hr className="my-5" />
-                  <ListItem>
-                    <Link href="/dashboard" onClick={closeMenu}>
-                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-                    </Link>
-                  </ListItem>
-                </Fragment>
-              )}
-            </Fragment>
+          {LoggedInUser && (
+            <ListItem>
+              <Link href={'/dashboard'} onClick={closeMenu}>
+                <FormattedMessage defaultMessage="Dashboard" id="Dashboard" />
+              </Link>
+            </ListItem>
           )}
+          {menuItems.map((menuItem, index) => (
+            <Fragment key={menuItem.label.id}>
+              <ListItem>
+                {menuItem.items ? (
+                  <Collapsible>
+                    <CollapsibleTrigger asChild>
+                      <Flex justifyContent="space-between" style={{ cursor: 'pointer' }}>
+                        <FormattedMessage {...menuItem.label} />
+                        <ChevronDown size={20} />
+                      </Flex>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <Box as="ul" my={2} pl="12px">
+                        {menuItem.items.map(subItem => (
+                          <SubListItem key={subItem.href}>
+                            {subItem.target === '_blank' ? (
+                              <a href={subItem.href} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
+                                <FormattedMessage {...subItem.label} />
+                              </a>
+                            ) : (
+                              <Link href={subItem.href} onClick={closeMenu}>
+                                <FormattedMessage {...subItem.label} />
+                              </Link>
+                            )}
+                          </SubListItem>
+                        ))}
+                      </Box>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ) : (
+                  <Link href={menuItem.href} onClick={closeMenu}>
+                    <FormattedMessage {...menuItem.label} />
+                  </Link>
+                )}
+              </ListItem>
+              {index < menuItems.length - 1 && <hr className="my-5" />}
+            </Fragment>
+          ))}
         </Box>
-        {(!useDashboard || onHomeRoute) && (
-          <Container
-            display="flex"
-            alignItems="center"
-            width={1}
-            p={2}
-            mt={3}
-            order={['2', null, '3']}
-            borderRadius={16}
-            background="#F7F8FA"
-            justifyContent="space-between"
-          >
-            <StyledLink href="https://blog.opencollective.com/" openInNewTab onClick={closeMenu}>
-              <StyledRoundButton size={40}>
-                <Blog size={17} color="#9D9FA3" />
-              </StyledRoundButton>
-            </StyledLink>
-            <StyledLink href="https://github.com/opencollective" openInNewTab onClick={closeMenu}>
-              <StyledRoundButton size={40}>
-                <Github size={17} color="#9D9FA3" />
-              </StyledRoundButton>
-            </StyledLink>
-            <StyledLink href="https://discord.opencollective.com" openInNewTab onClick={closeMenu}>
-              <StyledRoundButton size={40}>
-                <Discord size={17} color="#9D9FA3" />
-              </StyledRoundButton>
-            </StyledLink>
-            <StyledLink href="mailto:info@opencollective.com" openInNewTab onClick={closeMenu}>
-              <StyledRoundButton size={40}>
-                <Mail size={19} color="#9D9FA3" />
-              </StyledRoundButton>
-            </StyledLink>
-          </Container>
-        )}
       </Container>
     </React.Fragment>
   );

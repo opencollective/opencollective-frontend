@@ -5,7 +5,7 @@ import { pick } from 'lodash';
 import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
@@ -132,7 +132,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
               },
               {
                 Link: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/developers/personal-tokens',
+                  href: 'https://documentation.opencollective.com/development/api',
                   openInNewTab: true,
                 }),
               },
@@ -207,7 +207,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                     },
                     {
                       Link: getI18nLink({
-                        href: 'https://docs.opencollective.com/help/developers/oauth#text-available-scopes',
+                        href: 'https://documentation.opencollective.com/development/api',
                         openInNewTab: true,
                       }),
                     },

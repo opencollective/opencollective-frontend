@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { debounce } from 'lodash';
 import { Search, XIcon } from 'lucide-react';
 import { defineMessage, useIntl } from 'react-intl';

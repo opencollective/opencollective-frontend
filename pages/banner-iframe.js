@@ -5,7 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash';
 import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';

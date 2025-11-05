@@ -3,7 +3,7 @@ import { diffArrays, diffChars, diffJson } from 'diff';
 import { has, isEmpty, pickBy, startCase } from 'lodash';
 import { Pencil } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { Flex } from '../../../Grid';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import type { SizeProps, SpaceProps } from 'styled-system';
 import { size, space } from 'styled-system';
 

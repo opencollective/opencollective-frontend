@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
 
 const SectionTitle = styled.p.attrs(props => ({

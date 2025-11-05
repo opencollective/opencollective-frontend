@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import type { LucideIcon } from 'lucide-react';
 import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import ReactAnimateHeight from 'react-animate-height';
@@ -51,7 +51,7 @@ export const MenuLink = ({
   });
   const subMenuExpanded = sectionExpanded || selfExpanded;
 
-  const isSelected = !subMenu && section && sectionAndSubpath === section;
+  const isSelected = !subMenu && section && (sectionAndSubpath === section || selectedSection === section);
 
   if (!label && SECTION_LABELS[section]) {
     label = formatMessage(SECTION_LABELS[section]);
@@ -62,6 +62,11 @@ export const MenuLink = ({
     isSelected ? 'bg-blue-50/50 text-blue-700' : 'text-slate-700 hover:bg-blue-50/50 hover:text-blue-700',
     className,
   );
+
+  // Hide menu item if all it's submenu items are hidden
+  if (!href && !section && !subMenu?.length) {
+    return null;
+  }
 
   return (
     <div>

@@ -7,6 +7,8 @@ import { Check, ChevronDown } from 'lucide-react';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn } from '../../lib/utils';
 
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './Command';
+
 const Select = SelectPrimitive.Root;
 
 const SelectGroup = SelectPrimitive.Group;
@@ -107,7 +109,85 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-// ui library
+type DefaultCommandSelectProps = {
+  name: string;
+  placeholder: string;
+  searchPlaceholder?: string;
+  emptyResultLabel?: string | React.ReactNode;
+  value: string;
+  setValue: (value: string) => void;
+  options: { value: string; label: string | React.ReactNode }[];
+};
+
+const DefaultCommandSelect = ({
+  name,
+  placeholder,
+  searchPlaceholder,
+  emptyResultLabel,
+  value,
+  setValue,
+  options,
+}: DefaultCommandSelectProps) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [isOpen, setOpen] = React.useState(false);
+  const handleSelectOpen = React.useCallback(
+    open => {
+      setOpen(open);
+      if (open) {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
+      }
+    },
+    [inputRef],
+  );
+  return (
+    <Select value={value} open={isOpen} onOpenChange={handleSelectOpen}>
+      <SelectTrigger className={cn(!value && 'text-muted-foreground')} data-cy={`${name}-trigger`}>
+        {options.find(option => option.value === value)?.label || placeholder}
+      </SelectTrigger>
+      <SelectContent className="max-h-[50vh]">
+        <Command>
+          <CommandInput placeholder={searchPlaceholder} data-cy={`${name}-search`} ref={inputRef} />
+          <CommandList data-cy={`${name}-list`}>
+            <CommandEmpty>{emptyResultLabel}</CommandEmpty>
+            <CommandGroup>
+              {options.map(({ value, label }) => (
+                <CommandItem
+                  key={value}
+                  data-cy={`${name}-${value}`}
+                  onSelect={() => {
+                    setValue(value);
+                    setOpen(false);
+                  }}
+                >
+                  <span>{label}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </SelectContent>
+    </Select>
+  );
+};
+
+const DefaultSelect = ({ name, placeholder, value, setValue, options }: DefaultCommandSelectProps) => {
+  return (
+    <Select onValueChange={setValue} value={value} name={name}>
+      <SelectTrigger data-cy={`${name}-trigger`} className="flex-1">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map(({ value, label }) => (
+          <SelectItem className="cursor-pointer" data-cy={`${name}-${value}`} value={value} key={value}>
+            {label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
 
 export {
   Select,
@@ -119,4 +199,6 @@ export {
   SelectLabel,
   SelectItem,
   SelectSeparator,
+  DefaultCommandSelect,
+  DefaultSelect,
 };

@@ -146,6 +146,7 @@ const LocationInput = ({ value, onChange, placeholder }) => {
                 <FormattedMessage id="OnlineAddress" defaultMessage="Online address" />
               </Label>
               <Input
+                type="url"
                 width="100%"
                 placeholder="https://meet.jit.si/opencollective"
                 defaultValue={value.address}

@@ -1,13 +1,16 @@
 import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, pick } from 'lodash';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/schema';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
@@ -24,14 +27,14 @@ import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
 
 class EmbedContributionFlowPage extends React.Component<{
-  router: any;
+  router: Router;
   collectiveSlug: string;
   tierId: number;
   error: string;
   queryParams: Record<string, unknown>;
   loadStripe: () => void;
-  intl: any;
-  LoggedInUser: any;
+  intl: IntlShape;
+  LoggedInUser: LoggedInUser;
   data: Record<string, any>;
 }> {
   static getInitialProps({ query, res }) {

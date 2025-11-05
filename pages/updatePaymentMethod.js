@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';

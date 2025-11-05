@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -98,7 +98,7 @@ const JoinUsActionContainer = ({ title, description, link }) => {
   );
 };
 
-const JoinUs = ({ page }) => (
+const JoinUs = ({ page = undefined }) => (
   <JoinUsWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}

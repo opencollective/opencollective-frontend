@@ -4,7 +4,7 @@ import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
 import { get, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { i18nGraphqlException } from '../../../lib/errors';
@@ -23,8 +23,8 @@ import { useToast } from '../../ui/useToast';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const accountQuery = gql`
-  query AccountSecurity($slug: String) {
+const securityAccountQuery = gql`
+  query SecurityAccount($slug: String) {
     account(slug: $slug) {
       id
       slug
@@ -88,7 +88,10 @@ const getInitialValues = account => {
 const Security = ({ collective }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { data, loading } = useQuery(accountQuery, { variables: { slug: collective.slug }, context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(securityAccountQuery, {
+    variables: { slug: collective.slug },
+    context: API_V2_CONTEXT,
+  });
   const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation, {
     context: API_V2_CONTEXT,
   });
@@ -213,8 +216,8 @@ const Security = ({ collective }) => {
               <Link
                 href={
                   data.account.isHost
-                    ? 'https://docs.opencollective.com/help/fiscal-hosts/payouts/two-factor-authentication-for-payouts'
-                    : 'https://docs.opencollective.com/help/product/two-factor-authentication'
+                    ? 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-security#two-factor-authentication-for-payouts'
+                    : 'https://documentation.opencollective.com/advanced/security-for-accounts/two-factor-authentication'
                 }
               >
                 <FormattedMessage defaultMessage="Read the documentation about 2FA" id="E+Bll1" />

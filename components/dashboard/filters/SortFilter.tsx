@@ -66,6 +66,14 @@ const i18nFieldDirectionLabels = {
     [OrderDirection.DESC]: { defaultMessage: 'Newest to Oldest', id: 'SortDirection.NewestToOldest' },
     [OrderDirection.ASC]: { defaultMessage: 'Oldest to Newest', id: 'SortDirection.OldestToNewest' },
   }),
+  [OrderByFieldType.MONEY_MANAGED]: defineMessages({
+    [OrderDirection.DESC]: { defaultMessage: 'Highest to Lowest', id: 'SortDirection.HighestToLowest' },
+    [OrderDirection.ASC]: { defaultMessage: 'Lowest to Highest', id: 'SortDirection.LowestToHighest' },
+  }),
+  [OrderByFieldType.LAST_TRANSACTION_CREATED_AT]: defineMessages({
+    [OrderDirection.DESC]: { defaultMessage: 'Newest to Oldest', id: 'SortDirection.NewestToOldest' },
+    [OrderDirection.ASC]: { defaultMessage: 'Oldest to Newest', id: 'SortDirection.OldestToNewest' },
+  }),
 };
 
 const FieldIconTypes = {
@@ -80,6 +88,8 @@ const FieldIconTypes = {
   [OrderByFieldType.NAME]: 'ALPHABETIC',
   [OrderByFieldType.RANK]: 'NUMERICAL',
   [OrderByFieldType.TOTAL_CONTRIBUTED]: 'NUMERICAL',
+  [OrderByFieldType.MONEY_MANAGED]: 'NUMERICAL',
+  [OrderByFieldType.LAST_TRANSACTION_CREATED_AT]: 'NUMERICAL',
 };
 
 const Icons = {

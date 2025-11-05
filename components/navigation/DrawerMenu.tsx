@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { cn } from '../../lib/utils';
 

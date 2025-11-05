@@ -199,7 +199,7 @@ const RequestVirtualCardModal = props => {
                     link: getI18nLink({
                       as: Link,
                       openInNewTab: true,
-                      href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                      href: 'https://documentation.opencollective.com/fiscal-hosts/virtual-cards',
                     }),
                   }}
                 />
@@ -231,7 +231,6 @@ const RequestVirtualCardModal = props => {
                 <StyledInputAmount
                   {...inputProps}
                   id="spendingLimitAmount"
-                  placeholder="0.00"
                   error={formik.touched.spendingLimitAmount && Boolean(formik.errors.spendingLimitAmount)}
                   currency={currency}
                   prepend={currency}

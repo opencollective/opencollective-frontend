@@ -23,7 +23,7 @@ import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/sch
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
 import Link from '../Link';
-import StyledSpinner from '../StyledSpinner';
+import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';
 import { useWorkspace } from '../WorkspaceProvider';
@@ -224,7 +224,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           placeholder={queryFilter.values.context ? '' : 'Search...'}
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
-        {isLoading && <StyledSpinner size={16} className="absolute right-4 text-muted-foreground" />}
+        {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
       <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">

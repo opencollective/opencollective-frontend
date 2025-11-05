@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { display, flexbox, space, textAlign, typography, width } from 'styled-system';
 
 import { listStyle } from '../lib/styled-system-custom-properties';

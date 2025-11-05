@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nGraphqlException } from '@/lib/errors';
+import { useNavigationWarning } from '@/lib/hooks/useNavigationWarning';
 
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
@@ -13,13 +14,12 @@ import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
 import { useToast } from '../ui/useToast';
 
 import { SubmitExpenseFlowForm } from './form/SubmitExpenseFlowForm';
-import { useNavigationWarning } from './hooks';
 import { Step, SubmitExpenseFlowSteps } from './SubmitExpenseFlowSteps';
 import { SubmittedExpense } from './SubmittedExpense';
 import { InviteeAccountType, RecurrenceFrequencyOption, useExpenseForm, YesNoOption } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
-  onClose: (submittedExpense: boolean) => void;
+  onClose: (submittedExpense: boolean, hasSelectedViewAll: boolean) => void;
   expenseId?: number;
   draftKey?: string;
   duplicateExpense?: boolean;
@@ -34,6 +34,16 @@ const I18nMessages = defineMessages({
   },
 });
 
+/**
+ * Main container component for the expense submission flow.
+ *
+ * Manages the dialog lifecycle, handles success/error callbacks, and orchestrates
+ * the overall expense creation/editing workflow. Acts as the entry point for both
+ * expense and grant submission flows.
+ *
+ * @param props Configuration including expense ID, draft key, and callbacks
+ * @see README.md for detailed architecture documentation
+ */
 export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -48,16 +58,25 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   });
 
   const { onClose } = props;
-  const handleOnClose = React.useCallback(() => {
-    if (confirmNavigation()) {
-      onClose(!!submittedExpenseId);
-    }
-  }, [confirmNavigation, onClose, submittedExpenseId]);
+  const handleOnClose = React.useCallback(
+    (hasSelectedViewAll = false) => {
+      if (confirmNavigation()) {
+        onClose(!!submittedExpenseId, hasSelectedViewAll);
+      }
+    },
+    [confirmNavigation, onClose, submittedExpenseId],
+  );
 
   const onExpenseInviteDeclined = React.useCallback(() => {
-    onClose(true);
+    onClose(true, false);
   }, [onClose]);
 
+  /**
+   * Handles successful expense submission with appropriate success messages.
+   * Shows different toast notifications based on submission type (edit/new/invite).
+   *
+   * @see README.md - API Error Handling section for error handling patterns
+   */
   const onSuccess = React.useCallback(
     (result, type: 'edit' | 'new' | 'invite') => {
       setSubmittedExpenseId(result.data.expense.legacyId);
@@ -94,6 +113,11 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     [LoggedInUser, toast],
   );
 
+  /**
+   * Handles API errors from mutations with internationalized error messages.
+   *
+   * @see README.md - API Error Handling section for error handling patterns
+   */
   const onError = React.useCallback(
     err => {
       toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
@@ -116,7 +140,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           className="overflow-hidden rounded-none p-0 sm:max-w-screen sm:min-w-screen sm:rounded-none sm:p-0"
           hideCloseButton
         >
-          <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC] before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')]">
+          <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')] sm:bg-[#F8FAFC]">
             <header className="z-30 flex min-w-screen items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
               <span className="text-xl leading-7 font-bold text-slate-800">
                 <FormattedMessage
@@ -126,7 +150,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 />
               </span>
               <Button
-                onClick={handleOnClose}
+                onClick={() => handleOnClose()}
                 variant="ghost"
                 className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
                 asChild
@@ -137,7 +161,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 </span>
               </Button>
 
-              <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden">
+              <Button onClick={() => handleOnClose()} variant="ghost" className="cursor-pointer sm:hidden">
                 <X />
               </Button>
             </header>
@@ -149,7 +173,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </div>
             </main>
             <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
-              <Button onClick={handleOnClose}>
+              <Button onClick={() => handleOnClose(true)}>
                 {props.endFlowButtonLabel || (
                   <FormattedMessage
                     defaultMessage="View all expenses"
@@ -184,13 +208,13 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
+        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl leading-7 font-bold text-slate-800">
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
             </span>
             <Button
-              onClick={handleOnClose}
+              onClick={() => handleOnClose()}
               variant="ghost"
               className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
               asChild
@@ -201,13 +225,13 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </span>
             </Button>
 
-            <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden">
+            <Button onClick={() => handleOnClose()} variant="ghost" className="cursor-pointer sm:hidden">
               <X />
             </Button>
           </header>
           <main className="flex w-full grow overflow-hidden">
             <div className="flex w-full grow justify-center">
-              <div className="relative flex w-full flex-row justify-center overflow-y-scroll pt-10 sm:gap-11 sm:px-8">
+              <div className="relative flex w-full flex-row justify-center overflow-y-scroll pt-4 sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
                   draftKey={props.draftKey}
@@ -226,6 +250,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   );
 }
 
+/**
+ * Internal component that wraps the expense form with FormikProvider.
+ *
+ * Manages form state initialization, step navigation, and integrates with
+ * the useExpenseForm hook for form logic and validation.
+ */
 function ExpenseFormikContainer(props: {
   submitExpenseTo?: string;
   draftKey?: string;
@@ -258,7 +288,6 @@ function ExpenseFormikContainer(props: {
           key: 'initial', // "key" is only used for enabling FlipMove animations
           amount: {
             valueInCents: 0,
-            currency: 'USD',
           },
           description: '',
         },
@@ -284,7 +313,7 @@ function ExpenseFormikContainer(props: {
     <FormikProvider value={expenseForm}>
       <SubmitExpenseFlowSteps className="sticky top-0 hidden w-64 min-w-44 sm:block" activeStep={activeStep} />
 
-      <div className="h-max w-full px-4 pb-4 sm:max-w-3xl sm:overflow-x-hidden sm:px-0">
+      <div className="h-max w-full pb-4 sm:max-w-3xl sm:overflow-x-hidden">
         <form ref={formRef} onSubmit={e => e.preventDefault()}>
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}

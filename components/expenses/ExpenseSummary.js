@@ -2,20 +2,23 @@ import React, { Fragment } from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { Download, MessageSquare } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { cn } from '../../lib/utils';
+import { cn, parseToBoolean } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
+import { isFeatureEnabled } from '@/lib/allowed-features';
+import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -24,6 +27,7 @@ import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
@@ -101,10 +105,12 @@ const ExpenseSummary = ({
   openFileViewer,
   enableKeyboardShortcuts,
   openedItemId,
+  onCloneModalOpenChange = undefined,
   ...props
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const router = useRouter();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -122,7 +128,7 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const { canEditTitle, canEditType, canEditItems } = LoggedInUser?.hasPreviewFeatureEnabled(
+  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote } = LoggedInUser?.hasPreviewFeatureEnabled(
     PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
   )
     ? expense?.permissions || {}
@@ -135,6 +141,9 @@ const ExpenseSummary = ({
     () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
     [expense?.attachedFiles, expense?.draft?.attachedFiles],
   );
+  const hasNewEditFlow =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    !parseToBoolean(router.query.forceLegacyFlow);
 
   const processButtons = (
     <Flex
@@ -146,7 +155,8 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? undefined : onEdit}
+        onEdit={hasNewEditFlow ? undefined : onEdit}
+        onCloneModalOpenChange={onCloneModalOpenChange}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}
@@ -214,7 +224,13 @@ const ExpenseSummary = ({
             <Box>
               <ExpenseStatusTag
                 display="block"
-                status={expense.onHold ? 'ON_HOLD' : expense.status}
+                status={
+                  expense.onHold
+                    ? 'ON_HOLD'
+                    : expense.type === ExpenseType.PLATFORM_BILLING && expense.status === ExpenseStatus.APPROVED
+                      ? 'PAYMENT_DUE'
+                      : expense.status
+                }
                 letterSpacing="0.8px"
                 fontWeight="bold"
                 fontSize="12px"
@@ -247,7 +263,9 @@ const ExpenseSummary = ({
               host={host}
               account={expense.account}
               expense={expense}
-              canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
+              canEdit={
+                isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') && Boolean(expense.permissions?.canEditAccountingCategory)
+              }
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
@@ -263,7 +281,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
+            <Container ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
               {isDraft && expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedBy"
@@ -332,7 +350,7 @@ const ExpenseSummary = ({
                   />
                 </React.Fragment>
               )}
-            </P>
+            </Container>
           </React.Fragment>
         )}
       </Flex>
@@ -445,8 +463,8 @@ const ExpenseSummary = ({
                       />
                     </Box>
                   )}
-                  <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
-                    <Flex flexDirection="column" justifyContent="center" flexGrow="1">
+                  <Flex justifyContent="space-between" minWidth="0" alignItems="flex-start" flex="1">
+                    <Flex flexDirection="column" minWidth="0" justifyContent="center" flexGrow="1">
                       {attachment.description ? (
                         <HTMLContent
                           content={attachment.description}
@@ -536,8 +554,8 @@ const ExpenseSummary = ({
             )}
           </Flex>
           {isMultiCurrency && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-              <Container fontWeight="500" mr={3} whiteSpace="nowrap">
+            <div className="mt-2 flex flex-wrap items-center justify-end gap-2 text-sm text-muted-foreground">
+              <span>
                 <FormattedMessage
                   defaultMessage="Accounted as ({currency}):"
                   id="4Wdhe4"
@@ -548,8 +566,8 @@ const ExpenseSummary = ({
                         : expense.amountInAccountCurrency.currency,
                   }}
                 />
-              </Container>
-              <Container>
+              </span>
+              <span>
                 <AmountWithExchangeRateInfo
                   amount={
                     isPaid && expense.amountInHostCurrency
@@ -557,7 +575,7 @@ const ExpenseSummary = ({
                       : expense.amountInAccountCurrency
                   }
                 />
-              </Container>
+              </span>
             </div>
           )}
         </Flex>
@@ -624,6 +642,32 @@ const ExpenseSummary = ({
         </Span>
         <StyledHr flex="1 1" borderColor="black.300" ml={2} />
       </Flex>
+
+      {expense?.privateMessage && (
+        <Box mb={3} p={3} borderRadius="8px" backgroundColor="#f9fafb" border="1px solid" borderColor="black.200">
+          <Flex alignItems="center" mb={2} justifyContent="space-between">
+            <Flex alignItems="center" gap={6}>
+              <Span fontSize="13px" fontWeight="500" color="black.700" lineHeight="16px" textTransform="uppercase">
+                <FormattedMessage defaultMessage="Additional notes" id="xqG0ln" />
+              </Span>
+              <PrivateInfoIcon size={12}>
+                <FormattedMessage
+                  defaultMessage="This will only be visible to you, the Collective admins and its Fiscal Host"
+                  id="734IeW"
+                />
+              </PrivateInfoIcon>
+            </Flex>
+            {canUsePrivateNote && (
+              <EditExpenseDialog
+                field="privateMessage"
+                expense={expense}
+                title={intl.formatMessage({ defaultMessage: 'Edit notes', id: 'expense.editNotes' })}
+              />
+            )}
+          </Flex>
+          <HTMLContent content={expense.privateMessage} fontSize="13px" color="black.800" />
+        </Box>
+      )}
 
       <ExpenseSummaryAdditionalInformation
         isLoading={isLoading}

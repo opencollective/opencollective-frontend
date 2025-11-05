@@ -1,170 +1,241 @@
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessage } from 'react-intl';
 
-type Item = {
-  label: React.ReactNode;
-  href?: string;
-  items?: Item[];
-};
+interface MenuItem {
+  label: MessageDescriptor;
+}
+interface LinkItem extends MenuItem {
+  href: string;
+  target?: string;
+}
+interface MenuGroupItem extends MenuItem {
+  items: LinkItem[];
+}
 
-const landingPageItems: Item[] = [
+export const newMarketingTopbarItems: MenuGroupItem[] = [
   {
-    label: <FormattedMessage defaultMessage="Solutions" id="asqGnV" />,
+    label: defineMessage({ defaultMessage: 'Platform', id: 'platform' }),
+    items: [
+      { label: defineMessage({ id: 'home', defaultMessage: 'Home' }), href: '/home' },
+      { label: defineMessage({ defaultMessage: 'Explore', id: 'Explore' }), href: '/search' },
+      {
+        label: defineMessage({
+          defaultMessage: 'About',
+          id: 'collective.about.title',
+        }),
+        href: '/about',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'Contact',
+          id: 'Contact',
+        }),
+        href: '/contact',
+      },
+    ],
+  },
+  {
+    label: defineMessage({
+      defaultMessage: 'Solutions',
+      id: 'asqGnV',
+    }),
     items: [
       {
-        label: <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />,
+        label: defineMessage({
+          defaultMessage: 'For Organizations',
+          id: 'X7kjxh',
+        }),
+        href: '/organizations',
+      },
+      {
+        label: defineMessage({
+          defaultMessage: 'For Collectives',
+          id: 'pricing.forCollective',
+        }),
         href: '/collectives',
       },
-      { label: <FormattedMessage defaultMessage="For Sponsors" id="1rESHf" />, href: '/become-a-sponsor' },
+    ],
+  },
+
+  {
+    label: defineMessage({ defaultMessage: 'Resources', id: 'c/KktL' }),
+    items: [
       {
-        label: <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />,
+        label: defineMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' }),
+        href: '/help',
+      },
+      {
+        label: defineMessage({ defaultMessage: 'Documentation', id: 'menu.documentation' }),
+        href: 'https://documentation.opencollective.com',
+      },
+    ],
+  },
+];
+
+export const newFooterItems: MenuGroupItem[] = [
+  ...newMarketingTopbarItems,
+  {
+    label: defineMessage({ defaultMessage: 'Legal', id: '7oFrM6' }),
+    items: [
+      {
+        label: defineMessage({ defaultMessage: 'Privacy policy', id: 'cPwv2c' }),
+        href: '/privacypolicy',
+      },
+      {
+        label: defineMessage({ defaultMessage: 'Terms of Service', id: '32rBNK' }),
+        href: '/tos',
+      },
+    ],
+  },
+];
+
+export const legacyTopBarItems: MenuGroupItem[] = [
+  {
+    label: defineMessage({ defaultMessage: 'Solutions', id: 'asqGnV' }),
+    items: [
+      {
+        label: defineMessage({ id: 'pricing.forCollective', defaultMessage: 'For Collectives' }),
+        href: '/collectives',
+      },
+      {
+        label: defineMessage({ defaultMessage: 'For Sponsors', id: '1rESHf' }),
+        href: '/become-a-sponsor',
+      },
+      {
+        label: defineMessage({ id: 'pricing.fiscalHost', defaultMessage: 'For Fiscal Hosts' }),
         href: '/become-a-host',
       },
     ],
   },
   {
-    label: <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />,
+    label: defineMessage({ id: 'ContributionType.Product', defaultMessage: 'Product' }),
     items: [
-      { label: <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />, href: '/pricing' },
-      { label: <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />, href: '/how-it-works' },
       {
-        label: <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />,
+        label: defineMessage({ id: 'menu.pricing', defaultMessage: 'Pricing' }),
+        href: '/pricing',
+      },
+      {
+        label: defineMessage({ id: 'menu.howItWorks', defaultMessage: 'How it Works' }),
+        href: '/how-it-works',
+      },
+      {
+        label: defineMessage({ id: 'editCollective.fiscalHosting', defaultMessage: 'Fiscal Hosting' }),
         href: '/fiscal-hosting',
       },
     ],
   },
   {
-    label: <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />,
+    label: defineMessage({ id: 'Tags.ORGANIZATION', defaultMessage: 'Organization' }),
     items: [
       {
-        label: <FormattedMessage id="company.blog" defaultMessage="Blog" />,
+        label: defineMessage({ id: 'company.blog', defaultMessage: 'Blog' }),
         href: 'https://blog.opencollective.com/',
       },
       {
-        label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,
-        href: 'https://documentation.opencollective.com/our-organization/about',
+        label: defineMessage({ id: 'collective.about.title', defaultMessage: 'About' }),
+        href: '/about',
       },
     ],
   },
 ];
 
-export const dashboardFooterItems: Item[] = [
+export const legacyFooterItems: MenuGroupItem[] = [
   {
-    label: <FormattedMessage id="home" defaultMessage="Home" />,
-    href: '/home',
-  },
-  ...landingPageItems,
-  {
-    label: <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />,
-    href: '/help',
-  },
-  {
-    label: <FormattedMessage id="menu.privacyPolicy" defaultMessage="Privacy" />,
-    href: '/privacypolicy',
-  },
-  {
-    label: <FormattedMessage id="menu.termsOfAgreement" defaultMessage="Terms" />,
-    href: '/tos',
-  },
-];
-
-export const regularFooterItems: Item[] = [
-  {
-    label: <FormattedMessage id="platform" defaultMessage="Platform" />,
+    label: defineMessage({ id: 'platform', defaultMessage: 'Platform' }),
     items: [
       {
-        label: <FormattedMessage id="platform.explainerVideo" defaultMessage="Explainer video" />,
+        label: defineMessage({ id: 'platform.explainerVideo', defaultMessage: 'Explainer video' }),
         href: 'https://www.youtube.com/watch?v=IBU5fSILAe8',
       },
       {
-        label: <FormattedMessage id="howItWorks" defaultMessage="How it works" />,
+        label: defineMessage({ id: 'howItWorks', defaultMessage: 'How it works' }),
         href: '/how-it-works',
       },
       {
-        label: <FormattedMessage id="platform.useCases" defaultMessage="Use cases" />,
+        label: defineMessage({ id: 'platform.useCases', defaultMessage: 'Use cases' }),
         href: 'https://blog.opencollective.com/tag/case-studies/',
       },
       {
-        label: <FormattedMessage id="platform.signup" defaultMessage="Sign up" />,
+        label: defineMessage({ id: 'platform.signup', defaultMessage: 'Sign up' }),
         href: '/create-account',
       },
       {
-        label: <FormattedMessage id="platform.login" defaultMessage="Log in" />,
+        label: defineMessage({ id: 'platform.login', defaultMessage: 'Log in' }),
         href: '/signin',
       },
     ],
   },
   {
-    label: <FormattedMessage id="join" defaultMessage="Join" />,
+    label: defineMessage({ id: 'join', defaultMessage: 'Join' }),
     items: [
       {
-        label: <FormattedMessage id="home.create" defaultMessage="Create a Collective" />,
+        label: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
         href: '/create',
       },
       {
-        label: <FormattedMessage id="join.aboutFiscalHosting" defaultMessage="About Fiscal Hosting" />,
+        label: defineMessage({ id: 'join.aboutFiscalHosting', defaultMessage: 'About Fiscal Hosting' }),
         href: '/fiscal-hosting',
       },
       {
-        label: <FormattedMessage id="menu.discover" defaultMessage="Discover" />,
+        label: defineMessage({ id: 'menu.discover', defaultMessage: 'Discover' }),
         href: '/search',
       },
       {
-        label: <FormattedMessage id="join.findAFiscalHost" defaultMessage="Find a Fiscal Host" />,
+        label: defineMessage({ id: 'join.findAFiscalHost', defaultMessage: 'Find a Fiscal Host' }),
         href: '/search?isHost=true',
       },
       {
-        label: <FormattedMessage id="join.becomeASponsor" defaultMessage="Become a sponsor" />,
+        label: defineMessage({ id: 'join.becomeASponsor', defaultMessage: 'Become a sponsor' }),
         href: '/become-a-sponsor',
       },
       {
-        label: <FormattedMessage id="join.becomeAHost" defaultMessage="Become a Host" />,
+        label: defineMessage({ id: 'join.becomeAHost', defaultMessage: 'Become a Host' }),
         href: '/become-a-host',
       },
     ],
   },
   {
-    label: <FormattedMessage id="community" defaultMessage="Community" />,
+    label: defineMessage({ id: 'community', defaultMessage: 'Community' }),
     items: [
       {
-        label: <FormattedMessage id="community.openSource" defaultMessage="Open Source" />,
+        label: defineMessage({ id: 'community.openSource', defaultMessage: 'Open Source' }),
         href: 'https://github.com/opencollective/opencollective/issues',
       },
       {
-        label: <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />,
+        label: defineMessage({ id: 'menu.docs', defaultMessage: 'Docs & Help' }),
         href: '/help',
       },
     ],
   },
   {
-    label: <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />,
+    label: defineMessage({ id: 'Tags.ORGANIZATION', defaultMessage: 'Organization' }),
     items: [
       {
-        label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,
-        href: 'https://documentation.opencollective.com/our-organization/about',
+        label: defineMessage({ id: 'collective.about.title', defaultMessage: 'About' }),
+        href: '/about',
       },
       {
-        label: <FormattedMessage id="company.blog" defaultMessage="Blog" />,
+        label: defineMessage({ id: 'company.blog', defaultMessage: 'Blog' }),
         href: 'https://blog.opencollective.com/',
       },
       {
-        label: <FormattedMessage id="company.hiring" defaultMessage="Hiring" />,
+        label: defineMessage({ id: 'company.hiring', defaultMessage: 'Hiring' }),
         href: '/hiring',
       },
       {
-        label: <FormattedMessage id="company.termsOfService" defaultMessage="Terms of service" />,
+        label: defineMessage({ id: 'company.termsOfService', defaultMessage: 'Terms of service' }),
         href: '/tos',
       },
       {
-        label: <FormattedMessage id="company.privacyPolicy" defaultMessage="Privacy Policy" />,
+        label: defineMessage({ id: 'company.privacyPolicy', defaultMessage: 'Privacy Policy' }),
         href: '/privacypolicy',
       },
       {
-        label: <FormattedMessage id="company.securityPolicy" defaultMessage="Security Policy" />,
-        href: 'https://docs.opencollective.com/help/product/security',
+        label: defineMessage({ id: 'company.securityPolicy', defaultMessage: 'Security Policy' }),
+        href: 'https://documentation.opencollective.com/advanced/security-for-accounts',
       },
       {
-        label: <FormattedMessage id="contactUs" defaultMessage="Contact us" />,
+        label: defineMessage({ id: 'contactUs', defaultMessage: 'Contact us' }),
         href: '/contact',
       },
     ],

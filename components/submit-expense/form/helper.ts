@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { ExpenseForm } from '../useExpenseForm';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function memoWithGetFormProps<T extends React.ComponentType, GetFormProps extends (form: ExpenseForm) => any>(
   Component: T,
   getFormProps: GetFormProps,

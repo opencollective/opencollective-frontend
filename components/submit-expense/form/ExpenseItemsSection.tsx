@@ -1,10 +1,11 @@
 /* eslint-disable prefer-arrow-callback */
 import React, { useId } from 'react';
-import { TaxType } from '@opencollective/taxes';
+import { GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
-import { get, pick, round } from 'lodash';
-import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from 'lucide-react';
+import { get, isNil, pick, round, truncate } from 'lodash';
+import { ArrowDown, ArrowUp, Coins, Plus, Trash2 } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
 import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
+import { getIntlDisplayNames } from '../../../lib/i18n';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import {
@@ -24,14 +26,17 @@ import { DISABLE_ANIMATIONS } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
 import { FormField } from '@/components/FormField';
+import PrivateInfoIcon from '@/components/icons/PrivateInfoIcon';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { RadioGroup, RadioGroupCard } from '@/components/ui/RadioGroup';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import MessageBox from '../../MessageBox';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -42,6 +47,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type ExpenseItemsSectionProps = {
   form: ExpenseForm;
@@ -53,12 +59,7 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
     <FormSectionContainer
       step={Step.EXPENSE_ITEMS}
       inViewChange={props.inViewChange}
-      subtitle={
-        <div className="flex items-center gap-2">
-          <FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />
-          <Lock size={14} />
-        </div>
-      }
+      subtitle={<FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />}
     >
       <React.Fragment>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(props.form)} />
@@ -73,9 +74,18 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
 function getExpenseItemFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'initialLoading', 'isSubmitting']),
-    ...pick(form.options, ['expenseCurrency', 'totalInvoicedInExpenseCurrency', 'taxType', 'lockedFields']),
-    ...pick(form.values, ['tax', 'hasTax', 'expenseItems']),
+    ...pick(form.options, [
+      'expenseCurrency',
+      'totalInvoicedInExpenseCurrency',
+      'taxType',
+      'lockedFields',
+      'availableReferenceCurrencies',
+    ]),
+    ...pick(form.values, ['tax', 'hasTax', 'expenseItems', 'referenceCurrency']),
     expenseItemCount: form.values.expenseItems?.length || 0,
+    payoutMethodCurrency:
+      form.options.payoutMethod?.data?.currency || form.options.expense?.payoutMethod?.data?.currency,
+    collectiveCurrency: form.options.account?.currency,
   };
 }
 
@@ -155,26 +165,45 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           <Skeleton className="h-30 w-full" />
         </div>
       )}
-      <div className="flex justify-between pr-12">
+
+      {props.availableReferenceCurrencies && props.availableReferenceCurrencies.length > 1 && (
+        <ReferenceCurrencySelector
+          referenceCurrency={props.referenceCurrency}
+          availableReferenceCurrencies={props.availableReferenceCurrencies}
+          setFieldValue={setFieldValue}
+          isSubmitting={props.isSubmitting}
+          payoutMethodCurrency={props.payoutMethodCurrency}
+        />
+      )}
+
+      <div className="flex flex-wrap justify-between gap-2 md:pr-12">
         <Button
           variant="outline"
+          className="shrink-0"
           disabled={props.initialLoading || isAmountLocked || props.isSubmitting}
           onClick={() =>
             setFieldValue('expenseItems', [
               ...expenseItems,
               {
                 key: uuid(),
-                amount: { valueInCents: 0, currency: props.expenseCurrency },
                 description: '',
                 incurredAt: new Date().toISOString(),
                 attachment: null,
+                amount: {
+                  valueInCents: 0,
+                  currency:
+                    props.referenceCurrency ||
+                    props.availableReferenceCurrencies[0] ||
+                    props.expenseCurrency ||
+                    props.collectiveCurrency,
+                },
               },
             ])
           }
         >
           <Plus size={16} /> <FormattedMessage defaultMessage="Add item" id="KDO3hW" />
         </Button>
-        <div>
+        <div className="flex-grow">
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
             {props.hasTax && props.tax && (
               <React.Fragment>
@@ -257,7 +286,7 @@ type ExpenseItemProps = {
 
 function getExpenseItemProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'isSubmitting']),
+    ...pick(form, ['setFieldValue', 'isSubmitting', 'setFieldTouched']),
     ...pick(form.options, [
       'allowExpenseItemAttachment',
       'isAdminOfPayee',
@@ -298,11 +327,14 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   const hasAttachment = props.allowExpenseItemAttachment;
   const attachmentId = useId();
 
-  const { setFieldValue } = props;
+  const { setFieldValue, setFieldTouched } = props;
 
   const onCurrencyChange = React.useCallback(
-    v => setFieldValue(`expenseItems.${props.index}.amount.currency`, v),
-    [props.index, setFieldValue],
+    v => {
+      setFieldTouched('expenseItems');
+      setFieldValue(`expenseItems.${props.index}.amount.currency`, v);
+    },
+    [props.index, setFieldValue, setFieldTouched],
   );
 
   const onGraphQLSuccess = React.useCallback(
@@ -354,6 +386,8 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 disabled={props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
+                isPrivate
+                privateMessage={privateInfoYouCollectiveAndHost}
               >
                 {({ field }) => {
                   return (
@@ -426,7 +460,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                     {...field}
                     currencyDisplay="FULL"
                     hasCurrencyPicker={props.allowDifferentItemCurrency}
-                    currency={item.amount.currency || 'USD'}
+                    currency={item.amount.currency}
                     onCurrencyChange={onCurrencyChange}
                     value={item.amount.valueInCents}
                     onChange={onAmountChange}
@@ -449,7 +483,9 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               </FormField>
 
               <div className="self-end">
-                {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
+                {Boolean(
+                  item.amount?.currency && props.expenseCurrency !== item.amount?.currency && props.expenseCurrency,
+                ) && (
                   <ExchangeRate
                     className="mt-2 text-muted-foreground"
                     {...getExpenseExchangeRateWarningOrError(
@@ -514,8 +550,9 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
 
   return (
     <div>
-      <Label htmlFor="additionalAttachments">
+      <Label htmlFor="additionalAttachments" className="mt-5 mb-1 flex items-center gap-2">
         <FormattedMessage defaultMessage="Additional Attachments (Optional)" id="n3evmu" />
+        <PrivateInfoIcon>{privateInfoYouCollectiveAndHost}</PrivateInfoIcon>
       </Label>
       <div className="flex flex-wrap gap-4 pt-2">
         <div>
@@ -572,6 +609,101 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
   }
 };
 
+const ReferenceCurrencySelector = React.memo(function ReferenceCurrencySelector(props: {
+  setFieldValue: ExpenseForm['setFieldValue'];
+  isSubmitting: ExpenseForm['isSubmitting'];
+  referenceCurrency: Currency;
+  availableReferenceCurrencies: Currency[];
+  payoutMethodCurrency?: Currency;
+}) {
+  const intl = useIntl();
+  const { setFieldValue } = props;
+
+  const onCurrencyChange = React.useCallback(
+    (currency: Currency) => {
+      if (currency) {
+        setFieldValue('referenceCurrency', currency);
+      }
+    },
+    [setFieldValue],
+  );
+
+  // Generate currency options for RadioGroup
+  const currencyOptions = React.useMemo(() => {
+    const currencyDisplayNames = getIntlDisplayNames(intl.locale, 'currency');
+    return props.availableReferenceCurrencies.map(currency => {
+      const currencyName = currencyDisplayNames.of(currency);
+      const emoji = getEmojiByCurrencyCode(currency);
+      return {
+        value: currency,
+        label: (
+          <div className="flex flex-col gap-1 py-1">
+            <div className="flex items-center gap-1">
+              {emoji && <span className="flex-shrink-0">{emoji}</span>}
+              <span className="text-sm font-semibold text-foreground">{currency}</span>
+            </div>
+            <span className="text-xs leading-tight text-muted-foreground">
+              {truncate(currencyName, { length: 30 })}
+            </span>
+          </div>
+        ),
+      };
+    });
+  }, [intl.locale, props.availableReferenceCurrencies]);
+
+  return (
+    <MessageBox type="info" className="mb-6">
+      <div className="space-y-3">
+        <label className="flex items-center gap-2 text-sm font-semibold" htmlFor="input-referenceCurrency">
+          <Coins className="h-4 w-4" />
+          <FormattedMessage defaultMessage="Payment currency" id="6uc7kW" />
+        </label>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          <FormattedMessage
+            defaultMessage="Your expense items use multiple currencies. Select the currency in which you wish to get paid, other amounts will be converted automatically."
+            id="okSLzP"
+          />
+        </p>
+        <FormField name="referenceCurrency">
+          {() => (
+            <RadioGroup
+              value={props.referenceCurrency}
+              onValueChange={onCurrencyChange}
+              disabled={props.isSubmitting}
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              data-cy="reference-currency-picker"
+            >
+              {currencyOptions.map(option => (
+                <RadioGroupCard
+                  key={option.value}
+                  value={option.value}
+                  className="cursor-pointer transition-all duration-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:scale-[1.02] hover:bg-muted/50 hover:shadow-sm"
+                  data-cy={`reference-currency-option-${option.value}`}
+                >
+                  {option.label}
+                </RadioGroupCard>
+              ))}
+            </RadioGroup>
+          )}
+        </FormField>
+      </div>
+      {props.referenceCurrency &&
+        props.payoutMethodCurrency &&
+        props.payoutMethodCurrency !== props.referenceCurrency && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground italic">
+            <FormattedMessage
+              defaultMessage="Please note that your payout method currency is in {currency}. The actual amount you receive will depend on exchange rates and fees collected by payment processors and banks."
+              id="uzfoYE"
+              values={{
+                currency: props.payoutMethodCurrency,
+              }}
+            />
+          </p>
+        )}
+    </MessageBox>
+  );
+});
+
 const Taxes = React.memo(function Taxes(props: {
   setFieldValue: ExpenseForm['setFieldValue'];
   isSubmitting: ExpenseForm['isSubmitting'];
@@ -584,17 +716,23 @@ const Taxes = React.memo(function Taxes(props: {
   const onHasTaxChange = React.useCallback(
     (checked: CheckedState) => {
       setFieldValue('hasTax', Boolean(checked));
+      if (props.taxType === TaxType.GST) {
+        setFieldValue('tax', { rate: GST_RATE_PERCENT, idNumber: '', ...props.tax });
+      } else if (props.taxType === TaxType.VAT) {
+        setFieldValue('tax', { rate: null, idNumber: '', ...props.tax });
+      }
     },
-    [setFieldValue],
+    [setFieldValue, props.taxType, props.tax],
   );
 
   return (
     <div>
       <FormField label={intl.formatMessage({ defaultMessage: 'Taxes', id: 'r+dgiv' })} name="hasTax">
         {() => (
-          <div className="items-top mt-1 flex space-x-2">
+          <div className="items-top mt-1 flex items-center space-x-2">
             <Checkbox
               id="hasTax"
+              name="hasTax"
               disabled={props.isSubmitting}
               checked={props.hasTax}
               onCheckedChange={onHasTaxChange}
@@ -612,7 +750,7 @@ const Taxes = React.memo(function Taxes(props: {
         )}
       </FormField>
 
-      <div className="items-top mt-4 flex gap-4">
+      <div className="items-top mt-4 flex flex-wrap gap-4">
         <div>
           {props.hasTax && props.taxType === TaxType.GST && (
             <FormField
@@ -629,12 +767,14 @@ const Taxes = React.memo(function Taxes(props: {
                 <StyledSelect
                   disabled={props.isSubmitting}
                   inputId={`input-${props.taxType}-rate`}
+                  required={true}
+                  minWidth={115}
                   value={{
                     value: round(field.value * 100, 2),
                     label: i18nTaxRate(intl, props.taxType, field.value),
                   }}
                   onChange={({ value }) => props.setFieldValue('tax.rate', value)}
-                  options={[0, 0.15].map(rate => ({
+                  options={[0, GST_RATE_PERCENT].map(rate => ({
                     value: rate,
                     label: i18nTaxRate(intl, props.taxType, rate),
                   }))}
@@ -657,8 +797,8 @@ const Taxes = React.memo(function Taxes(props: {
               {({ field }) => (
                 <InputGroup
                   {...field}
-                  value={field.value ? round(field.value * 100, 2) : 0}
-                  onChange={e => props.setFieldValue('tax.rate', round((e.target.value as any) / 100, 4))}
+                  value={isNil(field.value) ? '' : round(field.value * 100, 2)}
+                  onChange={e => props.setFieldValue('tax.rate', round(Number(e.target.value) / 100, 4))}
                   minWidth={65}
                   append="%"
                   min={0}
@@ -671,19 +811,21 @@ const Taxes = React.memo(function Taxes(props: {
         </div>
 
         {props.hasTax && (
-          <FormField
-            name="tax.idNumber"
-            htmlFor={`input-${props.taxType}-idNumber`}
-            label={intl.formatMessage(
-              { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
-              { taxName: i18nTaxType(intl, props.taxType, 'short') },
-            )}
-            placeholder={intl.formatMessage(
-              { id: 'examples', defaultMessage: 'e.g., {examples}' },
-              { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
-            )}
-            disabled={props.isSubmitting}
-          />
+          <div>
+            <FormField
+              name="tax.idNumber"
+              htmlFor={`input-${props.taxType}-idNumber`}
+              label={intl.formatMessage(
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: i18nTaxType(intl, props.taxType, 'short') },
+              )}
+              placeholder={intl.formatMessage(
+                { id: 'examples', defaultMessage: 'e.g., {examples}' },
+                { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
+              )}
+              disabled={props.isSubmitting}
+            />
+          </div>
         )}
       </div>
     </div>

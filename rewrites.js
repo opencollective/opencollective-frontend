@@ -19,7 +19,15 @@ exports.REWRITES = [
     destination: '/welcome',
   },
   {
-    source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
+    source: '/organizations',
+    destination: '/solutions',
+  },
+  {
+    source: '/solutions',
+    destination: '/solutions',
+  },
+  {
+    source: '/:pageSlug(widgets|tos|privacypolicy|hiring|about)',
     destination: '/staticPage',
   },
   {
@@ -52,7 +60,7 @@ exports.REWRITES = [
   },
   {
     source: '/organizations/new',
-    destination: '/createOrganization',
+    destination: '/signup/organization',
   },
   {
     source: '/dashboard',
@@ -396,8 +404,16 @@ exports.REWRITES = [
     destination: '/pricing',
   },
   {
-    source: '/pricing-old',
-    destination: '/pricing-old',
+    source: '/organizations/pricing',
+    destination: '/new-pricing',
+  },
+  {
+    source: '/new-pricing',
+    destination: '/new-pricing',
+  },
+  {
+    source: '/legacy-pricing',
+    destination: '/legacy-pricing',
   },
   {
     source: '/become-a-sponsor',

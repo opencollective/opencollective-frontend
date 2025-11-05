@@ -138,6 +138,8 @@ export const expenseHostFields = gql`
       id
       MULTI_CURRENCY_EXPENSES
       PAYPAL_PAYOUTS
+      CHART_OF_ACCOUNTS
+      TRANSFERWISE
     }
     paypalPreApproval {
       id
@@ -171,6 +173,13 @@ export const expenseHostFields = gql`
       EXPENSE_CATEGORIZATION {
         requiredForExpenseSubmitters
         requiredForCollectiveAdmins
+      }
+    }
+    ... on AccountWithPlatformSubscription {
+      platformSubscription {
+        plan {
+          title
+        }
       }
     }
   }
@@ -429,6 +438,7 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
+        TAX_FORMS
       }
       location {
         id
@@ -438,7 +448,11 @@ export const expensePageExpenseFieldsFragment = gql`
 
       stats {
         id
-        balanceWithBlockedFunds {
+        balance {
+          valueInCents
+          currency
+        }
+        balanceWithBlockedFunds: balance(withBlockedFunds: true) {
           valueInCents
           currency
         }

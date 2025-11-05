@@ -88,13 +88,13 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
   }
 
   return (
-    <div className={cn('flex w-full items-center gap-2', props.className)}>
+    <div className={cn('flex w-full min-w-0 items-center gap-2', props.className)}>
       <div>
         <Avatar collective={account} radius={24} />
       </div>
-      <div className="flex grow flex-col gap-0.5">
-        <div className="max-w-96 overflow-x-clip font-medium text-ellipsis whitespace-nowrap">{account.name}</div>
-        <div className="max-w-96 overflow-x-clip text-ellipsis whitespace-nowrap text-muted-foreground">
+      <div className="flex min-w-0 grow flex-col gap-0.5" data-testid="expense-account-item">
+        <div className="w-full max-w-full min-w-0 truncate font-medium">{account.name}</div>
+        <div className="max-w-96 truncate text-muted-foreground">
           {'parent' in account && account.parent ? (
             <FormattedMessage
               defaultMessage="{childAccountType, select, EVENT {An event} PROJECT {A project} other {an account}} by {parentAccount}"

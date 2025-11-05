@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
@@ -53,6 +53,8 @@ const TypeIllustration = styled.img.attrs({ alt: '' })`
 const StaticTypeIllustration = styled(TypeIllustration)`
   position: absolute;
   background: white;
+  width: 48px;
+  height: 48px;
 `;
 
 const ExpenseTypeOptionContainer = styled.label`

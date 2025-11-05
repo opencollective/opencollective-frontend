@@ -1,12 +1,9 @@
 import React from 'react';
 import { groupBy } from 'lodash';
-import { FormattedMessage } from 'react-intl';
 
 import { capitalize } from '../../../lib/utils';
 
 import { Box } from '../../Grid';
-import { getI18nLink } from '../../I18nFormatters';
-import { P } from '../../Text';
 import EditConnectedAccount from '../EditConnectedAccount';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -29,18 +26,6 @@ const ConnectedAccounts = props => {
 
   return (
     <div className="EditConnectedAccounts">
-      <P mb={4}>
-        <FormattedMessage
-          defaultMessage="See <Link>the documentation</Link> to learn more about Connected Accounts."
-          id="5thSOv"
-          values={{
-            Link: getI18nLink({
-              href: 'https://docs.opencollective.com/help/fiscal-hosts/fiscal-host-settings/connected-accounts',
-              openInNewTab: true,
-            }),
-          }}
-        />
-      </P>
       {services.map(service => (
         <Box key={`connect-${service}`} mb={4}>
           <SettingsSectionTitle>{TITLE_OVERRIDE[service] || capitalize(service)}</SettingsSectionTitle>

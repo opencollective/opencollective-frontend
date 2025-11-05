@@ -4,6 +4,7 @@ import { includes } from 'lodash';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ExpensePageQuery, ExpensePageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import ExpenseSummary from '../expenses/ExpenseSummary';
@@ -39,7 +40,8 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   }
 
   const expense = query.data?.expense;
-  const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
+  const showTaxFormMsg =
+    isFeatureEnabled(expense?.account, 'TAX_FORMS') && includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
 
   return (
     <div>
@@ -49,7 +51,9 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <ExpenseSummary
             onDelete={() => {}}
             onEdit={() => {}}
-            openFileViewer={() => {}}
+            openFileViewer={url => {
+              window.open(url, '_blank');
+            }}
             enableKeyboardShortcuts={false}
             drawerActionsContainer={null}
             canEditTags={false}

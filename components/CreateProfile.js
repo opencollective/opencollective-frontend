@@ -188,6 +188,20 @@ const CreateProfile = ({
           )}
         </Box>
       </Flex>
+      <MessageBox type="info" mt="24px">
+        <Box fontSize="13px" fontWeight={700}>
+          <FormattedMessage defaultMessage="Do you want to create an account for your organization?" id="HM2YJg" />
+        </Box>
+        <Box mt="8px" fontSize="12px" fontWeight={400} lineHeight="18px">
+          <FormattedMessage
+            defaultMessage="If you are creating a profile for your organization, <a>click here</a>."
+            id="tApWSV"
+            values={{
+              a: chunk => <a href="/signup/organization">{chunk}</a>,
+            }}
+          />
+        </Box>
+      </MessageBox>
       <Box
         as="form"
         onSubmit={event => {
@@ -282,20 +296,6 @@ const CreateProfile = ({
             </Box>
           </Box>
         </StyledCard>
-        <MessageBox type="info" mt="24px">
-          <Box fontSize="13px" fontWeight={700}>
-            <FormattedMessage defaultMessage="Do you want to create an account for your organization?" id="HM2YJg" />
-          </Box>
-          <Box mt="8px" fontSize="12px" fontWeight={400} lineHeight="18px">
-            <FormattedMessage
-              defaultMessage="If you are creating a profile for your organization, <a>click here</a>."
-              id="tApWSV"
-              values={{
-                a: chunk => <a href="/signup/organization">{chunk}</a>,
-              }}
-            />
-          </Box>
-        </MessageBox>
         {emailAlreadyExists && (
           <MessageBox type="warning" mt="24px">
             <Box fontSize="14px" fontWeight={400} lineHeight="20px">

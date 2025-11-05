@@ -63,46 +63,17 @@ const MobileFooterIconContainer = styled(Box)`
   border-radius: 24px;
 `;
 
-const MainNavItem = styled(Link)<{ $isActive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 340px;
-  flex-shrink: 1;
-  color: #0f172a;
-  font-size: 14px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 100px;
-  white-space: nowrap;
-  transition-property: color, background-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-  text-overflow: ellipsis;
-  overflow: hidden;
-
-  ${props =>
-    props.href &&
-    css`
-      @media (hover: hover) {
-        &:hover {
-          color: #0f172a !important;
-          background-color: #f1f5f9;
-        }
-      }
-    `}
-  ${props =>
-    props.href &&
-    css`
-      &:hover {
-        color: #0f172a !important;
-        background-color: #f1f5f9;
-      }
-    }
-  `}
-  font-weight: 500;
-  ${props => props.$isActive && `background-color: #f1f5f9;`}
-`;
+const MainNavItem = ({ href, $isActive, children, ...props }) => {
+  return (
+    <Link
+      href={href}
+      className={`flex h-8 max-w-sm flex-shrink items-center gap-2 overflow-hidden rounded-full px-3 text-sm font-medium text-ellipsis whitespace-nowrap text-slate-900 transition-colors duration-150 ease-out ${href ? 'hover:bg-slate-100 hover:text-slate-900' : ''} ${$isActive ? 'bg-slate-100' : ''} `}
+      {...props}
+    >
+      {children}
+    </Link>
+  );
+};
 
 const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
   const { direction, accPosition } = useWindowScroll();
@@ -128,14 +99,6 @@ const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
 };
 
 type TopBarProps = {
-  showSearch?: boolean;
-  showProfileAndChangelogMenu?: boolean;
-  menuItems?: {
-    solutions?: boolean;
-    product?: boolean;
-    company?: boolean;
-    docs?: boolean;
-  };
   account?: {
     parentCollective?: {
       name: string;
@@ -144,7 +107,6 @@ type TopBarProps = {
     name: string;
     slug: string;
   };
-  loading?: boolean;
 };
 
 const TopBar = ({ account }: TopBarProps) => {

@@ -41,7 +41,7 @@ const INITIAL_VALUES = {
   preAuthorize2FA: false,
 };
 
-const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => {
+const CreatePersonalTokenModal = ({ account, onSuccess, onClose, disabled, ...props }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [isWaitingForOnSuccess, setIsWaitingForOnSuccess] = React.useState(false);
@@ -117,7 +117,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                   },
                   {
                     Link: getI18nLink({
-                      href: 'https://docs.opencollective.com/help/developers/oauth#text-available-scopes',
+                      href: 'https://documentation.opencollective.com/development/personel-tokens',
                       openInNewTab: true,
                     }),
                   },
@@ -191,6 +191,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                   buttonStyle="primary"
                   buttonSize="small"
                   loading={isSubmitting || isWaitingForOnSuccess}
+                  disabled={disabled}
                 >
                   <FormattedMessage defaultMessage="Create token" id="c+swVk" />
                 </StyledButton>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { get } from 'lodash';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective';
 import { IGNORED_TAGS } from '../../lib/constants/collectives';

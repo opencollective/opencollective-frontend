@@ -21,9 +21,11 @@ import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-imp
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 import { getI18nLink } from '@/components/I18nFormatters';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import StackedAvatars from '@/components/StackedAvatars';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
@@ -42,6 +44,7 @@ import {
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
@@ -294,6 +297,9 @@ const defaultFilterValues = {
 export const OffPlatformTransactions = ({ accountSlug }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequired = requiresUpgrade(account, FEATURES.OFF_PLATFORM_TRANSACTIONS);
+
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const apolloClient = useApolloClient();
@@ -330,6 +336,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
       ...queryFilter.variables,
       fetchOnlyRowIds: false,
     },
+    skip: isUpgradeRequired,
   });
 
   const host = data?.host;
@@ -403,7 +410,9 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
           }
         />
       </div>
-      {loading && !host ? (
+      {isUpgradeRequired ? (
+        <UpgradePlanCTA featureKey={FEATURES.OFF_PLATFORM_TRANSACTIONS} />
+      ) : loading && !host ? (
         <LoadingPlaceholder height={300} />
       ) : error ? (
         <MessageBoxGraphqlError error={error} />
@@ -450,8 +459,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
               </Button>
             </div>
           )}
-
-          <div className="px-2">
+          <div>
             {/** Tabs & filters */}
             <Filterbar
               className="mb-4"

@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { NotepadText } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

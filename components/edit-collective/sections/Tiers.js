@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
@@ -98,7 +98,7 @@ const Tiers = ({ collective }) => {
           </P>
           <P mt={3}>
             <StyledLink
-              href="https://docs.opencollective.com/help/collectives/collective-settings/tiers-goals"
+              href="https://documentation.opencollective.com/collectives/raising-money/setting-goals-and-tiers"
               openInNewTab
             >
               <FormattedMessage defaultMessage="Learn more about tiers" id="108gPp" />.

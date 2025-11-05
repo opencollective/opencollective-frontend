@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { includes } from 'lodash';
-import { Check, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from 'lucide-react';
+import { Check, Copy, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -21,8 +21,9 @@ import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpe
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
+import Spinner from '@/components/Spinner';
 import StyledLink from '@/components/StyledLink';
-import StyledSpinner from '@/components/StyledSpinner';
+import SubmitGrantFlow from '@/components/submit-grant/SubmitGrantFlow';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -110,6 +111,7 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
             grant={grant}
             onViewDetailsClick={meta.onViewDetailsClick}
             enableViewGrantsByBeneficiary={meta.enableViewGrantsByBeneficiary}
+            refetch={meta.refetch}
           >
             <TableActionsButton data-cy="more-actions-btn" className="h-8 w-8">
               <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
@@ -124,6 +126,7 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
 export type GrantsTableMeta = TableMeta<any> & {
   onViewDetailsClick: (grant: Expense) => void;
   enableViewGrantsByBeneficiary?: boolean;
+  refetch: () => void;
 };
 
 type MoreActionsMenuProps = {
@@ -131,10 +134,12 @@ type MoreActionsMenuProps = {
   grant: Expense;
   onViewDetailsClick: (grant: Expense) => void;
   enableViewGrantsByBeneficiary?: boolean;
+  refetch: () => void;
 };
 function MoreActionsMenu(props: MoreActionsMenuProps) {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
+  const [isGrantFlowOpen, setIsGrantFlowOpen] = React.useState(false);
 
   const isHost = isHostAccount(account);
 
@@ -189,7 +194,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
             >
               <Check className="text-muted-foreground" size={16} />
               <FormattedMessage defaultMessage="Approve grant" id="202vW9" />
-              {processExpense.loading && processExpense.currentAction === 'APPROVE' && <StyledSpinner size={16} />}
+              {processExpense.loading && processExpense.currentAction === 'APPROVE' && <Spinner size={16} />}
             </DropdownMenuItem>
           )}
           {permissions?.canReject && (
@@ -198,10 +203,27 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
               <FormattedMessage defaultMessage="Reject grant" id="laRuyZ" />
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem disabled={processExpense.loading} onClick={() => setIsGrantFlowOpen(true)}>
+            <Copy className="h-4 w-4 text-muted-foreground" />
+            <FormattedMessage defaultMessage="Duplicate grant" id="VErmYl" />
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {processModal && (
         <ConfirmProcessExpenseModal type={processModal} expense={props.grant} onClose={() => setProcessModal(null)} />
+      )}
+      {isGrantFlowOpen && (
+        <SubmitGrantFlow
+          handleOnClose={() => {
+            setIsGrantFlowOpen(false);
+          }}
+          onGrantSubmitted={() => {
+            props.refetch();
+          }}
+          expenseId={props.grant.legacyId}
+          account={props.grant.account}
+          duplicateGrant
+        />
       )}
     </React.Fragment>
   );

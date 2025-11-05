@@ -1,22 +1,20 @@
 import React from 'react';
+import { PopoverPortal } from '@radix-ui/react-popover';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import ReactDOM from 'react-dom';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import { Manager, Popper, Reference } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { mergeRefs } from '../lib/react-utils';
 
+import { Popover, PopoverAnchor, PopoverContent } from './ui/Popover';
 import Avatar from './Avatar';
 import { InviteCollectiveDropdownOption } from './CollectivePickerInviteMenu';
 import CollectiveTypePicker from './CollectiveTypePicker';
 import Container from './Container';
 import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
 import { Flex } from './Grid';
-import StyledCard from './StyledCard';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
 
@@ -304,120 +302,94 @@ class CollectivePicker extends React.PureComponent {
     const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
     return (
-      <Manager>
-        <Reference>
-          {({ ref }) => (
-            <Container
-              position="relative"
-              minWidth={minWidth}
-              maxWidth={maxWidth}
-              width={width}
-              ref={mergeRefs([this.containerRef, ref])}
-            >
-              <StyledSelect
-                inputId={inputId}
-                options={allOptions}
-                defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
-                menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
-                isDisabled={Boolean(createFormCollectiveType) || displayInviteMenu || isDisabled}
-                onMenuOpen={this.openMenu}
-                onMenuClose={this.closeMenu}
-                value={this.getValue()}
-                onChange={this.onChange}
-                noOptionsMessage={searchText ? undefined : () => null}
-                isSearchable={isSearchable ?? true}
-                formatOptionLabel={(option, context) => {
-                  if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
-                    return formatOptionLabel(option, context, intl);
-                  } else if (option[FLAG_NEW_COLLECTIVE]) {
-                    return renderNewCollectiveOption ? (
-                      renderNewCollectiveOption()
-                    ) : (
-                      <CollectiveTypePicker
-                        onChange={this.setCreateFormCollectiveType}
-                        types={option.types || (typeof creatable === 'object' ? creatable : types)}
-                        useBeneficiaryForVendor={useBeneficiaryForVendor}
-                      />
-                    );
-                  } else if (option[FLAG_INVITE_NEW]) {
-                    return (
-                      <InviteCollectiveDropdownOption
-                        isSearching={!!searchText && !collectives.length}
-                        expenseType={expenseType}
-                        onClick={() => {
-                          onInvite?.(true);
-                          onChange?.({ label: null, value: null });
-                          this.setState({ menuIsOpen: false });
-                        }}
-                      />
-                    );
-                  } else {
-                    return option.label;
+      <Popover open={createFormCollectiveType}>
+        <PopoverAnchor asChild>
+          <Container position="relative" minWidth={minWidth} maxWidth={maxWidth} width={width} ref={this.containerRef}>
+            <StyledSelect
+              inputId={inputId}
+              options={allOptions}
+              defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
+              menuIsOpen={this.getMenuIsOpen(menuIsOpen)}
+              isDisabled={Boolean(createFormCollectiveType) || displayInviteMenu || isDisabled}
+              onMenuOpen={this.openMenu}
+              onMenuClose={this.closeMenu}
+              value={this.getValue()}
+              onChange={this.onChange}
+              noOptionsMessage={searchText ? undefined : () => null}
+              isSearchable={isSearchable ?? true}
+              formatOptionLabel={(option, context) => {
+                if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
+                  return formatOptionLabel(option, context, intl);
+                } else if (option[FLAG_NEW_COLLECTIVE]) {
+                  return renderNewCollectiveOption ? (
+                    renderNewCollectiveOption()
+                  ) : (
+                    <CollectiveTypePicker
+                      onChange={this.setCreateFormCollectiveType}
+                      types={option.types || (typeof creatable === 'object' ? creatable : types)}
+                      useBeneficiaryForVendor={useBeneficiaryForVendor}
+                    />
+                  );
+                } else if (option[FLAG_INVITE_NEW]) {
+                  return (
+                    <InviteCollectiveDropdownOption
+                      isSearching={!!searchText && !collectives.length}
+                      expenseType={expenseType}
+                      onClick={() => {
+                        onInvite?.(true);
+                        onChange?.({ label: null, value: null });
+                        this.setState({ menuIsOpen: false });
+                      }}
+                    />
+                  );
+                } else {
+                  return option.label;
+                }
+              }}
+              {...props}
+              onInputChange={this.onInputChange}
+            />
+          </Container>
+        </PopoverAnchor>
+        <PopoverPortal
+          container={
+            props.menuPortalTarget === null
+              ? this.containerRef?.current
+              : typeof document !== 'undefined'
+                ? document.body
+                : undefined
+          }
+        >
+          <PopoverContent className="w-(--radix-popper-anchor-width)">
+            {createFormCollectiveType && (
+              <CreateCollectiveMiniForm
+                type={createFormCollectiveType}
+                onCancel={this.setCreateFormCollectiveType}
+                addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
+                excludeAdminFields={this.props.excludeAdminFields}
+                optionalFields={this.props.createCollectiveOptionalFields}
+                onSuccess={collective => {
+                  if (onChange) {
+                    onChange({ label: collective.name, value: collective, isNew: true });
                   }
+                  this.setState(state => ({
+                    menuIsOpen: false,
+                    createFormCollectiveType: null,
+                    createdCollectives: [...state.createdCollectives, collective],
+                    showCreatedCollective: true,
+                  }));
                 }}
-                {...props}
-                onInputChange={this.onInputChange}
+                otherInitialValues={
+                  createFormCollectiveType === CollectiveType.VENDOR
+                    ? { ParentCollectiveId: this.props.HostCollectiveId }
+                    : {}
+                }
+                {...prefillValue}
               />
-            </Container>
-          )}
-        </Reference>
-        {createFormCollectiveType &&
-          ReactDOM.createPortal(
-            <Popper placement="bottom">
-              {({ placement, ref, style }) => (
-                <div
-                  data-placement={placement}
-                  ref={ref}
-                  style={{
-                    ...style,
-                    width: this.containerRef.current.clientWidth,
-                    zIndex: 9999,
-                  }}
-                >
-                  <StyledCard
-                    p={3}
-                    my={1}
-                    boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
-                    height={400}
-                    data-cy="collective-mini-form-scroll"
-                    {...this.props.styles?.menu}
-                  >
-                    {createFormCollectiveType && (
-                      <CreateCollectiveMiniForm
-                        type={createFormCollectiveType}
-                        onCancel={this.setCreateFormCollectiveType}
-                        addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
-                        excludeAdminFields={this.props.excludeAdminFields}
-                        optionalFields={this.props.createCollectiveOptionalFields}
-                        onSuccess={collective => {
-                          if (onChange) {
-                            onChange({ label: collective.name, value: collective, isNew: true });
-                          }
-                          this.setState(state => ({
-                            menuIsOpen: false,
-                            createFormCollectiveType: null,
-                            createdCollectives: [...state.createdCollectives, collective],
-                            showCreatedCollective: true,
-                          }));
-                        }}
-                        otherInitialValues={
-                          createFormCollectiveType === CollectiveType.VENDOR
-                            ? { ParentCollectiveId: this.props.HostCollectiveId }
-                            : {}
-                        }
-                        {...prefillValue}
-                      />
-                    )}
-                  </StyledCard>
-                </div>
-              )}
-            </Popper>,
-            // When `menuPortalTarget` us explicitly set to `null`, we render the menu in the body
-            // without using a portal to body. This addresses a focus issue when rendered in modals
-            // where the create collective form cannot be focused because it's outside the modal.
-            props.menuPortalTarget === null ? this.containerRef?.current : document.body,
-          )}
-      </Manager>
+            )}
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>
     );
   }
 }

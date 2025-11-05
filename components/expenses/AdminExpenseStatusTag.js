@@ -3,7 +3,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import ReactDOM from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
@@ -12,7 +12,6 @@ import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
-import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
@@ -42,7 +41,7 @@ const PopupContainer = styled(`div`)`
     display: none;
   }
 
-  ${StyledSpinner} {
+  svg[data-spinner='true'] {
     display: block;
     margin: auto;
   }

@@ -4,7 +4,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Expense } from '../../lib/graphql/types/v2/schema';
-import { ExpenseStatus, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -16,20 +16,31 @@ import { Label, P } from '../Text';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
-const generateNewExpenseStatusOptions = intl => [
-  {
-    value: MarkAsUnPaidExpenseStatus.APPROVED,
-    label: i18nExpenseStatus(intl, ExpenseStatus.APPROVED),
-  },
-  {
-    value: MarkAsUnPaidExpenseStatus.INCOMPLETE,
-    label: i18nExpenseStatus(intl, ExpenseStatus.INCOMPLETE),
-  },
-  {
-    value: MarkAsUnPaidExpenseStatus.ERROR,
-    label: i18nExpenseStatus(intl, ExpenseStatus.ERROR),
-  },
-];
+const generateNewExpenseStatusOptions = (intl, expense) => {
+  if (expense.type === ExpenseType.CHARGE) {
+    return [
+      {
+        value: MarkAsUnPaidExpenseStatus.ERROR,
+        label: i18nExpenseStatus(intl, ExpenseStatus.ERROR),
+      },
+    ];
+  }
+
+  return [
+    {
+      value: MarkAsUnPaidExpenseStatus.APPROVED,
+      label: i18nExpenseStatus(intl, ExpenseStatus.APPROVED),
+    },
+    {
+      value: MarkAsUnPaidExpenseStatus.INCOMPLETE,
+      label: i18nExpenseStatus(intl, ExpenseStatus.INCOMPLETE),
+    },
+    {
+      value: MarkAsUnPaidExpenseStatus.ERROR,
+      label: i18nExpenseStatus(intl, ExpenseStatus.ERROR),
+    },
+  ];
+};
 
 const messages = defineMessages({
   reasonPlaceholder: {
@@ -44,7 +55,7 @@ type MarkExpenseAsUnpaidButtonProps = {
 
 const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidButtonProps) => {
   const intl = useIntl();
-  const expenseStatusOptions = React.useMemo(() => generateNewExpenseStatusOptions(intl), [intl]);
+  const expenseStatusOptions = React.useMemo(() => generateNewExpenseStatusOptions(intl, expense), [intl, expense]);
   const [newExpenseStatusOption, setNewExpenseStatusOption] = React.useState(expenseStatusOptions[0]);
   const [uploading, setUploading] = React.useState(false);
   const [message, setMessage] = React.useState<string>();

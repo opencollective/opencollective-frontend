@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';

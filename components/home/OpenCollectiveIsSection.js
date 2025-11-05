@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';

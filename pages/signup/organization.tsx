@@ -56,7 +56,7 @@ export default function SignupOrganizationPage() {
                     id="signup.orgCreated.description"
                     defaultMessage="Your organization has been successfully created."
                   />
-                  <p className="mt-2 text-xs">
+                  <p className="mt-4 text-xs">
                     <FormattedMessage
                       id="signup.orgCreated.redirecting"
                       defaultMessage="We're redirecting you to your <link>organization's dashboard</link>..."
@@ -76,7 +76,7 @@ export default function SignupOrganizationPage() {
                     id="signup.orgCreated.descriptionNoUser"
                     defaultMessage="Your organization has been successfully created. We've sent you a confirmation email, please proceed from there!"
                   />
-                  <p className="mt-2 text-xs">
+                  <p className="mt-4 text-xs">
                     <FormattedMessage
                       id="SignIn.SuccessDetails"
                       defaultMessage="You’ll be redirected from the link in the email, you can safely close this tab."

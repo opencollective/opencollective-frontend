@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { getCollectivePageMetadata } from '../lib/collective';
 import { TierTypes } from '../lib/constants/tiers-types';
@@ -18,7 +17,6 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/constants';
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
@@ -26,31 +24,13 @@ import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
-import { Box, Flex, Grid } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
-import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
-
-const CardsContainer = styled(Grid).attrs({
-  gridGap: '30px',
-  justifyContent: ['center', 'space-between'],
-  gridTemplateColumns: [
-    'minmax(280px, 400px)',
-    'repeat(2, minmax(280px, 350px))',
-    'repeat(3, minmax(240px, 350px))',
-    'repeat(3, minmax(280px, 350px))',
-    'repeat(4, 280px)',
-  ],
-})`
-  & > * {
-    width: 100%;
-  }
-`;
 
 class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
@@ -272,53 +252,53 @@ class ContributePage extends React.Component {
             <Loading />
           ) : (
             <CollectiveThemeProvider collective={data.Collective}>
-              <Container pb={3}>
+              <div className="pb-3">
                 <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} />
-                <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
-                  <Box my={5}>
-                    <Flex flexWrap="wrap" justifyContent="space-between">
-                      <H2 fontWeight="normal" mb={2}>
-                        {title}
-                      </H2>
-                      {LoggedInUser?.isAdminOfCollective(collective) && verb === 'events' && (
-                        <Link href={`/${collective.slug}/events/new`}>
-                          <StyledButton buttonStyle="primary">
-                            <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
-                          </StyledButton>
-                        </Link>
-                      )}
-                      {LoggedInUser?.isAdminOfCollective(collective) && verb === 'projects' && (
-                        <Link href={`/${collective.slug}/projects/new`}>
-                          <StyledButton buttonStyle="primary">
-                            <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
-                          </StyledButton>
-                        </Link>
-                      )}
-                    </Flex>
-                    {subtitle && (
-                      <P color="black.700" mt={3}>
-                        {subtitle}
-                      </P>
-                    )}
+                <div className="mx-auto my-8 max-w-[1260px] px-[15px] sm:px-[30px]">
+                  <div className="mb-8">
                     {waysToContribute.length > 0 && (
-                      <Link href={getCollectivePageRoute(collective)}>
-                        <StyledButton buttonSize="small" mt={3}>
-                          ←&nbsp;
-                          <FormattedMessage
-                            id="goBackToCollectivePage"
-                            defaultMessage="Go back to {name}'s page"
-                            values={{ name: collectiveName }}
-                          />
-                        </StyledButton>
-                      </Link>
+                      <div className="mb-6">
+                        <Link href={getCollectivePageRoute(collective)}>
+                          <StyledButton buttonSize="small">
+                            ←&nbsp;
+                            <FormattedMessage
+                              id="goBackToCollectivePage"
+                              defaultMessage="Go back to {name}'s page"
+                              values={{ name: collectiveName }}
+                            />
+                          </StyledButton>
+                        </Link>
+                      </div>
                     )}
-                  </Box>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h2 className="mb-2 text-3xl font-semibold text-gray-900">{title}</h2>
+                        {subtitle && <p className="text-lg text-gray-600">{subtitle}</p>}
+                      </div>
+                      <div className="flex gap-3">
+                        {LoggedInUser?.isAdminOfCollective(collective) && verb === 'events' && (
+                          <Link href={`/${collective.slug}/events/new`}>
+                            <StyledButton buttonStyle="primary">
+                              <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
+                            </StyledButton>
+                          </Link>
+                        )}
+                        {LoggedInUser?.isAdminOfCollective(collective) && verb === 'projects' && (
+                          <Link href={`/${collective.slug}/projects/new`}>
+                            <StyledButton buttonStyle="primary">
+                              <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
+                            </StyledButton>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                   {waysToContribute.length > 0 ? (
-                    <CardsContainer>
+                    <div className="grid grid-cols-1 justify-center gap-[30px] sm:grid-cols-[repeat(2,minmax(280px,350px))] sm:justify-between md:grid-cols-[repeat(3,minmax(240px,350px))] lg:grid-cols-[repeat(3,minmax(280px,350px))] xl:grid-cols-[repeat(4,280px)] [&>*]:w-full">
                       {waysToContribute.map(({ ContributeCardComponent, key, props }) => (
                         <ContributeCardComponent key={key} {...props} />
                       ))}
-                    </CardsContainer>
+                    </div>
                   ) : (
                     <MessageBox type="info" withIcon>
                       <FormattedMessage
@@ -334,8 +314,8 @@ class ContributePage extends React.Component {
                       </Link>
                     </MessageBox>
                   )}
-                </Container>
-              </Container>
+                </div>
+              </div>
             </CollectiveThemeProvider>
           )}
         </Body>

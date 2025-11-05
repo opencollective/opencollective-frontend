@@ -37,12 +37,19 @@ describe('edit collective', () => {
     cy.wait(200);
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
-    cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
-    cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').should('eq', 1);
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('exist');
+    cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').then(result => {
+      expect(result.count).to.eq(1);
+    });
 
     // Re-send the invitation email
     cy.mailpitDeleteAllEmails();
-    cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
+    cy.get('[data-cy="members-table"]')
+      .find('tr:nth-child(1) ')
+      .find('[data-cy="member-actions-btn"]')
+      .should('exist')
+      .click({ force: true });
+    cy.getByDataCy('resend-invite-btn').should('exist').click({ force: true });
 
     // Check invitation email
     cy.openEmail(({ Subject }) => Subject.includes('Invitation to join CollectiveToEdit')).then(email => {
@@ -63,7 +70,7 @@ describe('edit collective', () => {
     cy.contains('#section-our-team', 'AmazingNewUser');
 
     cy.visit(`/dashboard/${collectiveSlug}/team`);
-    cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
+    cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
 
@@ -97,7 +104,7 @@ describe('edit collective', () => {
       .invoke('prop', 'validity')
       .should('deep.include', { valid: false, valueMissing: true });
     cy.getByDataCy('select-type').click();
-    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy=select-option]', 'Product').click();
     cy.get('[data-cy=name]').click();
     cy.get('[data-cy=name]').type('Tshirt');
     cy.get('[data-cy=description]').type('Made with love');
@@ -153,11 +160,13 @@ describe('edit collective', () => {
     cy.getByDataCy('VAT').click();
 
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
+    cy.get('input[name="settings.VAT.number"]').type('EU123456789');
     cy.contains('button', 'Save').click();
+    cy.contains('[data-cy="toast-notification"]', 'Account updated');
     cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
-    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy=select-option]', 'Product').click();
     cy.contains('[data-cy="edit-tier-modal-form"]:first', 'Value-added tax (VAT): 21%');
     // TODO save and make sure it's enabled
   });

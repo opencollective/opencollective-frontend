@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';

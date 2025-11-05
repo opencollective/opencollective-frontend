@@ -282,7 +282,7 @@ interface TransactionsProps {
   };
   loading?: boolean;
   refetch?(...args: unknown[]): unknown;
-  error?: any;
+  error?: Error;
   LoggedInUser?: LoggedInUser;
   query?: {
     searchTerm?: string;
@@ -439,12 +439,7 @@ const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) =>
         ) : (
           <div className="flex flex-col gap-4">
             <div className={cn(loading && 'animate-pulse')}>
-              <TransactionsList
-                collective={account}
-                transactions={transactions.nodes}
-                displayActions
-                onMutationSuccess={() => refetch()}
-              />
+              <TransactionsList collective={account} transactions={transactions.nodes} displayActions />
             </div>
             <Pagination queryFilter={queryFilter} total={transactions.totalCount} />
           </div>

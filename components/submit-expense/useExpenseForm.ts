@@ -2,6 +2,7 @@ import React from 'react';
 import type { ApolloClient, FetchResult } from '@apollo/client';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
+import type { Account } from '@opencollective/taxes/dist/types/Accounts';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
@@ -11,7 +12,7 @@ import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import type { ZodObjectDef } from 'zod';
-import z from 'zod';
+import { z } from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
@@ -41,7 +42,7 @@ import {
 } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
-import { isValidEmail } from '../../lib/utils';
+import { getArrayValuesMemoizer, isValidEmail } from '../../lib/utils';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 import { AnalyticsEvent } from '@/lib/analytics/events';
@@ -144,8 +145,10 @@ export type ExpenseFormValues = {
   title?: string;
   accountingCategoryId?: string;
   tags?: string[];
+  privateMessage?: string;
   expenseItems?: ExpenseItem[];
   additionalAttachments?: Attachment[];
+  referenceCurrency?: Currency; // The "payment source" currency to use for conversions
   hasTax?: boolean;
   tax?: {
     rate: number;
@@ -162,6 +165,7 @@ export type ExpenseFormValues = {
   hasInvoiceOption?: YesNoOption;
   invoiceFile?: Attachment;
   invoiceNumber?: string;
+  invoiceInfo?: string;
 };
 
 type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue' | 'getFieldProps'> & {
@@ -169,6 +173,7 @@ type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setF
     field: F,
     value: PathValue<ExpenseFormValues, F>,
   ) => Promise<void> | Promise<FormikErrors<ExpenseFormValues>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getFieldProps: <F extends Path<ExpenseFormValues>>(field: F) => FieldInputProps<any>;
 };
 
@@ -292,6 +297,7 @@ const formSchemaQuery = gql`
       }
       payoutMethod {
         id
+        data
       }
       attachedFiles {
         id
@@ -361,16 +367,17 @@ const formSchemaQuery = gql`
       id
       MULTI_CURRENCY_EXPENSES
       PAYPAL_PAYOUTS
+      CHART_OF_ACCOUNTS
     }
   }
 
   fragment ExpenseFormSchemaPolicyFields on Account {
     policies {
+      COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
       EXPENSE_CATEGORIZATION {
         requiredForExpenseSubmitters
         requiredForCollectiveAdmins
       }
-
       EXPENSE_POLICIES {
         invoicePolicy
         receiptPolicy
@@ -413,7 +420,6 @@ const formSchemaQuery = gql`
     }
 
     supportedPayoutMethods
-    isTrustedHost
 
     expensesTags {
       id
@@ -614,6 +620,7 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  availableReferenceCurrencies?: Currency[]; // Available currencies that can be selected as reference
   allowDifferentItemCurrency?: boolean;
   isLongFormItemDescription?: boolean;
   hasExpenseItemDate?: boolean;
@@ -622,8 +629,16 @@ type ExpenseFormOptions = {
   lockedFields?: ExpenseLockableFields[];
 };
 
+const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
+
+/**
+ * Memoized GraphQL query for expense form schema data.
+ *
+ * Uses memoizeOne to cache query results and prevent redundant network requests.
+ * Only refetches when variables change or refresh is explicitly requested.
+ */
 const memoizedExpenseFormSchema = memoizeOne(
-  async (apolloClient: ApolloClient<any>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
+  async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
       context: API_V2_CONTEXT,
@@ -648,138 +663,143 @@ type RecursivePartial<T> = {
       : T[P];
 };
 
+/**
+ * Builds dynamic Zod validation schema based on form options and context.
+ *
+ * This function creates different validation rules depending on:
+ * - Expense type (INVOICE vs RECEIPT vs GRANT)
+ * - Account settings (VAT/GST requirements, accounting categories)
+ * - Form state (invite vs direct submission)
+ *
+ * @param values Current form values
+ * @param options Form configuration options
+ * @param intl Internationalization context for error messages
+ * @param pickSchemaFields Optional field filtering for partial validation
+ * @returns Zod schema for form validation
+ */
 function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
   intl: IntlShape,
   pickSchemaFields?: Record<string, boolean>,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
+  const requiredMessage = { message: intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }) };
   const schema = z.object({
     accountSlug: z
       .string()
       .nullish()
-      .refine(
-        slug => {
-          return slug && !slug.startsWith('__');
-        },
-        {
-          message: 'Required',
-        },
-      ),
+      .refine(slug => {
+        return slug && !slug.startsWith('__');
+      }, requiredMessage),
     payeeSlug: z
       .string()
       .nullish()
-      .refine(
-        slug => {
-          if (slug === '__invite' || slug === '__inviteExistingUser') {
-            return true;
-          }
-
-          return options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount
-            ? true
-            : slug && !slug.startsWith('__');
-        },
-        {
-          message: 'Required',
-        },
-      ),
-    expenseId: z.number().nullish(),
-    expenseTypeOption: z.nativeEnum(ExpenseType).refine(
-      v => {
-        if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
+      .refine(slug => {
+        if (slug === '__invite' || slug === '__inviteExistingUser') {
           return true;
         }
 
-        if (options.account?.supportedExpenseTypes?.length > 0) {
-          return options.account.supportedExpenseTypes.includes(v);
-        }
-
+        return options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount
+          ? true
+          : slug && !slug.startsWith('__');
+      }, requiredMessage),
+    expenseId: z.number().nullish(),
+    expenseTypeOption: z.nativeEnum(ExpenseType).refine(v => {
+      if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
         return true;
-      },
-      {
-        message: 'Required',
-      },
-    ),
+      }
+
+      if (options.account?.supportedExpenseTypes?.length > 0) {
+        return options.account.supportedExpenseTypes.includes(v);
+      }
+
+      return true;
+    }, requiredMessage),
     payoutMethodId: z
       .string()
       .nullish()
-      .refine(
-        v => {
-          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
-            return true;
-          }
-          if (
-            v === '__newAccountBalancePayoutMethod' &&
-            options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
-          ) {
-            return true;
-          }
+      .refine(v => {
+        if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+          return true;
+        }
+        if (
+          v === '__newAccountBalancePayoutMethod' &&
+          options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
+        ) {
+          return true;
+        }
 
-          if (options.payee?.type === CollectiveType.VENDOR && !options.payee?.['hasPayoutMethod']) {
-            return false;
-          }
+        if (options.payee?.type === CollectiveType.VENDOR && !options.payee?.['hasPayoutMethod']) {
+          return false;
+        }
 
-          // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
-          if (v && v !== '__newPayoutMethod') {
-            const payee = options.payee;
-            const account = options.account;
-            const host = account && 'host' in account ? account.host : null;
-            if (payee?.['host'] && host && payee['host'].id !== host.id) {
-              if (!payee['host'].payoutMethods?.some(pm => pm.id === v)) {
-                return false;
-              }
-            } else if (!options.payee?.payoutMethods?.some(pm => pm.id === v)) {
+        // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
+        if (v && v !== '__newPayoutMethod') {
+          const payee = options.payee;
+          const account = options.account;
+          const host = account && 'host' in account ? account.host : null;
+          if (payee?.['host'] && host && payee['host'].id !== host.id) {
+            if (!payee['host'].payoutMethods?.some(pm => pm.id === v)) {
               return false;
             }
+          } else if (!options.payee?.payoutMethods?.some(pm => pm.id === v)) {
+            return false;
           }
+        }
 
-          return true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+        return true;
+      }, requiredMessage),
     accountingCategoryId: z
       .string()
       .nullish()
-      .refine(
-        v => {
-          if (
-            options.isAccountingCategoryRequired &&
-            options.accountingCategories?.length > 0 &&
-            !options.accountingCategories.some(ac => ac.id === v) &&
-            !isNull(v) && // null represents "I don't know" and is a valid option
-            values.expenseTypeOption !== ExpenseType.GRANT
-          ) {
-            return false;
-          }
+      .refine(v => {
+        if (
+          options.isAccountingCategoryRequired &&
+          options.accountingCategories?.length > 0 &&
+          !options.accountingCategories.some(ac => ac.id === v) &&
+          !isNull(v) && // null represents "I don't know" and is a valid option
+          values.expenseTypeOption !== ExpenseType.GRANT
+        ) {
+          return false;
+        }
 
-          return true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+        return true;
+      }, requiredMessage),
     title: z
       .string()
       .nullish()
-      .refine(
-        v => {
-          if (
-            ['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug) ||
-            values.expenseTypeOption === ExpenseType.GRANT
-          ) {
-            return true;
-          }
+      .refine(v => {
+        if (
+          ['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug) ||
+          values.expenseTypeOption === ExpenseType.GRANT
+        ) {
+          return true;
+        }
 
-          return v.length > 0;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+        return v.length > 0;
+      }, requiredMessage),
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    privateMessage: z.string().optional().nullable(),
+    referenceCurrency: z
+      .nativeEnum(Currency)
+      .optional()
+      .nullable()
+      .refine(
+        v => {
+          // If multiple currencies are supported, the reference currency must be set
+          if (options.availableReferenceCurrencies.length > 1) {
+            return v && options.availableReferenceCurrencies.includes(v);
+          } else {
+            return !v || v === options.availableReferenceCurrencies[0];
+          }
+        },
+        value => ({
+          message: value
+            ? intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' })
+            : intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }),
+        }),
+      ),
     expenseAttachedFiles: z
       .array(
         z.object({
@@ -795,57 +815,43 @@ function buildFormSchema(
           url: z.string().url().nullish(),
         }),
       ])
-      .refine(
-        attachment => {
-          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
-            return true;
-          }
-
-          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
-            return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
-          }
+      .refine(attachment => {
+        if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
           return true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+        }
+
+        if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
+          return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
+        }
+        return true;
+      }, requiredMessage),
     invoiceNumber: z
       .string()
       .nullish()
-      .refine(
-        invoiceNumber => {
-          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
-            return true;
-          }
-
-          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
-            return !!invoiceNumber;
-          }
+      .refine(invoiceNumber => {
+        if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
           return true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+        }
+
+        if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
+          return options.isAdminOfPayee || options.payee?.type === CollectiveType.VENDOR ? !!invoiceNumber : true;
+        }
+        return true;
+      }, requiredMessage),
+    invoiceInfo: z.string().optional(),
     expenseItems: z.array(
       z
         .object({
           description: z
             .string()
             .nullish()
-            .refine(
-              v => {
-                if (!options.isAdminOfPayee) {
-                  return true;
-                }
+            .refine(v => {
+              if (!options.isAdminOfPayee) {
+                return true;
+              }
 
-                return v.length > 0;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return v.length > 0;
+            }, requiredMessage),
           attachment: z
             .union([
               z.string().nullish(),
@@ -854,38 +860,43 @@ function buildFormSchema(
               }),
             ])
             .nullish()
-            .refine(
-              attachment => {
-                if ([ExpenseType.GRANT, ExpenseType.INVOICE].includes(values.expenseTypeOption)) {
-                  return true;
-                }
+            .refine(attachment => {
+              if (
+                [ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.SETTLEMENT, ExpenseType.PLATFORM_BILLING].includes(
+                  values.expenseTypeOption,
+                )
+              ) {
+                return true;
+              }
 
-                return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
+            }, requiredMessage),
           incurredAt: z
             .string()
             .nullish()
-            .refine(
-              incurredAt => {
-                if (values.expenseTypeOption === ExpenseType.GRANT) {
-                  return true;
-                }
+            .refine(incurredAt => {
+              if (values.expenseTypeOption === ExpenseType.GRANT) {
+                return true;
+              }
 
-                return !!incurredAt;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return !!incurredAt;
+            }, requiredMessage),
           amount: z.object({
             valueInCents: z.number().min(1),
-            currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
-              message: `Currency must be one of: ${Object.values(Currency).join(',')}`,
-            }),
+            currency: z.string().refine(
+              v => Object.values(Currency).includes(v as Currency),
+              () => ({
+                message: intl.formatMessage(
+                  {
+                    id: 'FormError.enum',
+                    defaultMessage: 'Must be one of: {options}',
+                  },
+                  {
+                    options: Object.values(Currency).join(','),
+                  },
+                ),
+              }),
+            ),
             exchangeRate: z
               .object({
                 value: z.number(),
@@ -908,10 +919,10 @@ function buildFormSchema(
             }
             return true;
           },
-          {
+          () => ({
             message: intl.formatMessage({ defaultMessage: 'Missing exchange rate', id: 'UXE8lX' }),
             path: ['amount', 'exchangeRate', 'value'],
-          },
+          }),
         ),
     ),
     hasTax: z.boolean().nullable(),
@@ -926,9 +937,17 @@ function buildFormSchema(
               }
               return [0, 0.15].includes(v);
             },
-            {
-              message: 'GST tax must be 0% or 15%',
-            },
+            () => ({
+              message: intl.formatMessage(
+                {
+                  id: 'FormError.enum',
+                  defaultMessage: 'Must be one of: {options}',
+                },
+                {
+                  options: '0%, 15%',
+                },
+              ),
+            }),
           )
           .refine(
             v => {
@@ -938,9 +957,12 @@ function buildFormSchema(
 
               return v > 0 && v < 1;
             },
-            {
-              message: 'VAT tax must be between 0% and 100%',
-            },
+            () => ({
+              message: intl.formatMessage(
+                { defaultMessage: 'Value must be between {min} and {max}', id: 'f5QMcL' },
+                { min: '0%', max: '100%' },
+              ),
+            }),
           ),
         idNumber: z
           .string()
@@ -953,9 +975,9 @@ function buildFormSchema(
 
               return checkVATNumberFormat(v).isValid;
             },
-            {
-              message: 'Invalid VAT Number',
-            },
+            () => ({
+              message: intl.formatMessage({ defaultMessage: 'Invalid VAT Number', id: 'zL/Rl8' }),
+            }),
           ),
       })
       .nullable()
@@ -974,9 +996,7 @@ function buildFormSchema(
           values.expenseTypeOption === ExpenseType.INVOICE && options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy
             ? v
             : true,
-        {
-          message: 'Required',
-        },
+        requiredMessage,
       ),
     acknowledgedCollectiveReceiptExpensePolicy: z
       .boolean()
@@ -986,24 +1006,17 @@ function buildFormSchema(
           values.expenseTypeOption === ExpenseType.RECEIPT && options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy
             ? v
             : true,
-        {
-          message: 'Required',
-        },
+        requiredMessage,
       ),
     acknowledgedCollectiveTitleExpensePolicy: z
       .boolean()
       .nullish()
-      .refine(
-        v => {
-          if (values.expenseTypeOption === ExpenseType.GRANT) {
-            return true;
-          }
-          return options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+      .refine(v => {
+        if (values.expenseTypeOption === ExpenseType.GRANT) {
+          return true;
+        }
+        return options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true;
+      }, requiredMessage),
     acknowledgedCollectiveGrantExpensePolicy: z
       .boolean()
       .nullish()
@@ -1012,9 +1025,7 @@ function buildFormSchema(
           values.expenseTypeOption === ExpenseType.GRANT && options.account?.policies?.EXPENSE_POLICIES?.grantPolicy
             ? v
             : true,
-        {
-          message: 'Required',
-        },
+        requiredMessage,
       ),
     acknowledgedHostInvoiceExpensePolicy: z
       .boolean()
@@ -1026,9 +1037,7 @@ function buildFormSchema(
           options.host?.slug !== options.account?.slug
             ? v
             : true,
-        {
-          message: 'Required',
-        },
+        requiredMessage,
       ),
     acknowledgedHostReceiptExpensePolicy: z
       .boolean()
@@ -1040,26 +1049,19 @@ function buildFormSchema(
           options.host?.slug !== options.account?.slug
             ? v
             : true,
-        {
-          message: 'Required',
-        },
+        requiredMessage,
       ),
     acknowledgedHostTitleExpensePolicy: z
       .boolean()
       .nullish()
-      .refine(
-        v => {
-          if (values.expenseTypeOption === ExpenseType.GRANT) {
-            return true;
-          }
-          return options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
-            ? v
-            : true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+      .refine(v => {
+        if (values.expenseTypeOption === ExpenseType.GRANT) {
+          return true;
+        }
+        return options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
+          ? v
+          : true;
+      }, requiredMessage),
     acknowledgedHostGrantExpensePolicy: z
       .boolean()
       .nullish()
@@ -1070,87 +1072,69 @@ function buildFormSchema(
           options.host?.slug !== options.account?.slug
             ? v
             : true,
-        {
-          message: 'Required',
-        },
+        requiredMessage,
       ),
-    payoutMethodNameDiscrepancyReason: z
-      .string()
-      .nullish()
-      .refine(
-        v => {
-          if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
-            const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
-            const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
-            if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
-              return !!v;
-            }
-          }
+    payoutMethodNameDiscrepancyReason: z.string().nullish().optional(),
+    // See https://github.com/opencollective/opencollective/issues/8306
+    // .refine(v => {
+    //   if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
+    //     const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
+    //     const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
+    //     if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
+    //       return !!v;
+    //     }
+    //   }
 
-          return true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+    //   return true;
+    // }, requiredMessage)
     newPayoutMethod: z.object({
       type: z
         .nativeEnum(PayoutMethodType)
         .nullish()
-        .refine(
-          type => {
-            if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
-              return true;
-            }
-
-            if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
-              return true;
-            }
-
-            if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
-              return !!type;
-            }
-
-            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
-              return !!type;
-            }
-
+        .refine(type => {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
             return true;
-          },
-          {
-            message: 'Required',
-          },
-        ),
+          }
+
+          if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
+            return true;
+          }
+
+          if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
+            return !!type;
+          }
+
+          if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
+            return !!type;
+          }
+
+          return true;
+        }, requiredMessage),
       name: z.string().nullish(),
       data: z
         .object({
           currency: z
             .string()
             .nullish()
-            .refine(
-              currency => {
-                if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
-                  return true;
-                }
-
-                if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
-                  return true;
-                }
-
-                if (values.payoutMethodId === '__newAccountBalancePayoutMethod') {
-                  return true;
-                }
-
-                if (values.payoutMethodId === '__newPayoutMethod') {
-                  return !!currency;
-                }
-
+            .refine(currency => {
+              if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
                 return true;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              }
+
+              if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
+                return true;
+              }
+
+              if (values.payoutMethodId === '__newAccountBalancePayoutMethod') {
+                return true;
+              }
+
+              if (values.payoutMethodId === '__newPayoutMethod') {
+                return !!currency;
+              }
+
+              return true;
+            }, requiredMessage),
         })
         .nullish(),
     }),
@@ -1158,49 +1142,34 @@ function buildFormSchema(
     inviteeExistingAccount: z
       .string()
       .nullish()
-      .refine(
-        inviteeExistingAccount => {
-          if (values.payeeSlug === '__inviteExistingUser') {
-            return !!inviteeExistingAccount;
-          }
+      .refine(inviteeExistingAccount => {
+        if (values.payeeSlug === '__inviteExistingUser') {
+          return !!inviteeExistingAccount;
+        }
 
-          return true;
-        },
-        {
-          message: 'Required',
-        },
-      ),
+        return true;
+      }, requiredMessage),
     inviteeNewIndividual: z.object({
       name: z
         .string()
         .nullish()
-        .refine(
-          name => {
-            if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
-              return !isEmpty(name);
-            }
+        .refine(name => {
+          if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
+            return !isEmpty(name);
+          }
 
-            return true;
-          },
-          {
-            message: 'Required',
-          },
-        ),
+          return true;
+        }, requiredMessage),
       email: z
         .string()
         .nullish()
-        .refine(
-          email => {
-            if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
-              return isValidEmail(email);
-            }
+        .refine(email => {
+          if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
+            return isValidEmail(email);
+          }
 
-            return true;
-          },
-          {
-            message: 'Required',
-          },
-        )
+          return true;
+        }, requiredMessage)
         .refine(
           email => {
             if (email) {
@@ -1209,42 +1178,35 @@ function buildFormSchema(
 
             return true;
           },
-          {
-            message: 'Invalid',
-          },
+          () => ({
+            message: intl.formatMessage({
+              defaultMessage: 'This email address is not valid',
+              id: 'FormError.InvalidEmail',
+            }),
+          }),
         ),
     }),
     inviteeNewOrganization: z.object({
       name: z
         .string()
         .nullish()
-        .refine(
-          name => {
-            if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-              return !isEmpty(name);
-            }
+        .refine(name => {
+          if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+            return !isEmpty(name);
+          }
 
-            return true;
-          },
-          {
-            message: 'Required',
-          },
-        ),
+          return true;
+        }, requiredMessage),
       email: z
         .string()
         .nullish()
-        .refine(
-          email => {
-            if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-              return !!email;
-            }
+        .refine(email => {
+          if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+            return !!email;
+          }
 
-            return true;
-          },
-          {
-            message: 'Required',
-          },
-        )
+          return true;
+        }, requiredMessage)
         .refine(
           email => {
             if (email) {
@@ -1253,86 +1215,64 @@ function buildFormSchema(
 
             return true;
           },
-          {
-            message: 'Invalid',
-          },
+          () => ({
+            message: intl.formatMessage({
+              defaultMessage: 'This email address is not valid',
+              id: 'FormError.InvalidEmail',
+            }),
+          }),
         ),
       organization: z
         .object({
           name: z
             .string()
             .nullish()
-            .refine(
-              name => {
-                if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-                  return !isEmpty(name);
-                }
+            .refine(name => {
+              if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+                return !isEmpty(name);
+              }
 
-                return true;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return true;
+            }, requiredMessage),
           slug: z
             .string()
             .nullish()
-            .refine(
-              slug => {
-                if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-                  return !isEmpty(slug);
-                }
+            .refine(slug => {
+              if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+                return !isEmpty(slug);
+              }
 
-                return true;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return true;
+            }, requiredMessage),
           website: z
             .string()
             .nullish()
-            .refine(
-              website => {
-                if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-                  return !isEmpty(website);
-                }
+            .refine(website => {
+              if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+                return !isEmpty(website);
+              }
 
-                return true;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return true;
+            }, requiredMessage),
           description: z
             .string()
             .nullish()
-            .refine(
-              description => {
-                if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-                  return !isEmpty(description);
-                }
+            .refine(description => {
+              if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+                return !isEmpty(description);
+              }
 
-                return true;
-              },
-              {
-                message: 'Required',
-              },
-            ),
+              return true;
+            }, requiredMessage),
         })
         .nullish()
-        .refine(
-          organization => {
-            if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-              return !!organization;
-            }
+        .refine(organization => {
+          if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+            return !!organization;
+          }
 
-            return true;
-          },
-          {
-            message: 'Required',
-          },
-        ),
+          return true;
+        }, requiredMessage),
     }),
   });
 
@@ -1356,7 +1296,7 @@ function getPayeeSlug(values: ExpenseFormValues): string {
 
 async function buildFormOptions(
   intl: IntlShape,
-  apolloClient: ApolloClient<any>,
+  apolloClient: ApolloClient<unknown>,
   loggedInUser: LoggedInUser,
   values: ExpenseFormValues,
   startOptions: ExpenseFormStartOptions,
@@ -1391,6 +1331,7 @@ async function buildFormOptions(
 
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
+    const expenseType = values.expenseTypeOption || options.expense?.type;
     const host = account && 'host' in account ? account.host : null;
     const payee =
       query.data?.payee ||
@@ -1446,11 +1387,8 @@ async function buildFormOptions(
       options.isHostAdmin = loggedInUser?.isAdminOfCollective(host) ?? false;
       options.host = host;
       options.vendorsForAccount =
-        'vendorsForAccount' in host
-          ? ((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []
-          : [];
-      options.showVendorsOption =
-        options.isHostAdmin || ('vendors' in host ? (host.vendors as any)?.totalCount > 0 : false);
+        'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
+      options.showVendorsOption = options.isHostAdmin || ('vendors' in host ? host.vendors?.['totalCount'] > 0 : false);
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1477,7 +1415,10 @@ async function buildFormOptions(
 
     if (query.data?.loggedInAccount) {
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
-      if (payee && payee.type !== CollectiveType.VENDOR) {
+      options.isAdminOfPayee =
+        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
+        values.payeeSlug === '__findAccountIAdminister';
+      if (payee && payee.type !== CollectiveType.VENDOR && options.isAdminOfPayee) {
         // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
         if (payee['host'] && host && payee['host'].id !== host.id) {
           options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
@@ -1521,10 +1462,6 @@ async function buildFormOptions(
         t => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(t),
       );
 
-      options.isAdminOfPayee =
-        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        values.payeeSlug === '__findAccountIAdminister';
-
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
       } else if (
@@ -1542,18 +1479,40 @@ async function buildFormOptions(
       options.lockedFields = options.expense.lockedFields;
     }
 
-    if (
-      options.expense &&
-      !startOptions.duplicateExpense &&
-      options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
-    ) {
-      options.expenseCurrency = options.expense.currency;
-    } else if (values.expenseTypeOption === ExpenseType.GRANT) {
-      options.expenseCurrency = options.account?.currency;
-    } else if (options.payoutMethod) {
-      options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
+    // Compute available reference currencies from all sources
+    const availableCurrencies = new Set<Currency>();
+    if (options.expense && options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)) {
+      availableCurrencies.add(options.expense.currency);
+    } else if (expenseType === ExpenseType.GRANT) {
+      // Grants are always in the account currency
+      availableCurrencies.add(options.account?.currency);
     } else {
-      options.expenseCurrency = options.expense?.currency ?? options.account?.currency;
+      // For all other expenses one of the items currencies
+      values.expenseItems?.forEach(item => {
+        if (item.amount?.currency) {
+          availableCurrencies.add(item.amount.currency as Currency);
+        }
+      });
+
+      // If we didn't get any currency from the items, default to the account + payout method currencies
+      if (availableCurrencies.size === 0) {
+        if (options.account?.currency) {
+          availableCurrencies.add(options.account.currency);
+        }
+        if (options.payoutMethod?.data?.currency) {
+          availableCurrencies.add(options.payoutMethod.data.currency);
+        }
+      }
+    }
+
+    options.availableReferenceCurrencies = memoizeAvailableReferenceCurrencies(Array.from(availableCurrencies));
+
+    if (options.availableReferenceCurrencies.length === 1) {
+      options.expenseCurrency = options.availableReferenceCurrencies[0]; // If there's only one available currency, use it
+    } else if (options.availableReferenceCurrencies.includes(values.referenceCurrency as Currency)) {
+      options.expenseCurrency = values.referenceCurrency as Currency; // If the user provided a reference currency, use it
+    } else if (options.expense?.currency) {
+      options.expenseCurrency = options.expense.currency; // Use the expense currency if it's set
     }
 
     options.isLongFormItemDescription = false;
@@ -1561,21 +1520,22 @@ async function buildFormOptions(
     options.hasExpenseItemDate = true;
     options.canSetupRecurrence = true;
 
-    if (values.expenseTypeOption === ExpenseType.GRANT) {
+    if (expenseType === ExpenseType.GRANT) {
       options.isLongFormItemDescription = true;
       options.allowDifferentItemCurrency = false;
       options.hasExpenseItemDate = false;
       options.canSetupRecurrence = false;
     }
 
-    options.allowExpenseItemAttachment = values.expenseTypeOption
-      ? values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE
-      : options.expense?.type === ExpenseType.RECEIPT || options.expense?.type === ExpenseType.CHARGE;
+    options.allowExpenseItemAttachment = expenseType === ExpenseType.RECEIPT || expenseType === ExpenseType.CHARGE;
 
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
-    if (values.expenseTypeOption === ExpenseType.INVOICE) {
-      if (accountHasVAT(account as any, host as any)) {
+    if (expenseType === ExpenseType.INVOICE) {
+      // Preserve tax type from existing expense if it has taxes
+      if (options.expense?.taxes?.length > 0) {
+        options.taxType = options.expense.taxes[0].type;
+      } else if (accountHasVAT(account as Account, host as Account)) {
         options.taxType = TaxType.VAT;
       } else if (accountHasGST(host || account)) {
         options.taxType = TaxType.GST;
@@ -1634,8 +1594,20 @@ type ExpenseFormStartOptions = {
   pickSchemaFields?: Record<string, boolean>;
 };
 
+/**
+ * Central hook for managing expense form state, validation, data fetching, and submission.
+ *
+ * This hook integrates Formik for form management, Zod for validation, Apollo Client for
+ * data fetching/mutations, and handles complex initialization workflows for both expense
+ * creation and editing scenarios.
+ *
+ * @param opts Configuration options including form ref, initial values, and callbacks
+ * @returns ExpenseForm object with form state, validation, and submission methods
+ *
+ * @see README.md for detailed architecture documentation
+ */
 export function useExpenseForm(opts: {
-  formRef?: React.MutableRefObject<HTMLFormElement>;
+  formRef?: React.RefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
   startOptions: ExpenseFormStartOptions;
   handleOnSubmit?: boolean;
@@ -1649,13 +1621,14 @@ export function useExpenseForm(opts: {
     formikHelpers: FormikHelpers<ExpenseFormValues>,
     options: ExpenseFormOptions,
     startOptions: ExpenseFormStartOptions,
-  ) => void | Promise<any>;
+  ) => void | Promise<unknown>;
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();
   const { LoggedInUser } = useLoggedInUser();
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
   const startOptions = React.useRef(opts.startOptions);
+  const [expenseLoaded, setExpenseLoaded] = React.useState(false);
   const setInitialExpenseValues = React.useRef(false);
   const setInitialFormOptions = React.useRef(false);
   const initialLoading = React.useRef(true);
@@ -1664,20 +1637,15 @@ export function useExpenseForm(opts: {
   const initialValues = React.useRef(opts.initialValues);
   const initialStatus = React.useRef({ schema: formOptions.schema });
 
+  // GraphQL mutations for expense operations
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
     gql`
       mutation CreateExpenseFromDashboard(
         $expenseCreateInput: ExpenseCreateInput!
         $account: AccountReferenceInput!
         $recurring: RecurringExpenseInput
-        $privateComment: String
       ) {
-        expense: createExpense(
-          expense: $expenseCreateInput
-          account: $account
-          privateComment: $privateComment
-          recurring: $recurring
-        ) {
+        expense: createExpense(expense: $expenseCreateInput, account: $account, recurring: $recurring) {
           id
           legacyId
         }
@@ -1782,7 +1750,7 @@ export function useExpenseForm(opts: {
             attachedFiles,
             currency: formOptions.expenseCurrency,
             customData: null,
-            invoiceInfo: null,
+            invoiceInfo: values.invoiceInfo || null,
             invoiceFile:
               values.hasInvoiceOption === YesNoOption.NO
                 ? null
@@ -1811,7 +1779,7 @@ export function useExpenseForm(opts: {
                   : null,
             })),
             longDescription: null,
-            privateMessage: null,
+            privateMessage: values.privateMessage || null,
             tags: values.tags,
             tax: values.hasTax
               ? [
@@ -1861,11 +1829,6 @@ export function useExpenseForm(opts: {
                       },
                     }
                   : {}),
-                privateComment:
-                  formOptions.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT &&
-                  formOptions.payoutMethod?.data?.accountHolderName !== formOptions.payee?.legalName
-                    ? values.payoutMethodNameDiscrepancyReason
-                    : null,
               },
             });
 
@@ -1967,6 +1930,7 @@ export function useExpenseForm(opts: {
   const setFieldValue = expenseForm.setFieldValue;
   const setFieldTouched = expenseForm.setFieldTouched;
 
+  // Load initial values from expense
   React.useEffect(() => {
     if (!formOptions.expense || setInitialExpenseValues.current) {
       return;
@@ -1976,15 +1940,19 @@ export function useExpenseForm(opts: {
     setFieldValue('accountingCategoryId', formOptions.expense.accountingCategory?.id);
     setFieldValue('accountSlug', formOptions.expense.account.slug);
     setFieldValue('expenseTypeOption', formOptions.expense.type);
-    setFieldValue('hasTax', (formOptions.expense.taxes || []).length > 0);
     setFieldValue('payoutMethodId', formOptions.expense.payoutMethod?.id);
     setFieldValue('tags', formOptions.expense.tags);
-    if (formOptions.expense.taxes?.length > 0) {
-      setFieldValue('tax.idNumber', formOptions.expense.taxes[0].idNumber);
-      setFieldValue('tax.rate', formOptions.expense.taxes[0].rate);
-    }
     setFieldValue('title', formOptions.expense.description);
     setFieldTouched('title', true);
+    setFieldValue('privateMessage', formOptions.expense.privateMessage);
+
+    // Load taxes
+    const taxes = formOptions.expense.taxes || [];
+    setFieldValue('hasTax', taxes.length > 0);
+    if (taxes?.length > 0) {
+      setFieldValue('tax.idNumber', taxes[0].idNumber);
+      setFieldValue('tax.rate', taxes[0].rate);
+    }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT && formOptions.expense.draft?.payee) {
       if (
@@ -2044,6 +2012,10 @@ export function useExpenseForm(opts: {
       }
     }
 
+    if (formOptions.expense.invoiceInfo) {
+      setFieldValue('invoiceInfo', formOptions.expense.invoiceInfo);
+    }
+
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
       setFieldValue(
         'expenseItems',
@@ -2077,6 +2049,8 @@ export function useExpenseForm(opts: {
           },
         })),
       );
+      setFieldTouched('expenseItems', true);
+      setExpenseLoaded(true);
     }
   }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue, setFieldTouched]);
 
@@ -2099,6 +2073,7 @@ export function useExpenseForm(opts: {
     setFieldValue,
   ]);
 
+  // Drop taxes when not supported
   React.useEffect(() => {
     if (!formOptions.taxType) {
       setFieldValue('hasTax', false);
@@ -2114,7 +2089,7 @@ export function useExpenseForm(opts: {
         setFieldValue('expenseItems.0.attachment', null);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
       } else {
-        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments?.length ?? 0;
         let count = 0;
 
         expenseForm.values.expenseItems.forEach((item, i) => {
@@ -2159,7 +2134,9 @@ export function useExpenseForm(opts: {
   ]);
 
   React.useEffect(() => {
-    if (!expenseForm.values.hasTax) {
+    if (initialLoading.current) {
+      return;
+    } else if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
     } else if (!expenseForm.values.tax) {
       const selectedVendor = formOptions.vendorsForAccount?.find(
@@ -2182,6 +2159,46 @@ export function useExpenseForm(opts: {
       setFieldValue('accountingCategoryId', null);
     }
   }, [formOptions.accountingCategories, expenseForm.values.accountingCategoryId, setFieldValue]);
+
+  // Reset reference currency if it's no longer in the available currencies
+  React.useEffect(() => {
+    if (
+      formOptions.availableReferenceCurrencies &&
+      expenseForm.values.referenceCurrency &&
+      !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
+    ) {
+      setFieldValue('referenceCurrency', null);
+    }
+  }, [expenseForm.values.referenceCurrency, formOptions.availableReferenceCurrencies, setFieldValue]);
+
+  // Set item currency if we're done loading and there's a single available reference currency
+  React.useEffect(() => {
+    if (
+      formOptions.availableReferenceCurrencies &&
+      formOptions.availableReferenceCurrencies.length === 1 &&
+      expenseForm.values.expenseItems.length === 1 &&
+      !expenseForm.values.expenseItems[0].amount?.currency
+    ) {
+      setFieldValue('expenseItems.0.amount.currency', formOptions.availableReferenceCurrencies[0]);
+    }
+  }, [formOptions.availableReferenceCurrencies, setFieldValue, expenseForm.values.expenseItems]);
+
+  // If there's an existing expense, assume that reference currency = expense currency
+  React.useEffect(() => {
+    if (
+      formOptions.expense?.id &&
+      formOptions.expense.currency &&
+      !expenseForm.values.referenceCurrency &&
+      formOptions.availableReferenceCurrencies.length > 1
+    ) {
+      setFieldValue('referenceCurrency', formOptions.expense.currency);
+    }
+  }, [
+    formOptions.expense,
+    expenseForm.values.referenceCurrency,
+    formOptions.availableReferenceCurrencies,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {
@@ -2209,6 +2226,11 @@ export function useExpenseForm(opts: {
 
     const ctrl = new AbortController();
     let queryComplete = false;
+
+    /**
+     * Fetches exchange rates for expense items with different currencies.
+     * Uses AbortController to cancel in-flight requests on component unmount.
+     */
     async function updateExchangeRates() {
       try {
         const res = await apolloClient.query<ExpenseFormExchangeRatesQuery, ExpenseFormExchangeRatesQueryVariables>({
@@ -2226,14 +2248,15 @@ export function useExpenseForm(opts: {
           `,
           context: {
             ...API_V2_CONTEXT,
-            fetchOptions: {
-              signal: ctrl.signal,
-            },
           },
           variables: {
             exchangeRateRequests,
           },
         });
+
+        if (ctrl.signal.aborted) {
+          return;
+        }
 
         queryComplete = true;
         if (!isEmpty(res.data?.currencyExchangeRate)) {
@@ -2272,7 +2295,13 @@ export function useExpenseForm(opts: {
         ctrl.abort();
       }
     };
-  }, [apolloClient, formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+  }, [
+    apolloClient,
+    formOptions.expenseCurrency,
+    expenseForm.values.expenseItems,
+    expenseForm.values.expenseTypeOption,
+    setFieldValue,
+  ]);
 
   const setStatus = expenseForm.setStatus;
   React.useEffect(() => {
@@ -2319,15 +2348,18 @@ export function useExpenseForm(opts: {
 
     runValidation();
   }, [formOptions.schema, validateForm]);
-
   React.useEffect(() => {
+    if (startOptions.current.expenseId && !expenseLoaded) {
+      return;
+    }
+
     for (let i = 0; i < (expenseForm.values.expenseItems?.length ?? 0); i++) {
       const expenseItem = expenseForm.values.expenseItems[i];
       if (!expenseItem.amount?.currency) {
         setFieldValue(`expenseItems.${i}.amount.currency`, formOptions.expenseCurrency);
       }
     }
-  }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+  }, [formOptions.expenseCurrency, expenseForm.values.expenseItems, setFieldValue, expenseLoaded]);
 
   React.useEffect(() => {
     if (

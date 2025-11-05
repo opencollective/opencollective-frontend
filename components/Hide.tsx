@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { bottom, flex, height, left, position, right, top } from 'styled-system';
 
 import { pointerEvents } from '../lib/styled-system-custom-properties';

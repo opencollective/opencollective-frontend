@@ -6,7 +6,7 @@ import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';

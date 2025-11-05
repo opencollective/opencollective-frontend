@@ -22,6 +22,7 @@ export function FormField({
   children,
   error: customError,
   isPrivate,
+  privateMessage,
   validate,
   className,
   ...props
@@ -41,6 +42,7 @@ export function FormField({
   htmlFor?: string;
   error?: string;
   isPrivate?: boolean;
+  privateMessage?: React.ReactNode;
   validate?: any;
   className?: string;
   onFocus?: () => void;
@@ -98,7 +100,7 @@ export function FormField({
                 {isPrivate && (
                   <React.Fragment>
                     &nbsp;
-                    <PrivateInfoIcon />
+                    <PrivateInfoIcon children={privateMessage} />
                   </React.Fragment>
                 )}
               </Label>
@@ -106,7 +108,13 @@ export function FormField({
             {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
             {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
             {hasError && showError && (
-              <p className="text-sm text-red-600">{isOCError(error) ? formatFormErrorMessage(intl, error) : error}</p>
+              <p className="text-sm text-red-600">
+                {isOCError(error)
+                  ? formatFormErrorMessage(intl, error)
+                  : typeof error === 'string'
+                    ? error
+                    : JSON.stringify(error) || 'Error'}
+              </p>
             )}
           </div>
         );
