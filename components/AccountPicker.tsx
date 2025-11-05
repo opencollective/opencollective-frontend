@@ -10,7 +10,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { cn } from '../lib/utils';
 
 import { Button } from './ui/Button';
-import { Input } from './ui/Input';
+import { BASE_INPUT_CLASS, Input } from './ui/Input';
 import { Badge } from './ui/Badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog';
 import { Label } from './ui/Label';
@@ -21,6 +21,71 @@ import { Command, CommandEmpty, CommandInput, CommandGroup, CommandItem, Command
 import Avatar from './Avatar';
 import CreateCollectiveMiniForm from './CreateCollectiveMiniForm';
 import { Command as CommandPrimitive } from 'cmdk';
+import formatAccountType from '@/lib/i18n/account-type';
+import Image from '@/components/Image';
+import { Skeleton } from './ui/Skeleton';
+import { Separator } from './ui/Separator';
+import formatCollectiveType from '@/lib/i18n/collective-type';
+
+// TypeScript interfaces
+type CollectiveTypeValue = (typeof CollectiveType)[keyof typeof CollectiveType];
+
+interface Collective {
+  id: string;
+  name: string;
+  slug?: string;
+  email?: string;
+  type: CollectiveTypeValue;
+  status?: string;
+}
+
+interface OptionType {
+  value: Collective;
+  label?: string;
+  isDisabled?: boolean;
+}
+
+interface AccountPickerProps {
+  inputId?: string;
+  collectives?: Collective[];
+  creatable?: boolean | CollectiveTypeValue[];
+  customOptions?: OptionType[];
+  formatOptionLabel?: (option: OptionType, context?: any) => React.ReactNode;
+  getDefaultOptions?: (buildOption: (c: Collective) => OptionType, allOptions: OptionType[]) => OptionType;
+  groupByType?: boolean;
+  onInvite?: (value: boolean) => void;
+  sortFunc?: (collectives: Collective[]) => Collective[];
+  types?: CollectiveTypeValue[];
+  isDisabled?: boolean;
+  menuIsOpen?: boolean;
+  minWidth?: string | number;
+  maxWidth?: string | number;
+  width?: string | number;
+  addLoggedInUserAsAdmin?: boolean;
+  renderNewCollectiveOption?: () => React.ReactNode;
+  isSearchable?: boolean;
+  expenseType?: string;
+  useBeneficiaryForVendor?: boolean;
+  onChange?: (value: Collective | Collective[] | null) => void;
+  onInputChange?: (value: string) => void;
+  onCreateClick?: (type: CollectiveTypeValue) => void;
+  collective?: Collective | Collective[] | null;
+  isMulti?: boolean;
+  getOptions?: (buildOption: (c: Collective) => OptionType) => OptionType;
+  customOptionsPosition?: 'TOP' | 'BOTTOM';
+  invitable?: boolean;
+  excludeAdminFields?: string[];
+  createCollectiveOptionalFields?: string[];
+  HostCollectiveId?: string;
+  styles?: any;
+  menuPortalTarget?: HTMLElement | null;
+  placeholder?: string;
+  className?: string;
+  AccountMeta?: React.ComponentType<{ account: Collective }>;
+  onMenuScrollToBottom?: () => void;
+  isLoadingMoreResults?: boolean;
+  isLoading?: boolean;
+}
 
 const Messages = defineMessages({
   createNew: {
@@ -28,8 +93,28 @@ const Messages = defineMessages({
     defaultMessage: 'Create new',
   },
   inviteNew: {
-    id: 'CollectivePicker.InviteNew',
-    defaultMessage: 'Invite new',
+    id: 'CollectivePicker.InviteSomeone',
+    defaultMessage: 'Invite someone to submit an expense',
+  },
+  inviteNewUser: {
+    id: 'User.InviteNew',
+    defaultMessage: 'Invite new User',
+  },
+  createOrganization: {
+    id: 'organization.create',
+    defaultMessage: 'Create Organization',
+  },
+  createCollective: {
+    id: 'collective.create',
+    defaultMessage: 'Create Collective',
+  },
+  createBeneficiary: {
+    id: 'AzRKUx',
+    defaultMessage: 'Create Beneficiary',
+  },
+  createVendor: {
+    id: 'I5p2+k',
+    defaultMessage: 'Create Vendor',
   },
 });
 
@@ -67,36 +152,20 @@ export const CUSTOM_OPTIONS_POSITION = {
   BOTTOM: 'BOTTOM',
 };
 
-// Utility functions from prototype
-const getAccountIcon = type => {
-  switch (type) {
-    case 'ORGANIZATION':
-    case 'business':
-      return <Building2 className="h-4 w-4" />;
-    case 'team':
-      return <User className="h-4 w-4" />;
-    default:
-      return <User className="h-4 w-4" />;
+/** Return the caption associated to a given collective type */
+const getTypeCaption = (intl, type: CollectiveTypeValue, { useBeneficiaryForVendor = false }) => {
+  if (type === CollectiveType.USER) {
+    return intl.formatMessage(Messages.inviteNewUser);
+  } else if (type === CollectiveType.ORGANIZATION) {
+    return intl.formatMessage(Messages.createOrganization);
+  } else if (type === CollectiveType.COLLECTIVE) {
+    return intl.formatMessage(Messages.createCollective);
+  } else if (type === CollectiveType.VENDOR) {
+    return useBeneficiaryForVendor
+      ? intl.formatMessage(Messages.createBeneficiary)
+      : intl.formatMessage(Messages.createVendor);
   }
-};
-
-const getStatusBadge = status => {
-  switch (status) {
-    case 'pending':
-      return (
-        <Badge type="warning" size="xs" className="text-xs">
-          Pending
-        </Badge>
-      );
-    case 'invited':
-      return (
-        <Badge type="outline" size="xs" className="text-xs">
-          Invited
-        </Badge>
-      );
-    default:
-      return null;
-  }
+  return null;
 };
 
 /**
@@ -105,13 +174,13 @@ const getStatusBadge = status => {
  *
  * If you want the collectives to be automatically loaded from the API, check `CollectivePickerAsync`.
  */
-const CollectivePicker = props => {
+const AccountPicker: React.FC<AccountPickerProps> = props => {
   const {
     inputId,
     collectives = [],
     creatable,
     customOptions,
-    formatOptionLabel,
+    formatOptionLabel = DefaultAccountLabel,
     getDefaultOptions,
     groupByType,
     onInvite,
@@ -142,6 +211,10 @@ const CollectivePicker = props => {
     menuPortalTarget,
     placeholder = 'Select account...',
     className,
+    AccountMeta,
+    onMenuScrollToBottom,
+    isLoadingMoreResults = false,
+    isLoading,
     ...restProps
   } = props;
 
@@ -151,18 +224,15 @@ const CollectivePicker = props => {
   // Modern state management
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(menuIsOpenProp || false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const [newAccountName, setNewAccountName] = useState('');
-  const [newAccountEmail, setNewAccountEmail] = useState('');
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteMessage, setInviteMessage] = useState('');
   const [displayedResults, setDisplayedResults] = useState(10);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Legacy state for compatibility
-  const [createFormCollectiveType, setCreateFormCollectiveType] = useState(null);
-  const [createdCollectives, setCreatedCollectives] = useState([]);
+  const [createFormCollectiveType, setCreateFormCollectiveType] = useState<CollectiveTypeValue | null>(null);
+  const [createdCollectives, setCreatedCollectives] = useState<Collective[]>([]);
 
   // Filter collectives based on search query
   const filteredCollectives = useMemo(() => {
@@ -180,76 +250,76 @@ const CollectivePicker = props => {
   }, [collectives, searchQuery]);
 
   // Get selected collectives for multi-select
-  const currentSelectedCollectives = useMemo(() => {
+  const currentSelectedCollectives = useMemo((): Collective[] => {
     if (isMulti) {
       return Array.isArray(collective) ? collective : [];
     }
-    return collective ? [collective] : [];
+    return collective && !Array.isArray(collective) ? [collective] : [];
   }, [collective, isMulti]);
 
   const selectedIds = useMemo(() => {
     return new Set(currentSelectedCollectives.map(acc => acc.id));
   }, [currentSelectedCollectives]);
 
-  // Separate selected and unselected collectives
-  const selectedCollectivesInResults = useMemo(() => {
-    return filteredCollectives.filter(coll => selectedIds.has(coll.id));
-  }, [filteredCollectives, selectedIds]);
+  // Build all options with value and label, including custom options
+  const allOptions = useMemo((): OptionType[] => {
+    // Build options from filtered collectives
+    const collectiveOptions: OptionType[] = filteredCollectives.map(collective => ({
+      value: collective,
+      label: collective.name,
+    }));
 
-  const unselectedCollectivesInResults = useMemo(() => {
-    return filteredCollectives.filter(coll => !selectedIds.has(coll.id));
-  }, [filteredCollectives, selectedIds]);
+    // Merge with custom options if they exist
+    if (!customOptions || customOptions.length === 0) {
+      return collectiveOptions;
+    }
+
+    // Add custom options at the top or bottom based on customOptionsPosition
+    if (customOptionsPosition === CUSTOM_OPTIONS_POSITION.BOTTOM) {
+      return [...collectiveOptions, ...customOptions];
+    } else {
+      // Default to TOP
+      return [...customOptions, ...collectiveOptions];
+    }
+  }, [filteredCollectives, customOptions, customOptionsPosition]);
 
   const hasMoreResults = useMemo(() => {
-    if (searchQuery.trim() !== '') {
-      return selectedCollectivesInResults.length + unselectedCollectivesInResults.length > displayedResults;
+    // If we're doing API pagination, don't limit display locally
+    if (onMenuScrollToBottom) {
+      return false;
     }
-    return unselectedCollectivesInResults.length > displayedResults;
-  }, [searchQuery, selectedCollectivesInResults, unselectedCollectivesInResults, displayedResults]);
+
+    return allOptions.length > displayedResults;
+  }, [allOptions, displayedResults, onMenuScrollToBottom]);
 
   // Event handlers
   const handleScroll = useCallback(() => {
-    if (!scrollRef.current || !hasMoreResults || isLoadingMore) return;
+    if (!scrollRef.current || isLoadingMore || isLoadingMoreResults) return;
 
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
     if (scrollTop + clientHeight >= scrollHeight - 5) {
-      setIsLoadingMore(true);
-      // Simulate loading delay
-      setTimeout(() => {
-        setDisplayedResults(prev => Math.min(prev + 10, filteredCollectives.length));
-        setIsLoadingMore(false);
-      }, 300);
+      // If API pagination is enabled, call the callback
+      if (onMenuScrollToBottom) {
+        onMenuScrollToBottom();
+      }
+      // Otherwise, load more from local data if available
+      else if (hasMoreResults) {
+        setIsLoadingMore(true);
+        // Simulate loading delay
+        setTimeout(() => {
+          setDisplayedResults(prev => Math.min(prev + 10, filteredCollectives.length));
+          setIsLoadingMore(false);
+        }, 300);
+      }
     }
-  }, [hasMoreResults, isLoadingMore, filteredCollectives.length]);
-
-  const handleCreateAccount = useCallback(() => {
-    const newAccount = {
-      id: Date.now().toString(),
-      name: newAccountName,
-      email: newAccountEmail,
-      type: 'USER',
-      status: 'active',
-    };
-
-    if (isMulti) {
-      onChangeProp?.([...currentSelectedCollectives, newAccount]);
-    } else {
-      onChangeProp?.(newAccount);
-      setIsOpen(false);
-    }
-
-    setIsCreateDialogOpen(false);
-    setNewAccountName('');
-    setNewAccountEmail('');
-    setCreatedCollectives(prev => [...prev, newAccount]);
-  }, [newAccountName, newAccountEmail, isMulti, currentSelectedCollectives, onChangeProp]);
+  }, [hasMoreResults, isLoadingMore, isLoadingMoreResults, filteredCollectives.length, onMenuScrollToBottom]);
 
   const handleInviteAccount = useCallback(() => {
-    const invitedAccount = {
+    const invitedAccount: Collective = {
       id: Date.now().toString(),
       name: inviteEmail.split('@')[0],
       email: inviteEmail,
-      type: 'USER',
+      type: CollectiveType.USER,
       status: 'invited',
     };
 
@@ -331,6 +401,15 @@ const CollectivePicker = props => {
 
   const prefillValue = isEmail(searchQuery) ? { email: searchQuery } : { name: searchQuery };
 
+  // Determine which types are available for creation
+  const creatableTypes = useMemo(() => {
+    if (!creatable) return [];
+    if (typeof creatable === 'object' && Array.isArray(creatable)) {
+      return creatable;
+    }
+    return types || [];
+  }, [creatable, types]);
+
   return (
     <div className={cn('relative', className)} style={{ minWidth, maxWidth, width }}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -340,22 +419,13 @@ const CollectivePicker = props => {
             role="combobox"
             aria-expanded={isOpen}
             disabled={isDisabled}
-            className="min-h-9 w-full justify-between bg-background hover:bg-accent/50"
+            className="min-h-12 w-full justify-between bg-background hover:bg-accent/50"
           >
             {currentSelectedCollectives.length > 0 ? (
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 {isMulti ? (
                   currentSelectedCollectives.length === 1 ? (
-                    <>
-                      <Avatar collective={currentSelectedCollectives[0]} radius={20} />
-                      <div className="flex min-w-0 flex-1 flex-col items-start">
-                        <span className="truncate text-sm font-medium">{currentSelectedCollectives[0].name}</span>
-                        <span className="truncate text-xs text-muted-foreground">
-                          {currentSelectedCollectives[0].email || currentSelectedCollectives[0].slug}
-                        </span>
-                      </div>
-                      {getAccountIcon(currentSelectedCollectives[0].type)}
-                    </>
+                    formatOptionLabel({ value: currentSelectedCollectives[0] } as OptionType, undefined)
                   ) : (
                     <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
                       {currentSelectedCollectives.slice(0, 2).map(collective => (
@@ -382,256 +452,179 @@ const CollectivePicker = props => {
                       )}
                     </div>
                   )
-                ) : (
-                  <>
-                    <Avatar collective={collective} radius={20} />
-                    <div className="flex min-w-0 flex-1 flex-col items-start">
-                      <span className="truncate text-sm font-medium">{collective?.name}</span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        {collective?.email || collective?.slug}
-                      </span>
-                    </div>
-                    {getAccountIcon(collective?.type)}
-                  </>
-                )}
+                ) : !Array.isArray(collective) && collective ? (
+                  formatOptionLabel({ value: collective } as OptionType, undefined)
+                ) : null}
               </div>
             ) : (
-              <span className="text-muted-foreground">{placeholder}</span>
+              <span className="text-muted-foreground"> {isMulti ? 'Select Accounts' : 'Select Account'}</span>
             )}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
           <Command shouldFilter={false} className="rounded-none border-0 bg-transparent">
-            <div className="space-y-3 p-3">
+            <div className="">
               {/* Header */}
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">
                   {isMulti ? 'Select Accounts' : 'Select Account'}
                   {isMulti && currentSelectedCollectives.length > 0 && (
                     <span className="ml-1 text-muted-foreground">({currentSelectedCollectives.length})</span>
                   )}
                 </span>
-              </div>
+              </div> */}
 
               {/* Search */}
               {isSearchable && (
-                <div className="relative">
+                <div className="relative p-0">
                   {/* <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 transform text-muted-foreground" /> */}
                   <CommandInput
-                    placeholder="Search accounts..."
+                    placeholder={placeholder}
                     value={searchQuery}
                     onValueChange={val => handleInputChange(val)}
                     // className="h-8 pl-8 text-sm"
+                    // wrapperClass={BASE_INPUT_CLASS}
                   />
                 </div>
               )}
 
               {/* Action buttons */}
               {(creatable || invitable) && (
-                <div className="flex gap-2">
-                  {creatable && (
-                    <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-9 flex-1 bg-transparent text-sm font-medium">
+                <React.Fragment>
+                  <div className="flex max-w-full items-center gap-2 px-3">
+                    <Separator className="flex-1" /> <div className="text-xs font-medium text-muted-foreground">OR</div>
+                    <Separator className="flex-1" />
+                  </div>
+                  <div className="flex gap-2 p-2">
+                    {creatable &&
+                      creatableTypes.map(type => (
+                        <Button
+                          key={type}
+                          variant="outline"
+                          size="xs"
+                          className="whitespace-nowrap"
+                          onClick={() => {
+                            if (typeof onCreateClick === 'function') {
+                              onChangeProp?.(null);
+                              setIsOpen(false);
+                              onCreateClick(type);
+                            } else {
+                              setCreateFormCollectiveType(type);
+                            }
+                          }}
+                        >
                           <Plus className="mr-2 h-4 w-4" />
-                          Create New
+                          {getTypeCaption(intl, type, { useBeneficiaryForVendor })}
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Create New Account</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="name">Account Name</Label>
-                            <Input
-                              id="name"
-                              value={newAccountName}
-                              onChange={e => setNewAccountName(e.target.value)}
-                              placeholder="Enter account name"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input
-                              id="email"
-                              type="email"
-                              value={newAccountEmail}
-                              onChange={e => setNewAccountEmail(e.target.value)}
-                              placeholder="Enter email address"
-                            />
-                          </div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                              Cancel
-                            </Button>
-                            <Button onClick={handleCreateAccount} disabled={!newAccountName || !newAccountEmail}>
-                              Create Account
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
+                      ))}
 
-                  {invitable && (
-                    <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-9 flex-1 bg-transparent text-sm font-medium">
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          Invite User
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Invite Account</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="invite-email">Email Address</Label>
-                            <Input
-                              id="invite-email"
-                              type="email"
-                              value={inviteEmail}
-                              onChange={e => setInviteEmail(e.target.value)}
-                              placeholder="Enter email to invite"
-                            />
+                    {invitable && (
+                      <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 w-full justify-start bg-transparent text-sm font-medium"
+                          >
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Invite someone by email
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Invite Account</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="invite-email">Email Address</Label>
+                              <Input
+                                id="invite-email"
+                                type="email"
+                                value={inviteEmail}
+                                onChange={e => setInviteEmail(e.target.value)}
+                                placeholder="Enter email to invite"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="message">Invitation Message (Optional)</Label>
+                              <Textarea
+                                id="message"
+                                value={inviteMessage}
+                                onChange={e => setInviteMessage(e.target.value)}
+                                placeholder="Add a personal message..."
+                                rows={3}
+                              />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>
+                                Cancel
+                              </Button>
+                              <Button onClick={handleInviteAccount} disabled={!inviteEmail}>
+                                Send Invite
+                              </Button>
+                            </div>
                           </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="message">Invitation Message (Optional)</Label>
-                            <Textarea
-                              id="message"
-                              value={inviteMessage}
-                              onChange={e => setInviteMessage(e.target.value)}
-                              placeholder="Add a personal message..."
-                              rows={3}
-                            />
-                          </div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>
-                              Cancel
-                            </Button>
-                            <Button onClick={handleInviteAccount} disabled={!inviteEmail}>
-                              Send Invite
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                </React.Fragment>
               )}
 
               {/* Results */}
               <CommandList
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className="max-h-60 space-y-1 overflow-y-auto border-0"
+                className="max-h-90 space-y-1 overflow-y-auto border-0 border-t p-1"
               >
-                {/* Selected items */}
-                {currentSelectedCollectives.length > 0 && (
-                  <CommandGroup
-                    heading="Selected"
-                    className="p-0 [&_[cmdk-group-heading]]:rounded [&_[cmdk-group-heading]]:bg-muted/30 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground"
-                  >
-                    {(searchQuery.trim() === '' ? currentSelectedCollectives : selectedCollectivesInResults).map(
-                      collective => (
-                        <CommandItem
-                          key={collective.id}
-                          value={`selected-${collective.id}-${collective.name}`}
-                          onSelect={() => handleCollectiveSelect(collective)}
-                          className="flex cursor-pointer items-center gap-2 rounded-md border border-primary/20 bg-primary/10 p-2 text-sm transition-colors hover:bg-accent/50 data-[selected=true]:bg-primary/10 data-[selected=true]:text-foreground"
-                        >
-                          {isMulti && <Checkbox checked={true} className="pointer-events-none" />}
-
-                          <Avatar collective={collective} radius={24} />
-
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <p className="truncate font-medium">{collective.name}</p>
-                              {getAccountIcon(collective.type)}
-                              {getStatusBadge(collective.status)}
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <p className="truncate text-xs text-muted-foreground">
-                                {collective.email || collective.slug}
-                              </p>
-                              {collective.role && (
-                                <Badge type="outline" size="xs" className="h-4 px-1 text-xs">
-                                  {collective.role}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-
-                          {!isMulti && <Check className="h-3.5 w-3.5 text-primary" />}
-                        </CommandItem>
-                      ),
-                    )}
-                  </CommandGroup>
-                )}
-
-                {/* Available items */}
-                {unselectedCollectivesInResults.length > 0 && (
-                  <CommandGroup
-                    heading={`${unselectedCollectivesInResults.length} result${unselectedCollectivesInResults.length !== 1 ? 's' : ''}`}
-                    className="p-0 [&_[cmdk-group-heading]]:rounded [&_[cmdk-group-heading]]:bg-muted/30 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground"
-                  >
-                    {unselectedCollectivesInResults
+                {/* All items */}
+                {allOptions.length > 0 && (
+                  <CommandGroup className="gap-1 p-0 [&_[cmdk-group-heading]]:rounded [&_[cmdk-group-heading]]:bg-muted/30 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground">
+                    {allOptions
                       .slice(
                         0,
-                        searchQuery.trim() === ''
-                          ? displayedResults
-                          : displayedResults - selectedCollectivesInResults.length,
+                        // If API pagination is enabled, show all results
+                        onMenuScrollToBottom ? allOptions.length : displayedResults,
                       )
-                      .map(collective => (
-                        <CommandItem
-                          key={collective.id}
-                          value={`unselected-${collective.id}-${collective.name}`}
-                          onSelect={() => handleCollectiveSelect(collective)}
-                          className="flex cursor-pointer items-center gap-2 rounded-md p-2 text-sm transition-colors hover:bg-accent/50 aria-selected:bg-accent/50"
-                        >
-                          {isMulti && (
-                            <Checkbox checked={isCollectiveSelected(collective.id)} className="pointer-events-none" />
-                          )}
-
-                          <Avatar collective={collective} radius={24} />
-
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <p className="truncate font-medium">{collective.name}</p>
-                              {getAccountIcon(collective.type)}
-                              {getStatusBadge(collective.status)}
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <p className="truncate text-xs text-muted-foreground">
-                                {collective.email || collective.slug}
-                              </p>
-                              {collective.role && (
-                                <Badge type="outline" size="xs" className="h-4 px-1 text-xs">
-                                  {collective.role}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-
-                          {!isMulti && isCollectiveSelected(collective.id) && (
-                            <Check className="h-3.5 w-3.5 text-primary" />
-                          )}
-                        </CommandItem>
-                      ))}
+                      .map(option => {
+                        const isSelected = isCollectiveSelected(option.value.id);
+                        return (
+                          <CommandItem
+                            key={option.value.id}
+                            value={`${option.value.id}-${option.value.name}`}
+                            onSelect={() => handleCollectiveSelect(option.value)}
+                            disabled={option.isDisabled}
+                            className={cn(
+                              'flex cursor-pointer items-center gap-2 rounded-md p-2 text-sm transition-colors hover:bg-accent/50 aria-selected:bg-accent/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+                              isSelected && 'border border-primary/20 bg-primary/10 data-[selected=true]:bg-primary/10',
+                            )}
+                          >
+                            {isMulti && <Checkbox checked={isSelected} className="pointer-events-none" />}
+                            {formatOptionLabel ? formatOptionLabel(option, undefined) : option.label}
+                            {!isMulti && isSelected && <Check className="h-3.5 w-3.5 text-primary" />}
+                          </CommandItem>
+                        );
+                      })}
                   </CommandGroup>
                 )}
 
-                {isLoadingMore && (
-                  <div className="flex items-center justify-center py-2">
-                    <div className="text-xs text-muted-foreground">Loading more...</div>
-                  </div>
-                )}
+                {(isLoadingMore || isLoadingMoreResults || isLoading) &&
+                  Array.from({ length: 20 }, (_, i) => i + 1).map(id => <LoadingResult key={`skeleton-${id}`} />)}
 
                 <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
-                  No accounts found
+                  <div>
+                    <div className="relative flex items-center justify-center rounded-full">
+                      <Image
+                        alt="No results found illustration with a magnifying glass."
+                        className="z-10 h-40 w-40"
+                        src="/static/images/no-results.png"
+                        width={160}
+                        height={160}
+                      />
+                    </div>
+                  </div>
+                  Find an account
                 </CommandEmpty>
               </CommandList>
             </div>
@@ -672,12 +665,42 @@ const CollectivePicker = props => {
   );
 };
 
-CollectivePicker.defaultProps = {
-  groupByType: true,
-  getDefaultOptions: () => undefined,
-  getOptions: () => undefined,
-  formatOptionLabel: DefaultCollectiveLabel,
-  sortFunc: collectives => sortBy(collectives, 'name'),
-};
+export default AccountPicker;
 
-export default CollectivePicker;
+function DefaultMetaRender({ account }) {
+  const intl = useIntl();
+  return (
+    <Badge size="sm" type="outline">
+      {formatAccountType(intl, account.type)}
+    </Badge>
+  );
+}
+
+export function DefaultAccountLabel({ value: account }, context) {
+  const intl = useIntl();
+  return (
+    <div className="flex min-w-0 flex-1 items-center gap-2">
+      <Avatar collective={account} radius={20} />
+      <div className="flex min-w-0 flex-1 flex-col items-start truncate overflow-hidden">
+        <span className="truncate text-sm font-medium">{account.name}</span>{' '}
+        <span className="truncate text-xs text-muted-foreground">@{account.slug}</span>
+        {/* abillity to show email? */}
+      </div>
+
+      <Badge size="sm" type="outline">
+        {formatCollectiveType(intl, account.type)}
+      </Badge>
+    </div>
+  );
+}
+function LoadingResult() {
+  return (
+    <div className="flex items-center gap-2 px-2 py-3">
+      <Skeleton className="size-9 shrink-0 rounded-md" />
+      <div className="flex flex-1 flex-col gap-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+    </div>
+  );
+}

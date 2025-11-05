@@ -4,16 +4,17 @@ import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { gqlV1 } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
 
-import CollectivePicker from './AccountPicker';
+import AccountPicker from './AccountPicker';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 
 const accountPickerSearchQuery = gql`
   query AccountPickerSearch(
     $term: String!
     $types: [AccountType]
     $limit: Int
+    $offset: Int
     $host: [AccountReferenceInput]
     $parent: [AccountReferenceInput]
     $skipGuests: Boolean
@@ -24,6 +25,7 @@ const accountPickerSearchQuery = gql`
       searchTerm: $term
       type: $types
       limit: $limit
+      offset: $offset
       host: $host
       parent: $parent
       skipGuests: $skipGuests
@@ -127,9 +129,9 @@ const getPlaceholder = (intl, types, options: { useBeneficiaryForVendor?: boolea
 };
 
 /**
- * A specialization of `CollectivePicker` that fetches the data based on user search.
+ * A specialization of `AccountPicker` that fetches the data based on user search.
  */
-const CollectivePickerAsync = ({
+const AccountPickerAsync = ({
   inputId,
   types = undefined,
   limit = 20,
@@ -151,8 +153,14 @@ const CollectivePickerAsync = ({
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
-  const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { fetchPolicy });
+  const [searchCollectives, { loading, data, fetchMore }] = useLazyQuery(searchQuery, {
+    fetchPolicy,
+    context: API_V2_CONTEXT,
+  });
   const [term, setTerm] = React.useState(null);
+  const [allCollectives, setAllCollectives] = React.useState([]);
+  const [hasMore, setHasMore] = React.useState(true);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
   const intl = useIntl();
 
   // Filter defaultCollectives by term if provided
@@ -171,14 +179,26 @@ const CollectivePickerAsync = ({
     );
   }, [defaultCollectives, term]);
 
+  // Update accumulated collectives when data changes
+  React.useEffect(() => {
+    if (data?.accounts?.nodes) {
+      const totalCount = data.accounts.totalCount;
+      const currentNodes = data.accounts.nodes;
+
+      // Check if we have more data to load
+      setHasMore(currentNodes.length < totalCount);
+      setAllCollectives(currentNodes);
+    }
+  }, [data]);
+
   // Combine API results with defaultCollectives
   const collectives = React.useMemo(() => {
     // If we have search results, use them
-    if ((term || preload) && data?.accounts?.nodes) {
-      const apiResults = [...data.accounts.nodes];
+    if ((term || preload) && allCollectives.length > 0) {
+      const apiResults = [...allCollectives];
 
       // When loading is complete, we only need unique collectives
-      if (!loading && filteredDefaultCollectives.length > 0) {
+      if (!loading && !isLoadingMore && filteredDefaultCollectives.length > 0) {
         const apiResultIds = new Set(apiResults.map(c => c.id));
         // Add default collectives that aren't already in the results
         filteredDefaultCollectives.forEach(c => {
@@ -193,18 +213,90 @@ const CollectivePickerAsync = ({
 
     // When no search or results yet, show default collectives
     return filteredDefaultCollectives;
-  }, [term, preload, data, loading, filteredDefaultCollectives]);
+  }, [term, preload, allCollectives, loading, isLoadingMore, filteredDefaultCollectives]);
 
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
   const placeholder = getPlaceholder(intl, types, { useBeneficiaryForVendor });
 
+  // Function to load more results
+  const loadMoreResults = React.useCallback(() => {
+    if (!hasMore || isLoadingMore || loading) {
+      return;
+    }
+    console.log('loadMoreResults');
+
+    setIsLoadingMore(true);
+
+    fetchMore({
+      variables: {
+        term: term || '',
+        types,
+        limit,
+        offset: allCollectives.length,
+        host: hostCollectiveIds?.map(id => ({ id })),
+        parent: parentCollectiveIds?.map(id => ({ id })),
+        skipGuests,
+        includeArchived,
+        includeVendorsForHost: includeVendorsForHostId ? { id: includeVendorsForHostId } : undefined,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        setIsLoadingMore(false);
+
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const newNodes = fetchMoreResult.accounts.nodes;
+        const totalCount = fetchMoreResult.accounts.totalCount;
+
+        // Merge previous and new results
+        const mergedNodes = [...(prev.accounts?.nodes || []), ...newNodes];
+
+        // Check if we have more data to load
+        setHasMore(mergedNodes.length < totalCount);
+        setAllCollectives(mergedNodes);
+
+        return {
+          accounts: {
+            ...fetchMoreResult.accounts,
+            nodes: mergedNodes,
+          },
+        };
+      },
+    }).catch(error => {
+      console.error('Error loading more results:', error);
+      setIsLoadingMore(false);
+    });
+  }, [
+    hasMore,
+    isLoadingMore,
+    loading,
+    fetchMore,
+    term,
+    types,
+    limit,
+    allCollectives.length,
+    hostCollectiveIds,
+    parentCollectiveIds,
+    skipGuests,
+    includeArchived,
+    includeVendorsForHostId,
+  ]);
+
+  console.log({ loading, loadMoreResults, isLoadingMore });
+
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (term || preload) {
+      // Reset state on new search
+      setAllCollectives([]);
+      setHasMore(true);
+
       throttledSearch(searchCollectives, {
         term: term || '',
         types,
         limit,
+        offset: 0,
         host: hostCollectiveIds?.map(id => ({ id })),
         parent: parentCollectiveIds?.map(id => ({ id })),
         skipGuests,
@@ -216,9 +308,10 @@ const CollectivePickerAsync = ({
   }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, term]);
 
   return (
-    <CollectivePicker
+    <AccountPicker
       inputId={inputId}
       isLoading={Boolean(loading || isLoading)}
+      isLoadingMoreResults={isLoadingMore}
       collectives={filteredCollectives}
       groupByType={!types || types.length > 1}
       sortFunc={collectives => collectives /** Already sorted by the API */}
@@ -232,9 +325,10 @@ const CollectivePickerAsync = ({
       }}
       customOptions={!term ? emptyCustomOptions : []}
       useBeneficiaryForVendor={useBeneficiaryForVendor}
+      onMenuScrollToBottom={hasMore ? loadMoreResults : undefined}
       {...props}
     />
   );
 };
 
-export default CollectivePickerAsync;
+export default AccountPickerAsync;

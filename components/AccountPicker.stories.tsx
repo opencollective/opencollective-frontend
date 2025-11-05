@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { MockedProvider } from '@apollo/client/testing';
+import { gql } from '@apollo/client';
 
 import { CollectiveType } from '../lib/constants/collectives';
 
-import CollectivePicker from './AccountPicker';
+import AccountPicker, { DefaultCollectiveLabel } from './AccountPicker';
+import AccountPickerAsync from './AccountPickerAsync';
+import { Label } from './ui/Label';
 
 const mockCollectives = [
   {
@@ -75,9 +79,9 @@ const mockCollectives = [
   })),
 ];
 
-const meta: Meta<typeof CollectivePicker> = {
+const meta: Meta<typeof AccountPicker> = {
   title: 'Components/AccountPicker',
-  component: CollectivePicker,
+  component: AccountPicker,
   parameters: {
     layout: 'centered',
     docs: {
@@ -139,7 +143,7 @@ const PickerWrapper = (props: any) => {
 
   return (
     <div className="w-80">
-      <CollectivePicker
+      <AccountPicker
         {...props}
         collective={collective}
         onChange={(newValue: any) => {
@@ -274,5 +278,398 @@ export const CustomWidth: Story = {
     placeholder: 'Custom width picker...',
     isSearchable: true,
     width: '100%',
+  },
+};
+
+// ============================================================
+// AccountPickerAsync Stories
+// ============================================================
+
+// Mock data for async scenarios
+const mockHostCollective = {
+  id: 'host-1',
+  name: 'Open Source Collective',
+  slug: 'opensource',
+  type: 'ORGANIZATION',
+  imageUrl: 'https://images-staging.opencollective.com/opensource/499dca8/logo/256.png?height=256',
+  isHost: true,
+};
+
+const mockVendors = [
+  {
+    id: 'vendor-1',
+    name: 'Office Supplies Co',
+    slug: 'office-supplies-co',
+    type: 'VENDOR',
+    imageUrl: 'https://images-staging.opencollective.com/11004-cool-vendor-df225f15/logo/64.png',
+  },
+  {
+    id: 'vendor-2',
+    name: 'Catering Services',
+    slug: 'catering-services',
+    type: 'VENDOR',
+    imageUrl: 'https://images-staging.opencollective.com/11004-cool-vendor-df225f15/logo/64.png',
+  },
+];
+
+// Mock search results for AccountPickerAsync
+const mockSearchResults = [
+  {
+    id: '1',
+    name: 'John Doe',
+    slug: 'john-doe',
+    type: 'USER',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    hasTwoFactorAuth: false,
+  },
+  {
+    id: '2',
+    name: 'Acme Corporation',
+    slug: 'acme-corp',
+    type: 'ORGANIZATION',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+  },
+  {
+    id: '8',
+    name: 'Sarah Wilson',
+    slug: 'sarah-wilson',
+    type: 'USER',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    hasTwoFactorAuth: true,
+  },
+  {
+    id: '9',
+    name: 'Tech Solutions Inc',
+    slug: 'tech-solutions',
+    type: 'ORGANIZATION',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+  },
+  {
+    id: 'vendor-3',
+    name: 'Marketing Vendor',
+    slug: '11004-marketing-vendor',
+    type: 'VENDOR',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    hasPayoutMethod: true,
+    visibleToAccounts: [],
+  },
+];
+
+// GraphQL query used by AccountPickerAsync
+const accountPickerSearchQuery = gql`
+  query AccountPickerSearch(
+    $term: String!
+    $types: [AccountType]
+    $limit: Int
+    $offset: Int
+    $host: [AccountReferenceInput]
+    $parent: [AccountReferenceInput]
+    $skipGuests: Boolean
+    $includeArchived: Boolean
+    $includeVendorsForHost: AccountReferenceInput
+  ) {
+    accounts(
+      searchTerm: $term
+      type: $types
+      limit: $limit
+      offset: $offset
+      host: $host
+      parent: $parent
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+      includeVendorsForHost: $includeVendorsForHost
+    ) {
+      totalCount
+      nodes {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          id
+          address
+          country
+        }
+        imageUrl(height: 64)
+        isActive
+        isArchived
+        isHost
+        ... on Vendor {
+          hasPayoutMethod
+          visibleToAccounts {
+            id
+            slug
+            name
+          }
+        }
+        ... on Individual {
+          hasTwoFactorAuth
+        }
+      }
+    }
+  }
+`;
+
+// Create comprehensive Apollo mocks for different query scenarios
+// Note: 800ms delay added to make loading state visible in Storybook
+const apolloMocks = [
+  // Default empty search (preload or initial state)
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: '',
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: mockSearchResults.length,
+          nodes: mockSearchResults,
+        },
+      },
+    },
+  },
+  // Search for USER, ORGANIZATION, VENDOR types (AddFundsSourcePicker)
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: '',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: mockSearchResults.length,
+          nodes: mockSearchResults,
+        },
+      },
+    },
+  },
+  // Search with term for USER, ORGANIZATION, VENDOR types
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: 'sarah',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: 1,
+          nodes: [mockSearchResults[2]], // Sarah Wilson
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: 'john',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: 1,
+          nodes: [mockSearchResults[0]], // John Doe
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: 'acme',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: 1,
+          nodes: [mockSearchResults[1]], // Acme Corporation
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: 'tech',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: 1,
+          nodes: [mockSearchResults[3]], // Tech Solutions Inc
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: accountPickerSearchQuery,
+      variables: {
+        term: 'vendor',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        offset: 0,
+        skipGuests: true,
+        includeArchived: false,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: 1,
+          nodes: [mockSearchResults[4]], // Marketing Vendor
+        },
+      },
+    },
+  },
+  // Catch-all for other variations (returns all results)
+  {
+    request: {
+      query: accountPickerSearchQuery,
+    },
+    delay: 800,
+    result: {
+      data: {
+        accounts: {
+          totalCount: mockSearchResults.length,
+          nodes: mockSearchResults,
+        },
+      },
+    },
+  },
+];
+
+// Wrapper for async picker stories with Apollo mocks
+const AsyncPickerWrapper = (props: any) => {
+  const [collective, setCollective] = useState(props.collective);
+
+  return (
+    <MockedProvider mocks={apolloMocks} addTypename={false}>
+      <div className="w-80">
+        {props.label && <Label>{props.label}</Label>}
+        <AccountPickerAsync
+          {...props}
+          collective={collective}
+          onChange={(newValue: any) => {
+            console.log({ newValue });
+            setCollective(newValue);
+            console.log('Account changed:', newValue);
+          }}
+        />
+      </div>
+    </MockedProvider>
+  );
+};
+
+type AsyncStory = StoryObj<typeof AccountPickerAsync>;
+
+// Pre-render custom options outside of the render function to avoid infinite re-renders
+const addFundsCustomOptions = [
+  {
+    label: DefaultCollectiveLabel({ value: mockHostCollective }, {}),
+    value: mockHostCollective,
+  },
+  ...mockVendors.map(v => ({
+    label: DefaultCollectiveLabel({ value: v }, {}),
+    value: v,
+  })),
+];
+
+/**
+ * Add Funds Modal - Source Selection
+ * Uses: Query + Custom Options (vendors + host)
+ * Types: INDIVIDUAL, ORGANIZATION, VENDOR
+ * Creatable: INDIVIDUAL, VENDOR
+ */
+export const AddFundsSourcePicker: AsyncStory = {
+  render: args => {
+    return <AsyncPickerWrapper {...args} customOptions={addFundsCustomOptions} />;
+  },
+  args: {
+    types: [CollectiveType.USER, CollectiveType.ORGANIZATION, CollectiveType.VENDOR],
+    creatable: [CollectiveType.USER, CollectiveType.VENDOR],
+    label: 'Source',
+    placeholder: 'Search for Users, Organizations or Vendors',
+    preload: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Used in Add Funds Modal to select the source account with recommended vendors and host.',
+      },
+    },
   },
 };
