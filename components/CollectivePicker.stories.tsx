@@ -23,19 +23,478 @@
  * - Contextual documentation
  *
  * ## Note on Async Stories
- * CollectivePickerAsync stories use Apollo Client's MockedProvider. API queries
- * won't return actual data, so stories with `defaultCollectives` will display those,
- * while others may show loading or empty states. This is expected behavior for
- * component demonstration purposes.
+ * CollectivePickerAsync stories use Apollo Client's MockedProvider with comprehensive
+ * mocks for the search query. Search functionality works with predefined mock data,
+ * allowing full interaction testing in Storybook. Stories with `defaultCollectives`
+ * will merge those with search results for a realistic user experience.
  */
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { MockedProvider } from '@apollo/client/testing';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { gqlV1 } from '../lib/graphql/helpers';
 
-import CollectivePicker from './CollectivePicker';
+import CollectivePicker, { DefaultCollectiveLabel } from './CollectivePicker';
 import CollectivePickerAsync from './CollectivePickerAsync';
 import { Label } from './ui/Label';
+
+// Import the actual query used by CollectivePickerAsync
+const collectivePickerSearchQuery = gqlV1 /* GraphQL */ `
+  query CollectivePickerSearch(
+    $term: String!
+    $types: [TypeOfCollective]
+    $limit: Int
+    $hostCollectiveIds: [Int]
+    $parentCollectiveIds: [Int]
+    $skipGuests: Boolean
+    $includeArchived: Boolean
+    $includeVendorsForHostId: Int
+    $vendorVisibleToAccountIds: [Int]
+  ) {
+    search(
+      term: $term
+      types: $types
+      limit: $limit
+      hostCollectiveIds: $hostCollectiveIds
+      parentCollectiveIds: $parentCollectiveIds
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+      includeVendorsForHostId: $includeVendorsForHostId
+      vendorVisibleToAccountIds: $vendorVisibleToAccountIds
+    ) {
+      id
+      collectives {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          id
+          address
+          country
+        }
+        imageUrl(height: 64)
+        hostFeePercent
+        isActive
+        isArchived
+        isHost
+        ... on Vendor {
+          hasPayoutMethod
+          visibleToAccounts {
+            id
+            slug
+            name
+          }
+        }
+        ... on User {
+          isTwoFactorAuthEnabled
+        }
+        ... on Organization {
+          isTrustedHost
+        }
+      }
+    }
+  }
+`;
+
+// Mock GraphQL search results
+const mockSearchResults = [
+  {
+    id: '1',
+    name: 'John Doe',
+    slug: 'john-doe',
+    type: 'USER',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    hostFeePercent: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    isTwoFactorAuthEnabled: false,
+  },
+  {
+    id: '2',
+    name: 'Acme Corporation',
+    slug: 'acme-corp',
+    type: 'ORGANIZATION',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    hostFeePercent: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    isTrustedHost: false,
+  },
+  {
+    id: '3',
+    name: 'Open Source Collective',
+    slug: 'open-source-collective',
+    type: 'COLLECTIVE',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    hostFeePercent: 10,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+  },
+  {
+    id: '8',
+    name: 'Sarah Wilson',
+    slug: 'sarah-wilson',
+    type: 'USER',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    hostFeePercent: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    isTwoFactorAuthEnabled: true,
+  },
+  {
+    id: '9',
+    name: 'Tech Solutions Inc',
+    slug: 'tech-solutions',
+    type: 'ORGANIZATION',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    hostFeePercent: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    isTrustedHost: true,
+  },
+  {
+    id: '7',
+    name: 'Marketing Vendor',
+    slug: null,
+    type: 'VENDOR',
+    currency: 'USD',
+    location: null,
+    imageUrl: null,
+    hostFeePercent: null,
+    isActive: true,
+    isArchived: false,
+    isHost: false,
+    hasPayoutMethod: true,
+    visibleToAccounts: [],
+  },
+];
+
+// Create comprehensive mocks for different query scenarios
+// Note: 800ms delay added to make loading state visible in Storybook
+const apolloMocks = [
+  // Default empty search (preload or initial state)
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: '',
+        types: undefined,
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-1',
+          collectives: mockSearchResults,
+        },
+      },
+    },
+  },
+  // Search with term
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: 'john',
+        types: undefined,
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-2',
+          collectives: [mockSearchResults[0]],
+        },
+      },
+    },
+  },
+  // Search for USER, ORGANIZATION, VENDOR types (AddFundsSourcePicker)
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: '',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-3',
+          collectives: [
+            mockSearchResults[0],
+            mockSearchResults[1],
+            mockSearchResults[3],
+            mockSearchResults[4],
+            mockSearchResults[5],
+          ],
+        },
+      },
+    },
+  },
+  // Search with term for USER, ORGANIZATION, VENDOR types
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: 'sarah',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-4',
+          collectives: [mockSearchResults[3]],
+        },
+      },
+    },
+  },
+  // Search for COLLECTIVE, PROJECT, EVENT, FUND types
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: '',
+        types: ['COLLECTIVE', 'PROJECT', 'EVENT', 'FUND'],
+        limit: 20,
+        hostCollectiveIds: [1],
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-5',
+          collectives: [mockSearchResults[2]],
+        },
+      },
+    },
+  },
+  // Search for USER only
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: '',
+        types: ['USER'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-6',
+          collectives: [mockSearchResults[0], mockSearchResults[3]],
+        },
+      },
+    },
+  },
+  // Search for VENDOR only
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: '',
+        types: ['VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-7',
+          collectives: [mockSearchResults[5]],
+        },
+      },
+    },
+  },
+  // Search with generic term (e.g., "tech", "acme", "wilson")
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: 'tech',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-8',
+          collectives: [mockSearchResults[4]], // Tech Solutions Inc
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: 'acme',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-9',
+          collectives: [mockSearchResults[1]], // Acme Corporation
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: 'wilson',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-10',
+          collectives: [mockSearchResults[3]], // Sarah Wilson
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+      variables: {
+        term: 'vendor',
+        types: ['USER', 'ORGANIZATION', 'VENDOR'],
+        limit: 20,
+        hostCollectiveIds: undefined,
+        parentCollectiveIds: undefined,
+        skipGuests: true,
+        includeArchived: false,
+        includeVendorsForHostId: undefined,
+        vendorVisibleToAccountIds: undefined,
+      },
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-11',
+          collectives: [mockSearchResults[5]], // Marketing Vendor
+        },
+      },
+    },
+  },
+  // Catch-all for other variations (returns all results)
+  {
+    request: {
+      query: collectivePickerSearchQuery,
+    },
+    delay: 800,
+    result: {
+      data: {
+        search: {
+          id: 'search-default',
+          collectives: mockSearchResults,
+        },
+      },
+    },
+  },
+];
 
 const mockCollectives = [
   {
@@ -467,18 +926,16 @@ const mockVendors = [
   {
     id: 'vendor-1',
     name: 'Office Supplies Co',
-    email: 'contact@officesupplies.com',
-    slug: null,
+    slug: 'office-supplies-co',
     type: 'VENDOR',
-    imageUrl: null,
+    imageUrl: 'https://images-staging.opencollective.com/11004-cool-vendor-df225f15/logo/64.png',
   },
   {
     id: 'vendor-2',
     name: 'Catering Services',
-    email: 'info@catering.com',
-    slug: null,
+    slug: 'catering-services',
     type: 'VENDOR',
-    imageUrl: null,
+    imageUrl: 'https://images-staging.opencollective.com/11004-cool-vendor-df225f15/logo/64.png',
   },
 ];
 
@@ -516,7 +973,7 @@ const mockUserProfiles = [
     slug: 'alice-johnson',
     email: 'alice@example.com',
     type: 'USER',
-    imageUrl: null,
+    imageUrl: 'https://images-staging.opencollective.com/beepb00p/2c73813/avatar.png?height=256',
   },
   {
     id: 'user-2',
@@ -524,7 +981,7 @@ const mockUserProfiles = [
     slug: 'bob-smith',
     email: 'bob@example.com',
     type: 'USER',
-    imageUrl: null,
+    imageUrl: 'https://images-staging.opencollective.com/xdamman/f96199a/avatar.png?height=256',
   },
 ];
 
@@ -536,25 +993,27 @@ const mockCollectiveUsers = [
     slug: 'carol-white',
     email: 'carol@example.com',
     type: 'USER',
-    imageUrl: null,
+    imageUrl: 'https://images-staging.opencollective.com/piamancini/e3c6e6e/avatar.png?height=256',
   },
 ];
 
-// Wrapper for async picker stories
+// Wrapper for async picker stories with Apollo mocks
 const AsyncPickerWrapper = (props: any) => {
   const [collective, setCollective] = useState(props.collective);
 
   return (
-    <div className="w-96">
-      {props.label && <Label>{props.label}</Label>}
-      <CollectivePickerAsync
-        {...props}
-        collective={collective}
-        onChange={(newValue: any) => {
-          setCollective(newValue?.value);
-        }}
-      />
-    </div>
+    <MockedProvider mocks={apolloMocks} addTypename={false}>
+      <div className="w-96">
+        {props.label && <Label>{props.label}</Label>}
+        <CollectivePickerAsync
+          {...props}
+          collective={collective}
+          onChange={(newValue: any) => {
+            setCollective(newValue?.value);
+          }}
+        />
+      </div>
+    </MockedProvider>
   );
 };
 
@@ -603,7 +1062,7 @@ export const AddFundsSourcePicker: AsyncStory = {
         label: 'Organizations',
         options: [
           {
-            label: mockHostCollective.name,
+            label: <DefaultCollectiveLabel value={mockHostCollective} />,
             value: mockHostCollective,
           },
         ],
@@ -611,7 +1070,7 @@ export const AddFundsSourcePicker: AsyncStory = {
       {
         label: 'Vendors',
         options: mockVendors.map(v => ({
-          label: v.name,
+          label: <DefaultCollectiveLabel value={v} />,
           value: v,
         })),
       },
@@ -664,7 +1123,7 @@ export const AddFundsCollectiveSelector: AsyncStory = {
   render: args => {
     const customOptions = [
       {
-        label: mockHostCollective.name,
+        label: <DefaultCollectiveLabel value={mockHostCollective} />,
         value: mockHostCollective,
       },
     ];
@@ -741,14 +1200,14 @@ export const ExpensePayeeSelection: AsyncStory = {
       {
         label: 'My Profiles',
         options: mockUserProfiles.map(p => ({
-          label: p.name,
+          label: <DefaultCollectiveLabel value={p} />,
           value: p,
         })),
       },
       {
         label: 'Saved Vendors',
         options: mockVendors.map(v => ({
-          label: v.name,
+          label: <DefaultCollectiveLabel value={v} />,
           value: v,
         })),
       },
@@ -843,7 +1302,7 @@ export const VirtualCardCollectiveSelection: AsyncStory = {
   render: args => {
     const customOptions = [
       {
-        label: mockHostCollective.name,
+        label: <DefaultCollectiveLabel value={mockHostCollective} />,
         value: mockHostCollective,
       },
     ];
