@@ -10170,7 +10170,7 @@ export type OrganizationCreateInput = {
   /** Two-letters country code following ISO31661 */
   countryISO?: InputMaybe<Scalars['String']['input']>;
   currency?: InputMaybe<Currency>;
-  description: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
@@ -10400,6 +10400,8 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
+  /** Whether this payout method can be archived */
+  canBeArchived?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be deleted or only archived */
   canBeDeleted?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be edited */

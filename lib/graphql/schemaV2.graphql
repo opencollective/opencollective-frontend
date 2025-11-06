@@ -5726,6 +5726,11 @@ type PayoutMethod {
   Whether this payout method can be deleted or only archived
   """
   canBeDeleted: Boolean
+
+  """
+  Whether this payout method can be archived
+  """
+  canBeArchived: Boolean
 }
 
 """
@@ -21873,7 +21878,7 @@ type Mutation {
     """
     A optional private comment to add to the created expense
     """
-    privateComment: String
+    privateComment: String @deprecated(reason: "2025-11-03: This field is no longer used")
   ): Expense!
 
   """
@@ -25230,7 +25235,7 @@ input OrganizationCreateInput {
   name: String!
   legalName: String
   slug: String!
-  description: String!
+  description: String
   website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 
@@ -25691,6 +25696,7 @@ enum UploadedFileKind {
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE
+  RECEIPT_EMBEDDED_IMAGE
 }
 
 """
