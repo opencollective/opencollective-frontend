@@ -182,6 +182,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           variant="outline"
           className="shrink-0"
           disabled={props.initialLoading || isAmountLocked || props.isSubmitting}
+          data-cy="expense-add-item-btn"
           onClick={() =>
             setFieldValue('expenseItems', [
               ...expenseItems,

@@ -4,6 +4,7 @@
 import type { Message, MessageSummary } from 'cypress-mailpit/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
+import type { AmountInput } from '@/lib/graphql/types/v2/schema';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 
@@ -57,6 +58,7 @@ declare global {
         userEmail?: string;
         account: { slug: string };
         payee: { slug: string };
+        items?: { description: string; amountV2: AmountInput }[];
         payoutMethod: {
           type: string;
           name: string;
@@ -76,6 +78,8 @@ declare global {
       createVendor: typeof createVendor;
 
       getAccount: typeof getAccount;
+
+      checkToast(params: { variant: 'success' | 'error' | 'warning' | 'info'; message: string }): Chainable<void>;
     }
   }
 }
