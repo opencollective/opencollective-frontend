@@ -207,7 +207,7 @@ const DashboardPage = () => {
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (activeSlug && activeSlug !== workspace.slug) {
+    if (activeSlug) {
       if (LoggedInUser) {
         const membership = LoggedInUser.memberOf.find(val => val.collective.slug === activeSlug);
         setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
