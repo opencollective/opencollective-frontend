@@ -26,6 +26,7 @@ import {
   TypeOfLimitationOnBenefitsProvisions,
 } from './common';
 import type { AccountFromTaxInformationQuery } from './queries';
+import { TaxFormSubQuestion } from './TaxFormSubQuestion';
 
 const Chapter3StatusThatCanBeHybrid = [
   Chapter3Status.DisregardedEntity,
@@ -222,7 +223,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
         )}
       </StyledInputFormikField>
       {values.nffeStatus === NFFEStatus.PassiveNFFE && (
-        <React.Fragment>
+        <TaxFormSubQuestion>
           <StyledInputFormikField
             name="entityHasNoUSOwners"
             label="I further certify that the entity identified has no substantial U.S. owners (or, if applicable, no controlling U.S. persons)"
@@ -240,12 +241,14 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
             )}
           </StyledInputFormikField>
           {values.entityHasNoUSOwners === false && (
-            <StyledInputFormikField
-              name="usOwners"
-              label="Provide the name, address, and TIN of each substantial U.S. owner (or, if applicable, controlling U.S. person) of the NFFE"
-            />
+            <TaxFormSubQuestion>
+              <StyledInputFormikField
+                name="usOwners"
+                label="Provide the name, address, and TIN of each substantial U.S. owner (or, if applicable, controlling U.S. person) of the NFFE"
+              />
+            </TaxFormSubQuestion>
           )}
-        </React.Fragment>
+        </TaxFormSubQuestion>
       )}
 
       <StyledInputFormikField name="chapter3Status" label="Chapter 3 status (entity type)">
@@ -275,7 +278,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
       </StyledInputFormikField>
 
       {(Chapter3StatusThatCanBeHybrid as readonly string[]).includes(values.chapter3Status) && (
-        <React.Fragment>
+        <TaxFormSubQuestion>
           <StyledInputFormikField name="isHybridEntity" label="Is this a hybrid entity making a treaty claim?">
             {({ field }) => (
               <ButtonSet
@@ -290,7 +293,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
             )}
           </StyledInputFormikField>
           {values.isHybridEntity === true && (
-            <React.Fragment>
+            <TaxFormSubQuestion>
               <p className="mb-2 text-sm font-bold text-neutral-800">I certify that (select all that apply):</p>
               <StyledInputFormikField name="certifyBeneficialOwnerCountry">
                 {({ field }) => (
@@ -303,21 +306,6 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                     />
                     The beneficial owner is a resident of the country listed in the residence address on this form,
                     within the meaning of the income tax treaty between the United States and that country
-                  </label>
-                )}
-              </StyledInputFormikField>
-              <StyledInputFormikField name="certifyDerivesIncome">
-                {({ field }) => (
-                  <label className="cursor-pointer text-sm leading-normal font-normal">
-                    <Checkbox
-                      className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                    />
-                    The beneficial owner derives the item (or items) of income for which the treaty benefits are
-                    claimed, and, if applicable, meets the requirements of the treaty provision dealing with limitation
-                    on benefits.
                   </label>
                 )}
               </StyledInputFormikField>
@@ -336,45 +324,66 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                   </label>
                 )}
               </StyledInputFormikField>
-              {values.certifyDerivesIncome && (
-                <StyledInputFormikField
-                  name="typeOfLimitationOnBenefitsProvisions"
-                  label="Type of limitation on benefits provisions"
-                >
-                  {({ field }) => (
-                    <Select
+              <StyledInputFormikField name="certifyDerivesIncome">
+                {({ field }) => (
+                  <label className="cursor-pointer text-sm leading-normal font-normal">
+                    <Checkbox
+                      className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
                       name={field.name}
-                      value={field.value}
-                      onValueChange={(value: TypeOfLimitationOnBenefitsProvisions) => setFieldValue(field.name, value)}
-                    >
-                      <SelectTrigger
-                        id={field.name}
-                        className={cn('truncate', {
-                          'border-red-500': field.error,
-                        })}
+                      checked={field.value}
+                      onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
+                    />
+                    The beneficial owner derives the item (or items) of income for which the treaty benefits are
+                    claimed, and, if applicable, meets the requirements of the treaty provision dealing with limitation
+                    on benefits.
+                  </label>
+                )}
+              </StyledInputFormikField>
+              {values.certifyDerivesIncome && (
+                <TaxFormSubQuestion>
+                  <StyledInputFormikField
+                    name="typeOfLimitationOnBenefitsProvisions"
+                    label="Type of limitation on benefits provisions"
+                  >
+                    {({ field }) => (
+                      <Select
+                        name={field.name}
+                        value={field.value}
+                        onValueChange={(value: TypeOfLimitationOnBenefitsProvisions) =>
+                          setFieldValue(field.name, value)
+                        }
                       >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.values(TypeOfLimitationOnBenefitsProvisions).map(chapter3Status => (
-                          <SelectItem key={chapter3Status} value={chapter3Status}>
-                            {TypeOfLimitationOnBenefitsProvisionsLabels[chapter3Status]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                        <SelectTrigger
+                          id={field.name}
+                          className={cn('truncate', {
+                            'border-red-500': field.error,
+                          })}
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.values(TypeOfLimitationOnBenefitsProvisions).map(chapter3Status => (
+                            <SelectItem key={chapter3Status} value={chapter3Status}>
+                              {TypeOfLimitationOnBenefitsProvisionsLabels[chapter3Status]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </StyledInputFormikField>
+                  {values.typeOfLimitationOnBenefitsProvisions === TypeOfLimitationOnBenefitsProvisions.Other && (
+                    <TaxFormSubQuestion>
+                      <StyledInputFormikField
+                        name="typeOfLimitationOnBenefitsProvisionsOther"
+                        label="Specify article and paragraph of 'other' type of limitation on benefits provisions"
+                      />
+                    </TaxFormSubQuestion>
                   )}
-                </StyledInputFormikField>
+                </TaxFormSubQuestion>
               )}
-              {values.typeOfLimitationOnBenefitsProvisions === TypeOfLimitationOnBenefitsProvisions.Other && (
-                <StyledInputFormikField
-                  name="typeOfLimitationOnBenefitsProvisionsOther"
-                  label="Specify article and paragraph of 'other' type of limitation on benefits provisions"
-                />
-              )}
-            </React.Fragment>
+            </TaxFormSubQuestion>
           )}
-        </React.Fragment>
+        </TaxFormSubQuestion>
       )}
 
       <StyledInputFormikField
@@ -441,7 +450,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
         )}
       </StyledInputFormikField>
       {values.claimsSpecialRatesAndConditions === true && (
-        <React.Fragment>
+        <TaxFormSubQuestion>
           <StyledInputFormikField name="claimsArticleAndParagraph" label="Article and paragraph" />
           <StyledInputFormikField inputType="number" name="claimsRate" label="Rate">
             {({ field }) => (
@@ -450,7 +459,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
           </StyledInputFormikField>
           <StyledInputFormikField name="claimsIncomeType" label="Type of income" />
           <StyledInputFormikField name="claimsExplanation" label="Explanation" />
-        </React.Fragment>
+        </TaxFormSubQuestion>
       )}
 
       <div className="mt-2">
