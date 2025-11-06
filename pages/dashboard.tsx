@@ -100,6 +100,9 @@ const getProfileUrl = (
   contextAccount: DashboardQuery['account'],
   account: { id: string; slug: string; type: string },
 ) => {
+  if (!contextAccount) {
+    return null;
+  }
   const context =
     'host' in contextAccount && loggedInUser?.isAdminOfCollective(contextAccount.host)
       ? contextAccount.host
@@ -206,7 +209,8 @@ const DashboardPage = () => {
   React.useEffect(() => {
     if (activeSlug && activeSlug !== workspace.slug) {
       if (LoggedInUser) {
-        setWorkspace({ slug: activeSlug });
+        const membership = LoggedInUser.memberOf.find(val => val.collective.slug === activeSlug);
+        setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
       }
     }
     // If there is no slug set (that means /dashboard)

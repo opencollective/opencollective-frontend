@@ -1,13 +1,174 @@
 import { gql } from '@apollo/client';
 
-const searchAccountFieldsFragment = gql`
+export const searchAccountFieldsFragment = gql`
   fragment SearchAccountFields on Account {
     id
     name
     slug
     imageUrl(height: $imageHeight)
     type
+    ... on AccountWithHost {
+      host {
+        id
+        name
+        slug
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        name
+        slug
+      }
+    }
   }
+`;
+
+const searchCommentFieldsFragment = gql`
+  fragment SearchCommentFields on Comment {
+    id
+    html
+    createdAt
+    type
+    fromAccount {
+      ...SearchAccountFields
+    }
+    expense {
+      id
+      legacyId
+      description
+      account {
+        ...SearchAccountFields
+      }
+    }
+    update {
+      id
+      legacyId
+      title
+      account {
+        ...SearchAccountFields
+      }
+    }
+    order {
+      id
+      legacyId
+      toAccount {
+        ...SearchAccountFields
+      }
+    }
+    hostApplication {
+      id
+      account {
+        ...SearchAccountFields
+      }
+      host {
+        ...SearchAccountFields
+      }
+    }
+    conversation {
+      id
+      slug
+      account {
+        ...SearchAccountFields
+      }
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+export const searchExpenseFieldsFragment = gql`
+  fragment SearchExpenseFields on Expense {
+    id
+    description
+    legacyId
+    type
+    status
+    amountV2 {
+      valueInCents
+      currency
+    }
+    payee {
+      ...SearchAccountFields
+    }
+    account {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+export const searchOrderFieldsFragment = gql`
+  fragment SearchOrderFields on Order {
+    id
+    legacyId
+    description
+    status
+    amount {
+      valueInCents
+      currency
+    }
+    toAccount {
+      ...SearchAccountFields
+    }
+    fromAccount {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+export const searchTransactionFieldsFragment = gql`
+  fragment SearchTransactionFields on Transaction {
+    id
+    legacyId
+    description
+    type
+    kind
+    netAmount {
+      valueInCents
+      currency
+    }
+    account {
+      ...SearchAccountFields
+    }
+    oppositeAccount {
+      ...SearchAccountFields
+    }
+    host {
+      id
+      slug
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+export const searchUpdateFieldsFragment = gql`
+  fragment SearchUpdateFields on Update {
+    id
+    legacyId
+    slug
+    title
+    html
+    account {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
+`;
+
+export const searchHostApplicationFieldsFragment = gql`
+  fragment SearchHostApplicationFields on HostApplication {
+    id
+    status
+    createdAt
+    account {
+      ...SearchAccountFields
+    }
+    host {
+      ...SearchAccountFields
+    }
+  }
+  ${searchAccountFieldsFragment}
 `;
 
 export const searchCommandQuery = gql`
@@ -16,12 +177,20 @@ export const searchCommandQuery = gql`
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $limit: Int!
-    $includeTransactions: Boolean!
     $imageHeight: Int
+    $useTopHits: Boolean
+    $includeAccounts: Boolean!
+    $includeComments: Boolean!
+    $includeExpenses: Boolean!
+    $includeTransactions: Boolean!
+    $includeOrders: Boolean!
+    $includeUpdates: Boolean!
+    $includeHostApplications: Boolean!
+    $offset: Int
   ) {
-    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account) {
+    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account, useTopHits: $useTopHits) {
       results {
-        accounts {
+        accounts(limit: $limit, offset: $offset) @include(if: $includeAccounts) {
           highlights
           collection {
             totalCount
@@ -31,152 +200,192 @@ export const searchCommandQuery = gql`
             }
           }
         }
-        comments {
+        comments(limit: $limit, offset: $offset) @include(if: $includeComments) {
           highlights
           collection {
             totalCount
             limit
             nodes {
-              id
-              html
-              createdAt
-              fromAccount {
-                ...SearchAccountFields
-              }
-              expense {
-                id
-                legacyId
-                description
-                account {
-                  ...SearchAccountFields
-                }
-              }
-              update {
-                id
-                legacyId
-                title
-                account {
-                  ...SearchAccountFields
-                }
-              }
-              order {
-                id
-                legacyId
-                toAccount {
-                  ...SearchAccountFields
-                }
-              }
-              hostApplication {
-                id
-                account {
-                  ...SearchAccountFields
-                }
-                host {
-                  ...SearchAccountFields
-                }
-              }
-              conversation {
-                id
-                slug
-                account {
-                  ...SearchAccountFields
-                }
-              }
+              ...SearchCommentFields
             }
           }
         }
-        expenses {
+        expenses(limit: $limit, offset: $offset) @include(if: $includeExpenses) {
           highlights
           collection {
             totalCount
             limit
+            offset
             nodes {
-              id
-              description
-              legacyId
-              type
-              status
-              amountV2 {
-                valueInCents
-                currency
-              }
-              payee {
-                ...SearchAccountFields
-              }
-              account {
-                ...SearchAccountFields
-              }
+              ...SearchExpenseFields
             }
           }
         }
-        orders @include(if: $includeTransactions) {
+        orders(limit: $limit, offset: $offset) @include(if: $includeOrders) {
           highlights
           collection {
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              description
-              status
-              amount {
-                valueInCents
-                currency
-              }
-              toAccount {
-                ...SearchAccountFields
-              }
-              fromAccount {
-                ...SearchAccountFields
-              }
+              ...SearchOrderFields
             }
           }
         }
-        transactions @include(if: $includeTransactions) {
+        transactions(limit: $limit, offset: $offset) @include(if: $includeTransactions) {
           highlights
           collection {
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              description
-              type
-              kind
-              netAmount {
-                valueInCents
-                currency
-              }
-              account {
-                ...SearchAccountFields
-              }
-              oppositeAccount {
-                ...SearchAccountFields
-              }
+              ...SearchTransactionFields
             }
           }
         }
 
-        updates {
+        updates(limit: $limit, offset: $offset) @include(if: $includeUpdates) {
           highlights
           collection {
             totalCount
             limit
             nodes {
-              id
-              legacyId
-              slug
-              title
-              account {
-                ...SearchAccountFields
-              }
+              ...SearchUpdateFields
+            }
+          }
+        }
+        hostApplications(limit: $limit, offset: $offset) @include(if: $includeHostApplications) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchHostApplicationFields
             }
           }
         }
       }
     }
   }
-  ${searchAccountFieldsFragment}
+  ${searchCommentFieldsFragment}
+  ${searchExpenseFieldsFragment}
+  ${searchOrderFieldsFragment}
+  ${searchTransactionFieldsFragment}
+  ${searchUpdateFieldsFragment}
+  ${searchHostApplicationFieldsFragment}
+`;
+
+export const searchPageQuery = gql`
+  query SearchPage(
+    $searchTerm: String!
+    $host: AccountReferenceInput
+    $account: AccountReferenceInput
+    $defaultLimit: Int!
+    $accountsLimit: Int
+    $commentsLimit: Int
+    $expensesLimit: Int
+    $ordersLimit: Int
+    $updatesLimit: Int
+    $transactionsLimit: Int
+    $hostApplicationsLimit: Int
+    $imageHeight: Int
+    $useTopHits: Boolean
+    $includeAccounts: Boolean!
+    $includeComments: Boolean!
+    $includeExpenses: Boolean!
+    $includeTransactions: Boolean!
+    $includeOrders: Boolean!
+    $includeUpdates: Boolean!
+    $includeHostApplications: Boolean!
+    $offset: Int
+  ) {
+    search(
+      searchTerm: $searchTerm
+      defaultLimit: $defaultLimit
+      host: $host
+      account: $account
+      useTopHits: $useTopHits
+    ) {
+      results {
+        accounts(limit: $accountsLimit, offset: $offset) @include(if: $includeAccounts) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchAccountFields
+            }
+          }
+        }
+        comments(limit: $commentsLimit, offset: $offset) @include(if: $includeComments) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchCommentFields
+            }
+          }
+        }
+        expenses(limit: $expensesLimit, offset: $offset) @include(if: $includeExpenses) {
+          highlights
+          collection {
+            totalCount
+            limit
+            offset
+            nodes {
+              ...SearchExpenseFields
+            }
+          }
+        }
+        orders(limit: $ordersLimit, offset: $offset) @include(if: $includeOrders) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchOrderFields
+            }
+          }
+        }
+        transactions(limit: $transactionsLimit, offset: $offset) @include(if: $includeTransactions) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchTransactionFields
+            }
+          }
+        }
+
+        updates(limit: $updatesLimit, offset: $offset) @include(if: $includeUpdates) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchUpdateFields
+            }
+          }
+        }
+        hostApplications(limit: $hostApplicationsLimit, offset: $offset) @include(if: $includeHostApplications) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchHostApplicationFields
+            }
+          }
+        }
+      }
+    }
+  }
+  ${searchCommentFieldsFragment}
+  ${searchExpenseFieldsFragment}
+  ${searchOrderFieldsFragment}
+  ${searchTransactionFieldsFragment}
+  ${searchUpdateFieldsFragment}
+  ${searchHostApplicationFieldsFragment}
 `;
 
 export const contextQuery = gql`

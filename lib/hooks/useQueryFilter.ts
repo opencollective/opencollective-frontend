@@ -60,7 +60,7 @@ export function getSSRVariablesFromQuery<S extends z.ZodObject<z.ZodRawShape>, G
     if (toVariables?.[key]) {
       apiVariables = {
         ...apiVariables,
-        ...toVariables[key](value, key, meta),
+        ...toVariables[key](value, key, meta, values),
       };
     } else {
       apiVariables = {
@@ -149,7 +149,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
       if (opts.toVariables?.[key]) {
         apiVariables = {
           ...apiVariables,
-          ...opts.toVariables[key](value, key, opts.meta),
+          ...opts.toVariables[key](value, key, opts.meta, values),
         };
       } else {
         apiVariables = {
@@ -253,13 +253,13 @@ function addFilterValidationErrorToast(error, intl) {
     errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
   });
 
-  if (typeof setImmediate !== 'undefined') {
-    setImmediate(() => {
-      toast({
-        variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
-        message: errorMessage,
-      });
+  // Use setTimeout instead of setImmediate to avoid hydration mismatch
+  // setImmediate is Node.js only and causes client/server differences
+  setTimeout(() => {
+    toast({
+      variant: 'error',
+      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
+      message: errorMessage,
     });
-  }
+  }, 0);
 }

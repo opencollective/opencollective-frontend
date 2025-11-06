@@ -384,9 +384,9 @@ const getConversationPageUrl = (conversation: Conversation) => {
   return `${getCollectivePageRoute(conversation.account)}/conversations/${conversation.slug}-${conversation.id}`;
 };
 
-const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
+export const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
   if (loggedInUser.isAdminOfCollective(application.host) || loggedInUser.isHostAdmin(application.account)) {
-    return `${getDashboardRoute(application.account, 'host-applications')}?hostApplicationId=${application.id}`;
+    return `${getDashboardRoute(application.host, 'host-applications')}?hostApplicationId=${application.id}`;
   } else {
     return `${getDashboardRoute(application.account, 'host')}`;
   }
