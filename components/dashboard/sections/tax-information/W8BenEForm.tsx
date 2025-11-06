@@ -257,7 +257,6 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
               setFieldValue(field.name, value);
               if (!(Chapter3StatusThatCanBeHybrid as readonly string[]).includes(value)) {
                 setFieldValue('isHybridEntity', false);
-                setFieldValue('claimsSpecialRatesAndConditions', false);
               }
             }}
           >
@@ -373,38 +372,6 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                   label="Specify article and paragraph of 'other' type of limitation on benefits provisions"
                 />
               )}
-              <StyledInputFormikField
-                name="claimsSpecialRatesAndConditions"
-                label="Are you claiming special rates and conditions?"
-              >
-                {({ field }) => (
-                  <ButtonSet
-                    selected={values.claimsSpecialRatesAndConditions}
-                    onChange={value => setFieldValue(field.name, value)}
-                    error={field.error}
-                    options={[
-                      { label: 'Yes', value: true },
-                      { label: 'No', value: false },
-                    ]}
-                  />
-                )}
-              </StyledInputFormikField>
-              {values.claimsSpecialRatesAndConditions === true && (
-                <React.Fragment>
-                  <StyledInputFormikField name="claimsArticleAndParagraph" label="Article and paragraph" />
-                  <StyledInputFormikField inputType="number" name="claimsRate" label="Rate">
-                    {({ field }) => (
-                      <StyledInputPercentage
-                        {...field}
-                        clamp={false}
-                        onChange={value => setFieldValue(field.name, value)}
-                      />
-                    )}
-                  </StyledInputFormikField>
-                  <StyledInputFormikField name="claimsIncomeType" label="Type of income" />
-                  <StyledInputFormikField name="claimsExplanation" label="Explanation" />
-                </React.Fragment>
-              )}
             </React.Fragment>
           )}
         </React.Fragment>
@@ -453,6 +420,38 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
           />
         )}
       </StyledInputFormikField>
+
+      <div className="mt-2">
+        <p className="text-lg font-bold">Tax treaty benefits</p>
+      </div>
+      <StyledInputFormikField
+        name="claimsSpecialRatesAndConditions"
+        label="Are you claiming special rates and conditions?"
+      >
+        {({ field }) => (
+          <ButtonSet
+            selected={values.claimsSpecialRatesAndConditions}
+            onChange={value => setFieldValue(field.name, value)}
+            error={field.error}
+            options={[
+              { label: 'Yes', value: true },
+              { label: 'No', value: false },
+            ]}
+          />
+        )}
+      </StyledInputFormikField>
+      {values.claimsSpecialRatesAndConditions === true && (
+        <React.Fragment>
+          <StyledInputFormikField name="claimsArticleAndParagraph" label="Article and paragraph" />
+          <StyledInputFormikField inputType="number" name="claimsRate" label="Rate">
+            {({ field }) => (
+              <StyledInputPercentage {...field} clamp={false} onChange={value => setFieldValue(field.name, value)} />
+            )}
+          </StyledInputFormikField>
+          <StyledInputFormikField name="claimsIncomeType" label="Type of income" />
+          <StyledInputFormikField name="claimsExplanation" label="Explanation" />
+        </React.Fragment>
+      )}
 
       <div className="mt-2">
         <p className="text-lg font-bold">Taxpayer Identification Number (TIN)</p>
