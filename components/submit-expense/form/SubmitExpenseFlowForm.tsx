@@ -65,15 +65,19 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
         />
       )}
       <WhoIsPayingSection inViewChange={onInViewChange} {...WhoIsPayingSection.getFormProps(form)} />
-      <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
-      <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
-      <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
-      {form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length > 0 && (
-        <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
+      {!form.options.hasInvalidAccount && (
+        <React.Fragment>
+          <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
+          <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
+          <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
+          {form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length > 0 && (
+            <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
+          )}
+          <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
+          <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
+          <SummarySection inViewChange={onInViewChange} form={form} />
+        </React.Fragment>
       )}
-      <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
-      <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
-      <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-center sm:justify-end">
         <Button
           disabled={form.initialLoading || form.isSubmitting || form.isValidating}

@@ -224,6 +224,7 @@
   "6cdzhs": "Tarjeta pausada",
   "6ctWuQ": "Importe total gastado este periodo",
   "6DCLcI": "Por favor, introduce una fecha válida",
+  "6dZw2w": "The selected account does not support expense submissions.",
   "6eJG5Y": "No se ha podido analizar el archivo CSV. Asegúrate de que está en el formato correcto.",
   "6EnwoZ": "Gasto movido de {movedFromCollective}",
   "6ez1/V": "Selecciona un elemento de la tabla anterior para emparejarlo con la transacción importada o <Link>añadir fondos</Link>.",

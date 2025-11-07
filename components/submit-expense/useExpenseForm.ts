@@ -53,6 +53,8 @@ import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
 
+import { supportsBaseExpenseTypes } from './form/helper';
+
 export enum InviteeAccountType {
   INDIVIDUAL = 'INDIVIDUAL',
   ORGANIZATION = 'ORGANIZATION',
@@ -627,6 +629,7 @@ type ExpenseFormOptions = {
   canSetupRecurrence?: boolean;
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
+  hasInvalidAccount?: boolean;
 };
 
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
@@ -690,7 +693,17 @@ function buildFormSchema(
       .nullish()
       .refine(slug => {
         return slug && !slug.startsWith('__');
-      }, requiredMessage),
+      }, requiredMessage)
+      .refine(
+        accountSlug =>
+          accountSlug && (!options.supportedExpenseTypes || supportsBaseExpenseTypes(options.supportedExpenseTypes)),
+        () => ({
+          message: intl.formatMessage({
+            defaultMessage: 'The selected account does not support expense submissions.',
+            id: '6dZw2w',
+          }),
+        }),
+      ),
     payeeSlug: z
       .string()
       .nullish()
@@ -1409,8 +1422,11 @@ async function buildFormOptions(
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
 
-    if ((account?.supportedExpenseTypes ?? []).length > 0) {
+    if (account?.supportedExpenseTypes) {
       options.supportedExpenseTypes = account.supportedExpenseTypes;
+      if (!supportsBaseExpenseTypes(options.supportedExpenseTypes) && !query.loading) {
+        options.hasInvalidAccount = true;
+      }
     }
 
     if (query.data?.loggedInAccount) {
@@ -2153,6 +2169,19 @@ export function useExpenseForm(opts: {
     formOptions.vendorsForAccount,
     setFieldValue,
   ]);
+
+  // Reset expense type if the account does not support it (unless we're editing an existing one)
+  React.useEffect(() => {
+    if (
+      !initialLoading.current &&
+      expenseForm.values.expenseTypeOption &&
+      !formOptions.expense?.id &&
+      formOptions.supportedExpenseTypes &&
+      !formOptions.supportedExpenseTypes.includes(expenseForm.values.expenseTypeOption)
+    ) {
+      setFieldValue('expenseTypeOption', null);
+    }
+  }, [formOptions.supportedExpenseTypes, expenseForm.values.expenseTypeOption, formOptions.expense?.id, setFieldValue]);
 
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
