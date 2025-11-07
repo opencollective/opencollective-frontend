@@ -82,18 +82,6 @@ export const W8BenETaxFormValuesSchema = BaseFormSchema.merge(
     ]),
   )
   .and(
-    z.discriminatedUnion('isHybridEntity', [
-      z.object({ isHybridEntity: z.literal<boolean>(false) }),
-      z.object({
-        isHybridEntity: z.literal<boolean>(true),
-        certifyBeneficialOwnerCountry: z.boolean().nullable(),
-        certifyDerivesIncome: z.boolean().nullable(),
-        certifyForeignCorporation: z.boolean().nullable(),
-        claimsSpecialRatesAndConditions: z.boolean(),
-      }),
-    ]),
-  )
-  .and(
     z.discriminatedUnion('certifyDerivesIncome', [
       z.object({ certifyDerivesIncome: z.literal<boolean>(null) }),
       z.object({ certifyDerivesIncome: z.literal<boolean>(false) }),
@@ -292,97 +280,6 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
               />
             )}
           </StyledInputFormikField>
-          {values.isHybridEntity === true && (
-            <TaxFormSubQuestion>
-              <p className="mb-2 text-sm font-bold text-neutral-800">I certify that (select all that apply):</p>
-              <StyledInputFormikField name="certifyBeneficialOwnerCountry">
-                {({ field }) => (
-                  <label className="cursor-pointer text-sm leading-normal font-normal">
-                    <Checkbox
-                      className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                    />
-                    The beneficial owner is a resident of the country listed in the residence address on this form,
-                    within the meaning of the income tax treaty between the United States and that country
-                  </label>
-                )}
-              </StyledInputFormikField>
-              <StyledInputFormikField name="certifyForeignCorporation">
-                {({ field }) => (
-                  <label className="cursor-pointer text-sm leading-normal font-normal">
-                    <Checkbox
-                      className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                    />
-                    The beneficial owner is claiming treaty benefits for U.S. source dividends received from a foreign
-                    corporation or interest from a U.S. trade or business of a foreign corporation and meets qualified
-                    resident status.
-                  </label>
-                )}
-              </StyledInputFormikField>
-              <StyledInputFormikField name="certifyDerivesIncome">
-                {({ field }) => (
-                  <label className="cursor-pointer text-sm leading-normal font-normal">
-                    <Checkbox
-                      className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                    />
-                    The beneficial owner derives the item (or items) of income for which the treaty benefits are
-                    claimed, and, if applicable, meets the requirements of the treaty provision dealing with limitation
-                    on benefits.
-                  </label>
-                )}
-              </StyledInputFormikField>
-              {values.certifyDerivesIncome && (
-                <TaxFormSubQuestion>
-                  <StyledInputFormikField
-                    name="typeOfLimitationOnBenefitsProvisions"
-                    label="Type of limitation on benefits provisions"
-                  >
-                    {({ field }) => (
-                      <Select
-                        name={field.name}
-                        value={field.value}
-                        onValueChange={(value: TypeOfLimitationOnBenefitsProvisions) =>
-                          setFieldValue(field.name, value)
-                        }
-                      >
-                        <SelectTrigger
-                          id={field.name}
-                          className={cn('truncate', {
-                            'border-red-500': field.error,
-                          })}
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.values(TypeOfLimitationOnBenefitsProvisions).map(chapter3Status => (
-                            <SelectItem key={chapter3Status} value={chapter3Status}>
-                              {TypeOfLimitationOnBenefitsProvisionsLabels[chapter3Status]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </StyledInputFormikField>
-                  {values.typeOfLimitationOnBenefitsProvisions === TypeOfLimitationOnBenefitsProvisions.Other && (
-                    <TaxFormSubQuestion>
-                      <StyledInputFormikField
-                        name="typeOfLimitationOnBenefitsProvisionsOther"
-                        label="Specify article and paragraph of 'other' type of limitation on benefits provisions"
-                      />
-                    </TaxFormSubQuestion>
-                  )}
-                </TaxFormSubQuestion>
-              )}
-            </TaxFormSubQuestion>
-          )}
         </TaxFormSubQuestion>
       )}
 
@@ -433,6 +330,92 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
       <div className="mt-2">
         <p className="text-lg font-bold">Tax treaty benefits</p>
       </div>
+      <p className="text-sm font-bold text-neutral-800">I certify that (select all that apply):</p>
+      <TaxFormSubQuestion>
+        <StyledInputFormikField name="certifyBeneficialOwnerCountry">
+          {({ field }) => (
+            <label className="cursor-pointer text-sm leading-normal font-normal">
+              <Checkbox
+                className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
+                name={field.name}
+                checked={field.value}
+                onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
+              />
+              The beneficial owner is a resident of the country listed in the residence address on this form, within the
+              meaning of the income tax treaty between the United States and that country
+            </label>
+          )}
+        </StyledInputFormikField>
+        <StyledInputFormikField name="certifyDerivesIncome">
+          {({ field }) => (
+            <label className="cursor-pointer text-sm leading-normal font-normal">
+              <Checkbox
+                className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
+                name={field.name}
+                checked={field.value}
+                onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
+              />
+              The beneficial owner derives the item (or items) of income for which the treaty benefits are claimed, and,
+              if applicable, meets the requirements of the treaty provision dealing with limitation on benefits.
+            </label>
+          )}
+        </StyledInputFormikField>
+        {values.certifyDerivesIncome && (
+          <TaxFormSubQuestion>
+            <StyledInputFormikField
+              name="typeOfLimitationOnBenefitsProvisions"
+              label="Type of limitation on benefits provisions"
+            >
+              {({ field }) => (
+                <Select
+                  name={field.name}
+                  value={field.value}
+                  onValueChange={(value: TypeOfLimitationOnBenefitsProvisions) => setFieldValue(field.name, value)}
+                >
+                  <SelectTrigger
+                    id={field.name}
+                    className={cn('truncate', {
+                      'border-red-500': field.error,
+                    })}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(TypeOfLimitationOnBenefitsProvisions).map(chapter3Status => (
+                      <SelectItem key={chapter3Status} value={chapter3Status}>
+                        {TypeOfLimitationOnBenefitsProvisionsLabels[chapter3Status]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </StyledInputFormikField>
+            {values.typeOfLimitationOnBenefitsProvisions === TypeOfLimitationOnBenefitsProvisions.Other && (
+              <TaxFormSubQuestion>
+                <StyledInputFormikField
+                  name="typeOfLimitationOnBenefitsProvisionsOther"
+                  label="Specify article and paragraph of 'other' type of limitation on benefits provisions"
+                />
+              </TaxFormSubQuestion>
+            )}
+          </TaxFormSubQuestion>
+        )}
+        <StyledInputFormikField name="certifyForeignCorporation">
+          {({ field }) => (
+            <label className="cursor-pointer text-sm leading-normal font-normal">
+              <Checkbox
+                className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
+                name={field.name}
+                checked={field.value}
+                onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
+              />
+              The beneficial owner is claiming treaty benefits for U.S. source dividends received from a foreign
+              corporation or interest from a U.S. trade or business of a foreign corporation and meets qualified
+              resident status.
+            </label>
+          )}
+        </StyledInputFormikField>
+      </TaxFormSubQuestion>
       <StyledInputFormikField
         name="claimsSpecialRatesAndConditions"
         label="Are you claiming special rates and conditions?"
