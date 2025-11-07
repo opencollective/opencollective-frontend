@@ -305,7 +305,7 @@ export default function Pricing({ data }) {
                   id="pricing.new.faq.governance.question"
                 />
               </h3>
-              <p className="text-muted-foreground">
+              <p className="my-4 text-muted-foreground">
                 <FormattedMessage
                   defaultMessage="Since October 2024, the platform has been managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives."
                   id="8/YzW7"
@@ -332,26 +332,22 @@ export default function Pricing({ data }) {
                   id="pricing.new.faq.change.question"
                 />
               </h3>
-              <p className="text-muted-foreground">
-                <FormattedMessage
-                  defaultMessage="The previous pricing model included a <strong>15% Revenue Share</strong> on Host Fees collected on the platform. The updated pricing replaces that with a <strong>non-percentage model</strong> based on measurable activity, such as the number of <strong>Collectives</strong> and the <strong>Expenses</strong> you process.{newLine}{newLine}This approach makes costs clearer and more predictable. Instead of paying a share of your revenue, your price now scales with how you use the platform. <strong>Collectives remain free to use</strong>, supported by optional <strong>Platform Tips</strong>, while <strong>Organizations</strong> select a plan that fits their activity level and needs."
-                  id="pricing.new.faq.change.answer"
-                  values={I18nFormatters}
-                />
-              </p>
+              <FormattedMessage
+                defaultMessage="<p>The previous pricing model included a <strong>15% Revenue Share</strong> on Host Fees collected on the platform. The updated pricing replaces that with a <strong>non-percentage model</strong> based on measurable activity, such as the number of <strong>Collectives</strong> and the <strong>Expenses</strong> you process.</p><p>This approach makes costs clearer and more predictable. Instead of paying a share of your revenue, your price now scales with how you use the platform. <strong>Collectives remain free to use</strong>, supported by optional <strong>Platform Tips</strong>, while <strong>Organizations</strong> select a plan that fits their activity level and needs.</p>"
+                id="pricing.new.faq.change.answer"
+                values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
+              />
             </div>
 
             <div className="p-6" id="platform-tips">
               <h3 className="mb-2 text-xl font-medium text-foreground">
                 <FormattedMessage defaultMessage="What are Platform Tips?" id="pricing.new.faq.tips.question" />
               </h3>
-              <p className="text-muted-foreground">
-                <FormattedMessage
-                  defaultMessage="<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>"
-                  id="pricing.new.faq.tips.answer"
-                  values={I18nFormatters}
-                />
-              </p>
+              <FormattedMessage
+                defaultMessage="<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>"
+                id="pricing.new.faq.tips.answer"
+                values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
+              />
             </div>
 
             <div className="p-6">
@@ -361,13 +357,11 @@ export default function Pricing({ data }) {
                   id="pricing.new.faq.organizationcollective.question"
                 />
               </h3>
-              <p className="text-muted-foreground">
-                <FormattedMessage
-                  defaultMessage="An <strong>Organization</strong> is a legal entity, such as a company, nonprofit, or cooperative, that uses the platform to manage its own funds or to act as a <strong>Host</strong> for other groups. Hosts receive and hold contributions on behalf of the <strong>Collectives</strong> they support and ensure that funds are used in line with their purpose and policies.{newLine}{newLine}A <strong>Collective</strong> is a group of people with a shared purpose who raise and spend money together through a Host. Collectives do not directly hold funds, as their Host, which is an Organization, manages the money for them.{newLine}{newLine}In short, Organizations have <strong>legal and financial control</strong>, while Collectives focus on their <strong>mission and community activities</strong>."
-                  id="pricing.new.faq.organizationcollective.answer"
-                  values={I18nFormatters}
-                />
-              </p>
+              <FormattedMessage
+                defaultMessage="<p>An <strong>Organization</strong> is a legal entity, such as a company, nonprofit, or cooperative, that uses the platform to manage its own funds or to act as a <strong>Host</strong> for other groups. Hosts receive and hold contributions on behalf of the <strong>Collectives</strong> they support and ensure that funds are used in line with their purpose and policies.</p><p>A <strong>Collective</strong> is a group of people with a shared purpose who raise and spend money together through a Host. Collectives do not directly hold funds, as their Host, which is an Organization, manages the money for them.</p><p>In short, Organizations have <strong>legal and financial control</strong>, while Collectives focus on their <strong>mission and community activities</strong>.</p>"
+                id="pricing.new.faq.organizationcollective.answer"
+                values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
+              />
             </div>
 
             <div className="p-6">
@@ -377,13 +371,11 @@ export default function Pricing({ data }) {
                   id="pricing.new.faq.independentcollective.question"
                 />
               </h3>
-              <p className="text-muted-foreground">
-                <FormattedMessage
-                  defaultMessage="<strong>Independent Collectives</strong> are being converted to <strong>Organizations</strong>.{newLine}{newLine}This change removes a confusing account type and makes the platform more consistent. <strong>Collectives</strong> are always hosted, while <strong>Organizations</strong> represent legal entities that can hold and manage money themselves.{newLine}{newLine}If you previously had an <strong>Independent Collective</strong>, it is now being converted to an <strong>Organization</strong>. You can continue using the same tools to receive contributions, pay expenses, and manage your budget.{newLine}{newLine}<strong>Independent Collectives</strong> converted to <strong>Organizations</strong> are subject to the updated pricing, and fees may apply if you process many expenses or need advanced features."
-                  id="pricing.new.faq.independentcollective.answer"
-                  values={I18nFormatters}
-                />
-              </p>
+              <FormattedMessage
+                defaultMessage="<p><strong>Independent Collectives</strong> are being converted to <strong>Organizations</strong>.</p><p>This change removes a confusing account type and makes the platform more consistent. <strong>Collectives</strong> are always hosted, while <strong>Organizations</strong> represent legal entities that can hold and manage money themselves.</p><p>If you previously had an <strong>Independent Collective</strong>, it is now being converted to an <strong>Organization</strong>. You can continue using the same tools to receive contributions, pay expenses, and manage your budget.</p><p><strong>Independent Collectives</strong> converted to <strong>Organizations</strong> are subject to the updated pricing, and fees may apply if you process many expenses or need advanced features.</p>"
+                id="pricing.new.faq.independentcollective.answer"
+                values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
+              />
             </div>
           </div>
         </div>
