@@ -243,6 +243,7 @@ export const AVAILABLE_FEATURES = [
   'EXPENSE_SECURITY_CHECKS',
   'EXPECTED_FUNDS',
   'CHARGE_HOSTING_FEES',
+  'RESTRICTED_FUNDS',
   'AGREEMENTS',
   'TAX_FORMS',
   'OFF_PLATFORM_TRANSACTIONS',
@@ -279,4 +280,5 @@ export const AVAILABLE_FEATURES_LABELS: Record<(typeof AVAILABLE_FEATURES)[numbe
   TAX_FORMS: 'Tax forms',
   OFF_PLATFORM_TRANSACTIONS: 'Bank account synchronization',
   FUNDS_GRANTS_MANAGEMENT: 'Funds & grants management',
+  RESTRICTED_FUNDS: 'Restricted funds',
 };
