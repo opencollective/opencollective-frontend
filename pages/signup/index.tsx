@@ -30,6 +30,7 @@ const singupPageQuery = gql`
   }
 `;
 
+// ts-unused-exports:disable-next-line
 export default function SignupPage() {
   const { data } = useQuery(singupPageQuery, { context: API_V2_CONTEXT, fetchPolicy: 'network-only' });
   const me = data?.me;
