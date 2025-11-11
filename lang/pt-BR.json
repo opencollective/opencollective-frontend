@@ -403,7 +403,7 @@
   "Account.Updated": "Account updated.",
   "accountingCategory.accountAdmin": "o administrador coletivo",
   "AccountingCategory.appliesTo.both": "Tudo",
-  "AccountingCategory.appliesTo.hint": "Choose whether this category applies to your own transactions or the transactions of your hosted collectives",
+  "AccountingCategory.appliesTo.hint": "Escolha se esta categoria se aplica às suas próprias transações ou às transações de seus coletivos hospedados",
   "AccountingCategory.AppliesTo.HOST": "Fundos operacionais",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Fundos gerenciados",
   "AccountingCategory.code": "Código",
