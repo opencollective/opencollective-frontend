@@ -213,13 +213,12 @@ export const EditAvatar = ({
   size: string | number;
   minSize?: number;
   maxSize?: number;
-  onSuccess: ({ url: string }) => void;
-  onReject?: ({ reason: string }) => void;
+  onSuccess: ({ url }: { url: string }) => void;
+  onReject?: ({ reason }: { reason: string }) => void;
 }) => {
-  // @ts-expect-error 2345
   const { uploadFiles, isUploading } = useImageUploader({
     isMulti: false,
-    // mockImageGenerator: () => `https://loremflickr.com/120/120/logo`,
+    mockImageGenerator: () => `https://loremflickr.com/120/120/logo`,
     onSuccess,
     onReject,
     kind: UploadedFileKind.ACCOUNT_AVATAR,
