@@ -783,6 +783,7 @@ export type AccountUpdateInput = {
   hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['String']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<LocationInput>;
   longDescription?: InputMaybe<Scalars['String']['input']>;
@@ -1166,6 +1167,7 @@ export enum ActivityAndClassesType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_OTP_REQUESTED = 'USER_OTP_REQUESTED',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   USER_RESET_PASSWORD = 'USER_RESET_PASSWORD',
@@ -1353,6 +1355,7 @@ export enum ActivityType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_OTP_REQUESTED = 'USER_OTP_REQUESTED',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   USER_RESET_PASSWORD = 'USER_RESET_PASSWORD',
@@ -7231,6 +7234,7 @@ export type Individual = Account & {
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']['output']>;
+  requiresProfileCompletion: Scalars['Boolean']['output'];
   settings: Scalars['JSON']['output'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String']['output'];
@@ -8059,6 +8063,8 @@ export type Mutation = {
   importTransactions: TransactionsImport;
   /** Invite a new member to the Collective. Scope: "account". */
   inviteMember: MemberInvitation;
+  /** Creates and invites admins to an existing Organization. Scope: "account". */
+  inviteOrganizationAdmins?: Maybe<Organization>;
   /** [Root only] Merge two accounts, returns the result account */
   mergeAccounts: MergeAccountsResponse;
   /** Moves an expense from one account within a Collective to another */
@@ -8855,6 +8861,13 @@ export type MutationInviteMemberArgs = {
   memberAccount: AccountReferenceInput;
   role: MemberRole;
   since?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationInviteOrganizationAdminsArgs = {
+  inviteMembers: Array<InviteMemberInput>;
+  organization: AccountReferenceInput;
 };
 
 
