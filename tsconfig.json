@@ -24,6 +24,7 @@
   },
   "include": [
     ".eslintrc.js",
+    ".storybook/**/*",
     "components",
     "cypress",
     "*.config.*",
