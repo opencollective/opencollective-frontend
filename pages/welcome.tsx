@@ -7,6 +7,7 @@ import AuthenticatedPage from '../components/AuthenticatedPage';
 import Image from '../components/Image';
 import Link from '../components/Link';
 import { Separator } from '../components/ui/Separator';
+import Avatar from '@/components/Avatar';
 
 const Welcome = () => {
   const { LoggedInUser } = useLoggedInUser();
@@ -40,7 +41,12 @@ const Welcome = () => {
 
         <div className="mt-24 flex w-full flex-col items-center rounded-lg border shadow-xs lg:mt-0 lg:w-[520px]">
           <div className="-mt-16 rounded-full border-4 border-white bg-white">
-            <Image src="/static/images/sample-avatar.png" height={128} width={128} alt="Avatar" />
+            <Avatar
+              src={LoggedInUser?.image || '/static/images/sample-avatar.png'}
+              height={128}
+              width={128}
+              alt="Avatar"
+            />
           </div>
           <div className="text-black-900 pt-10 pb-8 text-2xl leading-8 font-bold">{LoggedInUser?.collective?.name}</div>
 
