@@ -376,9 +376,9 @@ export function CompleteProfileSteps() {
   const intl = useIntl();
   const router = useRouter();
   const signupContext = React.useContext(SignupFormContext);
-  const { refetchLoggedInUser } = useLoggedInUser();
+  const { refetchLoggedInUser, LoggedInUser } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<CompleteProfileFormValuesSchema>>(undefined);
-  const { data } = useQuery(profileQuery, { context: API_V2_CONTEXT });
+  const { data, refetch: refetchMe } = useQuery(profileQuery, { context: API_V2_CONTEXT, skip: !LoggedInUser });
   const [updateAccount, { loading: submitting }] = useMutation(completeProfileMutation, {
     context: API_V2_CONTEXT,
   });
@@ -405,10 +405,13 @@ export function CompleteProfileSteps() {
   );
 
   React.useEffect(() => {
-    if (data?.me) {
+    if (!data?.me && LoggedInUser) {
+      refetchMe();
+    }
+    if (data?.me && !formikRef.current?.values?.id) {
       formikRef.current?.setFieldValue('id', data.me.id);
     }
-  }, [data]);
+  }, [data, LoggedInUser, refetchMe]);
 
   return (
     <FormikZod<CompleteProfileFormValuesSchema>
