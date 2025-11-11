@@ -10,6 +10,7 @@ import Info, { infoSettingsDashboardQuery } from './Info';
 
 // Heavy HTML editor is not needed for this test; stub them
 jest.mock('../../../components/RichTextEditor', () => () => <div data-testid="rich-text-editor-mock" />);
+jest.mock('../../../lib/hooks/useLoggedInUser', () => () => ({}));
 
 type AccountFromQuery = QueryResult<AccountTaxInformationQuery>['data']['account'];
 
@@ -32,6 +33,7 @@ const buildQueryMock = (account: AccountFromQuery) => ({
         isActive: false,
         isHost: false,
         currency: 'USD',
+        imageUrl: null,
         type: AccountType.COLLECTIVE,
         id: 'acc1',
         slug: 'acc1',
