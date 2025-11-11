@@ -269,7 +269,12 @@ const AccountPicker: React.FC<AccountPickerProps> = props => {
       label: collective.name,
     }));
 
-    // Merge with custom options if they exist
+    // Don't include custom options when searching
+    if (searchQuery.trim()) {
+      return collectiveOptions;
+    }
+
+    // Merge with custom options if they exist (only when not searching)
     if (!customOptions || customOptions.length === 0) {
       return collectiveOptions;
     }
@@ -281,7 +286,7 @@ const AccountPicker: React.FC<AccountPickerProps> = props => {
       // Default to TOP
       return [...customOptions, ...collectiveOptions];
     }
-  }, [filteredCollectives, customOptions, customOptionsPosition]);
+  }, [filteredCollectives, customOptions, customOptionsPosition, searchQuery]);
 
   const hasMoreResults = useMemo(() => {
     // If we're doing API pagination, don't limit display locally
@@ -624,7 +629,7 @@ const AccountPicker: React.FC<AccountPickerProps> = props => {
                       />
                     </div>
                   </div>
-                  Find an account
+                  No results
                 </CommandEmpty>
               </CommandList>
             </div>

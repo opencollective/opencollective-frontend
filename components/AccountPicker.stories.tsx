@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { gql } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing';
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { CollectiveType } from '../lib/constants/collectives';
 
@@ -138,7 +137,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Wrapper component to handle state
-const PickerWrapper = (props: any) => {
+const PickerWrapper = (props: React.ComponentProps<typeof AccountPicker>) => {
   const [collective, setCollective] = useState(props.collective);
 
   return (
@@ -146,12 +145,19 @@ const PickerWrapper = (props: any) => {
       <AccountPicker
         {...props}
         collective={collective}
-        onChange={(newValue: any) => {
+        onChange={newValue => {
           setCollective(newValue);
+          // eslint-disable-next-line no-console
           console.log('Account changed:', newValue);
         }}
-        onInputChange={(newValue: any) => console.log('Search changed:', newValue)}
-        onInvite={(value: any) => console.log('Invite clicked:', value)}
+        onInputChange={newValue => {
+          // eslint-disable-next-line no-console
+          console.log('Search changed:', newValue);
+        }}
+        onInvite={value => {
+          // eslint-disable-next-line no-console
+          console.log('Invite clicked:', value);
+        }}
       />
     </div>
   );
@@ -255,7 +261,7 @@ export const LargeDataset: Story = {
         name: `Account ${i + 50}`,
         email: `account${i + 50}@example.com`,
         slug: `account-${i + 50}`,
-        type: ['USER', 'ORGANIZATION', 'COLLECTIVE'][i % 3] as any,
+        type: ['USER', 'ORGANIZATION', 'COLLECTIVE'][i % 3] as 'USER' | 'ORGANIZATION' | 'COLLECTIVE',
         imageUrl: null,
         status: 'active' as const,
       })),
@@ -438,6 +444,7 @@ const accountPickerSearchQuery = gql`
 
 // Create comprehensive Apollo mocks for different query scenarios
 // Note: 800ms delay added to make loading state visible in Storybook
+// Note: Must include all variables that AccountPickerAsync passes, even if undefined
 const apolloMocks = [
   // Default empty search (preload or initial state)
   {
@@ -447,8 +454,11 @@ const apolloMocks = [
         term: '',
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -470,8 +480,11 @@ const apolloMocks = [
         types: ['USER', 'ORGANIZATION', 'VENDOR'],
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -493,8 +506,11 @@ const apolloMocks = [
         types: ['USER', 'ORGANIZATION', 'VENDOR'],
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -515,8 +531,11 @@ const apolloMocks = [
         types: ['USER', 'ORGANIZATION', 'VENDOR'],
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -537,8 +556,11 @@ const apolloMocks = [
         types: ['USER', 'ORGANIZATION', 'VENDOR'],
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -559,8 +581,11 @@ const apolloMocks = [
         types: ['USER', 'ORGANIZATION', 'VENDOR'],
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -581,8 +606,11 @@ const apolloMocks = [
         types: ['USER', 'ORGANIZATION', 'VENDOR'],
         limit: 20,
         offset: 0,
+        host: undefined,
+        parent: undefined,
         skipGuests: true,
         includeArchived: false,
+        includeVendorsForHost: undefined,
       },
     },
     delay: 800,
@@ -613,7 +641,7 @@ const apolloMocks = [
 ];
 
 // Wrapper for async picker stories with Apollo mocks
-const AsyncPickerWrapper = (props: any) => {
+const AsyncPickerWrapper = (props: React.ComponentProps<typeof AccountPickerAsync> & { label?: string }) => {
   const [collective, setCollective] = useState(props.collective);
 
   return (
@@ -623,9 +651,11 @@ const AsyncPickerWrapper = (props: any) => {
         <AccountPickerAsync
           {...props}
           collective={collective}
-          onChange={(newValue: any) => {
+          onChange={newValue => {
+            // eslint-disable-next-line no-console
             console.log({ newValue });
             setCollective(newValue);
+            // eslint-disable-next-line no-console
             console.log('Account changed:', newValue);
           }}
         />

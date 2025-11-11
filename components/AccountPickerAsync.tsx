@@ -5,9 +5,9 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import formatCollectiveType from '../lib/i18n/collective-type';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 
 import AccountPicker from './AccountPicker';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 
 const accountPickerSearchQuery = gql`
   query AccountPickerSearch(
@@ -161,7 +161,17 @@ const AccountPickerAsync = ({
   const [allCollectives, setAllCollectives] = React.useState([]);
   const [hasMore, setHasMore] = React.useState(true);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [isDebouncing, setIsDebouncing] = React.useState(false);
   const intl = useIntl();
+
+  // Create a wrapped search function that manages debouncing state
+  const wrappedSearch = React.useCallback(
+    variables => {
+      setIsDebouncing(false);
+      return searchCollectives({ variables });
+    },
+    [searchCollectives],
+  );
 
   // Filter defaultCollectives by term if provided
   const filteredDefaultCollectives = React.useMemo(() => {
@@ -223,7 +233,6 @@ const AccountPickerAsync = ({
     if (!hasMore || isLoadingMore || loading) {
       return;
     }
-    console.log('loadMoreResults');
 
     setIsLoadingMore(true);
 
@@ -263,8 +272,7 @@ const AccountPickerAsync = ({
           },
         };
       },
-    }).catch(error => {
-      console.error('Error loading more results:', error);
+    }).catch(() => {
       setIsLoadingMore(false);
     });
   }, [
@@ -283,16 +291,15 @@ const AccountPickerAsync = ({
     includeVendorsForHostId,
   ]);
 
-  console.log({ loading, loadMoreResults, isLoadingMore });
-
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (term || preload) {
       // Reset state on new search
       setAllCollectives([]);
       setHasMore(true);
+      setIsDebouncing(true);
 
-      throttledSearch(searchCollectives, {
+      throttledSearch(wrappedSearch, {
         term: term || '',
         types,
         limit,
@@ -304,13 +311,28 @@ const AccountPickerAsync = ({
         includeVendorsForHost: includeVendorsForHostId ? { id: includeVendorsForHostId } : undefined,
         // vendorVisibleToAccountIds, // Commented out as per the query
       });
+    } else {
+      // No search term and no preload, so not debouncing
+      setIsDebouncing(false);
     }
-  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, term]);
+  }, [
+    types,
+    limit,
+    hostCollectiveIds,
+    parentCollectiveIds,
+    vendorVisibleToAccountIds,
+    term,
+    wrappedSearch,
+    preload,
+    skipGuests,
+    includeArchived,
+    includeVendorsForHostId,
+  ]);
 
   return (
     <AccountPicker
       inputId={inputId}
-      isLoading={Boolean(loading || isLoading)}
+      isLoading={Boolean(loading || isLoading || isDebouncing)}
       isLoadingMoreResults={isLoadingMore}
       collectives={filteredCollectives}
       groupByType={!types || types.length > 1}
