@@ -91,6 +91,7 @@
     "framer-motion": "12.23.12",
     "graphql": "16.11.0",
     "helmet": "8.1.0",
+    "input-otp": "1.4.2",
     "interweave": "13.1.1",
     "interweave-ssr": "2.0.0",
     "jose": "6.1.0",
