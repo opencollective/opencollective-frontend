@@ -52,13 +52,13 @@ const preview: Preview = {
       test: 'todo',
     },
     backgrounds: {
-      default: 'light',
-      values: [
-        { name: 'light', value: '#ffffff' },
-        { name: 'dark', value: '#1a1a1a' },
-      ],
+      options: {
+        light: { name: 'light', value: '#ffffff' },
+        dark: { name: 'dark', value: '#1a1a1a' }
+      }
     },
   },
+
   decorators: [
     Story =>
       React.createElement(
@@ -102,6 +102,12 @@ const preview: Preview = {
         ),
       ),
   ],
+
+  initialGlobals: {
+    backgrounds: {
+      value: 'light'
+    }
+  }
 };
 
 export default preview;

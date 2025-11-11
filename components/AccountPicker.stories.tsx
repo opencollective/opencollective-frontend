@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
-import { MockedProvider } from '@apollo/client/testing';
+import React, { useState } from 'react';
 import { gql } from '@apollo/client';
+import { MockedProvider } from '@apollo/client/testing';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { CollectiveType } from '../lib/constants/collectives';
 
+import { Label } from './ui/Label';
 import AccountPicker, { DefaultCollectiveLabel } from './AccountPicker';
 import AccountPickerAsync from './AccountPickerAsync';
-import { Label } from './ui/Label';
 
 const mockCollectives = [
   {
