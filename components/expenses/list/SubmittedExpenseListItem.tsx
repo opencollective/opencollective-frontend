@@ -143,7 +143,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
           </span>
         </div>
       </div>
-      <div>
+      <div className="flex flex-col justify-center">
         <div className="mb-1 flex flex-col items-end text-sm font-medium text-slate-800">
           <span>
             <FormattedMoneyAmount amount={props.expense.amount} currency={props.expense.currency} precision={2} />
