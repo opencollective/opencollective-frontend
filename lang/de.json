@@ -224,6 +224,7 @@
   "6cdzhs": "Gutschein pausiert",
   "6ctWuQ": "Gesamtbetrag, der in diesem Zeitraum ausgegeben wurde.",
   "6DCLcI": "Bitte geben Sie ein gültiges Datum ein",
+  "6dZw2w": "The selected account does not support expense submissions.",
   "6eJG5Y": "Could not parse the CSV file. Please make sure it is correctly formatted.",
   "6EnwoZ": "Ausgabe verschoben von {movedFromCollective}",
   "6ez1/V": "Select an item from the table above to match it against the imported transaction or <Link>add funds</Link>.",
