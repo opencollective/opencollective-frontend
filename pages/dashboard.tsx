@@ -3,20 +3,25 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { require2FAForAdmins } from '../lib/policies';
+import { AppSidebar } from '@/components/dashboard/AppSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import {
+  DASHBOARD_SETTINGS_STORAGE_KEY,
+  DEFAULT_DASHBOARD_SETTINGS,
+  SidebarOrganization,
+  SidebarSettingsPanel,
+  type DashboardSettings,
+} from '@/components/dashboard/SidebarSettingsPanel';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 import type { Context } from '@/lib/apollo-client';
 import { isHostAccount } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
-import type LoggedInUser from '@/lib/LoggedInUser';
-import { getDashboardRoute } from '@/lib/url-helpers';
 import useLocalStorage from '@/lib/hooks/useLocalStorage';
+import type LoggedInUser from '@/lib/LoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
-
 import {
   ALL_SECTIONS,
   ROOT_PROFILE_ACCOUNT,
@@ -38,17 +43,10 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
-import { AppSidebar } from '@/components/dashboard/AppSidebar';
-import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
-import {
-  DASHBOARD_SETTINGS_STORAGE_KEY,
-  type DashboardSettingKey,
-  type DashboardSettings,
-  DEFAULT_DASHBOARD_SETTINGS,
-  SidebarOption,
-  SidebarSettingsPanel,
-} from '@/components/dashboard/SidebarSettingsPanel';
-import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
+import roles from '../lib/constants/roles';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../lib/policies';
 const messages = defineMessages({
   collectiveIsArchived: {
     id: 'collective.isArchived',
@@ -254,12 +252,23 @@ const DashboardPage = () => {
     DEFAULT_DASHBOARD_SETTINGS,
   );
   const resolvedDashboardSettings = React.useMemo(
-    () => ({ ...DEFAULT_DASHBOARD_SETTINGS, ...dashboardSettings }),
+    () => ({
+      ...DEFAULT_DASHBOARD_SETTINGS,
+      ...dashboardSettings,
+      pitchedSolutionsProgress:
+        dashboardSettings.sidebarOrganization === SidebarOrganization.CAMPAIGN
+          ? dashboardSettings.pitchedSolutionsProgress
+          : 0,
+    }),
     [dashboardSettings],
   );
   const handleDashboardSettingChange = React.useCallback(
-    <K extends DashboardSettingKey>(key: K, value: DashboardSettings[K]) => {
-      setDashboardSettings(previous => ({ ...DEFAULT_DASHBOARD_SETTINGS, ...previous, [key]: value }));
+    (updates: Partial<DashboardSettings>) => {
+      setDashboardSettings(previous => ({
+        ...DEFAULT_DASHBOARD_SETTINGS,
+        ...previous,
+        ...updates,
+      }));
     },
     [setDashboardSettings],
   );

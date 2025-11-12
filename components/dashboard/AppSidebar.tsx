@@ -30,11 +30,16 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+import { type IntlShape, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '@/lib/collective';
+import { isOneOfTypes, isType } from '@/lib/collective-sections';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { type DashboardQuery, ExpenseType } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import type LoggedInUserType from '@/lib/LoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import Link from '../Link';
@@ -57,17 +62,11 @@ import {
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { ALL_SECTIONS, SECTION_LABELS } from './constants';
-import type { MenuItem, PageMenuItem } from './getMenuItems';
-import { ROOT_MENU, shouldIncludeMenuItemWithLegacyFallback } from './getMenuItems';
+import { type MenuItem, type PageMenuItem, ROOT_MENU, shouldIncludeMenuItemWithLegacyFallback } from './getMenuItems';
+import type { MenuSections } from './Menu';
 import AccountSwitcher from './NewAccountSwitcher';
 import AdminPanelSideBar from './SideBar';
-import { DashboardSettings, SidebarOption } from './SidebarSettingsPanel';
-import type { MenuSections } from './Menu';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import { DashboardQuery, ExpenseType } from '@/lib/graphql/types/v2/graphql';
-import { isOneOfTypes, isType } from '@/lib/collective-sections';
-import { CollectiveType } from '@/lib/constants/collectives';
-import LoggedInUser from '@/lib/LoggedInUser';
+import { type DashboardSettings, SidebarOrganization } from './SidebarSettingsPanel';
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
 
 type AppSidebarProps = {
@@ -101,9 +100,9 @@ export const getMenuItems = ({
   LoggedInUser,
   prototype,
 }: {
-  intl: any;
-  account: any;
-  LoggedInUser: LoggedInUser;
+  intl: IntlShape;
+  account: DashboardQuery['account'] | null | undefined;
+  LoggedInUser: LoggedInUserType;
   prototype: DashboardSettings;
 }): MenuSections => {
   if (!account) {
@@ -265,6 +264,184 @@ export const getMenuItems = ({
       if: !isAccountantOnly,
     },
   ];
+
+  if (prototype.sidebarOrganization === SidebarOrganization.GROUPING && isHost) {
+    return {
+      main: filterAndLabel(
+        [
+          {
+            section: ALL_SECTIONS.OVERVIEW,
+            Icon: Home,
+            if: !isAccountantOnly,
+          },
+          {
+            if: canHostAccounts,
+            section: ALL_SECTIONS.HOST_EXPENSES,
+            label: 'Expenses',
+            Icon: Receipt,
+          },
+          {
+            if: (isHost && canHostAccounts) || isSelfHosted,
+            label: 'Contributions',
+            section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
+            Icon: HandCoins,
+          },
+          {
+            if:
+              (isHost || isSelfHosted) && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
+            label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
+            section: ALL_SECTIONS.PEOPLE,
+            Icon: Users2,
+          },
+          {
+            section: ALL_SECTIONS.INFO,
+            Icon: Settings,
+            label: 'Settings',
+            type: 'group',
+            subMenu: settingsMenu,
+          },
+        ] as MenuItem[],
+        intl,
+      ),
+      tools: filterAndLabel(
+        [
+          {
+            type: 'group',
+            label: 'Hosting',
+            Icon: Network,
+            subMenu: [
+              {
+                section: ALL_SECTIONS.HOSTED_COLLECTIVES,
+              },
+              {
+                label: intl.formatMessage({ id: 'HostApplications.Applications', defaultMessage: 'Applications' }),
+                section: ALL_SECTIONS.HOST_APPLICATIONS,
+              },
+            ],
+          },
+          {
+            type: 'group',
+            label: 'Funds & Grants',
+            Icon: Vault,
+            subMenu: [
+              {
+                if: isHost && canHostAccounts,
+                section: ALL_SECTIONS.HOSTED_FUNDS,
+              },
+              {
+                if: isHost || isSelfHosted,
+                section: ALL_SECTIONS.HOSTED_GRANTS,
+                label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+              },
+            ],
+          },
+          {
+            type: 'group',
+            label: 'Reporting',
+            Icon: BarChart2,
+            subMenu: [
+              {
+                section: ALL_SECTIONS.TRANSACTION_REPORTS,
+                label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+              },
+              {
+                section: ALL_SECTIONS.EXPENSE_REPORTS,
+                label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+              },
+            ],
+          },
+          {
+            type: 'group',
+            label: 'Organization',
+            Icon: Building2,
+            subMenu: [
+              {
+                section: ALL_SECTIONS.ACCOUNTS,
+                label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
+              },
+              {
+                section: ALL_SECTIONS.EXPENSES,
+                label: intl.formatMessage(
+                  {
+                    defaultMessage: 'Expenses',
+                    id: 'k2VBcF',
+                  },
+                  { accountName: account.name },
+                ),
+              },
+              {
+                if: !isIndividual && !isCommunityManagerOnly,
+                section: ALL_SECTIONS.CONTRIBUTORS,
+                label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
+              },
+            ],
+          },
+          {
+            type: 'group',
+            label: 'Ledger',
+            Icon: Rows3,
+            subMenu: [
+              {
+                section: ALL_SECTIONS.HOST_TRANSACTIONS,
+                label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+              },
+              {
+                section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
+                label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
+                if: shouldIncludeMenuItemWithLegacyFallback(
+                  account,
+                  FEATURES.OFF_PLATFORM_TRANSACTIONS,
+                  isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+                ),
+              },
+              {
+                section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
+                label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
+                if: shouldIncludeMenuItemWithLegacyFallback(
+                  account,
+                  FEATURES.OFF_PLATFORM_TRANSACTIONS,
+                  isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
+                ),
+              },
+            ],
+          },
+          {
+            type: 'group',
+            label: 'More',
+            Icon: Ellipsis,
+            subMenu: [
+              {
+                section: ALL_SECTIONS.HOST_TAX_FORMS,
+                label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+                if: shouldIncludeMenuItemWithLegacyFallback(
+                  account,
+                  FEATURES.TAX_FORMS,
+                  isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+                ),
+              },
+              {
+                section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
+              },
+              {
+                if: (isHost || isSelfHosted) && !isAccountantOnly && !isCommunityManagerOnly,
+                section: ALL_SECTIONS.VENDORS,
+              },
+              {
+                label: 'Virtual Cards',
+                section: ALL_SECTIONS.HOST_VIRTUAL_CARDS,
+              },
+              {
+                section: ALL_SECTIONS.HOST_AGREEMENTS,
+                if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, isHost && canHostAccounts),
+                label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+              },
+            ],
+          },
+        ] as MenuItem[],
+        intl,
+      ),
+    };
+  }
 
   const items: MenuItem[] = [
     {
@@ -640,257 +817,86 @@ export const getMenuItems = ({
   return { main: filterAndLabel(items, intl) };
 };
 
-export function AppSidebar({
-  menuItems: ogMenu,
-  isLoading,
-  useLegacy = false,
-  prototypeSettings,
-  variant = 'inset',
-}: AppSidebarProps) {
+export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, variant = 'inset' }: AppSidebarProps) {
   const { workspace, account } = useWorkspace();
   const activeSlug = workspace?.slug;
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
-  const menuItems = React.useMemo(
+  const computedMenuItems = React.useMemo(
     () => getMenuItems({ intl, account, LoggedInUser, prototype: prototypeSettings }),
     [account, intl, LoggedInUser, prototypeSettings],
   );
-  const menuItemsOld = React.useMemo(() => {
-    //     const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
-    //   if (isRootProfile) {
-    //     return ROOT_MENU;
-    //   }
-
-    if (!account) {
-      return { main: [], tools: undefined };
-    }
-    const isIndividual = isIndividualAccount(account);
-    const isHost = isHostAccount(account);
-    const isSelfHosted = isSelfHostedAccount(account);
-    const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
-    const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
-    const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
-
-    if (!isHost) {
-      return {
-        main: ogMenu,
-        tools: undefined,
-      };
-    }
-    if (prototypeSettings.sidebarOption === SidebarOption.GROUPING) {
-      if (isHost) {
-        return {
-          main: (
-            [
-              {
-                section: ALL_SECTIONS.OVERVIEW,
-                Icon: Home,
-                if: !isAccountantOnly,
-              },
-              {
-                if: canHostAccounts,
-                section: ALL_SECTIONS.HOST_EXPENSES,
-                label: 'Expenses',
-                Icon: Receipt,
-              },
-              {
-                if: (isHost && canHostAccounts) || isSelfHosted,
-                label: 'Contributions',
-                section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
-                Icon: HandCoins,
-              },
-              {
-                section: ALL_SECTIONS.INFO,
-                Icon: Settings,
-                label: 'Settings',
-              },
-            ] as MenuItem[]
-          )
-            .filter(item => item.if !== false)
-            // filter subMenu items and add labels where missing
-            .map(item => {
-              if (item.type === 'group') {
-                return {
-                  ...item,
-                  subMenu: item.subMenu
-                    .filter(item => item.if !== false)
-                    .map(item => ({ ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) })),
-                };
-              }
-              return { ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) };
-            }),
-          tools: (
-            [
-              {
-                type: 'group',
-                label: 'Hosting',
-                Icon: Network,
-                subMenu: [
-                  {
-                    section: ALL_SECTIONS.HOSTED_COLLECTIVES,
-                  },
-                  {
-                    label: intl.formatMessage({ id: 'HostApplications.Applications', defaultMessage: 'Applications' }),
-                    section: ALL_SECTIONS.HOST_APPLICATIONS,
-                  },
-                ],
-              },
-              {
-                type: 'group',
-                label: 'Funds & Grants',
-                Icon: Vault,
-                subMenu: [
-                  {
-                    if: isHost && canHostAccounts,
-                    section: ALL_SECTIONS.HOSTED_FUNDS,
-                  },
-                  {
-                    if: isHost || isSelfHosted,
-                    section: ALL_SECTIONS.HOSTED_GRANTS,
-                    label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
-                  },
-                ],
-              },
-              {
-                type: 'group',
-                label: 'Reporting',
-                Icon: BarChart2,
-                subMenu: [
-                  {
-                    section: ALL_SECTIONS.TRANSACTION_REPORTS,
-                    label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
-                  },
-                  {
-                    section: ALL_SECTIONS.EXPENSE_REPORTS,
-                    label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-                  },
-                ],
-              },
-              {
-                type: 'group',
-                label: 'Organization',
-                Icon: Building2,
-                subMenu: [
-                  {
-                    section: ALL_SECTIONS.ACCOUNTS,
-                    label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
-                  },
-                  {
-                    section: ALL_SECTIONS.EXPENSES,
-                    label: intl.formatMessage(
-                      {
-                        defaultMessage: 'Expenses',
-                        id: 'k2VBcF',
-                      },
-                      { accountName: account.name },
-                    ),
-                  },
-                  {
-                    if: !isIndividual && !isCommunityManagerOnly,
-                    section: ALL_SECTIONS.CONTRIBUTORS,
-                    label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
-                  },
-                ],
-              },
-              {
-                type: 'group',
-                label: 'Ledger',
-                Icon: Rows3,
-                subMenu: [
-                  {
-                    section: ALL_SECTIONS.HOST_TRANSACTIONS,
-                    label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
-                  },
-                  {
-                    section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
-                    label: intl.formatMessage({ defaultMessage: 'Bank Account Sync', id: 'nVcwjv' }),
-                    if: shouldIncludeMenuItemWithLegacyFallback(
-                      account,
-                      FEATURES.OFF_PLATFORM_TRANSACTIONS,
-                      isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
-                    ),
-                  },
-                  {
-                    section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
-                    label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
-                    if: shouldIncludeMenuItemWithLegacyFallback(
-                      account,
-                      FEATURES.OFF_PLATFORM_TRANSACTIONS,
-                      isFeatureEnabled(account, FEATURES.OFF_PLATFORM_TRANSACTIONS),
-                    ),
-                  },
-                ],
-              },
-              {
-                type: 'group',
-                label: 'More',
-                Icon: Ellipsis,
-                subMenu: [
-                  {
-                    section: ALL_SECTIONS.HOST_TAX_FORMS,
-                    label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-                    if: shouldIncludeMenuItemWithLegacyFallback(
-                      account,
-                      FEATURES.TAX_FORMS,
-                      isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
-                    ),
-                  },
-                  {
-                    section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
-                  },
-                  {
-                    if: (isHost || isSelfHosted) && !isAccountantOnly && !isCommunityManagerOnly,
-                    section: ALL_SECTIONS.VENDORS,
-                  },
-                  {
-                    label: 'Virtual Cards',
-                    section: ALL_SECTIONS.HOST_VIRTUAL_CARDS,
-                  },
-                  {
-                    section: ALL_SECTIONS.HOST_AGREEMENTS,
-                    if: shouldIncludeMenuItemWithLegacyFallback(
-                      account,
-                      FEATURES.AGREEMENTS,
-                      isHost && canHostAccounts,
-                    ),
-                    label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
-                  },
-                ],
-              },
-            ] as MenuItem[]
-          )
-            .filter(item => item.if !== false)
-            // filter subMenu items and add labels where missing
-            .map(item => {
-              if (item.type === 'group') {
-                return {
-                  ...item,
-                  subMenu: item.subMenu
-                    .filter(item => item.if !== false)
-                    .map(item => ({ ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) })),
-                };
-              }
-              return { ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) };
-            }),
-        };
-      }
-      return {
-        main: [],
-      };
+  const { main: mainMenuItems, tools: toolMenuItems } = React.useMemo(() => {
+    if (Array.isArray(computedMenuItems)) {
+      return { main: computedMenuItems, tools: undefined };
     }
     return {
-      main: ogMenu,
-      tools: undefined,
+      main: computedMenuItems.main ?? [],
+      tools: computedMenuItems.tools,
     };
-  }, [account, intl, LoggedInUser, ogMenu, prototypeSettings]);
+  }, [computedMenuItems]);
 
-  const isSectionActive = (section: string) => {
-    return router.query.section === section || router.asPath.includes(`section=${section}`);
-  };
+  const isSectionActive = React.useCallback(
+    (section: string) => {
+      const currentSection = router.query.section;
+      const activeSection = Array.isArray(currentSection) ? currentSection[0] : currentSection;
+      return activeSection === section || router.asPath.includes(`section=${section}`);
+    },
+    [router.asPath, router.query.section],
+  );
+
+  const getGroupKey = React.useCallback(
+    (item: MenuItem, index: number) => (item.type === 'group' ? item.label : item.section) ?? `group-${index}`,
+    [],
+  );
+
+  const mainActiveGroupKey = React.useMemo(() => {
+    for (let index = 0; index < mainMenuItems.length; index++) {
+      const item = mainMenuItems[index];
+      if (item.type === 'group' && item.subMenu?.some(subItem => isSectionActive(subItem.section))) {
+        return getGroupKey(item, index);
+      }
+    }
+    return null;
+  }, [getGroupKey, isSectionActive, mainMenuItems]);
+
+  const toolsActiveGroupKey = React.useMemo(() => {
+    if (!toolMenuItems) {
+      return null;
+    }
+
+    for (let index = 0; index < toolMenuItems.length; index++) {
+      const item = toolMenuItems[index];
+      if (item.type === 'group' && item.subMenu?.some(subItem => isSectionActive(subItem.section))) {
+        return getGroupKey(item, index);
+      }
+    }
+
+    return null;
+  }, [getGroupKey, isSectionActive, toolMenuItems]);
+
+  const [openMainSubmenu, setOpenMainSubmenu] = React.useState<string | null>(() => mainActiveGroupKey);
+  const [openToolsSubmenu, setOpenToolsSubmenu] = React.useState<string | null>(() => toolsActiveGroupKey);
+
+  const previousMainActiveKeyRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (mainActiveGroupKey && mainActiveGroupKey !== previousMainActiveKeyRef.current) {
+      setOpenMainSubmenu(mainActiveGroupKey);
+    }
+    previousMainActiveKeyRef.current = mainActiveGroupKey;
+  }, [mainActiveGroupKey]);
+
+  const previousToolsActiveKeyRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (toolsActiveGroupKey && toolsActiveGroupKey !== previousToolsActiveKeyRef.current) {
+      setOpenToolsSubmenu(toolsActiveGroupKey);
+    }
+    previousToolsActiveKeyRef.current = toolsActiveGroupKey;
+  }, [toolsActiveGroupKey]);
 
   if (useLegacy) {
-    return <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />;
+    return <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={computedMenuItems} />;
   }
 
   return (
@@ -910,21 +916,26 @@ export function AppSidebar({
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems?.main.map(item => {
+                {mainMenuItems.map((item, index) => {
                   // Handle group items (with sub-menu)
                   if (item.type === 'group') {
-                    const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
+                    const itemKey = getGroupKey(item, index);
+                    const groupIsActive = item.subMenu?.some(subItem => isSectionActive(subItem.section));
 
                     return (
                       <Collapsible
-                        key={item.label}
+                        key={itemKey}
                         asChild
-                        defaultOpen={hasActiveSubItem}
+                        open={openMainSubmenu === itemKey}
+                        onOpenChange={open => setOpenMainSubmenu(open ? itemKey : null)}
                         className="group/collapsible"
                       >
                         <SidebarMenuItem>
                           <CollapsibleTrigger asChild>
-                            <SidebarMenuButton tooltip={item.label}>
+                            <SidebarMenuButton
+                              tooltip={item.label}
+                              isActive={groupIsActive && openMainSubmenu !== itemKey}
+                            >
                               {item.Icon && <item.Icon />}
                               <span>{item.label}</span>
                               <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
@@ -935,7 +946,7 @@ export function AppSidebar({
                               {item.subMenu?.map(subItem => (
                                 <SidebarMenuSubItem key={subItem.section}>
                                   <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
-                                    <Link href={getDashboardRoute(account, subItem.section)}>
+                                    <Link shallow href={getDashboardRoute(account, subItem.section)}>
                                       <span>{subItem.label}</span>
                                     </Link>
                                   </SidebarMenuSubButton>
@@ -952,7 +963,7 @@ export function AppSidebar({
                   return (
                     <SidebarMenuItem key={item.section}>
                       <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                        <Link href={getDashboardRoute(account, item.section)}>
+                        <Link shallow href={getDashboardRoute(account, item.section)}>
                           {item.Icon && <item.Icon />}
                           <span>{item.label}</span>
                         </Link>
@@ -963,27 +974,32 @@ export function AppSidebar({
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          {menuItems.tools && (
+          {toolMenuItems && (
             <SidebarGroup>
               <SidebarGroupLabel>Tools</SidebarGroupLabel>
 
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {menuItems?.tools?.map(item => {
+                  {toolMenuItems.map((item, index) => {
                     // Handle group items (with sub-menu)
                     if (item.type === 'group') {
-                      const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
+                      const itemKey = getGroupKey(item, index);
+                      const groupIsActive = item.subMenu?.some(subItem => isSectionActive(subItem.section));
 
                       return (
                         <Collapsible
-                          key={item.label}
+                          key={itemKey}
                           asChild
-                          defaultOpen={hasActiveSubItem}
+                          open={openToolsSubmenu === itemKey}
+                          onOpenChange={open => setOpenToolsSubmenu(open ? itemKey : null)}
                           className="group/collapsible"
                         >
                           <SidebarMenuItem>
                             <CollapsibleTrigger asChild>
-                              <SidebarMenuButton tooltip={item.label}>
+                              <SidebarMenuButton
+                                tooltip={item.label}
+                                isActive={groupIsActive && openToolsSubmenu !== itemKey}
+                              >
                                 {item.Icon && <item.Icon />}
                                 <span>{item.label}</span>
                                 <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
@@ -994,7 +1010,7 @@ export function AppSidebar({
                                 {item.subMenu?.map(subItem => (
                                   <SidebarMenuSubItem key={subItem.section}>
                                     <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
-                                      <Link href={getDashboardRoute(account, subItem.section)}>
+                                      <Link shallow href={getDashboardRoute(account, subItem.section)}>
                                         <span>{subItem.label}</span>
                                       </Link>
                                     </SidebarMenuSubButton>
@@ -1011,7 +1027,7 @@ export function AppSidebar({
                     return (
                       <SidebarMenuItem key={item.section}>
                         <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                          <Link href={getDashboardRoute(account, item.section)}>
+                          <Link shallow href={getDashboardRoute(account, item.section)}>
                             {item.Icon && <item.Icon />}
                             <span>{item.label}</span>
                           </Link>
