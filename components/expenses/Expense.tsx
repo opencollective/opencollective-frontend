@@ -848,6 +848,7 @@ function Expense(props: ExpenseProps) {
       )}
 
       {state.showFilesViewerModal &&
+        expense &&
         createPortal(
           <FilesViewerModal
             allowOutsideInteraction={isDrawer}

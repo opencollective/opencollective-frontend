@@ -224,6 +224,7 @@
   "6cdzhs": "Карта приостановлена",
   "6ctWuQ": "Общая сумма, потраченная на этот период",
   "6DCLcI": "Пожалуйста, введите правильную дату",
+  "6dZw2w": "The selected account does not support expense submissions.",
   "6eJG5Y": "Не удалось разобрать файл CSV. Пожалуйста, убедитесь, что он корректного формата.",
   "6EnwoZ": "Расход перемещен из {movedFromCollective}",
   "6ez1/V": "Select an item from the table above to match it against the imported transaction or <Link>add funds</Link>.",
