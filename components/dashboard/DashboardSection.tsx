@@ -80,6 +80,100 @@ import { DashboardContext } from './DashboardContext';
 import DashboardHeader from './DashboardHeader';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import clsx from 'clsx';
+import Tabs from '../Tabs';
+import { Alert } from '../ui/Alert';
+import { TitleHostContext } from './TitleHostContext';
+
+function DashboardPrototypeSection({ title, description, views: rawViews, actions, message }) {
+  const views = rawViews?.map(raw => ({ label: raw, id: raw }));
+  return (
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <DashboardHeader title={title} description={description} actions={actions} />
+      {views && <Tabs tabs={views} selectedId={views[0].id} />}
+      {message && <Alert className="mt-4 text-sm whitespace-pre-line">{message}</Alert>}
+    </div>
+  );
+}
+
+const IncompleteContributions = (props: DashboardSectionProps) => {
+  return (
+    <DashboardPrototypeSection
+      title={<TitleHostContext title="Incomplete Contributions" />}
+      description={'Manual bank transfer contributions that have not been reconciled'}
+      message={`Based on the existing Expected funds tool. create a tool dedicated for pending contributions that were created by contributors who went through the contribution flow and chose to use a  manual bank transfer that has not yet been reconciled.
+
+Include only pending contributions created by contributors that have not been reconciled. This should exclude expected funds created by host admins and potentially, in the near future, collective admins.`}
+    />
+  );
+};
+
+const ReceivedMoney = (props: DashboardSectionProps) => {
+  return (
+    <DashboardPrototypeSection
+      title={<TitleHostContext title="Received Money" />}
+      description="All received incoming funds"
+      views={['All', 'Contributions', 'Added Funds', 'Payment Requests']}
+      message={`“Received Money” tool for reviewing, filtering and searching all money that has been received and documented on the ledger.`}
+    />
+  );
+};
+
+const DisbursedMoney = (props: DashboardSectionProps) => {
+  return (
+    <DashboardPrototypeSection
+      title={<TitleHostContext title="Disbursed Money" />}
+      description="All paid payment & grant requests"
+      views={['All', 'Invoices', 'Reimbursements', 'Grants', 'Outgoing Contributions']}
+      message={`“Disbursed Money” tool for reviewing, filtering and search all money that has been paid out and documented on the ledger. `}
+    />
+  );
+};
+
+const UnpaidPaymentRequests = (props: DashboardSectionProps) => {
+  return (
+    <DashboardPrototypeSection
+      title={<TitleHostContext title="Unpaid Payment Requests" />}
+      description="All submitted and unpaid payment & grant requests"
+      views={['All', 'Pending', 'Approved', 'Rejected']}
+      message={`“Unpaid Payment Requests” tool that gives hosts access to all unpaid payment requests including those that have not yet been approved, approved but not yet paid and rejected.`}
+    />
+  );
+};
+
+const InternalTransfers = (props: DashboardSectionProps) => {
+  return (
+    <DashboardPrototypeSection
+      title={<TitleHostContext title="Internal Transfers" />}
+      views={[
+        'All',
+        'Organization',
+        'Organization to Collectives',
+        'Collectives to Organization',
+        'Within Collectives',
+        'Between Collectives',
+      ]}
+      message={`1. “Internal Transfers” 
+- these are payment intents that are neither incoming nor outgoing and includes transfers between
+- Within organization accounts
+- Organization to collectives accounts
+- Collective to organization accounts
+- Within collective accounts
+- Between collectives`}
+    />
+  );
+};
+
+const IssuedPaymentRequests = (props: DashboardSectionProps) => {
+  return (
+    <DashboardPrototypeSection
+      title={<TitleHostContext title="Issued Payment Requests" />}
+      // description=""
+      views={['All', 'Drafted', 'Issued', 'Expired']}
+      message={`Payment requests submitted by your organization to other platform accounts
+    + Announced funds that have not yet been paid`}
+    />
+  );
+};
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -117,6 +211,12 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.ACCOUNTS]: Accounts,
   [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
   [SECTIONS.SEARCH]: Search,
+  'incomplete-contributions': IncompleteContributions,
+  'received-money': ReceivedMoney,
+  'disbursed-money': DisbursedMoney,
+  'unpaid-payment-requests': UnpaidPaymentRequests,
+  'internal-transfers': InternalTransfers,
+  'issued-payment-requests': IssuedPaymentRequests,
 };
 
 const SETTINGS_COMPONENTS = {

@@ -48,6 +48,8 @@ import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { HostContextFilter } from '../../filters/HostContextFilter';
+import { TitleHostContext } from '../../TitleHostContext';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -503,7 +505,7 @@ const Contributions = ({
     }
   }, [metadata?.account]);
 
-  const { account } = useContext(DashboardContext);
+  const { account, prototype } = useContext(DashboardContext);
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
@@ -638,18 +640,30 @@ const Contributions = ({
           title={
             isIncoming ? (
               onlyExpectedFunds ? (
-                <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
+                prototype.pitchedSolutionsProgress >= 2 ? (
+                  'Issued Payment Requests'
+                ) : (
+                  <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
+                )
+              ) : prototype.pitchedSolutionsProgress >= 1 ? (
+                <TitleHostContext
+                  title={<FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />}
+                />
               ) : includeHostedAccounts ? (
                 <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
               ) : (
                 <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
               )
+            ) : prototype.pitchedSolutionsProgress >= 2 ? (
+              <TitleHostContext
+                title={<FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />}
+              />
             ) : (
               <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
             )
           }
           description={
-            isIncoming ? (
+            prototype.pitchedSolutionsProgress >= 1 ? null : isIncoming ? (
               onlyExpectedFunds ? (
                 includeHostedAccounts ? (
                   <FormattedMessage defaultMessage="Expected funds for Collectives you host." id="tNEw2N" />

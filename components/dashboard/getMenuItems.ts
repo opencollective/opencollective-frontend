@@ -54,7 +54,7 @@ type GroupMenuItem = {
   if?: boolean;
 };
 
-const ROOT_MENU = [
+export const ROOT_MENU = [
   {
     type: 'group',
     label: 'Accounts',

@@ -28,6 +28,7 @@ import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta, FilterValues } from './filters';
 import { filters as commonFilters, schema, toVariables } from './filters';
 import { accountExpensesQuery } from './queries';
+import { DashboardContext } from '../../DashboardContext';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
@@ -54,6 +55,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const { LoggedInUser } = useLoggedInUser();
+  const { prototype } = React.useContext(DashboardContext);
 
   const omitExpenseTypesInFilter = [ExpenseType.GRANT];
 
@@ -106,7 +108,13 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     <React.Fragment>
       <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
+          title={
+            prototype.pitchedSolutionsProgress >= 6 ? (
+              'Expected Payments'
+            ) : (
+              <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
+            )
+          }
           description={
             <FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." id="aKfm6V" />
           }

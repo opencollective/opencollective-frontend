@@ -49,7 +49,7 @@ const pitchedSolutions = [
   '1. Integrated "Contributions" tool',
   '2. Establish "Money In"',
   '3. Integrated "Received Money" tool',
-  '4. Sowing the seeds for "Money Out" by creating a "Paid Disbursements" tool.',
+  '4. "Disbursed Money" tool, renaming Host Expenses to "Pay Disbursements".',
   '5. Introduction of "Payment Requests" terminology',
   '6. Establish "Money Out"',
   '7. Introduce "Internal Transfers"',

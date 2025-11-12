@@ -37,6 +37,7 @@ import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
+import { DashboardContext } from '../../DashboardContext';
 
 const schema = commonSchema.extend({
   account: z.string().nullable().default(null),
@@ -107,6 +108,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
+  const { prototype } = React.useContext(DashboardContext);
 
   const {
     data: metadata,
@@ -164,7 +166,13 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     <React.Fragment>
       <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
+          title={
+            prototype.pitchedSolutionsProgress >= 5 ? (
+              'Approve Payment Requests'
+            ) : (
+              <FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />
+            )
+          }
           description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
           actions={
             hasNewSubmitExpenseFlow ? (

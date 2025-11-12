@@ -276,6 +276,7 @@ const DashboardPage = () => {
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
+        prototype: resolvedDashboardSettings,
       }}
     >
       {useSidebarReorgPreviewFeature ? (
@@ -286,7 +287,7 @@ const DashboardPage = () => {
                 variant="inset"
                 menuItems={menuItems}
                 isLoading={isLoading}
-                sidebarOption={resolvedDashboardSettings.sidebarOption ?? SidebarOption.GROUPING}
+                prototypeSettings={resolvedDashboardSettings}
               />
               <SidebarInset className="px-6">
                 <DashboardTopbar />
@@ -318,7 +319,7 @@ const DashboardPage = () => {
                       useLegacy
                       isLoading={isLoading}
                       menuItems={menuItems}
-                      sidebarOption={resolvedDashboardSettings.sidebarOption ?? SidebarOption.GROUPING}
+                      prototypeSettings={resolvedDashboardSettings}
                     />
                     <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
                       <DashboardSection

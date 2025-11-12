@@ -42,6 +42,8 @@ import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
+import { DashboardContext } from '../../DashboardContext';
+import { TitleHostContext } from '../../TitleHostContext';
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
@@ -124,6 +126,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     context: API_V2_CONTEXT,
   });
 
+  const { prototype } = React.useContext(DashboardContext);
   const views: Views<FilterValues> = [
     {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
@@ -177,11 +180,16 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       id: 'error',
       count: metaData?.error?.totalCount,
     },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-      filter: { status: [ExpenseStatusFilter.PAID] },
-      id: 'paid',
-    },
+
+    ...(prototype.pitchedSolutionsProgress < 4
+      ? [
+          {
+            label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+            filter: { status: [ExpenseStatusFilter.PAID] },
+            id: 'paid',
+          },
+        ]
+      : []),
   ];
 
   const meta: FilterMeta = {
@@ -228,7 +236,15 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
+      <DashboardHeader
+        title={
+          prototype.pitchedSolutionsProgress >= 4 ? (
+            <TitleHostContext title={'Pay Disbursements'} />
+          ) : (
+            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          )
+        }
+      />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>
           {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
