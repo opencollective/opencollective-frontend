@@ -68,7 +68,7 @@ export default function SignupPage() {
       />
       <Body className="flex h-screen flex-col bg-white/50 bg-[url(/static/images/signup/background.png)] bg-size-[auto,100%] bg-top bg-no-repeat bg-blend-lighten 2xl:bg-size-[110%,auto]">
         <div
-          className="h-[5px] max-w-full rounded-r-sm bg-primary transition-all"
+          className="h-[5px] max-w-full rounded-r-sm bg-primary transition-all duration-700"
           style={{ width: `${progress * 95}%` }}
         ></div>
         <Link href="/" className="mx-auto flex w-full max-w-7xl items-center gap-2 px-4 py-4">
