@@ -15,7 +15,7 @@ import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
-import { getMenuItems } from '../dashboard/Menu';
+import { getMenuItems } from '../dashboard/getMenuItems';
 import Spinner from '../Spinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { DialogTitle } from '../ui/Dialog';

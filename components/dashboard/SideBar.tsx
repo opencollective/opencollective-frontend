@@ -1,7 +1,6 @@
 import React from 'react';
 import { MenuIcon } from 'lucide-react';
 
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
@@ -10,14 +9,13 @@ import { DrawerMenu } from '../navigation/DrawerMenu';
 import StyledRoundButton from '../StyledRoundButton';
 
 import AccountSwitcher from './AccountSwitcher';
-import type { MenuItem } from './Menu';
-import Menu from './Menu';
+import Menu, { type MenuSections } from './Menu';
 
 interface AdminPanelSideBarProps {
   isLoading?: boolean;
-  onRoute?: (...args: any[]) => void;
+  onRoute?: (...args: unknown[]) => void;
   activeSlug?: string;
-  menuItems: MenuItem[];
+  menuItems: MenuSections;
 }
 
 const AdminPanelSideBar = ({
@@ -27,17 +25,19 @@ const AdminPanelSideBar = ({
   onRoute: _onRoute,
   ...props
 }: AdminPanelSideBarProps) => {
-  const { LoggedInUser } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
 
-  const onRoute = isMobile
-    ? (...args) => {
+  const onRoute = React.useCallback(
+    (...args: unknown[]) => {
+      if (isMobile) {
         setMenuOpen(false);
-        _onRoute?.(...args);
       }
-    : _onRoute;
+      _onRoute?.(...args);
+    },
+    [_onRoute, isMobile],
+  );
 
   const content = React.useMemo(
     () => (
@@ -54,7 +54,7 @@ const AdminPanelSideBar = ({
         )}
       </div>
     ),
-    [isLoading, activeSlug, viewport, LoggedInUser, menuItems],
+    [isLoading, menuItems, onRoute],
   );
 
   return (

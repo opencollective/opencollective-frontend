@@ -12,7 +12,7 @@ import Link from '../Link';
 
 import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
-import { type PageMenuItem } from './Menu';
+import { type PageMenuItem } from './getMenuItems';
 
 type MenuLinkProps = {
   isBeta?: boolean;

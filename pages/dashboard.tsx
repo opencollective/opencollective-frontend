@@ -12,8 +12,8 @@ import { isHostAccount } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
+import useLocalStorage from '@/lib/hooks/useLocalStorage';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
@@ -27,7 +27,7 @@ import {
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
-import { getMenuItems } from '../components/dashboard/Menu';
+import { getMenuItems } from '../components/dashboard/getMenuItems';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
@@ -38,8 +38,17 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
-import DashboardLayout from '@/components/dashboard/Layout';
-
+import { AppSidebar } from '@/components/dashboard/AppSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import {
+  DASHBOARD_SETTINGS_STORAGE_KEY,
+  type DashboardSettingKey,
+  type DashboardSettings,
+  DEFAULT_DASHBOARD_SETTINGS,
+  SidebarOption,
+  SidebarSettingsPanel,
+} from '@/components/dashboard/SidebarSettingsPanel';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 const messages = defineMessages({
   collectiveIsArchived: {
     id: 'collective.isArchived',
@@ -239,6 +248,22 @@ const DashboardPage = () => {
   const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
+  const useSidebarReorgPreviewFeature = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG);
+  const [dashboardSettings, setDashboardSettings] = useLocalStorage<DashboardSettings>(
+    DASHBOARD_SETTINGS_STORAGE_KEY,
+    DEFAULT_DASHBOARD_SETTINGS,
+  );
+  const resolvedDashboardSettings = React.useMemo(
+    () => ({ ...DEFAULT_DASHBOARD_SETTINGS, ...dashboardSettings }),
+    [dashboardSettings],
+  );
+  const handleDashboardSettingChange = React.useCallback(
+    <K extends DashboardSettingKey>(key: K, value: DashboardSettings[K]) => {
+      setDashboardSettings(previous => ({ ...DEFAULT_DASHBOARD_SETTINGS, ...previous, [key]: value }));
+    },
+    [setDashboardSettings],
+  );
+
   return (
     <DashboardContext.Provider
       value={{
@@ -253,71 +278,117 @@ const DashboardPage = () => {
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
-      {LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG) ? (
-        LoggedInUser && //         <DashboardLayout isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems}>
-        require2FAForAdmins(account) &&
-        !LoggedInUser.hasTwoFactorAuth &&
-        selectedSection !== 'user-security' ? (
-          <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-        ) : (
-          <DashboardSection section={selectedSection} isLoading={isLoading} account={account} subpath={subpath} />
-        )
-      ) : (
-        <div className="flex min-h-screen flex-col justify-between">
-          <Page
-            noRobots
-            collective={account}
-            title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
-            pageTitle={titleBase}
-            showFooter={false}
-          >
-            {Boolean(notification) && <NotificationBar {...notification} />}
-            {blocker ? (
-              <div className="my-32 flex flex-col items-center">
-                <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-                  <p>{blocker}</p>
-                  {LoggedInUser && (
-                    <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                      <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
-                    </Link>
-                  )}
-                </MessageBox>
-                {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
-              </div>
-            ) : (
-              <div
-                className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
-                data-cy="admin-panel-container"
-              >
-                <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-                {LoggedInUser &&
-                require2FAForAdmins(account) &&
-                !LoggedInUser.hasTwoFactorAuth &&
-                selectedSection !== 'user-security' ? (
-                  <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-                ) : (
-                  <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
-                    <DashboardSection
-                      section={selectedSection}
+      {useSidebarReorgPreviewFeature ? (
+        <SidebarProvider>
+          {resolvedDashboardSettings.useLayoutReorg ? (
+            <React.Fragment>
+              <AppSidebar
+                variant="inset"
+                menuItems={menuItems}
+                isLoading={isLoading}
+                sidebarOption={resolvedDashboardSettings.sidebarOption ?? SidebarOption.GROUPING}
+              />
+              <SidebarInset className="px-6">
+                <DashboardTopbar />
+                <div className="flex flex-1 flex-col gap-4 py-4">
+                  <DashboardSection
+                    section={selectedSection}
+                    isLoading={isLoading}
+                    account={account}
+                    subpath={subpath}
+                  />
+                </div>
+              </SidebarInset>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <div className="flex min-h-screen flex-col justify-between">
+                <Page
+                  noRobots
+                  collective={account}
+                  title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
+                  pageTitle={titleBase}
+                  showFooter={false}
+                >
+                  <div
+                    className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
+                    data-cy="admin-panel-container"
+                  >
+                    <AppSidebar
+                      useLegacy
                       isLoading={isLoading}
-                      account={account}
-                      subpath={subpath}
+                      menuItems={menuItems}
+                      sidebarOption={resolvedDashboardSettings.sidebarOption ?? SidebarOption.GROUPING}
                     />
+                    <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
+                      <DashboardSection
+                        section={selectedSection}
+                        isLoading={isLoading}
+                        account={account}
+                        subpath={subpath}
+                      />
+                    </div>
                   </div>
-                )}
+                </Page>
+                <Footer />
               </div>
-            )}
-          </Page>
-          <Footer />
-        </div>
+            </React.Fragment>
+          )}
+          <SidebarSettingsPanel settings={resolvedDashboardSettings} onSettingChange={handleDashboardSettingChange} />
+        </SidebarProvider>
+      ) : (
+        <React.Fragment>
+          <div className="flex min-h-screen flex-col justify-between">
+            <Page
+              noRobots
+              collective={account}
+              title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
+              pageTitle={titleBase}
+              showFooter={false}
+            >
+              {Boolean(notification) && <NotificationBar {...notification} />}
+              {blocker ? (
+                <div className="my-32 flex flex-col items-center">
+                  <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+                    <p>{blocker}</p>
+                    {LoggedInUser && (
+                      <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                        <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+                      </Link>
+                    )}
+                  </MessageBox>
+                  {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+                </div>
+              ) : (
+                <div
+                  className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
+                  data-cy="admin-panel-container"
+                >
+                  <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
+                  {LoggedInUser &&
+                  require2FAForAdmins(account) &&
+                  !LoggedInUser.hasTwoFactorAuth &&
+                  selectedSection !== 'user-security' ? (
+                    <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+                  ) : (
+                    <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
+                      <DashboardSection
+                        section={selectedSection}
+                        isLoading={isLoading}
+                        account={account}
+                        subpath={subpath}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </Page>
+            <Footer />
+          </div>
+        </React.Fragment>
       )}
     </DashboardContext.Provider>
   );
-};
-
-// Apply DashboardLayout to this page
-DashboardPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <DashboardLayout>{page}</DashboardLayout>;
 };
 
 // next.js export
