@@ -74,6 +74,7 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
 };
 
 export function EmailVerificationSteps() {
+  const router = useRouter();
   const { login } = useLoggedInUser();
   const intl = useIntl();
   const signupContext = React.useContext(SignupFormContext);
@@ -100,7 +101,7 @@ export function EmailVerificationSteps() {
         handleContinue(SignupSteps.SET_PASSWORD);
       } else if (signupContext.step === SignupSteps.SET_PASSWORD) {
         const response = await signup(values);
-        if (response.success) {
+        if (response.success || response.error.type === 'OTP_REQUEST_EXISTS') {
           handleContinue(SignupSteps.VERIFY_OTP);
         } else {
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
@@ -156,7 +157,7 @@ export function EmailVerificationSteps() {
       schema={emailVerificationFormSchema}
       onSubmit={onSubmit}
       validate={validate}
-      initialValues={{}}
+      initialValues={{ email: router.query?.email as string }}
       innerRef={formikRef}
     >
       {({ values, setFieldValue }) => (

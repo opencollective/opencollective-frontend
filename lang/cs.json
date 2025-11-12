@@ -3709,6 +3709,7 @@
   "signup.orgCreated.redirecting": "We're redirecting you to your <link>organization's dashboard</link>...",
   "signup.otp.description": "We need to verify your email address to secure your account and ensure you receive important updates.",
   "signup.otp.resendSuccess": "A new OTP code has been sent to your email.",
+  "signup.requiresVerificationError": "Email not verified, please finish signing up.",
   "singup.completeProfile.title": "Let's complete your profile",
   "singup.individual.title": "Register your personal account",
   "singup.otp.title": "Let's verify your email",
