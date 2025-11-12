@@ -83,6 +83,7 @@ export function AppSidebar({
     const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
     const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
     const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
+
     if (!isHost) {
       return {
         main: ogMenu,
