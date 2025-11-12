@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   Megaphone,
   Receipt,
+  Search,
   Settings,
   Signature,
   Store,
@@ -147,6 +148,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: !isAccountantOnly,
     },
     {
+      section: ALL_SECTIONS.SEARCH,
+      Icon: Search,
+      label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search' }),
+      if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE),
+    },
+    {
       if: isIndividual,
       section: ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
@@ -211,9 +218,9 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOSTED_FUNDS,
         },
         {
-          if: isHost || isSelfHosted,
+          if: (isHost && canHostAccounts) || isSelfHosted,
           section: ALL_SECTIONS.HOSTED_GRANTS,
-          label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
+          label: intl.formatMessage({ defaultMessage: 'Hosted Grant Requests', id: 'Bt/+M7' }),
         },
         {
           if: showReceivedGrantRequests,
@@ -301,6 +308,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, isHost && canHostAccounts),
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+    },
+    {
+      if: (isHost || isSelfHosted) && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
+      label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
+      section: ALL_SECTIONS.PEOPLE,
+      Icon: Users2,
     },
     {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
@@ -454,7 +467,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           ? [
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
-                label: intl.formatMessage({ defaultMessage: 'Platform Subscription', id: '28toyD' }),
+                label: intl.formatMessage({ defaultMessage: 'Platform Billing', id: 'beRXFK' }),
                 if: hasPlatformBillingEnabled,
               },
               {
