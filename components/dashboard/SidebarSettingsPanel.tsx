@@ -61,6 +61,7 @@ export type DashboardSettings = {
   useLayoutReorg: boolean;
   sidebarOrganization: SidebarOrganization;
   pitchedSolutionsProgress: number;
+  useShortcuts: boolean;
 };
 
 export const DASHBOARD_SETTINGS_STORAGE_KEY = 'oc-dashboard-settings';
@@ -69,6 +70,7 @@ export const DEFAULT_DASHBOARD_SETTINGS: DashboardSettings = {
   useLayoutReorg: false,
   sidebarOrganization: SidebarOrganization.DEFAULT,
   pitchedSolutionsProgress: 0,
+  useShortcuts: false,
 };
 
 type SidebarSettingsPanelProps = {
@@ -84,32 +86,18 @@ export function SidebarSettingsPanel({ settings, onSettingChange }: SidebarSetti
     ? (settings ?? DEFAULT_DASHBOARD_SETTINGS)
     : DEFAULT_DASHBOARD_SETTINGS;
   return (
-    <div className="fixed right-4 bottom-4 z-50 w-80 max-w-full">
-      <Card className="gap-0 border-border bg-card shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between gap-3 px-5 py-4">
+    <div className="fixed right-4 bottom-4 z-50 w-96 max-w-full">
+      <Card className="border-border bg-card shadow-lg">
+        <CardHeader className="flex flex-row items-center justify-between gap-3 px-5">
           <div className="flex items-center gap-2">
             <CardTitle className="text-base">Prototype Settings</CardTitle>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4 pt-0 pb-5">
-          <div className="flex items-center justify-between gap-4">
-            <div className="space-y-1">
-              <Label htmlFor="use-layout-reorg-toggle">Reorganized layout</Label>
-              {/* <p className="text-xs text-muted-foreground">
-                    Toggle this to remember your sidebar reorganization preference.
-                  </p> */}
-            </div>
-            <Switch
-              id="use-layout-reorg-toggle"
-              checked={resolvedSettings.useLayoutReorg}
-              onCheckedChange={checked => onSettingChange({ useLayoutReorg: checked })}
-              aria-label="Use reorganized layout"
-            />
-          </div>
+        <CardContent className="space-y-4 pb-5">
           <div className="space-y-2">
             <div className="space-y-1">
-              <Label htmlFor="sidebar-option-select">Sidebar content organization</Label>
+              <Label htmlFor="sidebar-option-select">Tools organization</Label>
               {/* <p className="text-xs text-muted-foreground">
                     Pick the layout that helps you navigate host tools fastest.
                   </p> */}
@@ -146,8 +134,44 @@ export function SidebarSettingsPanel({ settings, onSettingChange }: SidebarSetti
               >
                 Sidebar re-organization campaign
               </RadioGroupCard>
-              <RadioGroupCard value={SidebarOrganization.GROUPING}>Grouping</RadioGroupCard>
+              <RadioGroupCard
+                value={SidebarOrganization.GROUPING}
+                showSubcontent={resolvedSettings.sidebarOrganization === SidebarOrganization.GROUPING}
+                subContent={
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <Label htmlFor="use-layout-reorg-toggle">Use shortcuts</Label>
+                      {/* <p className="text-xs text-muted-foreground">
+                        Toggle this to remember your sidebar reorganization preference.
+                      </p> */}
+                    </div>
+                    <Switch
+                      id="use-layout-reorg-toggle"
+                      checked={resolvedSettings.useShortcuts}
+                      onCheckedChange={checked => onSettingChange({ useShortcuts: checked })}
+                      aria-label="Use reorganized layout"
+                    />
+                  </div>
+                }
+              >
+                Lighter reshuffling
+              </RadioGroupCard>
             </RadioGroup>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <Label htmlFor="use-layout-reorg-toggle">Reorganized layout</Label>
+              {/* <p className="text-xs text-muted-foreground">
+                    Toggle this to remember your sidebar reorganization preference.
+                  </p> */}
+            </div>
+            <Switch
+              id="use-layout-reorg-toggle"
+              checked={resolvedSettings.useLayoutReorg}
+              onCheckedChange={checked => onSettingChange({ useLayoutReorg: checked })}
+              aria-label="Use reorganized layout"
+            />
           </div>
         </CardContent>
       </Card>

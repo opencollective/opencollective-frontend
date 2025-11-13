@@ -11,7 +11,7 @@ export function TitleHostContext({ title }) {
     return title;
   }
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center justify-between gap-4">
       {title}
       <HostContextFilter value={hostContext} onChange={val => setHostContext(val as HostContext)} />
     </div>

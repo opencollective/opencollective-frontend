@@ -3,16 +3,10 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { AppSidebar } from '@/components/dashboard/AppSidebar';
-import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
-import {
-  DASHBOARD_SETTINGS_STORAGE_KEY,
-  DEFAULT_DASHBOARD_SETTINGS,
-  SidebarOrganization,
-  SidebarSettingsPanel,
-  type DashboardSettings,
-} from '@/components/dashboard/SidebarSettingsPanel';
-import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
+import roles from '../lib/constants/roles';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
 import { isHostAccount } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
@@ -22,6 +16,7 @@ import type LoggedInUser from '@/lib/LoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
+
 import {
   ALL_SECTIONS,
   ROOT_PROFILE_ACCOUNT,
@@ -35,6 +30,7 @@ import DashboardSection from '../components/dashboard/DashboardSection';
 import { getMenuItems } from '../components/dashboard/getMenuItems';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
+import { useRecentDashboardSections } from '../components/dashboard/useRecentDashboardSections';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
@@ -43,10 +39,16 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
-import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { require2FAForAdmins } from '../lib/policies';
+import { AppSidebar } from '@/components/dashboard/AppSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import {
+  DASHBOARD_SETTINGS_STORAGE_KEY,
+  type DashboardSettings,
+  DEFAULT_DASHBOARD_SETTINGS,
+  SidebarOrganization,
+  SidebarSettingsPanel,
+} from '@/components/dashboard/SidebarSettingsPanel';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 const messages = defineMessages({
   collectiveIsArchived: {
     id: 'collective.isArchived',
@@ -229,14 +231,14 @@ const DashboardPage = () => {
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
-  }, [activeSlug, LoggedInUser]);
+  }, [activeSlug, LoggedInUser, router, setWorkspace, slug]);
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
     if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
       setWorkspace({ slug: undefined });
     }
-  }, [account]);
+  }, [LoggedInUser, account, isRootProfile, isRootUser, setWorkspace]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
@@ -247,6 +249,19 @@ const DashboardPage = () => {
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
   const useSidebarReorgPreviewFeature = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG);
+  const {
+    recentSections,
+    pinnedSections,
+    addRecentSection,
+    pinSection,
+    unpinSection,
+    togglePinnedSection,
+    isSectionPinned,
+  } = useRecentDashboardSections(activeSlug);
+  const [activeSectionHighlight, setActiveSectionHighlight] = React.useState<{
+    section: string;
+    source: 'menu' | 'shortcut' | 'tools';
+  } | null>(null);
   const [dashboardSettings, setDashboardSettings] = useLocalStorage<DashboardSettings>(
     DASHBOARD_SETTINGS_STORAGE_KEY,
     DEFAULT_DASHBOARD_SETTINGS,
@@ -286,6 +301,15 @@ const DashboardPage = () => {
         setDefaultSlug: slug => setWorkspace({ slug }),
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
         prototype: resolvedDashboardSettings,
+        recentSections,
+        addRecentSection,
+        pinnedSections,
+        pinSection,
+        unpinSection,
+        togglePinnedSection,
+        isSectionPinned,
+        activeSectionHighlight,
+        setActiveSectionHighlight,
       }}
     >
       {useSidebarReorgPreviewFeature ? (

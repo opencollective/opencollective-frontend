@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
+import cx from 'clsx';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -22,6 +24,8 @@ import MoveReceivedContributions from '../root-actions/MoveReceivedContributions
 import RecurringContributions from '../root-actions/RecurringContributions';
 import RootActivityLog from '../root-actions/RootActivityLog';
 import UnhostAccountForm from '../root-actions/UnhostAccountForm';
+import Tabs from '../Tabs';
+import { Alert } from '../ui/Alert';
 
 import { HostAdminAccountingSection } from './sections/accounting';
 import Accounts from './sections/accounts';
@@ -78,13 +82,23 @@ import {
 } from './constants';
 import { DashboardContext } from './DashboardContext';
 import DashboardHeader from './DashboardHeader';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import clsx from 'clsx';
-import Tabs from '../Tabs';
-import { Alert } from '../ui/Alert';
 import { TitleHostContext } from './TitleHostContext';
 
-function DashboardPrototypeSection({ title, description, views: rawViews, actions, message }) {
+type DashboardPrototypeSectionProps = {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  views?: string[];
+  actions?: React.ReactNode;
+  message?: string;
+};
+
+function DashboardPrototypeSection({
+  title,
+  description,
+  views: rawViews,
+  actions,
+  message,
+}: DashboardPrototypeSectionProps) {
   const views = rawViews?.map(raw => ({ label: raw, id: raw }));
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
@@ -95,7 +109,7 @@ function DashboardPrototypeSection({ title, description, views: rawViews, action
   );
 }
 
-const IncompleteContributions = (props: DashboardSectionProps) => {
+const IncompleteContributions = () => {
   return (
     <DashboardPrototypeSection
       title={<TitleHostContext title="Incomplete Contributions" />}
@@ -107,7 +121,7 @@ Include only pending contributions created by contributors that have not been re
   );
 };
 
-const ReceivedMoney = (props: DashboardSectionProps) => {
+const ReceivedMoney = () => {
   return (
     <DashboardPrototypeSection
       title={<TitleHostContext title="Received Money" />}
@@ -118,7 +132,7 @@ const ReceivedMoney = (props: DashboardSectionProps) => {
   );
 };
 
-const DisbursedMoney = (props: DashboardSectionProps) => {
+const DisbursedMoney = () => {
   return (
     <DashboardPrototypeSection
       title={<TitleHostContext title="Disbursed Money" />}
@@ -129,7 +143,7 @@ const DisbursedMoney = (props: DashboardSectionProps) => {
   );
 };
 
-const UnpaidPaymentRequests = (props: DashboardSectionProps) => {
+const UnpaidPaymentRequests = () => {
   return (
     <DashboardPrototypeSection
       title={<TitleHostContext title="Unpaid Payment Requests" />}
@@ -140,7 +154,7 @@ const UnpaidPaymentRequests = (props: DashboardSectionProps) => {
   );
 };
 
-const InternalTransfers = (props: DashboardSectionProps) => {
+const InternalTransfers = () => {
   return (
     <DashboardPrototypeSection
       title={<TitleHostContext title="Internal Transfers" />}
@@ -163,7 +177,7 @@ const InternalTransfers = (props: DashboardSectionProps) => {
   );
 };
 
-const IssuedPaymentRequests = (props: DashboardSectionProps) => {
+const IssuedPaymentRequests = () => {
   return (
     <DashboardPrototypeSection
       title={<TitleHostContext title="Issued Payment Requests" />}
@@ -256,9 +270,29 @@ interface DashboardSectionProps {
 
 const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSectionProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const { activeSlug } = useContext(DashboardContext);
+  const { activeSlug, addRecentSection } = useContext(DashboardContext);
 
   const { formatMessage } = useIntl();
+
+  const lastRecordedSectionRef = useRef<string | null>(null);
+  const addRecentSectionRef = useRef(addRecentSection);
+
+  useEffect(() => {
+    addRecentSectionRef.current = addRecentSection;
+  }, [addRecentSection]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (!section || lastRecordedSectionRef.current === section) {
+      return;
+    }
+
+    addRecentSectionRef.current(section);
+    lastRecordedSectionRef.current = section;
+  }, [isLoading, section]);
 
   if (isLoading) {
     return (
@@ -273,7 +307,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
       <div
-        className={clsx(
+        className={cx(
           'w-full',
           LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
             ? 'mx-auto max-w-(--breakpoint-xl)'
@@ -289,7 +323,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (DashboardComponent) {
     return (
       <div
-        className={clsx(
+        className={cx(
           'w-full',
           LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
             ? 'mx-auto max-w-(--breakpoint-xl)'
@@ -304,7 +338,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div
-        className={clsx(
+        className={cx(
           'w-full',
           LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
             ? 'mx-auto max-w-(--breakpoint-xl)'
@@ -326,7 +360,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     return (
       // <div className="flex max-w-(--breakpoint-lg) justify-center">
       <div
-        className={clsx(
+        className={cx(
           LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
             ? 'mx-auto w-full max-w-(--breakpoint-xl)'
             : 'max-w-(--breakpoint-md) flex-1 pb-6',
@@ -341,7 +375,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
     return (
       // <div className="flex max-w-(--breakpoint-lg) justify-center">
       <div
-        className={clsx(
+        className={cx(
           LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG)
             ? 'mx-auto w-full max-w-(--breakpoint-xl)'
             : 'max-w-(--breakpoint-md) flex-1 pb-6',

@@ -14,6 +14,15 @@ type DashboardContextType = {
   setDefaultSlug: (slug: string | null) => void;
   getProfileUrl: (account: { id: string; slug: string; type: string }) => string | null;
   prototype?: DashboardSettings;
+  recentSections: string[];
+  addRecentSection: (section: string) => void;
+  pinnedSections: string[];
+  pinSection: (section: string) => void;
+  unpinSection: (section: string) => void;
+  togglePinnedSection: (section: string) => void;
+  isSectionPinned: (section: string) => boolean;
+  activeSectionHighlight: { section: string; source: 'menu' | 'shortcut' | 'tools' } | null;
+  setActiveSectionHighlight: (highlight: { section: string; source: 'menu' | 'shortcut' | 'tools' } | null) => void;
 };
 
 export const DashboardContext = React.createContext<DashboardContextType>({
@@ -27,4 +36,13 @@ export const DashboardContext = React.createContext<DashboardContextType>({
   setDefaultSlug: () => {},
   getProfileUrl: () => null,
   prototype: undefined,
+  recentSections: [],
+  addRecentSection: () => {},
+  pinnedSections: [],
+  pinSection: () => {},
+  unpinSection: () => {},
+  togglePinnedSection: () => {},
+  isSectionPinned: () => false,
+  activeSectionHighlight: null,
+  setActiveSectionHighlight: () => {},
 });

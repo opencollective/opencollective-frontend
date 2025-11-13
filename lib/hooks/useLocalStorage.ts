@@ -17,12 +17,13 @@ export default function useLocalStorage<T>(key: string, defaultValue?: T) {
 
   const set = useCallback(
     (update: T | ((prevValue: T) => T)) => {
-      // Function to determine the next value based on the updater type
-      const nextValue = update instanceof Function ? update(value) : update;
-      setLocalStorage(key, JSON.stringify(nextValue));
-      setValue(nextValue);
+      setValue(prevValue => {
+        const nextValue = update instanceof Function ? update(prevValue) : update;
+        setLocalStorage(key, JSON.stringify(nextValue));
+        return nextValue;
+      });
     },
-    [key, value], // Including value as a dependency to ensure correct updater function behavior
+    [key],
   );
 
   return [value, set] as const;

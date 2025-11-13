@@ -6,6 +6,7 @@ import {
   Building,
   Building2,
   ChevronDown,
+  Clock,
   Coins,
   CreditCard,
   Ellipsis,
@@ -17,6 +18,8 @@ import {
   LifeBuoy,
   Megaphone,
   Network,
+  Pin,
+  PinOff,
   Receipt,
   Rows3,
   Search,
@@ -28,9 +31,10 @@ import {
   Users2,
   Vault,
   Wallet,
+  X,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { type IntlShape, useIntl } from 'react-intl';
+import { defineMessages, useIntl, type IntlShape } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '@/lib/collective';
@@ -53,6 +57,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
+  SidebarMenuAction,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
@@ -67,7 +72,13 @@ import type { MenuSections } from './Menu';
 import AccountSwitcher from './NewAccountSwitcher';
 import AdminPanelSideBar from './SideBar';
 import { type DashboardSettings, SidebarOrganization } from './SidebarSettingsPanel';
+import { DashboardContext } from './DashboardContext';
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
+
+const messages = defineMessages({
+  pinToShortcuts: { id: 'dashboard.shortcuts.pin', defaultMessage: 'Pin to Shortcuts' },
+  unpinFromShortcuts: { id: 'dashboard.shortcuts.unpin', defaultMessage: 'Unpin from Shortcuts' },
+});
 
 type AppSidebarProps = {
   menuItems: MenuItem[];
@@ -297,8 +308,8 @@ export const getMenuItems = ({
             section: ALL_SECTIONS.INFO,
             Icon: Settings,
             label: 'Settings',
-            type: 'group',
-            subMenu: settingsMenu,
+            // type: 'group',
+            // subMenu: settingsMenu,
           },
         ] as MenuItem[],
         intl,
@@ -819,6 +830,15 @@ export const getMenuItems = ({
 
 export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, variant = 'inset' }: AppSidebarProps) {
   const { workspace, account } = useWorkspace();
+  const {
+    recentSections,
+    pinnedSections,
+    togglePinnedSection,
+    isSectionPinned,
+    activeSectionHighlight,
+    setActiveSectionHighlight,
+  } = React.useContext(DashboardContext);
+  console.log({ activeSectionHighlight });
   const activeSlug = workspace?.slug;
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
@@ -837,8 +857,68 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
     };
   }, [computedMenuItems]);
 
+  const getGroupKey = React.useCallback(
+    (item: MenuItem, index: number) => (item.type === 'group' ? item.label : item.section) ?? `group-${index}`,
+    [],
+  );
+
+  const sectionSourceMap = React.useMemo(() => {
+    const map = new Map<string, 'menu' | 'tools'>();
+
+    const registerItems = (items: MenuItem[], source: 'menu' | 'tools') => {
+      for (const item of items) {
+        if (item.type === 'group' && item.subMenu) {
+          for (const subItem of item.subMenu) {
+            if ('section' in subItem && subItem.section && !map.has(subItem.section)) {
+              map.set(subItem.section, source);
+            }
+          }
+        } else if ('section' in item && item.section && !map.has(item.section)) {
+          map.set(item.section, source);
+        }
+      }
+    };
+
+    registerItems(mainMenuItems, 'menu');
+    if (toolMenuItems) {
+      registerItems(toolMenuItems, 'tools');
+    }
+
+    return map;
+  }, [mainMenuItems, toolMenuItems]);
+
+  const findMenuItemBySection = React.useCallback(
+    (section: string): { item: PageMenuItem; source: 'menu' | 'tools' } | null => {
+      const searchItems = (items: MenuItem[] | undefined, source: 'menu' | 'tools') => {
+        if (!items) {
+          return null;
+        }
+
+        for (const item of items) {
+          if (item.type === 'group' && item.subMenu) {
+            const subItem = item.subMenu.find(subItem => 'section' in subItem && subItem.section === section);
+            if (subItem && 'section' in subItem) {
+              return { item: subItem, source };
+            }
+          } else if ('section' in item && item.section === section) {
+            return { item: item as PageMenuItem, source };
+          }
+        }
+
+        return null;
+      };
+
+      return searchItems(mainMenuItems, 'menu') ?? searchItems(toolMenuItems, 'tools');
+    },
+    [mainMenuItems, toolMenuItems],
+  );
+
   const isSectionActive = React.useCallback(
     (section: string) => {
+      if (!section) {
+        return false;
+      }
+
       const currentSection = router.query.section;
       const activeSection = Array.isArray(currentSection) ? currentSection[0] : currentSection;
       return activeSection === section || router.asPath.includes(`section=${section}`);
@@ -846,54 +926,141 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
     [router.asPath, router.query.section],
   );
 
-  const getGroupKey = React.useCallback(
-    (item: MenuItem, index: number) => (item.type === 'group' ? item.label : item.section) ?? `group-${index}`,
-    [],
+  const getDefaultSourceForSection = React.useCallback(
+    (section: string): 'menu' | 'tools' => sectionSourceMap.get(section) ?? 'menu',
+    [sectionSourceMap],
   );
 
+  const isSectionActiveInSource = React.useCallback(
+    (section: string, source: 'menu' | 'shortcut' | 'tools') => {
+      // Always check activeSectionHighlight first to prevent blinking
+      if (activeSectionHighlight) {
+        if (activeSectionHighlight.section === section) {
+          return activeSectionHighlight.source === source;
+        }
+        // If there's an active highlight for a different section, don't highlight this one
+        if (source === 'shortcut') {
+          return false;
+        }
+      }
+
+      if (!isSectionActive(section)) {
+        return false;
+      }
+
+      if (source === 'shortcut') {
+        return false;
+      }
+
+      const defaultSource = getDefaultSourceForSection(section);
+
+      if (defaultSource === 'tools') {
+        return source === 'tools';
+      }
+
+      // Default to highlighting menu entries when no explicit highlight is set.
+      return source === 'menu';
+    },
+    [activeSectionHighlight, getDefaultSourceForSection, isSectionActive],
+  );
+
+  const handleSectionLinkClick = React.useCallback(
+    (source: 'menu' | 'shortcut' | 'tools', section: string) => {
+      if (!section) {
+        return;
+      }
+
+      // Prevent transient highlight flicker by updating the highlight before triggering navigation.
+      setActiveSectionHighlight({ section, source });
+
+      // If clicking a menu or tools item, open its parent group if it exists
+      if (source === 'menu' || source === 'tools') {
+        const items = source === 'menu' ? mainMenuItems : toolMenuItems;
+        if (items) {
+          for (let index = 0; index < items.length; index++) {
+            const item = items[index];
+            if (item.type === 'group' && item.subMenu?.some(subItem => subItem.section === section)) {
+              const itemKey = getGroupKey(item, index);
+              if (source === 'menu') {
+                setOpenMainSubmenu(itemKey);
+              } else {
+                setOpenToolsSubmenu(itemKey);
+              }
+              break;
+            }
+          }
+        }
+      }
+    },
+    [getGroupKey, mainMenuItems, setActiveSectionHighlight, toolMenuItems],
+  );
+
+  const shortcuts = React.useMemo(() => {
+    const pinned = Array.isArray(pinnedSections) ? pinnedSections : [];
+    const recent = Array.isArray(recentSections) ? recentSections : [];
+
+    return [...pinned, ...recent.filter(section => !pinned.includes(section))];
+  }, [pinnedSections, recentSections]);
+
+  React.useEffect(() => {
+    if (!activeSectionHighlight || activeSectionHighlight.source !== 'shortcut') {
+      return;
+    }
+
+    if (!shortcuts.includes(activeSectionHighlight.section)) {
+      setActiveSectionHighlight(null);
+    }
+  }, [activeSectionHighlight, shortcuts, setActiveSectionHighlight]);
+
+  const handlePinClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, section: string) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      togglePinnedSection(section);
+    },
+    [togglePinnedSection],
+  );
+
+  const shouldShowShortcuts = prototypeSettings?.useShortcuts && shortcuts.length > 0;
+
   const mainActiveGroupKey = React.useMemo(() => {
+    // Only auto-open groups if not navigating from shortcuts
+    if (activeSectionHighlight?.source === 'shortcut') {
+      return null;
+    }
+
     for (let index = 0; index < mainMenuItems.length; index++) {
       const item = mainMenuItems[index];
-      if (item.type === 'group' && item.subMenu?.some(subItem => isSectionActive(subItem.section))) {
+      if (item.type === 'group' && item.subMenu?.some(subItem => subItem.section && isSectionActive(subItem.section))) {
         return getGroupKey(item, index);
       }
     }
     return null;
-  }, [getGroupKey, isSectionActive, mainMenuItems]);
+  }, [activeSectionHighlight?.source, getGroupKey, isSectionActive, mainMenuItems]);
 
   const toolsActiveGroupKey = React.useMemo(() => {
     if (!toolMenuItems) {
       return null;
     }
 
+    // Only auto-open groups if not navigating from shortcuts
+    if (activeSectionHighlight?.source === 'shortcut') {
+      return null;
+    }
+
     for (let index = 0; index < toolMenuItems.length; index++) {
       const item = toolMenuItems[index];
-      if (item.type === 'group' && item.subMenu?.some(subItem => isSectionActive(subItem.section))) {
+      if (item.type === 'group' && item.subMenu?.some(subItem => subItem.section && isSectionActive(subItem.section))) {
         return getGroupKey(item, index);
       }
     }
 
     return null;
-  }, [getGroupKey, isSectionActive, toolMenuItems]);
+  }, [activeSectionHighlight?.source, getGroupKey, isSectionActive, toolMenuItems]);
 
   const [openMainSubmenu, setOpenMainSubmenu] = React.useState<string | null>(() => mainActiveGroupKey);
   const [openToolsSubmenu, setOpenToolsSubmenu] = React.useState<string | null>(() => toolsActiveGroupKey);
-
-  const previousMainActiveKeyRef = React.useRef<string | null>(null);
-  React.useEffect(() => {
-    if (mainActiveGroupKey && mainActiveGroupKey !== previousMainActiveKeyRef.current) {
-      setOpenMainSubmenu(mainActiveGroupKey);
-    }
-    previousMainActiveKeyRef.current = mainActiveGroupKey;
-  }, [mainActiveGroupKey]);
-
-  const previousToolsActiveKeyRef = React.useRef<string | null>(null);
-  React.useEffect(() => {
-    if (toolsActiveGroupKey && toolsActiveGroupKey !== previousToolsActiveKeyRef.current) {
-      setOpenToolsSubmenu(toolsActiveGroupKey);
-    }
-    previousToolsActiveKeyRef.current = toolsActiveGroupKey;
-  }, [toolsActiveGroupKey]);
 
   if (useLegacy) {
     return <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={computedMenuItems} />;
@@ -920,7 +1087,9 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
                   // Handle group items (with sub-menu)
                   if (item.type === 'group') {
                     const itemKey = getGroupKey(item, index);
-                    const groupIsActive = item.subMenu?.some(subItem => isSectionActive(subItem.section));
+                    const groupIsActive = item.subMenu?.some(subItem =>
+                      subItem.section ? isSectionActiveInSource(subItem.section, 'menu') : false,
+                    );
 
                     return (
                       <Collapsible
@@ -943,15 +1112,27 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
                           </CollapsibleTrigger>
                           <CollapsibleContent>
                             <SidebarMenuSub>
-                              {item.subMenu?.map(subItem => (
-                                <SidebarMenuSubItem key={subItem.section}>
-                                  <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
-                                    <Link shallow href={getDashboardRoute(account, subItem.section)}>
-                                      <span>{subItem.label}</span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
+                              {item.subMenu?.map(subItem => {
+                                if (!subItem.section) {
+                                  return null;
+                                }
+
+                                const section = subItem.section;
+
+                                return (
+                                  <SidebarMenuSubItem key={section}>
+                                    <SidebarMenuSubButton asChild isActive={isSectionActiveInSource(section, 'menu')}>
+                                      <Link
+                                        shallow
+                                        href={getDashboardRoute(account, section)}
+                                        onClick={() => handleSectionLinkClick('menu', section)}
+                                      >
+                                        <span>{subItem.label}</span>
+                                      </Link>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                );
+                              })}
                             </SidebarMenuSub>
                           </CollapsibleContent>
                         </SidebarMenuItem>
@@ -962,8 +1143,16 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
                   // Handle regular page items
                   return (
                     <SidebarMenuItem key={item.section}>
-                      <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                        <Link shallow href={getDashboardRoute(account, item.section)}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isSectionActiveInSource(item.section, 'menu')}
+                        tooltip={item.label}
+                      >
+                        <Link
+                          shallow
+                          href={getDashboardRoute(account, item.section)}
+                          onClick={() => handleSectionLinkClick('menu', item.section)}
+                        >
                           {item.Icon && <item.Icon />}
                           <span>{item.label}</span>
                         </Link>
@@ -974,6 +1163,55 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+          {shouldShowShortcuts && (
+            <SidebarGroup>
+              <SidebarGroupLabel>Shortcuts</SidebarGroupLabel>
+
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {shortcuts.map(section => {
+                    const match = findMenuItemBySection(section);
+                    if (!match) {
+                      return null;
+                    }
+
+                    const { item: menuItem } = match;
+                    const pinned = isSectionPinned(section);
+                    const pinActionLabel = intl.formatMessage(
+                      pinned ? messages.unpinFromShortcuts : messages.pinToShortcuts,
+                    );
+
+                    return (
+                      <SidebarMenuItem key={section} className="group/shortcut-trigger">
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isSectionActiveInSource(section, 'shortcut')}
+                          tooltip={menuItem.label}
+                        >
+                          <Link
+                            shallow
+                            href={getDashboardRoute(account, section)}
+                            onClick={() => handleSectionLinkClick('shortcut', section)}
+                          >
+                            {pinned ? <Pin /> : <Clock />}
+                            <span>{menuItem.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                        <SidebarMenuAction
+                          type="button"
+                          aria-label={pinActionLabel}
+                          showOnHover
+                          onClick={event => handlePinClick(event, section)}
+                        >
+                          {pinned ? <X className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                        </SidebarMenuAction>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
           {toolMenuItems && (
             <SidebarGroup>
               <SidebarGroupLabel>Tools</SidebarGroupLabel>
@@ -984,14 +1222,19 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
                     // Handle group items (with sub-menu)
                     if (item.type === 'group') {
                       const itemKey = getGroupKey(item, index);
-                      const groupIsActive = item.subMenu?.some(subItem => isSectionActive(subItem.section));
+                      const groupIsActive = item.subMenu?.some(subItem =>
+                        subItem.section ? isSectionActiveInSource(subItem.section, 'tools') : false,
+                      );
 
                       return (
                         <Collapsible
                           key={itemKey}
                           asChild
                           open={openToolsSubmenu === itemKey}
-                          onOpenChange={open => setOpenToolsSubmenu(open ? itemKey : null)}
+                          onOpenChange={open => {
+                            console.log({ open, itemKey });
+                            setOpenToolsSubmenu(open ? itemKey : null);
+                          }}
                           className="group/collapsible"
                         >
                           <SidebarMenuItem>
@@ -1007,15 +1250,28 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
                             </CollapsibleTrigger>
                             <CollapsibleContent>
                               <SidebarMenuSub>
-                                {item.subMenu?.map(subItem => (
-                                  <SidebarMenuSubItem key={subItem.section}>
-                                    <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
-                                      <Link shallow href={getDashboardRoute(account, subItem.section)}>
-                                        <span>{subItem.label}</span>
-                                      </Link>
-                                    </SidebarMenuSubButton>
-                                  </SidebarMenuSubItem>
-                                ))}
+                                {item.subMenu?.map(subItem => {
+                                  if (!subItem.section) {
+                                    return null;
+                                  }
+
+                                  return (
+                                    <SidebarMenuSubItem key={subItem.section}>
+                                      <SidebarMenuSubButton
+                                        asChild
+                                        isActive={isSectionActiveInSource(subItem.section, 'tools')}
+                                      >
+                                        <Link
+                                          shallow
+                                          href={getDashboardRoute(account, subItem.section)}
+                                          onClick={() => handleSectionLinkClick('tools', subItem.section)}
+                                        >
+                                          <span>{subItem.label}</span>
+                                        </Link>
+                                      </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                  );
+                                })}
                               </SidebarMenuSub>
                             </CollapsibleContent>
                           </SidebarMenuItem>
@@ -1026,8 +1282,16 @@ export function AppSidebar({ isLoading, useLegacy = false, prototypeSettings, va
                     // Handle regular page items
                     return (
                       <SidebarMenuItem key={item.section}>
-                        <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                          <Link shallow href={getDashboardRoute(account, item.section)}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isSectionActiveInSource(item.section, 'tools')}
+                          tooltip={item.label}
+                        >
+                          <Link
+                            shallow
+                            href={getDashboardRoute(account, item.section)}
+                            onClick={() => handleSectionLinkClick('tools', item.section)}
+                          >
                             {item.Icon && <item.Icon />}
                             <span>{item.label}</span>
                           </Link>

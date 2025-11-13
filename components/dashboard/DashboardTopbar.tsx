@@ -21,10 +21,10 @@ export function DashboardTopbar() {
       <header
         className={`sticky top-0 z-10 grid h-15 w-full shrink-0 grid-cols-[1fr_minmax(auto,var(--breakpoint-xl))_minmax(auto,1fr)] items-center bg-background/85 backdrop-blur-sm transition-[width,height,box-shadow] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12`}
       >
-        <div className="mr-8 flex items-center gap-3">
+        <div className="mr-4 flex items-center gap-3">
           <SidebarTrigger className="-ml-1" />
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <nav className="flex items-center gap-1 text-sm">
               <a href="/" className="text-muted-foreground transition-colors hover:text-foreground">
                 Dashboard
@@ -32,7 +32,7 @@ export function DashboardTopbar() {
               <span className="text-muted-foreground">/</span>
               <span className="font-medium">Overview</span>
             </nav>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center gap-2">
