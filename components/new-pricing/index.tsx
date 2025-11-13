@@ -247,7 +247,7 @@ export default function Pricing({ data }) {
           <div className="rounded-full bg-blue-50 px-6 py-3 text-sm text-blue-800">
             <span>
               <FormattedMessage
-                defaultMessage="This is our updated pricing for Organizations, applying to all in 2026 and new sign-ups now. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
+                defaultMessage="This is our updated pricing for Organizations, applying in 2026. <LinkLegacyPricing>View legacy pricing</LinkLegacyPricing>."
                 id="pricing.newModel.onNewPricing"
                 values={{
                   LinkLegacyPricing: parts => (
@@ -307,7 +307,7 @@ export default function Pricing({ data }) {
               </h3>
               <p className="my-4 text-muted-foreground">
                 <FormattedMessage
-                  defaultMessage="Since October 2024, the platform has been managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives."
+                  defaultMessage="Since October 2024, the platform has been stewarded by {oficoLink} (OFiCo), a membership non-profit organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives."
                   id="8/YzW7"
                   values={{
                     oficoLink: (
@@ -333,7 +333,7 @@ export default function Pricing({ data }) {
                 />
               </h3>
               <FormattedMessage
-                defaultMessage="<p>The previous pricing model included a <strong>15% Revenue Share</strong> on Host Fees collected on the platform. The updated pricing replaces that with a <strong>non-percentage model</strong> based on measurable activity, such as the number of <strong>Collectives</strong> and the <strong>Expenses</strong> you process.</p><p>This approach makes costs clearer and more predictable. Instead of paying a share of your revenue, your price now scales with how you use the platform. <strong>Collectives remain free to use</strong>, supported by optional <strong>Platform Tips</strong>, while <strong>Organizations</strong> select a plan that fits their activity level and needs.</p>"
+                defaultMessage="<p>The previous pricing model included a <strong>15% Revenue Share</strong> on Host Fees collected on non-crowdfunding contributions to the platform. The updated pricing replaces that with a <strong>non-percentage model</strong> based on measurable activity, such as the number of <strong>Collectives</strong> and the <strong>Expenses</strong> you process.</p><p>This approach makes costs clearer and more predictable. Instead of paying a share of your revenue, your price now scales with how you use the platform. Organizations select a plan that fits their activity level and needs while <strong>Collectives remain free to use</strong>, supported by optional <strong>Platform Tips</strong>.</p>"
                 id="pricing.new.faq.change.answer"
                 values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
               />
@@ -344,7 +344,7 @@ export default function Pricing({ data }) {
                 <FormattedMessage defaultMessage="What are Platform Tips?" id="pricing.new.faq.tips.question" />
               </h3>
               <FormattedMessage
-                defaultMessage="<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>"
+                defaultMessage="<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they make a financial contribution on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% Crowdfunding Fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>"
                 id="pricing.new.faq.tips.answer"
                 values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
               />
@@ -353,7 +353,7 @@ export default function Pricing({ data }) {
             <div className="p-6">
               <h3 className="mb-2 text-xl font-medium text-foreground">
                 <FormattedMessage
-                  defaultMessage="What is the difference between a Collective and an Organization?"
+                  defaultMessage="What is the difference between an Organization and a Collective?"
                   id="pricing.new.faq.organizationcollective.question"
                 />
               </h3>
