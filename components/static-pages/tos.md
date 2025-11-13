@@ -61,7 +61,7 @@ For a Recurring Contribution, you are authorizing our designated Payment Process
 If the initial contribution was made with a Platform Tip, the Platform Tip will be included on each recurring payment.
 **When you initiate a recurring contribution to a Host for designation to a Collective, you expressly agree that our Payment Processor is authorized to charge you on a monthly basis (or on an annual basis, if specified via the platform) for the same payment amount until you cancel it or we suspend or stop providing you access to the platform in accordance with these Terms.**
 
-(d) **Cancellations.** Financial Contributors can cancel or change the amount of a Recurring Contribution via [opencollective.com/recurring-contributions](https://opencollective.com/dashboard/outgoing-contributions).
+(d) **Cancellations.** Financial Contributors can cancel or change the amount of a Recurring Contribution via [opencollective.com/dashboard/outgoing-contributions](https://opencollective.com/dashboard/outgoing-contributions).
 
 (e) **Refunds.** Except as provided in these Terms, **all contributions are final, and there are no refunds**. You agree (i) to look solely to the Contributors or Host of an applicable Collective to resolve any disputes regarding contributions that you make via the Platform, and (ii) that the Collective Admin or Host are solely responsible for providing any refunds. Any refunds initiated by Contributors or Hosts via the Platform may be credited to the Payment Method maintained in your account.
 
