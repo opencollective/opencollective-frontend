@@ -1106,7 +1106,6 @@ type CollectiveFeatures {
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
-  RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus

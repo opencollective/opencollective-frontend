@@ -2639,7 +2639,6 @@ export type CollectiveFeatures = {
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
-  RESTRICTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
   STRIPE_PAYMENT_INTENT?: Maybe<CollectiveFeatureStatus>;
   TAX_FORMS?: Maybe<CollectiveFeatureStatus>;
   TEAM?: Maybe<CollectiveFeatureStatus>;
@@ -10748,7 +10747,6 @@ export type PlatformSubscriptionFeatures = {
   RECEIVE_EXPENSES: Scalars['Boolean']['output'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['output'];
-  RESTRICTED_FUNDS: Scalars['Boolean']['output'];
   TAX_FORMS: Scalars['Boolean']['output'];
   TRANSFERWISE: Scalars['Boolean']['output'];
   UPDATES: Scalars['Boolean']['output'];
@@ -10769,7 +10767,6 @@ export type PlatformSubscriptionFeaturesFeatures = {
   RECEIVE_EXPENSES: Scalars['Boolean']['input'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['input'];
-  RESTRICTED_FUNDS: Scalars['Boolean']['input'];
   TAX_FORMS: Scalars['Boolean']['input'];
   TRANSFERWISE: Scalars['Boolean']['input'];
   UPDATES: Scalars['Boolean']['input'];
