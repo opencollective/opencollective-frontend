@@ -22,6 +22,9 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { getWebsiteUrl } from '../../../../lib/utils';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
@@ -312,6 +315,9 @@ const Contributions = ({
 }: ContributionsProps) => {
   const { toast } = useToast();
 
+  const { account } = useContext(DashboardContext);
+  const isUpgradeRequired = onlyExpectedFunds && requiresUpgrade(account, FEATURES.EXPECTED_FUNDS);
+
   const [expireOrder] = useMutation(
     gql`
       mutation ContributionsExpireOrder($orderId: Int) {
@@ -503,12 +509,11 @@ const Contributions = ({
     }
   }, [metadata?.account]);
 
-  const { account } = useContext(DashboardContext);
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
-    childrenAccounts: account.childrenAccounts?.nodes ?? [],
-    accountSlug: account.slug,
+    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
+    accountSlug: account?.slug,
     showChildAccountFilter: direction === 'INCOMING' && !includeHostedAccounts && includeChildrenAccounts,
   };
 
@@ -546,6 +551,7 @@ const Contributions = ({
     },
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+    skip: isUpgradeRequired,
   });
 
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string | number }; action: EditOrderActions }>({
@@ -679,6 +685,7 @@ const Contributions = ({
                   onClick={() => setShowCreatePendingOrderModal(true)}
                   className="gap-1"
                   data-cy="create-pending-contribution"
+                  disabled={isUpgradeRequired}
                 >
                   <span>
                     <FormattedMessage defaultMessage="Create" id="create" />
@@ -699,50 +706,56 @@ const Contributions = ({
             ) : null
           }
         />
-        <Filterbar {...queryFilter} />
-
-        {isIncoming &&
-          !onlyExpectedFunds &&
-          metadata?.account?.canStartResumeContributionsProcess &&
-          metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
-          !metadata.account.parent && (
-            <PausedIncomingContributionsMessage
-              account={metadata.account}
-              count={metadata.account[ContributionsTab.PAUSED].totalCount}
-            />
-          )}
-
-        {error ? (
-          <MessageBoxGraphqlError error={error} />
-        ) : !loading && selectedOrders.length === 0 ? (
-          <EmptyResults
-            entityType="CONTRIBUTIONS"
-            hasFilters={queryFilter.hasFilters}
-            onResetFilters={() => queryFilter.resetFilters({})}
-          />
+        {isUpgradeRequired ? (
+          <UpgradePlanCTA featureKey={FEATURES.EXPECTED_FUNDS} />
         ) : (
-          <div className="flex flex-col gap-4">
-            <DataTable<ManagedOrderFieldsFragment, unknown>
-              loading={loading}
-              columns={columns}
-              data={selectedOrders}
-              mobileTableView
-              nbPlaceholders={nbPlaceholders}
-              onClickRow={row => onToogleOrderDrawer(row.original.legacyId)}
-              getActions={getActions}
-            />
-          </div>
+          <React.Fragment>
+            <Filterbar {...queryFilter} />
+
+            {isIncoming &&
+              !onlyExpectedFunds &&
+              metadata?.account?.canStartResumeContributionsProcess &&
+              metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
+              !metadata.account.parent && (
+                <PausedIncomingContributionsMessage
+                  account={metadata.account}
+                  count={metadata.account[ContributionsTab.PAUSED].totalCount}
+                />
+              )}
+
+            {error ? (
+              <MessageBoxGraphqlError error={error} />
+            ) : !loading && selectedOrders.length === 0 ? (
+              <EmptyResults
+                entityType="CONTRIBUTIONS"
+                hasFilters={queryFilter.hasFilters}
+                onResetFilters={() => queryFilter.resetFilters({})}
+              />
+            ) : (
+              <div className="flex flex-col gap-4">
+                <DataTable<ManagedOrderFieldsFragment, unknown>
+                  loading={loading}
+                  columns={columns}
+                  data={selectedOrders}
+                  mobileTableView
+                  nbPlaceholders={nbPlaceholders}
+                  onClickRow={row => onToogleOrderDrawer(row.original.legacyId)}
+                  getActions={getActions}
+                />
+              </div>
+            )}
+            {editOrder.order && (
+              <EditOrderModal
+                accountSlug={accountSlug}
+                order={editOrder.order}
+                action={editOrder.action}
+                onClose={() => setEditOrder({ order: null, action: null })}
+                onSuccess={() => refetch()}
+              />
+            )}
+            <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
+          </React.Fragment>
         )}
-        {editOrder.order && (
-          <EditOrderModal
-            accountSlug={accountSlug}
-            order={editOrder.order}
-            action={editOrder.action}
-            onClose={() => setEditOrder({ order: null, action: null })}
-            onSuccess={() => refetch()}
-          />
-        )}
-        <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
       </div>
       <ContributionDrawer
         open={!!selectedContributionId}
