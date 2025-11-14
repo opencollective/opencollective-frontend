@@ -404,7 +404,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: ArrowRightLeft,
       subMenu: [
         {
-          section: ALL_SECTIONS.HOST_TRANSACTIONS,
+          section: hasHosting ? ALL_SECTIONS.HOST_TRANSACTIONS : ALL_SECTIONS.TRANSACTIONS,
           label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
         },
         {
