@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { Field } from 'formik';
 import { pickBy } from 'lodash';
+import type { InputHTMLAttributes } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
@@ -45,6 +46,7 @@ export function FormField({
   privateMessage?: React.ReactNode;
   validate?: any;
   className?: string;
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
   onFocus?: () => void;
   onChange?: (e) => void;
 }) {

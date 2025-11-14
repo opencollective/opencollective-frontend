@@ -12,7 +12,7 @@ const constructRoutePath = (href: string | NextLinkProps['href']) => {
   }
 };
 
-type LinkProps = {
+export type LinkProps = {
   children: React.ReactNode;
   tabIndex?: number;
   href?: string | NextLinkProps['href'];

@@ -61,6 +61,7 @@
   --animate-collapsible-down: collapsible-down 0.2s ease-out;
   --animate-collapsible-up: collapsible-up 0.2s ease-out;
   --animate-arrow-right: arrow-right 0.2s ease-out forwards;
+  --animate-caret-blink: caret-blink 0.2s linear infinite;
 
   --transition-duration-1500: 1500ms;
   --transition-duration-2000: 2000ms;
@@ -105,6 +106,11 @@
       transform: translateX(25%);
     }
   }
+@keyframes caret-blink {
+  50% {
+    opacity: 0.0;
+  }
+}
 }
 
 :root {

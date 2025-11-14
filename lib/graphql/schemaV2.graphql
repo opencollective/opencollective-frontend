@@ -7097,6 +7097,7 @@ enum ActivityType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -13493,6 +13494,7 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+  requiresProfileCompletion: Boolean!
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
   newsletterOptIn: Boolean
@@ -18654,6 +18656,7 @@ enum ActivityAndClassesType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -20956,7 +20959,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -20986,7 +20989,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21001,7 +21004,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21016,7 +21019,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21031,7 +21034,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21046,7 +21049,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21061,7 +21064,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21076,7 +21079,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -23652,6 +23655,7 @@ input AccountUpdateInput {
   legalName: String
   slug: String
   description: String
+  image: String
   longDescription: String
   company: String
   tags: [String]

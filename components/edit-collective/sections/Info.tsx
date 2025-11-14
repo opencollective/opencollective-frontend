@@ -15,9 +15,11 @@ import dayjs from '@/lib/dayjs';
 import { loadGoogleMaps } from '@/lib/google-maps';
 import type { Account, AccountUpdateInput, Currency } from '@/lib/graphql/types/v2/schema';
 import { AccountType } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
+import { EditAvatar } from '@/components/Avatar';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '@/components/collective-page/graphql/queries';
 import CurrencyPicker from '@/components/CurrencyPicker';
 import EditTags from '@/components/EditTags';
@@ -46,6 +48,7 @@ const editAccountFragment = gql`
     name
     slug
     legalName
+    imageUrl
     description
     longDescription
     isActive
@@ -115,6 +118,7 @@ const baseInfo = z.object({
   longDescription: z.string().max(30000).nullable(),
   currency: z.string().max(3).nullable(),
   tags: z.array(z.string()).nullable(),
+  image: z.string().url().nullable().optional(),
   location: z
     .object({
       name: z.string().optional().nullable(),
@@ -182,6 +186,7 @@ type FormValuesSchema = z.infer<typeof formSchema>;
 const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 'slug'> }) => {
   const intl = useIntl();
   const { showConfirmationModal } = useModal();
+  const { refetchLoggedInUser } = useLoggedInUser();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
   const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const { toast } = useToast();
@@ -216,6 +221,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               ...Object.keys(eventShape.shape),
               ...Object.keys(individualShape.shape),
             ]),
+            image: get(account, 'imageUrl'),
             privateInstructions: get(account, 'data.privateInstructions'),
             endsAt: account.endsAt && dayjs(account.endsAt).format('YYYY-MM-DDTHH:mm:ss'),
             startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
@@ -255,6 +261,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
           variables,
           context: API_V2_CONTEXT,
         });
+        await refetchLoggedInUser();
         toast({
           variant: 'success',
           message: <FormattedMessage id="Account.Updated" defaultMessage="Account updated." />,
@@ -316,6 +323,20 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         );
         return (
           <Form className="flex flex-col gap-4">
+            <FormField name="image" label={<FormattedMessage defaultMessage="Avatar" id="Avatar" />}>
+              {({ field, form }) => (
+                <EditAvatar
+                  size={120}
+                  name={field.name}
+                  type={account.type}
+                  value={field.value}
+                  onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                  onReject={() => form.setFieldValue(field.name, null)}
+                  minSize={1024}
+                  maxSize={2e3 * 1024}
+                />
+              )}
+            </FormField>
             <FormField
               name="name"
               label={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
