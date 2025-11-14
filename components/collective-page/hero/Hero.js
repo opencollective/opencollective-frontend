@@ -13,6 +13,7 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
+import { hasAccountHosting } from '@/lib/collective';
 
 import { AccountTrustBadge } from '@/components/AccountTrustBadge';
 
@@ -125,7 +126,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
   const numberOfHiddenTags = hiddenTags?.length;
-  const canHostAccounts = collective.isHost && collective.settings?.canHostAccounts !== false;
+  const hasHosting = hasAccountHosting(collective);
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -379,7 +380,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {canHostAccounts && (
+                {hasHosting && (
                   <Fragment>
                     {collective.type !== CollectiveType.COLLECTIVE && (
                       <Fragment>

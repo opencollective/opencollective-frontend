@@ -8,7 +8,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
-import { isHostAccount } from '@/lib/collective';
+import { hasAccountHosting } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -62,7 +62,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (loggedInUser?.isAccountantOnly(account) && isHostAccount(account)) {
+  } else if (loggedInUser?.isAccountantOnly(account) && hasAccountHosting(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
