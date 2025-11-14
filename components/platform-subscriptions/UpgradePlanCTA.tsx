@@ -30,7 +30,7 @@ const content: Content = {
   CHART_OF_ACCOUNTS: {
     title: defineMessage({
       id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.title',
-      defaultMessage: 'Upgrade your plan to access chart of accounts.',
+      defaultMessage: 'Upgrade your plan to enable chart of accounts.',
     }),
     benefits: [
       defineMessage({
@@ -222,7 +222,7 @@ type UpgradePlanCTAProps = {
   compact?: boolean;
 };
 
-export function UpgradePlanCTA({ featureKey, className, compact = false }: UpgradePlanCTAProps) {
+export function UpgradePlanCTA({ featureKey, className, compact = false, hideBenefits = false }: UpgradePlanCTAProps) {
   const { account } = React.useContext(DashboardContext);
 
   if (isFeatureEnabled(account, featureKey)) {
@@ -251,7 +251,7 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
               <AlertTitle className="mb-0 leading-tight font-semibold text-foreground">{title}</AlertTitle>
             </div>
           </div>
-          {featureAccess === 'DISABLED' && customContent?.benefits && (
+          {featureAccess === 'DISABLED' && customContent?.benefits && !hideBenefits && (
             <div className="space-y-1">
               {customContent.benefits.map(benefit => (
                 <div key={benefit.id} className="flex items-start gap-2 text-left">
@@ -300,7 +300,7 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
             {title}
           </AlertTitle>
 
-          {featureAccess === 'DISABLED' && customContent?.benefits && (
+          {featureAccess === 'DISABLED' && customContent?.benefits && !hideBenefits && (
             <div className="w-full max-w-xl space-y-3">
               {customContent.benefits.map(benefit => (
                 <div key={benefit.id} className="flex items-start gap-3 text-left">

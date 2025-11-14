@@ -12,6 +12,10 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations';
 import { stripHTML } from '../../../lib/html';
 import { omitDeep } from '../../../lib/utils';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { DashboardContext } from '@/components/dashboard/DashboardContext';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -183,6 +187,8 @@ const Policies = ({ collective }) => {
   const [selected, setSelected] = React.useState([]);
   const { toast } = useToast();
   const isSelfHosted = isSelfHostedAccount(collective);
+  const { account } = React.useContext(DashboardContext);
+  const isUpgradeRequiredForChartOfAccounts = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -327,7 +333,7 @@ const Policies = ({ collective }) => {
   return (
     <Flex flexDirection="column">
       {error && <MessageBoxGraphqlError error={error} />}
-      <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={formik.handleSubmit} className="space-y-12">
         <Container>
           <SettingsSectionTitle>
             <FormattedMessage defaultMessage="Contributions" id="Contributions" />
@@ -643,7 +649,7 @@ const Policies = ({ collective }) => {
 
         {collective.isHost && !isSelfHosted && (
           <Container>
-            <SettingsSectionTitle className="mt-4">
+            <SettingsSectionTitle>
               <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
             </SettingsSectionTitle>
             <P mb={2}>
@@ -735,7 +741,7 @@ const Policies = ({ collective }) => {
           </Container>
         )}
         <Container>
-          <SettingsSectionTitle className="mt-4">
+          <SettingsSectionTitle>
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
           </SettingsSectionTitle>
           <StyledCheckbox
@@ -877,21 +883,22 @@ const Policies = ({ collective }) => {
               />
             </P>
           )}
+          <Container mt={3}>
+            <StyledCheckbox
+              name="allow-expense-submission"
+              label={formatMessage(messages['expensePolicy.allowExpense'])}
+              onChange={() =>
+                formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
+              }
+              defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
+            />
+          </Container>
         </Container>
-        <Container mt={3}>
-          <StyledCheckbox
-            name="allow-expense-submission"
-            label={formatMessage(messages['expensePolicy.allowExpense'])}
-            onChange={() =>
-              formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
-            }
-            defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
-          />
-        </Container>
+
         {collective.isHost && (
           <React.Fragment>
             <Container>
-              <SettingsSectionTitle className="mt-4">
+              <SettingsSectionTitle>
                 <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
               </SettingsSectionTitle>
               <P mb={2}>
@@ -930,7 +937,7 @@ const Policies = ({ collective }) => {
               ))}
             </Container>
             <Container>
-              <SettingsSectionTitle className="mt-4">
+              <SettingsSectionTitle>
                 <FormattedMessage defaultMessage="Vendors" id="RilevA" />
               </SettingsSectionTitle>
               <div className="mb-1">
@@ -969,7 +976,7 @@ const Policies = ({ collective }) => {
             </Container>
             {collective.isHost && (
               <Container>
-                <SettingsSectionTitle className="mt-4">
+                <SettingsSectionTitle>
                   <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
                 </SettingsSectionTitle>
                 <P mb={3}>
@@ -994,6 +1001,7 @@ const Policies = ({ collective }) => {
                         id="CwU4gm"
                       />
                     }
+                    disabled={isUpgradeRequiredForChartOfAccounts}
                     checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
                     onChange={({ checked }) => {
                       const newPolicies = cloneDeep(formik.values.policies);
@@ -1011,6 +1019,7 @@ const Policies = ({ collective }) => {
                         id="4cDrzh"
                       />
                     }
+                    disabled={isUpgradeRequiredForChartOfAccounts}
                     checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForCollectiveAdmins}
                     onChange={({ checked }) => {
                       const newPolicies = cloneDeep(formik.values.policies);
@@ -1019,12 +1028,15 @@ const Policies = ({ collective }) => {
                     }}
                   />
                 </div>
+                {isUpgradeRequiredForChartOfAccounts && (
+                  <UpgradePlanCTA className="mt-4" compact hideBenefits featureKey={FEATURES.CHART_OF_ACCOUNTS} />
+                )}
               </Container>
             )}
           </React.Fragment>
         )}
         <Container>
-          <SettingsSectionTitle className="mt-4">
+          <SettingsSectionTitle>
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
           </SettingsSectionTitle>
           <P mb={2}>
@@ -1048,7 +1060,7 @@ const Policies = ({ collective }) => {
         </Container>
         {collective.isHost && (
           <Container>
-            <SettingsSectionTitle className="mt-4">
+            <SettingsSectionTitle>
               <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
             </SettingsSectionTitle>
 

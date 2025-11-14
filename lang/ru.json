@@ -4262,7 +4262,7 @@
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.categorize": "Assign expenses and added funds to their correct accounting categories.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.export": "Include the selected accounting categories in your exports.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.optimize": "Reduce the accounting costs, workload, and risk of accounting errors.",
-  "UpgradePlanCTA.CHART_OF_ACCOUNTS.title": "Upgrade your plan to access chart of accounts.",
+  "UpgradePlanCTA.CHART_OF_ACCOUNTS.title": "Upgrade your plan to enable chart of accounts.",
   "UpgradePlanCTA.EXPECTED_FUNDS.allocate": "Allocate expected funds to specific Collectives, projects, events, or tiers.",
   "UpgradePlanCTA.EXPECTED_FUNDS.notify": "Automatically notify admins and funders once funds are received and allocated.",
   "UpgradePlanCTA.EXPECTED_FUNDS.reconcile": "Reconcile arrivals faster with pre-filled contribution details and ledger entries.",
