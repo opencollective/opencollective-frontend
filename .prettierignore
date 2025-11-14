@@ -1,4 +1,37 @@
+
+# Build outputs
+.next/
+dist/
+build/
+stage/
+out/
+storybook-static/
 public/*
-.next/*
-# Auto-generated files
+
+# Dependency artifacts
+node_modules/
+.pnp.*
+
+# Coverage and test snapshots
+coverage/
+.nyc_output/
+test/cypress/screenshots/
+test/cypress/videos/
+test/cypress/downloads/
+
+# Generated files
 lib/graphql/types/v2/*
+scripts/publish-components/.tmp/
+.rollup.cache/
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# Environment and tool metadata
+.env
+.env.*
+.vercel/
+.cursor/
+.vscode/
+.idea/
+.DS_Store
+
