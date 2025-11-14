@@ -181,6 +181,31 @@ const content: Content = {
     }),
     learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/funds-and-grants',
   },
+  EXPECTED_FUNDS: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.EXPECTED_FUNDS.title',
+      defaultMessage: 'Upgrade your plan to manage expected funds effortlessly.',
+    }),
+    benefits: [
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.track',
+        defaultMessage: 'Track pending bank transfers and fundraising pledges before the money lands.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.allocate',
+        defaultMessage: 'Allocate expected funds to specific Collectives, projects, events, or tiers.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.reconcile',
+        defaultMessage: 'Reconcile arrivals faster with pre-filled contribution details and ledger entries.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.notify',
+        defaultMessage: 'Automatically notify admins and funders once funds are received and allocated.',
+      }),
+    ],
+    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/receiving-money/expected-funds',
+  },
 };
 
 type UpgradePlanCTAProps = {

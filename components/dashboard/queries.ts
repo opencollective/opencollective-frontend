@@ -98,6 +98,7 @@ export const adminPanelQuery = gql`
         TRANSFERWISE
         AGREEMENTS
         FUNDS_GRANTS_MANAGEMENT
+        EXPECTED_FUNDS
       }
       policies {
         id
