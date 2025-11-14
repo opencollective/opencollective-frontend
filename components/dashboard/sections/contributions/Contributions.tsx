@@ -22,6 +22,9 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { getWebsiteUrl } from '../../../../lib/utils';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
@@ -48,8 +51,6 @@ import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
-import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
-import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -511,8 +512,8 @@ const Contributions = ({
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
-    childrenAccounts: account.childrenAccounts?.nodes ?? [],
-    accountSlug: account.slug,
+    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
+    accountSlug: account?.slug,
     showChildAccountFilter: direction === 'INCOMING' && !includeHostedAccounts && includeChildrenAccounts,
   };
 

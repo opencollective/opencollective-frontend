@@ -220,6 +220,7 @@ type UpgradePlanCTAProps = {
   featureKey: FeatureKey;
   className?: string;
   compact?: boolean;
+  hideBenefits?: boolean;
 };
 
 export function UpgradePlanCTA({ featureKey, className, compact = false, hideBenefits = false }: UpgradePlanCTAProps) {
