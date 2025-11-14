@@ -361,6 +361,7 @@ const Policies = ({ collective }) => {
               )}
             </StyledInputField>
 
+            {/* Mandatory Fields: For Organizations and Independent Collectives */}
             {hasMoneyManagement && (
               <div className="mt-4 flex flex-col gap-2">
                 <div className="font-bold">
@@ -642,6 +643,7 @@ const Policies = ({ collective }) => {
           </P>
         </Container>
 
+        {/* Required Admins: For Host Organizations */}
         {hasHosting && (
           <Container>
             <SettingsSectionTitle className="mt-4">
@@ -735,6 +737,8 @@ const Policies = ({ collective }) => {
               )}
           </Container>
         )}
+
+        {/* Expense Approvals: For everyone */}
         <Container>
           <SettingsSectionTitle className="mt-4">
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
@@ -804,6 +808,7 @@ const Policies = ({ collective }) => {
               }
             />
           </Flex>
+
           {hasHosting && (
             <React.Fragment>
               <Container
@@ -879,6 +884,8 @@ const Policies = ({ collective }) => {
             </P>
           )}
         </Container>
+
+        {/* Public Expense submission: For everyone */}
         <Container mt={3}>
           <StyledCheckbox
             name="allow-expense-submission"
@@ -889,6 +896,8 @@ const Policies = ({ collective }) => {
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
+
+        {/* Expense Types: For Organizations and Independent Collectives */}
         {hasMoneyManagement && (
           <React.Fragment>
             <Container>
@@ -1025,6 +1034,8 @@ const Policies = ({ collective }) => {
             )}
           </React.Fragment>
         )}
+
+        {/* Rejected categories: For everyone */}
         <Container>
           <SettingsSectionTitle className="mt-4">
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
@@ -1048,7 +1059,9 @@ const Policies = ({ collective }) => {
             isMulti
           />
         </Container>
-        {hasMoneyManagement && (
+
+        {/* Allow collective admins to refund: For Host Organizations */}
+        {hasHosting && (
           <Container>
             <SettingsSectionTitle className="mt-4">
               <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
