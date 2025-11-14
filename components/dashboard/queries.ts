@@ -99,6 +99,7 @@ export const adminPanelQuery = gql`
         AGREEMENTS
         FUNDS_GRANTS_MANAGEMENT
         EXPECTED_FUNDS
+        CHARGE_HOSTING_FEES
       }
       policies {
         id

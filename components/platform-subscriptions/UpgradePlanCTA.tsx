@@ -206,6 +206,14 @@ const content: Content = {
     ],
     learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/receiving-money/expected-funds',
   },
+  CHARGE_HOSTING_FEES: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.CHARGE_HOSTING_FEES.title',
+      defaultMessage: 'Upgrade your plan to enable collecting host fees.',
+    }),
+    learnMoreUrl:
+      'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/setting-your-fiscal-host-fees',
+  },
 };
 
 type UpgradePlanCTAProps = {
@@ -236,11 +244,11 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
   if (compact) {
     return (
       <Alert variant="info" className={cn('p-4', className)}>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Image src="/static/images/lock.png" alt="Lock" width={24} height={24} className="shrink-0" />
             <div className="min-w-0 flex-1">
-              <AlertTitle className="leading-tight font-semibold text-foreground">{title}</AlertTitle>
+              <AlertTitle className="mb-0 leading-tight font-semibold text-foreground">{title}</AlertTitle>
             </div>
           </div>
           {featureAccess === 'DISABLED' && customContent?.benefits && (

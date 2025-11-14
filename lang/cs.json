@@ -4257,6 +4257,7 @@
   "UpgradePlanCTA.AUTOMATED_PAYMENTS.reduceErrors": "Reduce manual data entry errors.",
   "UpgradePlanCTA.AUTOMATED_PAYMENTS.saveTime": "Process more expenses in less time.",
   "UpgradePlanCTA.AUTOMATED_PAYMENTS.title": "Upgrade your plan for automated payments.",
+  "UpgradePlanCTA.CHARGE_HOSTING_FEES.title": "Upgrade your plan to enable collecting host fees.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.accountingCategories": "Setup your accounting categories to mirror your accounting needs.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.categorize": "Assign expenses and added funds to their correct accounting categories.",
   "UpgradePlanCTA.CHART_OF_ACCOUNTS.export": "Include the selected accounting categories in your exports.",
