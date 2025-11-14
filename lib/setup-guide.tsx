@@ -268,7 +268,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
           },
         },
-        isHost && {
+        hasHosting && {
           title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
           description: (
             <FormattedMessage
@@ -285,7 +285,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
           },
         },
-        isHost && {
+        hasHosting && {
           title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
           description: (
             <FormattedMessage
