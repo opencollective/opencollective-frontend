@@ -2,7 +2,7 @@
 
 **Last Updated: November 13th 2025**
 
-<p class="lead">This **Privacy Policy** apply to your access to and use of the **Open Collective Platform**, accessible through **opencollective.com** and related domains, as well as other websites, applications, and online services (collectively, "**the Platform**" or "**the Services**"). The Platform is provided and operated by **OFi Technologies LLC** ("**OFiTech**", "**we**", "**us**", or "**our**"), a company 100% owned and controlled by **Open Finance Consortium Inc.**, a Delaware **501(c)(6)** nonprofit corporation ("**OFi Consortium**" or "**OFiCo**").</p>
+This **Privacy Policy** apply to your access to and use of the **Open Collective Platform**, accessible through **opencollective.com** and related domains, as well as other websites, applications, and online services (collectively, "**the Platform**" or "**the Services**"). The Platform is provided and operated by **OFi Technologies LLC** ("**OFiTech**", "**we**", "**us**", or "**our**"), a company 100% owned and controlled by **Open Finance Consortium Inc.**, a Delaware **501(c)(6)** nonprofit corporation ("**OFi Consortium**" or "**OFiCo**").
 
 We may change this Privacy Policy from time to time. If we make changes, we will notify you by revising the date at the top of the policy and, in some cases, we may provide you with additional notice (such as adding a statement to our homepage or sending you a notification). We encourage you to review the Privacy Policy whenever you access the Services or otherwise interact with us to stay informed about our information practices and the ways you can help protect your privacy.
 
