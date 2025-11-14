@@ -4674,7 +4674,6 @@ type PlatformSubscriptionFeatures {
   EXPENSE_SECURITY_CHECKS: Boolean!
   EXPECTED_FUNDS: Boolean!
   CHARGE_HOSTING_FEES: Boolean!
-  RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
@@ -6714,7 +6713,6 @@ type CollectiveFeatures {
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
-  RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
@@ -20956,7 +20954,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -20986,7 +20984,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21001,7 +20999,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21016,7 +21014,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21031,7 +21029,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21046,7 +21044,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21061,7 +21059,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21076,7 +21074,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -25998,7 +25996,6 @@ input PlatformSubscriptionFeaturesFeatures {
   EXPENSE_SECURITY_CHECKS: Boolean!
   EXPECTED_FUNDS: Boolean!
   CHARGE_HOSTING_FEES: Boolean!
-  RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
