@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, isNil, set, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isSelfHostedAccount } from '../../../lib/collective';
+import { hasAccountHosting, hasAccountMoneyManagement } from '../../../lib/collective';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
@@ -182,7 +182,8 @@ const Policies = ({ collective }) => {
   const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
   const { toast } = useToast();
-  const isSelfHosted = isSelfHostedAccount(collective);
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
+  const hasHosting = hasAccountHosting(collective);
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -230,7 +231,7 @@ const Policies = ({ collective }) => {
     async onSubmit(values) {
       const { contributionPolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
       const newSettings = { ...collective.settings, disablePublicExpenseSubmission };
-      if (collective.isHost) {
+      if (hasMoneyManagement) {
         newSettings.expenseTypes = expenseTypes;
       }
 
@@ -360,7 +361,7 @@ const Policies = ({ collective }) => {
               )}
             </StyledInputField>
 
-            {collective.isHost && (
+            {hasMoneyManagement && (
               <div className="mt-4 flex flex-col gap-2">
                 <div className="font-bold">
                   <FormattedMessage defaultMessage="Mandatory Information" id="IuoUBR" />
@@ -641,7 +642,7 @@ const Policies = ({ collective }) => {
           </P>
         </Container>
 
-        {collective.isHost && !isSelfHosted && (
+        {hasAccountHosting && (
           <Container>
             <SettingsSectionTitle className="mt-4">
               <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
@@ -803,7 +804,7 @@ const Policies = ({ collective }) => {
               }
             />
           </Flex>
-          {collective.isHost && !isSelfHosted && (
+          {hasAccountHosting && (
             <React.Fragment>
               <Container
                 ml="1.4rem"
@@ -888,17 +889,18 @@ const Policies = ({ collective }) => {
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
-        {collective.isHost && (
+        {hasMoneyManagement && (
           <React.Fragment>
             <Container>
               <SettingsSectionTitle className="mt-4">
                 <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
               </SettingsSectionTitle>
               <P mb={2}>
-                {isSelfHosted ? (
+                {hasHosting ? (
                   <FormattedMessage
-                    defaultMessage="Specify the types of expenses allowed for your Collective."
+                    defaultMessage="Specify the types of expenses allowed for {type, select, ORGANIZATION {your organization} COLLECTIVE {your collective} other {your account}}"
                     id="a9eYkM"
+                    values={{ type: collective.type }}
                   />
                 ) : (
                   <FormattedMessage
@@ -938,9 +940,9 @@ const Policies = ({ collective }) => {
                   <FormattedMessage defaultMessage="Public Expense submission" id="p5Icf1" />
                 </div>
                 <p className="mb-2 text-sm">
-                  {isSelfHosted ? (
+                  {!hasHosting ? (
                     <FormattedMessage
-                      defaultMessage="By default only Collective administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
+                      defaultMessage="By default only administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
                       id="QtxPLy"
                     />
                   ) : (
@@ -967,7 +969,7 @@ const Policies = ({ collective }) => {
                 />
               </div>
             </Container>
-            {collective.isHost && (
+            {hasMoneyManagement && (
               <Container>
                 <SettingsSectionTitle className="mt-4">
                   <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
@@ -1046,7 +1048,7 @@ const Policies = ({ collective }) => {
             isMulti
           />
         </Container>
-        {collective.isHost && (
+        {hasMoneyManagement && (
           <Container>
             <SettingsSectionTitle className="mt-4">
               <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />

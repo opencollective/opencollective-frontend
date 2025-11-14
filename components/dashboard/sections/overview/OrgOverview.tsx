@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { isHostAccount } from '@/lib/collective';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
@@ -81,12 +81,14 @@ export function OrgOverview() {
     [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
   );
 
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+
   return (
     <div className="max-w-(--breakpoint-lg) space-y-6">
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={
-          isHostAccount(account) && (
+          hasMoneyManagement && (
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
                 {showSetupGuide ? (
@@ -99,7 +101,7 @@ export function OrgOverview() {
           )
         }
       />
-      {isHostAccount(account) ? (
+      {hasMoneyManagement ? (
         <React.Fragment>
           {account.platformSubscription && (
             <Collapsible open={showSubscriptionCard}>
