@@ -905,7 +905,7 @@ const Policies = ({ collective }) => {
                 <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
               </SettingsSectionTitle>
               <P mb={2}>
-                {hasHosting ? (
+                {!hasHosting ? (
                   <FormattedMessage
                     defaultMessage="Specify the types of expenses allowed for {type, select, ORGANIZATION {your organization} COLLECTIVE {your collective} other {your account}}"
                     id="a9eYkM"
