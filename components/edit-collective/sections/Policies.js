@@ -978,41 +978,42 @@ const Policies = ({ collective }) => {
                 />
               </div>
             </Container>
-            {hasMoneyManagement && (
-              <Container>
-                <SettingsSectionTitle className="mt-4">
-                  <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
-                </SettingsSectionTitle>
-                <P mb={3}>
-                  <FormattedMessage
-                    defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
-                    id="QwktWn"
-                    values={{
-                      LinkAccountingCategories: getI18nLink({
-                        as: Link,
-                        href: `/dashboard/${collective.slug}/chart-of-accounts`,
-                      }),
-                    }}
-                  />
-                </P>
 
-                <div className="mb-1">
-                  <StyledCheckbox
-                    name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
-                    label={
-                      <FormattedMessage
-                        defaultMessage="Require expense submitters to select a category when submitting an expense"
-                        id="CwU4gm"
-                      />
-                    }
-                    checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
-                    onChange={({ checked }) => {
-                      const newPolicies = cloneDeep(formik.values.policies);
-                      set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
-                      formik.setFieldValue('policies', newPolicies);
-                    }}
-                  />
-                </div>
+            <Container>
+              <SettingsSectionTitle className="mt-4">
+                <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
+              </SettingsSectionTitle>
+              <P mb={3}>
+                <FormattedMessage
+                  defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
+                  id="QwktWn"
+                  values={{
+                    LinkAccountingCategories: getI18nLink({
+                      as: Link,
+                      href: `/dashboard/${collective.slug}/chart-of-accounts`,
+                    }),
+                  }}
+                />
+              </P>
+
+              <div className="mb-1">
+                <StyledCheckbox
+                  name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
+                  label={
+                    <FormattedMessage
+                      defaultMessage="Require expense submitters to select a category when submitting an expense"
+                      id="CwU4gm"
+                    />
+                  }
+                  checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
+                  onChange={({ checked }) => {
+                    const newPolicies = cloneDeep(formik.values.policies);
+                    set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
+                    formik.setFieldValue('policies', newPolicies);
+                  }}
+                />
+              </div>
+              {hasHosting && (
                 <div>
                   <StyledCheckbox
                     name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
@@ -1030,8 +1031,8 @@ const Policies = ({ collective }) => {
                     }}
                   />
                 </div>
-              </Container>
-            )}
+              )}
+            </Container>
           </React.Fragment>
         )}
 
