@@ -892,140 +892,138 @@ const Policies = ({ collective }) => {
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
-        {hasMoneyManagement && (
-          <React.Fragment>
-            <Container>
-              <SettingsSectionTitle className="mt-4">
-                <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
-              </SettingsSectionTitle>
-              <P mb={2}>
-                {hasHosting ? (
-                  <FormattedMessage
-                    defaultMessage="Specify the types of expenses allowed for {type, select, ORGANIZATION {your organization} COLLECTIVE {your collective} other {your account}}"
-                    id="a9eYkM"
-                    values={{ type: collective.type }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="editCollective.expenseTypes.description"
-                    defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
-                    values={{
-                      HostedCollectivesLink: getI18nLink({
-                        as: Link,
-                        href: `/dashboard/${collective.slug}/hosted-collectives`,
-                      }),
-                    }}
-                  />
-                )}
-              </P>
 
-              {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
-                <StyledCheckbox
-                  key={type}
-                  name={`allow-${type}-submission`}
-                  label={formatMessage(messages[`expensePolicy.${type}`])}
-                  checked={Boolean(formik.values.expenseTypes[type])}
-                  onChange={() =>
-                    formik.setFieldValue('expenseTypes', {
-                      ...formik.values.expenseTypes,
-                      [type]: !formik.values.expenseTypes[type],
-                    })
-                  }
-                />
-              ))}
-            </Container>
-            <Container>
-              <SettingsSectionTitle className="mt-4">
-                <FormattedMessage defaultMessage="Vendors" id="RilevA" />
-              </SettingsSectionTitle>
-              <div className="mb-1">
-                <div className="mb-2 text-base font-bold">
-                  <FormattedMessage defaultMessage="Public Expense submission" id="p5Icf1" />
-                </div>
-                <p className="mb-2 text-sm">
-                  {!hasHosting ? (
-                    <FormattedMessage
-                      defaultMessage="By default only administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
-                      id="QtxPLy"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      defaultMessage="By default only fiscal host administrators can submit expenses on behalf of vendors. You can allow other users who submit expenses to collectives you host to also submit expenses on behalf vendors."
-                      id="dK5ItS"
-                    />
-                  )}
-                </p>
-                <StyledCheckbox
-                  name={`checkbox-EXPENSE_PUBLIC_VENDORS-requiredForExpenseSubmitters`}
-                  label={
-                    <FormattedMessage
-                      defaultMessage="Allow expense submission on behalf of vendors by all users"
-                      id="l15EJO"
-                    />
-                  }
-                  checked={formik.values.policies?.EXPENSE_PUBLIC_VENDORS}
-                  onChange={({ checked }) => {
-                    const newPolicies = cloneDeep(formik.values.policies);
-                    set(newPolicies, 'EXPENSE_PUBLIC_VENDORS', checked);
-                    formik.setFieldValue('policies', newPolicies);
-                  }}
-                />
-              </div>
-            </Container>
-            <Container>
-              <SettingsSectionTitle className="mt-4">
-                <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
-              </SettingsSectionTitle>
-              <P mb={3}>
+        <Container>
+          <SettingsSectionTitle className="mt-4">
+            <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
+          </SettingsSectionTitle>
+          <P mb={2}>
+            {!hasHosting ? (
+              <FormattedMessage
+                defaultMessage="Specify the types of expenses allowed for {type, select, ORGANIZATION {your organization} COLLECTIVE {your collective} other {your account}}"
+                id="a9eYkM"
+                values={{ type: collective.type }}
+              />
+            ) : (
+              <FormattedMessage
+                id="editCollective.expenseTypes.description"
+                defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+                values={{
+                  HostedCollectivesLink: getI18nLink({
+                    as: Link,
+                    href: `/dashboard/${collective.slug}/hosted-collectives`,
+                  }),
+                }}
+              />
+            )}
+          </P>
+
+          {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
+            <StyledCheckbox
+              key={type}
+              name={`allow-${type}-submission`}
+              label={formatMessage(messages[`expensePolicy.${type}`])}
+              checked={Boolean(formik.values.expenseTypes[type])}
+              onChange={() =>
+                formik.setFieldValue('expenseTypes', {
+                  ...formik.values.expenseTypes,
+                  [type]: !formik.values.expenseTypes[type],
+                })
+              }
+            />
+          ))}
+        </Container>
+        <Container>
+          <SettingsSectionTitle className="mt-4">
+            <FormattedMessage defaultMessage="Vendors" id="RilevA" />
+          </SettingsSectionTitle>
+          <div className="mb-1">
+            <div className="mb-2 text-base font-bold">
+              <FormattedMessage defaultMessage="Public Expense submission" id="p5Icf1" />
+            </div>
+            <p className="mb-2 text-sm">
+              {!hasHosting ? (
                 <FormattedMessage
-                  defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
-                  id="QwktWn"
-                  values={{
-                    LinkAccountingCategories: getI18nLink({
-                      as: Link,
-                      href: `/dashboard/${collective.slug}/chart-of-accounts`,
-                    }),
-                  }}
+                  defaultMessage="By default only administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
+                  id="QtxPLy"
                 />
-              </P>
+              ) : (
+                <FormattedMessage
+                  defaultMessage="By default only fiscal host administrators can submit expenses on behalf of vendors. You can allow other users who submit expenses to collectives you host to also submit expenses on behalf vendors."
+                  id="dK5ItS"
+                />
+              )}
+            </p>
+            <StyledCheckbox
+              name={`checkbox-EXPENSE_PUBLIC_VENDORS-requiredForExpenseSubmitters`}
+              label={
+                <FormattedMessage
+                  defaultMessage="Allow expense submission on behalf of vendors by all users"
+                  id="l15EJO"
+                />
+              }
+              checked={formik.values.policies?.EXPENSE_PUBLIC_VENDORS}
+              onChange={({ checked }) => {
+                const newPolicies = cloneDeep(formik.values.policies);
+                set(newPolicies, 'EXPENSE_PUBLIC_VENDORS', checked);
+                formik.setFieldValue('policies', newPolicies);
+              }}
+            />
+          </div>
+        </Container>
+        <Container>
+          <SettingsSectionTitle className="mt-4">
+            <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
+          </SettingsSectionTitle>
+          <P mb={3}>
+            <FormattedMessage
+              defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
+              id="QwktWn"
+              values={{
+                LinkAccountingCategories: getI18nLink({
+                  as: Link,
+                  href: `/dashboard/${collective.slug}/chart-of-accounts`,
+                }),
+              }}
+            />
+          </P>
 
-              <div className="mb-1">
-                <StyledCheckbox
-                  name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
-                  label={
-                    <FormattedMessage
-                      defaultMessage="Require expense submitters to select a category when submitting an expense"
-                      id="CwU4gm"
-                    />
-                  }
-                  checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
-                  onChange={({ checked }) => {
-                    const newPolicies = cloneDeep(formik.values.policies);
-                    set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
-                    formik.setFieldValue('policies', newPolicies);
-                  }}
+          <div className="mb-1">
+            <StyledCheckbox
+              name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
+              label={
+                <FormattedMessage
+                  defaultMessage="Require expense submitters to select a category when submitting an expense"
+                  id="CwU4gm"
                 />
-              </div>
-              <div>
-                <StyledCheckbox
-                  name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
-                  label={
-                    <FormattedMessage
-                      defaultMessage="Require collective admins to verify expense categories when reviewing and approving expenses"
-                      id="4cDrzh"
-                    />
-                  }
-                  checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForCollectiveAdmins}
-                  onChange={({ checked }) => {
-                    const newPolicies = cloneDeep(formik.values.policies);
-                    set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForCollectiveAdmins', checked);
-                    formik.setFieldValue('policies', newPolicies);
-                  }}
+              }
+              checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
+              onChange={({ checked }) => {
+                const newPolicies = cloneDeep(formik.values.policies);
+                set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
+                formik.setFieldValue('policies', newPolicies);
+              }}
+            />
+          </div>
+          <div>
+            <StyledCheckbox
+              name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
+              label={
+                <FormattedMessage
+                  defaultMessage="Require collective admins to verify expense categories when reviewing and approving expenses"
+                  id="4cDrzh"
                 />
-              </div>
-            </Container>
-          </React.Fragment>
-        )}
+              }
+              checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForCollectiveAdmins}
+              onChange={({ checked }) => {
+                const newPolicies = cloneDeep(formik.values.policies);
+                set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForCollectiveAdmins', checked);
+                formik.setFieldValue('policies', newPolicies);
+              }}
+            />
+          </div>
+        </Container>
+
         <Container>
           <SettingsSectionTitle className="mt-4">
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
