@@ -394,7 +394,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
         description={
           <FormattedMessage
             id="Vendors.Description"
-            defaultMessage="Manage all the external organizations acting as vendors for the Collectives you host."
+            defaultMessage="Manage all the external organizations you work with as vendors."
           />
         }
         actions={
