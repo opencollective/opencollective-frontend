@@ -642,7 +642,7 @@ const Policies = ({ collective }) => {
           </P>
         </Container>
 
-        {hasAccountHosting && (
+        {hasHosting && (
           <Container>
             <SettingsSectionTitle className="mt-4">
               <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
@@ -804,7 +804,7 @@ const Policies = ({ collective }) => {
               }
             />
           </Flex>
-          {hasAccountHosting && (
+          {hasHosting && (
             <React.Fragment>
               <Container
                 ml="1.4rem"

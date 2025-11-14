@@ -8,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
+import { hasAccountHosting } from '../../../../lib/collective';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
@@ -579,6 +580,8 @@ const Contributions = ({
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
+  const hasHosting = hasAccountHosting(account);
+
   const getActions = getContributionActions({
     intl,
     LoggedInUser,
@@ -651,12 +654,12 @@ const Contributions = ({
           description={
             isIncoming ? (
               onlyExpectedFunds ? (
-                includeHostedAccounts ? (
+                includeHostedAccounts && hasHosting ? (
                   <FormattedMessage defaultMessage="Expected funds for Collectives you host." id="tNEw2N" />
                 ) : (
                   <FormattedMessage id="ExpectedFunds.description" defaultMessage="Expected funds to your account" />
                 )
-              ) : includeHostedAccounts ? (
+              ) : includeHostedAccounts && hasHosting ? (
                 <FormattedMessage defaultMessage="Contributions for Collectives you host." id="ZIZ7Ms" />
               ) : (
                 <FormattedMessage
