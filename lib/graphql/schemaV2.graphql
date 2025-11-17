@@ -13492,7 +13492,7 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
-  requiresProfileCompletion: Boolean!
+  requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
   newsletterOptIn: Boolean
@@ -23668,7 +23668,7 @@ input AccountUpdateInput {
   legalName: String
   slug: String
   description: String
-  image: String
+  image: URL
   longDescription: String
   company: String
   tags: [String]

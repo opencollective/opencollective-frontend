@@ -783,7 +783,7 @@ export type AccountUpdateInput = {
   hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
-  image?: InputMaybe<Scalars['String']['input']>;
+  image?: InputMaybe<Scalars['URL']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<LocationInput>;
   longDescription?: InputMaybe<Scalars['String']['input']>;
@@ -7234,7 +7234,7 @@ export type Individual = Account & {
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']['output']>;
-  requiresProfileCompletion: Scalars['Boolean']['output'];
+  requiresProfileCompletion?: Maybe<Scalars['Boolean']['output']>;
   settings: Scalars['JSON']['output'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String']['output'];
