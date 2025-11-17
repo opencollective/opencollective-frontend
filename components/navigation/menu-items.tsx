@@ -157,7 +157,7 @@ export const legacyFooterItems: MenuGroupItem[] = [
       },
       {
         label: defineMessage({ id: 'platform.signup', defaultMessage: 'Sign up' }),
-        href: '/create-account',
+        href: '/signup',
       },
       {
         label: defineMessage({ id: 'platform.login', defaultMessage: 'Log in' }),

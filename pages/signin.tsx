@@ -156,7 +156,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
   getRoutes() {
     const { next } = this.props;
-    const routes = { signin: '/signin', join: '/create-account' };
+    const routes = { signin: '/signin', join: '/signup' };
     if (!next) {
       return routes;
     } else {
