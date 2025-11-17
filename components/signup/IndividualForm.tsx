@@ -2,16 +2,16 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { isEmpty, pick } from 'lodash';
-import { Mail } from 'lucide-react';
+import { isEmpty, omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { resendOTP, signup, verifyEmail } from '@/lib/api';
 import { formatErrorMessage, i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { cn } from '@/lib/utils';
 
 import I18nFormatters from '@/components/I18nFormatters';
 import Image from '@/components/Image';
@@ -27,23 +27,32 @@ import { PasswordInput } from '../PasswordInput';
 import { PasswordStrengthBar } from '../PasswordStrengthBar';
 import { Button } from '../ui/Button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/InputOTP';
-import { Separator } from '../ui/Separator';
 import { useToast } from '../ui/useToast';
 
-import { SignupFormContext, SignupSteps } from './common';
+import type { SignupStepProps } from './common';
+import { SignupSteps } from './common';
+
+const passwordPlaceholder = defineMessage({ id: 'CreatePassword', defaultMessage: 'Create password' });
 
 const makeLink = (props: Omit<LinkProps, 'children'>) => (children: React.ReactNode) => (
   <Link {...props}>{children}</Link>
 );
 
-const emailVerificationFormSchema = z.object({
-  email: z.string().email().min(5).max(64),
-  password: z.string().min(8).max(128).optional(),
-  otp: z.string().min(6).max(6).optional(),
-  captcha: z.object({ token: z.string().nonempty(), provider: z.string().nonempty() }).optional(),
-});
+const emailVerificationFormSchema = z.union([
+  z.object({
+    email: z.string().email().min(5).max(64),
+    password: z.string().min(8).max(128).optional(),
+    captcha: isCaptchaEnabled()
+      ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
+      : z.undefined(),
+  }),
+  z.object({
+    email: z.string().email().min(5).max(64),
+    otp: z.string().min(6).max(6).toUpperCase(),
+  }),
+]);
 
-type emailVerificationFormValuesSchema = z.infer<typeof emailVerificationFormSchema>;
+type EmailVerificationFormValuesSchema = z.infer<typeof emailVerificationFormSchema>;
 
 const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   const start = React.useRef<number | null>(new Date().getTime());
@@ -67,63 +76,55 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
 
   return (
     <Button {...props} variant="link" disabled={secondsLeft > 0}>
-      {secondsLeft > 0 ? ` (${secondsLeft}s) ` : ''}
-      <FormattedMessage defaultMessage="Resend one-time-password" id="signup.individual.resendOTP" />
+      <FormattedMessage
+        defaultMessage="Didn't receive a code? Resend{secondsLeft, select, 0 {} other { ({secondsLeft}s)}}"
+        id="signup.individual.resendOTP"
+        values={{ secondsLeft }}
+      />
     </Button>
   );
 };
 
-export function EmailVerificationSteps() {
+export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
   const router = useRouter();
-  const { login } = useLoggedInUser();
   const intl = useIntl();
-  const signupContext = React.useContext(SignupFormContext);
-  const formikRef = React.useRef<FormikProps<emailVerificationFormValuesSchema>>(undefined);
-  const [passwordScore, setPasswordScore] = React.useState(0);
-
   const { toast } = useToast();
-
-  const handleContinue = React.useCallback(
-    async (step?: SignupSteps) => {
-      if (formikRef.current) {
-        const errors = await formikRef.current.validateForm();
-        if (isEmpty(errors)) {
-          signupContext.nextStep(step);
-        }
-      }
-    },
-    [signupContext],
-  );
+  const { login } = useLoggedInUser();
+  const formikRef = React.useRef<FormikProps<EmailVerificationFormValuesSchema>>(undefined);
+  const [passwordScore, setPasswordScore] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
 
   const onSubmit = React.useCallback(
-    async (values: emailVerificationFormValuesSchema) => {
-      if (signupContext.step === SignupSteps.EMAIL_INPUT) {
-        handleContinue(SignupSteps.SET_PASSWORD);
-      } else if (signupContext.step === SignupSteps.SET_PASSWORD) {
+    async (values: EmailVerificationFormValuesSchema) => {
+      setLoading(true);
+      if (step === SignupSteps.EMAIL_INPUT) {
         const response = await signup(values);
         if (response.success || response.error.type === 'OTP_REQUEST_EXISTS') {
-          handleContinue(SignupSteps.VERIFY_OTP);
+          nextStep(SignupSteps.VERIFY_OTP, undefined, {
+            email: values.email,
+          });
         } else {
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         }
-      } else if (signupContext.step === SignupSteps.VERIFY_OTP) {
+      } else if (step === SignupSteps.VERIFY_OTP) {
         const response = await verifyEmail(pick(values, ['email', 'otp']));
         if (response.success) {
           const token = response.token;
           await login(token);
-          handleContinue();
+          nextStep();
         } else {
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         }
       }
+      setLoading(false);
     },
-    [signupContext.step, handleContinue, login, toast, intl],
+    [step, login, nextStep, toast, intl],
   );
 
   const validate = React.useCallback(
-    async (values: emailVerificationFormValuesSchema) => {
+    async (values: EmailVerificationFormValuesSchema) => {
       const errors = {} as Record<string, string>;
-      if (values.password && passwordScore < 3) {
+      if ('password' in values && values.password && passwordScore < 3) {
         errors.password = 'Password is too weak';
       }
       return errors;
@@ -146,193 +147,200 @@ export function EmailVerificationSteps() {
       } else {
         toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         if (response.error.type === 'OTP_REQUEST_NOT_FOUND') {
-          signupContext.nextStep(SignupSteps.EMAIL_INPUT);
+          nextStep(SignupSteps.EMAIL_INPUT);
         }
       }
     }
-  }, [intl, signupContext, toast]);
+  }, [intl, nextStep, toast]);
 
   return (
-    <FormikZod<emailVerificationFormValuesSchema>
+    <FormikZod<EmailVerificationFormValuesSchema>
       schema={emailVerificationFormSchema}
       onSubmit={onSubmit}
       validate={validate}
       initialValues={{ email: router.query?.email as string }}
       innerRef={formikRef}
     >
-      {({ values, setFieldValue }) => (
-        <Form className="flex grow flex-col gap-8" data-cy="create-organization-form">
-          <div className="flex w-full max-w-xl grow flex-col items-center gap-6">
-            {signupContext.step === SignupSteps.VERIFY_OTP ? (
-              <Image width={160} height={160} src="/static/images/signup/pidgeon.png" alt="Pidgeon" />
+      {({ values, setFieldValue, setValues }) => (
+        <Form
+          className="mb-6 flex max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
+          data-cy="signup-form"
+        >
+          {step === SignupSteps.VERIFY_OTP ? (
+            <Image width={100} height={116} src="/static/images/signup/pidgeon.png" alt="Pidgeon" />
+          ) : (
+            <Image width={64} height={101} src="/static/images/signup/face.png" alt="Face" />
+          )}
+          <div className="flex flex-col gap-2 px-3 text-center">
+            {step === SignupSteps.VERIFY_OTP ? (
+              <React.Fragment>
+                <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
+                  <FormattedMessage defaultMessage="Let's verify your email" id="signup.otp.title" />
+                </h1>
+                <p className="text-sm break-words text-slate-700 sm:text-base">
+                  <FormattedMessage
+                    defaultMessage="We need to verify your email address to secure your account and ensure you receive important updates."
+                    id="signup.otp.description"
+                  />
+                </p>
+              </React.Fragment>
             ) : (
-              <Image width={64} height={40} src="/static/images/signup/face.png" alt="Face" />
+              <React.Fragment>
+                <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
+                  <FormattedMessage defaultMessage="Register your personal account" id="signup.individual.title" />
+                </h1>
+                <p className="text-sm break-words text-slate-700 sm:text-base">
+                  <FormattedMessage
+                    defaultMessage="You need to register your personal account to create an organisation.{newLine}Sign in or create a personal account to continue"
+                    id="signup.individual.description"
+                    values={I18nFormatters}
+                  />
+                </p>
+              </React.Fragment>
             )}
-            <div className="flex flex-col gap-2 px-3 text-center">
-              {signupContext.step === SignupSteps.VERIFY_OTP ? (
+          </div>
+          <Card className="w-full max-w-lg">
+            <CardContent className="flex flex-col gap-4">
+              {step === SignupSteps.EMAIL_INPUT && (
                 <React.Fragment>
-                  <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                    <FormattedMessage defaultMessage="Let's verify your email" id="singup.otp.title" />
-                  </h1>
-                  <p className="text-sm break-words text-slate-700 sm:text-base">
-                    <FormattedMessage
-                      defaultMessage="We need to verify your email address to secure your account and ensure you receive important updates."
-                      id="signup.otp.description"
-                    />
-                  </p>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                    <FormattedMessage defaultMessage="Register your personal account" id="singup.individual.title" />
-                  </h1>
-                  <p className="text-sm break-words text-slate-700 sm:text-base">
-                    <FormattedMessage
-                      defaultMessage="You need to register your personal account to create an organisation.{newLine}Sign in or create a personal account to continue"
-                      id="signup.individual.description"
-                      values={I18nFormatters}
-                    />
-                  </p>
-                </React.Fragment>
-              )}
-            </div>
-            <Card className="w-full max-w-lg">
-              <CardContent className="flex flex-col gap-6">
-                {[SignupSteps.EMAIL_INPUT, SignupSteps.SET_PASSWORD].includes(signupContext.step) && (
                   <FormField
                     name="email"
                     label={<FormattedMessage id="Email" defaultMessage="Email" />}
                     placeholder="e.g. doe@johns.com"
                     type="email"
                     autoComplete="email"
+                    autoFocus
                   />
-                )}
-                {signupContext.step === SignupSteps.EMAIL_INPUT && (
-                  <React.Fragment>
-                    <Button className="w-full" type="submit" variant="default">
-                      <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-                    </Button>
-                    <div className="mt-4 text-center text-sm">
-                      <FormattedMessage
-                        defaultMessage="Already have an account? <SignInLink>Sign in</SignInLink>"
-                        id="signup.alreadyHaveAccount"
-                        values={{
-                          SignInLink: makeLink({
-                            href: '/signin',
-                            className: 'text-primary hover:underline',
-                          }),
-                        }}
-                      />
-                    </div>
-                  </React.Fragment>
-                )}
-                {signupContext.step === SignupSteps.SET_PASSWORD && (
-                  <React.Fragment>
-                    <div>
-                      <FormField
-                        name="password"
-                        label={<FormattedMessage id="Password" defaultMessage="Password" />}
-                        autoComplete="new-password"
-                      >
-                        {({ field }) => <PasswordInput {...field} />}
-                      </FormField>
-                      <div className="mt-2 w-full self-center px-1">
-                        <PasswordStrengthBar
-                          password={values.password}
-                          onChangeScore={score => setPasswordScore(score)}
+                  <div>
+                    <FormField
+                      name="password"
+                      label={<FormattedMessage id="Password" defaultMessage="Password" />}
+                      placeholder={intl.formatMessage(passwordPlaceholder)}
+                      autoComplete="new-password"
+                    >
+                      {({ field }) => (
+                        <PasswordInput
+                          {...field}
+                          onChange={e => {
+                            const { value } = e.target;
+                            if ('password' in values && value === '') {
+                              setValues(omit(values, 'password'));
+                            } else {
+                              setFieldValue('password', value);
+                            }
+                          }}
                         />
-                      </div>
-                    </div>
-                    {isCaptchaEnabled() && (
-                      <div className="flex justify-center">
-                        <Captcha onVerify={value => setFieldValue('captcha', value)} />
-                      </div>
-                    )}
-                    <Button className="w-full" type="submit" variant="default">
-                      <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-                    </Button>
-                    <div className="flex items-center justify-stretch gap-4 overflow-hidden text-sm text-muted-foreground">
-                      <Separator className="w-fit grow" />
-                      <FormattedMessage defaultMessage="Or" id="signup.individual.or" />
-                      <Separator className="w-fit grow" />
-                    </div>
-                    <Button className="w-full" type="submit" variant="outline">
-                      <Mail size="16px" />
-                      <FormattedMessage
-                        id="signup.individual.continueWithEmail"
-                        defaultMessage="Continue with email code"
+                      )}
+                    </FormField>
+                    <div className="mt-2 w-full self-center px-1">
+                      <PasswordStrengthBar
+                        password={'password' in values && values.password}
+                        onChangeScore={score => setPasswordScore(score)}
                       />
-                    </Button>
-                  </React.Fragment>
-                )}
-                {signupContext.step === SignupSteps.VERIFY_OTP && (
-                  <React.Fragment>
-                    <p className="text-center">
-                      <FormattedMessage
-                        defaultMessage="We have sent a one-time code to <strong>{email}</strong>.{newLine}Please enter it below to verify your account."
-                        id="signup.individual.verifyOtp.description"
-                        values={{ ...I18nFormatters, email: values.email }}
-                      />
-                    </p>
-                    <div>
-                      <FormField name="otp" required autoComplete="one-time-code" showError={false}>
-                        {({ field, form }) => (
-                          <InputOTP
-                            maxLength={6}
-                            containerClassName="justify-center"
-                            onChange={value => form.setFieldValue(field.name, value)}
-                          >
-                            <InputOTPGroup>
-                              <InputOTPSlot index={0} autoFocus />
-                              <InputOTPSlot index={1} />
-                              <InputOTPSlot index={2} />
-                              <InputOTPSlot index={3} />
-                              <InputOTPSlot index={4} />
-                              <InputOTPSlot index={5} />
-                            </InputOTPGroup>
-                          </InputOTP>
-                        )}
-                      </FormField>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <ResendOTPCodeButton variant="link" onClick={resendOTPCode} />
-                      <Button className="w-full" type="submit" variant="default">
-                        <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          signupContext.nextStep(SignupSteps.EMAIL_INPUT);
-                        }}
-                      >
-                        <FormattedMessage defaultMessage="Change email address" id="signup.individual.changeEmail" />
-                      </Button>
-                    </div>
-                  </React.Fragment>
-                )}
-              </CardContent>
-            </Card>
-
-            <div className="grow" />
-            <div className="mb-[10%] max-w-md text-center text-sm text-muted-foreground">
-              <FormattedMessage
-                defaultMessage="By creating an account, you agree to our{newLine}<TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
-                id="signup.individual.tosAgreement"
-                values={{
-                  ...I18nFormatters,
-                  TOSLink: makeLink({
-                    href: '/tos',
-                    openInNewTab: true,
-                    className: 'underline',
-                  }),
-                  PrivacyPolicyLink: makeLink({
-                    href: '/privacypolicy',
-                    openInNewTab: true,
-                    className: 'underline',
-                  }),
+                  </div>
+                  {isCaptchaEnabled() && (
+                    <FormField name="captcha" className="flex items-center">
+                      {() => <Captcha onVerify={value => setFieldValue('captcha', value)} />}
+                    </FormField>
+                  )}
+                </React.Fragment>
+              )}
+              {step === SignupSteps.VERIFY_OTP && (
+                <React.Fragment>
+                  <p className="text-center">
+                    <FormattedMessage
+                      defaultMessage="Enter the code sent to <strong>{email}</strong>."
+                      id="signup.individual.verifyOtp.description"
+                      values={{ email: values.email, ...I18nFormatters }}
+                    />
+                  </p>
+                  <div>
+                    <FormField name="otp" required autoComplete="one-time-code" showError={false}>
+                      {({ field, form }) => (
+                        <InputOTP
+                          maxLength={6}
+                          containerClassName="justify-center"
+                          onChange={async value => {
+                            form.setFieldValue(field.name, value.toUpperCase());
+                          }}
+                          onComplete={form.submitForm}
+                          autoFocus
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      )}
+                    </FormField>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <ResendOTPCodeButton variant="link" onClick={resendOTPCode} />
+                  </div>
+                </React.Fragment>
+              )}
+            </CardContent>
+          </Card>
+          {step === SignupSteps.VERIFY_OTP && <div className="grow sm:hidden" />}
+          <div className={cn('flex w-full max-w-lg flex-col gap-4', step === SignupSteps.EMAIL_INPUT && 'grow')}>
+            <Button type="submit" variant="default" loading={loading} className="w-full">
+              <FormattedMessage id="actions.continue" defaultMessage="Continue" />
+            </Button>
+            {step === SignupSteps.VERIFY_OTP && (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  await router.replace(router.pathname, undefined, { shallow: true });
+                  nextStep(SignupSteps.EMAIL_INPUT);
                 }}
-              />
-            </div>
+                className="w-full"
+                disabled={loading}
+              >
+                <FormattedMessage defaultMessage="Go Back" id="GoBack" />
+              </Button>
+            )}
+            {step === SignupSteps.EMAIL_INPUT && (
+              <React.Fragment>
+                <div className="text-center text-sm text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="Already have an account? <SignInLink>Sign in</SignInLink>"
+                    id="signup.alreadyHaveAccount"
+                    values={{
+                      SignInLink: makeLink({
+                        href: '/signin',
+                        className: 'text-primary hover:underline',
+                      }),
+                    }}
+                  />
+                </div>
+                <div className="-order-2 grow text-center text-sm text-muted-foreground sm:order-none sm:flex sm:items-end sm:justify-center">
+                  <p>
+                    <FormattedMessage
+                      defaultMessage="By creating an account, you agree to our{newLine}<TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+                      id="signup.individual.tosAgreement"
+                      values={{
+                        ...I18nFormatters,
+                        TOSLink: makeLink({
+                          href: '/tos',
+                          openInNewTab: true,
+                          className: 'underline',
+                        }),
+                        PrivacyPolicyLink: makeLink({
+                          href: '/privacypolicy',
+                          openInNewTab: true,
+                          className: 'underline',
+                        }),
+                      }}
+                    />
+                  </p>
+                </div>
+              </React.Fragment>
+            )}
           </div>
         </Form>
       )}
@@ -373,27 +381,29 @@ const completeProfileMutation = gql`
   }
 `;
 
-export function CompleteProfileSteps() {
+export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
   const intl = useIntl();
   const router = useRouter();
-  const signupContext = React.useContext(SignupFormContext);
+  const { toast } = useToast();
   const { refetchLoggedInUser, LoggedInUser } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<CompleteProfileFormValuesSchema>>(undefined);
   const { data, refetch: refetchMe } = useQuery(profileQuery, { context: API_V2_CONTEXT, skip: !LoggedInUser });
-  const [updateAccount, { loading: submitting }] = useMutation(completeProfileMutation, {
+  const [updateAccount] = useMutation(completeProfileMutation, {
     context: API_V2_CONTEXT,
   });
-  const { toast } = useToast();
+  const [loading, setLoading] = React.useState(false);
 
   const onSubmit = React.useCallback(
     async (values: CompleteProfileFormValuesSchema) => {
       try {
+        setLoading(true);
         await updateAccount({ variables: { account: values } });
         await refetchLoggedInUser();
-        signupContext.nextStep(undefined, () => {
+        nextStep(undefined, () => {
           router.push('/welcome');
         });
       } catch (e) {
+        setLoading(false);
         toast({ variant: 'error', title: 'Error', message: e.message });
         toast({
           variant: 'error',
@@ -402,7 +412,7 @@ export function CompleteProfileSteps() {
         });
       }
     },
-    [signupContext, updateAccount, intl, router, refetchLoggedInUser, toast],
+    [nextStep, updateAccount, intl, router, refetchLoggedInUser, toast],
   );
 
   React.useEffect(() => {
@@ -421,68 +431,65 @@ export function CompleteProfileSteps() {
       initialValues={{}}
       innerRef={formikRef}
     >
-      {() => (
-        <Form className="flex grow flex-col gap-8" data-cy="create-organization-form">
-          <div className="flex w-full max-w-xl grow flex-col items-center gap-6">
-            <Image width={80} height={79} src="/static/images/signup/stars.png" alt="Face" />
-            <div className="flex flex-col gap-2 px-3 text-center">
-              <React.Fragment>
-                <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                  <FormattedMessage defaultMessage="Let's complete your profile" id="singup.completeProfile.title" />
-                </h1>
-                <p className="text-sm break-words text-slate-700 sm:text-base">
-                  <FormattedMessage
-                    defaultMessage="A well rounded complete profile increases trust."
-                    id="signup.completeProfile.description"
-                  />
-                </p>
-              </React.Fragment>
-            </div>
-            <Card className="w-full max-w-lg">
-              <CardContent className="flex flex-col gap-6">
-                <div className="self-center">
-                  <FormField name="image">
-                    {({ field, form }) => (
-                      <EditAvatar
-                        size={120}
-                        type="USER"
-                        name={field.name}
-                        value={field.value}
-                        onSuccess={({ url }) => form.setFieldValue(field.name, url)}
-                        onReject={() => form.setFieldValue(field.name, null)}
-                        minSize={1024}
-                        maxSize={2e3 * 1024}
-                      />
-                    )}
-                  </FormField>
-                </div>
-                <FormField
-                  name="name"
-                  label={<FormattedMessage id="DisplayName" defaultMessage="Display Name" />}
-                  placeholder="e.g. John Doe"
-                  type="string"
-                  autoComplete="name nickname"
+      {({ values }) => (
+        <Form
+          className="mb-6 flex max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
+          data-cy="complete-profile-form"
+        >
+          <Image width={80} height={79} src="/static/images/signup/stars.png" alt="Face" />
+          <div className="flex flex-col gap-2 px-3 text-center">
+            <React.Fragment>
+              <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
+                <FormattedMessage defaultMessage="Let's complete your profile" id="signup.completeProfile.title" />
+              </h1>
+              <p className="text-sm break-words text-slate-700 sm:text-base">
+                <FormattedMessage
+                  defaultMessage="A well rounded complete profile increases trust."
+                  id="signup.completeProfile.description"
                 />
-                <FormField
-                  name="legalName"
-                  label={<FormattedMessage id="LegalName" defaultMessage="Legal Name" />}
-                  placeholder="e.g. Johnathan Doe"
-                  type="string"
-                  autoComplete="name"
-                  hint={
-                    <span className="text-xs">
-                      <FormattedMessage
-                        defaultMessage="Your full legal name is required if different from name."
-                        id="Hs/7w7"
-                      />
-                    </span>
-                  }
-                />
-                <Button className="w-full" type="submit" variant="default" loading={submitting}>
-                  <FormattedMessage id="signup.completeProfile.action" defaultMessage="Create Profile" />
-                </Button>
-              </CardContent>
-            </Card>
+              </p>
+            </React.Fragment>
+          </div>
+          <Card className="w-full max-w-lg">
+            <CardContent className="flex flex-col gap-4">
+              <div className="self-center">
+                <FormField name="image">
+                  {({ field, form }) => (
+                    <EditAvatar
+                      size={120}
+                      type="INDIVIDUAL"
+                      value={field.value}
+                      onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                      onReject={() => form.setFieldValue(field.name, null)}
+                      minSize={1024}
+                      maxSize={2e3 * 1024}
+                    />
+                  )}
+                </FormField>
+              </div>
+              <FormField
+                name="name"
+                label={<FormattedMessage id="DisplayName" defaultMessage="Display Name" />}
+                placeholder="e.g. John Doe"
+                type="string"
+                autoComplete="name nickname"
+                autoFocus
+              />
+              <FormField
+                name="legalName"
+                label={<FormattedMessage id="LegalName" defaultMessage="Legal Name" />}
+                placeholder={isEmpty(values.name) ? 'e.g. Johnathan Doe' : values.name}
+                type="string"
+                autoComplete="name"
+              />
+            </CardContent>
+          </Card>
+          <div className="grow sm:hidden" />
+
+          <div className="flex w-full max-w-lg flex-col gap-4">
+            <Button className="w-full" type="submit" variant="default" loading={loading}>
+              <FormattedMessage id="signup.completeProfile.action" defaultMessage="Create Profile" />
+            </Button>
           </div>
         </Form>
       )}
