@@ -10,7 +10,7 @@ export enum SignupSteps {
 
 export type SignupStepProps = {
   step: SignupSteps;
-  nextStep: (step?: SignupSteps, completeAction?: () => void, query?: Record<string, string | string[]>) => void;
+  nextStep: (step?: SignupSteps, query?: Record<string, string | string[]>) => void;
   setCreatedOrganization?: (organizationData: OrganizationSignupMutation['createOrganization']) => void;
   createdOrganization?: OrganizationSignupMutation['createOrganization'];
 };

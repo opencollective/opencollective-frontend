@@ -16,7 +16,6 @@ import { CountryIso, Currency } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nCountryName } from '@/lib/i18n';
 import { getCountryCodeFromLocalBrowserLanguage, getFlagEmoji } from '@/lib/i18n/countries';
-import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
 
 import Captcha, { isCaptchaEnabled } from '../Captcha';
@@ -427,7 +426,6 @@ const invitedAdminToMember = ({ email, name }) => {
 export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepProps) {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<InviteAdminsValuesSchema>>(undefined);
-  const router = useRouter();
   const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
   const [inviteOrganizationAdmins] = useMutation(inviteOrganizationAdminsMutation, {
     context: API_V2_CONTEXT,
@@ -452,9 +450,7 @@ export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepPro
         variant: 'success',
         message: <FormattedMessage id="signup.inviteAdmins.success" defaultMessage="Invites sent!" />,
       });
-      nextStep(undefined, () => {
-        router.push(getDashboardRoute(createdOrganization, '/overview'));
-      });
+      nextStep();
     } catch (error) {
       setLoading(false);
       const gqlError = getErrorFromGraphqlException(error);
@@ -564,13 +560,7 @@ export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepPro
           </Card>
           <div className="grow sm:hidden" />
           <div className="flex w-full max-w-lg flex-col-reverse gap-4 sm:flex-row sm:justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              className="grow"
-              disabled={loading}
-              onClick={() => router.push(getDashboardRoute(createdOrganization, '/overview'))}
-            >
+            <Button type="button" variant="outline" className="grow" disabled={loading} onClick={() => nextStep()}>
               <FormattedMessage defaultMessage="Skip to Dashboard" id="SkipToDashboard" />
             </Button>
             <Button type="submit" disabled={!isValid} loading={loading} className="grow">

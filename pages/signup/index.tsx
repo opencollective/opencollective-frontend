@@ -1,10 +1,12 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { omit } from 'lodash';
+import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import { getDashboardRoute, isRelativeHref } from '@/lib/url-helpers';
 
 import Body from '@/components/Body';
 import Header from '@/components/Header';
@@ -34,12 +36,21 @@ const STEP_URLS = {
   [SignupSteps.CREATE_ORG]: '/signup/organization',
 };
 
+const getRedirectPathSafe = (router: NextRouter) => {
+  if (!router.query?.next) {
+    return null;
+  }
+  const next = Array.isArray(router.query?.next) ? router.query.next[0] : router.query.next;
+  return isRelativeHref(next) && next !== '/' ? next : null;
+};
+
 // ts-unused-exports:disable-next-line
 export default function SignupPage() {
   const router = useRouter();
   const [includeOrganizationFlow, setIncludeOrganizationFlow] = React.useState(
     Boolean(router.query?.step === 'organization' || router.query?.organization === 'true'),
   );
+  const redirectPath = React.useRef(getRedirectPathSafe(router));
   const steps = React.useMemo(
     () =>
       !includeOrganizationFlow ? DEFAULT_STEPS : [...DEFAULT_STEPS, SignupSteps.CREATE_ORG, SignupSteps.INVITE_ADMINS],
@@ -51,11 +62,14 @@ export default function SignupPage() {
     STEP_URLS[router.query?.step as SignupSteps] ? (router.query?.step as SignupSteps) : steps[0],
   );
   const nextStep = React.useCallback(
-    (requestedStep?: SignupSteps, completeAction?: () => void, query?: Record<string, string | string[]>) => {
+    (requestedStep?: SignupSteps, query?: Record<string, string | string[]>) => {
       setStep(prev => {
         const nextStep = steps[steps.indexOf(prev) + 1];
-        if (!requestedStep && !nextStep && completeAction) {
-          completeAction();
+        if (!requestedStep && !nextStep) {
+          const pathname =
+            redirectPath.current ||
+            (createdOrganization ? getDashboardRoute(createdOrganization, '/overview') : '/welcome');
+          router.push(pathname);
           return prev;
         } else {
           const step = requestedStep || nextStep;
@@ -73,7 +87,7 @@ export default function SignupPage() {
         }
       });
     },
-    [steps, router, includeOrganizationFlow],
+    [steps, router, includeOrganizationFlow, createdOrganization],
   );
 
   const me = data?.me;
@@ -83,12 +97,12 @@ export default function SignupPage() {
     }
     if (me && step === steps[0]) {
       if (me.requiresProfileCompletion) {
-        nextStep(SignupSteps.COMPLETE_PROFILE, undefined, omit(router.query, ['email']));
+        nextStep(SignupSteps.COMPLETE_PROFILE, omit(router.query, ['email']));
       } else if (includeOrganizationFlow) {
         nextStep(SignupSteps.CREATE_ORG);
       } else {
         // If the user is already logged in and not creating an org, redirect to home page
-        router.push('/dashboard');
+        router.push(redirectPath.current || '/dashboard');
       }
     } else if (
       !me &&

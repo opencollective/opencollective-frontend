@@ -100,7 +100,7 @@ export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
       if (step === SignupSteps.EMAIL_INPUT) {
         const response = await signup(values);
         if (response.success || response.error.type === 'OTP_REQUEST_EXISTS') {
-          nextStep(SignupSteps.VERIFY_OTP, undefined, {
+          nextStep(SignupSteps.VERIFY_OTP, {
             email: values.email,
           });
         } else {
@@ -295,6 +295,7 @@ export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
               <Button
                 variant="outline"
                 onClick={async () => {
+                  // Clear Query
                   await router.replace(router.pathname, undefined, { shallow: true });
                   nextStep(SignupSteps.EMAIL_INPUT);
                 }}
@@ -383,7 +384,6 @@ const completeProfileMutation = gql`
 
 export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
   const intl = useIntl();
-  const router = useRouter();
   const { toast } = useToast();
   const { refetchLoggedInUser, LoggedInUser } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<CompleteProfileFormValuesSchema>>(undefined);
@@ -399,9 +399,7 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
         setLoading(true);
         await updateAccount({ variables: { account: values } });
         await refetchLoggedInUser();
-        nextStep(undefined, () => {
-          router.push('/welcome');
-        });
+        nextStep();
       } catch (e) {
         setLoading(false);
         toast({ variant: 'error', title: 'Error', message: e.message });
@@ -412,7 +410,7 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
         });
       }
     },
-    [nextStep, updateAccount, intl, router, refetchLoggedInUser, toast],
+    [nextStep, updateAccount, intl, refetchLoggedInUser, toast],
   );
 
   React.useEffect(() => {
