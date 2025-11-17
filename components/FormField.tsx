@@ -47,6 +47,8 @@ export function FormField({
   validate?: any;
   className?: string;
   autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
+  autoFocus?: boolean;
+  ref?: React.ForwardedRef<HTMLInputElement>;
   onFocus?: () => void;
   onChange?: (e) => void;
 }) {
@@ -74,6 +76,9 @@ export function FormField({
               required: props.required,
               error: hasError,
               placeholder,
+              autoFocus: props.autoFocus,
+              autoComplete: props.autoComplete,
+              ref: props.ref,
               onFocus: props.onFocus,
               onChange: props.onChange || field.onChange,
             },

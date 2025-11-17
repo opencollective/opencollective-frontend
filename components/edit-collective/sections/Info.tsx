@@ -327,7 +327,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               {({ field, form }) => (
                 <EditAvatar
                   size={120}
-                  name={field.name}
+                  name={values.name}
                   type={account.type}
                   value={field.value}
                   onSuccess={({ url }) => form.setFieldValue(field.name, url)}

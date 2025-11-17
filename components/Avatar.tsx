@@ -1,5 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
+import { isEmpty } from 'lodash';
 import { ArrowUp, Calendar, LoaderCircle, Pencil, TestTube2, UserCog } from 'lucide-react';
 import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
@@ -114,6 +115,8 @@ const Avatar = ({
   style?: React.CSSProperties;
 } & React.ComponentProps<typeof StyledAvatar>) => {
   let child = children;
+  const isIndividual = type === 'INDIVIDUAL' || type === 'USER';
+
   if (collective?.type === 'ROOT') {
     useIcon = true;
   }
@@ -133,13 +136,13 @@ const Avatar = ({
     } else {
       src = getCollectiveImage(collective, { height: getImageHeightFromRadius(radius) });
     }
-
-    if (!src && !child) {
-      if ((type === 'USER' || type === 'INDIVIDUAL') && name) {
-        child = <span>{getInitials(name)}</span>;
-      }
+  }
+  if (!src && !child) {
+    if (isIndividual && !isEmpty(name)) {
+      child = <span>{getInitials(name)}</span>;
     }
   }
+
   return (
     <StyledAvatar size={radius} type={type} src={src} title={displayTitle ? name : undefined} {...styleProps}>
       {child}
@@ -230,6 +233,7 @@ export const EditAvatar = ({
     },
     [uploadFiles],
   );
+  const isIndividual = type === 'INDIVIDUAL' || type === 'USER';
   const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
   const { getRootProps, isDragActive } = useDropzone(dropzoneParams);
   const dropProps = getRootProps();
@@ -249,10 +253,11 @@ export const EditAvatar = ({
           isUploading && 'opacity-30 ring-0!',
           isDragActive && 'ring-2 ring-primary after:bg-white/30',
         )}
-        src={value || '/static/images/signup/face.png'}
-        backgroundSize={value ? undefined : '30%'}
+        src={isIndividual ? value || '/static/images/sample-avatar.png' : value}
+        backgroundSize={value ? undefined : '80%'}
+        type={type || 'INDIVIDUAL'}
         name={name}
-        type={type || 'USER'}
+        displayTitle
       />
       <div
         className={cn(
