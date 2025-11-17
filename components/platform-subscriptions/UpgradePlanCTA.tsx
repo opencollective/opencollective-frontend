@@ -30,7 +30,7 @@ const content: Content = {
   CHART_OF_ACCOUNTS: {
     title: defineMessage({
       id: 'UpgradePlanCTA.CHART_OF_ACCOUNTS.title',
-      defaultMessage: 'Upgrade your plan to access chart of accounts.',
+      defaultMessage: 'Upgrade your plan to enable chart of accounts.',
     }),
     benefits: [
       defineMessage({
@@ -181,15 +181,49 @@ const content: Content = {
     }),
     learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/funds-and-grants',
   },
+  EXPECTED_FUNDS: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.EXPECTED_FUNDS.title',
+      defaultMessage: 'Upgrade your plan to manage expected funds effortlessly.',
+    }),
+    benefits: [
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.track',
+        defaultMessage: 'Track pending bank transfers and fundraising pledges before the money lands.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.allocate',
+        defaultMessage: 'Allocate expected funds to specific Collectives, projects, events, or tiers.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.reconcile',
+        defaultMessage: 'Reconcile arrivals faster with pre-filled contribution details and ledger entries.',
+      }),
+      defineMessage({
+        id: 'UpgradePlanCTA.EXPECTED_FUNDS.notify',
+        defaultMessage: 'Automatically notify admins and funders once funds are received and allocated.',
+      }),
+    ],
+    learnMoreUrl: 'https://documentation.opencollective.com/fiscal-hosts/receiving-money/expected-funds',
+  },
+  CHARGE_HOSTING_FEES: {
+    title: defineMessage({
+      id: 'UpgradePlanCTA.CHARGE_HOSTING_FEES.title',
+      defaultMessage: 'Upgrade your plan to enable collecting host fees.',
+    }),
+    learnMoreUrl:
+      'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/setting-your-fiscal-host-fees',
+  },
 };
 
 type UpgradePlanCTAProps = {
   featureKey: FeatureKey;
   className?: string;
   compact?: boolean;
+  hideBenefits?: boolean;
 };
 
-export function UpgradePlanCTA({ featureKey, className, compact = false }: UpgradePlanCTAProps) {
+export function UpgradePlanCTA({ featureKey, className, compact = false, hideBenefits = false }: UpgradePlanCTAProps) {
   const { account } = React.useContext(DashboardContext);
 
   if (isFeatureEnabled(account, featureKey)) {
@@ -211,14 +245,14 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
   if (compact) {
     return (
       <Alert variant="info" className={cn('p-4', className)}>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Image src="/static/images/lock.png" alt="Lock" width={24} height={24} className="shrink-0" />
             <div className="min-w-0 flex-1">
-              <AlertTitle className="leading-tight font-semibold text-foreground">{title}</AlertTitle>
+              <AlertTitle className="mb-0 leading-tight font-semibold text-foreground">{title}</AlertTitle>
             </div>
           </div>
-          {featureAccess === 'DISABLED' && customContent?.benefits && (
+          {featureAccess === 'DISABLED' && customContent?.benefits && !hideBenefits && (
             <div className="space-y-1">
               {customContent.benefits.map(benefit => (
                 <div key={benefit.id} className="flex items-start gap-2 text-left">
@@ -267,7 +301,7 @@ export function UpgradePlanCTA({ featureKey, className, compact = false }: Upgra
             {title}
           </AlertTitle>
 
-          {featureAccess === 'DISABLED' && customContent?.benefits && (
+          {featureAccess === 'DISABLED' && customContent?.benefits && !hideBenefits && (
             <div className="w-full max-w-xl space-y-3">
               {customContent.benefits.map(benefit => (
                 <div key={benefit.id} className="flex items-start gap-3 text-left">

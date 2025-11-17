@@ -20,6 +20,7 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { elementFromClass } from '../../../../lib/react-utils';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -498,6 +499,8 @@ const CollectiveDetails = ({
   const isLoading = loading || loadingCollectiveInfo;
   const isChild = !!collective?.parent?.id;
 
+  const isUpgradeRequiredForSettingHostFee = requiresUpgrade(account, FEATURES.CHARGE_HOSTING_FEES);
+
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
   const balance = collective?.stats?.balance;
   const consolidatedBalance = collective?.stats?.consolidatedBalance;
@@ -604,10 +607,13 @@ const CollectiveDetails = ({
             <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
             {isHostedCollective && (
               <React.Fragment>
-                <InfoListItem
-                  title={<FormattedMessage defaultMessage="Fee Structure" id="CS88Lr" />}
-                  value={<HostFeeStructurePicker host={host} collective={collective} />}
-                />
+                {!isUpgradeRequiredForSettingHostFee && (
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Fee Structure" id="CS88Lr" />}
+                    value={<HostFeeStructurePicker host={host} collective={collective} />}
+                  />
+                )}
+
                 <InfoListItem
                   title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
                   value={<ExpenseTypesPicker host={host} collective={collective} />}
