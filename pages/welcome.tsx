@@ -48,7 +48,9 @@ const Welcome = () => {
               alt="Avatar"
             />
           </div>
-          <div className="text-black-900 pt-10 pb-8 text-2xl leading-8 font-bold">{LoggedInUser?.collective?.name}</div>
+          <div data-cy="welcome-username" className="text-black-900 pt-10 pb-8 text-2xl leading-8 font-bold">
+            {LoggedInUser?.collective?.name}
+          </div>
 
           <div className="mt-2 w-full rounded-lg bg-white p-2 hover:bg-blue-50 lg:w-[472px]">
             <Link href="/create">
