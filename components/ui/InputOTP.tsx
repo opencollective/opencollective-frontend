@@ -16,6 +16,8 @@ function InputOTP({
       containerClassName={cn('flex items-center gap-2 has-disabled:opacity-50', containerClassName)}
       className={cn('disabled:cursor-not-allowed', className)}
       {...props}
+      // Since we use alphanumeric characters, we force "text" inputMode so that mobile devices show the full keyboard
+      inputMode="text"
     />
   );
 }

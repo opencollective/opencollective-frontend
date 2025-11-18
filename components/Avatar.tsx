@@ -235,7 +235,7 @@ export const EditAvatar = ({
   );
   const isIndividual = type === 'INDIVIDUAL' || type === 'USER';
   const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
-  const { getRootProps, isDragActive } = useDropzone(dropzoneParams);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
   const dropProps = getRootProps();
   return (
     <div
@@ -246,6 +246,7 @@ export const EditAvatar = ({
       role="button"
       tabIndex={0}
     >
+      <input name={name} {...getInputProps()} />
       <Avatar
         size={size}
         className={cn(
