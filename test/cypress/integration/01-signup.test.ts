@@ -76,7 +76,8 @@ describe('/signup', () => {
         cy.getByDataCy('signup-form').as('form');
         cy.get('@form').find('input[name="email"]').type(email);
         cy.get('@form').find('button[type="submit"]').click();
-        cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}&organization=true`);
+        cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}`);
+        cy.url().should('include', `&organization=true`);
       });
 
       it('should send OTP through email', () => {
