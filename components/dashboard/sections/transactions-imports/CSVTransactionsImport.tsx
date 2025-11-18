@@ -120,6 +120,18 @@ const transactionsImportHostFieldsFragment = gql`
   ${accountingCategoryFields}
 `;
 
+const transactionsImportStatsQuery = gql`
+  query TransactionsImportStats($importId: NonEmptyString!) {
+    transactionsImport(id: $importId) {
+      id
+      stats {
+        ...TransactionsImportStats
+      }
+    }
+  }
+  ${TransactionsImportStatsFragment}
+`;
+
 const transactionsImportQuery = gql`
   query TransactionsImport(
     $importId: NonEmptyString!
@@ -305,7 +317,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
     filters,
   });
 
-  const { data, previousData, loading, error, refetch, variables } = useQuery<
+  const { data, previousData, loading, error, refetch, variables, client } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
   >(transactionsImportQuery, {
@@ -323,6 +335,14 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host: importData?.account?.['host'],
+    onUpdateSuccess: () =>
+      client.query({
+        query: transactionsImportStatsQuery,
+        variables: { importId },
+        fetchPolicy: 'network-only',
+        context: API_V2_CONTEXT,
+      }),
+    skipOptimisticResponse: true,
     getAllRowsIds: async () => {
       const { data, error } = await apolloClient.query<TransactionsImportQuery, TransactionsImportQueryVariables>({
         query: transactionsImportQuery,

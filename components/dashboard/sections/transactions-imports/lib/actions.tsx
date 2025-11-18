@@ -56,12 +56,16 @@ const getOptimisticResponse = (
 export const useTransactionsImportActions = ({
   host,
   getAllRowsIds,
+  onUpdateSuccess,
+  skipOptimisticResponse,
 }: {
   host: React.ComponentProps<typeof MatchCreditDialog>['host'] &
     React.ComponentProps<typeof MatchDebitDialog>['host'] &
     React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
   /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
   getAllRowsIds: () => Promise<string[]>;
+  onUpdateSuccess: () => void;
+  skipOptimisticResponse?: boolean;
 }): {
   getActions: GetActions<TransactionsImportRow>;
   setRowsStatus: (
@@ -105,8 +109,10 @@ export const useTransactionsImportActions = ({
           action,
           rows: allRowsIds.map(id => ({ id, status: newStatus })),
         },
-        optimisticResponse: getOptimisticResponse(host, rowIds, newStatus),
+        optimisticResponse: !skipOptimisticResponse ? getOptimisticResponse(host, rowIds, newStatus) : undefined,
       });
+
+      onUpdateSuccess?.();
 
       return true;
     } catch (error) {
