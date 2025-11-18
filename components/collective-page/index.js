@@ -235,6 +235,7 @@ class CollectivePage extends Component {
           <SectionConnectedCollectives
             collective={this.props.collective}
             connectedCollectives={this.props.connectedCollectives}
+            isAdmin={this.props.isAdmin}
           />
         );
       case Sections.TOP_FINANCIAL_CONTRIBUTORS:
