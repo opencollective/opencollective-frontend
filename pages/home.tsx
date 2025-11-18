@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getRequestIntl } from '../lib/i18n/request';
