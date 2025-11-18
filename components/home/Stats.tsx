@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -62,62 +63,104 @@ const Stats = () => {
 
           {/* Content with relative positioning to appear above background */}
           <div className="relative z-10">
-            <h2 className="mb-6 text-center text-2xl font-semibold text-slate-700 sm:mb-8 sm:text-3xl lg:mb-10 lg:text-[2rem]">
+            <motion.h2
+              className="mb-6 text-center text-2xl font-semibold text-slate-700 sm:mb-8 sm:text-3xl lg:mb-10 lg:text-[2rem]"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
+            >
               {formatMessage(messages.title)}
-            </h2>
+            </motion.h2>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
               {/* Top Row */}
-              <div className="text-center">
+              <motion.div
+                className="text-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
                   {stats.organizations}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.organizations)}
                 </div>
-              </div>
-              <div className="text-center">
+              </motion.div>
+              <motion.div
+                className="text-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
                   {stats.collectives}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.collectives)}
                 </div>
-              </div>
-              <div className="text-center">
+              </motion.div>
+              <motion.div
+                className="text-center"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
                   {stats.moneyManaged}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.moneyManaged)}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Bottom Row */}
-              <div className="text-center lg:pt-8">
+              <motion.div
+                className="text-center lg:pt-8"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
                   {stats.expensesPaid}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.expensesPaid)}
                 </div>
-              </div>
-              <div className="text-center lg:pt-8">
+              </motion.div>
+              <motion.div
+                className="text-center lg:pt-8"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
                   {stats.contributionsReceived}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.contributionsReceived)}
                 </div>
-              </div>
-              <div className="text-center lg:pt-8">
+              </motion.div>
+              <motion.div
+                className="text-center lg:pt-8"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
                 <div className="mb-2 text-4xl font-bold text-slate-700 sm:mb-3 sm:text-5xl lg:text-6xl">
                   {stats.transactionsRecorded}
                 </div>
                 <div className="text-base text-slate-700 sm:text-lg lg:text-xl">
                   {formatMessage(messages.transactionsRecorded)}
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
