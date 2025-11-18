@@ -11,6 +11,7 @@ export enum SignupSteps {
 export type SignupStepProps = {
   step: SignupSteps;
   nextStep: (step?: SignupSteps, query?: Record<string, string | string[]>) => void;
+  includeOrganizationFlow?: boolean;
   setCreatedOrganization?: (organizationData: OrganizationSignupMutation['createOrganization']) => void;
   createdOrganization?: OrganizationSignupMutation['createOrganization'];
 };

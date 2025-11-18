@@ -2,9 +2,9 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
-import { isEmpty, omit, pick } from 'lodash';
+import { omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { resendOTP, signup, verifyEmail } from '@/lib/api';
@@ -32,8 +32,6 @@ import { useToast } from '../ui/useToast';
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
 
-const passwordPlaceholder = defineMessage({ id: 'CreatePassword', defaultMessage: 'Create password' });
-
 const makeLink = (props: Omit<LinkProps, 'children'>) => (children: React.ReactNode) => (
   <Link {...props}>{children}</Link>
 );
@@ -41,7 +39,6 @@ const makeLink = (props: Omit<LinkProps, 'children'>) => (children: React.ReactN
 const emailVerificationFormSchema = z.union([
   z.object({
     email: z.string().email().min(5).max(64),
-    password: z.string().min(8).max(128).optional(),
     captcha: isCaptchaEnabled()
       ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
       : z.undefined(),
@@ -54,9 +51,11 @@ const emailVerificationFormSchema = z.union([
 
 type EmailVerificationFormValuesSchema = z.infer<typeof emailVerificationFormSchema>;
 
+const OTP_RESEND_INTERVAL = 30; // seconds
+
 const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
-  const start = React.useRef<number | null>(new Date().getTime());
-  const [secondsLeft, setSecondsLeft] = React.useState(60);
+  const [start, setStart] = React.useState<number>(new Date().getTime());
+  const [secondsLeft, setSecondsLeft] = React.useState(OTP_RESEND_INTERVAL);
 
   React.useEffect(() => {
     if (secondsLeft <= 0) {
@@ -64,18 +63,29 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
     }
     const interval = setInterval(() => {
       const now = new Date().getTime();
-      const elapsed = Math.floor((now - (start.current || now)) / 1000);
-      const remaining = Math.max(0, 60 - elapsed);
+      const elapsed = Math.floor((now - (start || now)) / 1000);
+      const remaining = Math.max(0, OTP_RESEND_INTERVAL - elapsed);
       setSecondsLeft(remaining);
       if (remaining <= 0) {
         clearInterval(interval);
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [secondsLeft]);
+  }, [secondsLeft, start]);
+
+  const onClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      setStart(new Date().getTime());
+      setSecondsLeft(OTP_RESEND_INTERVAL);
+      if (props.onClick) {
+        props.onClick(e);
+      }
+    },
+    [props],
+  );
 
   return (
-    <Button {...props} variant="link" disabled={secondsLeft > 0}>
+    <Button {...props} onClick={onClick} variant="link" disabled={secondsLeft > 0}>
       <FormattedMessage
         defaultMessage="Didn't receive a code? Resend{secondsLeft, select, 0 {} other { ({secondsLeft}s)}}"
         id="signup.individual.resendOTP"
@@ -85,29 +95,32 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   );
 };
 
-export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
+export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow }: SignupStepProps) {
   const router = useRouter();
   const intl = useIntl();
   const { toast } = useToast();
   const { login } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<EmailVerificationFormValuesSchema>>(undefined);
-  const [passwordScore, setPasswordScore] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
 
   const onSubmit = React.useCallback(
     async (values: EmailVerificationFormValuesSchema) => {
       setLoading(true);
       if (step === SignupSteps.EMAIL_INPUT) {
-        const response = await signup(values);
-        if (response.success || response.error.type === 'OTP_REQUEST_EXISTS') {
+        const response = await signup(values as Parameters<typeof signup>[0]);
+        if (response.success) {
           nextStep(SignupSteps.VERIFY_OTP, {
             email: values.email,
+            session: response.sessionId,
           });
         } else {
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         }
       } else if (step === SignupSteps.VERIFY_OTP) {
-        const response = await verifyEmail(pick(values, ['email', 'otp']));
+        const sessionId = router.query?.session as string;
+        const response = await verifyEmail({ ...pick(values, ['email', 'otp']), sessionId } as Parameters<
+          typeof verifyEmail
+        >[0]);
         if (response.success) {
           const token = response.token;
           await login(token);
@@ -118,24 +131,14 @@ export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
       }
       setLoading(false);
     },
-    [step, login, nextStep, toast, intl],
-  );
-
-  const validate = React.useCallback(
-    async (values: EmailVerificationFormValuesSchema) => {
-      const errors = {} as Record<string, string>;
-      if ('password' in values && values.password && passwordScore < 3) {
-        errors.password = 'Password is too weak';
-      }
-      return errors;
-    },
-    [passwordScore],
+    [step, login, nextStep, toast, intl, router.query.session],
   );
 
   const resendOTPCode = React.useCallback(async () => {
     if (formikRef.current) {
+      const sessionId = router.query?.session as string;
       const email = formikRef.current.values.email;
-      const response = await resendOTP({ email });
+      const response = await resendOTP({ email, sessionId });
       if (response.success) {
         toast({
           variant: 'success',
@@ -151,19 +154,18 @@ export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
         }
       }
     }
-  }, [intl, nextStep, toast]);
+  }, [intl, nextStep, toast, router.query.session]);
 
   return (
     <FormikZod<EmailVerificationFormValuesSchema>
       schema={emailVerificationFormSchema}
       onSubmit={onSubmit}
-      validate={validate}
       initialValues={{ email: router.query?.email as string }}
       innerRef={formikRef}
     >
-      {({ values, setFieldValue, setValues }) => (
+      {({ values, setFieldValue }) => (
         <Form
-          className="mb-6 flex max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
+          className="mb-6 flex w-full max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
           data-cy="signup-form"
         >
           {step === SignupSteps.VERIFY_OTP ? (
@@ -187,14 +189,29 @@ export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
             ) : (
               <React.Fragment>
                 <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                  <FormattedMessage defaultMessage="Register your personal account" id="signup.individual.title" />
+                  {includeOrganizationFlow ? (
+                    <FormattedMessage
+                      defaultMessage="Register your personal account"
+                      id="signup.individual.orgFlow.title"
+                    />
+                  ) : (
+                    <FormattedMessage defaultMessage="Create your account" id="signup.individual.title" />
+                  )}
                 </h1>
                 <p className="text-sm break-words text-slate-700 sm:text-base">
-                  <FormattedMessage
-                    defaultMessage="You need to register your personal account to create an organisation.{newLine}Sign in or create a personal account to continue"
-                    id="signup.individual.description"
-                    values={I18nFormatters}
-                  />
+                  {includeOrganizationFlow ? (
+                    <FormattedMessage
+                      defaultMessage="You need to register your personal account to create an organisation.{newLine}Sign in or create a personal account to continue"
+                      id="signup.individual.orgFlow.description"
+                      values={I18nFormatters}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="Join Open Collective to start contributing to open source projects and communities."
+                      id="signup.individual.description"
+                      values={I18nFormatters}
+                    />
+                  )}
                 </p>
               </React.Fragment>
             )}
@@ -211,34 +228,6 @@ export function EmailVerificationSteps({ step, nextStep }: SignupStepProps) {
                     autoComplete="email"
                     autoFocus
                   />
-                  <div>
-                    <FormField
-                      name="password"
-                      label={<FormattedMessage id="Password" defaultMessage="Password" />}
-                      placeholder={intl.formatMessage(passwordPlaceholder)}
-                      autoComplete="new-password"
-                    >
-                      {({ field }) => (
-                        <PasswordInput
-                          {...field}
-                          onChange={e => {
-                            const { value } = e.target;
-                            if ('password' in values && value === '') {
-                              setValues(omit(values, 'password'));
-                            } else {
-                              setFieldValue('password', value);
-                            }
-                          }}
-                        />
-                      )}
-                    </FormField>
-                    <div className="mt-2 w-full self-center px-1">
-                      <PasswordStrengthBar
-                        password={'password' in values && values.password}
-                        onChangeScore={score => setPasswordScore(score)}
-                      />
-                    </div>
-                  </div>
                   {isCaptchaEnabled() && (
                     <FormField name="captcha" className="flex items-center">
                       {() => <Captcha onVerify={value => setFieldValue('captcha', value)} />}
@@ -354,6 +343,7 @@ const completeProfileFormSchema = z.object({
   name: z.string().min(5),
   legalName: z.string().min(8).max(128).optional(),
   image: z.string().url().optional(),
+  password: z.string().min(8).max(128).optional(),
 });
 
 type CompleteProfileFormValuesSchema = z.infer<typeof completeProfileFormSchema>;
@@ -365,6 +355,7 @@ const profileQuery = gql`
       slug
       name
       description
+      hasPassword
     }
   }
 `;
@@ -382,22 +373,44 @@ const completeProfileMutation = gql`
   }
 `;
 
+const setPasswordMutation = gql`
+  mutation CompleteProfileSetPassword($password: String!) {
+    setPassword(password: $password) {
+      individual {
+        id
+        hasPassword
+      }
+      token
+    }
+  }
+`;
+
 export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
   const intl = useIntl();
   const { toast } = useToast();
-  const { refetchLoggedInUser, LoggedInUser } = useLoggedInUser();
+  const { refetchLoggedInUser, LoggedInUser, login } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<CompleteProfileFormValuesSchema>>(undefined);
   const { data, refetch: refetchMe } = useQuery(profileQuery, { context: API_V2_CONTEXT, skip: !LoggedInUser });
   const [updateAccount] = useMutation(completeProfileMutation, {
     context: API_V2_CONTEXT,
   });
+  const [setPassword] = useMutation(setPasswordMutation, {
+    context: API_V2_CONTEXT,
+  });
   const [loading, setLoading] = React.useState(false);
+  const [passwordScore, setPasswordScore] = React.useState(0);
 
   const onSubmit = React.useCallback(
     async (values: CompleteProfileFormValuesSchema) => {
       try {
         setLoading(true);
-        await updateAccount({ variables: { account: values } });
+        await updateAccount({ variables: { account: omit(values, ['password']) } });
+        if (values.password) {
+          const result = await setPassword({ variables: { password: values.password } });
+          if (result.data.setPassword.token) {
+            await login(result.data.setPassword.token);
+          }
+        }
         await refetchLoggedInUser();
         nextStep();
       } catch (e) {
@@ -410,7 +423,7 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
         });
       }
     },
-    [nextStep, updateAccount, intl, refetchLoggedInUser, toast],
+    [nextStep, updateAccount, intl, refetchLoggedInUser, toast, setPassword, login],
   );
 
   React.useEffect(() => {
@@ -422,16 +435,28 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
     }
   }, [data, LoggedInUser, refetchMe]);
 
+  const validate = React.useCallback(
+    async (values: CompleteProfileFormValuesSchema) => {
+      const errors = {} as Record<string, string>;
+      if ('password' in values && values.password && passwordScore < 3) {
+        errors.password = 'Password is too weak';
+      }
+      return errors;
+    },
+    [passwordScore],
+  );
+
   return (
     <FormikZod<CompleteProfileFormValuesSchema>
       schema={completeProfileFormSchema}
       onSubmit={onSubmit}
       initialValues={{}}
       innerRef={formikRef}
+      validate={validate}
     >
-      {({ values }) => (
+      {({ values, setValues, setFieldValue }) => (
         <Form
-          className="mb-6 flex max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
+          className="mb-6 flex w-full max-w-xl grow flex-col items-center gap-8 px-6 sm:mb-20 sm:px-0"
           data-cy="complete-profile-form"
         >
           <Image width={80} height={79} src="/static/images/signup/stars.png" alt="Face" />
@@ -473,17 +498,44 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
                 autoComplete="name nickname"
                 autoFocus
               />
-              <FormField
-                name="legalName"
-                label={<FormattedMessage id="LegalName" defaultMessage="Legal Name" />}
-                placeholder={isEmpty(values.name) ? 'e.g. Johnathan Doe' : values.name}
-                type="string"
-                autoComplete="name"
-              />
+              {!data?.me?.hasPassword && (
+                <div>
+                  <FormField
+                    name="password"
+                    label={<FormattedMessage id="Password" defaultMessage="Password" />}
+                    autoComplete="new-password"
+                    hint={
+                      <FormattedMessage
+                        id="signup.completeProfile.password.hint"
+                        defaultMessage="You can always sign-in using just your e-mail."
+                      />
+                    }
+                  >
+                    {({ field }) => (
+                      <PasswordInput
+                        {...field}
+                        onChange={e => {
+                          const { value } = e.target;
+                          if ('password' in values && value === '') {
+                            setValues(omit(values, 'password'));
+                          } else {
+                            setFieldValue('password', value);
+                          }
+                        }}
+                      />
+                    )}
+                  </FormField>
+                  <div className="mt-2 w-full self-center px-1">
+                    <PasswordStrengthBar
+                      password={'password' in values && values.password}
+                      onChangeScore={score => setPasswordScore(score)}
+                    />
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
           <div className="grow sm:hidden" />
-
           <div className="flex w-full max-w-lg flex-col gap-4">
             <Button className="w-full" type="submit" variant="default" loading={loading}>
               <FormattedMessage id="signup.completeProfile.action" defaultMessage="Create Profile" />

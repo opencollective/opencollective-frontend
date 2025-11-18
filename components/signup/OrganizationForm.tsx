@@ -337,7 +337,7 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
                 name="organization.legalName"
                 label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                 hint={
-                  <FormattedMessage defaultMessage="Official name as registered with legal authorities" id="jQOxmT" />
+                  <FormattedMessage defaultMessage="Official name as registered with legal authorities." id="jQOxmT" />
                 }
                 placeholder="e.g. Green Horizon Foundation, Inc."
                 autoComplete="organization"
@@ -563,7 +563,13 @@ export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepPro
             <Button type="button" variant="outline" className="grow" disabled={loading} onClick={() => nextStep()}>
               <FormattedMessage defaultMessage="Skip to Dashboard" id="SkipToDashboard" />
             </Button>
-            <Button type="submit" disabled={!isValid} loading={loading} className="grow">
+            <Button
+              type="submit"
+              disabled={!isValid}
+              loading={loading}
+              className="grow aria-hidden:hidden"
+              aria-hidden={inviteFieldsCount === 0}
+            >
               <FormattedMessage defaultMessage="Send Invite" id="Expense.SendInvite" />
             </Button>
           </div>

@@ -267,7 +267,7 @@ export async function signup(body: {
   email?: string;
   password?: string;
   captcha?: { token?: string; provider?: string };
-}) {
+}): Promise<{ success?: true; sessionId?: string; error?: any }> {
   const response = await fetch('/api/users/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -280,7 +280,7 @@ export async function signup(body: {
   }
 }
 
-export async function resendOTP(body: { email?: string }) {
+export async function resendOTP(body: { email: string; sessionId: string }) {
   const response = await fetch('/api/users/resend-otp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -293,7 +293,7 @@ export async function resendOTP(body: { email?: string }) {
   }
 }
 
-export async function verifyEmail(body: { email?: string; otp?: string }) {
+export async function verifyEmail(body: { email: string; otp: string; sessionId: string }) {
   const response = await fetch('/api/users/verify-email', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -125,10 +125,12 @@ export default function SignupPage() {
         withTopBar={false}
       />
       <Body className="flex h-screen flex-col bg-white/50 bg-[url(/static/images/signup/background.png)] bg-size-[auto,100%] bg-top bg-no-repeat bg-blend-lighten 2xl:bg-size-[110%,auto]">
-        <div
-          className="fixed top-0 left-0 h-[5px] max-w-full rounded-r-sm bg-primary transition-all duration-700"
-          style={{ width: `${progress * 95}%` }}
-        />
+        {includeOrganizationFlow && steps.indexOf(step) >= steps.indexOf(SignupSteps.COMPLETE_PROFILE) && (
+          <div
+            className="fixed top-0 left-0 h-[5px] max-w-full rounded-r-sm bg-primary transition-all duration-700"
+            style={{ width: `${progress * 95}%` }}
+          />
+        )}
         <div className="mx-auto flex w-full max-w-7xl items-center px-4 py-4">
           <Link href="/" className="flex items-center gap-2">
             <Image width={35} height={35} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />{' '}
@@ -147,7 +149,11 @@ export default function SignupPage() {
           ) : (
             <React.Fragment>
               {[SignupSteps.EMAIL_INPUT, SignupSteps.VERIFY_OTP].includes(step) && (
-                <EmailVerificationSteps step={step} nextStep={nextStep} />
+                <EmailVerificationSteps
+                  step={step}
+                  nextStep={nextStep}
+                  includeOrganizationFlow={includeOrganizationFlow}
+                />
               )}
               {step === SignupSteps.COMPLETE_PROFILE && <CompleteProfileSteps step={step} nextStep={nextStep} />}
               {step === SignupSteps.CREATE_ORG && (
