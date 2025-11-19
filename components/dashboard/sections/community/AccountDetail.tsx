@@ -129,26 +129,29 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     nextFetchPolicy: 'standby',
   });
 
-  const TABS = [
-    {
-      id: AccountDetailView.DETAILS,
-      label: <FormattedMessage defaultMessage="Details" id="Details" />,
-    },
-    {
-      id: AccountDetailView.EXPENSES,
-      label: <FormattedMessage defaultMessage="Expenses" id="Expenses" />,
-      count: query.data?.account?.communityStats?.transactionSummary[0]?.expenseCountAcc || 0,
-    },
-    {
-      id: AccountDetailView.CONTRIBUTIONS,
-      label: <FormattedMessage defaultMessage="Contributions" id="Contributions" />,
-      count: query.data?.account?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0,
-    },
-    {
-      id: AccountDetailView.ACTIVITIES,
-      label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
-    },
-  ];
+  const tabs = React.useMemo(
+    () => [
+      {
+        id: AccountDetailView.DETAILS,
+        label: <FormattedMessage defaultMessage="Details" id="Details" />,
+      },
+      {
+        id: AccountDetailView.EXPENSES,
+        label: <FormattedMessage defaultMessage="Expenses" id="Expenses" />,
+        count: query.data?.account?.communityStats?.transactionSummary[0]?.expenseCountAcc || 0,
+      },
+      {
+        id: AccountDetailView.CONTRIBUTIONS,
+        label: <FormattedMessage defaultMessage="Contributions" id="Contributions" />,
+        count: query.data?.account?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0,
+      },
+      {
+        id: AccountDetailView.ACTIVITIES,
+        label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
+      },
+    ],
+    [query.data],
+  );
 
   const handleTabChange = React.useCallback(
     (tab: AccountDetailView) => {
@@ -261,7 +264,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
-            <Tabs tabs={TABS} selectedId={selectedTab as string} onChange={handleTabChange} />
+            <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
               className="flex flex-col gap-4 aria-hidden:hidden"
               aria-hidden={selectedTab !== AccountDetailView.DETAILS}
