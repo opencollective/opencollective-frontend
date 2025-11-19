@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -40,7 +40,7 @@ const getRedirectPathSafe = (router: NextRouter) => {
   if (!router.query?.next) {
     return null;
   }
-  const next = Array.isArray(router.query?.next) ? router.query.next[0] : router.query.next;
+  const next = decodeURIComponent(Array.isArray(router.query?.next) ? router.query.next[0] : router.query.next);
   return isRelativeHref(next) && next !== '/' ? next : null;
 };
 
@@ -50,7 +50,6 @@ export default function SignupPage() {
   const [includeOrganizationFlow, setIncludeOrganizationFlow] = React.useState(
     Boolean(router.query?.step === 'organization' || router.query?.organization === 'true'),
   );
-  const redirectPath = React.useRef(getRedirectPathSafe(router));
   const steps = React.useMemo(
     () =>
       !includeOrganizationFlow ? DEFAULT_STEPS : [...DEFAULT_STEPS, SignupSteps.CREATE_ORG, SignupSteps.INVITE_ADMINS],
@@ -67,13 +66,13 @@ export default function SignupPage() {
         const nextStep = steps[steps.indexOf(prev) + 1];
         if (!requestedStep && !nextStep) {
           const pathname =
-            redirectPath.current ||
+            getRedirectPathSafe(router) ||
             (createdOrganization ? getDashboardRoute(createdOrganization, '/overview') : '/welcome');
           router.push(pathname);
           return prev;
         } else {
           const step = requestedStep || nextStep;
-          const newQuery = omit(query || router.query, ['step']);
+          const newQuery = omit({ ...pick(router.query, ['next', 'session']), ...query }, ['step']);
           if (includeOrganizationFlow) {
             newQuery.organization = 'true';
           }
@@ -102,7 +101,7 @@ export default function SignupPage() {
         nextStep(SignupSteps.CREATE_ORG);
       } else {
         // If the user is already logged in and not creating an org, redirect to home page
-        router.push(redirectPath.current || '/dashboard');
+        router.push(getRedirectPathSafe(router) || '/dashboard');
       }
     } else if (
       !me &&
