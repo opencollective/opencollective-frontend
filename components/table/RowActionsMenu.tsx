@@ -63,13 +63,15 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => openDetails()} className="gap-2.5">
-          <PanelRightOpen className="text-muted-foreground" size={16} />
-          <FormattedMessage defaultMessage="View details" id="MnpUD7" />
-        </DropdownMenuItem>
+        {openDrawer && (
+          <DropdownMenuItem onClick={() => openDetails()} className="gap-2.5">
+            <PanelRightOpen className="text-muted-foreground" size={16} />
+            <FormattedMessage defaultMessage="View details" id="MnpUD7" />
+          </DropdownMenuItem>
+        )}
         {primary?.length > 0 && (
           <React.Fragment>
-            <DropdownMenuSeparator />
+            {openDrawer && <DropdownMenuSeparator />}
             {primary.map(action => (
               <DropdownActionItem key={action.key} action={action} />
             ))}

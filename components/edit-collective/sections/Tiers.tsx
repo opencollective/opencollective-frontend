@@ -1,109 +1,69 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { styled } from 'styled-components';
+import { PlusIcon } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
+import type { Tier } from '../../../lib/graphql/types/v2/schema';
 import { sortTiersForCollective, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
 
-import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
-import ContributeCustom from '../../contribute-cards/ContributeCustom';
-import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Grid } from '../../Grid';
 import Image from '../../Image';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
 import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
+import { Button } from '../../ui/Button';
 import { editAccountSettingsMutation } from '../mutations';
+import { useTierActions } from '../tiers/actions';
 import { listTierQuery } from '../tiers/EditTierModal';
+import TiersTable from '../TiersTable';
 
-const getSortedContributeCards = (collective, tiers, intl) => {
-  const sortedTiers = sortTiersForCollective(collective, tiers);
-  return sortedTiers.map(tier => {
-    if (tier === 'custom') {
-      return {
-        key: 'custom',
-        Component: ContributeCustom,
-        componentProps: {
-          collective,
-          hideContributors: true,
-          hideCTA: true,
-          missingCTAMsg: intl.formatMessage({
-            defaultMessage: 'The default contribution tier cannot be edited.',
-            id: 'setJlw',
-          }),
-        },
-      };
-    } else {
-      return {
-        key: tier.id,
-        Component: ContributeTier,
-        componentProps: {
-          collective,
-          tier,
-          hideContributors: true,
-          hideCTA: true,
-        },
-      };
-    }
-  });
-};
-
-const CardsContainer = styled(Grid).attrs({
-  justifyItems: 'center',
-  gridGap: '30px',
-  gridTemplateColumns: ['repeat(auto-fit, minmax(280px, 1fr))'],
-  gridAutoRows: ['1fr'],
-})`
-  & > * {
-    padding: 0;
-  }
-`;
+type TierRow = Tier | { id: 'custom'; type: 'CUSTOM'; name: string; description?: string };
 
 /**
  * A revamp of `components/edit-collective/sections/Tiers.js`. Meant to be renamed once we'll be ready
  * to replace the old tiers form.
  */
 const Tiers = ({ collective }) => {
-  const [draggingId, setDraggingId] = React.useState(null);
   const [error, setError] = React.useState(null);
 
   const variables = { accountSlug: collective.slug };
   const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
-  });
-  const intl = useIntl();
+  }); // Still needed for handleToggleCustomContribution
+
   const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);
-  const contributeCards = React.useMemo(
-    () => getSortedContributeCards(collective, tiers, intl),
-    [collective, tiers, intl],
-  );
+  const sortedTiers = sortTiersForCollective(collective, tiers, true);
+  const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
 
-  const onTiersReorder = async cards => {
-    const cardKeys = cards.map(c => c.key);
+  // Transform sorted tiers to table rows, including custom contribution
+  const tableData: TierRow[] = React.useMemo(() => {
+    const rows: TierRow[] = [];
+    sortedTiers.forEach(tier => {
+      if (tier === 'custom') {
+        rows.push({ id: 'custom', type: 'CUSTOM', name: 'Donation' });
+      } else {
+        rows.push(tier);
+      }
+    });
+    return rows;
+  }, [sortedTiers]);
 
-    setError(null);
-    try {
-      await editAccountSettings({
-        variables: {
-          account: { legacyId: collective.id },
-          key: TIERS_ORDER_KEY,
-          value: cardKeys,
-        },
-      });
-    } catch (e) {
-      setError(getErrorFromGraphqlException(e));
-    }
-  };
+  const { getActions, handleEdit } = useTierActions({
+    tiersOrderKey: TIERS_ORDER_KEY,
+    data: tableData,
+    collectiveId: collective.id,
+    isCustomContributionEnabled: hasCustomContribution,
+    refetch,
+    setError,
+    collective,
+  });
 
   return (
     <div>
@@ -145,54 +105,29 @@ const Tiers = ({ collective }) => {
         ) : (
           <div>
             {error && <MessageBoxGraphqlError mb={5} error={error} />}
-            <Box mb={4}>
-              <P fontSize="14px" lineHeight="20x" mb={3}>
-                <FormattedMessage
-                  id="tier.defaultContribution.description"
-                  defaultMessage="The default contribution tier doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
-                />
-              </P>
-              <Mutation
-                mutation={editAccountSettingsMutation}
-                refetchQueries={[{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }]}
-                awaitRefetchQueries
+            <div className="mb-4 flex justify-end">
+              <Button
+                data-cy="create-contribute-tier"
+                className="gap-1"
+                size="sm"
+                variant="outline"
+                disabled={isSubmitting}
+                onClick={() => handleEdit(null)}
               >
-                {(editSettings, { loading }) => (
-                  <StyledCheckbox
-                    name="custom-contributions"
-                    label={intl.formatMessage({
-                      id: 'tier.defaultContribution.label',
-                      defaultMessage: 'Enable default contribution tier',
-                    })}
-                    defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
-                    width="auto"
-                    isLoading={loading}
-                    disabled={isSubmitting}
-                    onChange={({ target }) => {
-                      editSettings({
-                        variables: {
-                          account: { legacyId: collective.id },
-                          key: 'disableCustomContributions',
-                          value: !target.value,
-                        },
-                        context: API_V2_CONTEXT,
-                      });
-                    }}
-                  />
-                )}
-              </Mutation>
-            </Box>
-            <AdminContributeCardsContainer
+                <span>
+                  <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+                </span>
+                <PlusIcon size={20} />
+              </Button>
+            </div>
+            <TiersTable
+              data={tableData}
               collective={collective}
-              cards={contributeCards}
-              CardsContainer={CardsContainer as any}
-              enableReordering={true}
-              onTierUpdate={() => refetch()}
-              onReorder={onTiersReorder}
-              draggingId={draggingId}
-              setDraggingId={setDraggingId}
-              isSaving={isSubmitting}
-              canEdit
+              loading={isSubmitting}
+              getActions={getActions}
+              emptyMessage={() => (
+                <FormattedMessage defaultMessage="No tiers yet. Create your first contribution tier!" id="NoTiersYet" />
+              )}
             />
           </div>
         )}

@@ -17,6 +17,7 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
+import { i18nTierType } from '@/lib/i18n/tier-type';
 
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
@@ -42,32 +43,12 @@ const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
 function getTierTypeOptions(intl, collectiveType) {
-  const simplifiedTierTypes = [
-    { value: TIER, label: capitalize(intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' })) },
-    {
-      value: SERVICE,
-      label: capitalize(intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' })),
-    },
-    {
-      value: PRODUCT,
-      label: capitalize(intl.formatMessage({ id: 'tier.type.product', defaultMessage: 'product (e.g., t-shirt)' })),
-    },
-    {
-      value: DONATION,
-      label: capitalize(intl.formatMessage({ id: 'tier.type.donation', defaultMessage: 'donation (gift)' })),
-    },
-  ];
-
-  const membershipTierType = {
-    value: MEMBERSHIP,
-    label: capitalize(intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' })),
-  };
-
-  if (collectiveType === PROJECT) {
-    return simplifiedTierTypes;
+  const types = [TIER, SERVICE, PRODUCT, DONATION];
+  if (collectiveType !== PROJECT) {
+    types.push(MEMBERSHIP);
   }
 
-  return [...simplifiedTierTypes, membershipTierType];
+  return types.map(type => ({ value: type, label: capitalize(i18nTierType(intl, type)) }));
 }
 
 function getReceiptTemplates(intl, host) {
