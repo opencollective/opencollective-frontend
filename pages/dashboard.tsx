@@ -37,6 +37,11 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
+import Header from '@/components/Header';
+import { cn } from '@/lib/utils';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -251,53 +256,61 @@ const DashboardPage = () => {
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
-      <div className="flex min-h-screen flex-col justify-between">
-        <Page
-          noRobots
-          collective={account}
-          title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
-          pageTitle={titleBase}
-          showFooter={false}
-        >
-          {Boolean(notification) && <NotificationBar {...notification} />}
-          {blocker ? (
-            <div className="my-32 flex flex-col items-center">
-              <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-                <p>{blocker}</p>
-                {LoggedInUser && (
-                  <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                    <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
-                  </Link>
+      <SidebarProvider>
+        <DashboardSidebar menuItems={menuItems} isLoading={isLoading} />
+        <div className="flex flex-1 flex-col">
+          <DashboardTopbar />
+          <Header
+            title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
+            noRobots
+            collective={account}
+            withTopBar={false}
+          />
+          <main className="flex-1 px-6">
+            {/* <SidebarInset className="px-6"> */}
+
+            {Boolean(notification) && <NotificationBar {...notification} />}
+            {blocker ? (
+              <div className="my-32 flex flex-col items-center">
+                <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+                  <p>{blocker}</p>
+                  {LoggedInUser && (
+                    <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                      <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+                    </Link>
+                  )}
+                </MessageBox>
+                {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+              </div>
+            ) : (
+              <div
+                className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
+                data-cy="admin-panel-container"
+              >
+                {/* <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} /> */}
+                {LoggedInUser &&
+                require2FAForAdmins(account) &&
+                !LoggedInUser.hasTwoFactorAuth &&
+                selectedSection !== 'user-security' ? (
+                  <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+                ) : (
+                  <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
+                    <DashboardSection
+                      section={selectedSection}
+                      isLoading={isLoading}
+                      account={account}
+                      subpath={subpath}
+                    />
+                  </div>
                 )}
-              </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
-            </div>
-          ) : (
-            <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
-              data-cy="admin-panel-container"
-            >
-              <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-              {LoggedInUser &&
-              require2FAForAdmins(account) &&
-              !LoggedInUser.hasTwoFactorAuth &&
-              selectedSection !== 'user-security' ? (
-                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-              ) : (
-                <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </Page>
-        <Footer />
-      </div>
+              </div>
+            )}
+          </main>
+          <Footer isDashboard />
+
+          {/* </SidebarInset> */}
+        </div>
+      </SidebarProvider>
     </DashboardContext.Provider>
   );
 };

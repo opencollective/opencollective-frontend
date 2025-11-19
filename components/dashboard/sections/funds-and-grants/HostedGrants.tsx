@@ -231,7 +231,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   );
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Grants" id="Csh2rX" />}
         description={<FormattedMessage defaultMessage="Grant requests submitted to your hosted funds" id="TPbcKk" />}

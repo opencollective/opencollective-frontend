@@ -7,7 +7,6 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
-import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -22,7 +21,6 @@ import { Button } from '@/components/ui/Button';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
-import NewTopBar from './navigation/TopBar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -108,39 +106,12 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
-  const router = useRouter();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
   const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
 
   const toggleMobileMenu = () => {
     debouncedSetShowMobileMenu(state => !state);
   };
-
-  const isRouteActive = route => {
-    const regex = new RegExp(`^${route}(/.*)?$`);
-    return regex.test(router.asPath);
-  };
-
-  const onDashboardRoute = isRouteActive('/dashboard');
-  const homeRoutes = [
-    '/',
-    '/home',
-    '/collectives',
-    '/become-a-sponsor',
-    '/become-a-host',
-    '/pricing',
-    '/legacy-pricing',
-    '/new-pricing',
-    '/how-it-works',
-    '/fiscal-hosting',
-    '/help',
-    '/organizations',
-  ];
-  const onHomeRoute = homeRoutes.some(isRouteActive);
-
-  if (onDashboardRoute || (!onHomeRoute && LoggedInUser)) {
-    return <NewTopBar {...{ account }} />;
-  }
 
   const showMenu = showMenuItems ?? (!whitelabel || whitelabel?.links?.length > 0);
 

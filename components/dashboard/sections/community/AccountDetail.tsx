@@ -169,7 +169,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const legalName = account?.legalName !== account?.name && account?.legalName;
 
   return (
-    <div className="flex max-w-screen-lg flex-col">
+    <div className="flex flex-col">
       <button className="mb-4 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
         <ArrowLeft size="14px" className="mr-1" />
         <FormattedMessage defaultMessage="Go Back" id="GoBack" />

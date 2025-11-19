@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { cx } from 'class-variance-authority';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -170,7 +171,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const RootComponent = ROOT_COMPONENTS[section];
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
-      <div className="w-full pb-6">
+      <div className="w-full">
         <RootComponent subpath={subpath} isDashboard />
       </div>
     );
@@ -179,7 +180,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
     return (
-      <div className="w-full pb-6">
+      <div className="w-full">
         <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
       </div>
     );
@@ -187,7 +188,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-(--breakpoint-lg) pb-6">
+      <div className="w-full">
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
@@ -201,8 +202,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      // <div className="flex max-w-(--breakpoint-lg) justify-center">
-      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
+      <div className="w-full max-w-(--breakpoint-lg)">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
@@ -210,15 +210,12 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      // <div className="flex max-w-(--breakpoint-lg) justify-center">
-      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
+      <div className="w-full max-w-(--breakpoint-lg)">
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
-
         <AccountSettings account={account} section={section} />
       </div>
-      // </div>
     );
   }
 

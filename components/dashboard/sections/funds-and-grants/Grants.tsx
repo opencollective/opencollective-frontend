@@ -186,7 +186,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
           }}
         />
       )}
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Grant requests" id="71LMx7" />}
           description={<FormattedMessage defaultMessage="Grant requests submitted to your account." id="qSe73a" />}
