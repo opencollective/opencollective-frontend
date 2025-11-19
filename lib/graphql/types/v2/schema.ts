@@ -2754,9 +2754,15 @@ export type CommunityStatsActivitiesArgs = {
 export type CommunityTransactionSummary = {
   __typename?: 'CommunityTransactionSummary';
   contributionCount: Scalars['Int']['output'];
+  contributionCountAcc: Scalars['Int']['output'];
   contributionTotal: Amount;
+  contributionTotalAcc: Amount;
   expenseCount: Scalars['Int']['output'];
+  expenseCountAcc: Scalars['Int']['output'];
   expenseTotal: Amount;
+  expenseTotalAcc: Amount;
+  orderCount: Scalars['Int']['output'];
+  orderCountAcc: Scalars['Int']['output'];
   year: Scalars['Int']['output'];
 };
 
