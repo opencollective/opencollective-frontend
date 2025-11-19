@@ -150,7 +150,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
   const getActions = useLegalDocumentActions(data?.host, refetch, isUpgradeRequired);
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
       {isUpgradeRequired && <UpgradePlanCTA featureKey="TAX_FORMS" />}
       <Filterbar {...queryFilter} />

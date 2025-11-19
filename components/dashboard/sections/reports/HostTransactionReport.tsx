@@ -115,7 +115,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
   };
   return (
     <Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
           titleRoute={`/dashboard/${hostSlug}/reports/transactions`}

@@ -151,7 +151,7 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
   const hostedAccounts = data?.accounts;
   const onClickRow = row => handleDrawer(row.original);
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="All Collectives" id="uQguR/" />} />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}

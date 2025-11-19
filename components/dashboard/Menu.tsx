@@ -122,6 +122,9 @@ function shouldIncludeMenuItemWithLegacyFallback(
 }
 
 export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+  if (!account) {
+    return null;
+  }
   const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
   if (isRootProfile) {
     return ROOT_MENU;

@@ -158,7 +158,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     const metric = metrics.find(m => m.id === queryFilter.values.subpath);
     if (metric) {
       return (
-        <div className="flex max-w-(--breakpoint-lg) flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <DashboardHeader
             title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
             subpathTitle={metric.label}
@@ -176,7 +176,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   }
 
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col gap-3">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}

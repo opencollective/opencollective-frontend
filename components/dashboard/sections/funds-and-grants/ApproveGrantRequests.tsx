@@ -165,7 +165,7 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Approve Grants Requests" id="nsfRjl" />}
           description={<FormattedMessage defaultMessage="Review received Grant Requests" id="su6SvX" />}

@@ -22,7 +22,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
   const slug = router.query?.as || accountSlug;
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
+    <div className="flex flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}

@@ -222,7 +222,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
   const hostedAccounts = data?.host?.hostedAccounts;
   const onClickRow = row => handleDrawer(row.original);
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Hosted Funds" id="HostedFunds" />}
         actions={

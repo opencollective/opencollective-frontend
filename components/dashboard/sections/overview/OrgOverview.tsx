@@ -82,7 +82,7 @@ export function OrgOverview() {
   );
 
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div className="space-y-6">
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={

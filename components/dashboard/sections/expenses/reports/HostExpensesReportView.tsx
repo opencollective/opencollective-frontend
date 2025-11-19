@@ -104,7 +104,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Expense Reports" id="qC0ZXX" />}
           titleRoute={`/dashboard/${props.accountSlug}/reports/expenses`}
