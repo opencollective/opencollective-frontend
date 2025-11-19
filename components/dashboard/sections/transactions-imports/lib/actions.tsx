@@ -64,7 +64,7 @@ export const useTransactionsImportActions = ({
     React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
   /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
   getAllRowsIds: () => Promise<string[]>;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess?: () => void;
   skipOptimisticResponse?: boolean;
 }): {
   getActions: GetActions<TransactionsImportRow>;

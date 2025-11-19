@@ -15,6 +15,7 @@ import { TransactionImportListFieldsFragment } from './lib/graphql';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
+import DateTime from '@/components/DateTime';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -116,6 +117,22 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
                       {i18nTransactionsImportType(intl, type)}
                     </Badge>
                   );
+                },
+              },
+              {
+                header: intl.formatMessage({ defaultMessage: 'Created on', id: 'transactions.import.createdOn' }),
+                accessorKey: 'createdAt',
+                cell: ({ cell }) => {
+                  const createdAt = cell.getValue() as string;
+                  return <DateTime value={new Date(createdAt)} timeStyle="short" dateStyle="short" />;
+                },
+              },
+              {
+                header: intl.formatMessage({ defaultMessage: 'Last update', id: 'transactions.import.lastUpdate' }),
+                accessorKey: 'updatedAt',
+                cell: ({ cell }) => {
+                  const updatedAt = cell.getValue() as string;
+                  return <DateTime value={new Date(updatedAt)} timeStyle="short" dateStyle="short" />;
                 },
               },
               {
