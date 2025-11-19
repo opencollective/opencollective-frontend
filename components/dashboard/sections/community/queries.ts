@@ -49,7 +49,7 @@ export const peopleHostDashboardQuery = gql`
 `;
 
 export const communityAccountDetailQuery = gql`
-  query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $host: AccountReferenceInput!) {
+  query CommunityAccountDetail($accountId: String!, $host: AccountReferenceInput!) {
     account(id: $accountId) {
       id
       legacyId
@@ -104,34 +104,11 @@ export const communityAccountDetailQuery = gql`
         relations
         transactionSummary {
           year
-          expenseTotal {
-            valueInCents
-            currency
-          }
-          expenseCount
-          contributionTotal {
-            valueInCents
-            currency
-          }
-          contributionCount
+          expenseCountAcc
+          contributionCountAcc
         }
         lastInteractionAt
         firstInteractionAt
-      }
-    }
-    host(slug: $hostSlug) {
-      id
-      hostedLegalDocuments(account: [{ id: $accountId }], type: US_TAX_FORM) {
-        nodes {
-          id
-          year
-          type
-          status
-          service
-          isExpired
-          requestedAt
-          documentLink
-        }
       }
     }
   }
@@ -241,6 +218,21 @@ export const communityAccountExpensesDetailQuery = gql`
     account(id: $accountId) {
       id
       legacyId
+      communityStats(host: $host) {
+        transactionSummary {
+          year
+          expenseTotal {
+            valueInCents
+            currency
+          }
+          expenseCount
+          expenseTotalAcc {
+            valueInCents
+            currency
+          }
+          expenseCountAcc
+        }
+      }
       expenses(direction: SUBMITTED, host: $host, limit: $limit, offset: $offset) {
         totalCount
         nodes {
@@ -281,6 +273,21 @@ export const communityAccountContributionsDetailQuery = gql`
     account(id: $accountId) {
       id
       legacyId
+      communityStats(host: $host) {
+        transactionSummary {
+          year
+          contributionTotal {
+            valueInCents
+            currency
+          }
+          contributionCount
+          contributionTotalAcc {
+            valueInCents
+            currency
+          }
+          contributionCountAcc
+        }
+      }
       orders(host: $host, limit: $limit, offset: $offset) {
         totalCount
         nodes {
