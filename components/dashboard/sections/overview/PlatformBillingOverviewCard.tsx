@@ -3,6 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import { X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import { hasAccountHosting } from '@/lib/collective';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   PlatformBillingOverviewCardQuery,
@@ -27,9 +28,14 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
   const query = useQuery<PlatformBillingOverviewCardQuery, PlatformBillingOverviewCardQueryVariables>(
     gql`
       query PlatformBillingOverviewCard($slug: String!) {
-        host(slug: $slug) {
-          platformSubscription {
-            ...PlatformSubscriptionFields
+        account(slug: $slug) {
+          isHost
+          type
+          settings
+          ... on AccountWithPlatformSubscription {
+            platformSubscription {
+              ...PlatformSubscriptionFields
+            }
           }
         }
       }
@@ -47,9 +53,11 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return <Skeleton className="h-16 w-full" />;
   }
 
-  if (!query.data?.host?.platformSubscription) {
+  if (!query.data?.account?.platformSubscription) {
     return null;
   }
+
+  const hasHosting = hasAccountHosting(query.data?.account);
 
   return (
     <MessageBox className="relative" type="info">
@@ -61,7 +69,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
           defaultMessage={`You're on the "{planTitle}" plan`}
           id="Fw/mF9"
           values={{
-            planTitle: query.data.host.platformSubscription.plan.title,
+            planTitle: query.data.account.platformSubscription.plan.title,
           }}
         />
       </div>
@@ -70,12 +78,12 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
           defaultMessage={`The "{planTitle}" plan gives you access with limited usage mentioned below. Any usage exceeding the plan limits will incur additional charges.`}
           id="j/a0gE"
           values={{
-            planTitle: query.data.host.platformSubscription.plan.title,
+            planTitle: query.data.account.platformSubscription.plan.title,
           }}
         />
       </div>
       <div className="my-4 py-4">
-        <PlatformSubscriptionDetails subscription={query.data.host.platformSubscription} />
+        <PlatformSubscriptionDetails subscription={query.data.account.platformSubscription} hasHosting={hasHosting} />
       </div>
       <Button asChild variant="outline">
         <Link className="!no-underline" href={getDashboardRoute({ slug: props.accountSlug }, 'platform-subscription')}>

@@ -4,6 +4,7 @@ import { ChevronDown, Pencil, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
+import { hasAccountHosting } from '@/lib/collective';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   DashboardPlatformSubscriptionQuery,
@@ -38,11 +39,13 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
     gql`
       query DashboardPlatformSubscription($slug: String!) {
         account(slug: $slug) {
+          type
+          isHost
+          settings
           ... on AccountWithPlatformSubscription {
             platformSubscription {
               ...PlatformSubscriptionFields
             }
-
             platformBilling {
               ...PlatformBillingFields
             }
@@ -72,7 +75,9 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
     query.data?.account && 'platformBilling' in query.data.account ? query.data.account.platformBilling : null;
   const isLoading = query.loading;
 
-  const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+  const isFreeTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+
+  const hasHosting = hasAccountHosting(query.data?.account);
 
   React.useEffect(() => {
     if (!desiredFeature || !activeSubscription?.plan || !billing) {
@@ -135,7 +140,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
                     <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
                   </Button>
                 </DropdownMenuItem>
-                {!isFreeDiscoverTier && (
+                {!isFreeTier && (
                   <DropdownMenuItem asChild>
                     <Button
                       disabled={isLoading}
@@ -192,7 +197,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             </div>
             <Separator className="w-auto grow border-b bg-border" />
             <div className="font-bold">
-              {activeSubscription.plan.pricing.pricePerMonth.valueInCents !== 0 && (
+              {!isFreeTier && (
                 <FormattedMessage
                   defaultMessage="{perMonth} / Month"
                   id="+2hntI"
@@ -209,7 +214,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
               )}
             </div>
           </div>
-          {!isFreeDiscoverTier && (
+          {!isFreeTier && (
             <div className="mb-4 text-muted-foreground">
               <FormattedMessage
                 defaultMessage="Subscription will renew on {dueDate}"
@@ -229,7 +234,11 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         <div className="flex flex-col gap-4">
           {billing?.subscriptions?.length > 0 &&
             billing?.subscriptions.map(subscription => (
-              <PlatformSubscriptionCard key={subscription.startDate} subscription={subscription} />
+              <PlatformSubscriptionCard
+                key={subscription.startDate}
+                subscription={subscription}
+                hasHosting={hasHosting}
+              />
             ))}
         </div>
       )}
