@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type { Currency, DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, HostContext, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
 import type { Account } from '@/lib/graphql/types/v2/schema';
@@ -17,6 +17,7 @@ import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
+import { hostContextFilter } from '../../filters/HostContextFilter';
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
@@ -53,6 +54,7 @@ export const schema = z.object({
   paymentMethodId: isMulti(z.string()).optional(),
   tier: isMulti(z.string()).optional(),
   account: childAccountFilter.schema,
+  hostContext: hostContextFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -86,6 +88,18 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
       return { includeChildrenAccounts: true };
     } else {
       return { slug: value, includeChildrenAccounts: false };
+    }
+  },
+  hostContext: (value, key, meta) => {
+    if (value === HostContext.INTERNAL) {
+      return { includeHostedAccounts: false, includeChildrenAccounts: true };
+    } else if (value === HostContext.HOSTED) {
+      return {
+        includeHostedAccounts: true,
+        excludeHostAccount: true,
+      };
+    } else {
+      return { includeHostedAccounts: true, includeChildrenAccounts: true };
     }
   },
 };

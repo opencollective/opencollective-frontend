@@ -549,6 +549,11 @@ interface Account {
     includeHostedAccounts: Boolean
 
     """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
+
+    """
     Include orders from children events/projects
     """
     includeChildrenAccounts: Boolean! = false
@@ -3232,6 +3237,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     includeHostedAccounts: Boolean
 
     """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
+
+    """
     Include orders from children events/projects
     """
     includeChildrenAccounts: Boolean! = false
@@ -5787,6 +5797,11 @@ type PaymentMethod {
     includeHostedAccounts: Boolean
 
     """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
+
+    """
     Include orders from children events/projects
     """
     includeChildrenAccounts: Boolean! = false
@@ -7095,6 +7110,7 @@ enum ActivityType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -9212,6 +9228,11 @@ type Bot implements Account {
     includeHostedAccounts: Boolean
 
     """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
+
+    """
     Include orders from children events/projects
     """
     includeChildrenAccounts: Boolean! = false
@@ -10173,6 +10194,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
 
     """
     Include orders from children events/projects
@@ -11696,6 +11722,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     includeHostedAccounts: Boolean
 
     """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
+
+    """
     Include orders from children events/projects
     """
     includeChildrenAccounts: Boolean! = false
@@ -12933,6 +12964,11 @@ type Individual implements Account {
     includeHostedAccounts: Boolean
 
     """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
+
+    """
     Include orders from children events/projects
     """
     includeChildrenAccounts: Boolean! = false
@@ -13491,6 +13527,7 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+  requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
   newsletterOptIn: Boolean
@@ -14146,6 +14183,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
 
     """
     Include orders from children events/projects
@@ -15229,6 +15271,11 @@ type Vendor implements Account & AccountWithContributions {
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
 
     """
     Include orders from children events/projects
@@ -16633,6 +16680,11 @@ type Query {
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
 
     """
     Include orders from children events/projects
@@ -18652,6 +18704,7 @@ enum ActivityAndClassesType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -19131,6 +19184,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
 
     """
     Include orders from children events/projects
@@ -20241,6 +20299,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Used together with the "includeHostedAccounts" argument to not get the hosted accounts orders
+    """
+    excludeHostAccount: Boolean = false
 
     """
     Include orders from children events/projects
@@ -22552,6 +22615,21 @@ type Mutation {
   ): Organization
 
   """
+  Creates and invites admins to an existing Organization. Scope: "account".
+  """
+  inviteOrganizationAdmins(
+    """
+    Reference to the organization to invite admins to
+    """
+    organization: AccountReferenceInput!
+
+    """
+    List of members to invite as admins.
+    """
+    inviteMembers: [InviteMemberInput!]!
+  ): Organization
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -23650,6 +23728,7 @@ input AccountUpdateInput {
   legalName: String
   slug: String
   description: String
+  image: URL
   longDescription: String
   company: String
   tags: [String]

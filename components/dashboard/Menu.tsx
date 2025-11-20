@@ -263,17 +263,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       subMenu: [
         {
           if: (isHost && canHostAccounts) || isSelfHosted,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'X98JAE' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
-          label: intl.formatMessage(
-            {
-              id: 'hZhgoW',
-              defaultMessage: 'To {accountName}',
-            },
-            { accountName: account.name },
-          ),
+          if: !((isHost && canHostAccounts) || isSelfHosted),
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'X98JAE' }),
           section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
         },
         {

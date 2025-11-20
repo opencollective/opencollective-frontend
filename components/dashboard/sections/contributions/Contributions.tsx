@@ -11,7 +11,11 @@ import type { GetActions } from '../../../../lib/actions/types';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  ContributionDrawerQuery,
+  HostContext,
+  ManagedOrderFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import {
   ContributionFrequency,
   ExpectedFundsFilter,
@@ -51,6 +55,7 @@ import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { HostContextFilter } from '../../filters/HostContextFilter';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -63,6 +68,7 @@ enum ContributionsTab {
   EXPIRED = 'EXPIRED',
   DISPUTED = 'DISPUTED',
   IN_REVIEW = 'IN_REVIEW',
+  ERROR = 'ERROR',
 }
 
 const dashboardContributionsMetadataQuery = gql`
@@ -217,6 +223,14 @@ const dashboardContributionsMetadataQuery = gql`
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
+      ERROR: orders(
+        filter: $filter
+        status: [ERROR]
+        includeIncognito: true
+        includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
     }
   }
 `;
@@ -234,6 +248,7 @@ const dashboardContributionsQuery = gql`
     $amount: AmountRangeInput
     $paymentMethod: [PaymentMethodReferenceInput]
     $includeHostedAccounts: Boolean!
+    $excludeHostAccount: Boolean
     $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -262,6 +277,7 @@ const dashboardContributionsQuery = gql`
         limit: $limit
         paymentMethod: $paymentMethod
         includeHostedAccounts: $includeHostedAccounts
+        excludeHostAccount: $excludeHostAccount
         includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter
         orderBy: $orderBy
@@ -406,11 +422,31 @@ const Contributions = ({
       : null,
     !onlyExpectedFunds && includeHostedAccounts
       ? {
+          id: ContributionsTab.ERROR,
+          label: intl.formatMessage({ defaultMessage: 'Error', id: 'KN7zKn' }),
+          count: metadata?.account?.[ContributionsTab.ERROR].totalCount,
+          filter: {
+            status: [OrderStatus.ERROR],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && includeHostedAccounts
+      ? {
           id: ContributionsTab.IN_REVIEW,
           label: intl.formatMessage({ id: 'order.in_review', defaultMessage: 'In Review' }),
           count: metadata?.account?.[ContributionsTab.IN_REVIEW].totalCount,
           filter: {
             status: [OrderStatus.IN_REVIEW],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && includeHostedAccounts
+      ? {
+          id: ContributionsTab.PAUSED,
+          label: intl.formatMessage({ defaultMessage: 'Paused', id: 'C2iTEH' }),
+          count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
+          filter: {
+            status: [OrderStatus.PAUSED],
           },
         }
       : null,
@@ -646,7 +682,14 @@ const Contributions = ({
               onlyExpectedFunds ? (
                 <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
               ) : includeHostedAccounts ? (
-                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+                <div className="flex flex-1 items-center justify-between gap-4">
+                  <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
+                  <HostContextFilter
+                    value={queryFilter.values.hostContext}
+                    onChange={val => queryFilter.setFilter('hostContext', val)}
+                    intl={intl}
+                  />
+                </div>
               ) : (
                 <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
               )
@@ -663,7 +706,10 @@ const Contributions = ({
                   <FormattedMessage id="ExpectedFunds.description" defaultMessage="Expected funds to your account" />
                 )
               ) : includeHostedAccounts ? (
-                <FormattedMessage defaultMessage="Contributions for Collectives you host." id="ZIZ7Ms" />
+                <FormattedMessage
+                  defaultMessage="Contributions made to your organization and Collectives you host."
+                  id="IZotDb"
+                />
               ) : (
                 <FormattedMessage
                   id="IncomingContributions.description"
