@@ -225,7 +225,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOSTED_FUNDS,
         },
         {
-          if: hasHosting, // used to be available to Independent Collectives for no valid reason?
+          if: hasHosting,
           section: ALL_SECTIONS.HOSTED_GRANTS,
           label: intl.formatMessage({ defaultMessage: 'Hosted Grant Requests', id: 'Bt/+M7' }),
         },
@@ -263,7 +263,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Coins,
       subMenu: [
         {
-          if: hasHosting, // used to be available to Independent Collectives for no valid reason?
+          if: hasHosting,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
