@@ -353,6 +353,7 @@ const profileQuery = gql`
     me {
       id
       slug
+      email
       name
       description
       hasPassword
@@ -490,6 +491,8 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
                   )}
                 </FormField>
               </div>
+              {/* This hidden input acts as a username cue for password managers */}
+              <input type="email" name="email" value={data?.me?.email} className="hidden" disabled />
               <FormField
                 name="name"
                 label={<FormattedMessage id="DisplayName" defaultMessage="Display Name" />}
