@@ -182,12 +182,25 @@ class SignInOrJoinFree extends React.Component {
         this.setState({ unknownEmailError: true, submitting: false });
       } else if (e.json?.errorCode === 'PASSWORD_REQUIRED') {
         this.setState({ passwordRequired: true, submitting: false });
+      } else if (e.json?.errorCode === 'EMAIL_AWAITING_VERIFICATION') {
+        toast({
+          variant: 'error',
+          message: (
+            <FormattedMessage
+              defaultMessage="Email not verified, please finish signing up."
+              id="signup.requiresVerificationError"
+            />
+          ),
+        });
+        setTimeout(() => {
+          this.props.router.push({ pathname: '/signup', query: { email } });
+        }, 1000);
       } else if (e.message?.includes('Two-factor authentication is enabled')) {
         this.setState({ submitting: false });
       } else {
         toast({
           variant: 'error',
-          message: e.message || 'Server error',
+          message: e.json?.message || e.message || 'Server error',
         });
         this.setState({ submitting: false });
       }

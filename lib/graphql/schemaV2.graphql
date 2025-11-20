@@ -7095,6 +7095,7 @@ enum ActivityType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -13491,6 +13492,7 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+  requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
   newsletterOptIn: Boolean
@@ -18652,6 +18654,7 @@ enum ActivityAndClassesType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -22552,6 +22555,21 @@ type Mutation {
   ): Organization
 
   """
+  Creates and invites admins to an existing Organization. Scope: "account".
+  """
+  inviteOrganizationAdmins(
+    """
+    Reference to the organization to invite admins to
+    """
+    organization: AccountReferenceInput!
+
+    """
+    List of members to invite as admins.
+    """
+    inviteMembers: [InviteMemberInput!]!
+  ): Organization
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -23650,6 +23668,7 @@ input AccountUpdateInput {
   legalName: String
   slug: String
   description: String
+  image: URL
   longDescription: String
   company: String
   tags: [String]

@@ -59,6 +59,10 @@ exports.REWRITES = [
     destination: '/guest-join',
   },
   {
+    source: '/signup/:step(verify|profile|organization)?',
+    destination: '/signup',
+  },
+  {
     source: '/organizations/new',
     destination: '/signup/organization',
   },

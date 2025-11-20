@@ -30,8 +30,8 @@ Cypress.Commands.add('login', (params = {}) => {
 });
 
 Cypress.Commands.add('logout', () => {
-  cy.getByDataCy('user-menu-trigger').click();
-  cy.getByDataCy('logout').click();
+  cy.getByDataCy('user-menu-trigger').click({ force: true });
+  cy.getByDataCy('logout').click({ force: true });
 });
 
 /**

@@ -112,8 +112,7 @@ const Footer = ({ className }: { className?: string }) => {
                     <p className="mb-4 text-sm/6 font-medium text-slate-900">{intl.formatMessage(label)}</p>
                     <ul className="space-y-4">
                       {items.map(item =>
-                        !LoggedInUser ||
-                        (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
+                        !LoggedInUser || (LoggedInUser && !(item.href === '/signup' || item.href === '/signin')) ? (
                           <li className="text-slate-600 hover:text-foreground" key={item.label.id}>
                             {item.href[0] === '/' ? (
                               <Link href={item.href}>{intl.formatMessage(item.label)}</Link>

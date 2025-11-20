@@ -17,6 +17,7 @@ class LoggedInUser {
   public collective: GraphQLV1Collective;
   public isRoot: boolean;
   public id: number;
+  public image: string;
   public hasTwoFactorAuth: boolean;
   public email: string;
   public memberOf: Array<{ id: number; role: ReverseCompatibleMemberRole; collective: GraphQLV1Collective }>;
