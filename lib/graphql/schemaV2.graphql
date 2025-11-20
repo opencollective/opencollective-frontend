@@ -7859,7 +7859,6 @@ type TransactionsImport {
     """
     accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
-    @deprecated(reason: "2025-04-29: Please use `host.offPlatformTransactions` instead.")
   stats: TransactionsImportStats!
 }
 
