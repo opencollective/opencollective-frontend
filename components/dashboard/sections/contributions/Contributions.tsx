@@ -12,7 +12,11 @@ import { hasAccountHosting } from '../../../../lib/collective';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  ContributionDrawerQuery,
+  HostContext,
+  ManagedOrderFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import {
   ContributionFrequency,
   ExpectedFundsFilter,
@@ -52,6 +56,7 @@ import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { hostContextFilter, HostContextFilter } from '../../filters/HostContextFilter';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -64,6 +69,7 @@ enum ContributionsTab {
   EXPIRED = 'EXPIRED',
   DISPUTED = 'DISPUTED',
   IN_REVIEW = 'IN_REVIEW',
+  ERROR = 'ERROR',
 }
 
 const dashboardContributionsMetadataQuery = gql`
@@ -218,6 +224,10 @@ const dashboardContributionsMetadataQuery = gql`
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
+      ERROR: orders(filter: $filter, status: [ERROR], includeIncognito: true, includeHostedAccounts: true)
+        @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
     }
   }
 `;
@@ -237,7 +247,7 @@ const dashboardContributionsQuery = gql`
     $paymentMethodService: [PaymentMethodService]
     $paymentMethodType: [PaymentMethodType]
     $accountingCategory: [String]
-    $includeHostedAccounts: Boolean!
+    $hostContext: HostContext
     $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -268,7 +278,7 @@ const dashboardContributionsQuery = gql`
         paymentMethodService: $paymentMethodService
         paymentMethodType: $paymentMethodType
         accountingCategory: $accountingCategory
-        includeHostedAccounts: $includeHostedAccounts
+        hostContext: $hostContext
         includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter
         orderBy: $orderBy
@@ -318,7 +328,7 @@ const Contributions = ({
   direction,
   onlyExpectedFunds,
   includeHostedAccounts,
-  includeChildrenAccounts,
+  includeChildrenAccounts = true,
 }: ContributionsProps) => {
   const { toast } = useToast();
 
@@ -392,6 +402,7 @@ const Contributions = ({
     },
     [router],
   );
+  const hasHosting = hasAccountHosting(account);
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -401,7 +412,7 @@ const Contributions = ({
         ...(onlyExpectedFunds ? { expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS } : {}),
       },
     },
-    !onlyExpectedFunds && includeHostedAccounts
+    !onlyExpectedFunds && hasHosting
       ? {
           id: ContributionsTab.DISPUTED,
           label: intl.formatMessage({ defaultMessage: 'Disputed', id: 'X1pwhF' }),
@@ -411,7 +422,17 @@ const Contributions = ({
           },
         }
       : null,
-    !onlyExpectedFunds && includeHostedAccounts
+    !onlyExpectedFunds && hasHosting
+      ? {
+          id: ContributionsTab.ERROR,
+          label: intl.formatMessage({ defaultMessage: 'Error', id: 'KN7zKn' }),
+          count: metadata?.account?.[ContributionsTab.ERROR].totalCount,
+          filter: {
+            status: [OrderStatus.ERROR],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && hasHosting
       ? {
           id: ContributionsTab.IN_REVIEW,
           label: intl.formatMessage({ id: 'order.in_review', defaultMessage: 'In Review' }),
@@ -421,7 +442,17 @@ const Contributions = ({
           },
         }
       : null,
-    !onlyExpectedFunds && !includeHostedAccounts
+    !onlyExpectedFunds && hasHosting
+      ? {
+          id: ContributionsTab.PAUSED,
+          label: intl.formatMessage({ defaultMessage: 'Paused', id: 'C2iTEH' }),
+          count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
+          filter: {
+            status: [OrderStatus.PAUSED],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && !hasHosting
       ? {
           id: ContributionsTab.RECURRING,
           label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
@@ -432,7 +463,7 @@ const Contributions = ({
           },
         }
       : null,
-    !onlyExpectedFunds && !includeHostedAccounts
+    !onlyExpectedFunds && !hasHosting
       ? {
           id: ContributionsTab.ONETIME,
           label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
@@ -486,7 +517,7 @@ const Contributions = ({
           },
         }
       : null,
-    !includeHostedAccounts || onlyExpectedFunds
+    !hasHosting || onlyExpectedFunds
       ? {
           id: ContributionsTab.CANCELED,
           label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
@@ -517,7 +548,7 @@ const Contributions = ({
   }, [metadata?.account]);
 
   const filterMeta: FilterMeta = {
-    currency: metadata?.account?.currency,
+    currency: account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
     childrenAccounts: account.childrenAccounts?.nodes ?? [],
     accountSlug: account.slug,
@@ -527,11 +558,14 @@ const Contributions = ({
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
+  const newSchema = hasHosting ? schema.extend({ hostContext: hostContextFilter.schema }) : schema;
+
   const queryFilter = useQueryFilter({
-    schema,
+    schema: newSchema,
     toVariables,
     meta: filterMeta,
     views,
+    skipFiltersOnReset: ['hostContext'],
     filters: onlyExpectedFunds
       ? expectedFundsFilters
       : isIncoming && !includeHostedAccounts
@@ -595,8 +629,6 @@ const Contributions = ({
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
-  const hasHosting = hasAccountHosting(account);
-
   const getActions = getContributionActions({
     intl,
     LoggedInUser,
@@ -657,8 +689,15 @@ const Contributions = ({
             isIncoming ? (
               onlyExpectedFunds ? (
                 <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
-              ) : includeHostedAccounts ? (
-                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+              ) : hasHosting ? (
+                <div className="flex flex-1 items-center justify-between gap-4">
+                  <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
+                  <HostContextFilter
+                    value={queryFilter.values.hostContext}
+                    onChange={val => queryFilter.setFilter('hostContext', val)}
+                    intl={intl}
+                  />
+                </div>
               ) : (
                 <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
               )
@@ -674,8 +713,11 @@ const Contributions = ({
                 ) : (
                   <FormattedMessage id="ExpectedFunds.description" defaultMessage="Expected funds to your account" />
                 )
-              ) : includeHostedAccounts && hasHosting ? (
-                <FormattedMessage defaultMessage="Contributions for Collectives you host." id="ZIZ7Ms" />
+              ) : hasHosting ? (
+                <FormattedMessage
+                  defaultMessage="Contributions made to your organization and Collectives you host."
+                  id="IZotDb"
+                />
               ) : (
                 <FormattedMessage
                   id="IncomingContributions.description"

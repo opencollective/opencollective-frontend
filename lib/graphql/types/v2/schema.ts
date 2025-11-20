@@ -338,6 +338,7 @@ export type AccountOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -1832,6 +1833,7 @@ export type BotOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -2408,6 +2410,7 @@ export type CollectiveOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -4512,6 +4515,7 @@ export type EventOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -5780,6 +5784,7 @@ export type FundOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -6601,6 +6606,7 @@ export type HostOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -7488,6 +7494,7 @@ export type IndividualOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -10027,6 +10034,7 @@ export type OrganizationOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -10279,6 +10287,7 @@ export type PaymentMethodOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -11370,6 +11379,7 @@ export type ProjectOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -11850,6 +11860,7 @@ export type QueryOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
@@ -13753,6 +13764,7 @@ export type VendorOrdersArgs = {
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  excludeHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
