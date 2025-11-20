@@ -5432,6 +5432,7 @@ type Conversation {
   updatedAt: DateTime!
   tags: [String]
   summary: String!
+  visibility: ConversationVisibility!
   account: Account
   fromAccount: Account
 
@@ -5446,6 +5447,11 @@ type Conversation {
   comments(limit: Int! = 150, offset: Int! = 0): CommentCollection!
   followers(limit: Int! = 10, offset: Int! = 0): AccountCollection!
   stats: ConversationStats
+
+  """
+  The date of the last comment in this conversation
+  """
+  lastCommentDate: DateTime
 }
 
 """
@@ -5492,6 +5498,21 @@ enum CommentType {
   Comment is visible only to host admins
   """
   PRIVATE_NOTE
+}
+
+"""
+Conversation visibility levels
+"""
+enum ConversationVisibility {
+  """
+  Public conversation visible to everyone
+  """
+  PUBLIC
+
+  """
+  Private conversation visible only to collective admins and host admins
+  """
+  ADMINS_AND_HOST
 }
 
 type HostApplication {

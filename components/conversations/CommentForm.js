@@ -110,6 +110,7 @@ const CommentForm = ({
   minHeight = 250,
   submitButtonJustify,
   submitButtonVariant,
+  richTextEditorVersion,
 }) => {
   const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
   const intl = useIntl();
@@ -187,6 +188,7 @@ const CommentForm = ({
                 setValidationError(null);
               }}
               setUploading={setUploading}
+              version={richTextEditorVersion}
             />
           </div>
         )}

@@ -44,7 +44,10 @@ export const conversationListFragment = gql`
       summary
       slug
       createdAt
+      updatedAt
       tags
+      visibility
+      lastCommentDate
       fromAccount {
         id
         name
