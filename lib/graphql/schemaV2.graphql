@@ -546,7 +546,12 @@ interface Account {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -3229,7 +3234,12 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -5270,6 +5280,23 @@ input PayoutMethodReferenceInput {
   id: String
 }
 
+enum HostContext {
+  """
+  Both the Host Organizations internal accounts and Hosted Collectives
+  """
+  ALL
+
+  """
+  Only the Host Organization (including its projects/events)
+  """
+  INTERNAL
+
+  """
+  Only Hosted Collectives (including their projects/events)
+  """
+  HOSTED
+}
+
 """
 The user or system that paused the order
 """
@@ -5784,7 +5811,12 @@ type PaymentMethod {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -7392,23 +7424,6 @@ type HostStats {
     """
     net: Boolean = false
   ): Amount
-}
-
-enum HostContext {
-  """
-  Both the Host Organizations internal accounts and Hosted Collectives
-  """
-  ALL
-
-  """
-  Only the Host Organization (including its projects/events)
-  """
-  INTERNAL
-
-  """
-  Only Hosted Collectives (including their projects/events)
-  """
-  HOSTED
 }
 
 """
@@ -9215,7 +9230,12 @@ type Bot implements Account {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -10178,7 +10198,12 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -11699,7 +11724,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -12936,7 +12966,12 @@ type Individual implements Account {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -14152,7 +14187,12 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -15235,7 +15275,12 @@ type Vendor implements Account & AccountWithContributions {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -16639,7 +16684,12 @@ type Query {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -19138,7 +19188,12 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
@@ -20248,7 +20303,12 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     If account is a host, also include hosted accounts orders
     """
-    includeHostedAccounts: Boolean
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED (default behavior is INTERNAL)
+    """
+    hostContext: HostContext = INTERNAL
 
     """
     Include orders from children events/projects
