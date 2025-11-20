@@ -288,7 +288,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           title={<FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />}
           description={
             <FormattedMessage
-              defaultMessage="Manage your accounting categories, and use these categories to keep your Collectives’ expenses organized."
+              defaultMessage="Manage your accounting categories, and use these categories to keep expenses organized."
               id="5j8RQd"
             />
           }

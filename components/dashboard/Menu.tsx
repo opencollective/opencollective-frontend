@@ -30,7 +30,13 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
-import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
+import {
+  hasAccountHosting,
+  hasAccountMoneyManagement,
+  isChildAccount,
+  isIndividualAccount,
+  isOrganizationAccount,
+} from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { ExpenseType } from '../../lib/graphql/types/v2/schema';
@@ -128,14 +134,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   }
 
   const isIndividual = isIndividualAccount(account);
-  const isHost = isHostAccount(account);
-  const isSelfHosted = isSelfHostedAccount(account);
+  const isOrganization = isOrganizationAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
-  const isActive = account.isActive;
-  const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
-  const canHostAccounts = account.settings?.canHostAccounts !== false && isHost;
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hasHosting = hasAccountHosting(account);
 
   const hasPlatformBillingEnabled =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription;
@@ -143,9 +147,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
     hasReceivedGrantRequests ||
-    (!isIndividual &&
-      !(isHost || isSelfHosted) &&
-      Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
+    (!isIndividual && !hasMoneyManagement && Boolean(account.supportedExpenseTypes?.includes?.(ExpenseType.GRANT)));
 
   const items: MenuItem[] = [
     {
@@ -178,7 +180,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
-          if: isHost && canHostAccounts,
+          if: hasHosting,
           section: ALL_SECTIONS.HOST_EXPENSES,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
         },
@@ -214,17 +216,16 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: !isIndividual,
       type: 'group',
       Icon: Receipt,
-      label:
-        isHost || isSelfHosted
-          ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
-          : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      label: hasMoneyManagement
+        ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
+        : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
       subMenu: [
         {
-          if: isHost && canHostAccounts,
+          if: hasHosting,
           section: ALL_SECTIONS.HOSTED_FUNDS,
         },
         {
-          if: (isHost && canHostAccounts) || isSelfHosted,
+          if: hasHosting,
           section: ALL_SECTIONS.HOSTED_GRANTS,
           label: intl.formatMessage({ defaultMessage: 'Hosted Grant Requests', id: 'Bt/+M7' }),
         },
@@ -262,7 +263,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Coins,
       subMenu: [
         {
-          if: (isHost && canHostAccounts) || isSelfHosted,
+          if: hasHosting,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
@@ -289,13 +290,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: (isHost || isSelfHosted) && !isCommunityManagerOnly,
+      if: hasMoneyManagement && !isCommunityManagerOnly,
       label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
       Icon: Coins,
       section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },
     {
-      if: isHost && !isAccountantOnly && !isCommunityManagerOnly && canHostAccounts,
+      if: hasHosting && !isAccountantOnly && !isCommunityManagerOnly,
       type: 'group',
       Icon: Building,
       label: intl.formatMessage({ defaultMessage: 'Hosting', id: 'DkzeEN' }),
@@ -311,12 +312,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       section: ALL_SECTIONS.HOST_AGREEMENTS,
-      if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, isHost && canHostAccounts),
+      if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, hasHosting),
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
-      if: (isHost || isSelfHosted) && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
+      if: hasMoneyManagement && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -328,11 +329,16 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: shouldIncludeMenuItemWithLegacyFallback(
         account,
         FEATURES.TAX_FORMS,
-        isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+        hasMoneyManagement && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
       ),
     },
     {
-      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isCommunityManagerOnly,
+      if:
+        hasMoneyManagement &&
+        isOrganization && //
+        hasFeature(account, FEATURES.VIRTUAL_CARDS) &&
+        !isAccountantOnly &&
+        !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
       Icon: CreditCard,
@@ -348,7 +354,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost && !isCommunityManagerOnly,
+      if: hasHosting && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
@@ -364,13 +370,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isHost && !isIndividual && !isCommunityManagerOnly,
+      if: !hasHosting && !isIndividual && !isCommunityManagerOnly,
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
-      if: (isHost || isSelfHosted) && !isAccountantOnly && !isCommunityManagerOnly,
+      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },
@@ -387,18 +393,18 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: HeartHandshake,
     },
     {
-      if: !(isHost || isSelfHosted) && !isCommunityManagerOnly,
+      if: !hasMoneyManagement && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
     },
     {
-      if: (isHost || isSelfHosted) && !isCommunityManagerOnly,
+      if: hasMoneyManagement && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
       Icon: ArrowRightLeft,
       subMenu: [
         {
-          section: ALL_SECTIONS.HOST_TRANSACTIONS,
+          section: hasHosting ? ALL_SECTIONS.HOST_TRANSACTIONS : ALL_SECTIONS.TRANSACTIONS,
           label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
         },
         {
@@ -429,7 +435,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if:
         !isOneOfTypes(account, [EVENT, USER]) &&
-        (account.type !== 'ORGANIZATION' || isActiveHost) &&
+        (account.type !== 'ORGANIZATION' || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,
@@ -469,7 +475,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           if: !isAccountantOnly,
         },
         // Host sections
-        ...(isHost || isSelfHosted
+        ...(hasMoneyManagement
           ? [
               {
                 section: ALL_SECTIONS.PLATFORM_SUBSCRIPTION,
@@ -478,7 +484,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.FISCAL_HOSTING,
-                if: !isAccountantOnly && !isSelfHosted && canHostAccounts,
+                if: !isAccountantOnly && hasHosting,
               },
               {
                 section: ALL_SECTIONS.POLICIES,
@@ -511,7 +517,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
-                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isSelfHosted,
+                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && isOrganization && !isAccountantOnly,
               },
             ]
           : []),
@@ -562,7 +568,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           // POLICIES also available for Fiscal hosts further up in this list
           section: ALL_SECTIONS.POLICIES,
-          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isHost && !isSelfHosted && !isAccountantOnly,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !hasMoneyManagement && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.CUSTOM_EMAIL,

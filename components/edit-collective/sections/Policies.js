@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, isNil, set, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isSelfHostedAccount } from '../../../lib/collective';
+import { hasAccountHosting, hasAccountMoneyManagement } from '../../../lib/collective';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
@@ -186,7 +186,8 @@ const Policies = ({ collective }) => {
   const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
   const { toast } = useToast();
-  const isSelfHosted = isSelfHostedAccount(collective);
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
+  const hasHosting = hasAccountHosting(collective);
   const { account } = React.useContext(DashboardContext);
   const isUpgradeRequiredForChartOfAccounts = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
 
@@ -236,7 +237,7 @@ const Policies = ({ collective }) => {
     async onSubmit(values) {
       const { contributionPolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
       const newSettings = { ...collective.settings, disablePublicExpenseSubmission };
-      if (collective.isHost) {
+      if (hasMoneyManagement) {
         newSettings.expenseTypes = expenseTypes;
       }
 
@@ -366,7 +367,8 @@ const Policies = ({ collective }) => {
               )}
             </StyledInputField>
 
-            {collective.isHost && (
+            {/* Mandatory Fields: For Organizations and Independent Collectives */}
+            {hasMoneyManagement && (
               <div className="mt-4 flex flex-col gap-2">
                 <div className="font-bold">
                   <FormattedMessage defaultMessage="Mandatory Information" id="IuoUBR" />
@@ -647,7 +649,8 @@ const Policies = ({ collective }) => {
           </P>
         </Container>
 
-        {collective.isHost && !isSelfHosted && (
+        {/* Required Admins: For Host Organizations */}
+        {hasHosting && (
           <Container>
             <SettingsSectionTitle>
               <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
@@ -740,6 +743,8 @@ const Policies = ({ collective }) => {
               )}
           </Container>
         )}
+
+        {/* Expense Approvals: For everyone */}
         <Container>
           <SettingsSectionTitle>
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
@@ -809,7 +814,8 @@ const Policies = ({ collective }) => {
               }
             />
           </Flex>
-          {collective.isHost && !isSelfHosted && (
+
+          {hasHosting && (
             <React.Fragment>
               <Container
                 ml="1.4rem"
@@ -883,29 +889,33 @@ const Policies = ({ collective }) => {
               />
             </P>
           )}
-          <Container mt={3}>
-            <StyledCheckbox
-              name="allow-expense-submission"
-              label={formatMessage(messages['expensePolicy.allowExpense'])}
-              onChange={() =>
-                formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
-              }
-              defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
-            />
-          </Container>
         </Container>
 
-        {collective.isHost && (
+        {/* Public Expense submission: For everyone */}
+        <Container mt={3}>
+          <StyledCheckbox
+            name="allow-expense-submission"
+            label={formatMessage(messages['expensePolicy.allowExpense'])}
+            onChange={() =>
+              formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
+            }
+            defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
+          />
+        </Container>
+
+        {/* Expense Types: For Organizations and Independent Collectives */}
+        {hasMoneyManagement && (
           <React.Fragment>
             <Container>
               <SettingsSectionTitle>
                 <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
               </SettingsSectionTitle>
               <P mb={2}>
-                {isSelfHosted ? (
+                {!hasHosting ? (
                   <FormattedMessage
-                    defaultMessage="Specify the types of expenses allowed for your Collective."
+                    defaultMessage="Specify the types of expenses allowed for {type, select, ORGANIZATION {your organization} COLLECTIVE {your collective} other {your account}}"
                     id="a9eYkM"
+                    values={{ type: collective.type }}
                   />
                 ) : (
                   <FormattedMessage
@@ -945,9 +955,9 @@ const Policies = ({ collective }) => {
                   <FormattedMessage defaultMessage="Public Expense submission" id="p5Icf1" />
                 </div>
                 <p className="mb-2 text-sm">
-                  {isSelfHosted ? (
+                  {!hasHosting ? (
                     <FormattedMessage
-                      defaultMessage="By default only Collective administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
+                      defaultMessage="By default only administrators can submit expenses on behalf of vendors. You can allow other users to also submit expenses on behalf vendors."
                       id="QtxPLy"
                     />
                   ) : (
@@ -974,42 +984,43 @@ const Policies = ({ collective }) => {
                 />
               </div>
             </Container>
-            {collective.isHost && (
-              <Container>
-                <SettingsSectionTitle>
-                  <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
-                </SettingsSectionTitle>
-                <P mb={3}>
-                  <FormattedMessage
-                    defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
-                    id="QwktWn"
-                    values={{
-                      LinkAccountingCategories: getI18nLink({
-                        as: Link,
-                        href: `/dashboard/${collective.slug}/chart-of-accounts`,
-                      }),
-                    }}
-                  />
-                </P>
 
-                <div className="mb-1">
-                  <StyledCheckbox
-                    name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
-                    label={
-                      <FormattedMessage
-                        defaultMessage="Require expense submitters to select a category when submitting an expense"
-                        id="CwU4gm"
-                      />
-                    }
-                    disabled={isUpgradeRequiredForChartOfAccounts}
-                    checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
-                    onChange={({ checked }) => {
-                      const newPolicies = cloneDeep(formik.values.policies);
-                      set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
-                      formik.setFieldValue('policies', newPolicies);
-                    }}
-                  />
-                </div>
+            <Container>
+              <SettingsSectionTitle>
+                <FormattedMessage defaultMessage="Expense categorization" id="apLY+L" />
+              </SettingsSectionTitle>
+              <P mb={3}>
+                <FormattedMessage
+                  defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
+                  id="QwktWn"
+                  values={{
+                    LinkAccountingCategories: getI18nLink({
+                      as: Link,
+                      href: `/dashboard/${collective.slug}/chart-of-accounts`,
+                    }),
+                  }}
+                />
+              </P>
+
+              <div className="mb-1">
+                <StyledCheckbox
+                  name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
+                  label={
+                    <FormattedMessage
+                      defaultMessage="Require expense submitters to select a category when submitting an expense"
+                      id="CwU4gm"
+                    />
+                  }
+                  disabled={isUpgradeRequiredForChartOfAccounts}
+                  checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
+                  onChange={({ checked }) => {
+                    const newPolicies = cloneDeep(formik.values.policies);
+                    set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
+                    formik.setFieldValue('policies', newPolicies);
+                  }}
+                />
+              </div>
+              {hasHosting && (
                 <div>
                   <StyledCheckbox
                     name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
@@ -1028,13 +1039,15 @@ const Policies = ({ collective }) => {
                     }}
                   />
                 </div>
-                {isUpgradeRequiredForChartOfAccounts && (
-                  <UpgradePlanCTA className="mt-4" compact hideBenefits featureKey={FEATURES.CHART_OF_ACCOUNTS} />
-                )}
-              </Container>
-            )}
+              )}
+              {isUpgradeRequiredForChartOfAccounts && (
+                <UpgradePlanCTA className="mt-4" compact hideBenefits featureKey={FEATURES.CHART_OF_ACCOUNTS} />
+              )}
+            </Container>
           </React.Fragment>
         )}
+
+        {/* Rejected categories: For everyone */}
         <Container>
           <SettingsSectionTitle>
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
@@ -1058,7 +1071,9 @@ const Policies = ({ collective }) => {
             isMulti
           />
         </Container>
-        {collective.isHost && (
+
+        {/* Allow collective admins to refund: For Host Organizations */}
+        {hasHosting && (
           <Container>
             <SettingsSectionTitle>
               <FormattedMessage defaultMessage="Refunds" id="pXQSzm" />
