@@ -64,8 +64,12 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const desiredFeature = router.query?.feature as unknown as (typeof PlatformSubscriptionFeatures)[number];
 
   const queryError = query.error;
-  const activeSubscription = query.data?.account?.platformSubscription;
-  const billing = query.data?.account?.platformBilling;
+  const activeSubscription =
+    query.data?.account && 'platformSubscription' in query.data.account
+      ? query.data.account.platformSubscription
+      : null;
+  const billing =
+    query.data?.account && 'platformBilling' in query.data.account ? query.data.account.platformBilling : null;
   const isLoading = query.loading;
 
   const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
