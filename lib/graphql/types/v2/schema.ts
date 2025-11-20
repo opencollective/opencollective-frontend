@@ -12901,10 +12901,7 @@ export type TransactionsImport = {
    * @deprecated 2025-07-02: Please use the generic accounts field instead.
    */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
-  /**
-   * List of rows in the import
-   * @deprecated 2025-04-29: Please use `host.offPlatformTransactions` instead.
-   */
+  /** List of rows in the import */
   rows: TransactionsImportRowCollection;
   /** Source of the import (e.g. "Bank of America", "Eventbrite", etc...) */
   source: Scalars['NonEmptyString']['output'];

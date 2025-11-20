@@ -37,13 +37,15 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const query = useQuery<DashboardPlatformSubscriptionQuery, DashboardPlatformSubscriptionQueryVariables>(
     gql`
       query DashboardPlatformSubscription($slug: String!) {
-        host(slug: $slug) {
-          platformSubscription {
-            ...PlatformSubscriptionFields
-          }
+        account(slug: $slug) {
+          ... on AccountWithPlatformSubscription {
+            platformSubscription {
+              ...PlatformSubscriptionFields
+            }
 
-          platformBilling {
-            ...PlatformBillingFields
+            platformBilling {
+              ...PlatformBillingFields
+            }
           }
         }
       }
@@ -62,8 +64,12 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const desiredFeature = router.query?.feature as unknown as (typeof PlatformSubscriptionFeatures)[number];
 
   const queryError = query.error;
-  const activeSubscription = query.data?.host?.platformSubscription;
-  const billing = query.data?.host?.platformBilling;
+  const activeSubscription =
+    query.data?.account && 'platformSubscription' in query.data.account
+      ? query.data.account.platformSubscription
+      : null;
+  const billing =
+    query.data?.account && 'platformBilling' in query.data.account ? query.data.account.platformBilling : null;
   const isLoading = query.loading;
 
   const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
