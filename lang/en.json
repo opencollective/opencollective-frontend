@@ -663,6 +663,8 @@
   "bHcyqz": "This will inactivate your previous recovery codes.",
   "billing.additionalActiveCollectives": "{count} active Collectives: {amount}",
   "billing.additionalExpensesPaid": "{count} Expenses paid: {amount}",
+  "billing.currentUtilization.activeCollectives": "{usedCount} / {includedCount} Active Collectives",
+  "billing.currentUtilization.paidExpenses": "{usedCount} / {includedCount} Paid Expenses",
   "BIYvoI": "Collective instructions to submit a grant request",
   "bjXbg/": "Additional message for contributors",
   "bKMsE/": "for {account}",

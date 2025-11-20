@@ -663,6 +663,8 @@
   "bHcyqz": "Cela désactivera vos codes de récupération existants.",
   "billing.additionalActiveCollectives": "{count} active Collectives: {amount}",
   "billing.additionalExpensesPaid": "{count} Expenses paid: {amount}",
+  "billing.currentUtilization.activeCollectives": "{usedCount} / {includedCount} Active Collectives",
+  "billing.currentUtilization.paidExpenses": "{usedCount} / {includedCount} Paid Expenses",
   "BIYvoI": "Instructions de Collectif pour soumettre une demande de subvention",
   "bjXbg/": "Message complémentaire pour les contributeurs",
   "bKMsE/": "pour {account}",

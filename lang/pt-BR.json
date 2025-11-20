@@ -663,6 +663,8 @@
   "bHcyqz": "Isto irá desativar seus códigos de recuperação anteriores.",
   "billing.additionalActiveCollectives": "{count} active Collectives: {amount}",
   "billing.additionalExpensesPaid": "{count} Expenses paid: {amount}",
+  "billing.currentUtilization.activeCollectives": "{usedCount} / {includedCount} Active Collectives",
+  "billing.currentUtilization.paidExpenses": "{usedCount} / {includedCount} Paid Expenses",
   "BIYvoI": "Instruções do Coletivo para enviar solicitação de subsídio",
   "bjXbg/": "Mensagem adicional aos contribuintes",
   "bKMsE/": "para {account}",
