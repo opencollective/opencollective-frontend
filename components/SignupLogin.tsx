@@ -122,7 +122,9 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
               </div>
 
               <div className="mt-4">
-                <span className="text-sm text-muted-foreground">Or </span>
+                <span className="text-sm text-muted-foreground capitalize">
+                  <FormattedMessage defaultMessage="OR" id="Or" />{' '}
+                </span>
                 <Link href="/create-account" className="text-sm text-blue-800 underline hover:text-blue-700">
                   <FormattedMessage defaultMessage="Join as an individual" id="s+BE7Y" />
                 </Link>
