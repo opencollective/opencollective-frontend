@@ -43,6 +43,7 @@ const Welcome = () => {
           <div className="-mt-16 rounded-full border-4 border-white bg-white">
             <Avatar
               src={LoggedInUser?.image || '/static/images/sample-avatar.png'}
+              backgroundSize={LoggedInUser?.image ? undefined : '80%'}
               height={128}
               width={128}
               alt="Avatar"
