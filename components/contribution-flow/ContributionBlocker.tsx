@@ -120,7 +120,7 @@ const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
             </P>
           ) : (
             <Container textAlign="center">
-              <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
+              <Link href={`/${account.slug}/accept-financial-contributions/host`}>
                 <StyledButton buttonStyle="primary" mt={3}>
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>

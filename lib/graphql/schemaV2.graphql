@@ -7048,6 +7048,7 @@ enum ActivityType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -18665,6 +18666,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -21688,6 +21690,26 @@ type Mutation {
   Regenerate two factor authentication recovery codes
   """
   regenerateRecoveryCodes: [String!]
+
+  """
+  Convert an account to an Organization. Scope: "account".
+  """
+  convertAccountToOrganization(
+    """
+    Account to convert.
+    """
+    account: AccountReferenceInput!
+
+    """
+    Should the Organization have money management capabilities
+    """
+    activateMoneyManagement: Boolean = false
+
+    """
+    Should the Organization have hosting capabilities
+    """
+    activateHosting: Boolean = false
+  ): Account!
 
   """
   Edit an accounting category. Returns the account with the updated categories.

@@ -360,8 +360,7 @@ exports.REWRITES = [
   },
   // New accept financial contributions flow
   {
-    source:
-      '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
+    source: '/:slug/accept-financial-contributions/host/:state(success)?',
     destination: '/accept-financial-contributions',
   },
   // New recurring contributions page

@@ -473,14 +473,13 @@ const availableCurrenciesQuery = gql`
  *
  * The main goal is to use this component in the Expense Flow (1) but it's also reused in:
  *
- * - Collective onboarding, AcceptContributionsOurselvesOrOrg.js (2)
- * - In Collective/Host settings -> Receiving Money, BankTransfer.js (3)
+ * - In Collective/Host settings -> Receiving Money, BankTransfer.js (2)
  *
  * In (1) we pass the host where the expense is submitted and fixedCurrency is never set.
  *   * If Wise is configured on that host, `availableCurrencies` should normally be available.
  *   * If it's not, we'll have to fetch `availableCurrencies` from the Platform Wise account
  *
- * In (2) and (3), we never pass an `host` and `fixedCurrency` is sometimes set.
+ * In (2), we never pass an `host` and `fixedCurrency` is sometimes set.
  *   * If `fixedCurrency` is set, we don't need `availableCurrencies`
  *   * If `fixedCurrency` is not set, we'll fetch `availableCurrencies` from the Platform Wise account
  */
