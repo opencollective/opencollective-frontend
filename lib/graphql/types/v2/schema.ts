@@ -915,7 +915,7 @@ export type AccountWithParent = {
   parent?: Maybe<Account>;
 };
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscription = {
   legacyPlan: HostPlan;
   platformBilling: PlatformBilling;
@@ -924,7 +924,7 @@ export type AccountWithPlatformSubscription = {
 };
 
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
   billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };

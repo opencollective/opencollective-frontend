@@ -661,6 +661,8 @@
   "bHcyqz": "Esto desactivará tus códigos de recuperación anteriores.",
   "billing.additionalActiveCollectives": "{count} active Collectives: {amount}",
   "billing.additionalExpensesPaid": "{count} Expenses paid: {amount}",
+  "billing.currentUtilization.activeCollectives": "{usedCount} / {includedCount} Active Collectives",
+  "billing.currentUtilization.paidExpenses": "{usedCount} / {includedCount} Paid Expenses",
   "BIYvoI": "Instrucciones del Colectivo para presentar una solicitud de subvención",
   "bjXbg/": "Mensaje adicional para los colaboradores",
   "bKMsE/": "para {account}",
