@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Check, ChevronDown, ChevronUp, LockKeyhole } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, ChevronUp, LockKeyhole } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
@@ -9,6 +10,7 @@ import type { SetupGuideQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import type { Category, Step } from '@/lib/setup-guide';
 import { generateSetupGuideSteps } from '@/lib/setup-guide';
+import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -195,6 +197,8 @@ const SetupCategory = ({
   );
 };
 
+const CardColors = ['bg-blue-50', 'bg-green-50', 'bg-red-50', 'bg-yellow-50', 'bg-purple-50', 'bg-organe-50'];
+
 export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
   const router = useRouter();
   const { data } = useQuery(setupGuideQuery, {
@@ -240,11 +244,114 @@ export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">
-              <FormattedMessage defaultMessage="Setup guide" id="SetupGuide.Title" />
+              <FormattedMessage
+                defaultMessage="What would like to do with the platform?"
+                id="Welcome.Organization.Title"
+              />
             </CardTitle>
-            <CardDescription>Get going with Open Collective!</CardDescription>
+            <CardDescription>
+              <FormattedMessage
+                defaultMessage="Get started with the basics or set up additional functionalities."
+                id="Welcome.Organization.Description"
+              />
+            </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-6 divide-y">
+          <CardContent className="grid grid-cols-3 gap-4">
+            {/* {Array.from({ length: 6 }).map((_, index) => ( */}
+            {/* <div key={index} className={cn('h-40 w-full rounded-md', CardColors[index])} /> */}
+            {/* ))} */}
+            <div className="flex h-40 w-full flex-col items-center justify-center gap-4 rounded-sm bg-blue-50 px-6 py-4 shadow-slate-100 transition duration-300 hover:shadow-md">
+              <Image src="/static/images/welcome/jar.png" alt="PlatformBasics" width={42} height={40} />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h1 className="flex items-center gap-2 font-bold">
+                  <FormattedMessage defaultMessage="Platform Basics" id="Welcome.Organization.PlatformBasics" />{' '}
+                  <ArrowRight size={17} />
+                </h1>
+                <small className="text-sm">
+                  <FormattedMessage
+                    defaultMessage="Make contributions, submit expenses and get paid"
+                    id="Welcome.Organization.PlatformBasics.Description"
+                  />
+                </small>
+              </div>
+            </div>
+            <div className="flex h-40 w-full flex-col items-center justify-center gap-4 rounded-sm bg-green-50 px-6 py-4">
+              <Image src="/static/images/welcome/place.png" alt="PlatformBasics" width={42} height={40} />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h1 className="flex items-center gap-2 font-bold">
+                  <FormattedMessage defaultMessage="Money Management" id="Welcome.Organization.MoneyManagement" />{' '}
+                  <ArrowRight size={17} />
+                </h1>
+                <small className="text-sm">
+                  <FormattedMessage
+                    defaultMessage="Create accounts, add funds and pay expenses"
+                    id="Welcome.Organization.MoneyManagement.Description"
+                  />
+                </small>
+              </div>
+            </div>
+            <div className="flex h-40 w-full flex-col items-center justify-center gap-4 rounded-sm bg-red-50 px-6 py-4">
+              <Image src="/static/images/welcome/jar.png" alt="PlatformBasics" width={42} height={40} />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h1 className="flex items-center gap-2 font-bold">
+                  <FormattedMessage defaultMessage="Crowdfunding" id="Welcome.Organization.Crowdfunding" />{' '}
+                  <ArrowRight size={17} />
+                </h1>
+                <small className="text-sm">
+                  <FormattedMessage
+                    defaultMessage="Receive crowdfunding contributions and fundraise"
+                    id="Welcome.Organization.Crowdfunding.Description"
+                  />
+                </small>
+              </div>
+            </div>
+            <div className="flex h-40 w-full flex-col items-center justify-center gap-4 rounded-sm bg-yellow-50 px-6 py-4">
+              <Image src="/static/images/welcome/jar.png" alt="PlatformBasics" width={42} height={40} />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h1 className="flex items-center gap-2 font-bold">
+                  <FormattedMessage defaultMessage="Expense Automations" id="Welcome.Organization.ExpenseAutomations" />{' '}
+                  <ArrowRight size={17} />
+                </h1>
+                <small className="text-sm">
+                  <FormattedMessage
+                    defaultMessage="Pay expenses through payment processors"
+                    id="Welcome.Organization.ExpenseAutomations.Description"
+                  />
+                </small>
+              </div>
+            </div>
+            <div className="flex h-40 w-full flex-col items-center justify-center gap-4 rounded-sm bg-purple-50 px-6 py-4">
+              <Image src="/static/images/welcome/place.png" alt="PlatformBasics" width={42} height={40} />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h1 className="flex items-center gap-2 font-bold">
+                  <FormattedMessage defaultMessage="Fiscal Hosting" id="Welcome.Organization.FiscalHosting" />{' '}
+                  <ArrowRight size={17} />
+                </h1>
+                <small className="text-sm">
+                  <FormattedMessage
+                    defaultMessage="Manage money on behalf of other groups (Collectives)"
+                    id="Welcome.Organization.FiscalHosting.Description"
+                  />
+                </small>
+              </div>
+            </div>
+            <div className="flex h-40 w-full flex-col items-center justify-center gap-4 rounded-sm bg-orange-50 px-6 py-4">
+              <Image src="/static/images/welcome/jar.png" alt="PlatformBasics" width={42} height={40} />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h1 className="flex items-center gap-2 font-bold">
+                  <FormattedMessage defaultMessage="Fund & Grants" id="Welcome.Organization.FundGrants" />{' '}
+                  <ArrowRight size={17} />
+                </h1>
+                <small className="text-sm">
+                  <FormattedMessage
+                    defaultMessage="Setup funds and distribute grants"
+                    id="Welcome.Organization.FundGrants.Description"
+                  />
+                </small>
+              </div>
+            </div>
+          </CardContent>
+          {/* <CardContent className="flex flex-col gap-6 divide-y">
             {categories?.map(category => (
               <SetupCategory
                 key={category.id}
@@ -254,7 +361,7 @@ export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
                 {...category}
               />
             ))}
-          </CardContent>
+          </CardContent> */}
         </Card>
       </CollapsibleContent>
     </Collapsible>
