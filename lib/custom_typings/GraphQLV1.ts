@@ -18,6 +18,10 @@ export type GraphQLV1Collective = {
   isHost?: boolean;
   policies: Policies;
   children?: GraphQLV1Collective[];
+  host?: GraphQLV1Collective;
+  stats?: {
+    balance?: number;
+  };
 };
 
 export interface GraphQLV1PaymentMethod {

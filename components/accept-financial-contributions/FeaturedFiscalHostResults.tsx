@@ -24,11 +24,9 @@ const HostCardContainer = styled(Grid).attrs({
 export default function FeaturedFiscalHostResults({
   hosts,
   collective,
-  onHostApplyClick,
 }: {
   hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
   collective: Pick<Account, 'slug'>;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   return (
     <StyledCard padding={4} bg="#F1F6FF" borderRadius="24px" borderStyle="none">
@@ -51,9 +49,7 @@ export default function FeaturedFiscalHostResults({
       </P>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
-          return (
-            <ApplyToHostCard key={host.slug} host={host} collective={collective} onHostApplyClick={onHostApplyClick} />
-          );
+          return <ApplyToHostCard key={host.slug} host={host} collective={collective} />;
         })}
       </HostCardContainer>
     </StyledCard>

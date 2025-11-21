@@ -1053,6 +1053,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION = 'COLLECTIVE_CONVERTED_TO_ORGANIZATION',
   COLLECTIVE_CORE_MEMBER_ADDED = 'COLLECTIVE_CORE_MEMBER_ADDED',
   COLLECTIVE_CORE_MEMBER_EDITED = 'COLLECTIVE_CORE_MEMBER_EDITED',
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED = 'COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED',
@@ -1245,6 +1246,7 @@ export enum ActivityType {
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION = 'COLLECTIVE_CONVERTED_TO_ORGANIZATION',
   COLLECTIVE_CORE_MEMBER_ADDED = 'COLLECTIVE_CORE_MEMBER_ADDED',
   COLLECTIVE_CORE_MEMBER_EDITED = 'COLLECTIVE_CORE_MEMBER_EDITED',
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED = 'COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED',
@@ -7927,6 +7929,8 @@ export type Mutation = {
   connectGoCardlessAccount: GoCardlessConnectAccountResponse;
   /** Connect a Plaid account */
   connectPlaidAccount: PlaidConnectAccountResponse;
+  /** Convert an account to an Organization. Scope: "account". */
+  convertAccountToOrganization: Account;
   /** Convert an organization to a vendor */
   convertOrganizationToVendor: Vendor;
   createApplication?: Maybe<Application>;
@@ -8312,6 +8316,14 @@ export type MutationConnectPlaidAccountArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   publicToken: Scalars['String']['input'];
   sourceName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationConvertAccountToOrganizationArgs = {
+  account: AccountReferenceInput;
+  activateHosting?: InputMaybe<Scalars['Boolean']['input']>;
+  activateMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
