@@ -81,7 +81,6 @@ export default function FindAHostSearch(props: {
   selectedCurrency: string;
   searchTerm: string;
   collective: Account;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(undefined);
   const [queryPage, setQueryPage] = React.useState(1);
@@ -152,11 +151,7 @@ export default function FindAHostSearch(props: {
 
       {topHosts.length !== 0 && (
         <Box my={4}>
-          <FeaturedFiscalHostResults
-            collective={props.collective}
-            hosts={topHosts}
-            onHostApplyClick={props.onHostApplyClick}
-          />
+          <FeaturedFiscalHostResults collective={props.collective} hosts={topHosts} />
         </Box>
       )}
       {otherHosts.length !== 0 && (
@@ -165,7 +160,6 @@ export default function FindAHostSearch(props: {
             collective={props.collective}
             hosts={otherHosts}
             totalCount={displayData.hosts.totalCount - topHosts.length}
-            onHostApplyClick={props.onHostApplyClick}
           />
         </Box>
       )}
