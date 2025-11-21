@@ -53,11 +53,11 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return <Skeleton className="h-16 w-full" />;
   }
 
-  if (!query.data?.account?.platformSubscription) {
+  if (!query.data?.account || !('platformSubscription' in query.data.account)) {
     return null;
   }
 
-  const hasHosting = hasAccountHosting(query.data?.account);
+  const hasHosting = hasAccountHosting(query.data.account);
 
   return (
     <MessageBox className="relative" type="info">
