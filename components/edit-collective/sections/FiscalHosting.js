@@ -18,8 +18,8 @@ import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const activateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
-  mutation ActivateCollectiveAsHost($id: Int!) {
+const activateMoneyManagementMutation = gqlV1 /* GraphQL */ `
+  mutation ActivateMoneyManagement($id: Int!) {
     activateCollectiveAsHost(id: $id) {
       id
       currency
@@ -34,8 +34,8 @@ const activateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const deactivateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
-  mutation DeactivateCollectiveAsHost($id: Int!) {
+const deactivateMoneyManagementMutation = gqlV1 /* GraphQL */ `
+  mutation DeactivateMoneyManagement($id: Int!) {
     deactivateCollectiveAsHost(id: $id) {
       id
       currency
@@ -105,8 +105,8 @@ const FiscalHosting = ({ collective }) => {
       },
     ],
   };
-  const [activateAsFiscalEntity] = useMutation(activateCollectiveAsHostMutation);
-  const [deactivateAsFiscalEntity] = useMutation(deactivateCollectiveAsHostMutation, refetchAdminPanelMutationParams);
+  const [activateMoneyManagement] = useMutation(activateMoneyManagementMutation);
+  const [deactivateMoneyManagement] = useMutation(deactivateMoneyManagementMutation, refetchAdminPanelMutationParams);
   const [toggleHostAccountsSetting] = useMutation(toggleHostAccountsSettingsQuery, {
     ...refetchAdminPanelMutationParams,
     context: API_V2_CONTEXT,
@@ -140,16 +140,9 @@ const FiscalHosting = ({ collective }) => {
       ),
       onConfirm: async () => {
         if (activate) {
-          await activateAsFiscalEntity({ variables: { id } });
-          await toggleHostAccountsSetting({
-            variables: {
-              account: { legacyId: id },
-              key: 'canHostAccounts',
-              enabled: false,
-            },
-          });
+          await activateMoneyManagement({ variables: { id } });
         } else {
-          await deactivateAsFiscalEntity({ variables: { id } });
+          await deactivateMoneyManagement({ variables: { id } });
         }
       },
       confirmLabel: activate ? (
