@@ -48,7 +48,7 @@ const editAccountFragment = gql`
     name
     slug
     legalName
-    imageUrl
+    image: imageUrl
     description
     longDescription
     isActive
@@ -217,11 +217,11 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         : {
             ...pick(account, [
               'type',
+              'image',
               ...Object.keys(baseInfo.shape),
               ...Object.keys(eventShape.shape),
               ...Object.keys(individualShape.shape),
             ]),
-            image: get(account, 'imageUrl'),
             privateInstructions: get(account, 'data.privateInstructions'),
             endsAt: account.endsAt && dayjs(account.endsAt).format('YYYY-MM-DDTHH:mm:ss'),
             startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
