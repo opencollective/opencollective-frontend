@@ -7262,6 +7262,12 @@ type CommunityTransactionSummary {
   expenseCount: Int!
   contributionTotal: Amount!
   contributionCount: Int!
+  expenseTotalAcc: Amount!
+  expenseCountAcc: Int!
+  contributionTotalAcc: Amount!
+  contributionCountAcc: Int!
+  orderCount: Int!
+  orderCountAcc: Int!
 }
 
 """
