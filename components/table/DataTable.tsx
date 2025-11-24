@@ -10,6 +10,8 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 import { isEqual, omitBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -59,6 +61,8 @@ interface DataTableProps<TData, TValue> {
   rowSelection?: Record<string, boolean>;
   setRowSelection?: OnChangeFn<RowSelectionState>;
   enableMultiRowSelection?: boolean;
+  sortableRowIds?: string[];
+  getSortableRowId?: (row: Row<TData>) => string;
 }
 
 const defaultGetRowId = (data: any) => data.id;
@@ -89,6 +93,8 @@ export function DataTable<TData, TValue>({
   rowSelection: rowSelectionFromProps,
   setRowSelection: setRowSelectionFromProps,
   enableMultiRowSelection,
+  sortableRowIds,
+  getSortableRowId,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
   ...tableProps
 }: DataTableProps<TData, TValue>) {
@@ -191,6 +197,8 @@ export function DataTable<TData, TValue>({
                 compact={compact}
                 onHoverRow={onHoverRow}
                 getRowClassName={getRowClassName}
+                sortableRowIds={sortableRowIds}
+                getSortableRowId={getSortableRowId}
               />
             ))
         ) : (
@@ -215,6 +223,64 @@ export function DataTable<TData, TValue>({
   );
 }
 
+function SortableDataTableRow({
+  row,
+  getRowClassName,
+  onClickRow,
+  getRowDataCy,
+  rowHasIndicator,
+  tableProps,
+  compact,
+  onHoverRow,
+  sortableId,
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortableId });
+  const actionsMenuTriggerRef = React.useRef(null);
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
+      data-state={row.getIsSelected() && 'selected'}
+      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      {...attributes}
+      {...(onClickRow && {
+        onClick: (e: React.MouseEvent) => onClickRow(row, actionsMenuTriggerRef, e),
+      })}
+      {...(onHoverRow && {
+        onMouseEnter: () => onHoverRow(row),
+        onMouseLeave: () => onHoverRow(null),
+      })}
+    >
+      {row.getVisibleCells().map(cell => {
+        const { className, align } = cell.column.columnDef.meta || {};
+        return (
+          <TableCell
+            key={cell.id}
+            className={clsx(align === 'right' && 'text-right', className)}
+            fullWidth={tableProps.fullWidth}
+            compact={compact}
+            {...(rowHasIndicator && {
+              withIndicator: true,
+              'data-state': rowHasIndicator(row) && 'indicated',
+            })}
+          >
+            {flexRender(cell.column.columnDef.cell, {
+              ...cell.getContext(),
+              actionsMenuTriggerRef,
+            })}
+          </TableCell>
+        );
+      })}
+    </TableRow>
+  );
+}
+
 function DataTableRow({
   row,
   getRowClassName,
@@ -224,16 +290,39 @@ function DataTableRow({
   tableProps,
   compact,
   onHoverRow,
+  sortableRowIds,
+  getSortableRowId,
 }) {
   // Reference that can be picked up by the actions column, to enable returning focus when closing a drawer or modal opened from actions menu
   const actionsMenuTriggerRef = React.useRef(null);
+  
+  // If sortable, use the sortable row component
+  const sortableId = sortableRowIds && getSortableRowId ? getSortableRowId(row) : null;
+  const isSortable = sortableId && sortableRowIds?.includes(sortableId);
+
+  if (isSortable) {
+    return (
+      <SortableDataTableRow
+        row={row}
+        getRowClassName={getRowClassName}
+        onClickRow={onClickRow}
+        getRowDataCy={getRowDataCy}
+        rowHasIndicator={rowHasIndicator}
+        tableProps={tableProps}
+        compact={compact}
+        onHoverRow={onHoverRow}
+        sortableId={sortableId}
+      />
+    );
+  }
+
   return (
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
       className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
       {...(onClickRow && {
-        onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
+        onClick: (e: React.MouseEvent) => onClickRow(row, actionsMenuTriggerRef, e),
       })}
       {...(onHoverRow && {
         onMouseEnter: () => onHoverRow(row),
