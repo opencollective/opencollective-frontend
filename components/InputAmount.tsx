@@ -1,9 +1,11 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
+import { useIntl } from 'react-intl';
 
 import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
+import { RICH_ERROR_MESSAGES } from '@/lib/form-utils';
 import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
@@ -26,12 +28,25 @@ const formatCurrencyName = (currency, currencyDisplay) => {
 };
 
 const parseValueFromEvent = (e, precision, ignoreComma = false) => {
-  if (e.target.value === '') {
+  let value = e.target.value as string;
+  if (value === '') {
     return null;
-  } else {
-    const parsedNumber = parseFloat(ignoreComma ? e.target.value.replace(',', '') : e.target.value);
-    return isNaN(parsedNumber) ? NaN : parsedNumber.toFixed(precision);
   }
+
+  if (value.endsWith(',') || value.endsWith('.')) {
+    value += '0';
+  }
+
+  if (value.startsWith(',') || value.startsWith('.')) {
+    value = `0${value}`;
+  }
+
+  if (ignoreComma) {
+    value = value.replaceAll(',', '.');
+  }
+
+  const parsedNumber = parseFloat(value);
+  return isNaN(parsedNumber) ? NaN : parsedNumber.toFixed(precision);
 };
 
 /** Formats value is valid, fallbacks on rawValue otherwise */
@@ -109,12 +124,14 @@ const ConvertedAmountInput = ({
         style={{ minWidth }}
         name={inputId}
         id={inputId}
-        type="number"
+        data-testid={inputId}
+        type="text"
         inputMode="decimal"
+        pattern="([0-9]+)?([,.]([0-9]+)?)?"
         step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
         min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
         max={maxFxRate ? getLimitAmountFromFxRate(maxFxRate) : undefined}
-        value={isBaseAmountInvalid ? '' : isEditing ? value : value.toFixed(precision)}
+        value={isBaseAmountInvalid ? '' : isEditing ? rawValue : value.toFixed(precision)}
         onWheel={ignoreOnWheel}
         required
         placeholder={!precision ? '--' : `--.${'-'.repeat(precision)}`}
@@ -122,7 +139,7 @@ const ConvertedAmountInput = ({
         onChange={e => {
           setEditing(true);
           setRawValue(e.target.value);
-          const convertedAmount = parseFloat(e.target.value);
+          const convertedAmount = e.target.value ? parseFloat(e.target.value.replaceAll(',', '.')) : 0;
           if (!convertedAmount) {
             onChange({ ...exchangeRate, value: null });
           } else {
@@ -145,6 +162,7 @@ const ConvertedAmountInput = ({
   );
 };
 
+const MAX_VALIDATION_LIMIT = 100000000000;
 /**
  * An input for amount inputs.
  */
@@ -153,7 +171,7 @@ const InputAmount = ({
   currencyDisplay = 'SYMBOL',
   name = 'amount',
   min = 0,
-  max = 100000000000,
+  max = MAX_VALIDATION_LIMIT,
   precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
   defaultValue = undefined,
   value,
@@ -178,11 +196,20 @@ const InputAmount = ({
   const disabled = props.disabled || loadingExchangeRate;
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);
+  const [isEditing, setEditing] = React.useState(false);
+  const intl = useIntl();
+
+  const minMaxValidityMsg = intl.formatMessage(
+    max !== MAX_VALIDATION_LIMIT ? RICH_ERROR_MESSAGES.notInRange : RICH_ERROR_MESSAGES.min,
+    {
+      min: (min / 100).toFixed(precision),
+      max: (max / 100).toFixed(precision),
+    },
+  );
 
   const dispatchValue = (e, parsedValue) => {
-    if (isControlled) {
-      setRawValue(e.target.value);
-    }
+    setRawValue(e.target.value);
+    e.target.setCustomValidity('');
     if (onChange) {
       const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
       if (parsedValue === null || isNaN(parsedValue)) {
@@ -190,7 +217,12 @@ const InputAmount = ({
       } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
         onChange(isNaN(e.target.value) ? NaN : null, e);
       } else {
-        onChange(floatAmountToCents(parsedValue), e);
+        const numericValue = floatAmountToCents(parsedValue);
+        if (numericValue < min || numericValue > max) {
+          e.target.setCustomValidity(minMaxValidityMsg);
+        }
+
+        onChange(numericValue, e);
       }
     }
   };
@@ -198,6 +230,7 @@ const InputAmount = ({
   return (
     <InputGroup
       {...props}
+      data-testid={props.id ? `${props.id}-input-amount` : undefined}
       className={cn('w-full overflow-hidden', className)}
       disabled={disabled}
       prepend={
@@ -208,6 +241,7 @@ const InputAmount = ({
         ) : (
           <CurrencyPicker
             data-cy={`${props.id}-currency-picker`}
+            data-testid={`${props.id}-currency-picker`}
             id={`${props.id}-currency-picker`}
             onChange={onCurrencyChange}
             value={currency}
@@ -239,21 +273,23 @@ const InputAmount = ({
       }
       appendClassName="px-0 py-0 bg-background"
       width="100%"
-      type="number"
+      type="text"
       inputMode="decimal"
+      pattern="[0-9]*([0-9]+)?([,.]([0-9]+)?)?"
       step={1 / 10 ** precision}
       style={{ minWidth }}
       name={name}
       min={minAmount}
       max={max / 100}
-      defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
-      value={curValue}
+      value={isEditing ? rawValue : !value || isNaN(value) ? rawValue : (value / 100).toFixed(precision)}
       onWheel={ignoreOnWheel}
       onChange={e => {
+        setEditing(true);
         e.stopPropagation();
-        dispatchValue(e, parseValueFromEvent(e, precision));
+        dispatchValue(e, parseValueFromEvent(e, precision, true));
       }}
       onBlur={e => {
+        setEditing(false);
         // Clean number if valid (ie. 41.1 -> 41.10)
         const parsedNumber = parseValueFromEvent(e, precision);
         const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
