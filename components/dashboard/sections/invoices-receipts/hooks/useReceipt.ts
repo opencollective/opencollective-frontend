@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { pick } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 export enum ReceiptTemplate {
@@ -9,6 +10,7 @@ export enum ReceiptTemplate {
 export enum ReceiptField {
   Title = 'title',
   Info = 'info',
+  EmbeddedImage = 'embeddedImage',
 }
 
 type ReceiptPlaceholder = {
@@ -46,10 +48,12 @@ const receiptPlaceholders: { [key in ReceiptTemplate]: ReceiptPlaceholder } = {
   [ReceiptTemplate.Default]: {
     title: 'Payment Receipt',
     info: messages.extraInfoPlaceholder,
+    embeddedImage: '',
   },
   [ReceiptTemplate.Alternative]: {
     title: 'Custom Receipt',
     info: messages.extraInfoPlaceholder,
+    embeddedImage: '',
   },
 };
 
@@ -69,14 +73,7 @@ type UseReceiptProps = {
 export const useReceipt = ({ settings, template }: UseReceiptProps): UseReceipt => {
   const { formatMessage } = useIntl();
   const templateData = settings.invoice?.templates?.[template] ?? {};
-
-  const initialValues = Object.values(ReceiptField).reduce(
-    (acc, field) => {
-      return { ...acc, [field]: templateData[field] };
-    },
-    {} as { [key in ReceiptField]?: string },
-  );
-
+  const initialValues = pick(templateData, Object.values(ReceiptField));
   const [values, setValues] = useState<{ [key in ReceiptField]?: string }>(initialValues);
 
   const placeholders = Object.entries(receiptPlaceholders[template]).reduce(

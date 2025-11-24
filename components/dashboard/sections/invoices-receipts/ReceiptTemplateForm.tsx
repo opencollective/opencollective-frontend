@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Flex } from '../../../Grid';
-import PreviewModal from '../../../PreviewModal';
-import StyledButton from '../../../StyledButton';
-import StyledInput from '../../../StyledInput';
-import StyledTextarea from '../../../StyledTextarea';
-import { Label, P, Span } from '../../../Text';
+import type { UploadFileResult } from '@/lib/graphql/types/v2/schema';
+
+import Dropzone, { DROPZONE_ACCEPT_IMAGES } from '../../../Dropzone';
+import { Input } from '../../../ui/Input';
+import { Label } from '../../../ui/Label';
+import { Textarea } from '../../../ui/Textarea';
 
 import type { UseReceipt } from './hooks/useReceipt';
 import { ReceiptField, ReceiptTemplate } from './hooks/useReceipt';
@@ -16,9 +16,10 @@ type ReceiptTemplateFormProps = {
   onChange: () => void;
 };
 
+const EMBEDDED_IMAGE_SIZE = { type: 'exact', width: 400, height: 136 } as const;
+
 const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) => {
-  const { template, initialValues, placeholders, changeValues } = receipt;
-  const [showPreview, setShowPreview] = useState(false);
+  const { template, initialValues, placeholders, values, changeValues } = receipt;
 
   const handleChange = (field: { [key in ReceiptField]?: string }) => {
     const [[key, value]] = Object.entries(field);
@@ -27,82 +28,82 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
       changeValues({ title: placeholders.title });
     }
 
-    if (value) {
-      changeValues(field);
-    }
-
+    changeValues(field);
     onChange();
+  };
+  const handleImageUploadSuccess = (uploadResults: UploadFileResult[]) => {
+    if (uploadResults) {
+      if (uploadResults.length > 0) {
+        const url = uploadResults[0].file.url;
+        handleChange({ [ReceiptField.EmbeddedImage]: url });
+      } else {
+        handleChange({ [ReceiptField.EmbeddedImage]: null });
+      }
+    }
+  };
+  const handleImageUploadClear = () => {
+    handleChange({ [ReceiptField.EmbeddedImage]: null });
   };
 
   return (
     <React.Fragment>
-      <Label htmlFor={`receipt-title-${template}`} color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
+      <Label htmlFor={`receipt-title-${template}`} className="text-black-800 text-base leading-6 font-bold">
         <FormattedMessage defaultMessage="Receipt title" id="tOMmos" />
       </Label>
-      <StyledInput
-        id={`receipt-title-${template}`}
-        placeholder={placeholders.title}
-        defaultValue={initialValues.title}
-        onChange={e => handleChange({ [ReceiptField.Title]: e.target.value })}
-        width="100%"
-        maxWidth={414}
-        mt="6px"
-      />
       {template === ReceiptTemplate.Default && (
-        <P mt="6px">
+        <p className="text-sm text-muted-foreground">
           <FormattedMessage
             defaultMessage="Keep this field empty to use the default title: {receiptTitlePlaceholder}."
             id="DsfNxu"
             values={{ receiptTitlePlaceholder: placeholders.title }}
           />
-        </P>
+        </p>
       )}
-      <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
-        <Label
-          htmlFor={`custom-message-${template}`}
-          color="black.800"
-          fontSize="16px"
-          fontWeight={700}
-          lineHeight="24px"
-        >
+      <Input
+        id={`receipt-title-${template}`}
+        placeholder={placeholders.title}
+        defaultValue={initialValues.title}
+        onChange={e => handleChange({ [ReceiptField.Title]: e.target.value })}
+        className="mt-1.5 w-full max-w-[414px]"
+      />
+      <div className="mt-3 flex flex-col items-center justify-between gap-2 md:flex-row">
+        <Label htmlFor={`custom-message-${template}`} className="text-black-800 text-base leading-6 font-bold">
           <FormattedMessage defaultMessage="Custom Message" id="+jDZdn" />
         </Label>
-        <StyledButton
-          buttonStyle="secondary"
-          buttonSize="tiny"
-          maxWidth="78px"
-          pt="4px"
-          pb="4px"
-          pl="14px"
-          pr="14px"
-          height="24px"
-          onClick={() => setShowPreview(true)}
-        >
-          <Span fontSize="13px" fontWeight={500} lineHeight="16px">
-            <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
-          </Span>
-        </StyledButton>
-      </Flex>
-      <StyledTextarea
+      </div>
+      <Textarea
         id={`custom-message-${template}`}
         placeholder={placeholders.info}
         defaultValue={initialValues.info}
         onChange={e => handleChange({ [ReceiptField.Info]: e.target.value })}
-        width="100%"
-        height="150px"
-        fontSize="13px"
-        mt="14px"
-        mb="23px"
+        className="mt-2 mb-6 min-h-[150px] w-full text-[13px]"
+        style={{ height: '150px' }}
       />
-      {showPreview && (
-        <PreviewModal
-          heading={<FormattedMessage defaultMessage="Receipt Preview" id="F21ZZ6" />}
-          onClose={() => setShowPreview(false)}
-          previewImage="/static/images/invoice-title-preview.jpg"
-          imgHeight="548.6px"
-          imgWidth="667px"
+      <Label htmlFor={`embedded-image-${template}`} className="text-black-800 text-base leading-6 font-bold">
+        <FormattedMessage defaultMessage="Embedded Image" id="x5mRqK" />
+      </Label>
+      <p className="text-sm text-muted-foreground">
+        <FormattedMessage defaultMessage="Add an image to embed in receipts (e.g., a signature or logo)." id="fE8hLt" />
+      </p>
+      <div className="mt-1.5 w-full max-w-[414px]">
+        <Dropzone
+          id={`embedded-image-${template}`}
+          name={`embedded-image-${template}`}
+          accept={DROPZONE_ACCEPT_IMAGES}
+          minSize={0}
+          maxSize={1_000_000} // 1MB
+          useGraphQL={true}
+          kind="RECEIPT_EMBEDDED_IMAGE"
+          onGraphQLSuccess={handleImageUploadSuccess}
+          onClear={handleImageUploadClear}
+          isMulti={false}
+          value={values.embeddedImage}
+          className="w-full"
+          showInstructions
+          showActions
+          imageSize={EMBEDDED_IMAGE_SIZE}
         />
-      )}
+      </div>
     </React.Fragment>
   );
 };

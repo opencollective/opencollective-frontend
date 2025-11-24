@@ -1,11 +1,12 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
-import { Info } from 'lucide-react';
+import { Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { BillingProjectionQuery, BillingProjectionQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type { PlatformUtilization } from '@/lib/graphql/types/v2/schema';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { I18nBold } from '@/components/I18nFormatters';
@@ -76,6 +77,11 @@ export function BillingProjection(props: BillingProjectionProps) {
           }}
         />
       </div>
+      {billing?.utilization && (
+        <div className="mb-4 rounded-md border px-6 py-4">
+          <CurrentUtilization utilization={billing.utilization} />
+        </div>
+      )}
       <div className="rounded-md border px-6 py-4">
         {billedSubscriptions.map((sub, idx) => (
           <div key={sub.startDate} className="flex items-center justify-between border-b py-4">
@@ -121,7 +127,7 @@ export function BillingProjection(props: BillingProjectionProps) {
           <div>
             <div className="text-sm leading-5 font-medium">
               <FormattedMessage
-                defaultMessage="{expensesPaid} additional {expensesPaid, plural, one {expense} other {expenses}} paid"
+                defaultMessage="{expensesPaid} additional paid {expensesPaid, plural, one {expense} other {expenses}}"
                 id="6GrAmA"
                 values={{
                   expensesPaid: billing.additional.utilization.expensesPaid ?? 0,
@@ -261,6 +267,75 @@ export function BillingProjection(props: BillingProjectionProps) {
               />
             </TooltipContent>
           </Tooltip>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type CurrentUtilizationProps = {
+  utilization: PlatformUtilization;
+};
+
+function CurrentUtilization(props: CurrentUtilizationProps) {
+  return (
+    <div className="flex flex-wrap gap-16">
+      <div className="flex items-center gap-3">
+        <div>
+          <Shapes />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center text-sm">
+            <b>
+              <FormattedMessage
+                defaultMessage="{includedCount} Active Collectives"
+                id="PQL55g"
+                values={{
+                  includedCount: props.utilization.activeCollectives,
+                }}
+              />
+            </b>
+            &nbsp;
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={14} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="Active collectives have at least one ledger transaction in the billing period."
+                  id="j0U5jT"
+                />
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div>
+          <Receipt />
+        </div>
+        <div className="flex flex-col gap-1 text-sm">
+          <div className="flex items-center">
+            <b>
+              <FormattedMessage
+                defaultMessage="{includedCount} Paid Expenses"
+                id="V35NqH"
+                values={{
+                  includedCount: props.utilization.expensesPaid,
+                }}
+              />
+            </b>
+            &nbsp;
+            <Tooltip>
+              <TooltipTrigger>
+                <Info size={14} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage defaultMessage="Completed expenses with the 'Paid' status." id="IHdyue" />
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </div>
     </div>

@@ -615,20 +615,23 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
   const [formDirty, setFormDirty] = React.useState(false);
   const intl = useIntl();
 
-  const handleClose = React.useCallback(() => {
-    if (formDirty) {
-      const confirmed = confirm(
-        intl.formatMessage({
-          id: 'WarningUnsavedChanges',
-          defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
-        }),
-      );
-      if (!confirmed) {
-        return; // Don't close if user cancels
+  const handleClose = React.useCallback(
+    ({ ignoreCloseWarning = false } = {}) => {
+      if (formDirty && !ignoreCloseWarning) {
+        const confirmed = confirm(
+          intl.formatMessage({
+            id: 'WarningUnsavedChanges',
+            defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
+          }),
+        );
+        if (!confirmed) {
+          return; // Don't close if user cancels
+        }
       }
-    }
-    onClose();
-  }, [formDirty, intl, onClose]);
+      onClose();
+    },
+    [formDirty, intl, onClose],
+  );
 
   return (
     <Dialog open={true} onOpenChange={open => !open && handleClose()}>
@@ -656,7 +659,7 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
           onClose={handleClose}
           forcedType={forcedType}
           onUpdate={onUpdate}
-          onFormDirtyChange={setFormDirty}
+          setFormDirty={setFormDirty}
         />
       </DialogContent>
     </Dialog>
@@ -796,7 +799,7 @@ function EditTierFormInner({
   onDeleteTierClick,
   isDeleting,
   isConfirmingDelete,
-  onFormDirtyChange,
+  setFormDirty,
 }) {
   const intl = useIntl();
   const { values, isSubmitting, dirty } = formik;
@@ -812,8 +815,8 @@ function EditTierFormInner({
 
   // Notify parent component when dirty state changes
   React.useEffect(() => {
-    onFormDirtyChange?.(dirty);
-  }, [dirty, onFormDirtyChange]);
+    setFormDirty?.(dirty);
+  }, [dirty, setFormDirty]);
 
   return (
     <Form data-cy="edit-tier-modal-form">
@@ -872,7 +875,7 @@ function EditTierFormInner({
   );
 }
 
-function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormDirtyChange }) {
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setFormDirty }) {
   const intl = useIntl();
   const isEditing = Boolean(tier?.id);
   const initialValues = React.useMemo(() => {
@@ -945,7 +948,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
             cache.gc();
           },
         });
-        onClose();
+        onClose({ ignoreCloseWarning: true });
         toast({
           variant: 'success',
           message: intl.formatMessage(
@@ -993,7 +996,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
                     { type: values.type },
                   ),
             });
-            onClose();
+            onClose({ ignoreCloseWarning: true });
           } catch (e) {
             toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
@@ -1010,7 +1013,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
               onDeleteTierClick={onDeleteTierClick}
               isDeleting={isDeleting}
               isConfirmingDelete={isConfirmingDelete}
-              onFormDirtyChange={onFormDirtyChange}
+              setFormDirty={setFormDirty}
             />
           );
         }}

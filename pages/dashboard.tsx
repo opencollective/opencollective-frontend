@@ -8,7 +8,12 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
-import { isHostAccount } from '@/lib/collective';
+import { hasAccountHosting } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import type LoggedInUser from '@/lib/LoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
@@ -57,7 +62,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (loggedInUser?.isAccountantOnly(account) && isHostAccount(account)) {
+  } else if (loggedInUser?.isAccountantOnly(account) && hasAccountHosting(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
@@ -86,6 +91,33 @@ const getNotification = (intl, account) => {
   }
 };
 
+/**
+ * Get the People dashboard detail URL for an individual account within the context of a dashboard account
+ * If the user is not an admin of the host account, return the public profile URL instead
+ */
+const getProfileUrl = (
+  loggedInUser: LoggedInUser,
+  contextAccount: DashboardQuery['account'],
+  account: { id: string; slug: string; type: string },
+) => {
+  if (!contextAccount) {
+    return null;
+  }
+  const context =
+    'host' in contextAccount && loggedInUser?.isAdminOfCollective(contextAccount.host)
+      ? contextAccount.host
+      : contextAccount.isHost
+        ? contextAccount
+        : null;
+
+  return context &&
+    loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
+    account?.type === CollectiveType.INDIVIDUAL &&
+    typeof account?.id === 'string'
+    ? getDashboardRoute({ slug: context.slug }, `people/${account?.id}`)
+    : null;
+};
+
 function getBlocker(LoggedInUser, account, section) {
   if (!LoggedInUser) {
     return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
@@ -112,8 +144,8 @@ function getBlocker(LoggedInUser, account, section) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.COMMUNITY_MANAGER, account)) {
       return (
         <FormattedMessage
-          defaultMessage="You need to be logged in as a community manager to view this page"
-          id="dnkxQ8"
+          defaultMessage="You need to be logged in as an admin or a community manager to view this page"
+          id="BduqMQ"
         />
       );
     }
@@ -175,9 +207,10 @@ const DashboardPage = () => {
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (activeSlug && activeSlug !== workspace.slug) {
+    if (activeSlug) {
       if (LoggedInUser) {
-        setWorkspace({ slug: activeSlug });
+        const membership = LoggedInUser.memberOf.find(val => val.collective.slug === activeSlug);
+        setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
       }
     }
     // If there is no slug set (that means /dashboard)
@@ -215,6 +248,7 @@ const DashboardPage = () => {
         activeSlug,
         defaultSlug,
         setDefaultSlug: slug => setWorkspace({ slug }),
+        getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
       <div className="flex min-h-screen flex-col justify-between">
@@ -262,7 +296,7 @@ const DashboardPage = () => {
             </div>
           )}
         </Page>
-        <Footer className="border-t" />
+        <Footer />
       </div>
     </DashboardContext.Provider>
   );

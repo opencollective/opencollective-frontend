@@ -45,7 +45,7 @@ describe('edit collective', () => {
     // Re-send the invitation email
     cy.mailpitDeleteAllEmails();
     cy.get('[data-cy="members-table"]')
-      .find('tr:nth-child(2) ')
+      .find('tr:nth-child(1) ')
       .find('[data-cy="member-actions-btn"]')
       .should('exist')
       .click({ force: true });
@@ -160,7 +160,9 @@ describe('edit collective', () => {
     cy.getByDataCy('VAT').click();
 
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
+    cy.get('input[name="settings.VAT.number"]').type('EU123456789');
     cy.contains('button', 'Save').click();
+    cy.contains('[data-cy="toast-notification"]', 'Account updated');
     cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();

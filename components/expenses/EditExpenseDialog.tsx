@@ -690,6 +690,11 @@ const EditExpenseType = ({ expense, onSubmit }) => {
 const ExpenseTypeStep = ({ expenseForm }) => {
   const { nextStep } = useStepper();
 
+  // Get supported expense types from account, default to both INVOICE and RECEIPT for backward compatibility
+  const supportedExpenseTypes = expenseForm.options.supportedExpenseTypes;
+  const supportsInvoice = !supportedExpenseTypes || supportedExpenseTypes.includes(ExpenseType.INVOICE);
+  const supportsReceipt = !supportedExpenseTypes || supportedExpenseTypes.includes(ExpenseType.RECEIPT);
+
   return (
     <React.Fragment>
       <RadioGroup
@@ -698,50 +703,54 @@ const ExpenseTypeStep = ({ expenseForm }) => {
         onValueChange={newValue => expenseForm.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
         className="mb-4 flex flex-wrap"
       >
-        <RadioGroupCard
-          className="grow basis-0"
-          value={ExpenseType.INVOICE}
-          disabled={expenseForm.initialLoading || expenseForm.isSubmitting}
-        >
-          <div>
-            <div className="mb-1 flex items-center justify-between gap-1">
-              <div className="font-bold">
-                <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+        {supportsInvoice && (
+          <RadioGroupCard
+            className="grow basis-0"
+            value={ExpenseType.INVOICE}
+            disabled={expenseForm.initialLoading || expenseForm.isSubmitting}
+          >
+            <div className="flex-1">
+              <div className="mb-1 flex items-center justify-between gap-1">
+                <div className="font-bold">
+                  <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+                </div>
+                {expenseForm.options.expense?.type === ExpenseType.INVOICE && (
+                  <Badge type="info" size="sm">
+                    <FormattedMessage id="Expense.Type.current" defaultMessage="Current" />
+                  </Badge>
+                )}
               </div>
-              {expenseForm.options.expense?.type === ExpenseType.INVOICE && (
-                <Badge type="info" size="sm">
-                  <FormattedMessage id="Expense.Type.current" defaultMessage="Current" />
-                </Badge>
-              )}
-            </div>
-            <div className="text-muted-foreground">
-              <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
-            </div>
-          </div>
-        </RadioGroupCard>
-
-        <RadioGroupCard
-          className="grow basis-0"
-          value={ExpenseType.RECEIPT}
-          disabled={expenseForm.initialLoading || expenseForm.isSubmitting}
-        >
-          <div>
-            <div className="mb-1 flex items-center justify-between gap-1">
-              <div className="font-bold">
-                <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
+              <div className="text-muted-foreground">
+                <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
               </div>
-              {expenseForm.options.expense?.type === ExpenseType.RECEIPT && (
-                <Badge type="info" size="sm">
-                  <FormattedMessage id="Expense.Type.current" defaultMessage="Current" />
-                </Badge>
-              )}
             </div>
+          </RadioGroupCard>
+        )}
 
-            <div className="text-muted-foreground">
-              <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
+        {supportsReceipt && (
+          <RadioGroupCard
+            className="grow basis-0"
+            value={ExpenseType.RECEIPT}
+            disabled={expenseForm.initialLoading || expenseForm.isSubmitting}
+          >
+            <div className="flex-1">
+              <div className="mb-1 flex items-center justify-between gap-1">
+                <div className="font-bold">
+                  <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
+                </div>
+                {expenseForm.options.expense?.type === ExpenseType.RECEIPT && (
+                  <Badge type="info" size="sm">
+                    <FormattedMessage id="Expense.Type.current" defaultMessage="Current" />
+                  </Badge>
+                )}
+              </div>
+
+              <div className="text-muted-foreground">
+                <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
+              </div>
             </div>
-          </div>
-        </RadioGroupCard>
+          </RadioGroupCard>
+        )}
       </RadioGroup>
       <DialogFooter className="gap-2 sm:gap-0">
         <DialogClose asChild>
@@ -990,7 +999,7 @@ export default function EditExpenseDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DialogTrigger asChild>
+          <DialogTrigger asChild data-cy={`edit-expense-${field}-btn`}>
             {trigger || (
               <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
                 <Pen size={16} />

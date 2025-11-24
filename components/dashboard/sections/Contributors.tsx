@@ -154,6 +154,7 @@ const dashboardContributorsQuery = gql`
             id
             slug
             name
+            type
           }
           totalDonations {
             currency

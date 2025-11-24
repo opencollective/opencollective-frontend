@@ -2,9 +2,10 @@ import React from 'react';
 import { truncate } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { getCollectivePageRoute } from '../lib/url-helpers';
 import { cn } from '../lib/utils';
+import { getCollectivePageRoute } from '@/lib/url-helpers';
 
+import { DashboardContext } from './dashboard/DashboardContext';
 import { AccountHoverCard } from './AccountHoverCard';
 import Link from './Link';
 
@@ -24,25 +25,35 @@ const LinkCollective = ({
   truncateNameLength = null,
   ...props
 }) => {
+  const context = React.useContext(DashboardContext);
+  const peoplesDashboardURL = context?.getProfileUrl?.(collective);
   const formatName = name => (truncateNameLength ? truncate(name, { length: truncateNameLength }) : name);
-  if (!collective || collective.isIncognito || (collective.type === 'USER' && (!collective.name || !collective.slug))) {
-    return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
-  } else if (collective.isGuest) {
-    if (children) {
-      return children;
-    } else if (collective.name === 'Guest') {
-      return <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
-    } else {
-      return collective.name;
+
+  // We do handle incognito and guest accounts if we have a contextual dashboard profile URL
+  if (!peoplesDashboardURL) {
+    if (
+      !collective ||
+      collective.isIncognito ||
+      (collective.type === 'USER' && (!collective.name || !collective.slug))
+    ) {
+      return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
+    } else if (collective.isGuest) {
+      if (children) {
+        return children;
+      } else if (collective.name === 'Guest') {
+        return <FormattedMessage id="profile.guest" defaultMessage="Guest" />;
+      } else {
+        return collective.name;
+      }
+    } else if (!collective.slug || collective.type === 'VENDOR') {
+      return children || formatName(collective.name);
     }
-  } else if (!collective.slug || collective.type === 'VENDOR') {
-    return children || formatName(collective.name);
   }
 
   const { slug, name } = collective;
   const link = (
     <Link
-      href={getCollectivePageRoute(collective)}
+      href={peoplesDashboardURL || getCollectivePageRoute(collective)}
       title={noTitle || withHoverCard ? null : title || name}
       target={target}
       className={cn('hover:underline', className)}

@@ -16,6 +16,7 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
+  SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
 }
@@ -105,10 +106,9 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.newExpenseFlowDescription"
       />
     ),
-    alwaysEnableInDev: true,
-    publicBeta: true,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
+    publicBeta: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
@@ -119,10 +119,9 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.inlineEditExpenseDescription"
       />
     ),
-    alwaysEnableInDev: true,
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.GENERAL,
+    publicBeta: true,
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
@@ -133,8 +132,17 @@ export const previewFeatures: PreviewFeature[] = [
         id="PreviewFeatures.searchCommandDescription"
       />
     ),
+    alwaysEnableInDev: true,
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    category: Categories.GENERAL,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE,
+    title: <FormattedMessage defaultMessage="Search Results Page" id="PreviewFeatures.searchResultsPage" />,
+    alwaysEnableInDev: false,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS],
     category: Categories.GENERAL,
   },
   {

@@ -783,6 +783,7 @@ export type AccountUpdateInput = {
   hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['URL']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<LocationInput>;
   longDescription?: InputMaybe<Scalars['String']['input']>;
@@ -1166,6 +1167,7 @@ export enum ActivityAndClassesType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_OTP_REQUESTED = 'USER_OTP_REQUESTED',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   USER_RESET_PASSWORD = 'USER_RESET_PASSWORD',
@@ -1353,6 +1355,7 @@ export enum ActivityType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_OTP_REQUESTED = 'USER_OTP_REQUESTED',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   USER_RESET_PASSWORD = 'USER_RESET_PASSWORD',
@@ -2639,7 +2642,6 @@ export type CollectiveFeatures = {
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
-  RESTRICTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
   STRIPE_PAYMENT_INTENT?: Maybe<CollectiveFeatureStatus>;
   TAX_FORMS?: Maybe<CollectiveFeatureStatus>;
   TEAM?: Maybe<CollectiveFeatureStatus>;
@@ -4676,7 +4678,9 @@ export type EventCreateInput = {
   endsAt: Scalars['DateTime']['input'];
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
+  location?: InputMaybe<LocationInput>;
   name: Scalars['String']['input'];
+  privateInstructions?: InputMaybe<Scalars['String']['input']>;
   settings?: InputMaybe<Scalars['JSON']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   /** The Event start date and time */
@@ -7230,6 +7234,7 @@ export type Individual = Account & {
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']['output']>;
+  requiresProfileCompletion?: Maybe<Scalars['Boolean']['output']>;
   settings: Scalars['JSON']['output'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String']['output'];
@@ -8058,6 +8063,8 @@ export type Mutation = {
   importTransactions: TransactionsImport;
   /** Invite a new member to the Collective. Scope: "account". */
   inviteMember: MemberInvitation;
+  /** Creates and invites admins to an existing Organization. Scope: "account". */
+  inviteOrganizationAdmins?: Maybe<Organization>;
   /** [Root only] Merge two accounts, returns the result account */
   mergeAccounts: MergeAccountsResponse;
   /** Moves an expense from one account within a Collective to another */
@@ -8854,6 +8861,13 @@ export type MutationInviteMemberArgs = {
   memberAccount: AccountReferenceInput;
   role: MemberRole;
   since?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationInviteOrganizationAdminsArgs = {
+  inviteMembers: Array<InviteMemberInput>;
+  organization: AccountReferenceInput;
 };
 
 
@@ -10168,7 +10182,7 @@ export type OrganizationCreateInput = {
   /** Two-letters country code following ISO31661 */
   countryISO?: InputMaybe<Scalars['String']['input']>;
   currency?: InputMaybe<Currency>;
-  description: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
@@ -10398,6 +10412,8 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
+  /** Whether this payout method can be archived */
+  canBeArchived?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be deleted or only archived */
   canBeDeleted?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be edited */
@@ -10744,7 +10760,6 @@ export type PlatformSubscriptionFeatures = {
   RECEIVE_EXPENSES: Scalars['Boolean']['output'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['output'];
-  RESTRICTED_FUNDS: Scalars['Boolean']['output'];
   TAX_FORMS: Scalars['Boolean']['output'];
   TRANSFERWISE: Scalars['Boolean']['output'];
   UPDATES: Scalars['Boolean']['output'];
@@ -10765,7 +10780,6 @@ export type PlatformSubscriptionFeaturesFeatures = {
   RECEIVE_EXPENSES: Scalars['Boolean']['input'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['input'];
-  RESTRICTED_FUNDS: Scalars['Boolean']['input'];
   TAX_FORMS: Scalars['Boolean']['input'];
   TRANSFERWISE: Scalars['Boolean']['input'];
   UPDATES: Scalars['Boolean']['input'];
@@ -12887,10 +12901,7 @@ export type TransactionsImport = {
    * @deprecated 2025-07-02: Please use the generic accounts field instead.
    */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
-  /**
-   * List of rows in the import
-   * @deprecated 2025-04-29: Please use `host.offPlatformTransactions` instead.
-   */
+  /** List of rows in the import */
   rows: TransactionsImportRowCollection;
   /** Source of the import (e.g. "Bank of America", "Eventbrite", etc...) */
   source: Scalars['NonEmptyString']['output'];
@@ -13347,6 +13358,7 @@ export enum UploadedFileKind {
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
   EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
+  RECEIPT_EMBEDDED_IMAGE = 'RECEIPT_EMBEDDED_IMAGE',
   TIER_LONG_DESCRIPTION = 'TIER_LONG_DESCRIPTION',
   TRANSACTIONS_IMPORT = 'TRANSACTIONS_IMPORT',
   UPDATE = 'UPDATE'

@@ -71,17 +71,12 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
             </p>
             {message ? (
               <div className="mt-4 text-sm whitespace-pre-line">
-                <div
-                  className="font-medium"
-                  style={{
-                    color: activityColors.text,
-                  }}
-                >
+                <div className="font-medium" style={{ color: activityColors.text }}>
                   {intl.formatMessage(message, {
                     movedFromCollective: props.activity.data?.movedFromCollective?.name || 'collective',
                   })}
                 </div>
-                {details ? <div className="mt-4">{details}</div> : null}
+                {details ? <div className="mt-2 text-sm text-muted-foreground">{details}</div> : null}
               </div>
             ) : null}
             {DataRenderer && <DataRenderer activity={props.activity} />}

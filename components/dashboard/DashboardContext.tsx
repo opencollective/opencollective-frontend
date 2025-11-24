@@ -11,6 +11,7 @@ type DashboardContextType = {
   activeSlug: string | null;
   defaultSlug: string | null;
   setDefaultSlug: (slug: string | null) => void;
+  getProfileUrl: (account: { id: string; slug: string; type: string }) => string | null;
 };
 
 export const DashboardContext = React.createContext<DashboardContextType>({
@@ -22,4 +23,5 @@ export const DashboardContext = React.createContext<DashboardContextType>({
   activeSlug: null,
   defaultSlug: null,
   setDefaultSlug: () => {},
+  getProfileUrl: () => null,
 });

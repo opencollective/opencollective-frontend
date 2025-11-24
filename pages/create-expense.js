@@ -18,7 +18,8 @@ import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
 import { compose, parseToBoolean } from '../lib/utils';
 
@@ -50,6 +51,7 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
+import { SubmitExpenseFlow } from '../components/submit-expense/SubmitExpenseFlow';
 import { Survey, SURVEY_KEY } from '../components/Survey';
 import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
@@ -61,6 +63,8 @@ const CreateExpensePageUrlQueryHelper = new UrlQueryHelper({
   parentCollectiveSlug: { type: 'string' },
   customData: { type: 'json' },
 });
+
+const NAVBAR_CALLS_TO_ACTION = { hasSubmitExpense: false, hasRequestGrant: false };
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: query }) {
@@ -241,9 +245,10 @@ class CreateExpensePage extends React.Component {
         const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
         const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
         const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-        await this.props.router.push(
-          `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-        );
+        await this.props.router.push({
+          pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
+          query: pick(this.props.router.query, ['forceLegacyFlow']),
+        });
       } else {
         this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
       }
@@ -280,7 +285,7 @@ class CreateExpensePage extends React.Component {
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
       await this.props.router.push({
         pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-        query: pick(this.props.router.query, ['ocr', 'mockImageUpload']),
+        query: pick(this.props.router.query, ['ocr', 'mockImageUpload', 'forceLegacyFlow']),
       });
       toast({
         variant: 'success',
@@ -345,31 +350,45 @@ class CreateExpensePage extends React.Component {
               />
             </MessageBox>
           </Flex>
-        ) : (
+        ) : !loadingLoggedInUser && !LoggedInUser ? (
+          // Not logged in - show sign-in
           <React.Fragment>
-            <CollectiveNavbar
-              collective={collective}
-              isLoading={!collective}
-              callsToAction={{ hasSubmitExpense: false, hasRequestGrant: false }}
-            />
+            <CollectiveNavbar collective={collective} isLoading={!collective} callsToAction={NAVBAR_CALLS_TO_ACTION} />
             <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
-              {!loadingLoggedInUser && !LoggedInUser && (
-                <ContainerOverlay
-                  py={[2, null, 6]}
-                  top="0"
-                  position={['fixed', null, 'absolute']}
-                  justifyContent={['center', null, 'flex-start']}
-                >
-                  <SignInOverlayBackground>
-                    <SignInOrJoinFree
-                      showOCLogo={false}
-                      showSubHeading={false}
-                      hideFooter
-                      routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
-                    />
-                  </SignInOverlayBackground>
-                </ContainerOverlay>
-              )}
+              <ContainerOverlay
+                py={[2, null, 6]}
+                top="0"
+                position={['fixed', null, 'absolute']}
+                justifyContent={['center', null, 'flex-start']}
+              >
+                <SignInOverlayBackground>
+                  <SignInOrJoinFree
+                    showOCLogo={false}
+                    showSubHeading={false}
+                    hideFooter
+                    routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
+                  />
+                </SignInOverlayBackground>
+              </ContainerOverlay>
+            </Container>
+          </React.Fragment>
+        ) : LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+          !parseToBoolean(router.query.forceLegacyFlow) ? (
+          // Logged in with new expense flow enabled
+          <React.Fragment>
+            <CollectiveNavbar collective={collective} isLoading={!collective} callsToAction={NAVBAR_CALLS_TO_ACTION} />
+            <SubmitExpenseFlow
+              submitExpenseTo={collectiveSlug}
+              onClose={() => {
+                router.push(`${getCollectivePageRoute(collective)}/expenses`);
+              }}
+            />
+          </React.Fragment>
+        ) : (
+          // Logged in with legacy flow (preview feature disabled)
+          <React.Fragment>
+            <CollectiveNavbar collective={collective} isLoading={!collective} callsToAction={NAVBAR_CALLS_TO_ACTION} />
+            <Container position="relative" minHeight={[null, 800]} ref={this.formTopRef}>
               <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
@@ -379,7 +398,7 @@ class CreateExpensePage extends React.Component {
                       ) : (
                         <FormattedMessage
                           id="ExpenseSummaryTitle"
-                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} PLATFORM_BILLING {Platform bill} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
                           values={{
                             type: this.state.expense?.type,
                             collectiveName: collective?.name,

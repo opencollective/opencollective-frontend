@@ -340,7 +340,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           </p>
                           <Link
                             className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-xs transition-colors hover:bg-gray-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                            href="/create"
+                            href={CREATE_NEW_LINKS[collectiveType] || '/create'}
                           >
                             <div className="mr-3 rounded-full border bg-white p-2 text-muted-foreground">
                               <Plus size={12} />

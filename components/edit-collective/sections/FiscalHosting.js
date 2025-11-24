@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
+import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
 import MessageBox from '@/components/MessageBox';
@@ -78,9 +79,9 @@ const toggleHostAccountsSettingsQuery = gql`
 `;
 
 const FiscalHosting = ({ collective }) => {
-  const isHostAccount = collective.isHost;
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
   const isBudgetActive = collective.isActive;
-  const canHostAccounts = collective.settings?.canHostAccounts !== false && isHostAccount;
+  const hasHosting = hasAccountHosting(collective);
   const { showConfirmationModal } = useModal();
 
   const [activateBudgetStatus, setActivateBudgetStatus] = useState({
@@ -129,7 +130,7 @@ const FiscalHosting = ({ collective }) => {
               <FormattedMessage defaultMessage="Are you sure you want to deactivate money management?" id="kAso3j" />
             )}
           </p>
-          {canHostAccounts && (
+          {hasHosting && (
             <FormattedMessage
               id="FiscalHosting.moneyManagement.deactivate.warning"
               defaultMessage="Deactivating money management will also deactivate fiscal hosting."
@@ -264,12 +265,12 @@ const FiscalHosting = ({ collective }) => {
           />
         </p>
         <Button
-          onClick={() => handleMoneyManagementUpdate({ id: collective.id, activate: !isHostAccount })}
-          disabled={isHostAccount && collective.plan.hostedCollectives > 0}
+          onClick={() => handleMoneyManagementUpdate({ id: collective.id, activate: !hasMoneyManagement })}
+          disabled={hasMoneyManagement && collective.plan.hostedCollectives > 0}
           variant="outline"
           className="my-2 w-fit"
         >
-          {isHostAccount ? (
+          {hasMoneyManagement ? (
             <FormattedMessage
               id="FiscalHosting.moneyManagement.deactivate"
               defaultMessage="Deactivate Money Management"
@@ -279,9 +280,9 @@ const FiscalHosting = ({ collective }) => {
           )}
         </Button>
 
-        {isHostAccount && collective.type === 'ORGANIZATION' && !isBudgetActive && (
+        {hasMoneyManagement && collective.type === 'ORGANIZATION' && !isBudgetActive && (
           <Fragment>
-            <SettingsSectionTitle mt={4}>
+            <SettingsSectionTitle className="mt-4">
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
             </SettingsSectionTitle>
             <p className="text-sm">
@@ -369,12 +370,12 @@ const FiscalHosting = ({ collective }) => {
           </MessageBox>
         )}
         <Button
-          onClick={() => handleFiscalHostUpdate({ id: collective.id, activate: !canHostAccounts })}
-          disabled={!isHostAccount || (isHostAccount && collective.plan.hostedCollectives > 0)}
+          onClick={() => handleFiscalHostUpdate({ id: collective.id, activate: !hasHosting })}
+          disabled={!hasMoneyManagement || (hasMoneyManagement && collective.plan.hostedCollectives > 0)}
           variant="outline"
           className="my-2 w-fit"
         >
-          {canHostAccounts && isHostAccount ? (
+          {hasHosting ? (
             <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
           ) : (
             <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />

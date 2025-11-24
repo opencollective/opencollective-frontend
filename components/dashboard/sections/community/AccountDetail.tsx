@@ -76,7 +76,6 @@ const associatedCollectiveColumns = intl => [
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     cell: ({ row }) => {
       const { account } = row.original;
-      const legalName = account.legalName !== account.name && account.legalName;
       return (
         <div className="flex items-center text-nowrap">
           {account.isFrozen && (
@@ -87,7 +86,6 @@ const associatedCollectiveColumns = intl => [
           <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
             <Avatar size={24} collective={account} mr={2} />
             {account.name}
-            {legalName && <span className="ml-1 text-muted-foreground">{`(${legalName})`}</span>}
           </LinkCollective>
         </div>
       );
@@ -378,6 +376,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const contributionCount = contributionsData?.account?.orders.totalCount || 0;
   const activities = activitiesData?.account?.communityStats?.activities.nodes || [];
   const activitiesCount = activitiesData?.account?.communityStats?.activities.totalCount || 0;
+  const legalName = account?.legalName !== account?.name && account?.legalName;
 
   const tabs = React.useMemo(
     () => [
@@ -422,6 +421,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               <React.Fragment>
                 <Avatar collective={account} size={36} />
                 {account.name}
+                {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
                 <div className="flex flex-wrap gap-1 align-middle">
                   {relations.map(role => (
                     <div
@@ -505,7 +505,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
               aria-hidden={selectedTab !== AccountDetailView.DETAILS}
             >
               <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {account?.location && (
+                {(account?.location?.address || account?.location?.country) && (
                   <SummaryCard
                     title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
                     isLoading={isLoading}
@@ -561,9 +561,15 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </InfoTooltipIcon>
               </h1>
               <div className="group flex flex-col gap-1 space-y-3 divide-y rounded-xl border p-4">
-                {activities.map(activity => (
-                  <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
-                ))}
+                {activities.length === 0 ? (
+                  <div className="text-center text-sm text-muted-foreground">
+                    <FormattedMessage defaultMessage="No recent activities" id="NoRecentActivities" />
+                  </div>
+                ) : (
+                  activities.map(activity => (
+                    <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
+                  ))
+                )}
               </div>
               <Pagination
                 queryFilter={activityPagination}

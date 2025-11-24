@@ -3,6 +3,7 @@ import { compact, isEmpty, isNil, orderBy } from 'lodash';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { hasAccountHosting } from '@/lib/collective';
 import type { SetupGuideQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getPolicy } from '@/lib/policies';
@@ -41,6 +42,8 @@ export const generateSetupGuideSteps = ({
   LoggedInUser: LoggedInUser;
 }): Category[] => {
   const planFeatures = 'platformSubscription' in account && account.platformSubscription?.plan?.features;
+  const hasHosting = hasAccountHosting(account);
+
   return [
     {
       id: 'verification',
@@ -172,7 +175,7 @@ export const generateSetupGuideSteps = ({
             />
           ),
           id: 'enable-hosting',
-          completed: account.isHost && account.settings?.canHostAccounts !== false,
+          completed: hasHosting,
           action: {
             label: <FormattedMessage defaultMessage="Enable hosting" id="SetupGuide.EnableHosting" />,
             onClick: () => {
@@ -202,7 +205,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'security')),
           },
         },
-        {
+        hasHosting && {
           title: (
             <FormattedMessage
               defaultMessage="Extend chart of accounts to managed funds"
@@ -265,7 +268,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
           },
         },
-        (!account.isHost || account.settings?.canHostAccounts !== false) && {
+        hasHosting && {
           title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
           description: (
             <FormattedMessage
@@ -282,7 +285,7 @@ export const generateSetupGuideSteps = ({
             onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
           },
         },
-        (!account.isHost || account.settings?.canHostAccounts !== false) && {
+        hasHosting && {
           title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
           description: (
             <FormattedMessage

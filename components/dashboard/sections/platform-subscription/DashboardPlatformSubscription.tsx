@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, Pencil, X } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
@@ -11,10 +12,12 @@ import type {
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { getI18nLink } from '@/components/I18nFormatters';
+import Link from '@/components/Link';
 import MessageBox from '@/components/MessageBox';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
 import { CancelSubscriptionModal } from '@/components/platform-subscriptions/CancelSubscriptionModal';
+import type { PlatformSubscriptionFeatures } from '@/components/platform-subscriptions/constants';
 import { ManageSubscriptionModal } from '@/components/platform-subscriptions/ManageSubscriptionModal';
 import { Button } from '@/components/ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
@@ -34,13 +37,15 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const query = useQuery<DashboardPlatformSubscriptionQuery, DashboardPlatformSubscriptionQueryVariables>(
     gql`
       query DashboardPlatformSubscription($slug: String!) {
-        host(slug: $slug) {
-          platformSubscription {
-            ...PlatformSubscriptionFields
-          }
+        account(slug: $slug) {
+          ... on AccountWithPlatformSubscription {
+            platformSubscription {
+              ...PlatformSubscriptionFields
+            }
 
-          platformBilling {
-            ...PlatformBillingFields
+            platformBilling {
+              ...PlatformBillingFields
+            }
           }
         }
       }
@@ -55,10 +60,36 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
     },
   );
 
+  const router = useRouter();
+  const desiredFeature = router.query?.feature as unknown as (typeof PlatformSubscriptionFeatures)[number];
+
   const queryError = query.error;
-  const activeSubscription = query.data?.host?.platformSubscription;
-  const billing = query.data?.host?.platformBilling;
+  const activeSubscription =
+    query.data?.account && 'platformSubscription' in query.data.account
+      ? query.data.account.platformSubscription
+      : null;
+  const billing =
+    query.data?.account && 'platformBilling' in query.data.account ? query.data.account.platformBilling : null;
   const isLoading = query.loading;
+
+  const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+
+  React.useEffect(() => {
+    if (!desiredFeature || !activeSubscription?.plan || !billing) {
+      return;
+    }
+
+    if (activeSubscription.plan.features[desiredFeature]) {
+      return;
+    }
+
+    showModal(ManageSubscriptionModal, {
+      currentPlan: activeSubscription.plan,
+      accountSlug: props.accountSlug,
+      billing: billing,
+      desiredFeature,
+    });
+  }, [desiredFeature, activeSubscription?.plan, billing, props.accountSlug, showModal]);
 
   return (
     <div>
@@ -104,17 +135,19 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
                     <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
                   </Button>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Button
-                    disabled={isLoading}
-                    onClick={() => showModal(CancelSubscriptionModal)}
-                    variant="ghost"
-                    size="xs"
-                  >
-                    <X size={14} />
-                    <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
-                  </Button>
-                </DropdownMenuItem>
+                {!isFreeDiscoverTier && (
+                  <DropdownMenuItem asChild>
+                    <Button
+                      disabled={isLoading}
+                      onClick={() => showModal(CancelSubscriptionModal)}
+                      variant="ghost"
+                      size="xs"
+                    >
+                      <X size={14} />
+                      <FormattedMessage defaultMessage="Cancel Subscription" id="SKFWE+" />
+                    </Button>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           )
@@ -131,16 +164,16 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             id="S3DC9x"
             values={{
               LegacyPricingLink: getI18nLink({
-                href: 'https://opencollective.com/pricing',
-                openInNewTabNoFollow: true,
+                as: Link,
+                href: '/pricing',
               }),
               ContactLink: getI18nLink({
-                href: 'https://opencollective.com/contact',
-                openInNewTabNoFollow: true,
+                as: Link,
+                href: '/contact',
               }),
               NewPricingLink: getI18nLink({
-                href: 'https://pricing-2026.opencollective.com',
-                openInNewTabNoFollow: true,
+                as: Link,
+                href: '/organizations/pricing',
               }),
             }}
           />
@@ -176,15 +209,17 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
               )}
             </div>
           </div>
-          <div className="mb-4 text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="Base subscription will renew on the {dueDate}"
-              id="28oT0p"
-              values={{
-                dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
-              }}
-            />
-          </div>
+          {!isFreeDiscoverTier && (
+            <div className="mb-4 text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Subscription will renew on {dueDate}"
+                id="28oT0p"
+                values={{
+                  dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 

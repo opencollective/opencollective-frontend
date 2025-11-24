@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { compact, flatten, get, isNil, isPlainObject, omitBy, set } from 'lodash';
+import { compact, flatten, get, isNil, isPlainObject, omitBy, set, startCase } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -14,6 +14,8 @@ import Avatar from '@/components/Avatar';
 import { FormField } from '@/components/FormField';
 import { FormikZod } from '@/components/FormikZod';
 import InputAmount from '@/components/InputAmount';
+import MessageBox from '@/components/MessageBox';
+import { PlatformSubscriptionFeatureTitles } from '@/components/platform-subscriptions/constants';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -22,7 +24,7 @@ import { Label } from '@/components/ui/Label';
 import { DefaultSelect } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/useToast';
 
-import { AVAILABLE_FEATURES, AVAILABLE_FEATURES_LABELS } from './common';
+import { AVAILABLE_FEATURES } from './common';
 import { availablePlansQuery, updateAccountPlatformSubscriptionMutation } from './queries';
 
 type SubscriberFormProps = {
@@ -75,6 +77,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
   const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation, {
     context: API_V2_CONTEXT,
   });
+  const [disclaimerChecked, setDisclaimerChecked] = React.useState(false);
   const planOptions = data?.platformSubscriptionTiers.map(plan => ({
     value: plan.id,
     label: plan.title,
@@ -125,18 +128,18 @@ const SubscriberForm = (props: SubscriberFormProps) => {
 
   return (
     <FormikZod<FormValuesSchema> schema={schema} onSubmit={handleSubmit} initialValues={initialValues}>
-      {({ setFieldValue, submitForm }) => (
+      {({ setFieldValue, submitForm, dirty }) => (
         <Form className="flex flex-col gap-2" onSubmit={submitForm}>
           <div className="flex flex-col gap-1">
             <label className="text-sm leading-normal font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              <FormattedMessage id="TwyMau" defaultMessage="Account" />
+              Account
             </label>
             <div className="flex h-10 w-full flex-1 flex-row items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background outline-hidden">
               <Avatar collective={props.account} radius={20} />
               {props.account.name}
             </div>
           </div>
-          <FormField name="plan.basePlanId" label={<FormattedMessage id="BaseTier" defaultMessage="Base Tier" />}>
+          <FormField name="plan.basePlanId" label="Base Tier">
             {({ field }) => (
               <DefaultSelect
                 name={field.name}
@@ -155,14 +158,8 @@ const SubscriberForm = (props: SubscriberFormProps) => {
               />
             )}
           </FormField>
-          <FormField
-            name="plan.title"
-            label={<FormattedMessage id="CustomTierName" defaultMessage="Custom Tier Name" />}
-          />
-          <FormField
-            name="plan.pricing.pricePerMonth.valueInCents"
-            label={<FormattedMessage id="PricePerMonth" defaultMessage="Base Monthly Price" />}
-          >
+          <FormField name="plan.title" label="Custom Tier Name" />
+          <FormField name="plan.pricing.pricePerMonth.valueInCents" label="Base Monthly Price">
             {({ field }) => (
               <InputAmount
                 name={field.name}
@@ -173,19 +170,10 @@ const SubscriberForm = (props: SubscriberFormProps) => {
             )}
           </FormField>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <FormField
-              name="plan.pricing.includedCollectives"
-              label={<FormattedMessage id="IncludedCollectives" defaultMessage="Included Active Collectives" />}
-              type="number"
-            />
+            <FormField name="plan.pricing.includedCollectives" label="Included Active Collectives" type="number" />
             <FormField
               name="plan.pricing.pricePerAdditionalCollective.valueInCents"
-              label={
-                <FormattedMessage
-                  id="PricePerAdditionalActiveCollective"
-                  defaultMessage="Price per additional active collective"
-                />
-              }
+              label={'Price per additional active collective'}
               placeholder="Enter price"
             >
               {({ field }) => (
@@ -201,15 +189,13 @@ const SubscriberForm = (props: SubscriberFormProps) => {
           <div className="flex flex-col gap-2 sm:flex-row">
             <FormField
               name="plan.pricing.includedExpensesPerMonth"
-              label={<FormattedMessage id="IncludedExpenses" defaultMessage="Included Expenses" />}
+              label="Included Expenses"
               type="number"
               placeholder="Enter limit"
             />
             <FormField
               name="plan.pricing.pricePerAdditionalExpense.valueInCents"
-              label={
-                <FormattedMessage id="PricePerAdditionalActiveExpense" defaultMessage="Price per additional Expense" />
-              }
+              label={'Price per additional Expense'}
               placeholder="Enter price"
             >
               {({ field }) => (
@@ -223,9 +209,7 @@ const SubscriberForm = (props: SubscriberFormProps) => {
             </FormField>
           </div>
           <div>
-            <Label>
-              <FormattedMessage id="Features" defaultMessage="Features" />
-            </Label>
+            <Label>Features</Label>
             <div className="mt-2 grid grid-flow-row grid-cols-2 gap-2">
               {AVAILABLE_FEATURES.map(feature => (
                 <div key={feature}>
@@ -233,7 +217,13 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                     {({ field }) => (
                       <div className="flex items-center gap-2">
                         <Checkbox checked={field.value} onCheckedChange={value => setFieldValue(field.name, value)} />
-                        <Label className="text-sm font-normal">{AVAILABLE_FEATURES_LABELS[feature]}</Label>
+                        <Label className="text-sm font-normal">
+                          {PlatformSubscriptionFeatureTitles[feature] ? (
+                            <FormattedMessage {...PlatformSubscriptionFeatureTitles[feature]} />
+                          ) : (
+                            startCase(feature)
+                          )}
+                        </Label>
                       </div>
                     )}
                   </FormField>
@@ -249,19 +239,36 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                 variant="destructive"
               >
                 <AlertDescription>
-                  <FormattedMessage
-                    id="LegacyPlanWarning"
-                    defaultMessage="This account is currently subscribed to a legacy plan, upgrading it to a new subscription plan is irreversible."
-                  />
+                  This account is currently subscribed to a legacy plan, upgrading it to a new subscription plan is
+                  irreversible.
                 </AlertDescription>
               </Alert>
             )}
-            <Button type="button" onClick={submitForm} className="grow" loading={updating}>
-              {props.isLegacy ? (
-                <FormattedMessage id="UpgradeSubscription" defaultMessage="Upgrade Subscription" />
-              ) : (
-                <FormattedMessage id="save" defaultMessage="Save" />
-              )}
+            {!props.isLegacy && (
+              <React.Fragment>
+                <MessageBox fontSize="14px" type="warning" my={2} withIcon>
+                  Saving will cancel the existing subscription, create a new one, and notify the organization's admins.
+                  <div className="mt-2 flex items-center gap-2">
+                    <Checkbox
+                      checked={disclaimerChecked}
+                      onCheckedChange={value => setDisclaimerChecked(value === true)}
+                      id="subscription-disclaimer-checkbox"
+                    />
+                    <Label htmlFor="subscription-disclaimer-checkbox" className="cursor-pointer text-sm font-normal">
+                      I understand the consequences.
+                    </Label>
+                  </div>
+                </MessageBox>
+              </React.Fragment>
+            )}
+            <Button
+              type="button"
+              onClick={submitForm}
+              className="grow"
+              loading={updating}
+              disabled={!dirty || (!props.isLegacy && !disclaimerChecked)}
+            >
+              {props.isLegacy ? 'Upgrade Subscription' : 'Apply new subscription'}
             </Button>
           </div>
         </Form>
@@ -279,9 +286,7 @@ export default function SubscriberPlanModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FormattedMessage id="EditSubscription" defaultMessage="Edit Subscription" />
-          </DialogTitle>
+          <DialogTitle className="flex items-center gap-2">Update Subscription</DialogTitle>
         </DialogHeader>
         <SubscriberForm {...formProps} onUpdate={() => setOpen(false)} />
       </DialogContent>

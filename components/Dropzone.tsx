@@ -3,12 +3,35 @@ import { isNil, isString, omit } from 'lodash';
 import { CircleAlert, Upload } from 'lucide-react';
 import type { Accept, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
+
+type ImageDimensionsInstructionsProps = {
+  imageSize: ImageDimensionsValidation | undefined;
+  intl: IntlShape;
+};
+
+/**
+ * Component to display image dimension instructions based on the imageSize validation type
+ */
+const ImageDimensionsInstructions = ({ imageSize, intl }: ImageDimensionsInstructionsProps) => {
+  if (!imageSize) {
+    return null;
+  } else if (imageSize.type === 'exact') {
+    return intl.formatMessage(
+      { defaultMessage: 'Dimensions must be {width}×{height}px', id: 'dropzone.dimensions' },
+      { width: imageSize.width, height: imageSize.height },
+    );
+  } else {
+    throw new Error('ImageDimensionsInstructions: Unsupported imageSize type');
+  }
+};
 
 import type { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/schema';
 import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
+import { getImageDimensions } from '../lib/image-utils';
 import { cn } from '@/lib/utils';
 
 import { Button } from './ui/Button';
@@ -17,6 +40,53 @@ import { getI18nLink } from './I18nFormatters';
 import LocalFilePreview from './LocalFilePreview';
 import Spinner from './Spinner';
 import UploadedFilePreview from './UploadedFilePreview';
+
+type ImageDimensionValidationResult = {
+  file: File;
+  isValid: boolean;
+  error?: string;
+};
+
+type ImageDimensionsValidation = {
+  type: 'exact';
+  height: number;
+  width: number;
+};
+
+/**
+ * Validates image dimensions and returns a promise with validation results
+ */
+const validateImageDimensions = async (
+  file: File,
+  expected: ImageDimensionsValidation,
+  intl: IntlShape,
+): Promise<ImageDimensionValidationResult> => {
+  const imageSize = await getImageDimensions(file);
+  if (!imageSize) {
+    return { file, isValid: false, error: intl.formatMessage({ defaultMessage: 'Invalid image', id: 'P0oNJA' }) };
+  } else if (expected.type === 'exact') {
+    if (imageSize.height !== expected.height || imageSize.width !== expected.width) {
+      return {
+        file,
+        isValid: false,
+        error: intl.formatMessage(
+          {
+            defaultMessage: 'Dimensions must be {width}x{height} (actual: {actualWidth}x{actualHeight})',
+            id: 'a6EMUJ',
+          },
+          {
+            height: expected.height,
+            width: expected.width,
+            actualHeight: imageSize.height,
+            actualWidth: imageSize.width,
+          },
+        ),
+      };
+    }
+  }
+
+  return { file, isValid: true, error: undefined };
+};
 
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
 export const DROPZONE_ACCEPT_CSV = { 'text/csv': ['.csv'] };
@@ -48,6 +118,7 @@ const Dropzone = ({
   parseDocument = false,
   parsingOptions = {},
   onGraphQLSuccess = undefined,
+  onClear = undefined,
   UploadingComponent = undefined,
   showInstructions = false,
   showIcon = false,
@@ -58,6 +129,7 @@ const Dropzone = ({
   showReplaceAction = true,
   className = '',
   id,
+  imageSize = undefined,
   ...props
 }: DropzoneProps) => {
   const { toast } = useToast();
@@ -82,7 +154,7 @@ const Dropzone = ({
   }
 
   const onDropCallback = React.useCallback(
-    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+    async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (isMulti && acceptedFiles.length > (limit || 0)) {
         toast({
           variant: 'error',
@@ -97,6 +169,22 @@ const Dropzone = ({
         return;
       }
 
+      // Validate image dimensions if imageSize is specified
+      if (imageSize) {
+        const validationResults = await Promise.all(
+          acceptedFiles.map(file => validateImageDimensions(file, imageSize, intl)),
+        );
+        const invalidFiles = validationResults.filter(result => !result.isValid);
+        if (invalidFiles.length > 0) {
+          toast({
+            variant: 'error',
+            title: intl.formatMessage({ defaultMessage: 'Invalid image dimensions', id: '18QYUb' }),
+            message: invalidFiles.map(result => `${result.file.name}: ${result.error}`).join('\n'),
+          });
+          return;
+        }
+      }
+
       onDrop?.(acceptedFiles, fileRejections);
       if (collectFilesOnly) {
         onSuccess?.(acceptedFiles as File[] & UploadedFile[] & UploadedFile, fileRejections);
@@ -109,7 +197,22 @@ const Dropzone = ({
         uploadFiles(acceptedFiles, fileRejections);
       }
     },
-    [collectFilesOnly, onSuccess, uploadFiles, uploadFileWithGraphQL, onDrop],
+    [
+      collectFilesOnly,
+      onSuccess,
+      uploadFiles,
+      uploadFileWithGraphQL,
+      onDrop,
+      imageSize,
+      toast,
+      intl,
+      isMulti,
+      limit,
+      useGraphQL,
+      kind,
+      parseDocument,
+      parsingOptions,
+    ],
   );
   const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: onDropCallback };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
@@ -222,6 +325,12 @@ const Dropzone = ({
                               />
                             </span>
                           )}
+                          {Boolean(imageSize) && (
+                            <span>
+                              &nbsp;
+                              <ImageDimensionsInstructions imageSize={imageSize} intl={intl} />
+                            </span>
+                          )}
                         </p>
                       )}
                     </div>
@@ -260,6 +369,12 @@ const Dropzone = ({
                               maxSize: `${Math.round(maxSize / 1024 / 1024)}MB`,
                             }}
                           />
+                          {Boolean(imageSize) && (
+                            <span>
+                              &nbsp;
+                              <ImageDimensionsInstructions imageSize={imageSize} intl={intl} />
+                            </span>
+                          )}
                         </p>
                       )}
                     </div>
@@ -299,10 +414,11 @@ const Dropzone = ({
             variant="outline"
             size="xs"
             onClick={() => {
+              onClear?.();
               if (isMulti) {
-                (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)([], []);
+                (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)?.([], []);
               } else {
-                (onSuccess as (file: UploadedFile) => void)(null);
+                (onSuccess as (file: UploadedFile) => void)?.(null);
               }
             }}
             disabled={isLoading}
@@ -362,12 +478,14 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
   useGraphQL?: boolean;
   showActions?: boolean;
   onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
+  onClear?: () => void;
   parseDocument?: boolean;
   parsingOptions?: OcrParsingOptionsInput;
   UploadingComponent?: React.ComponentType;
   /** When isMulti is true, limit the number of files that can be uploaded */
   limit?: number;
   showReplaceAction?: boolean;
+  imageSize?: ImageDimensionsValidation;
 } & (
     | {
         /** Collect File only, do not upload files */

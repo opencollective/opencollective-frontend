@@ -159,7 +159,7 @@ const Pricing = () => {
                     id="pricing.newModel.onLegacyPricing"
                     values={{
                       LinkNewPricing: parts => (
-                        <Link href="/pricing" className="font-medium underline hover:text-blue-900">
+                        <Link href="/organizations/pricing" className="font-medium underline hover:text-blue-900">
                           {parts}
                         </Link>
                       ),

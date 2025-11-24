@@ -4674,7 +4674,6 @@ type PlatformSubscriptionFeatures {
   EXPENSE_SECURITY_CHECKS: Boolean!
   EXPECTED_FUNDS: Boolean!
   CHARGE_HOSTING_FEES: Boolean!
-  RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
@@ -5726,6 +5725,11 @@ type PayoutMethod {
   Whether this payout method can be deleted or only archived
   """
   canBeDeleted: Boolean
+
+  """
+  Whether this payout method can be archived
+  """
+  canBeArchived: Boolean
 }
 
 """
@@ -6709,7 +6713,6 @@ type CollectiveFeatures {
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
-  RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
@@ -7092,6 +7095,7 @@ enum ActivityType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -7855,7 +7859,6 @@ type TransactionsImport {
     """
     accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
-    @deprecated(reason: "2025-04-29: Please use `host.offPlatformTransactions` instead.")
   stats: TransactionsImportStats!
 }
 
@@ -13488,6 +13491,7 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+  requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
   newsletterOptIn: Boolean
@@ -18649,6 +18653,7 @@ enum ActivityAndClassesType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -20951,7 +20956,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -20981,7 +20986,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -20996,7 +21001,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21011,7 +21016,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21026,7 +21031,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21041,7 +21046,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21056,7 +21061,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21071,7 +21076,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21873,7 +21878,7 @@ type Mutation {
     """
     A optional private comment to add to the created expense
     """
-    privateComment: String
+    privateComment: String @deprecated(reason: "2025-11-03: This field is no longer used")
   ): Expense!
 
   """
@@ -22546,6 +22551,21 @@ type Mutation {
     If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
     """
     financiallyActive: Boolean = false
+  ): Organization
+
+  """
+  Creates and invites admins to an existing Organization. Scope: "account".
+  """
+  inviteOrganizationAdmins(
+    """
+    Reference to the organization to invite admins to
+    """
+    organization: AccountReferenceInput!
+
+    """
+    List of members to invite as admins.
+    """
+    inviteMembers: [InviteMemberInput!]!
   ): Organization
 
   """
@@ -23523,6 +23543,8 @@ input EventCreateInput {
   description: String
   tags: [String]
   settings: JSON
+  location: LocationInput
+  privateInstructions: String
 
   """
   The Event start date and time
@@ -23645,6 +23667,7 @@ input AccountUpdateInput {
   legalName: String
   slug: String
   description: String
+  image: URL
   longDescription: String
   company: String
   tags: [String]
@@ -25228,7 +25251,7 @@ input OrganizationCreateInput {
   name: String!
   legalName: String
   slug: String!
-  description: String!
+  description: String
   website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 
@@ -25689,6 +25712,7 @@ enum UploadedFileKind {
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE
+  RECEIPT_EMBEDDED_IMAGE
 }
 
 """
@@ -25990,7 +26014,6 @@ input PlatformSubscriptionFeaturesFeatures {
   EXPENSE_SECURITY_CHECKS: Boolean!
   EXPECTED_FUNDS: Boolean!
   CHARGE_HOSTING_FEES: Boolean!
-  RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
@@ -9,26 +9,29 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import timezones from '@/lib/constants/timezones';
+import { Currency as CurrencyOptions } from '@/lib/constants/currency';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
 import { loadGoogleMaps } from '@/lib/google-maps';
-import type { Account, AccountUpdateInput } from '@/lib/graphql/types/v2/schema';
-import { AccountType, Currency } from '@/lib/graphql/types/v2/schema';
+import type { Account, AccountUpdateInput, Currency } from '@/lib/graphql/types/v2/schema';
+import { AccountType } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
+import { EditAvatar } from '@/components/Avatar';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '@/components/collective-page/graphql/queries';
+import CurrencyPicker from '@/components/CurrencyPicker';
 import EditTags from '@/components/EditTags';
 import { FormField } from '@/components/FormField';
 import { FormikZod } from '@/components/FormikZod';
 import { I18nSupportLink } from '@/components/I18nFormatters';
 import { useModal } from '@/components/ModalContext';
 import RichTextEditor from '@/components/RichTextEditor';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/Command';
+import { TimezonePicker } from '@/components/TimezonePicker';
 import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
@@ -45,6 +48,7 @@ const editAccountFragment = gql`
     name
     slug
     legalName
+    image: imageUrl
     description
     longDescription
     isActive
@@ -114,6 +118,7 @@ const baseInfo = z.object({
   longDescription: z.string().max(30000).nullable(),
   currency: z.string().max(3).nullable(),
   tags: z.array(z.string()).nullable(),
+  image: z.string().url().nullable().optional(),
   location: z
     .object({
       name: z.string().optional().nullable(),
@@ -137,8 +142,9 @@ const baseInfo = z.object({
     .object({
       VAT: z
         .object({
-          type: z.string().max(255).optional(),
-          number: z.string().max(255).optional(),
+          type: z.string().max(255).optional().nullable(),
+          number: z.string().max(255).optional().nullable(),
+          disabled: z.boolean().optional().nullable(),
         })
         .optional(),
       GST: z
@@ -180,11 +186,8 @@ type FormValuesSchema = z.infer<typeof formSchema>;
 const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 'slug'> }) => {
   const intl = useIntl();
   const { showConfirmationModal } = useModal();
+  const { refetchLoggedInUser } = useLoggedInUser();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
-  const currencyInputRef = useRef<HTMLInputElement>(null);
-  const timezoneInputRef = useRef<HTMLInputElement>(null);
-  const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
-  const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const { toast } = useToast();
   const { data, loading } = useQuery(infoSettingsDashboardQuery, {
@@ -214,6 +217,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         : {
             ...pick(account, [
               'type',
+              'image',
               ...Object.keys(baseInfo.shape),
               ...Object.keys(eventShape.shape),
               ...Object.keys(individualShape.shape),
@@ -225,47 +229,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
     [account],
   );
 
-  const currencyOptions = useMemo(
-    () =>
-      Object.keys(Currency).map(code => ({
-        value: code,
-        label: code,
-      })),
-    [],
-  );
-  const timezoneOptions = useMemo(
-    () =>
-      timezones.map(tz => ({
-        label: tz.replace('_', ' '),
-        value: tz,
-      })),
-    [],
-  );
-
-  const openCurrencySelect = useCallback(
-    open => {
-      setShowCurrencySelect(open);
-      if (open) {
-        setTimeout(() => {
-          currencyInputRef.current?.focus();
-        }, 100);
-      }
-    },
-    [currencyInputRef],
-  );
-
-  const openTimezoneSelect = useCallback(
-    open => {
-      setShowTimezoneSelect(open);
-      if (open) {
-        setTimeout(() => {
-          timezoneInputRef.current?.focus();
-        }, 100);
-      }
-    },
-    [timezoneInputRef],
-  );
-
   const onSubmit = async (values: FormValuesSchema) => {
     const diff = omitDeepBy(values, (value, key) => isEqual(value, get(account, key)) || isUndefined(value));
     if (diff.settings) {
@@ -274,7 +237,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
 
     try {
       const parseLocalDateTime = (date: string | null) =>
-        isNil(date) ? null : dayjs.tz(date, 'timezone' in values ? values.timezone : 'UTC').toISOString();
+        isNil(date)
+          ? null
+          : dayjs
+              .tz(date, values['timezone'] || 'UTC')
+              .utc()
+              .toISOString();
       const variables: { account: AccountUpdateInput } = {
         account: {
           id: account.id,
@@ -284,7 +252,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
       if ('endsAt' in values && values.endsAt) {
         variables.account.endsAt = parseLocalDateTime(values.endsAt);
       }
-      if ('startsAt' in values && values.endsAt) {
+      if ('startsAt' in values && values.startsAt) {
         variables.account.startsAt = parseLocalDateTime(values.startsAt);
       }
 
@@ -293,6 +261,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
           variables,
           context: API_V2_CONTEXT,
         });
+        await refetchLoggedInUser();
         toast({
           variant: 'success',
           message: <FormattedMessage id="Account.Updated" defaultMessage="Account updated." />,
@@ -354,6 +323,20 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         );
         return (
           <Form className="flex flex-col gap-4">
+            <FormField name="image" label={<FormattedMessage defaultMessage="Avatar" id="Avatar" />}>
+              {({ field, form }) => (
+                <EditAvatar
+                  size={120}
+                  name={values.name}
+                  type={account.type}
+                  value={field.value}
+                  onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                  onReject={() => form.setFieldValue(field.name, null)}
+                  minSize={1024}
+                  maxSize={2e3 * 1024}
+                />
+              )}
+            </FormField>
             <FormField
               name="name"
               label={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
@@ -472,51 +455,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   }
                 >
                   {({ field }) => (
-                    <Select
+                    <TimezonePicker
+                      data-cy="organization-timezone-trigger"
                       value={field.value}
-                      open={showTimezoneSelect}
-                      onOpenChange={openTimezoneSelect}
                       disabled={field.disabled}
-                    >
-                      <SelectTrigger
-                        className={cn(!field.value && 'text-muted-foreground')}
-                        data-cy="organization-timezone-trigger"
-                      >
-                        {field.value ? (
-                          timezoneOptions.find(option => option.value === field.value)?.label || field.value
-                        ) : (
-                          <FormattedMessage defaultMessage="Select timezone" id="collective.timezone.placeholder" />
-                        )}
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[50vh]">
-                        <Command>
-                          <CommandInput
-                            placeholder={intl.formatMessage({ defaultMessage: 'Search timezones...', id: 'VzPJtr' })}
-                            data-cy="organization-timezone-search"
-                            ref={timezoneInputRef}
-                          />
-                          <CommandList data-cy="organization-timezone-list">
-                            <CommandEmpty>
-                              <FormattedMessage defaultMessage="No timezone found." id="GTBZLL" />
-                            </CommandEmpty>
-                            <CommandGroup>
-                              {timezoneOptions.map(({ value, label }) => (
-                                <CommandItem
-                                  key={value}
-                                  data-cy={`organization-country-${value}`}
-                                  onSelect={() => {
-                                    setFieldValue(field.name, value as Currency);
-                                    setShowTimezoneSelect(false);
-                                  }}
-                                >
-                                  <span>{label}</span>
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </SelectContent>
-                    </Select>
+                      onChange={value => setFieldValue(field.name, value)}
+                    />
                   )}
                 </FormField>
                 <FormField
@@ -586,51 +530,16 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 }
               >
                 {({ field }) => (
-                  <Select
-                    value={field.value}
-                    open={showCurrencySelect}
-                    onOpenChange={openCurrencySelect}
+                  <CurrencyPicker
+                    data-cy="organization-currency-trigger"
                     disabled={field.disabled}
-                  >
-                    <SelectTrigger
-                      className={cn(!field.value && 'text-muted-foreground')}
-                      data-testid="organization-currency-trigger"
-                    >
-                      {field.value ? (
-                        field.value
-                      ) : (
-                        <FormattedMessage defaultMessage="Select currency" id="collective.curency.placeholder" />
-                      )}
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[50vh]">
-                      <Command>
-                        <CommandInput
-                          placeholder={intl.formatMessage({ defaultMessage: 'Search currencies...', id: 'fDMc8k' })}
-                          data-cy="organization-currency-search"
-                          ref={currencyInputRef}
-                        />
-                        <CommandList data-cy="organization-currency-list">
-                          <CommandEmpty>
-                            <FormattedMessage defaultMessage="No currency found." id="moOGSq" />
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {currencyOptions.map(({ value, label }) => (
-                              <CommandItem
-                                key={value}
-                                data-cy={`organization-country-${value}`}
-                                onSelect={() => {
-                                  setFieldValue(field.name, value as Currency);
-                                  setShowCurrencySelect(false);
-                                }}
-                              >
-                                <span>{label}</span>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </SelectContent>
-                  </Select>
+                    availableCurrencies={CurrencyOptions}
+                    value={field.value}
+                    // deepscan-disable-next-line
+                    onChange={value => {
+                      setFieldValue(field.name, value as Currency);
+                    }}
+                  />
                 )}
               </FormField>
             )}
@@ -647,44 +556,91 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             {taxes.includes(TaxType.VAT) && (
               <React.Fragment>
                 <FormField
-                  name="settings.VAT.type"
+                  name="settings.VAT"
                   label={<FormattedMessage defaultMessage="VAT settings" id="EditCollective.VAT" />}
-                >
-                  {({ field }) => (
-                    <Select value={field.value} onValueChange={value => setFieldValue(field.name, value)}>
-                      <SelectTrigger
-                        id={field.name}
-                        data-cy="VAT"
-                        className={cn('truncate', { 'border-red-500': field.error })}
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={null} data-cy="select-option">
-                          <FormattedMessage defaultMessage="Not subject to VAT" id="EditCollective.VAT.None" />
-                        </SelectItem>
-                        <SelectItem value={VAT_OPTIONS.OWN} data-cy="select-option">
-                          <FormattedMessage defaultMessage="Use my own VAT number" id="EditCollective.VAT.Own" />
-                        </SelectItem>
-                        {(!account.isHost || field.value === VAT_OPTIONS.HOST) && (
-                          <SelectItem value={VAT_OPTIONS.HOST} data-cy="select-option">
-                            <FormattedMessage defaultMessage="Use the host VAT settings" id="EditCollective.VAT.Host" />
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </FormField>
-                <FormField
-                  name="settings.VAT.number"
-                  label={<FormattedMessage defaultMessage="VAT number" id="EditCollective.VATNumber" />}
                   hint={
-                    <FormattedMessage
-                      id="EditCollective.VATNumber.Description"
-                      defaultMessage="Your European Value Added Tax (VAT) number"
-                    />
+                    values.settings?.VAT?.disabled && (
+                      <FormattedMessage
+                        id="EditCollective.VAT.Disabled.Warning"
+                        defaultMessage="Caution: Disabling VAT requires approval from your fiscal host. Please ensure you have discussed this with your host before saving."
+                      />
+                    )
                   }
-                />
+                >
+                  {({ field }) => {
+                    const isDisabled = field.value?.disabled;
+                    const currentType = isDisabled ? 'DISABLED' : field.value?.type;
+                    // Use 'HOST' to represent using host VAT settings (null in the form field)
+                    const displayType = currentType === null ? 'HOST' : currentType;
+                    const options = [
+                      {
+                        value: VAT_OPTIONS.HOST,
+                        label: (
+                          <FormattedMessage defaultMessage="Use the host VAT settings" id="EditCollective.VAT.Host" />
+                        ),
+                      },
+                      {
+                        value: VAT_OPTIONS.OWN,
+                        label: (
+                          <FormattedMessage
+                            defaultMessage="Use my own VAT number"
+                            id="EditCollective.VAT.OwnSettings"
+                          />
+                        ),
+                      },
+                      {
+                        value: 'DISABLED',
+                        label: <FormattedMessage defaultMessage="Disable VAT" id="EditCollective.VAT.Disabled" />,
+                      },
+                    ];
+                    return (
+                      <Select
+                        name="settings.VAT.type"
+                        value={displayType}
+                        onValueChange={value => {
+                          if (value === 'DISABLED') {
+                            setFieldValue('settings.VAT.type', VAT_OPTIONS.OWN);
+                            setFieldValue('settings.VAT.disabled', true);
+                          } else if (value === 'HOST') {
+                            setFieldValue('settings.VAT.type', VAT_OPTIONS.HOST);
+                            setFieldValue('settings.VAT.disabled', false);
+                          } else {
+                            setFieldValue('settings.VAT.type', value);
+                            setFieldValue('settings.VAT.disabled', false);
+                          }
+                        }}
+                      >
+                        <SelectTrigger
+                          id={field.name}
+                          data-cy="VAT"
+                          className={cn('truncate', { 'border-red-500': field.error })}
+                        >
+                          {options.find(opt => opt.value === displayType)?.label || <span>&nbsp;</span>}
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value} data-cy="select-option">
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    );
+                  }}
+                </FormField>
+                {values.settings?.VAT?.type === VAT_OPTIONS.OWN && !values.settings?.VAT?.disabled && (
+                  <FormField
+                    name="settings.VAT.number"
+                    label={<FormattedMessage defaultMessage="VAT number" id="EditCollective.VATNumber" />}
+                    required
+                    hint={
+                      <FormattedMessage
+                        id="EditCollective.VATNumber.Description"
+                        defaultMessage="Your European Value Added Tax (VAT) number"
+                      />
+                    }
+                  />
+                )}
               </React.Fragment>
             )}{' '}
             {taxes.includes(TaxType.GST) && account.isHost && (

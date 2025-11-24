@@ -40,6 +40,7 @@ export const SECTIONS = {
   SUBMITTED_GRANTS: 'submitted-grants',
   APPROVE_GRANT_REQUESTS: 'approve-grant-requests',
   PLATFORM_SUBSCRIPTION: 'platform-subscription',
+  SEARCH: 'search',
 };
 
 export const ROOT_SECTIONS = {

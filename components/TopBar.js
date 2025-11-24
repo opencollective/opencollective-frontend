@@ -134,7 +134,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
     '/how-it-works',
     '/fiscal-hosting',
     '/help',
-    '/solutions',
+    '/organizations',
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
 

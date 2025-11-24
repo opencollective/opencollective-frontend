@@ -354,7 +354,15 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   const validate = React.useCallback(
     async values => {
       const validationError = _validate ? await Promise.resolve(_validate(values)) : {};
-      return defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), validationError);
+      const errors = defaultsDeep(getErrorsObjectFromZodSchema<Values>(intl, schema, values), validationError);
+      if (process.env.NODE_ENV !== 'production' && Object.keys(errors).length > 0) {
+        // Log validation errors to help with debugging
+        // eslint-disable-next-line no-console
+        console.error('FormikZod validation values:', values);
+        // eslint-disable-next-line no-console
+        console.error('FormikZod validation errors:', errors);
+      }
+      return errors;
     },
     [intl, schema, _validate],
   );

@@ -14,7 +14,9 @@ import { Separator } from '@/components/ui/Separator';
 import CurrencyPicker from './CurrencyPicker';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
-  if (currencyDisplay === 'SYMBOL') {
+  if (!currency) {
+    return '---';
+  } else if (currencyDisplay === 'SYMBOL') {
     return getCurrencySymbol(currency);
   } else if (currencyDisplay === 'CODE') {
     return currency;

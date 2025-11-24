@@ -130,11 +130,16 @@ export const mailToURL = (address = '', opts) => {
   return `mailto://${address}${objectToQueryString(opts)}`;
 };
 
-export const getDashboardRoute = (account, section = null) => {
+export const getDashboardRoute = (account, section = null, { params }: { params?: URLSearchParams } = {}) => {
   if (!account) {
     return '';
   }
-  return `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+
+  const route = `/dashboard/${account.slug}${section ? `/${section}` : ''}`;
+  if (params) {
+    return `${route}?${params.toString()}`;
+  }
+  return route;
 };
 
 export const getDashboardTransactionsRoute = (account, queryParams: { openTransactionId?: number } = {}) => {
@@ -379,9 +384,9 @@ const getConversationPageUrl = (conversation: Conversation) => {
   return `${getCollectivePageRoute(conversation.account)}/conversations/${conversation.slug}-${conversation.id}`;
 };
 
-const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
+export const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
   if (loggedInUser.isAdminOfCollective(application.host) || loggedInUser.isHostAdmin(application.account)) {
-    return `${getDashboardRoute(application.account, 'host-applications')}?hostApplicationId=${application.id}`;
+    return `${getDashboardRoute(application.host, 'host-applications')}?hostApplicationId=${application.id}`;
   } else {
     return `${getDashboardRoute(application.account, 'host')}`;
   }

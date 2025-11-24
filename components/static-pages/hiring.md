@@ -217,7 +217,7 @@ On Open Collective, groups like open source projects, neighbourhood associations
 
 Watch this video about what we do and why we are passionate about it:
 
-<iframe src="https://www.youtube.com/embed/bbtQcW4E_RU?start=39" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen width="854" height="480" frameborder="0"></iframe>
+<iframe src="https://www.youtube-nocookie.com/embed/bbtQcW4E_RU?start=39" title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen width="854" height="480" frameborder="0"></iframe>
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% open source.
 

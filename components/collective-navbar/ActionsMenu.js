@@ -8,6 +8,7 @@ import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { pickBy } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -16,6 +17,7 @@ import { isSupportedExpenseType } from '../../lib/expenses';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '@/lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -181,10 +183,14 @@ const CollectiveNavbarActionsMenu = ({
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
+  const router = useRouter();
 
-  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+  const newExpenseFlowOptedOut = parseToBoolean(router?.query?.forceLegacyFlow);
+  const isNewGrantFlowEnabled =
+    !newExpenseFlowOptedOut && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
 
   const isNewExpenseFlowEnabled =
+    !newExpenseFlowOptedOut &&
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
     (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
@@ -246,7 +252,7 @@ const CollectiveNavbarActionsMenu = ({
                           <StyledLink
                             data-cy="submit-expense-dropdown"
                             as={Link}
-                            href={`${getCollectivePageRoute(collective)}/expenses/new`}
+                            href={`${getCollectivePageRoute(collective)}/expenses/new?forceLegacyFlow=true`}
                           >
                             <Container p={ITEM_PADDING}>
                               <Receipt size="20px" />

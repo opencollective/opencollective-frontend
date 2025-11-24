@@ -12,7 +12,7 @@ import StyledModal from '../../StyledModal';
 import { H2, P, Span } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
 
-const SustainTextWrapper = styled(Span)`
+const SustainTextWrapper = styled.span`
   background-image: url('/static/images/home/sustain-underline-sm.png');
   background-repeat: no-repeat;
   background-size: cover;
@@ -44,19 +44,13 @@ const MakeCommunity = () => {
         <Flex flexDirection="column" alignItems={['center', 'flex-start']} mr={[null, null, null, null, 3]}>
           <Box width={[null, null, '458px', null, '558px']}>
             <MainTitle my={[3, null, 3]} textAlign={['center', 'left']}>
-              <Span>
-                <FormattedMessage
-                  id="home.makeCommunitySection.title.makeYourCommunity"
-                  defaultMessage="Make your community {sustainable}"
-                  values={{
-                    sustainable: (
-                      <SustainTextWrapper>
-                        <FormattedMessage id="home.makeCommunitySection.title.sustain" defaultMessage="sustainable" />
-                      </SustainTextWrapper>
-                    ),
-                  }}
-                />
-              </Span>
+              <FormattedMessage
+                id="home.makeCommunitySection.title.makeYourCommunity"
+                defaultMessage="Make your community <SustainTextWrapper>sustainable</SustainTextWrapper>"
+                values={{
+                  SustainTextWrapper: chunks => <SustainTextWrapper>{chunks}</SustainTextWrapper>,
+                }}
+              />
             </MainTitle>
           </Box>
           <Box width={['288px', '306px', '342px', null, '558px']}>
@@ -65,12 +59,12 @@ const MakeCommunity = () => {
                 id="home.makeCommunitySection.description"
                 defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes."
               />{' '}
-              <Span fontWeight="bold" display={['none', 'inline']}>
+              <span className="hidden font-bold sm:inline">
                 <FormattedMessage
                   id="home.makeCommunitySection.subTitle"
                   defaultMessage="Collect and spend money transparently."
                 />
-              </Span>
+              </span>
             </MainDescription>
           </Box>
           <Box display="flex" flexDirection={['column', 'row']} alignItems="center">
@@ -170,7 +164,8 @@ const MakeCommunity = () => {
               title="YouTube video"
               width="100%"
               height="400px"
-              src="https://www.youtube.com/embed/IBU5fSILAe8"
+              src="https://www.youtube-nocookie.com/embed/IBU5fSILAe8"
+              referrerPolicy="strict-origin-when-cross-origin"
               frameBorder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

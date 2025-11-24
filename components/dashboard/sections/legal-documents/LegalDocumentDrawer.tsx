@@ -10,6 +10,8 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
+import LinkCollective from '@/components/LinkCollective';
+
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import { CopyID } from '../../../CopyId';
@@ -87,18 +89,16 @@ export default function LegalDocumentDrawer({
             entityName={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
             entityIdentifier={<CopyID value={document.id}>{document.id}</CopyID>}
             entityLabel={
-              <AccountHoverCard
-                account={document.account}
-                trigger={
-                  <Link
-                    className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
-                    href={getCollectivePageRoute(document.account)}
-                  >
-                    <Avatar radius={20} collective={document.account} />
-                    {document.account.name}
-                  </Link>
-                }
-              />
+              <LinkCollective
+                className="hover:text-primary hover:underline"
+                collective={document.account}
+                withHoverCard
+              >
+                <div className="flex items-center gap-1 font-medium">
+                  <Avatar radius={20} collective={document.account} />
+                  {document.account.name}
+                </div>
+              </LinkCollective>
             }
           />
           <SheetBody>

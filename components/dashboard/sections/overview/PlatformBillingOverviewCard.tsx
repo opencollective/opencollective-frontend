@@ -58,7 +58,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
       </Button>
       <div className="mb-2 text-base font-bold">
         <FormattedMessage
-          defaultMessage="You're on the {planTitle} plan"
+          defaultMessage={`You're on the "{planTitle}" plan`}
           id="Fw/mF9"
           values={{
             planTitle: query.data.host.platformSubscription.plan.title,
@@ -67,7 +67,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
       </div>
       <div className="text-sm">
         <FormattedMessage
-          defaultMessage="The {planTitle} plan gives you access with limited usage mentioned below. Any usage exceeding the plan limits will incur additional charges."
+          defaultMessage={`The "{planTitle}" plan gives you access with limited usage mentioned below. Any usage exceeding the plan limits will incur additional charges.`}
           id="j/a0gE"
           values={{
             planTitle: query.data.host.platformSubscription.plan.title,
@@ -79,7 +79,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
       </div>
       <Button asChild variant="outline">
         <Link className="!no-underline" href={getDashboardRoute({ slug: props.accountSlug }, 'platform-subscription')}>
-          <FormattedMessage defaultMessage="Upgrade Now" id="2LslN1" />
+          <FormattedMessage defaultMessage="Manage Subscription" id="9vk07U" />
         </Link>
       </Button>
     </MessageBox>

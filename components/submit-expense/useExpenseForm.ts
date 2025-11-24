@@ -53,6 +53,8 @@ import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
 
+import { supportsBaseExpenseTypes } from './form/helper';
+
 export enum InviteeAccountType {
   INDIVIDUAL = 'INDIVIDUAL',
   ORGANIZATION = 'ORGANIZATION',
@@ -627,10 +629,17 @@ type ExpenseFormOptions = {
   canSetupRecurrence?: boolean;
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
+  hasInvalidAccount?: boolean;
 };
 
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 
+/**
+ * Memoized GraphQL query for expense form schema data.
+ *
+ * Uses memoizeOne to cache query results and prevent redundant network requests.
+ * Only refetches when variables change or refresh is explicitly requested.
+ */
 const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
@@ -657,6 +666,20 @@ type RecursivePartial<T> = {
       : T[P];
 };
 
+/**
+ * Builds dynamic Zod validation schema based on form options and context.
+ *
+ * This function creates different validation rules depending on:
+ * - Expense type (INVOICE vs RECEIPT vs GRANT)
+ * - Account settings (VAT/GST requirements, accounting categories)
+ * - Form state (invite vs direct submission)
+ *
+ * @param values Current form values
+ * @param options Form configuration options
+ * @param intl Internationalization context for error messages
+ * @param pickSchemaFields Optional field filtering for partial validation
+ * @returns Zod schema for form validation
+ */
 function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
@@ -670,7 +693,17 @@ function buildFormSchema(
       .nullish()
       .refine(slug => {
         return slug && !slug.startsWith('__');
-      }, requiredMessage),
+      }, requiredMessage)
+      .refine(
+        accountSlug =>
+          accountSlug && (!options.supportedExpenseTypes || supportsBaseExpenseTypes(options.supportedExpenseTypes)),
+        () => ({
+          message: intl.formatMessage({
+            defaultMessage: 'The selected account does not support expense submissions.',
+            id: '6dZw2w',
+          }),
+        }),
+      ),
     payeeSlug: z
       .string()
       .nullish()
@@ -841,7 +874,11 @@ function buildFormSchema(
             ])
             .nullish()
             .refine(attachment => {
-              if ([ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.SETTLEMENT].includes(values.expenseTypeOption)) {
+              if (
+                [ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.SETTLEMENT, ExpenseType.PLATFORM_BILLING].includes(
+                  values.expenseTypeOption,
+                )
+              ) {
                 return true;
               }
 
@@ -1050,20 +1087,19 @@ function buildFormSchema(
             : true,
         requiredMessage,
       ),
-    payoutMethodNameDiscrepancyReason: z
-      .string()
-      .nullish()
-      .refine(v => {
-        if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
-          const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
-          const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
-          if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
-            return !!v;
-          }
-        }
+    payoutMethodNameDiscrepancyReason: z.string().nullish().optional(),
+    // See https://github.com/opencollective/opencollective/issues/8306
+    // .refine(v => {
+    //   if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
+    //     const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
+    //     const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
+    //     if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
+    //       return !!v;
+    //     }
+    //   }
 
-        return true;
-      }, requiredMessage),
+    //   return true;
+    // }, requiredMessage)
     newPayoutMethod: z.object({
       type: z
         .nativeEnum(PayoutMethodType)
@@ -1386,8 +1422,11 @@ async function buildFormOptions(
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
 
-    if ((account?.supportedExpenseTypes ?? []).length > 0) {
+    if (account?.supportedExpenseTypes) {
       options.supportedExpenseTypes = account.supportedExpenseTypes;
+      if (!supportsBaseExpenseTypes(options.supportedExpenseTypes) && !query.loading) {
+        options.hasInvalidAccount = true;
+      }
     }
 
     if (query.data?.loggedInAccount) {
@@ -1571,6 +1610,18 @@ type ExpenseFormStartOptions = {
   pickSchemaFields?: Record<string, boolean>;
 };
 
+/**
+ * Central hook for managing expense form state, validation, data fetching, and submission.
+ *
+ * This hook integrates Formik for form management, Zod for validation, Apollo Client for
+ * data fetching/mutations, and handles complex initialization workflows for both expense
+ * creation and editing scenarios.
+ *
+ * @param opts Configuration options including form ref, initial values, and callbacks
+ * @returns ExpenseForm object with form state, validation, and submission methods
+ *
+ * @see README.md for detailed architecture documentation
+ */
 export function useExpenseForm(opts: {
   formRef?: React.RefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
@@ -1602,20 +1653,15 @@ export function useExpenseForm(opts: {
   const initialValues = React.useRef(opts.initialValues);
   const initialStatus = React.useRef({ schema: formOptions.schema });
 
+  // GraphQL mutations for expense operations
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
     gql`
       mutation CreateExpenseFromDashboard(
         $expenseCreateInput: ExpenseCreateInput!
         $account: AccountReferenceInput!
         $recurring: RecurringExpenseInput
-        $privateComment: String
       ) {
-        expense: createExpense(
-          expense: $expenseCreateInput
-          account: $account
-          privateComment: $privateComment
-          recurring: $recurring
-        ) {
+        expense: createExpense(expense: $expenseCreateInput, account: $account, recurring: $recurring) {
           id
           legacyId
         }
@@ -1799,11 +1845,6 @@ export function useExpenseForm(opts: {
                       },
                     }
                   : {}),
-                privateComment:
-                  formOptions.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT &&
-                  formOptions.payoutMethod?.data?.accountHolderName !== formOptions.payee?.legalName
-                    ? values.payoutMethodNameDiscrepancyReason
-                    : null,
               },
             });
 
@@ -2129,6 +2170,19 @@ export function useExpenseForm(opts: {
     setFieldValue,
   ]);
 
+  // Reset expense type if the account does not support it (unless we're editing an existing one)
+  React.useEffect(() => {
+    if (
+      !initialLoading.current &&
+      expenseForm.values.expenseTypeOption &&
+      !formOptions.expense?.id &&
+      formOptions.supportedExpenseTypes &&
+      !formOptions.supportedExpenseTypes.includes(expenseForm.values.expenseTypeOption)
+    ) {
+      setFieldValue('expenseTypeOption', null);
+    }
+  }, [formOptions.supportedExpenseTypes, expenseForm.values.expenseTypeOption, formOptions.expense?.id, setFieldValue]);
+
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
       setFieldValue('accountingCategoryId', null);
@@ -2138,6 +2192,7 @@ export function useExpenseForm(opts: {
   // Reset reference currency if it's no longer in the available currencies
   React.useEffect(() => {
     if (
+      !initialLoading.current &&
       formOptions.availableReferenceCurrencies &&
       expenseForm.values.referenceCurrency &&
       !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
@@ -2149,6 +2204,7 @@ export function useExpenseForm(opts: {
   // Set item currency if we're done loading and there's a single available reference currency
   React.useEffect(() => {
     if (
+      !initialLoading.current &&
       formOptions.availableReferenceCurrencies &&
       formOptions.availableReferenceCurrencies.length === 1 &&
       expenseForm.values.expenseItems.length === 1 &&
@@ -2201,6 +2257,11 @@ export function useExpenseForm(opts: {
 
     const ctrl = new AbortController();
     let queryComplete = false;
+
+    /**
+     * Fetches exchange rates for expense items with different currencies.
+     * Uses AbortController to cancel in-flight requests on component unmount.
+     */
     async function updateExchangeRates() {
       try {
         const res = await apolloClient.query<ExpenseFormExchangeRatesQuery, ExpenseFormExchangeRatesQueryVariables>({

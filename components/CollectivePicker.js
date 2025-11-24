@@ -351,7 +351,15 @@ class CollectivePicker extends React.PureComponent {
             />
           </Container>
         </PopoverAnchor>
-        <PopoverPortal container={props.menuPortalTarget === null ? this.containerRef?.current : document.body}>
+        <PopoverPortal
+          container={
+            props.menuPortalTarget === null
+              ? this.containerRef?.current
+              : typeof document !== 'undefined'
+                ? document.body
+                : undefined
+          }
+        >
           <PopoverContent className="w-(--radix-popper-anchor-width)">
             {createFormCollectiveType && (
               <CreateCollectiveMiniForm

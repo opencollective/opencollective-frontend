@@ -35,7 +35,7 @@ function getFormProps(form: ExpenseForm) {
     setFieldValue: form.setFieldValue,
     initialLoading: form.initialLoading,
     isSubmitting: form.isSubmitting,
-    ...pick(form.options, ['isAdminOfPayee', 'account', 'host', 'payee', 'lockedFields']),
+    ...pick(form.options, ['isAdminOfPayee', 'account', 'host', 'payee', 'lockedFields', 'supportedExpenseTypes']),
     ...pick(form.values, [
       'expenseTypeOption',
       'acknowledgedCollectiveReceiptExpensePolicy',
@@ -50,8 +50,14 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
   props: TypeOfExpenseSectionProps,
 ) {
   const expenseTypeOption = props.expenseTypeOption;
-
   const isTypeLocked = props.lockedFields?.includes?.(ExpenseLockableFields.TYPE);
+  const isHostAccount = props.host?.slug === props.account?.slug;
+  const isCollective = props.account?.type === CollectiveType.COLLECTIVE;
+  const showHostInstructions = !isHostAccount || !isCollective;
+  const showCollectiveInstructions = !isHostAccount || isCollective;
+  const supportedExpenseTypes = props.supportedExpenseTypes;
+  const supportsInvoice = !supportedExpenseTypes || supportedExpenseTypes.includes(ExpenseType.INVOICE);
+  const supportsReceipt = !supportedExpenseTypes || supportedExpenseTypes.includes(ExpenseType.RECEIPT);
 
   return (
     <FormSectionContainer
@@ -66,51 +72,60 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
           onValueChange={newValue => props.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
           className="flex flex-wrap"
         >
-          <RadioGroupCard
-            className="min-w-48 grow basis-0"
-            value={ExpenseType.INVOICE}
-            disabled={props.initialLoading || props.isSubmitting}
-          >
-            <div>
-              <div className="mb-1 font-bold">
-                <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+          {supportsInvoice && (
+            <RadioGroupCard
+              className="min-w-48 grow basis-0"
+              value={ExpenseType.INVOICE}
+              disabled={props.initialLoading || props.isSubmitting}
+            >
+              <div className="flex-1">
+                <div className="mb-1 font-bold">
+                  <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+                </div>
+                <div className="text-muted-foreground">
+                  <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
+                </div>
               </div>
-              <div className="text-muted-foreground">
-                <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
-              </div>
-            </div>
-          </RadioGroupCard>
+            </RadioGroupCard>
+          )}
 
-          <RadioGroupCard
-            className="min-w-48 grow basis-0"
-            value={ExpenseType.RECEIPT}
-            disabled={props.initialLoading || props.isSubmitting}
-          >
-            <div>
-              <div className="mb-1 font-bold">
-                <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
+          {supportsReceipt && (
+            <RadioGroupCard
+              className="min-w-48 grow basis-0"
+              value={ExpenseType.RECEIPT}
+              disabled={props.initialLoading || props.isSubmitting}
+            >
+              <div className="flex-1">
+                <div className="mb-1 font-bold">
+                  <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
+                </div>
+                <div className="text-muted-foreground">
+                  <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
+                </div>
               </div>
-              <div className="text-muted-foreground">
-                <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
-              </div>
-            </div>
-          </RadioGroupCard>
+            </RadioGroupCard>
+          )}
         </RadioGroup>
 
         {!props.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div>
-            {props.host?.slug !== props.account?.slug && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+            {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                   checked={props.acknowledgedHostInvoiceExpensePolicy}
-                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
+                  onAcknowledgedChanged={v => {
+                    props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v);
+                    if (isHostAccount) {
+                      props.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v);
+                    }
+                  }}
                 />
               </div>
             )}
 
-            {props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+            {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />}
@@ -125,18 +140,23 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
 
         {!props.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
           <div>
-            {props.host?.slug !== props.account?.slug && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+            {showHostInstructions && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
                   policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedHostReceiptExpensePolicy}
-                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
+                  onAcknowledgedChanged={v => {
+                    props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v);
+                    if (isHostAccount) {
+                      props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v);
+                    }
+                  }}
                 />
               </div>
             )}
 
-            {props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+            {showCollectiveInstructions && props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
@@ -210,7 +230,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
   return (
     <div className="mt-4 rounded-md border border-gray-300 p-4">
       <Label>
-        {props.isAdminOfPayee || !LoggedInUser ? (
+        {props.isAdminOfPayee || !LoggedInUser || props.payee?.type === CollectiveType.VENDOR ? (
           <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
         ) : props.expenseTypeOption === ExpenseType.GRANT ? (
           <FormattedMessage

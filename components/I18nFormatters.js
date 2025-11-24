@@ -11,6 +11,8 @@ export const getI18nLink = linkProps => chunks => (
     {linkProps?.children || chunks}
   </StyledLink>
 );
+// ts-unused-exports:disable-next-line
+export const I18nParagraph = chunks => <p>{chunks}</p>;
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
 // ts-unused-exports:disable-next-line
@@ -55,7 +57,17 @@ export const i18nWithColon = item => <FormattedMessage id="withColon" defaultMes
 
 export const WebsiteName = 'Open Collective';
 
+/**
+ * Allows some basic formatting of the message.
+ *
+ * @example
+ * <FormattedMessage
+ *   defaultMessage="A rich message with <strong>bold</strong>, <i>italic</i>, <code>code</code>, <u>underline</u>.{newLine}See props for more!"
+ *   values={I18nFormatters}
+ * />
+ */
 const I18nFormatters = {
+  p: I18nParagraph,
   strong: I18nBold,
   i: I18nItalic,
   code: I18nCode,

@@ -19,11 +19,15 @@ exports.REWRITES = [
     destination: '/welcome',
   },
   {
+    source: '/organizations',
+    destination: '/solutions',
+  },
+  {
     source: '/solutions',
     destination: '/solutions',
   },
   {
-    source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
+    source: '/:pageSlug(widgets|tos|privacypolicy|hiring|about)',
     destination: '/staticPage',
   },
   {
@@ -53,6 +57,10 @@ exports.REWRITES = [
   {
     source: '/create-account/guest',
     destination: '/guest-join',
+  },
+  {
+    source: '/signup/:step(verify|profile|organization)?',
+    destination: '/signup',
   },
   {
     source: '/organizations/new',
@@ -396,8 +404,16 @@ exports.REWRITES = [
     destination: '/search',
   },
   {
+    source: '/search-results',
+    destination: '/search-results',
+  },
+  {
     source: '/pricing',
     destination: '/pricing',
+  },
+  {
+    source: '/organizations/pricing',
+    destination: '/new-pricing',
   },
   {
     source: '/new-pricing',

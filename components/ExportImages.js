@@ -169,7 +169,7 @@ class ExportImages extends React.Component {
             ))}
           </ul>
         )}
-        <SettingsSectionTitle mt={4}>
+        <SettingsSectionTitle className="mt-4">
           <FormattedMessage id="ExportImages.AllFinancial" defaultMessage="All financial contributors badge" />
         </SettingsSectionTitle>
         <Box mb={2}>

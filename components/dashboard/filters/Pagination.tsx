@@ -8,6 +8,7 @@ import useKeyboardKey, { PAGE_DOWN_KEY, PAGE_UP_KEY } from '../../../lib/hooks/u
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../../lib/hooks/usePrevious';
 import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
+import { cn } from '@/lib/utils';
 
 import { Button } from '../../ui/Button';
 import {
@@ -46,7 +47,7 @@ function SelectLimit({ limit, setLimit, defaultLimit }) {
   );
 }
 
-export function Pagination({ total, queryFilter }) {
+export function Pagination({ total, queryFilter, className = '' }) {
   const { LoggedInUser } = useLoggedInUser();
   const { offset, limit } = queryFilter.values;
   const defaultLimit = queryFilter.defaultSchemaValues.limit;
@@ -163,7 +164,7 @@ export function Pagination({ total, queryFilter }) {
     return pages;
   };
   return (
-    <div className="flex items-center justify-between gap-1">
+    <div className={cn('flex items-center justify-between gap-1', className)}>
       <UIPagination className="flex-1 items-center justify-between sm:flex">
         <div className="hidden lg:block">
           <SelectLimit limit={limit} defaultLimit={defaultLimit} setLimit={l => queryFilter.setFilter('limit', l)} />

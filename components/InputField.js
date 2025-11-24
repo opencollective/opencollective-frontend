@@ -19,7 +19,6 @@ import StyledInputGroup from './StyledInputGroup';
 import StyledInputLocation from './StyledInputLocation';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
-import TimezonePicker from './TimezonePicker';
 
 const Label = ({ label, isPrivate }) => (
   <label className="text-sm font-bold">
@@ -454,16 +453,6 @@ class InputField extends React.Component {
             className={`currency ${field.className}`}
             onFocus={event => event.target.select()}
             value={value}
-          />
-        );
-        break;
-
-      case 'TimezonePicker':
-        this.input = (
-          <TimezonePicker
-            label="Timezone"
-            selectedTimezone={field.defaultValue}
-            onChange={timezone => this.handleChange(timezone.value)}
           />
         );
         break;

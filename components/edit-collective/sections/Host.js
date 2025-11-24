@@ -234,26 +234,22 @@ class Host extends React.Component {
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </StyledLink>
               {selectedOption === 'selfHost' && LoggedInUser && (
-                <Flex
-                  flexDirection={['column', 'row', 'row']}
-                  justifyContent="space-between"
-                  alignItems="flex-end"
-                  mt={3}
-                >
-                  <Box mb={3}>
+                <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div>
                     <Button
                       onClick={() => this.changeHost({ id: collective.id })}
                       loading={this.state.isSubmitting}
                       minWidth={200}
+                      size="sm"
                     >
                       <FormattedMessage
                         id="host.selfHost.confirm"
                         defaultMessage="Yes, Activate Independent Collective"
                       />
                     </Button>
-                  </Box>
+                  </div>
                   {!stripeAccount && (
-                    <Box textAlign="right">
+                    <div className="md:text-right">
                       <EditConnectedAccount
                         collective={collective}
                         service="stripe"
@@ -261,9 +257,9 @@ class Host extends React.Component {
                           redirect: `${getWebsiteUrl()}/dashboard/${collective.slug}/host?selectedOption=selfHost`,
                         }}
                       />
-                    </Box>
+                    </div>
                   )}
-                </Flex>
+                </div>
               )}
             </Box>
           </Flex>

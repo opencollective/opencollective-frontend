@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, flatten } from 'lodash';
+import { compact, flatten, orderBy } from 'lodash';
 import { Mail, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,6 +13,7 @@ import formatMemberRole from '../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import type { MemberFieldsFragment, TeamSectionQuery } from '@/lib/graphql/types/v2/graphql';
 
+import LinkCollective from '@/components/LinkCollective';
 import { DataTable } from '@/components/table/DataTable';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 import { useToast } from '@/components/ui/useToast';
@@ -83,8 +84,10 @@ const MembersTable = ({
         const isInherited = member.inherited;
         return (
           <div className="flex items-center">
-            <Avatar collective={memberAccount} radius={32} className="mr-4" />
-            {memberAccount.name}
+            <LinkCollective collective={memberAccount} className="flex items-center hover:underline">
+              <Avatar collective={memberAccount} radius={32} className="mr-4" />
+              {memberAccount.name}
+            </LinkCollective>
             {memberAccount.email && <span className="ml-1 text-slate-500">{`<${memberAccount.email}>`}</span>}
             {isInvitation && (
               <span className="ml-2 rounded-sm bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
@@ -182,6 +185,22 @@ const MembersTable = ({
   return <DataTable loading={loading} columns={columns} data={members} mobileTableView {...props} />;
 };
 
+const roleSorter = (member: MemberTableRecord) => {
+  if (member.__typename === 'MemberInvitation') {
+    return 1;
+  }
+  switch (member.role) {
+    case roles.ADMIN:
+      return 2;
+    case roles.ACCOUNTANT:
+      return 3;
+    case roles.COMMUNITY_MANAGER:
+      return 4;
+    default:
+      return 5;
+  }
+};
+
 const Team = ({ accountSlug }: DashboardSectionProps) => {
   const [showInviteModal, setShowInviteModal] = React.useState(false);
   const [showEditModal, setShowEditModal] = React.useState<MemberTableRecord | null>(null);
@@ -192,9 +211,11 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
   });
   const host = data?.account && 'host' in data.account && data.account.host;
   const injectAccount = account => member => ({ ...member, accountContext: account });
-  const members = [...(data?.account?.members?.nodes || []), ...(data?.memberInvitations || [])].map(
-    injectAccount(data?.account),
-  );
+  const members = orderBy(
+    [...(data?.account?.members?.nodes || []), ...(data?.memberInvitations || [])].map(injectAccount(data?.account)),
+    [roleSorter, 'since'],
+    ['asc', 'asc'],
+  ) as MemberTableRecord[];
   const nbAdmins = members.filter(m => m.role === roles.ADMIN && m.id).length;
   const childrenAccountsWithMembers =
     data?.account?.childrenAccounts?.nodes?.filter(child => child.members?.nodes?.length > 0) || [];

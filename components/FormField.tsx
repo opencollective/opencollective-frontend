@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { Field } from 'formik';
 import { pickBy } from 'lodash';
+import type { InputHTMLAttributes } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
@@ -45,6 +46,9 @@ export function FormField({
   privateMessage?: React.ReactNode;
   validate?: any;
   className?: string;
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
+  autoFocus?: boolean;
+  ref?: React.ForwardedRef<HTMLInputElement>;
   onFocus?: () => void;
   onChange?: (e) => void;
 }) {
@@ -72,6 +76,9 @@ export function FormField({
               required: props.required,
               error: hasError,
               placeholder,
+              autoFocus: props.autoFocus,
+              autoComplete: props.autoComplete,
+              ref: props.ref,
               onFocus: props.onFocus,
               onChange: props.onChange || field.onChange,
             },
@@ -108,7 +115,13 @@ export function FormField({
             {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
             {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
             {hasError && showError && (
-              <p className="text-sm text-red-600">{isOCError(error) ? formatFormErrorMessage(intl, error) : error}</p>
+              <p className="text-sm text-red-600">
+                {isOCError(error)
+                  ? formatFormErrorMessage(intl, error)
+                  : typeof error === 'string'
+                    ? error
+                    : JSON.stringify(error) || 'Error'}
+              </p>
             )}
           </div>
         );

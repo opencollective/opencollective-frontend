@@ -243,7 +243,6 @@ export const AVAILABLE_FEATURES = [
   'EXPENSE_SECURITY_CHECKS',
   'EXPECTED_FUNDS',
   'CHARGE_HOSTING_FEES',
-  'RESTRICTED_FUNDS',
   'AGREEMENTS',
   'TAX_FORMS',
   'OFF_PLATFORM_TRANSACTIONS',
@@ -255,30 +254,3 @@ export const AVAILABLE_FEATURES = [
   'RECEIVE_EXPENSES',
   'ACCOUNT_MANAGEMENT',
 ] as const;
-
-export const AVAILABLE_FEATURES_LABELS: Record<(typeof AVAILABLE_FEATURES)[number], string> = {
-  // Basic features (all tiers)
-  ACCOUNT_MANAGEMENT: 'Account management',
-  USE_EXPENSES: 'Submit and review expenses',
-  RECEIVE_EXPENSES: 'Manually pay expenses',
-  UPDATES: 'Updates',
-  VENDORS: 'Vendors',
-  RECEIVE_FINANCIAL_CONTRIBUTIONS: 'Crowdfunding',
-
-  // Paid tier features (Basic and Pro)
-  TRANSFERWISE: 'Pay with Wise',
-  PAYPAL_PAYOUTS: 'Pay with PayPal',
-  // ADVANCED_PERMISSIONS: 'Advanced permissions',
-  CHART_OF_ACCOUNTS: 'Chart of accounts',
-  RECEIVE_HOST_APPLICATIONS: 'Hosted collectives',
-  EXPENSE_SECURITY_CHECKS: 'Antifraud security checks',
-  EXPECTED_FUNDS: 'Expected funds',
-  CHARGE_HOSTING_FEES: 'Charge hosting fees',
-  RESTRICTED_FUNDS: 'Restricted funds',
-
-  // Pro tier features
-  AGREEMENTS: 'Agreements',
-  TAX_FORMS: 'Tax forms',
-  OFF_PLATFORM_TRANSACTIONS: 'Bank account synchronization',
-  FUNDS_GRANTS_MANAGEMENT: 'Funds & grants management',
-};
