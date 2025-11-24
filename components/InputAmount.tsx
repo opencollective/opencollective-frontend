@@ -1,9 +1,11 @@
 import React from 'react';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
+import { useIntl } from 'react-intl';
 
 import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
+import { RICH_ERROR_MESSAGES } from '@/lib/form-utils';
 import type { Currency as CurrencyEnum } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
@@ -160,6 +162,7 @@ const ConvertedAmountInput = ({
   );
 };
 
+const MAX_VALIDATION_LIMIT = 100000000000;
 /**
  * An input for amount inputs.
  */
@@ -168,7 +171,7 @@ const InputAmount = ({
   currencyDisplay = 'SYMBOL',
   name = 'amount',
   min = 0,
-  max = 100000000000,
+  max = MAX_VALIDATION_LIMIT,
   precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
   defaultValue = undefined,
   value,
@@ -194,9 +197,19 @@ const InputAmount = ({
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);
   const [isEditing, setEditing] = React.useState(false);
+  const intl = useIntl();
+
+  const minMaxValidityMsg = intl.formatMessage(
+    max !== MAX_VALIDATION_LIMIT ? RICH_ERROR_MESSAGES.notInRange : RICH_ERROR_MESSAGES.min,
+    {
+      min: (min / 100).toFixed(precision),
+      max: (max / 100).toFixed(precision),
+    },
+  );
 
   const dispatchValue = (e, parsedValue) => {
     setRawValue(e.target.value);
+    e.target.setCustomValidity('');
     if (onChange) {
       const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
       if (parsedValue === null || isNaN(parsedValue)) {
@@ -204,7 +217,12 @@ const InputAmount = ({
       } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
         onChange(isNaN(e.target.value) ? NaN : null, e);
       } else {
-        onChange(floatAmountToCents(parsedValue), e);
+        const numericValue = floatAmountToCents(parsedValue);
+        if (numericValue < min || numericValue > max) {
+          e.target.setCustomValidity(minMaxValidityMsg);
+        }
+
+        onChange(numericValue, e);
       }
     }
   };

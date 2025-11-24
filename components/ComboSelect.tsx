@@ -109,12 +109,8 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           id={props.id}
           disabled={props.disabled}
           data-cy={props['data-cy']}
-<<<<<<< HEAD
-          data-testid={props['data-testid']}
-=======
           data-testid={props['data-cy']}
           data-disabled={props.disabled ? true : undefined}
->>>>>>> origin/main
           variant="outline"
           role="combobox"
           aria-expanded={open}
