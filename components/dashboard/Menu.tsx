@@ -33,7 +33,6 @@ import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../.
 import {
   hasAccountHosting,
   hasAccountMoneyManagement,
-  isChildAccount,
   isIndividualAccount,
   isOrganizationAccount,
 } from '../../lib/collective';
@@ -137,7 +136,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isOrganization = isOrganizationAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
-  const isChild = isChildAccount(account);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
   const hasHosting = hasAccountHosting(account);
 
@@ -168,7 +166,9 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
-      if: !isIndividual && !isChild && !isCommunityManagerOnly,
+      if:
+        (isOneOfTypes(account, [COLLECTIVE, FUND]) || (isOrganization && hasMoneyManagement)) &&
+        !isCommunityManagerOnly,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
@@ -185,6 +185,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
         },
         {
+          if: !isOrganization || hasMoneyManagement, // Not for Organization without Money Management
           section: ALL_SECTIONS.EXPENSES,
           label: intl.formatMessage(
             {
@@ -268,6 +269,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
+          if: !isOrganization || hasMoneyManagement, // Not for Organization without Money Management
           label: intl.formatMessage(
             {
               id: 'hZhgoW',
@@ -435,7 +437,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if:
         !isOneOfTypes(account, [EVENT, USER]) &&
-        (account.type !== 'ORGANIZATION' || hasMoneyManagement) &&
+        (!isOrganization || hasMoneyManagement) &&
         !isAccountantOnly &&
         !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,

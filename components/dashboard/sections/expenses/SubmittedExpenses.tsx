@@ -108,7 +108,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
           description={
-            <FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." id="aKfm6V" />
+            <FormattedMessage defaultMessage="Expenses that you have submitted to other accounts." id="aKfm6V" />
           }
           actions={
             hasNewSubmitExpenseFlow ? (
