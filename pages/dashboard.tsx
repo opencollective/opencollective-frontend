@@ -26,22 +26,18 @@ import {
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
-import { getMenuItems } from '../components/dashboard/Menu';
 import { adminPanelQuery } from '../components/dashboard/queries';
-import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
 import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 import Header from '@/components/Header';
-import { cn } from '@/lib/utils';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -239,7 +235,6 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
   return (
@@ -256,19 +251,17 @@ const DashboardPage = () => {
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
+      <Header
+        title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
+        noRobots
+        collective={account}
+        withTopBar={false}
+      />
       <SidebarProvider>
-        <DashboardSidebar menuItems={menuItems} isLoading={isLoading} />
-        <div className="flex flex-1 flex-col">
+        <DashboardSidebar isLoading={isLoading} />
+        <SidebarInset>
           <DashboardTopbar />
-          <Header
-            title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
-            noRobots
-            collective={account}
-            withTopBar={false}
-          />
-          <main className="flex-1 px-6">
-            {/* <SidebarInset className="px-6"> */}
-
+          <div className="flex-1 px-6">
             {Boolean(notification) && <NotificationBar {...notification} />}
             {blocker ? (
               <div className="my-32 flex flex-col items-center">
@@ -287,7 +280,6 @@ const DashboardPage = () => {
                 className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
                 data-cy="admin-panel-container"
               >
-                {/* <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} /> */}
                 {LoggedInUser &&
                 require2FAForAdmins(account) &&
                 !LoggedInUser.hasTwoFactorAuth &&
@@ -305,11 +297,9 @@ const DashboardPage = () => {
                 )}
               </div>
             )}
-          </main>
+          </div>
           <Footer isDashboard />
-
-          {/* </SidebarInset> */}
-        </div>
+        </SidebarInset>
       </SidebarProvider>
     </DashboardContext.Provider>
   );

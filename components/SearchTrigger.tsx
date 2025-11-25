@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+
 import { Button } from './ui/Button';
 
 const SearchTrigger = ({ setShowSearchModal }) => {

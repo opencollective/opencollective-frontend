@@ -4,7 +4,7 @@ import { Github } from '@styled-icons/fa-brands/Github';
 import { Linkedin } from '@styled-icons/fa-brands/Linkedin';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
+import { ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { cn, parseToBoolean } from '../../lib/utils';
@@ -17,7 +17,6 @@ import { LanguageSwitcher } from '../LanguageSwitcher';
 import Link from '../Link';
 
 import { legacyFooterItems, newFooterItems } from './menu-items';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
 
 const SocialLink = ({ href, children, ...props }) => (
   <Link
@@ -67,48 +66,6 @@ const Footer = ({ className, isDashboard }: { className?: string; isDashboard?: 
   const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
 
   const footerItems = usingNewPricing ? newFooterItems : legacyFooterItems;
-
-  if (false) {
-    return (
-      <footer className="-mx-6 grid w-full grid-cols-[1fr_minmax(auto,var(--breakpoint-xl))_minmax(auto,1fr)] items-center border-t py-8">
-        <div />
-
-        <div className="flex items-center justify-between gap-4">
-          <Link href="/home">
-            <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" height={28} width={167} />
-          </Link>
-          {footerItems.map((item, i) => {
-            if (item.items) {
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <div key={i}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="max-w-content group flex items-center text-sm hover:text-foreground">
-                      {intl.formatMessage(item.label)}
-                      <ChevronDown
-                        className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
-                        aria-hidden="true"
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {item.items.map(subItem => (
-                        <Link key={subItem.href} href={subItem.href}>
-                          <DropdownMenuItem className="cursor-pointer">
-                            {intl.formatMessage(subItem.label)}
-                          </DropdownMenuItem>
-                        </Link>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              );
-            }
-          })}
-          <LanguageSwitcher />
-        </div>
-      </footer>
-    );
-  }
 
   return (
     <footer className={cn('border-t bg-background px-6 pt-16 pb-12 antialiased lg:px-8', className)}>

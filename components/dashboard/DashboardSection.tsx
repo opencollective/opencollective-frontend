@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { cx } from 'class-variance-authority';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -114,7 +113,6 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
   [SECTIONS.ACCOUNTS]: Accounts,
-  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
   [SECTIONS.SEARCH]: Search,
 };
 
@@ -122,6 +120,7 @@ const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
+  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
 };
 
 const ROOT_COMPONENTS = {
@@ -202,7 +201,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      <div className="w-full max-w-(--breakpoint-lg)">
+      <div className="mx-auto w-full max-w-(--breakpoint-md)">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
@@ -210,7 +209,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-(--breakpoint-lg)">
+      <div className="mx-auto w-full max-w-(--breakpoint-md)">
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}

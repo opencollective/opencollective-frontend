@@ -1,4 +1,5 @@
 import React from 'react';
+import { cx } from 'class-variance-authority';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-react';
 import memoizeOne from 'memoize-one';
@@ -13,8 +14,8 @@ import { cn } from '@/lib/utils';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
-import { P, Span } from '../Text';
 import { Button } from '../ui/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +23,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/Sidebar';
 
 import { ROOT_PROFILE_KEY } from './constants';
-import { cx } from 'class-variance-authority';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/Sidebar';
 
 const CREATE_NEW_LINKS = {
   ORGANIZATION: '/signup/organization',
@@ -122,7 +122,7 @@ const Option = ({
 };
 
 const RootOption = () => (
-  <div className="flex items-center gap-3">
+  <div className="flex items-center gap-2">
     <UserCog size={24} className="shrink-0 text-slate-600" />
     <div className="flex min-w-0 flex-col overflow-hidden">
       <span className="truncate text-sm font-medium">Platform Admin</span>
@@ -130,18 +130,28 @@ const RootOption = () => (
   </div>
 );
 
-const MenuEntry = ({ account, activeSlug, handleClose }: { account: any; activeSlug: string }) => {
-  const [expanded, setExpanded] = React.useState(false);
-  const isActive = activeSlug === account.slug;
+const MenuEntry = ({
+  account,
+  activeSlug,
+  handleClose,
+}: {
+  account: any;
+  activeSlug: string;
+  handleClose: () => void;
+}) => {
+  const hasActiveChild = !!account.children?.some(child => child.slug === activeSlug);
+  const [expanded, setExpanded] = React.useState(hasActiveChild);
+  const isActive = activeSlug === account.slug || (hasActiveChild && !expanded);
 
+  React.useEffect(() => {
+    if (hasActiveChild) {
+      setExpanded(true);
+    }
+  }, [hasActiveChild]);
   return (
-    <React.Fragment>
+    <Collapsible open={expanded} onOpenChange={setExpanded}>
       <DropdownMenuItem
-        // className={cn(
-        //   'flex items-center justify-between rounded-lg px-2 py-2 text-sm font-medium',
-        //   isActive && 'bg-slate-100',
-        //   !isActive && 'hover:bg-slate-100',
-        // )}
+        className={cn(isActive && 'bg-slate-100')}
         onSelect={e => {
           // Prevent navigation only if clicking the expand button
           const target = e.target as HTMLElement;
@@ -161,45 +171,36 @@ const MenuEntry = ({ account, activeSlug, handleClose }: { account: any; activeS
           <Option collective={account} className="flex-1" />
         </Link>
         {account.children?.length > 0 && (
-          <Button
-            data-expand-button
-            variant="ghost"
-            size="icon-xs"
-            className="ml-2 h-6 w-6 shrink-0 text-slate-400 hover:text-slate-600"
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              setExpanded(!expanded);
-            }}
-          >
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </Button>
+          <CollapsibleTrigger asChild>
+            <Button
+              data-expand-button
+              variant="ghost"
+              size="icon-xs"
+              className="ml-2 h-6 w-6 shrink-0 text-slate-400 hover:text-slate-600"
+            >
+              {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </Button>
+          </CollapsibleTrigger>
         )}
       </DropdownMenuItem>
-      {expanded &&
-        account.children
-          ?.slice() // Create a copy to that we can sort the otherwise immutable array
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map(child => {
-            const childIsActive = activeSlug === child.slug;
-            return (
-              <DropdownMenuItem
-                key={child.id}
-                asChild
-                className="pl-6"
-                // className={cn(
-                //   'ml-4 flex items-center rounded-lg px-2 py-2 text-sm font-medium',
-                //   childIsActive && 'bg-slate-100',
-                //   !childIsActive && 'hover:bg-slate-100',
-                // )}
-              >
-                <Link href={`/dashboard/${child.slug}`} title={child.name} shallow onClick={handleClose}>
-                  <Option collective={child} isChild />
-                </Link>
-              </DropdownMenuItem>
-            );
-          })}
-    </React.Fragment>
+      {account.children?.length > 0 && (
+        <CollapsibleContent className="m-0 p-0">
+          {account.children
+            ?.slice() // Create a copy to that we can sort the otherwise immutable array
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map(child => {
+              const isChildActive = activeSlug === child.slug;
+              return (
+                <DropdownMenuItem key={child.id} asChild className={cn('pl-6', isChildActive && 'bg-slate-100')}>
+                  <Link href={`/dashboard/${child.slug}`} title={child.name} shallow onClick={handleClose}>
+                    <Option collective={child} isChild />
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
+        </CollapsibleContent>
+      )}
+    </Collapsible>
   );
 };
 
@@ -214,11 +215,13 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
   const handleClose = () => setOpen(false);
+  const { isMobile, state } = useSidebar();
 
+  const desktopSidebarCollapsed = !isMobile && state === 'collapsed';
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
               {activeSlug === ROOT_PROFILE_KEY ? <RootOption /> : <Option collective={activeAccount} isDisplay />}
@@ -226,17 +229,16 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="max-h-[70vh] w-(--radix-dropdown-menu-trigger-width) overflow-y-auto"
+            className={cx(
+              'max-h-[70vh] overflow-y-auto',
+              desktopSidebarCollapsed ? 'w-60' : 'w-(--radix-dropdown-menu-trigger-width)',
+            )}
             align="start"
             sideOffset={8}
           >
             <DropdownMenuItem
               asChild
-              // className={cn(
-              //   'flex items-center rounded-lg px-2 py-2 text-sm font-medium',
-              //   activeSlug === loggedInUserCollective?.slug && 'bg-slate-100',
-              //   activeSlug !== loggedInUserCollective?.slug && 'hover:bg-slate-100',
-              // )}
+              className={cn(activeSlug === loggedInUserCollective?.slug && 'bg-slate-100')}
               onSelect={handleClose}
             >
               <Link
@@ -249,14 +251,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
               </Link>
             </DropdownMenuItem>
             {LoggedInUser?.isRoot && (
-              <DropdownMenuItem
-                asChild
-                // className={cn(
-                //   '-mt-4 flex items-center rounded-lg px-2 py-2 text-sm font-medium',
-                //   activeSlug === ROOT_PROFILE_KEY && 'bg-slate-100',
-                //   activeSlug !== ROOT_PROFILE_KEY && 'hover:bg-slate-100',
-                // )}
-              >
+              <DropdownMenuItem asChild className={cn(activeSlug === ROOT_PROFILE_KEY && 'bg-slate-100')}>
                 <Link
                   href={`/dashboard/${ROOT_PROFILE_KEY}/all-collectives`}
                   title="Platform Admin"
@@ -269,8 +264,8 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
             )}
             {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
               return (
-                <div key={collectiveType}>
-                  <div className="mb-1 flex items-center gap-2 px-1">
+                <div key={collectiveType} className="mt-2 mb-1">
+                  <div className="flex items-center gap-2 px-1">
                     <span className="text-xs font-medium whitespace-nowrap text-muted-foreground uppercase">
                       <FormattedMessage
                         id="AccountSwitcher.Category.Titles"

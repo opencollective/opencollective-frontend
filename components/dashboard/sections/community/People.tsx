@@ -248,7 +248,9 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
 
   if (!isEmpty(id)) {
     return (
-      <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
+      <div className="max-w-(--breakpoint-lg)">
+        <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
+      </div>
     );
   }
 

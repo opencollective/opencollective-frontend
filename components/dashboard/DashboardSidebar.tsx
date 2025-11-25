@@ -1,23 +1,32 @@
 import * as React from 'react';
-import { ChevronDown, LifeBuoy, Telescope } from 'lucide-react';
+import { cx } from 'class-variance-authority';
+import type { LucideIcon } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, Globe2, LifeBuoy, Telescope } from 'lucide-react';
 import { useIntl } from 'react-intl';
-import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu';
 
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { getDashboardRoute } from '@/lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
+import { cn } from '@/lib/utils';
 
 import Link from '../Link';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '../ui/DropdownMenu';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
@@ -28,26 +37,9 @@ import { useWorkspace } from '../WorkspaceProvider';
 
 import AccountSwitcher from './AccountSwitcher';
 import { DashboardContext } from './DashboardContext';
-import type { MenuItem } from './Menu';
-import { getMenuItems } from './Menu';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '../ui/DropdownMenu';
-import { cn } from '@/lib/utils';
-import { cx } from 'class-variance-authority';
+import { getMenuItems } from './menu-items';
 
-type AppSidebarProps = {
-  menuItems: MenuItem[];
-  isLoading: boolean;
-  useLegacy?: boolean;
-  variant?: 'inset' | 'sidebar' | 'floating';
-};
-
-export function DashboardSidebar({ variant = 'sidebar' }: AppSidebarProps) {
+export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   const { workspace } = useWorkspace();
   const { account, selectedSection, subpath } = React.useContext(DashboardContext);
   const activeSlug = workspace?.slug;
@@ -62,7 +54,7 @@ export function DashboardSidebar({ variant = 'sidebar' }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar variant={variant} collapsible="icon">
+    <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -78,64 +70,117 @@ export function DashboardSidebar({ variant = 'sidebar' }: AppSidebarProps) {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems?.map(item => {
-                  // Handle group items (with sub-menu)
-                  if (item.type === 'group') {
-                    return <DashboardSidebarMenuGroup item={item} isSectionActive={isSectionActive} />;
-                  }
+                {isLoading
+                  ? [...Array(6)].map((_, i) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <SidebarMenuSkeleton key={i} />
+                    ))
+                  : menuItems
+                    ? menuItems.map(item => {
+                        // Handle group items (with sub-menu)
+                        if (item.type === 'group') {
+                          return (
+                            <DashboardSidebarMenuGroup key={item.label} item={item} isSectionActive={isSectionActive} />
+                          );
+                        }
 
-                  // Handle regular page items
-                  return (
-                    <SidebarMenuItem key={item.section}>
-                      <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                        <Link href={getDashboardRoute(account, item.section)} shallow>
-                          {item.Icon && <item.Icon />}
-                          <span>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
+                        // Handle regular page items
+                        return (
+                          <SidebarMenuItem key={item.section}>
+                            <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
+                              <Link href={getDashboardRoute(account, item.section)} shallow>
+                                {item.Icon && <item.Icon />}
+                                <span>{item.label}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })
+                    : null}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </div>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
+            {account?.type !== 'ROOT' && (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                >
+                  <SidebarLink
+                    href={getCollectivePageRoute(account)}
+                    Icon={Globe2}
+                    label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+                    data-cy="public-profile-link"
+                    external
+                  />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={false}>
-                <Link href={'/search'}>
-                  <Telescope />
-                  <span>Explore</span>
-                </Link>
+              <SidebarMenuButton asChild tooltip={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })}>
+                <SidebarLink
+                  href={'/search'}
+                  Icon={Telescope}
+                  label={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })}
+                  external
+                />
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={false}>
-                <Link href={'/help'}>
-                  <LifeBuoy />
-                  <span>Help & Support</span>
-                </Link>
+              <SidebarMenuButton
+                asChild
+                tooltip={intl.formatMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' })}
+              >
+                <SidebarLink
+                  href={'/help'}
+                  Icon={LifeBuoy}
+                  label={intl.formatMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' })}
+                  external
+                />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      {/* <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton>
-                <User />
-                <span>Account</span>
-                <ChevronDown className="ml-auto" />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter> */}
       <SidebarRail />
     </Sidebar>
+  );
+}
+
+function SidebarLink({
+  href,
+  label,
+  Icon,
+  external,
+  className,
+  ...props
+}: {
+  href: string;
+  label: string;
+  Icon?: LucideIcon;
+  external?: boolean;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn('group/sidebar-link', className)}
+      target={external ? '_blank' : undefined}
+      {...props}
+    >
+      {Icon && <Icon />}
+      <span>{label}</span>
+      {external && (
+        <ArrowUpRight
+          className="absolute right-2 text-slate-700 opacity-0 transition-opacity group-hover/sidebar-link:opacity-100 [[data-state=collapsed]_&]:hidden"
+          size={14}
+        />
+      )}
+    </Link>
   );
 }
 
@@ -175,6 +220,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive }) {
                 <DropdownMenuLabel className="text-xs font-medium">{item.label}</DropdownMenuLabel>
                 {item.subMenu.map(subItem => (
                   <DropdownMenuItem
+                    key={subItem.section}
                     asChild
                     className={cx(isSectionActive(subItem.section) && 'font-medium text-sidebar-accent-foreground')}
                   >
