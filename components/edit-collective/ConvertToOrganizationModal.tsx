@@ -58,7 +58,7 @@ export function ConvertToOrganizationModal({ open, setOpen, collective }: Conver
         await convertToOrganization({
           variables: {
             account: getAccountReferenceInput(collective),
-            activateMoneyManagement: true,
+            hasMoneyManagement: true,
             legalName: values.legalName,
           },
           context: API_V2_CONTEXT,
