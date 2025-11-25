@@ -39,7 +39,7 @@
     "@radix-ui/react-slot": "1.2.0",
     "@radix-ui/react-switch": "1.1.4",
     "@radix-ui/react-tabs": "1.1.4",
-    "@radix-ui/react-toast": "1.2.7",
+    "@radix-ui/react-toast": "1.2.15",
     "@radix-ui/react-tooltip": "1.2.0",
     "@sentry/browser": "^7.84.0",
     "@sentry/nextjs": "^7.84.0",
