@@ -174,7 +174,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
-      if: !isIndividual && !(isOrganization && !hasMoneyManagement && !isCommunityManagerOnly),
+      if: !isIndividual && !(isOrganization && !hasMoneyManagement) && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
       Icon: Receipt,
@@ -185,7 +185,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
         },
         {
-          if: !isOrganization || hasMoneyManagement, // Not for Organization without Money Management
+          // if: !isOrganization || hasMoneyManagement, // Not for Organization without Money Management
           section: ALL_SECTIONS.EXPENSES,
           label: intl.formatMessage(
             {
@@ -246,7 +246,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isIndividual || (isOrganization && !hasMoneyManagement),
+      if: isIndividual || (isOrganization && !hasMoneyManagement && !isCommunityManagerOnly),
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
@@ -269,7 +269,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
-          if: !isOrganization || hasMoneyManagement, // Not for Organization without Money Management
+          // if: !isOrganization || hasMoneyManagement, // Not for Organization without Money Management
           label: intl.formatMessage(
             {
               id: 'hZhgoW',
