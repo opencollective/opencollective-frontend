@@ -37,7 +37,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
                 <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
               </Badge>
             )}
-            {!account.isActive && (
+            {account.isArchived && (
               <Badge size="sm">
                 <FormattedMessage id="Archived" defaultMessage="Archived" />
               </Badge>
