@@ -87,7 +87,10 @@ export type Account = {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -917,7 +920,7 @@ export type AccountWithParent = {
   parent?: Maybe<Account>;
 };
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscription = {
   legacyPlan: HostPlan;
   platformBilling: PlatformBilling;
@@ -926,7 +929,7 @@ export type AccountWithPlatformSubscription = {
 };
 
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
   billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
@@ -1041,6 +1044,8 @@ export enum ActivityAndClassesType {
   ACCOUNTING_CATEGORIES_EDITED = 'ACCOUNTING_CATEGORIES_EDITED',
   ACTIVATED_COLLECTIVE_AS_HOST = 'ACTIVATED_COLLECTIVE_AS_HOST',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT = 'ACTIVATED_COLLECTIVE_AS_INDEPENDENT',
+  ACTIVATED_HOSTING = 'ACTIVATED_HOSTING',
+  ACTIVATED_MONEY_MANAGEMENT = 'ACTIVATED_MONEY_MANAGEMENT',
   ACTIVITIES_UPDATES = 'ACTIVITIES_UPDATES',
   ACTIVITY_ALL = 'ACTIVITY_ALL',
   ADDED_FUNDS_EDITED = 'ADDED_FUNDS_EDITED',
@@ -1116,6 +1121,8 @@ export enum ActivityAndClassesType {
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
+  DEACTIVATED_HOSTING = 'DEACTIVATED_HOSTING',
+  DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSES = 'EXPENSES',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
   FUND_EVENTS = 'FUND_EVENTS',
@@ -1236,6 +1243,8 @@ export enum ActivityType {
   ACCOUNTING_CATEGORIES_EDITED = 'ACCOUNTING_CATEGORIES_EDITED',
   ACTIVATED_COLLECTIVE_AS_HOST = 'ACTIVATED_COLLECTIVE_AS_HOST',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT = 'ACTIVATED_COLLECTIVE_AS_INDEPENDENT',
+  ACTIVATED_HOSTING = 'ACTIVATED_HOSTING',
+  ACTIVATED_MONEY_MANAGEMENT = 'ACTIVATED_MONEY_MANAGEMENT',
   ACTIVITY_ALL = 'ACTIVITY_ALL',
   ADDED_FUNDS_EDITED = 'ADDED_FUNDS_EDITED',
   ADDED_FUND_TO_ORG = 'ADDED_FUND_TO_ORG',
@@ -1308,6 +1317,8 @@ export enum ActivityType {
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
+  DEACTIVATED_HOSTING = 'DEACTIVATED_HOSTING',
+  DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
@@ -1580,7 +1591,10 @@ export type Bot = Account & {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -2110,7 +2124,10 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -4210,7 +4227,10 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -5486,7 +5506,10 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -6125,7 +6148,10 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   isFirstPartyHost: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -7204,7 +7230,10 @@ export type Individual = Account & {
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   isGuest: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -8058,6 +8087,8 @@ export type Mutation = {
   editMember: Member;
   /** Edit an existing member invitation of the Collective. Scope: "account". */
   editMemberInvitation?: Maybe<MemberInvitation>;
+  /** Convert an account to an Organization. Scope: "account". */
+  editOrganizationMoneyManagementAndHosting: Organization;
   editPayoutMethod: PayoutMethod;
   /** To edit a pending order. Scope: "orders". */
   editPendingOrder: Order;
@@ -8342,8 +8373,8 @@ export type MutationConnectPlaidAccountArgs = {
 /** This is the root mutation */
 export type MutationConvertAccountToOrganizationArgs = {
   account: AccountReferenceInput;
-  activateHosting?: InputMaybe<Scalars['Boolean']['input']>;
-  activateMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
+  hasMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
+  legalName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -8779,6 +8810,14 @@ export type MutationEditMemberInvitationArgs = {
   memberAccount: AccountReferenceInput;
   role?: InputMaybe<MemberRole>;
   since?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationEditOrganizationMoneyManagementAndHostingArgs = {
+  hasHosting?: InputMaybe<Scalars['Boolean']['input']>;
+  hasMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
+  organization: AccountReferenceInput;
 };
 
 
@@ -9734,6 +9773,10 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   feed?: Maybe<Array<Maybe<Activity>>>;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']['output']>;
+  /** Returns whether the account has hosting activated. */
+  hasHosting: Scalars['Boolean']['output'];
+  /** Returns whether the account has money management activated. */
+  hasMoneyManagement: Scalars['Boolean']['output'];
   /** Returns true if the account has started the process to resume contributions */
   hasResumeContributionsProcessStarted: Scalars['Boolean']['output'];
   /** If the organization is a host account, this will return the matching Host object */
@@ -9750,7 +9793,10 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -11084,7 +11130,10 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -13483,7 +13532,10 @@ export type Vendor = Account & AccountWithContributions & {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
