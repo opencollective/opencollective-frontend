@@ -1,13 +1,15 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
+import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
-import { sortTiersForCollective } from '../../../lib/tier-utils';
+import { sortTiersForCollective, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
+import { EMPTY_ARRAY } from '@/lib/constants/utils';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
@@ -25,35 +27,34 @@ import { listTierQuery } from '../tiers/EditTierModal';
 
 const getSortedContributeCards = (collective, tiers, intl) => {
   const sortedTiers = sortTiersForCollective(collective, tiers);
-
-  const sortedContributeCards = sortedTiers.map(tier =>
-    tier === 'custom'
-      ? {
-          key: 'custom',
-          Component: ContributeCustom,
-          componentProps: {
-            collective,
-            hideContributors: true,
-            hideCTA: true,
-            missingCTAMsg: intl.formatMessage({
-              defaultMessage: 'The default contribution tier cannot be edited.',
-              id: 'setJlw',
-            }),
-          },
-        }
-      : {
-          key: tier.id,
-          Component: ContributeTier,
-          componentProps: {
-            collective,
-            tier,
-            hideContributors: true,
-            hideCTA: true,
-          },
+  return sortedTiers.map(tier => {
+    if (tier === 'custom') {
+      return {
+        key: 'custom',
+        Component: ContributeCustom,
+        componentProps: {
+          collective,
+          hideContributors: true,
+          hideCTA: true,
+          missingCTAMsg: intl.formatMessage({
+            defaultMessage: 'The default contribution tier cannot be edited.',
+            id: 'setJlw',
+          }),
         },
-  );
-
-  return sortedContributeCards;
+      };
+    } else {
+      return {
+        key: tier.legacyId,
+        Component: ContributeTier,
+        componentProps: {
+          collective,
+          tier,
+          hideContributors: true,
+          hideCTA: true,
+        },
+      };
+    }
+  });
 };
 
 const CardsContainer = styled(Grid).attrs({
@@ -72,10 +73,38 @@ const CardsContainer = styled(Grid).attrs({
  * to replace the old tiers form.
  */
 const Tiers = ({ collective }) => {
+  const [draggingId, setDraggingId] = React.useState(null);
+  const [error, setError] = React.useState(null);
+
   const variables = { accountSlug: collective.slug };
-  const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
+  const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
+  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {
+    context: API_V2_CONTEXT,
+  });
   const intl = useIntl();
-  const tiers = get(data, 'account.tiers.nodes', []);
+  const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);
+  const contributeCards = React.useMemo(
+    () => getSortedContributeCards(collective, tiers, intl),
+    [collective, tiers, intl],
+  );
+
+  const onTiersReorder = async cards => {
+    const cardKeys = cards.map(c => c.key);
+
+    setError(null);
+    try {
+      await editAccountSettings({
+        variables: {
+          account: { legacyId: collective.id },
+          key: TIERS_ORDER_KEY,
+          value: cardKeys,
+        },
+      });
+    } catch (e) {
+      setError(getErrorFromGraphqlException(e));
+    }
+  };
+
   return (
     <div>
       <Grid gridTemplateColumns={['1fr', '172px 1fr']} gridGap={62} mt={34}>
@@ -111,10 +140,11 @@ const Tiers = ({ collective }) => {
       <Box my={4}>
         {loading ? (
           <LoadingPlaceholder height={500} width="100%" />
-        ) : error ? (
-          <MessageBoxGraphqlError error={error} />
+        ) : queryError ? (
+          <MessageBoxGraphqlError error={queryError} />
         ) : (
           <div>
+            {error && <MessageBoxGraphqlError mb={5} error={error} />}
             <Box mb={4}>
               <P fontSize="14px" lineHeight="20x" mb={3}>
                 <FormattedMessage
@@ -137,6 +167,7 @@ const Tiers = ({ collective }) => {
                     defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
                     width="auto"
                     isLoading={loading}
+                    disabled={isSubmitting}
                     onChange={({ target }) => {
                       editSettings({
                         variables: {
@@ -153,11 +184,15 @@ const Tiers = ({ collective }) => {
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
-              cards={getSortedContributeCards(collective, tiers, intl)}
-              CardsContainer={CardsContainer}
-              useTierModals
-              enableReordering={false}
+              cards={contributeCards}
+              CardsContainer={CardsContainer as any}
+              enableReordering={true}
               onTierUpdate={() => refetch()}
+              onReorder={onTiersReorder}
+              draggingId={draggingId}
+              setDraggingId={setDraggingId}
+              isSaving={isSubmitting}
+              canEdit
             />
           </div>
         )}

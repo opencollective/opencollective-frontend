@@ -70,3 +70,6 @@ export const CollectiveTagsCategories = invert(CollectiveCategory);
 export const AVATAR_WIDTH_RANGE = [200, 3000] as const;
 export const AVATAR_HEIGHT_RANGE = [200, 3000] as const;
 export const IGNORED_TAGS = ['community', 'user'] as const;
+
+export const PROJECTS_ORDER_KEY = 'collectivePage.projectsOrder';
+export const CONNECTED_COLLECTIVES_ORDER_KEY = 'collectivePage.connectedCollectivesOrder';
