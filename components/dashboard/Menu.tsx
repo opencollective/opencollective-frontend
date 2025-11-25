@@ -160,7 +160,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_RESULTS_PAGE),
     },
     {
-      if: isIndividual,
+      if: isIndividual || (isOrganization && !hasMoneyManagement && !isCommunityManagerOnly),
       section: ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
@@ -174,7 +174,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
-      if: !isIndividual && !isCommunityManagerOnly,
+      if: !isIndividual && !(isOrganization && !hasMoneyManagement && !isCommunityManagerOnly),
       type: 'group',
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
       Icon: Receipt,
@@ -246,7 +246,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isIndividual && !isCommunityManagerOnly,
+      if: isIndividual || (isOrganization && !hasMoneyManagement),
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
@@ -258,7 +258,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BookUserIcon,
     },
     {
-      if: !isIndividual && !isCommunityManagerOnly,
+      if: !isIndividual && !(isOrganization && !hasMoneyManagement) && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
