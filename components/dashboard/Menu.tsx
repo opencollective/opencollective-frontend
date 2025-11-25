@@ -372,7 +372,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !hasHosting && !isIndividual && !isCommunityManagerOnly,
+      if: !hasHosting && !isIndividual && !(isOrganization && !hasMoneyManagement) && !isCommunityManagerOnly,
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
