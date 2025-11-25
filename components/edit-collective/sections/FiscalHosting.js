@@ -141,13 +141,6 @@ const FiscalHosting = ({ collective }) => {
       onConfirm: async () => {
         if (activate) {
           await activateAsFiscalEntity({ variables: { id } });
-          await toggleHostAccountsSetting({
-            variables: {
-              account: { legacyId: id },
-              key: 'canHostAccounts',
-              enabled: false,
-            },
-          });
         } else {
           await deactivateAsFiscalEntity({ variables: { id } });
         }
