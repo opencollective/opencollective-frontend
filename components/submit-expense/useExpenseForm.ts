@@ -696,7 +696,8 @@ function buildFormSchema(
       }, requiredMessage)
       .refine(
         accountSlug =>
-          accountSlug && (!options.supportedExpenseTypes || supportsBaseExpenseTypes(options.supportedExpenseTypes)),
+          accountSlug &&
+          (values.expenseTypeOption === ExpenseType.GRANT || supportsBaseExpenseTypes(options.supportedExpenseTypes)),
         () => ({
           message: intl.formatMessage({
             defaultMessage: 'The selected account does not support expense submissions.',
@@ -1424,7 +1425,19 @@ async function buildFormOptions(
 
     if (account?.supportedExpenseTypes) {
       options.supportedExpenseTypes = account.supportedExpenseTypes;
-      if (!supportsBaseExpenseTypes(options.supportedExpenseTypes) && !query.loading) {
+      if (
+        values.expenseTypeOption === ExpenseType.GRANT &&
+        account.type === CollectiveType.FUND &&
+        !options.supportedExpenseTypes.includes(ExpenseType.GRANT)
+      ) {
+        options.supportedExpenseTypes.push(ExpenseType.GRANT);
+      }
+
+      if (
+        values.expenseTypeOption !== ExpenseType.GRANT &&
+        !supportsBaseExpenseTypes(options.supportedExpenseTypes) &&
+        !query.loading
+      ) {
         options.hasInvalidAccount = true;
       }
     }

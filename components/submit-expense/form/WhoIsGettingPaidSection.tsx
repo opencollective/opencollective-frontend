@@ -335,7 +335,7 @@ const VendorOption = React.memo(function VendorOption(props: {
   expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
 }) {
   const { LoggedInUser } = useLoggedInUser();
-  const isHostAdmin = LoggedInUser.isAdminOfCollective(props.host);
+  const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
   const isVendorSelected =
