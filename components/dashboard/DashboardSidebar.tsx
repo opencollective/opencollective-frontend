@@ -88,7 +88,11 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                         return (
                           <SidebarMenuItem key={item.section}>
                             <SidebarMenuButton asChild isActive={isSectionActive(item.section)} tooltip={item.label}>
-                              <Link href={getDashboardRoute(account, item.section)} shallow>
+                              <Link
+                                href={getDashboardRoute(account, item.section)}
+                                data-cy={`menu-item-${item.section}`}
+                                shallow
+                              >
                                 {item.Icon && <item.Icon />}
                                 <span>{item.label}</span>
                               </Link>
@@ -166,12 +170,7 @@ function SidebarLink({
   className?: string;
 }) {
   return (
-    <Link
-      href={href}
-      className={cn('group/sidebar-link', className)}
-      target={external ? '_blank' : undefined}
-      {...props}
-    >
+    <Link href={href} className={cn('group/sidebar-link', className)} {...props}>
       {Icon && <Icon />}
       <span>{label}</span>
       {external && (
@@ -196,7 +195,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive }) {
   const isRootItemActive = hasActiveSubItem && (!open || desktopSidebarCollapsed);
 
   const trigger = (
-    <SidebarMenuButton isActive={isRootItemActive} tooltip={item.label}>
+    <SidebarMenuButton isActive={isRootItemActive} tooltip={item.label} data-cy={`menu-item-${item.label}`}>
       {item.Icon && <item.Icon />}
       <span>{item.label}</span>
       <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
@@ -240,7 +239,11 @@ function DashboardSidebarMenuGroup({ item, isSectionActive }) {
             {item.subMenu?.map(subItem => (
               <SidebarMenuSubItem key={subItem.section}>
                 <SidebarMenuSubButton asChild isActive={isSectionActive(subItem.section)}>
-                  <Link href={getDashboardRoute(account, subItem.section)} shallow>
+                  <Link
+                    href={getDashboardRoute(account, subItem.section)}
+                    shallow
+                    data-cy={`menu-item-${subItem.section}`}
+                  >
                     <span>{subItem.label}</span>
                   </Link>
                 </SidebarMenuSubButton>

@@ -31,7 +31,7 @@ describe('host dashboard', () => {
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
       cy.get('[data-cy="menu-item-Hosting"]').click();
-      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').should('be.visible').click();
       cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
@@ -56,7 +56,7 @@ describe('host dashboard', () => {
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="menu-item-Hosting"]').click();
-      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').should('be.visible').click();
       cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
@@ -88,7 +88,7 @@ describe('host dashboard', () => {
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="menu-item-Hosting"]').click();
-      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').should('be.visible').click();
       cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
