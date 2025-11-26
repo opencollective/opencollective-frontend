@@ -73,14 +73,7 @@ enum ContributionsTab {
 }
 
 const dashboardContributionsMetadataQuery = gql`
-  query DashboardContributionsMetadata(
-    $slug: String!
-    $filter: AccountOrdersFilter!
-    $onlyExpectedFunds: Boolean!
-    $expectedFundsFilter: ExpectedFundsFilter
-    $includeHostedAccounts: Boolean!
-    $includeChildrenAccounts: Boolean
-  ) {
+  query DashboardContributionsMetadata($slug: String!) {
     account(slug: $slug) {
       id
       legacyId
@@ -133,12 +126,26 @@ const dashboardContributionsMetadataQuery = gql`
           hostFeePercent
         }
       }
+    }
+  }
+`;
+
+const dashboardContributionsViewCountQuery = gql`
+  query DashboardContributionsViewCount(
+    $slug: String!
+    $filter: AccountOrdersFilter!
+    $onlyExpectedFunds: Boolean!
+    $expectedFundsFilter: ExpectedFundsFilter
+    $hostContext: HostContext
+  ) {
+    account(slug: $slug) {
+      id
 
       PENDING: orders(
         filter: $filter
         expectedFundsFilter: $expectedFundsFilter
         status: [PENDING]
-        includeHostedAccounts: $includeHostedAccounts
+        hostContext: $hostContext
       ) @include(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -146,7 +153,7 @@ const dashboardContributionsMetadataQuery = gql`
         filter: $filter
         expectedFundsFilter: $expectedFundsFilter
         status: [EXPIRED]
-        includeHostedAccounts: $includeHostedAccounts
+        hostContext: $hostContext
       ) @include(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -155,8 +162,7 @@ const dashboardContributionsMetadataQuery = gql`
         frequency: [MONTHLY, YEARLY]
         status: [ACTIVE, ERROR]
         includeIncognito: true
-        includeHostedAccounts: $includeHostedAccounts
-        includeChildrenAccounts: $includeChildrenAccounts
+        hostContext: $hostContext
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -164,7 +170,7 @@ const dashboardContributionsMetadataQuery = gql`
         filter: $filter
         includeIncognito: true
         status: [PAID]
-        includeHostedAccounts: $includeHostedAccounts
+        hostContext: $hostContext
         expectedFundsFilter: $expectedFundsFilter
       ) @include(if: $onlyExpectedFunds) {
         totalCount
@@ -175,8 +181,7 @@ const dashboardContributionsMetadataQuery = gql`
         status: [PAID, PROCESSING]
         includeIncognito: true
         minAmount: 1
-        includeHostedAccounts: $includeHostedAccounts
-        includeChildrenAccounts: $includeChildrenAccounts
+        hostContext: $hostContext
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -185,46 +190,32 @@ const dashboardContributionsMetadataQuery = gql`
         status: [CANCELLED]
         includeIncognito: true
         expectedFundsFilter: $expectedFundsFilter
-        includeHostedAccounts: $includeHostedAccounts
-        includeChildrenAccounts: $includeChildrenAccounts
+        hostContext: $hostContext
       ) {
         totalCount
       }
-      PAUSED: orders(
-        filter: $filter
-        status: [PAUSED]
-        includeIncognito: true
-        includeHostedAccounts: $includeHostedAccounts
-      ) @skip(if: $onlyExpectedFunds) {
+      PAUSED: orders(filter: $filter, status: [PAUSED], includeIncognito: true, hostContext: $hostContext)
+        @skip(if: $onlyExpectedFunds) {
         totalCount
       }
       PAUSED_RESUMABLE: orders(
         filter: INCOMING
         status: [PAUSED]
         includeIncognito: true
-        includeHostedAccounts: false
-        includeChildrenAccounts: true
+        hostContext: INTERNAL
         pausedBy: [COLLECTIVE, HOST, PLATFORM]
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
-      DISPUTED: orders(
-        filter: $filter
-        status: [DISPUTED]
-        includeIncognito: true
-        includeHostedAccounts: $includeHostedAccounts
-      ) @skip(if: $onlyExpectedFunds) {
+      DISPUTED: orders(filter: $filter, status: [DISPUTED], includeIncognito: true, hostContext: $hostContext)
+        @skip(if: $onlyExpectedFunds) {
         totalCount
       }
-      IN_REVIEW: orders(
-        filter: $filter
-        status: [IN_REVIEW]
-        includeIncognito: true
-        includeHostedAccounts: $includeHostedAccounts
-      ) @skip(if: $onlyExpectedFunds) {
+      IN_REVIEW: orders(filter: $filter, status: [IN_REVIEW], includeIncognito: true, hostContext: $hostContext)
+        @skip(if: $onlyExpectedFunds) {
         totalCount
       }
-      ERROR: orders(filter: $filter, status: [ERROR], includeIncognito: true, includeHostedAccounts: true)
+      ERROR: orders(filter: $filter, status: [ERROR], includeIncognito: true, hostContext: $hostContext)
         @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -410,7 +401,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.DISPUTED,
           label: intl.formatMessage({ defaultMessage: 'Disputed', id: 'X1pwhF' }),
-          count: metadata?.account?.[ContributionsTab.DISPUTED].totalCount,
           filter: {
             status: [OrderStatus.DISPUTED],
           },
@@ -420,7 +410,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.ERROR,
           label: intl.formatMessage({ defaultMessage: 'Error', id: 'KN7zKn' }),
-          count: metadata?.account?.[ContributionsTab.ERROR].totalCount,
           filter: {
             status: [OrderStatus.ERROR],
           },
@@ -430,7 +419,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.IN_REVIEW,
           label: intl.formatMessage({ id: 'order.in_review', defaultMessage: 'In Review' }),
-          count: metadata?.account?.[ContributionsTab.IN_REVIEW].totalCount,
           filter: {
             status: [OrderStatus.IN_REVIEW],
           },
@@ -440,7 +428,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.PAUSED,
           label: intl.formatMessage({ defaultMessage: 'Paused', id: 'C2iTEH' }),
-          count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
           filter: {
             status: [OrderStatus.PAUSED],
           },
@@ -450,7 +437,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.RECURRING,
           label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
-          count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
           filter: {
             frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
             status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
@@ -461,18 +447,16 @@ const Contributions = ({
       ? {
           id: ContributionsTab.ONETIME,
           label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
-          count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
           filter: {
             frequency: [ContributionFrequency.ONETIME],
             status: [OrderStatus.PAID, OrderStatus.PROCESSING],
           },
         }
       : null,
-    !onlyExpectedFunds && metadata?.account?.[ContributionsTab.PAUSED].totalCount
+    !onlyExpectedFunds && !hasHosting
       ? {
           id: ContributionsTab.PAUSED,
           label: intl.formatMessage({ id: 'order.paused', defaultMessage: 'Paused' }),
-          count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
           filter: {
             status: [OrderStatus.PAUSED],
           },
@@ -482,7 +466,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.PENDING,
           label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
-          count: metadata?.account?.[ContributionsTab.PENDING].totalCount,
           filter: {
             status: [OrderStatus.PENDING],
             expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
@@ -493,7 +476,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.PAID,
           label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-          count: metadata?.account?.[ContributionsTab.PAID].totalCount,
           filter: {
             status: [OrderStatus.PAID],
             expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
@@ -504,7 +486,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.EXPIRED,
           label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
-          count: metadata?.account?.[ContributionsTab.EXPIRED].totalCount,
           filter: {
             status: [OrderStatus.EXPIRED],
             expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
@@ -515,7 +496,6 @@ const Contributions = ({
       ? {
           id: ContributionsTab.CANCELED,
           label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
-          count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
           filter: {
             status: [OrderStatus.CANCELLED],
             ...(onlyExpectedFunds ? { expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS } : {}),
@@ -574,7 +554,7 @@ const Contributions = ({
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       includeIncognito: true,
-      includeHostedAccounts: !!includeHostedAccounts,
+      // includeHostedAccounts: !!includeHostedAccounts,
       includeChildrenAccounts: !!includeChildrenAccounts,
       ...queryFilter.variables,
       ...(onlyExpectedFunds
@@ -588,6 +568,24 @@ const Contributions = ({
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
   });
+
+  const { data: viewCounts, refetch: refetchViewCounts } = useQuery(dashboardContributionsViewCountQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: direction || 'OUTGOING',
+      onlyExpectedFunds: !!onlyExpectedFunds,
+      expectedFundsFilter: onlyExpectedFunds ? ExpectedFundsFilter.ALL_EXPECTED_FUNDS : null,
+      hostContext: queryFilter.values.hostContext,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  // attach view counts
+  const viewsWithCount = React.useMemo(
+    () => views.map(view => ({ ...view, count: viewCounts?.account?.[view.id]?.totalCount })),
+    [viewCounts, views],
+  );
 
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string | number }; action: EditOrderActions }>({
     order: router.query.orderId ? { id: router.query.orderId as string } : null,
@@ -744,6 +742,7 @@ const Contributions = ({
                     onSuccess={() => {
                       refetch();
                       refetchMetadata();
+                      refetchViewCounts();
                     }}
                   />
                 )}
@@ -755,16 +754,16 @@ const Contributions = ({
           <UpgradePlanCTA featureKey={FEATURES.EXPECTED_FUNDS} />
         ) : (
           <React.Fragment>
-            <Filterbar {...queryFilter} />
+            <Filterbar {...queryFilter} views={viewsWithCount} />
 
             {isIncoming &&
               !onlyExpectedFunds &&
               metadata?.account?.canStartResumeContributionsProcess &&
-              metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
+              viewCounts?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
               !metadata.account.parent && (
                 <PausedIncomingContributionsMessage
                   account={metadata.account}
-                  count={metadata.account[ContributionsTab.PAUSED].totalCount}
+                  count={viewCounts.account[ContributionsTab.PAUSED].totalCount}
                 />
               )}
 
@@ -823,6 +822,7 @@ const Contributions = ({
           onSuccess={() => {
             refetch();
             refetchMetadata();
+            refetchViewCounts();
           }}
         />
       )}
