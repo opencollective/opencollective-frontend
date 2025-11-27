@@ -1,6 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { ArrowRight, Check, ChevronDown, ChevronUp, LockKeyhole } from 'lucide-react';
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  LockKeyhole,
+  SquareArrowOutUpRight,
+  SquareArrowUpRight,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
@@ -210,18 +220,27 @@ const SetupDrawer = React.memo(
             </div>
           )}
           {documentation.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <h1 className="text-lg leading-5 text-blue-400">
+            <div className="flex flex-col gap-3">
+              <h1 className="leading-5 font-medium">
                 <FormattedMessage defaultMessage="Documentation" id="menu.documentation" />
               </h1>
-              <div className="flex flex-col gap-2 divide-slate-200 *:pb-3">
+              <div className="flex flex-col gap-3 divide-slate-200 *:pb-3">
                 {documentation?.map(doc => (
-                  <a href={doc.url} key={doc.url} target="_blank" rel="noopener noreferrer" className="group text-sm">
-                    <p className="flex items-center gap-2 font-semibold text-blue-400 group-hover:text-blue-300 group-hover:underline">
-                      <ArrowRight size={14} />
-                      {doc.title}
-                    </p>
-                    <p className="mt-1 pl-6 text-xs text-slate-600">{doc.description}</p>
+                  <a
+                    href={doc.url}
+                    key={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group rounded-xl border p-3 pl-4 text-sm shadow-sm transition-colors hover:bg-slate-50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">{doc.title}</span>
+                      <SquareArrowOutUpRight
+                        className="text-muted-foreground transition-colors group-hover:text-foreground"
+                        size={14}
+                      />
+                    </div>
+                    <span className="mt-1 text-xs text-slate-600">{doc.description}</span>
                   </a>
                 ))}
               </div>
