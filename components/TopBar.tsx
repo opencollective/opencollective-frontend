@@ -223,7 +223,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
             {LoggedInUser && (
               <Button asChild variant="outline" className="mr-3 hidden whitespace-nowrap sm:flex" size="sm">
                 <Link href="/dashboard">
-                  <FormattedMessage defaultMessage="Dashboard" id="Dashboard" />
+                  <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
                 </Link>
               </Button>
             )}

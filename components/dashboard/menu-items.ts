@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
+  Award,
   BarChart2,
   BookOpenCheck,
   BookUserIcon,
@@ -20,6 +21,7 @@ import {
   Ticket,
   Users,
   Users2,
+  UserStar,
   UserX,
   Wallet,
 } from 'lucide-react';
@@ -213,7 +215,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if: !isIndividual,
       type: 'group',
-      Icon: Receipt,
+      Icon: Award,
       label: hasMoneyManagement
         ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
         : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
@@ -258,7 +260,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: Coins,
+      Icon: HandCoins,
       subMenu: [
         {
           if: hasHosting,
@@ -446,7 +448,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if: !isIndividual && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TEAM,
-      Icon: Users2,
+      Icon: UserStar,
     },
     {
       if:
