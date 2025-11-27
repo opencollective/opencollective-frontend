@@ -263,8 +263,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Coins,
       subMenu: [
         {
+          if: !hasHosting,
           label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'X98JAE' }),
           section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
+        },
+        {
+          if: hasHosting,
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'X98JAE' }),
+          section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
           label: intl.formatMessage(

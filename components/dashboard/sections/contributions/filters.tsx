@@ -18,6 +18,8 @@ import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import { hostContextFilter } from '../../filters/HostContextFilter';
+import { dashboardContributionsTierOptionsQuery } from './queries';
+import { useQuery } from '@apollo/client';
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
@@ -115,7 +117,24 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   tier: {
     labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
     Component: ({ meta, ...props }) => {
-      return <ComboSelectFilter options={meta.tierOptions} isMulti {...props} />;
+      const { data, loading } = useQuery(dashboardContributionsTierOptionsQuery, {
+        variables: { slug: meta.accountSlug },
+      });
+      const tierOptions = React.useMemo(() => {
+        if (data?.account.childrenAccounts.nodes?.length === 0) {
+          return data.account?.tiers?.nodes.map(tier => ({ label: tier.name, value: tier.id }));
+        } else {
+          const makeOption = account =>
+            account?.tiers?.nodes.map(tier => ({ label: `${tier.name}  (${account.name})`, value: tier.id }));
+          const options = makeOption(data?.account);
+          data?.account.childrenAccounts.nodes.forEach(children => {
+            options.push(...makeOption(children));
+          });
+          return options;
+        }
+      }, [data?.account]);
+
+      return <ComboSelectFilter options={tierOptions} loading={loading} isMulti {...props} />;
     },
     valueRenderer: ({ value, meta }) => meta.tierOptions?.find(tier => tier.value === value)?.label ?? value,
   },
