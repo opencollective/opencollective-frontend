@@ -201,6 +201,7 @@
   "5ASOpu": "<Individual></Individual> compró <Expense>{expenseDescription}</Expense> con tarjeta virtual",
   "5aZEOo": "Enlaza tus cuentas bancarias para reconciliar <Link>transacciones fuera de la plataforma</Link>.",
   "5cIM9E": "Si \" EsReembolsada\" indica \"cierto\" entonces este ID hará referencia al ID de transacción único alfanumérico de 8 caracteres de la transacción de reembolso (que indicará \"EsReembolsada\" como \"cierto\").",
+  "5ELw4E": "Switch workspace",
   "5j8RQd": "Manage your accounting categories, and use these categories to keep expenses organized.",
   "5jeq8P": "Unknown",
   "5kf2KT": "Plataforma por defecto",

@@ -26,13 +26,12 @@ export function DashboardTopbar() {
   return (
     <React.Fragment>
       <header
-        className={`grid h-16 w-full shrink-0 grid-cols-[1fr_minmax(auto,var(--breakpoint-xl))_minmax(auto,1fr)] items-center border-b px-4 transition-[width,height,box-shadow] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12`}
+        className={`flex h-16 w-full shrink-0 items-center justify-between border-b px-4 transition-[width,box-shadow] ease-linear`}
       >
         <div className="mr-4 flex items-center gap-3">
           <SidebarTrigger />
         </div>
 
-        <div className="flex items-center gap-2"></div>
         <div className="ml-auto flex items-center gap-2">
           <SearchTrigger setShowSearchModal={setShowSearchModal} />
 

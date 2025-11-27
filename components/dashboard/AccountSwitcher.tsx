@@ -4,7 +4,7 @@ import { flatten, groupBy, uniqBy } from 'lodash';
 import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import type { ReactElement } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -205,6 +205,7 @@ const MenuEntry = ({
 };
 
 const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
 
   const [open, setOpen] = React.useState(false);
@@ -223,7 +224,11 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
       <SidebarMenuItem>
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
+            <SidebarMenuButton
+              size="lg"
+              tooltip={intl.formatMessage({ defaultMessage: 'Switch workspace', id: '5ELw4E' })}
+              className="group-data-[collapsible=icon]:my-2! data-[state=open]:bg-sidebar-accent"
+            >
               {activeSlug === ROOT_PROFILE_KEY ? <RootOption /> : <Option collective={activeAccount} isDisplay />}
               <ChevronsUpDown size={18} className="ml-auto" />
             </SidebarMenuButton>
@@ -235,6 +240,9 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
             )}
             align="start"
             sideOffset={8}
+            onCloseAutoFocus={e => {
+              e.preventDefault();
+            }}
           >
             <DropdownMenuItem
               asChild

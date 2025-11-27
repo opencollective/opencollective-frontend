@@ -201,6 +201,7 @@
   "5ASOpu": "<Individual></Individual> uskutočnil nákup <Expense>{expenseDescription}</Expense> pomocou virtuálnej karty",
   "5aZEOo": "Link your bank accounts to reconcile <Link>off-platform transactions</Link>.",
   "5cIM9E": "Ak je v položke „IsRefunded“ uvedené „true“, potom tento identifikátor bude odkazovať na 8-miestny alfanumerický jedinečný identifikátor transakcie vrátenia (ktorý bude v položke „IsRefund“ uvedený ako „true“).",
+  "5ELw4E": "Switch workspace",
   "5j8RQd": "Manage your accounting categories, and use these categories to keep expenses organized.",
   "5jeq8P": "Unknown",
   "5kf2KT": "Predvolená platforma",

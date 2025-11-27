@@ -56,13 +56,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <AccountSwitcher activeSlug={activeSlug} />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <AccountSwitcher activeSlug={activeSlug} />
       </SidebarHeader>
 
       <SidebarContent className="justify-between">
