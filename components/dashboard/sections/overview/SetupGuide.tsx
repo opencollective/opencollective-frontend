@@ -1,16 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import {
-  ArrowRight,
-  BookOpen,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
-  LockKeyhole,
-  SquareArrowOutUpRight,
-  SquareArrowUpRight,
-} from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, ChevronUp, LockKeyhole, SquareArrowOutUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
