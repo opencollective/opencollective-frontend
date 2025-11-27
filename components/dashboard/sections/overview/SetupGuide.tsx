@@ -163,28 +163,30 @@ const SetupStep = (props: Step & { account: SetupGuideQuery['account'] }) => {
   );
 };
 
-const SetupDrawer = React.memo(
-  ({
-    category,
-    account,
-    onClose,
-  }: {
-    category: Category | null;
-    account: SetupGuideQuery['account'];
-    onClose: () => void;
-  }) => {
-    const steps = category?.steps || [];
-    const documentation = category?.documentation || [];
-    const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade).length;
-    const isCompleted = completedSteps === steps?.length;
+const SetupDrawer = ({
+  category,
+  account,
+  onClose,
+  open,
+}: {
+  category: Category | null;
+  account: SetupGuideQuery['account'];
+  onClose: () => void;
+  open: boolean;
+}) => {
+  const steps = category?.steps || [];
+  const documentation = category?.documentation || [];
+  const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade).length;
+  const isCompleted = completedSteps === steps?.length;
 
-    return (
-      <Drawer open={!!category} onClose={onClose} className="w-full max-w-xl" showCloseButton>
-        <header className="mb-6 flex items-start justify-between">
-          <div className="flex w-full flex-col gap-2">
-            {category?.image || <Skeleton className="size-10" />}
-            <div className="flex items-center justify-between gap-4">
-              <h1 className="text-2xl font-bold">{category?.title || <Skeleton className="h-6 w-64" />}</h1>
+  return (
+    <Drawer open={open} onClose={onClose} className="w-full max-w-xl" showCloseButton>
+      <header className="mb-6 flex items-start justify-between">
+        <div className="flex w-full flex-col gap-2">
+          {category?.image || <Skeleton className="size-10" />}
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-2xl font-bold">{category?.title || <Skeleton className="h-6 w-64" />}</h1>
+            {category?.steps ? (
               <Label
                 className="flex gap-1 rounded-full bg-slate-100 px-4 py-2 text-sm data-completed:bg-green-100 data-completed:text-green-800"
                 data-completed={isCompleted ? true : undefined}
@@ -195,52 +197,54 @@ const SetupDrawer = React.memo(
                   values={{ completed: completedSteps, total: steps.length }}
                 />
               </Label>
-            </div>
-            <p className="text-sm text-slate-700">
-              {category?.longDescription || category?.description || <Skeleton className="h-4 w-80" />}
-            </p>
+            ) : (
+              <Skeleton className="h-8 w-32 rounded-full" />
+            )}
           </div>
-        </header>
-        <div className="flex grow flex-col justify-between gap-6">
-          {steps.length > 0 && (
-            <div className="flex flex-col gap-4">
-              {steps?.map(step => (
-                <SetupStep key={step.id} account={account} {...step} />
+          <p className="text-sm text-slate-700">
+            {category?.longDescription || category?.description || <Skeleton className="h-4 w-80" />}
+          </p>
+        </div>
+      </header>
+      <div className="flex grow flex-col justify-between gap-6">
+        {steps.length > 0 && (
+          <div className="flex flex-col gap-4">
+            {steps?.map(step => (
+              <SetupStep key={step.id} account={account} {...step} />
+            ))}
+          </div>
+        )}
+        {documentation.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <h1 className="leading-5 font-medium">
+              <FormattedMessage defaultMessage="Documentation" id="menu.documentation" />
+            </h1>
+            <div className="flex flex-col gap-3 divide-slate-200 *:pb-3">
+              {documentation?.map(doc => (
+                <a
+                  href={doc.url}
+                  key={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group rounded-xl border p-3 pl-4 text-sm shadow-sm transition-colors hover:bg-slate-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{doc.title}</span>
+                    <SquareArrowOutUpRight
+                      className="text-muted-foreground transition-colors group-hover:text-foreground"
+                      size={14}
+                    />
+                  </div>
+                  <span className="mt-1 text-xs text-slate-600">{doc.description}</span>
+                </a>
               ))}
             </div>
-          )}
-          {documentation.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <h1 className="leading-5 font-medium">
-                <FormattedMessage defaultMessage="Documentation" id="menu.documentation" />
-              </h1>
-              <div className="flex flex-col gap-3 divide-slate-200 *:pb-3">
-                {documentation?.map(doc => (
-                  <a
-                    href={doc.url}
-                    key={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group rounded-xl border p-3 pl-4 text-sm shadow-sm transition-colors hover:bg-slate-50"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">{doc.title}</span>
-                      <SquareArrowOutUpRight
-                        className="text-muted-foreground transition-colors group-hover:text-foreground"
-                        size={14}
-                      />
-                    </div>
-                    <span className="mt-1 text-xs text-slate-600">{doc.description}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </Drawer>
-    );
-  },
-);
+          </div>
+        )}
+      </div>
+    </Drawer>
+  );
+};
 
 const CategoryButton = ({ img, title, description, className, onClick }) => {
   return (
@@ -317,7 +321,12 @@ export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
               />
             ))}
           </CardContent>
-          <SetupDrawer category={expandedCategory} account={data?.account} onClose={() => setExpandedCategory(null)} />
+          <SetupDrawer
+            category={expandedCategory}
+            account={data?.account}
+            onClose={() => setExpandedCategory(null)}
+            open={expandedCategory !== null}
+          />
         </Card>
       </CollapsibleContent>
     </Collapsible>
