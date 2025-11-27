@@ -538,7 +538,7 @@ const Contributions = ({
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
-  const newSchema = hasHosting ? schema.extend({ hostContext: hostContextFilter.schema }) : schema;
+  const newSchema = includeHostedAccounts ? schema.extend({ hostContext: hostContextFilter.schema }) : schema;
 
   const queryFilter = useQueryFilter({
     schema: newSchema,
@@ -584,7 +584,7 @@ const Contributions = ({
       filter: direction || 'OUTGOING',
       onlyExpectedFunds: !!onlyExpectedFunds,
       expectedFundsFilter: onlyExpectedFunds ? ExpectedFundsFilter.ALL_EXPECTED_FUNDS : null,
-      hostContext: queryFilter.values.hostContext,
+      ...('hostContext' in queryFilter.values && { hostContext: queryFilter.values.hostContext }),
     },
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
