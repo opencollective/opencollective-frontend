@@ -155,22 +155,19 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   );
 }
 
-function SidebarLink({
-  href,
-  label,
-  Icon,
-  external,
-  className,
-  ...props
-}: {
-  href: string;
-  label: string;
-  Icon?: LucideIcon;
-  external?: boolean;
-  className?: string;
-}) {
+const SidebarLink = React.forwardRef<
+  HTMLAnchorElement,
+  {
+    href: string;
+    label: string;
+    Icon?: LucideIcon;
+    external?: boolean;
+    className?: string;
+    'data-cy'?: string;
+  }
+>(({ href, label, Icon, external, className, ...props }, ref) => {
   return (
-    <Link href={href} className={cn('group/sidebar-link', className)} {...props}>
+    <Link innerRef={ref} href={href} className={cn('group/sidebar-link', className)} {...props}>
       {Icon && <Icon />}
       <span>{label}</span>
       {external && (
@@ -181,7 +178,7 @@ function SidebarLink({
       )}
     </Link>
   );
-}
+});
 
 function DashboardSidebarMenuGroup({ item, isSectionActive }) {
   const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
