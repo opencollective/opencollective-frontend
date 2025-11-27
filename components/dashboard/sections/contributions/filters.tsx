@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type { Currency, DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, HostContext, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
 import type { Account } from '@/lib/graphql/types/v2/schema';
@@ -17,10 +17,11 @@ import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
+import { hostContextFilter } from '../../filters/HostContextFilter';
 import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-import { hostContextFilter } from '../../filters/HostContextFilter';
+import { tierFilter } from '../../filters/TierFilter';
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
@@ -57,9 +58,11 @@ export const schema = z.object({
   paymentMethodId: isMulti(z.string()).optional(),
   paymentMethod: paymentMethodFilter.schema,
   accountingCategory: accountingCategoryFilter.schema,
-  tier: isMulti(z.string()).optional(),
+  tier: tierFilter.schema,
   account: childAccountFilter.schema,
 });
+
+export const hostSchema = schema.extend({ hostContext: hostContextFilter.schema });
 
 type FilterValues = z.infer<typeof schema>;
 
@@ -70,7 +73,6 @@ export const ContributionAccountingCategoryKinds = [
 
 export type FilterMeta = {
   currency?: Currency;
-  tierOptions?: Array<{ label: string; value: string }>;
   childrenAccounts?: Account[];
   accountSlug?: string;
   showChildAccountFilter?: boolean;
@@ -92,9 +94,7 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
   paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
   paymentMethod: paymentMethodFilter.toVariables,
   accountingCategory: value => ({ accountingCategory: value }),
-  tier: (value: [string]) => {
-    return { tier: value.map(id => ({ id })) };
-  },
+  tier: tierFilter.toVariables,
   account: (value, key, meta) => {
     if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
       return { includeChildrenAccounts: false };
@@ -127,13 +127,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
   },
-  tier: {
-    labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
-    Component: ({ meta, ...props }) => {
-      return <ComboSelectFilter options={meta.tierOptions} isMulti {...props} />;
-    },
-    valueRenderer: ({ value, meta }) => meta.tierOptions?.find(tier => tier.value === value)?.label ?? value,
-  },
+  tier: tierFilter.filter,
   frequency: {
     labelMsg: defineMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),
     Component: ({ valueRenderer, intl, ...props }) => (
