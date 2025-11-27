@@ -259,7 +259,7 @@ const DashboardPage = () => {
       />
       <SidebarProvider>
         <DashboardSidebar isLoading={isLoading} />
-        <SidebarInset>
+        <SidebarInset className="min-w-0">
           <DashboardTopbar />
           <div className="flex-1 px-6">
             {Boolean(notification) && <NotificationBar {...notification} />}

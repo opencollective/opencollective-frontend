@@ -38,6 +38,7 @@ import { useWorkspace } from '../WorkspaceProvider';
 import AccountSwitcher from './AccountSwitcher';
 import { DashboardContext } from './DashboardContext';
 import { getMenuItems } from './menu-items';
+import { useRouter } from 'next/router';
 
 export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   const { workspace } = useWorkspace();
@@ -181,12 +182,12 @@ const SidebarLink = React.forwardRef<
 });
 
 function DashboardSidebarMenuGroup({ item, isSectionActive }) {
-  const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
-
+  const router = useRouter();
   const { account } = React.useContext(DashboardContext);
-  const [open, setOpen] = React.useState(hasActiveSubItem);
   const { isMobile, state } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const hasActiveSubItem = item.subMenu?.some(subItem => isSectionActive(subItem.section));
+  const [open, setOpen] = React.useState(hasActiveSubItem);
 
   const desktopSidebarCollapsed = !isMobile && state === 'collapsed';
   const isRootItemActive = hasActiveSubItem && (!open || desktopSidebarCollapsed);

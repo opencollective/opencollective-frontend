@@ -10,6 +10,7 @@ import { Button } from './ui/Button';
 
 const SearchTrigger = ({ setShowSearchModal }) => {
   const { LoggedInUser } = useLoggedInUser();
+
   React.useEffect(() => {
     const handleKeydown = e => {
       if (e.key === '/' && e.target.tagName === 'BODY') {
@@ -26,7 +27,7 @@ const SearchTrigger = ({ setShowSearchModal }) => {
     <Button
       variant="outline"
       className={clsx(
-        'relative flex h-8 w-8 shrink items-center justify-center gap-1.5 lg:justify-start lg:px-2 lg:pr-4',
+        'relative flex h-8 w-8 shrink items-center justify-center gap-1.5 px-0 py-0 lg:justify-start lg:px-2 lg:py-2 lg:pr-4',
         LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND)
           ? 'max-w-lg flex-1 border lg:w-full'
           : 'rounded-full border lg:w-auto',
