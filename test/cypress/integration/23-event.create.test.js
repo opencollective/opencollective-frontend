@@ -84,7 +84,7 @@ describe('event.create.test.js', () => {
     // delete event tiers
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
     cy.getByDataCy('menu-item-Settings').click();
-    cy.getByDataCy('menu-item-advanced').click();
+    cy.getByDataCy('menu-item-advanced').should('be.visible').click();
     cy.contains('button', 'Delete this Event').click();
     cy.get('[data-cy=delete]').click();
     cy.wait(1000);
