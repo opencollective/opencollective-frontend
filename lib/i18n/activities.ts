@@ -179,6 +179,22 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     id: 'HTHBXN',
     avatar: 'fromAccount',
   },
+  ACTIVATED_HOSTING: {
+    defaultMessage: '<Individual></Individual> activated "Hosting"',
+    id: 'gadodfiofjdk',
+  },
+  ACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: '<Individual></Individual> activated "Money Management"',
+    id: 'dfsnjdfsjghdjfhghjd',
+  },
+  DEACTIVATED_HOSTING: {
+    defaultMessage: '<Individual></Individual> deactivated "Hosting"',
+    id: 'gadodfiofjdkde',
+  },
+  DEACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: '<Individual></Individual> deactivated "Money Management"',
+    id: 'dfsnjdfsjghdjfhghjddews',
+  },
 });
 
 export const ActivityDescriptionI18n = defineMessages({
@@ -581,6 +597,22 @@ export const ActivityDescriptionI18n = defineMessages({
   ADDED_FUNDS_EDITED: {
     defaultMessage: '<Individual></Individual> edited added funds',
     id: 'nxtsKq',
+  },
+  ACTIVATED_HOSTING: {
+    defaultMessage: 'Activated "Hosting" on <Account></Account>',
+    id: 'gadodfiofjdkdd',
+  },
+  ACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: 'Activated "Money Management" on <Account></Account>',
+    id: 'dfsnjdfsjghdjfhghjddd',
+  },
+  DEACTIVATED_HOSTING: {
+    defaultMessage: 'Deactivated "Hosting" on <Account></Account>',
+    id: 'gadodfiofjdkddde',
+  },
+  DEACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: 'Deactivated "Money Management" on <Account></Account>',
+    id: 'dfsnjdfsjghdjfhghjddewdds',
   },
 });
 
