@@ -22,8 +22,8 @@ import { Pagination } from '../../filters/Pagination';
 import { useContributionActions } from './actions';
 import { amount, beneficiary, contributionId, contributor, date, expectedAt, paymentMethod, status } from './columns';
 
-export const dashboardContributionsQuery = gql`
-  query DashboardRecurringContributions(
+const dashboardOrdersQuery = gql`
+  query DashboardOrders(
     $slug: String!
     $searchTerm: String
     $offset: Int
@@ -140,7 +140,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
     loading: queryLoading,
     error: queryError,
     refetch,
-  } = useQuery(dashboardContributionsQuery, {
+  } = useQuery(dashboardOrdersQuery, {
     variables: {
       slug: accountSlug,
       filter: direction,
