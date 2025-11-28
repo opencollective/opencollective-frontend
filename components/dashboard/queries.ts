@@ -11,6 +11,7 @@ export const adminPanelQuery = gql`
       currency
       slug
       name
+      legalName
       isHost
       type
       supportedExpenseTypes

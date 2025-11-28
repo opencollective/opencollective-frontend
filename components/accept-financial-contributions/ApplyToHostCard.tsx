@@ -22,7 +22,6 @@ const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
 export default function ApplyToHostCard(props: {
   host: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
   collective: Pick<Account, 'slug'>;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   const [showApplyToHostModal, setShowApplyToHostModal] = React.useState(false);
   const router = useRouter();
@@ -98,7 +97,6 @@ export default function ApplyToHostCard(props: {
         <Box mx={3} mt={3}>
           <StyledButton
             onClick={() => {
-              props.onHostApplyClick(props.host);
               setShowApplyToHostModal(true);
             }}
             buttonStyle="primary"
@@ -116,7 +114,7 @@ export default function ApplyToHostCard(props: {
           onClose={() => setShowApplyToHostModal(false)}
           onSuccess={() => {
             return router
-              .push(`${props.collective.slug}/accept-financial-contributions/host/success`)
+              .push(`${props.collective.slug}/accept-financial-contributions/host/success?hostSlug=${props.host.slug}`)
               .then(() => window.scrollTo(0, 0))
               .then(() => {
                 confettiFireworks(5000, { zIndex: 3000 });
