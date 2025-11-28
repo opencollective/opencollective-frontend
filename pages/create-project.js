@@ -53,7 +53,7 @@ const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   return (
-    <Page>
+    <Page showMenuItems={false}>
       <CreateProject parent={data && data.account} />
     </Page>
   );

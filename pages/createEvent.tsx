@@ -95,7 +95,7 @@ function CreateEventPage({ parentCollectiveSlug }: { parentCollectiveSlug: strin
   const loading = loadingParent || loadingLoggedInUser || isLoadingGoogleMaps;
   return (
     <div className="min-h-screen">
-      <Header title={title} LoggedInUser={LoggedInUser} />
+      <Header title={title} LoggedInUser={LoggedInUser} showMenuItems={false} />
 
       <Body className="bg-gray-50">
         <CollectiveNavbar isLoading={loading} collective={parent} isAdmin={isAdmin} selectedCategory={null} />
