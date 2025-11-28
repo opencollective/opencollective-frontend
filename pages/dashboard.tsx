@@ -255,27 +255,29 @@ const DashboardPage = () => {
         title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
         noRobots
         collective={account}
-        withTopBar={false}
+        withTopBar={Boolean(blocker)}
+        showMenuItems={false}
       />
-      <SidebarProvider>
-        <DashboardSidebar isLoading={isLoading} />
-        <SidebarInset className="min-w-0">
-          <DashboardTopbar />
-          <div className="flex-1 px-3 md:px-6">
-            {Boolean(notification) && <NotificationBar {...notification} />}
-            {blocker ? (
-              <div className="my-32 flex flex-col items-center">
-                <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-                  <p>{blocker}</p>
-                  {LoggedInUser && (
-                    <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                      <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
-                    </Link>
-                  )}
-                </MessageBox>
-                {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
-              </div>
-            ) : (
+      {blocker ? (
+        <div className="my-32 flex flex-col items-center">
+          <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+            <p>{blocker}</p>
+            {LoggedInUser && (
+              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+              </Link>
+            )}
+          </MessageBox>
+          {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+        </div>
+      ) : (
+        <SidebarProvider>
+          <DashboardSidebar isLoading={isLoading} />
+          <SidebarInset className="min-w-0">
+            <DashboardTopbar />
+            <div className="flex-1 px-3 md:px-6">
+              {Boolean(notification) && <NotificationBar {...notification} />}
+
               <div
                 className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
                 data-cy="admin-panel-container"
@@ -296,11 +298,11 @@ const DashboardPage = () => {
                   </div>
                 )}
               </div>
-            )}
-          </div>
-          <Footer isDashboard />
-        </SidebarInset>
-      </SidebarProvider>
+            </div>
+            <Footer isDashboard />
+          </SidebarInset>
+        </SidebarProvider>
+      )}
     </DashboardContext.Provider>
   );
 };
