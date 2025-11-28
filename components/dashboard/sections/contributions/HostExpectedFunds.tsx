@@ -21,7 +21,7 @@ import type { DashboardSectionProps } from '../../types';
 import ContributionsTable from './ContributionsTable';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, hostSchema, toVariables } from './filters';
+import { filters as allFilters, ContributionAccountingCategoryKinds, hostSchema, toVariables } from './filters';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -146,6 +146,9 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     childrenAccounts: [],
     accountSlug: account?.slug,
     showChildAccountFilter: false,
+    hostSlug: account.isHost ? account.slug : undefined,
+    includeUncategorized: true,
+    accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({

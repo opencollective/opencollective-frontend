@@ -15,7 +15,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, schema, toVariables } from './filters';
+import { filters as allFilters, ContributionAccountingCategoryKinds, schema, toVariables } from './filters';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -111,6 +111,9 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     childrenAccounts: [],
     accountSlug: account?.slug,
     showChildAccountFilter: false,
+    hostSlug: account.isHost ? account.slug : undefined,
+    includeUncategorized: true,
+    accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({
@@ -139,7 +142,7 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
         description={
           <FormattedMessage
             id="OutgoingContributions.description"
-            defaultMessage="Manage your contributions to other Collectives."
+            defaultMessage="Manage your contributions to other accounts."
           />
         }
       />

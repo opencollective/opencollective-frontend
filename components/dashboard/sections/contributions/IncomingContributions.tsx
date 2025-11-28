@@ -15,7 +15,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, schema, toVariables } from './filters';
+import { filters as allFilters, ContributionAccountingCategoryKinds, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -134,6 +134,9 @@ const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
     childrenAccounts: account?.childrenAccounts?.nodes ?? [],
     accountSlug: account?.slug,
     showChildAccountFilter: true,
+    hostSlug: account.isHost ? account.slug : undefined,
+    includeUncategorized: true,
+    accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({

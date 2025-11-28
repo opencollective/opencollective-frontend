@@ -16,7 +16,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, schema, toVariables } from './filters';
+import { filters as allFilters, ContributionAccountingCategoryKinds, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -113,7 +113,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     },
     {
       id: ContributionsTab.ERROR,
-      label: intl.formatMessage({ defaultMessage: 'Error', id: 'KN7zKn' }),
+      label: intl.formatMessage({ defaultMessage: 'Error', id: 'Error' }),
       filter: {
         status: [OrderStatus.ERROR],
       },
@@ -125,6 +125,9 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     childrenAccounts: account?.childrenAccounts?.nodes ?? [],
     accountSlug: account?.slug,
     showChildAccountFilter: false,
+    hostSlug: account.isHost ? account.slug : undefined,
+    includeUncategorized: true,
+    accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({

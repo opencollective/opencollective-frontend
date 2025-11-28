@@ -264,7 +264,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       subMenu: [
         {
           if: hasHosting,
-          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'X98JAE' }),
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
@@ -272,7 +272,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage(
             {
               defaultMessage: 'Incoming Contributions',
-              id: 'X98JAE',
+              id: 'IncomingContributions',
             },
             { accountName: account.name },
           ),
