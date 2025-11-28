@@ -229,7 +229,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
     nbAdmins <= (host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 1);
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Team" defaultMessage="Team" />}
         description={

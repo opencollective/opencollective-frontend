@@ -1,13 +1,8 @@
-/**
- * @deprecated Will be replaced by `components/navigation/TopBar` when Workspace moves out of preview feature
- */
-
 import React, { useRef, useState } from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
-import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -15,6 +10,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
 import { getEnvVar } from '@/lib/env-utils';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { parseToBoolean } from '@/lib/utils';
 
 import { Button } from '@/components/ui/Button';
@@ -22,7 +18,7 @@ import { Button } from '@/components/ui/Button';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
-import NewTopBar from './navigation/TopBar';
+import { SearchCommand } from './search/SearchCommand';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -101,14 +97,13 @@ const TopBarIcon = ({ provider }) => {
   );
 };
 
-const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangelogMenu = true, account }) => {
+const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangelogMenu = true }) => {
   const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
-  const router = useRouter();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
   const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
 
@@ -116,35 +111,11 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
     debouncedSetShowMobileMenu(state => !state);
   };
 
-  const isRouteActive = route => {
-    const regex = new RegExp(`^${route}(/.*)?$`);
-    return regex.test(router.asPath);
-  };
-
-  const onDashboardRoute = isRouteActive('/dashboard');
-  const homeRoutes = [
-    '/',
-    '/home',
-    '/collectives',
-    '/become-a-sponsor',
-    '/become-a-host',
-    '/pricing',
-    '/legacy-pricing',
-    '/new-pricing',
-    '/how-it-works',
-    '/fiscal-hosting',
-    '/help',
-    '/organizations',
-  ];
-  const onHomeRoute = homeRoutes.some(isRouteActive);
-
-  if (onDashboardRoute || (!onHomeRoute && LoggedInUser)) {
-    return <NewTopBar {...{ account }} />;
-  }
-
   const showMenu = showMenuItems ?? (!whitelabel || whitelabel?.links?.length > 0);
 
   const menuItems = parseToBoolean(getEnvVar('NEW_PRICING')) ? newMarketingTopbarItems : legacyTopBarItems;
+  const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
+
   return (
     <Flex
       px={[3, '24px']}
@@ -161,7 +132,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
       }}
       ref={ref}
     >
-      <div className="max-w-fit" css={{ gridArea: 'left' }}>
+      <div className="max-w-fit" style={{ gridArea: 'left' }}>
         <TopBarIcon provider={whitelabel} />
       </div>
 
@@ -171,45 +142,37 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
             <NavList as="ul" p={0} m={0} justifyContent="center" css="margin: 0;">
               {!whitelabel && (
                 <React.Fragment>
-                  {menuItems.map(section =>
-                    section.items ? (
-                      <PopupMenu
-                        key={section.label.id}
-                        zIndex={2000}
-                        closingEvents={['focusin', 'mouseover']}
-                        Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
-                          <NavButton
-                            isBorderless
-                            onMouseOver={onMouseOver}
-                            onFocus={onFocus}
-                            onClick={onClick}
-                            whiteSpace="nowrap"
-                          >
-                            {intl.formatMessage(section.label)}
-                            {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                          </NavButton>
-                        )}
-                        placement="bottom"
-                        popupMarginTop="-10px"
-                      >
-                        <NavLinkContainer>
-                          {section.items.map(item => (
-                            <Link key={item.label.id} href={item.href} target={item.target}>
-                              <NavItem as={Container} mt={16} mb={16}>
-                                {intl.formatMessage(item.label)}
-                              </NavItem>
-                            </Link>
-                          ))}
-                        </NavLinkContainer>
-                      </PopupMenu>
-                    ) : (
-                      <Link key={section.label.id} href={section.href} target={section.target}>
-                        <NavButton as={Container} whiteSpace="nowrap">
+                  {menuItems.map(section => (
+                    <PopupMenu
+                      key={section.label.id}
+                      zIndex={2000}
+                      closingEvents={['focusin', 'mouseover']}
+                      Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
+                        <NavButton
+                          isBorderless
+                          onMouseOver={onMouseOver}
+                          onFocus={onFocus}
+                          onClick={onClick}
+                          whiteSpace="nowrap"
+                        >
                           {intl.formatMessage(section.label)}
+                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </NavButton>
-                      </Link>
-                    ),
-                  )}
+                      )}
+                      placement="bottom"
+                      popupMarginTop="-10px"
+                    >
+                      <NavLinkContainer>
+                        {section.items.map(item => (
+                          <Link key={item.label.id} href={item.href} target={item.target}>
+                            <NavItem as={Container} mt={16} mb={16}>
+                              {intl.formatMessage(item.label)}
+                            </NavItem>
+                          </Link>
+                        ))}
+                      </NavLinkContainer>
+                    </PopupMenu>
+                  ))}
                 </React.Fragment>
               )}
               {whitelabel?.links?.map(({ label, href }) => (
@@ -236,7 +199,11 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
             </NavList>
           )}
         </Hide>
-        <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
+        {useSearchCommandMenu ? (
+          <SearchCommand open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+        ) : (
+          <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+        )}
       </Flex>
 
       {/* Right section - Profile, and Mobile Menu */}
@@ -254,14 +221,9 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
               <ChangelogTrigger />
             </div>
             {LoggedInUser && (
-              <Button
-                asChild
-                variant="marketing"
-                className="mr-3 hidden rounded-full whitespace-nowrap sm:flex"
-                size="sm"
-              >
+              <Button asChild variant="outline" className="mr-3 hidden whitespace-nowrap sm:flex" size="sm">
                 <Link href="/dashboard">
-                  <FormattedMessage defaultMessage="Dashboard" id="Dashboard" />
+                  <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
                 </Link>
               </Button>
             )}

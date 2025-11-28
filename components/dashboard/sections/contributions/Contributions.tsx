@@ -642,7 +642,7 @@ const Contributions = ({
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={
             isIncoming ? (

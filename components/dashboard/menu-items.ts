@@ -1,7 +1,7 @@
-import React from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
+  Award,
   BarChart2,
   BookOpenCheck,
   BookUserIcon,
@@ -9,8 +9,6 @@ import {
   Coins,
   CreditCard,
   FileText,
-  FlaskConical,
-  Globe2,
   HandCoins,
   HeartHandshake,
   LayoutDashboard,
@@ -23,11 +21,10 @@ import {
   Ticket,
   Users,
   Users2,
+  UserStar,
   UserX,
   Wallet,
 } from 'lucide-react';
-import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
 import {
@@ -39,14 +36,10 @@ import {
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { ExpenseType } from '../../lib/graphql/types/v2/schema';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
-import { DashboardContext } from './DashboardContext';
-import { MenuLink } from './MenuLink';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
 
@@ -114,7 +107,7 @@ const ROOT_MENU = [
   },
 ] as GroupMenuItem[];
 
-export type MenuItem = PageMenuItem | GroupMenuItem;
+type MenuItem = PageMenuItem | GroupMenuItem;
 
 function shouldIncludeMenuItemWithLegacyFallback(
   account: DashboardQuery['account'],
@@ -127,6 +120,9 @@ function shouldIncludeMenuItemWithLegacyFallback(
 }
 
 export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+  if (!account) {
+    return null;
+  }
   const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
   if (isRootProfile) {
     return ROOT_MENU;
@@ -212,14 +208,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: isIndividual && hasIssuedGrantRequests,
-      Icon: Receipt,
+      Icon: Award,
       label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,
     },
     {
       if: !isIndividual,
       type: 'group',
-      Icon: Receipt,
+      Icon: Award,
       label: hasMoneyManagement
         ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
         : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
@@ -258,13 +254,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: Coins,
+      Icon: HandCoins,
     },
     {
       if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: Coins,
+      Icon: HandCoins,
       subMenu: [
         {
           if: hasHosting,
@@ -452,7 +448,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if: !isIndividual && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TEAM,
-      Icon: Users2,
+      Icon: UserStar,
     },
     {
       if:
@@ -620,58 +616,3 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       })
   );
 };
-
-const Menu = ({ onRoute, menuItems }) => {
-  const router = useRouter();
-  const intl = useIntl();
-  const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-  React.useEffect(() => {
-    if (onRoute) {
-      router.events.on('routeChangeStart', onRoute);
-    }
-    return () => {
-      if (onRoute) {
-        router.events.off('routeChangeStart', onRoute);
-      }
-    };
-  }, [router, onRoute]);
-
-  const showLinkToProfilePrototype =
-    !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN);
-
-  return (
-    <div className="space-y-4">
-      {account.type !== 'ROOT' && (
-        <div className="flex flex-col gap-2">
-          <MenuLink
-            href={getCollectivePageRoute(account)}
-            Icon={Globe2}
-            label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-            className="hover:bg-slate-50 hover:text-slate-700"
-            dataCy="public-profile-link"
-            external
-          />
-          {showLinkToProfilePrototype && (
-            <MenuLink
-              href={`/preview/${account.slug}`}
-              Icon={FlaskConical}
-              label={intl.formatMessage({ defaultMessage: 'Preview new profile page', id: 'ob6Sw2' })}
-              className="hover:bg-slate-50 hover:text-slate-700"
-              external
-            />
-          )}
-        </div>
-      )}
-      <div className="space-y-2">
-        {menuItems.map(item => {
-          const key = item.type === 'group' ? item.label : item.section;
-          return <MenuLink key={key} {...item} />;
-        })}
-      </div>
-    </div>
-  );
-};
-
-export default Menu;

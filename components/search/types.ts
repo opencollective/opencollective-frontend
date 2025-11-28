@@ -8,7 +8,7 @@ import type {
   SearchUpdateFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 
-import type { PageMenuItem } from '../dashboard/Menu';
+import type { PageMenuItem } from '../dashboard/menu-items';
 
 import type { SearchEntity } from './filters';
 

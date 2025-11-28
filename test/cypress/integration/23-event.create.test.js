@@ -55,6 +55,7 @@ describe('event.create.test.js', () => {
     cy.get('#top').scrollIntoView();
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
     cy.get('[data-cy="menu-item-Settings"]:visible').click();
+    cy.get('[data-cy="menu-item-info"]:visible').click();
 
     // edit event info
     cy.get('input[name="name"]').type(`{selectall}${updatedTitle}`);
@@ -84,7 +85,7 @@ describe('event.create.test.js', () => {
     // delete event tiers
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
     cy.getByDataCy('menu-item-Settings').click();
-    cy.getByDataCy('menu-item-advanced').click();
+    cy.getByDataCy('menu-item-advanced').should('be.visible').click();
     cy.contains('button', 'Delete this Event').click();
     cy.get('[data-cy=delete]').click();
     cy.wait(1000);

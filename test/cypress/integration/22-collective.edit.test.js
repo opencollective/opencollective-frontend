@@ -180,8 +180,7 @@ describe('edit user collective', () => {
       redirect: `/dashboard/${userSlug}/info`,
     });
 
-    cy.getByDataCy('menu-item-Settings').click();
-    cy.getByDataCy('menu-item-user-security').click();
+    cy.getByDataCy('menu-item-user-security').should('be.visible').click();
     cy.contains('Add authenticator').click();
     cy.getByDataCy('qr-code').should('exist');
     cy.getByDataCy('manual-entry-2fa-token')

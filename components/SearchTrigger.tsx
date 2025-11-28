@@ -6,8 +6,11 @@ import { FormattedMessage } from 'react-intl';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
+import { Button } from './ui/Button';
+
 const SearchTrigger = ({ setShowSearchModal }) => {
   const { LoggedInUser } = useLoggedInUser();
+
   React.useEffect(() => {
     const handleKeydown = e => {
       if (e.key === '/' && e.target.tagName === 'BODY') {
@@ -21,8 +24,14 @@ const SearchTrigger = ({ setShowSearchModal }) => {
 
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
-    <button
-      className="relative flex h-8 w-8 shrink items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-hidden focus-visible:ring-2 lg:w-auto lg:justify-start lg:px-2 lg:pr-4"
+    <Button
+      variant="outline"
+      className={clsx(
+        'relative flex h-8 w-8 shrink items-center justify-center gap-1.5 px-0 py-0 lg:justify-start lg:px-2 lg:py-2 lg:pr-4',
+        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND)
+          ? 'max-w-lg flex-1 border lg:w-full'
+          : 'rounded-full border lg:w-auto',
+      )}
       onClick={() => setShowSearchModal(true)}
     >
       <Search size={16} />
@@ -41,7 +50,7 @@ const SearchTrigger = ({ setShowSearchModal }) => {
           />
         )}
       </span>
-    </button>
+    </Button>
   );
 };
 

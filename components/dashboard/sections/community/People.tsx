@@ -209,7 +209,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const columns = React.useMemo(() => getColumns({ intl }), [intl, queryFilter.activeViewId]);
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
@@ -248,7 +248,9 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
 
   if (!isEmpty(id)) {
     return (
-      <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
+      <div className="max-w-(--breakpoint-lg)">
+        <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
+      </div>
     );
   }
 

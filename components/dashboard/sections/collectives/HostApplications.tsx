@@ -152,7 +152,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />} />
 
       <Filterbar {...queryFilter} />

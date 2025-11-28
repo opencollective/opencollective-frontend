@@ -126,7 +126,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const getActions = useAgreementActions(handleEdit, handleDelete);
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
         actions={

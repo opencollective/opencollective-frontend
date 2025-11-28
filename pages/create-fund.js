@@ -11,7 +11,7 @@ const CreateFundPage = ({ loadingLoggedInUser }) => {
   }
 
   return (
-    <Page>
+    <Page showMenuItems={false}>
       <CreateFund />
     </Page>
   );
