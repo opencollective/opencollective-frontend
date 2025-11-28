@@ -200,7 +200,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
                 onSuccess={() => {
                   refetchMetadata();
                   client.refetchQueries({
-                    include: ['DashboardRecurringContributions'],
+                    include: ['DashboardOrders'],
                   });
                 }}
               />

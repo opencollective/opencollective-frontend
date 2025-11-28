@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { Currency, DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -81,7 +81,7 @@ export type FilterMeta = {
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
 };
 
-type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
+type GraphQLQueryVariables = DashboardOrdersQueryVariables;
 
 // Only needed when either the values or key of filters are different
 // to expected key or value of QueryVariables
