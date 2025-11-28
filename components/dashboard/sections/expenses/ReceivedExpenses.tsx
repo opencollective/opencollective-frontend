@@ -34,7 +34,12 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta as CommonFilterMeta } from './filters';
-import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
+import {
+  ExpenseAccountingCategoryKinds,
+  filters as commonFilters,
+  schema as commonSchema,
+  toVariables as commonToVariables,
+} from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
@@ -132,6 +137,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     hostSlug: hostSlug,
     includeUncategorized: true,
     omitExpenseTypesInFilter,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, { type: ExpenseType }>({

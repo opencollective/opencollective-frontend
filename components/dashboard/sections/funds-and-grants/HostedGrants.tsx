@@ -11,7 +11,7 @@ import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Expense } from '../../../../lib/graphql/types/v2/schema';
+import type { AccountingCategoryKind, Expense } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
@@ -34,6 +34,7 @@ import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta } from '../expenses/filters';
 import {
+  ExpenseAccountingCategoryKinds,
   filters as commonFilters,
   schema as commonSchema,
   toVariables as commonToVariables,
@@ -64,6 +65,7 @@ type FilterMeta = CommonFilterMeta & {
   hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
   expenseTags?: string[];
   includeUncategorized?: boolean;
+  accountingCategoryKinds: readonly AccountingCategoryKind[];
 };
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
@@ -173,6 +175,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     hostedAccounts: metaData?.hostedAccounts.nodes,
     expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
     includeUncategorized: true,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({

@@ -26,7 +26,7 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta as CommonFilterMeta, FilterValues } from './filters';
-import { filters as commonFilters, schema, toVariables } from './filters';
+import { ExpenseAccountingCategoryKinds, filters as commonFilters, schema, toVariables } from './filters';
 import { accountExpensesQuery } from './queries';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
@@ -91,6 +91,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const filterMeta: FilterMeta = {
     currency: (LoggedInUser?.collective?.currency || 'USD') as Currency,
     omitExpenseTypesInFilter,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const hasNewSubmitExpenseFlow =

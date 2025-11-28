@@ -50,7 +50,7 @@ import type { DashboardSectionProps } from '../../types';
 import { amount, beneficiary, contributionId, contributor, date, expectedAt, paymentMethod, status } from './columns';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, schema, toVariables } from './filters';
+import { ContributionAccountingCategoryKinds, filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -234,6 +234,9 @@ const dashboardContributionsQuery = gql`
     $includeIncognito: Boolean
     $amount: AmountRangeInput
     $paymentMethod: [PaymentMethodReferenceInput]
+    $paymentMethodService: [PaymentMethodService]
+    $paymentMethodType: [PaymentMethodType]
+    $accountingCategory: [String]
     $includeHostedAccounts: Boolean!
     $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
@@ -262,6 +265,9 @@ const dashboardContributionsQuery = gql`
         offset: $offset
         limit: $limit
         paymentMethod: $paymentMethod
+        paymentMethodService: $paymentMethodService
+        paymentMethodType: $paymentMethodType
+        accountingCategory: $accountingCategory
         includeHostedAccounts: $includeHostedAccounts
         includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter
@@ -513,9 +519,12 @@ const Contributions = ({
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
-    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
-    accountSlug: account?.slug,
+    childrenAccounts: account.childrenAccounts?.nodes ?? [],
+    accountSlug: account.slug,
     showChildAccountFilter: direction === 'INCOMING' && !includeHostedAccounts && includeChildrenAccounts,
+    hostSlug: account.isHost ? account.slug : undefined,
+    includeUncategorized: true,
+    accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({

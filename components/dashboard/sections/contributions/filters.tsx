@@ -9,12 +9,15 @@ import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/type
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
 import type { Account } from '@/lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
 
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
+import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
@@ -51,11 +54,18 @@ export const schema = z.object({
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
   frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
   paymentMethodId: isMulti(z.string()).optional(),
+  paymentMethod: paymentMethodFilter.schema,
+  accountingCategory: accountingCategoryFilter.schema,
   tier: isMulti(z.string()).optional(),
   account: childAccountFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
+
+export const ContributionAccountingCategoryKinds = [
+  AccountingCategoryKind.CONTRIBUTION,
+  AccountingCategoryKind.ADDED_FUNDS,
+] as const;
 
 export type FilterMeta = {
   currency?: Currency;
@@ -63,6 +73,9 @@ export type FilterMeta = {
   childrenAccounts?: Account[];
   accountSlug?: string;
   showChildAccountFilter?: boolean;
+  hostSlug?: string;
+  includeUncategorized?: boolean;
+  accountingCategoryKinds?: readonly AccountingCategoryKind[];
 };
 
 type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
@@ -76,6 +89,8 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
   date: orderCreateDateFilter.toVariables,
   amount: amountFilter.toVariables,
   paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
+  paymentMethod: paymentMethodFilter.toVariables,
+  accountingCategory: value => ({ accountingCategory: value }),
   tier: (value: [string]) => {
     return { tier: value.map(id => ({ id })) };
   },
@@ -135,6 +150,8 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ defaultMessage: 'Payment Method', id: 'paymentmethod.label' }),
     valueRenderer: ({ value }) => value.split('-')[0],
   },
+  paymentMethod: paymentMethodFilter.filter,
+  accountingCategory: accountingCategoryFilter.filter,
   account: {
     ...childAccountFilter.filter,
     hide: ({ meta }) => !meta?.showChildAccountFilter || !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
