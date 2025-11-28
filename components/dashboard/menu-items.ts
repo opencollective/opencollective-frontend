@@ -208,7 +208,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: isIndividual && hasIssuedGrantRequests,
-      Icon: Receipt,
+      Icon: Award,
       label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,
     },
@@ -254,7 +254,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: (isSimpleIndividual || isSimpleOrganization) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: Coins,
+      Icon: HandCoins,
     },
     {
       if: !isSimpleIndividual && !isSimpleOrganization && !isCommunityManagerOnly,
