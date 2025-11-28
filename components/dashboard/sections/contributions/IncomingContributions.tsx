@@ -17,6 +17,7 @@ import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, ContributionAccountingCategoryKinds, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { dashboardOrdersQuery } from './queries';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -157,10 +158,32 @@ const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
+  const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: 'INCOMING',
+      includeIncognito: true,
+      includeChildrenAccounts: true,
+      ...queryFilter.variables,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const handleRefetch = React.useCallback(() => {
+    refetch();
+    refetchMetadata();
+  }, [refetch, refetchMetadata]);
+
   const viewsWithCount = views.map(view => ({
     ...view,
     count: metadata?.account?.[view.id]?.totalCount,
   }));
+
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
   const showPausedMessage =
     !metadataLoading &&
@@ -186,11 +209,13 @@ const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
 
       <ContributionsTable
         accountSlug={accountSlug}
-        direction="INCOMING"
         queryFilter={queryFilter}
         views={viewsWithCount}
-        includeChildrenAccounts
-        onRefetch={refetchMetadata}
+        orders={orders}
+        loading={loading}
+        nbPlaceholders={nbPlaceholders}
+        error={error}
+        refetch={handleRefetch}
       />
     </div>
   );

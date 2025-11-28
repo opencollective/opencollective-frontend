@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useApolloClient, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -22,6 +22,7 @@ import ContributionsTable from './ContributionsTable';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, ContributionAccountingCategoryKinds, hostSchema, toVariables } from './filters';
+import { dashboardOrdersQuery } from './queries';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -89,12 +90,11 @@ const hostExpectedFundsMetadataQuery = gql`
   }
 `;
 
-const expectedFundsFilters = omit(allFilters, ['tier']);
+const filters = omit(allFilters, ['tier']);
 
 function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
-  const client = useApolloClient();
 
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.EXPECTED_FUNDS);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
@@ -156,7 +156,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     toVariables,
     meta: filterMeta,
     views,
-    filters: expectedFundsFilters,
+    filters,
   });
 
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
@@ -169,10 +169,34 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     skip: isUpgradeRequired,
   });
 
+  const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: 'INCOMING',
+      includeIncognito: true,
+      hostContext: 'ALL',
+      expectedFundsFilter: (queryFilter.variables as any).expectedFundsFilter || ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
+      ...queryFilter.variables,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+    skip: isUpgradeRequired,
+  });
+
+  const handleRefetch = React.useCallback(() => {
+    refetch();
+    refetchMetadata();
+  }, [refetch, refetchMetadata]);
+
   const viewsWithCount = views.map(view => ({
     ...view,
     count: metadata?.account?.[view.id]?.totalCount,
   }));
+
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
   return (
     <div className="flex flex-col gap-4">
@@ -197,12 +221,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
               <CreatePendingContributionModal
                 hostSlug={accountSlug}
                 onClose={() => setShowCreatePendingOrderModal(false)}
-                onSuccess={() => {
-                  refetchMetadata();
-                  client.refetchQueries({
-                    include: ['DashboardOrders'],
-                  });
-                }}
+                onSuccess={handleRefetch}
               />
             )}
           </React.Fragment>
@@ -214,13 +233,20 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       ) : (
         <ContributionsTable
           accountSlug={accountSlug}
-          direction="INCOMING"
           queryFilter={queryFilter}
           views={viewsWithCount}
+          orders={orders}
+          loading={loading}
+          nbPlaceholders={nbPlaceholders}
+          error={error}
+          refetch={handleRefetch}
           onlyExpectedFunds
-          includeChildrenAccounts={false}
           hostSlug={accountSlug}
-          onRefetch={refetchMetadata}
+          columnVisibility={{
+            legacyId: true,
+            fromAccount: false,
+            expectedAt: true,
+          }}
         />
       )}
     </div>
