@@ -544,12 +544,22 @@ interface Account {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -3227,12 +3237,22 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -5270,6 +5290,23 @@ input PayoutMethodReferenceInput {
   id: String
 }
 
+enum HostContext {
+  """
+  Both the Host Organizations internal accounts and Hosted Collectives
+  """
+  ALL
+
+  """
+  Only the Host Organization (including its projects/events)
+  """
+  INTERNAL
+
+  """
+  Only Hosted Collectives (including their projects/events)
+  """
+  HOSTED
+}
+
 """
 The user or system that paused the order
 """
@@ -5782,12 +5819,22 @@ type PaymentMethod {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -7392,23 +7439,6 @@ type HostStats {
     """
     net: Boolean = false
   ): Amount
-}
-
-enum HostContext {
-  """
-  Both the Host Organizations internal accounts and Hosted Collectives
-  """
-  ALL
-
-  """
-  Only the Host Organization (including its projects/events)
-  """
-  INTERNAL
-
-  """
-  Only Hosted Collectives (including their projects/events)
-  """
-  HOSTED
 }
 
 """
@@ -9213,12 +9243,22 @@ type Bot implements Account {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -10176,12 +10216,22 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -11697,12 +11747,22 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -12934,12 +12994,22 @@ type Individual implements Account {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -14150,12 +14220,22 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -15233,12 +15313,22 @@ type Vendor implements Account & AccountWithContributions {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -16637,12 +16727,22 @@ type Query {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -19136,12 +19236,22 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -20246,12 +20356,22 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 

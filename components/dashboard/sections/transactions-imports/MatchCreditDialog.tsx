@@ -310,6 +310,7 @@ const useMatchCreditDialogQueryFilter = (
       hostSlug: host.slug,
       hostedAccounts: accounts,
       disableHostedAccountsSearch: Boolean(accounts?.length),
+      accountingCategoryKinds: ExpenseFilters.ExpenseAccountingCategoryKinds,
     };
 
     return meta;

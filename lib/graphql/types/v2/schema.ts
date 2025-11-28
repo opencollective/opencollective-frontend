@@ -332,6 +332,7 @@ export type AccountOAuthApplicationsArgs = {
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -343,6 +344,7 @@ export type AccountOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1824,6 +1826,7 @@ export type BotOAuthApplicationsArgs = {
 
 /** This represents a Bot account */
 export type BotOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1835,6 +1838,7 @@ export type BotOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2398,6 +2402,7 @@ export type CollectiveOAuthApplicationsArgs = {
 
 /** This represents a Collective account */
 export type CollectiveOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2409,6 +2414,7 @@ export type CollectiveOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -4500,6 +4506,7 @@ export type EventOAuthApplicationsArgs = {
 
 /** This represents an Event account */
 export type EventOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4511,6 +4518,7 @@ export type EventOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5766,6 +5774,7 @@ export type FundOAuthApplicationsArgs = {
 
 /** This represents an Project account */
 export type FundOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5777,6 +5786,7 @@ export type FundOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6585,6 +6595,7 @@ export type HostOffPlatformTransactionsArgs = {
 
 /** This represents an Host account */
 export type HostOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6596,6 +6607,7 @@ export type HostOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7470,6 +7482,7 @@ export type IndividualOAuthAuthorizationsArgs = {
 
 /** This represents an Individual account */
 export type IndividualOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -7481,6 +7494,7 @@ export type IndividualOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10007,6 +10021,7 @@ export type OrganizationOAuthApplicationsArgs = {
 
 /** This represents an Organization account */
 export type OrganizationOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10018,6 +10033,7 @@ export type OrganizationOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10257,6 +10273,7 @@ export type PaymentMethod = {
 
 /** PaymentMethod model */
 export type PaymentMethodOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10268,6 +10285,7 @@ export type PaymentMethodOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11346,6 +11364,7 @@ export type ProjectOAuthApplicationsArgs = {
 
 /** This represents an Project account */
 export type ProjectOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11357,6 +11376,7 @@ export type ProjectOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11824,6 +11844,7 @@ export type QueryOrderArgs = {
 /** This is the root query */
 export type QueryOrdersArgs = {
   account?: InputMaybe<AccountReferenceInput>;
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11835,6 +11856,7 @@ export type QueryOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -13725,6 +13747,7 @@ export type VendorOAuthApplicationsArgs = {
 
 /** This represents a Vendor account */
 export type VendorOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -13736,6 +13759,7 @@ export type VendorOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
