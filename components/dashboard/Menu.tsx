@@ -317,7 +317,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       section: ALL_SECTIONS.HOST_AGREEMENTS,
-      if: !isIndividual && shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, hasHosting),
+      if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, hasHosting && !isIndividual),
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
