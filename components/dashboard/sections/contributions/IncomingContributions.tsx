@@ -1,21 +1,28 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
-import type { Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import type { Account, DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
+import { childAccountFilter } from '../../filters/ChildAccountFilter';
+import { tierFilter } from '../../filters/TierFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
-import type { FilterMeta } from './filters';
-import { filters as allFilters, ContributionAccountingCategoryKinds, schema, toVariables } from './filters';
+import type { FilterMeta as BaseFilterMeta } from './filters';
+import {
+  filters as baseFilters,
+  ContributionAccountingCategoryKinds,
+  schema as baseSchema,
+  toVariables as baseToVariables,
+} from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 import { dashboardOrdersQuery } from './queries';
 
@@ -85,8 +92,32 @@ const incomingContributionsMetadataQuery = gql`
     }
   }
 `;
+const schema = baseSchema.extend({ tier: tierFilter.schema, account: childAccountFilter.schema });
 
-const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate']);
+type FilterValues = z.infer<typeof schema>;
+type FilterMeta = BaseFilterMeta & {
+  childrenAccounts?: Account[];
+};
+
+const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
+  ...baseToVariables,
+  tier: tierFilter.toVariables,
+  account: (value, key, meta) => {
+    if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
+      return { includeChildrenAccounts: false };
+    } else if (!value) {
+      return { includeChildrenAccounts: true };
+    } else {
+      return { slug: value, includeChildrenAccounts: false };
+    }
+  },
+};
+
+const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
+  ...baseFilters,
+  tier: tierFilter.filter,
+  account: childAccountFilter.filter,
+};
 
 const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
   const intl = useIntl();
@@ -132,9 +163,8 @@ const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
 
   const filterMeta: FilterMeta = {
     currency: account?.currency,
-    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
     accountSlug: account?.slug,
-    showChildAccountFilter: true,
+    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,

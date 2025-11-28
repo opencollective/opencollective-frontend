@@ -1,27 +1,34 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
-import type { Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+import type { DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
+import { expectedDateFilter } from '../../filters/DateFilter';
+import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, ContributionAccountingCategoryKinds, hostSchema, toVariables } from './filters';
+import {
+  filters as baseFilters,
+  ContributionAccountingCategoryKinds,
+  schema as baseSchema,
+  toVariables as baseToVariables,
+} from './filters';
 import { dashboardOrdersQuery } from './queries';
 
 enum ContributionsTab {
@@ -90,7 +97,20 @@ const hostExpectedFundsMetadataQuery = gql`
   }
 `;
 
-const filters = omit(allFilters, ['tier']);
+const schema = baseSchema.extend({
+  expectedFundsFilter: expectedFundsFilter.schema,
+  expectedDate: expectedDateFilter.schema,
+});
+type FilterValues = z.infer<typeof schema>;
+const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
+  ...baseToVariables,
+  expectedDate: expectedDateFilter.toVariables,
+};
+const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
+  ...baseFilters,
+  expectedFundsFilter: expectedFundsFilter.filter,
+  expectedDate: expectedDateFilter.filter,
+};
 
 function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
@@ -99,7 +119,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.EXPECTED_FUNDS);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
 
-  const views: Views<z.infer<typeof hostSchema>> = [
+  const views: Views<z.infer<typeof schema>> = [
     {
       id: ContributionsTab.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
@@ -143,16 +163,14 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
 
   const filterMeta: FilterMeta = {
     currency: account?.currency,
-    childrenAccounts: [],
     accountSlug: account?.slug,
-    showChildAccountFilter: false,
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({
-    schema: hostSchema,
+    schema,
     toVariables,
     meta: filterMeta,
     views,
@@ -175,7 +193,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       filter: 'INCOMING',
       includeIncognito: true,
       hostContext: 'ALL',
-      expectedFundsFilter: (queryFilter.variables as any).expectedFundsFilter || ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
       ...queryFilter.variables,
     },
     context: API_V2_CONTEXT,
