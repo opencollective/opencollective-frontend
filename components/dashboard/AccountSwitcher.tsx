@@ -176,7 +176,8 @@ const MenuEntry = ({
               data-expand-button
               variant="ghost"
               size="icon-xs"
-              className="ml-2 h-6 w-6 shrink-0 text-slate-400 hover:text-slate-600"
+              className="ml-2 h-6 w-6 shrink-0 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
+              onClick={e => e.stopPropagation()}
             >
               {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </Button>
