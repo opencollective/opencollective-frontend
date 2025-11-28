@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import Avatar from './Avatar';
 import { ConfirmContributionForm } from './contributions/ConfirmContributionForm';
-import type { BaseModalProps } from './ModalContext';
 import { Button } from './ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog';
+import Avatar from './Avatar';
+import type { BaseModalProps } from './ModalContext';
 
 interface ContributionConfirmationModalProps extends BaseModalProps {
   /** the order that is being confirmed */

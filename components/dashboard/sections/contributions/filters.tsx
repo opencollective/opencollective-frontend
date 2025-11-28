@@ -8,18 +8,15 @@ import type { Currency, DashboardOrdersQueryVariables } from '../../../../lib/gr
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
-import type { Account } from '@/lib/graphql/types/v2/schema';
 import { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
 
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
-import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
+import { orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
 import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-import { tierFilter } from '../../filters/TierFilter';
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),

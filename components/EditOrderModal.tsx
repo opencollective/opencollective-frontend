@@ -15,7 +15,6 @@ import type { AccountReferenceInput, PaymentMethod, SetupIntentInput } from '../
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
 import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
-import type { BaseModalProps } from './ModalContext';
 import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
 import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
@@ -34,8 +33,8 @@ import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
 import Loading from './Loading';
 import LoadingPlaceholder from './LoadingPlaceholder';
+import type { BaseModalProps } from './ModalContext';
 import PayWithPaypalButton from './PayWithPaypalButton';
-import StyledButton from './StyledButton';
 import StyledInputAmount from './StyledInputAmount';
 import StyledRadioList from './StyledRadioList';
 import StyledSelect from './StyledSelect';

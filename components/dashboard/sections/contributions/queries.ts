@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client/core';
+
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 
 export const dashboardOrdersQuery = gql`
