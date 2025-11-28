@@ -15,6 +15,7 @@ import type { AccountReferenceInput, PaymentMethod, SetupIntentInput } from '../
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
 import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
+import type { BaseModalProps } from './ModalContext';
 import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
 import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
@@ -25,6 +26,8 @@ import {
   useUpdateOrder,
 } from './recurring-contributions/UpdateOrderPopUp';
 import { useUpdatePaymentMethod } from './recurring-contributions/UpdatePaymentMethodPopUp';
+import { Button } from './ui/Button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { toast, useToast } from './ui/useToast';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
@@ -34,11 +37,10 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import PayWithPaypalButton from './PayWithPaypalButton';
 import StyledButton from './StyledButton';
 import StyledInputAmount from './StyledInputAmount';
-import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
 import StyledRadioList from './StyledRadioList';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
-import { H4, P, Span } from './Text';
+import { P, Span } from './Text';
 
 const i18nReasons = defineMessages({
   NO_LONGER_WANT_TO_SUPPORT: {
@@ -51,8 +53,7 @@ const i18nReasons = defineMessages({
 
 export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod' | 'editAddedFunds';
 
-type EditOrderModalProps = {
-  onClose: () => void;
+type EditOrderModalProps = BaseModalProps & {
   order: any;
   accountSlug: string;
   action: EditOrderActions;
@@ -80,7 +81,7 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
       await submitCancellation({
         variables: values,
       });
-      props.onClose();
+      props.setOpen(false);
       toast({
         message: (
           <FormattedMessage
@@ -90,6 +91,7 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
           />
         ),
       });
+      props.onSuccess?.();
     } catch (error) {
       const errorMsg = getErrorFromGraphqlException(error).message;
       toast({ variant: 'error', message: errorMsg });
@@ -101,63 +103,73 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   });
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px" data-cy="cancel-order-modal">
-      <ModalHeader onClose={props.onClose}>
-        <H4 fontSize="20px" fontWeight="700">
-          <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
-        </H4>
-      </ModalHeader>
-      <ModalBody as="form" onSubmit={formik.handleSubmit as () => void} mb={0}>
-        <P fontSize="15px" mb="10px" lineHeight="20px">
-          <FormattedMessage
-            id="subscription.cancel.question"
-            defaultMessage="Why are you cancelling your subscription today? 🥺"
-          />
-        </P>
-        <StyledRadioList
-          id="reasonCode"
-          name="reasonCode"
-          defaultValue="NO_LONGER_WANT_TO_SUPPORT"
-          options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
-          onChange={({ value, name }) => formik.setFieldValue(name, value)}
-          value={formik.values.reasonCode}
-          data-cy="cancel-reason"
-        >
-          {({ value, radio }) => (
-            <Box data-cy={value} my={1} fontSize="13px" fontWeight={400}>
-              <Span mx={2}>{radio}</Span>
-              <Span>{intl.formatMessage(i18nReasons[value])}</Span>
-            </Box>
-          )}
-        </StyledRadioList>
-        {formik.values.reasonCode === 'OTHER' && (
-          <StyledTextarea
-            name="reason"
-            fontSize="12px"
-            placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
-            height={70}
-            width="100%"
-            resize="none"
-            onChange={formik.handleChange}
-            value={formik.values.reason}
-            mt={2}
-            data-cy="cancellation-text-area"
-          />
-        )}
-
-        <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
-          <StyledButton
-            width="100%"
-            m={1}
-            type="submit"
-            loading={formik.isSubmitting}
-            data-cy="recurring-contribution-cancel-yes"
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="max-w-[420px]"
+        data-cy="cancel-order-modal"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={formik.handleSubmit as () => void}>
+          <P fontSize="15px" mb="10px" lineHeight="20px">
+            <FormattedMessage
+              id="subscription.cancel.question"
+              defaultMessage="Why are you cancelling your subscription today? 🥺"
+            />
+          </P>
+          <StyledRadioList
+            id="reasonCode"
+            name="reasonCode"
+            defaultValue="NO_LONGER_WANT_TO_SUPPORT"
+            options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
+            onChange={({ value, name }) => formik.setFieldValue(name, value)}
+            value={formik.values.reasonCode}
+            data-cy="cancel-reason"
           >
-            <FormattedMessage id="submit" defaultMessage="Submit" />
-          </StyledButton>
-        </Flex>
-      </ModalBody>
-    </StyledModal>
+            {({ value, radio }) => (
+              <Box data-cy={value} my={1} fontSize="13px" fontWeight={400}>
+                <Span mx={2}>{radio}</Span>
+                <Span>{intl.formatMessage(i18nReasons[value])}</Span>
+              </Box>
+            )}
+          </StyledRadioList>
+          {formik.values.reasonCode === 'OTHER' && (
+            <StyledTextarea
+              name="reason"
+              fontSize="12px"
+              placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
+              height={70}
+              width="100%"
+              resize="none"
+              onChange={formik.handleChange}
+              value={formik.values.reason}
+              mt={2}
+              data-cy="cancellation-text-area"
+            />
+          )}
+
+          <div className="mt-4 flex justify-center">
+            <Button
+              className="w-full"
+              type="submit"
+              loading={formik.isSubmitting}
+              data-cy="recurring-contribution-cancel-yes"
+            >
+              <FormattedMessage id="submit" defaultMessage="Submit" />
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -169,7 +181,11 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
 
   // state management
   const { locale } = useIntl();
-  const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution: props.order, onSuccess: props.onClose });
+  const handleSuccess = () => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  };
+  const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution: props.order, onSuccess: handleSuccess });
   const tiers = get(data, 'account.tiers.nodes', null);
   const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
   const contributeOptionsState = useContributeOptions(props.order, tiers, tiersLoading, disableCustomContributions);
@@ -199,19 +215,27 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   };
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px">
-      <ModalHeader onClose={props.onClose}>
-        <H4 fontSize="20px" fontWeight="700">
-          <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
-        </H4>
-      </ModalHeader>
-      <ModalBody mb={0}>
-        <P fontSize="15px" mb="10" lineHeight="20px">
-          <FormattedMessage
-            id="subscription.updateTier.subheader"
-            defaultMessage="Pick an existing tier or enter a custom amount."
-          />
-        </P>
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="max-w-[420px]"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage id="subscription.menu.updateTier" defaultMessage="Update tier" />
+          </DialogTitle>
+          <DialogDescription>
+            <FormattedMessage
+              id="subscription.updateTier.subheader"
+              defaultMessage="Pick an existing tier or enter a custom amount."
+            />
+          </DialogDescription>
+        </DialogHeader>
         {tiersLoading || contributeOptionsState.loading ? (
           <LoadingPlaceholder height={100} />
         ) : (
@@ -297,7 +321,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             )}
           </StyledRadioList>
         )}
-        <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
+        <div className="mt-4 flex flex-wrap justify-between">
           {isPaypal && selectedAmountOption ? (
             <PayWithPaypalButton
               isSubmitting={isSubmittingOrder}
@@ -318,19 +342,19 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
               }
             />
           ) : (
-            <StyledButton
-              buttonStyle="secondary"
+            <Button
+              variant="outline"
               loading={isSubmittingOrder}
               data-cy="recurring-contribution-update-order-button"
               onClick={() => updateOrder(selectedTier, selectedAmountOption, inputAmountValue)}
-              width="100%"
+              className="w-full"
             >
               <FormattedMessage id="actions.update" defaultMessage="Update" />
-            </StyledButton>
+            </Button>
           )}
-        </Flex>
-      </ModalBody>
-    </StyledModal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -422,6 +446,15 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
 
   const { updatePaymentMethod } = useUpdatePaymentMethod(props.order);
 
+  const handleClose = React.useCallback(() => {
+    props.setOpen(false);
+  }, [props.setOpen]);
+
+  const handleSuccess = React.useCallback(() => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  }, [props.setOpen, props.onSuccess]);
+
   const onSaveClick = React.useCallback(async () => {
     let paymentMethodId;
 
@@ -431,7 +464,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         const res = await option.elements.submit();
         if (res.error) {
           toast({ variant: 'error', message: res.error.message });
-          props.onClose();
+          handleClose();
           return;
         }
 
@@ -452,7 +485,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         });
         if (setupResponse.error) {
           toast({ variant: 'error', message: setupResponse.error.message });
-          props.onClose();
+          handleClose();
           return;
         }
 
@@ -476,12 +509,12 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
 
       const success = await updatePaymentMethod({ id: paymentMethodId });
       if (success) {
-        props.onClose();
+        handleSuccess();
       }
     } finally {
       setSubmitting(false);
     }
-  }, [option, props.onClose, intl]);
+  }, [option, handleClose, handleSuccess, intl]);
 
   const onPaypalSubscription = React.useCallback(
     async paypalSubscriptionId => {
@@ -492,13 +525,13 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
           paypalInfo: { subscriptionId: paypalSubscriptionId },
         });
         if (success) {
-          props.onClose();
+          handleSuccess();
         }
       } finally {
         setSubmitting(false);
       }
     },
-    [props.onClose],
+    [handleSuccess],
   );
 
   React.useEffect(() => {
@@ -537,54 +570,62 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
   }, [router.query.orderId, router.query.stripeAccount, router.query.setup_intent, router.query.redirect_status]);
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="480px" width="100%">
-      <ModalHeader onClose={props.onClose}>
-        <H4 fontSize="20px" fontWeight="700">
-          {props.order.status === 'PAUSED' ? (
-            <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
-          ) : (
-            <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
-          )}
-        </H4>
-      </ModalHeader>
-      <ModalBody mb={0}>
-        <P fontSize="15px" mb="10" lineHeight="20px">
-          {props.order.status === 'PAUSED' ? (
-            <FormattedMessage
-              defaultMessage="To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one."
-              id="sEJpMg"
-              values={{
-                amountAndInterval: (
-                  <Span fontWeight="bold">
-                    <FormattedMoneyAmount
-                      amount={props.order.totalAmount.valueInCents}
-                      currency={props.order.totalAmount.currency}
-                      interval={getIntervalFromContributionFrequency(props.order.frequency)}
-                    />
-                  </Span>
-                ),
-                collective: <Span fontWeight="bold">{props.order.toAccount.name}</Span>,
-              }}
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Pick an existing payment method or add a new one for your {amountAndInterval} contribution to {collective}."
-              id="JYTV+i"
-              values={{
-                amountAndInterval: (
-                  <Span fontWeight="bold">
-                    <FormattedMoneyAmount
-                      amount={props.order.totalAmount.valueInCents}
-                      currency={props.order.totalAmount.currency}
-                      interval={getIntervalFromContributionFrequency(props.order.frequency)}
-                    />
-                  </Span>
-                ),
-                collective: <Span fontWeight="bold">{props.order.toAccount.slug}</Span>,
-              }}
-            />
-          )}
-        </P>
+    <Dialog open={props.open} onOpenChange={props.setOpen}>
+      <DialogContent
+        className="w-full max-w-[480px]"
+        onCloseAutoFocus={e => {
+          if (props.onCloseFocusRef?.current) {
+            e.preventDefault();
+            props.onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            {props.order.status === 'PAUSED' ? (
+              <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
+            ) : (
+              <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+            )}
+          </DialogTitle>
+          <DialogDescription>
+            {props.order.status === 'PAUSED' ? (
+              <FormattedMessage
+                defaultMessage="To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one."
+                id="sEJpMg"
+                values={{
+                  amountAndInterval: (
+                    <Span fontWeight="bold">
+                      <FormattedMoneyAmount
+                        amount={props.order.totalAmount.valueInCents}
+                        currency={props.order.totalAmount.currency}
+                        interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                      />
+                    </Span>
+                  ),
+                  collective: <Span fontWeight="bold">{props.order.toAccount.name}</Span>,
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Pick an existing payment method or add a new one for your {amountAndInterval} contribution to {collective}."
+                id="JYTV+i"
+                values={{
+                  amountAndInterval: (
+                    <Span fontWeight="bold">
+                      <FormattedMoneyAmount
+                        amount={props.order.totalAmount.valueInCents}
+                        currency={props.order.totalAmount.currency}
+                        interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                      />
+                    </Span>
+                  ),
+                  collective: <Span fontWeight="bold">{props.order.toAccount.slug}</Span>,
+                }}
+              />
+            )}
+          </DialogDescription>
+        </DialogHeader>
         {!order ? (
           <Loading />
         ) : (
@@ -597,7 +638,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
             account={order?.fromAccount}
           />
         )}
-        <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
+        <div className="mt-4 flex flex-wrap justify-between">
           {option.id === 'pay-with-paypal' ? (
             <PayWithPaypalButton
               order={props.order}
@@ -616,30 +657,45 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
               }}
             />
           ) : (
-            <StyledButton
-              buttonSize="tiny"
-              buttonStyle="secondary"
+            <Button
+              size="sm"
+              variant="outline"
               type="submit"
               data-cy="recurring-contribution-submit-pm-button"
               onClick={onSaveClick}
               loading={isSubmitting}
               disabled={loading || query.loading}
-              minWidth={60}
+              className="min-w-[60px]"
             >
               <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
+            </Button>
           )}
-        </Flex>
-      </ModalBody>
-    </StyledModal>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-const EditAddedFundsModal = (props: EditOrderModalProps) => {
+const EditAddedFundsModal = (props: Omit<EditOrderModalProps, 'action'>) => {
+  const handleClose = () => {
+    props.setOpen(false);
+  };
+
+  const handleSuccess = () => {
+    props.setOpen(false);
+    props.onSuccess?.();
+  };
+
+  // AddFundsModal still uses the old onClose pattern, so we bridge it here
+  // The modal visibility is controlled by the parent via `open` prop
+  if (!props.open) {
+    return null;
+  }
+
   return (
     <AddFundsModal
-      onClose={props.onClose}
-      onSuccess={props.onSuccess}
+      onClose={handleClose}
+      onSuccess={handleSuccess}
       collective={props.order.toAccount}
       editOrderId={props.order.id}
       initialValues={{

@@ -123,15 +123,14 @@ export default function ContributionsTable<FilterValues extends Record<string, u
         </div>
       )}
 
-      {editOrder.order && (
-        <EditOrderModal
-          accountSlug={accountSlug}
-          order={editOrder.order}
-          action={editOrder.action}
-          onClose={() => setEditOrder({ order: null, action: null })}
-          onSuccess={refetch}
-        />
-      )}
+      <EditOrderModal
+        accountSlug={accountSlug}
+        order={editOrder.order}
+        action={editOrder.action}
+        open={Boolean(editOrder.order)}
+        setOpen={open => !open && setEditOrder({ order: null, action: null })}
+        onSuccess={refetch}
+      />
 
       <Pagination queryFilter={queryFilter} total={orders.totalCount} />
 

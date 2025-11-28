@@ -217,13 +217,12 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
               </span>
               <PlusIcon size={20} />
             </Button>
-            {showCreatePendingOrderModal && (
-              <CreatePendingContributionModal
-                hostSlug={accountSlug}
-                onClose={() => setShowCreatePendingOrderModal(false)}
-                onSuccess={handleRefetch}
-              />
-            )}
+            <CreatePendingContributionModal
+              hostSlug={accountSlug}
+              open={showCreatePendingOrderModal}
+              setOpen={setShowCreatePendingOrderModal}
+              onSuccess={handleRefetch}
+            />
           </React.Fragment>
         }
       />
