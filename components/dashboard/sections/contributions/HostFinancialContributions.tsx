@@ -113,7 +113,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     },
     {
       id: ContributionsTab.ERROR,
-      label: intl.formatMessage({ defaultMessage: 'Error', id: 'KN7zKn' }),
+      label: intl.formatMessage({ defaultMessage: 'Error', id: 'Error' }),
       filter: {
         status: [OrderStatus.ERROR],
       },
