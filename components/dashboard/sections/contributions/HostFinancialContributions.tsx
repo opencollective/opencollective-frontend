@@ -1,9 +1,224 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useQuery } from '@apollo/client';
+import { omit } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
+import type { z } from 'zod';
 
+import type { Views } from '../../../../lib/filters/filter-types';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+
+import { DashboardContext } from '../../DashboardContext';
+import DashboardHeader from '../../DashboardHeader';
+import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import Contributions from './Contributions';
+import ContributionsTable from './ContributionsTable';
+import type { FilterMeta } from './filters';
+import { filters as allFilters, schema as baseSchema, toVariables } from './filters';
+import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { dashboardOrdersQuery } from './queries';
 
-export default function HostFinancialContributions(props: DashboardSectionProps) {
-  return <Contributions {...props} includeHostedAccounts direction="INCOMING" />;
+enum ContributionsTab {
+  ALL = 'ALL',
+  DISPUTED = 'DISPUTED',
+  ERROR = 'ERROR',
+  IN_REVIEW = 'IN_REVIEW',
+  PAUSED = 'PAUSED',
+}
+
+const hostFinancialContributionsMetadataQuery = gql`
+  query HostFinancialContributionsMetadata($slug: String!, $hostContext: HostContext) {
+    account(slug: $slug) {
+      id
+      slug
+      name
+      type
+      settings
+      imageUrl
+      currency
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          imageUrl
+          type
+          hostFeePercent
+        }
+      }
+      DISPUTED: orders(filter: INCOMING, status: [DISPUTED], includeIncognito: true, hostContext: $hostContext) {
+        totalCount
+      }
+      IN_REVIEW: orders(filter: INCOMING, status: [IN_REVIEW], includeIncognito: true, hostContext: $hostContext) {
+        totalCount
+      }
+      ERROR: orders(filter: INCOMING, status: [ERROR], includeIncognito: true, hostContext: $hostContext) {
+        totalCount
+      }
+      PAUSED: orders(filter: INCOMING, status: [PAUSED], includeIncognito: true, hostContext: $hostContext) {
+        totalCount
+      }
+      PAUSED_RESUMABLE: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        hostContext: INTERNAL
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
+      ) {
+        totalCount
+      }
+    }
+  }
+`;
+
+const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate', 'tier']);
+
+const schema = baseSchema.extend({ hostContext: hostContextFilter.schema });
+
+export default function HostFinancialContributions({ accountSlug }: DashboardSectionProps) {
+  const intl = useIntl();
+  const { account } = useContext(DashboardContext);
+
+  const views: Views<z.infer<typeof schema>> = [
+    {
+      id: ContributionsTab.ALL,
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+      filter: {},
+    },
+    {
+      id: ContributionsTab.DISPUTED,
+      label: intl.formatMessage({ defaultMessage: 'Disputed', id: 'X1pwhF' }),
+      filter: {
+        status: [OrderStatus.DISPUTED],
+      },
+    },
+    {
+      id: ContributionsTab.IN_REVIEW,
+      label: intl.formatMessage({ id: 'order.in_review', defaultMessage: 'In Review' }),
+      filter: {
+        status: [OrderStatus.IN_REVIEW],
+      },
+    },
+    {
+      id: ContributionsTab.PAUSED,
+      label: intl.formatMessage({ defaultMessage: 'Paused', id: 'C2iTEH' }),
+      filter: {
+        status: [OrderStatus.PAUSED],
+      },
+    },
+    {
+      id: ContributionsTab.ERROR,
+      label: intl.formatMessage({ defaultMessage: 'Error', id: 'Error' }),
+      filter: {
+        status: [OrderStatus.ERROR],
+      },
+    },
+  ];
+
+  const filterMeta: FilterMeta = {
+    currency: account?.currency,
+    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
+    accountSlug: account?.slug,
+    showChildAccountFilter: false,
+  };
+
+  const queryFilter = useQueryFilter({
+    schema,
+    toVariables,
+    meta: filterMeta,
+    views,
+    filters,
+    skipFiltersOnReset: ['hostContext'],
+  });
+
+  const {
+    data: metadata,
+    loading: metadataLoading,
+    refetch: refetchMetadata,
+  } = useQuery(hostFinancialContributionsMetadataQuery, {
+    variables: {
+      slug: accountSlug,
+      hostContext: queryFilter.values.hostContext,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: 'INCOMING',
+      includeIncognito: true,
+      ...queryFilter.variables,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const handleRefetch = React.useCallback(() => {
+    refetch();
+    refetchMetadata();
+  }, [refetch, refetchMetadata]);
+
+  const viewsWithCount = views.map(view => ({
+    ...view,
+    count: metadata?.account?.[view.id]?.totalCount,
+  }));
+
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
+
+  const showPausedMessage =
+    !metadataLoading &&
+    metadata?.account?.canStartResumeContributionsProcess &&
+    metadata?.account?.PAUSED_RESUMABLE?.totalCount > 0;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <DashboardHeader
+        title={
+          <div className="flex flex-1 items-center justify-between gap-4">
+            <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
+          </div>
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Contributions made to your organization and Collectives you host."
+            id="IZotDb"
+          />
+        }
+      />
+
+      {showPausedMessage && (
+        <PausedIncomingContributionsMessage
+          account={metadata.account}
+          count={metadata.account[ContributionsTab.PAUSED].totalCount}
+        />
+      )}
+
+      <ContributionsTable
+        accountSlug={accountSlug}
+        queryFilter={queryFilter}
+        views={viewsWithCount}
+        orders={orders}
+        loading={loading}
+        nbPlaceholders={nbPlaceholders}
+        error={error}
+        refetch={handleRefetch}
+      />
+    </div>
+  );
 }
