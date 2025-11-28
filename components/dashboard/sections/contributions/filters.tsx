@@ -14,8 +14,6 @@ import { amountFilter } from '../../filters/AmountFilter';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
-import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
-import { hostContextFilter } from '../../filters/HostContextFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import { tierFilter } from '../../filters/TierFilter';
@@ -45,27 +43,19 @@ export const schema = z.object({
   offset: integer.default(0),
   orderBy: contributionsOrderFilter.schema,
   searchTerm: searchFilter.schema,
-  expectedDate: expectedDateFilter.schema,
   chargeDate: orderChargeDateFilter.schema,
   date: orderCreateDateFilter.schema,
-  expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
   frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
   paymentMethodId: isMulti(z.string()).optional(),
-  tier: tierFilter.schema,
-  account: childAccountFilter.schema,
 });
-
-export const hostSchema = schema.extend({ hostContext: hostContextFilter.schema });
 
 type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
-  childrenAccounts?: Account[];
   accountSlug?: string;
-  showChildAccountFilter?: boolean;
 };
 
 type GraphQLQueryVariables = DashboardOrdersQueryVariables;
@@ -74,29 +64,16 @@ type GraphQLQueryVariables = DashboardOrdersQueryVariables;
 // to expected key or value of QueryVariables
 export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables, FilterMeta> = {
   orderBy: contributionsOrderFilter.toVariables,
-  expectedDate: expectedDateFilter.toVariables,
   chargeDate: orderChargeDateFilter.toVariables,
   date: orderCreateDateFilter.toVariables,
   amount: amountFilter.toVariables,
   paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
-  tier: tierFilter.toVariables,
-  account: (value, key, meta) => {
-    if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
-      return { includeChildrenAccounts: false };
-    } else if (!value) {
-      return { includeChildrenAccounts: true };
-    } else {
-      return { slug: value, includeChildrenAccounts: false };
-    }
-  },
 };
 
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
-  expectedDate: expectedDateFilter.filter,
   chargeDate: orderChargeDateFilter.filter,
   date: orderCreateDateFilter.filter,
-  expectedFundsFilter: expectedFundsFilter.filter,
   amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }) },
   orderBy: contributionsOrderFilter.filter,
   status: {
@@ -112,7 +89,6 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
   },
-  tier: tierFilter.filter,
   frequency: {
     labelMsg: defineMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),
     Component: ({ valueRenderer, intl, ...props }) => (
@@ -129,9 +105,5 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   paymentMethodId: {
     labelMsg: defineMessage({ defaultMessage: 'Payment Method', id: 'paymentmethod.label' }),
     valueRenderer: ({ value }) => value.split('-')[0],
-  },
-  account: {
-    ...childAccountFilter.filter,
-    hide: ({ meta }) => !meta?.showChildAccountFilter || !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
   },
 };

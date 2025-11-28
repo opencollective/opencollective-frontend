@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
@@ -16,7 +15,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, schema as baseSchema, toVariables } from './filters';
+import { filters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 import { dashboardOrdersQuery } from './queries';
 
@@ -77,8 +76,6 @@ const hostFinancialContributionsMetadataQuery = gql`
   }
 `;
 
-const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate', 'tier']);
-
 const schema = baseSchema.extend({ hostContext: hostContextFilter.schema });
 
 export default function HostFinancialContributions({ accountSlug }: DashboardSectionProps) {
@@ -123,9 +120,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
 
   const filterMeta: FilterMeta = {
     currency: account?.currency,
-    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
     accountSlug: account?.slug,
-    showChildAccountFilter: false,
   };
 
   const queryFilter = useQueryFilter({
