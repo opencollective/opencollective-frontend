@@ -201,6 +201,11 @@ function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
   const desktopSidebarCollapsed = !isMobile && state === 'collapsed';
   const isRootItemActive = hasActiveSubItem && (!open || desktopSidebarCollapsed);
 
+  // Hide menu group if all it's submenu items are hidden
+  if (!item.subMenu?.length) {
+    return null;
+  }
+
   const trigger = (
     <SidebarMenuButton isActive={isRootItemActive} tooltip={item.label} data-cy={`menu-item-${item.label}`}>
       {item.Icon && <item.Icon />}
