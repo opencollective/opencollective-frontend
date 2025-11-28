@@ -159,7 +159,7 @@ const UpdatesList = () => {
           description={
             <FormattedMessage
               id="Dashboard.Updates.Subtitle"
-              defaultMessage="Updates from your account that are visible to people following your account"
+              defaultMessage="Updates from your account that are visible to people following you"
             />
           }
           actions={

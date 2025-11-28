@@ -676,7 +676,7 @@ const Contributions = ({
             ) : (
               <FormattedMessage
                 id="OutgoingContributions.description"
-                defaultMessage="Manage your contributions to other Collectives."
+                defaultMessage="Manage your contributions to other accounts."
               />
             )
           }
