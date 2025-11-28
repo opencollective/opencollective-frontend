@@ -16,80 +16,10 @@ import { CopyID } from '../../../CopyId';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import Link from '../../../Link';
-import type { BaseModalProps } from '../../../ModalContext';
 import { useModal } from '../../../ModalContext';
 import { useToast } from '../../../ui/useToast';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
-
-// Wrapper for EditOrderModal to support BaseModalProps interface
-function EditOrderModalWrapper({
-  open,
-  setOpen,
-  onSuccess,
-  ...props
-}: Omit<React.ComponentProps<typeof EditOrderModal>, 'onClose' | 'onSuccess'> &
-  BaseModalProps & { onSuccess?: () => void }) {
-  if (!open) {
-    return null;
-  }
-  return (
-    <EditOrderModal
-      {...props}
-      onClose={() => setOpen(false)}
-      onSuccess={() => {
-        onSuccess?.();
-        setOpen(false);
-      }}
-    />
-  );
-}
-
-// Wrapper for ContributionConfirmationModal to support BaseModalProps interface
-function ContributionConfirmationModalWrapper({
-  open,
-  setOpen,
-  onSuccess,
-  ...props
-}: Omit<React.ComponentProps<typeof ContributionConfirmationModal>, 'onClose' | 'onSuccess'> &
-  BaseModalProps & { onSuccess?: () => void }) {
-  if (!open) {
-    return null;
-  }
-  return (
-    <ContributionConfirmationModal
-      {...props}
-      onClose={() => setOpen(false)}
-      onSuccess={() => {
-        onSuccess?.();
-        setOpen(false);
-      }}
-    />
-  );
-}
-
-// Wrapper for CreatePendingContributionModal to support BaseModalProps interface
-function CreatePendingContributionModalWrapper({
-  open,
-  setOpen,
-  onSuccess,
-  ...props
-}: Omit<React.ComponentProps<typeof CreatePendingContributionModal>, 'onClose' | 'onSuccess'> &
-  BaseModalProps & { onSuccess?: () => void }) {
-  if (!open) {
-    return null;
-  }
-  return (
-    <CreatePendingContributionModal
-      {...props}
-      onClose={() => setOpen(false)}
-      onSuccess={() => {
-        onSuccess?.();
-        setOpen(false);
-      }}
-    />
-  );
-}
 
 const expireOrderMutation = gql`
   mutation ContributionsExpireOrder($orderId: Int) {
@@ -188,7 +118,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     const showEditOrderModal = (action: EditOrderActions) => {
       showModal(
-        EditOrderModalWrapper,
+        EditOrderModal,
         {
           accountSlug,
           order,
@@ -232,10 +162,10 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         label: intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
         onClick: () => {
           showModal(
-            CreatePendingContributionModalWrapper,
+            CreatePendingContributionModal,
             {
               hostSlug: hostSlug || accountSlug,
-              edit: order,
+              edit: order as React.ComponentProps<typeof CreatePendingContributionModal>['edit'],
               onSuccess: onMutationSuccess,
               onCloseFocusRef,
             },
@@ -251,9 +181,9 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         label: intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
         onClick: () => {
           showModal(
-            ContributionConfirmationModalWrapper,
+            ContributionConfirmationModal,
             {
-              order,
+              order: order as React.ComponentProps<typeof ContributionConfirmationModal>['order'],
               onSuccess: onMutationSuccess,
               onCloseFocusRef,
             },
