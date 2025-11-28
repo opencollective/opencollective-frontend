@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
@@ -16,8 +16,9 @@ import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
-import { filters as allFilters, schema, toVariables } from './filters';
+import { filters as allFilters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { dashboardOrdersQuery } from './queries';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -78,13 +79,13 @@ const hostFinancialContributionsMetadataQuery = gql`
 
 const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate', 'tier']);
 
-const hostIncomingContributionsSchema = schema.extend({ hostContext: hostContextFilter.schema });
+const schema = baseSchema.extend({ hostContext: hostContextFilter.schema });
 
 export default function HostFinancialContributions({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const views: Views<z.infer<typeof hostIncomingContributionsSchema>> = [
+  const views: Views<z.infer<typeof schema>> = [
     {
       id: ContributionsTab.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
@@ -128,7 +129,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
   };
 
   const queryFilter = useQueryFilter({
-    schema: hostIncomingContributionsSchema,
+    schema,
     toVariables,
     meta: filterMeta,
     views,
@@ -149,10 +150,31 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
+  const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: 'INCOMING',
+      includeIncognito: true,
+      ...queryFilter.variables,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const handleRefetch = React.useCallback(() => {
+    refetch();
+    refetchMetadata();
+  }, [refetch, refetchMetadata]);
+
   const viewsWithCount = views.map(view => ({
     ...view,
     count: metadata?.account?.[view.id]?.totalCount,
   }));
+
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
   const showPausedMessage =
     !metadataLoading &&
@@ -189,11 +211,13 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
 
       <ContributionsTable
         accountSlug={accountSlug}
-        direction="INCOMING"
         queryFilter={queryFilter}
         views={viewsWithCount}
-        includeChildrenAccounts={false}
-        onRefetch={refetchMetadata}
+        orders={orders}
+        loading={loading}
+        nbPlaceholders={nbPlaceholders}
+        error={error}
+        refetch={handleRefetch}
       />
     </div>
   );

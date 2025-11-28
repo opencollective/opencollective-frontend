@@ -13,7 +13,7 @@ import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
-import ContributionsTable from './ContributionsTable';
+import ContributionsTable, { dashboardOrdersQuery } from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, schema, toVariables } from './filters';
 
@@ -127,10 +127,32 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
+  const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: 'OUTGOING',
+      includeIncognito: true,
+      includeChildrenAccounts: false,
+      ...queryFilter.variables,
+    },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const handleRefetch = React.useCallback(() => {
+    refetch();
+    refetchMetadata();
+  }, [refetch, refetchMetadata]);
+
   const viewsWithCount = views.map(view => ({
     ...view,
     count: metadata?.account?.[view.id]?.totalCount,
   }));
+
+  const currentViewCount = viewsWithCount.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
   return (
     <div className="flex flex-col gap-4">
@@ -146,11 +168,13 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
 
       <ContributionsTable
         accountSlug={accountSlug}
-        direction="OUTGOING"
         queryFilter={queryFilter}
         views={viewsWithCount}
-        includeChildrenAccounts={false}
-        onRefetch={refetchMetadata}
+        orders={orders}
+        loading={loading}
+        nbPlaceholders={nbPlaceholders}
+        error={error}
+        refetch={handleRefetch}
       />
     </div>
   );
