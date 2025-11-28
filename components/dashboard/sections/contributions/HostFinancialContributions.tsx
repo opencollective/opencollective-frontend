@@ -37,10 +37,6 @@ const hostFinancialContributionsMetadataQuery = gql`
       settings
       imageUrl
       currency
-      ... on AccountWithContributions {
-        canStartResumeContributionsProcess
-        hasResumeContributionsProcessStarted
-      }
       ... on AccountWithHost {
         host {
           id
@@ -61,15 +57,6 @@ const hostFinancialContributionsMetadataQuery = gql`
         totalCount
       }
       PAUSED: orders(filter: INCOMING, status: [PAUSED], includeIncognito: true, hostContext: $hostContext) {
-        totalCount
-      }
-      PAUSED_RESUMABLE: orders(
-        filter: INCOMING
-        status: [PAUSED]
-        includeIncognito: true
-        hostContext: INTERNAL
-        pausedBy: [COLLECTIVE, HOST, PLATFORM]
-      ) {
         totalCount
       }
     }
@@ -135,11 +122,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     skipFiltersOnReset: ['hostContext'],
   });
 
-  const {
-    data: metadata,
-    loading: metadataLoading,
-    refetch: refetchMetadata,
-  } = useQuery(hostFinancialContributionsMetadataQuery, {
+  const { data: metadata, refetch: refetchMetadata } = useQuery(hostFinancialContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
       hostContext: queryFilter.values.hostContext,
@@ -174,11 +157,6 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
 
-  const showPausedMessage =
-    !metadataLoading &&
-    metadata?.account?.canStartResumeContributionsProcess &&
-    metadata?.account?.PAUSED_RESUMABLE?.totalCount > 0;
-
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
@@ -200,12 +178,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
         }
       />
 
-      {showPausedMessage && (
-        <PausedIncomingContributionsMessage
-          account={metadata.account}
-          count={metadata.account[ContributionsTab.PAUSED].totalCount}
-        />
-      )}
+      <PausedIncomingContributionsMessage accountSlug={accountSlug} />
 
       <ContributionsTable
         accountSlug={accountSlug}

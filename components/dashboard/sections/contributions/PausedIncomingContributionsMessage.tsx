@@ -1,11 +1,10 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, AccountWithContributions, AccountWithParent } from '../../../../lib/graphql/types/v2/schema';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { getI18nLink } from '../../../I18nFormatters';
@@ -26,6 +25,39 @@ import {
 } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
 
+const pausedContributionsQuery = gql`
+  query PausedContributionsData($slug: String!) {
+    account(slug: $slug) {
+      id
+      slug
+      name
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          type
+        }
+      }
+      pausedIncoming: orders(filter: INCOMING, status: [PAUSED], includeIncognito: true, includeChildrenAccounts: true) {
+        totalCount
+      }
+      pausedResumable: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
+      ) {
+        totalCount
+      }
+    }
+  }
+`;
+
 const startResumeContributionsProcess = gql`
   mutation StartResumeContributionsProcess($account: AccountReferenceInput!, $message: String) {
     startResumeOrdersProcess(account: $account, message: $message) {
@@ -38,21 +70,46 @@ const startResumeContributionsProcess = gql`
   }
 `;
 
-export const PausedIncomingContributionsMessage = ({
-  account,
-  count,
-}: {
-  account: Account & AccountWithContributions & AccountWithParent;
-  count: number;
-}) => {
+interface PausedIncomingContributionsMessageProps {
+  accountSlug: string;
+}
+
+/**
+ * Self-contained component that fetches and displays paused contributions message.
+ * Returns null if there are no paused contributions that can be resumed.
+ */
+export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomingContributionsMessageProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [message, setMessage] = React.useState('');
-  const [resumeContributionsProcess, { loading }] = useMutation(startResumeContributionsProcess, {
+
+  const { data, loading: queryLoading } = useQuery(pausedContributionsQuery, {
+    variables: { slug: accountSlug },
+    context: API_V2_CONTEXT,
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(startResumeContributionsProcess, {
     context: API_V2_CONTEXT,
   });
 
+  const account = data?.account;
+  const pausedCount = account?.pausedIncoming?.totalCount ?? 0;
+  const pausedResumableCount = account?.pausedResumable?.totalCount ?? 0;
+
+  // Don't show if loading, no account, or no resumable paused contributions
+  const shouldShow =
+    !queryLoading &&
+    account?.canStartResumeContributionsProcess &&
+    pausedResumableCount > 0 &&
+    !account?.parent;
+
+  if (!shouldShow) {
+    return null;
+  }
+
   const msgType = account.hasResumeContributionsProcessStarted ? 'info' : 'warning';
+
   return (
     <MessageBox
       type={msgType}
@@ -74,7 +131,7 @@ export const PausedIncomingContributionsMessage = ({
         <FormattedMessage
           defaultMessage="{collective} holds {count, plural, one {an incoming recurring contribution that is currently paused} other {# incoming recurring contributions that are currently paused}}."
           id="gpuYXj"
-          values={{ count, collective: account.name }}
+          values={{ count: pausedCount, collective: account.name }}
         />
       </strong>
       {account.hasResumeContributionsProcessStarted ? (
@@ -177,7 +234,7 @@ export const PausedIncomingContributionsMessage = ({
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                   </Button>
                 </DialogClose>
-                <Button type="submit" loading={loading}>
+                <Button type="submit" loading={mutationLoading}>
                   <FormattedMessage defaultMessage="Start the Resuming Process" id="SJJHSI" />
                 </Button>
               </DialogFooter>
