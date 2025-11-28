@@ -294,16 +294,16 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                   {EMPTY_GROUP_STATE[collectiveType] && accounts.length === 0 && (
                     <div className="mx-1 flex flex-col">
                       <p className="text-xs text-muted-foreground">{EMPTY_GROUP_STATE[collectiveType].emptyMessage}</p>
-                      <Link
-                        className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-xs transition-colors hover:bg-slate-50 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                        href={CREATE_NEW_LINKS[collectiveType] || '/create'}
-                        onClick={handleClose}
-                      >
-                        <div className="mr-3 rounded-full border bg-white p-2 text-muted-foreground">
+                      <Button asChild variant="outline" size="xs">
+                        <Link
+                          className="my-2"
+                          href={CREATE_NEW_LINKS[collectiveType] || '/create'}
+                          onClick={handleClose}
+                        >
                           <Plus size={12} />
-                        </div>
-                        {EMPTY_GROUP_STATE[collectiveType].linkLabel}
-                      </Link>
+                          {EMPTY_GROUP_STATE[collectiveType].linkLabel}
+                        </Link>
+                      </Button>
                     </div>
                   )}
                   {accounts
