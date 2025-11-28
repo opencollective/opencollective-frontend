@@ -45,6 +45,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
   const activeSlug = workspace?.slug;
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
+  const { setOpenMobile, isMobile } = useSidebar();
   const menuItems = React.useMemo(() => getMenuItems({ intl, account, LoggedInUser }), [account, intl, LoggedInUser]);
 
   const isSectionActive = (section: string) => {
@@ -52,6 +53,12 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
 
     return section && (sectionAndSubpath === section || selectedSection === section);
   };
+
+  const closeMobileMenu = React.useCallback(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [isMobile, setOpenMobile]);
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -74,7 +81,12 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                         // Handle group items (with sub-menu)
                         if (item.type === 'group') {
                           return (
-                            <DashboardSidebarMenuGroup key={item.label} item={item} isSectionActive={isSectionActive} />
+                            <DashboardSidebarMenuGroup
+                              key={item.label}
+                              item={item}
+                              isSectionActive={isSectionActive}
+                              onNavigate={closeMobileMenu}
+                            />
                           );
                         }
 
@@ -86,6 +98,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                                 href={getDashboardRoute(account, item.section)}
                                 data-cy={`menu-item-${item.section}`}
                                 shallow
+                                onClick={closeMobileMenu}
                               >
                                 {item.Icon && <item.Icon />}
                                 <span>{item.label}</span>
@@ -113,6 +126,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                     label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
                     data-cy="public-profile-link"
                     external
+                    onClick={closeMobileMenu}
                   />
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -124,6 +138,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                   Icon={Telescope}
                   label={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })}
                   external
+                  onClick={closeMobileMenu}
                 />
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -137,6 +152,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                   Icon={LifeBuoy}
                   label={intl.formatMessage({ defaultMessage: 'Help & Support', id: 'Uf3+S6' })}
                   external
+                  onClick={closeMobileMenu}
                 />
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -158,10 +174,11 @@ const SidebarLink = React.forwardRef<
     external?: boolean;
     className?: string;
     'data-cy'?: string;
+    onClick?: () => void;
   }
->(({ href, label, Icon, external, className, ...props }, ref) => {
+>(({ href, label, Icon, external, className, onClick, ...props }, ref) => {
   return (
-    <Link innerRef={ref} href={href} className={cn('group/sidebar-link', className)} {...props}>
+    <Link innerRef={ref} href={href} className={cn('group/sidebar-link', className)} onClick={onClick} {...props}>
       {Icon && <Icon />}
       <span>{label}</span>
       {external && (
@@ -174,7 +191,7 @@ const SidebarLink = React.forwardRef<
   );
 });
 
-function DashboardSidebarMenuGroup({ item, isSectionActive }) {
+function DashboardSidebarMenuGroup({ item, isSectionActive, onNavigate }) {
   const { account } = React.useContext(DashboardContext);
   const { isMobile, state } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -213,7 +230,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive }) {
                     asChild
                     className={cx(isSectionActive(subItem.section) && 'font-medium text-sidebar-accent-foreground')}
                   >
-                    <Link href={getDashboardRoute(account, subItem.section)} shallow>
+                    <Link href={getDashboardRoute(account, subItem.section)} shallow onClick={onNavigate}>
                       {subItem.label}
                     </Link>
                   </DropdownMenuItem>
@@ -233,6 +250,7 @@ function DashboardSidebarMenuGroup({ item, isSectionActive }) {
                     href={getDashboardRoute(account, subItem.section)}
                     shallow
                     data-cy={`menu-item-${subItem.section}`}
+                    onClick={onNavigate}
                   >
                     <span>{subItem.label}</span>
                   </Link>
