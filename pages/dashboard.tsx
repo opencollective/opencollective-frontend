@@ -261,7 +261,7 @@ const DashboardPage = () => {
         <DashboardSidebar isLoading={isLoading} />
         <SidebarInset className="min-w-0">
           <DashboardTopbar />
-          <div className="flex-1 px-6">
+          <div className="flex-1 px-3 md:px-6">
             {Boolean(notification) && <NotificationBar {...notification} />}
             {blocker ? (
               <div className="my-32 flex flex-col items-center">

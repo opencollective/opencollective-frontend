@@ -68,7 +68,7 @@ const Footer = ({ className, isDashboard }: { className?: string; isDashboard?: 
   const footerItems = usingNewPricing ? newFooterItems : legacyFooterItems;
 
   return (
-    <footer className={cn('border-t bg-background px-6 pt-16 pb-12 antialiased lg:px-8', className)}>
+    <footer className={cn('border-t bg-background px-3 pt-16 pb-12 antialiased md:px-6', className)}>
       <div className="mx-auto max-w-(--breakpoint-xl)">
         <div className="xl:flex xl:gap-12">
           <div className="max-w-xs space-y-6">

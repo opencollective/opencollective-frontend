@@ -26,9 +26,9 @@ export function DashboardTopbar() {
   return (
     <React.Fragment>
       <header
-        className={`flex h-16 w-full shrink-0 items-center justify-between border-b px-4 transition-[width,box-shadow] ease-linear`}
+        className={`flex h-16 w-full shrink-0 items-center justify-between border-b px-3 transition-[width,box-shadow] ease-linear md:px-6`}
       >
-        <div className="mr-4 flex items-center gap-3">
+        <div className="mr-4 -ml-1 flex items-center gap-3">
           <SidebarTrigger />
         </div>
 
