@@ -59,6 +59,8 @@ module.exports = expressApp => {
           searchParams.set('api_key', process.env.API_KEY);
           return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
         },
+        // Be consistent to the actual API limit
+        limit: '10mb',
       }),
     );
   }

@@ -217,7 +217,7 @@ export const EditAvatar = ({
   minSize?: number;
   maxSize?: number;
   onSuccess: ({ url }: { url: string }) => void;
-  onReject?: ({ reason }: { reason: string }) => void;
+  onReject?: ({ message }: { message: string }) => void;
 }) => {
   const { uploadFiles, isUploading } = useImageUploader({
     isMulti: false,
