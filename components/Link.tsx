@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react';
+import { BookText } from 'lucide-react';
 import NextLink, { type LinkProps as NextLinkProps } from 'next/link'; // eslint-disable-line no-restricted-imports
 import { Scrollchor } from 'react-scrollchor';
+
+import { cn } from '@/lib/utils';
 
 const constructRoutePath = (href: string | NextLinkProps['href']) => {
   if (typeof href === 'string') {
@@ -71,3 +74,18 @@ const Link = ({ href, children, className, openInNewTab, innerRef, onClick, titl
 };
 
 export default React.forwardRef<typeof Link, LinkProps>((props, ref) => <Link innerRef={ref} {...props} />);
+
+export const DocumentationLink = ({ href, children, className }: Omit<LinkProps, 'href'> & { href: string }) => {
+  return (
+    <Link
+      href={href}
+      openInNewTab
+      className={cn(
+        'inline-flex flex-wrap items-baseline gap-1 text-wrap text-primary underline hover:text-primary/80 [&>svg]:size-[0.8rem]',
+        className,
+      )}
+    >
+      <BookText /> {children}
+    </Link>
+  );
+};

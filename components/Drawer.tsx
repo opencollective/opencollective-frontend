@@ -3,6 +3,7 @@ import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
+import { Button } from './ui/Button';
 import { Sheet, SheetContent } from './ui/Sheet';
 import StyledRoundButton from './StyledRoundButton';
 
@@ -60,18 +61,18 @@ export function Drawer({
         }}
       >
         <SheetContent className={clsx('flex flex-col gap-0 p-0', className)} ref={drawerRef} data-cy={dataCy}>
-          <div className="relative flex-1 overflow-y-scroll px-4 py-6 sm:px-6">
+          <div className="relative flex flex-1 flex-col overflow-y-scroll px-4 py-6 sm:px-6">
             {showCloseButton && (
-              <StyledRoundButton
-                className="absolute top-5 right-5"
-                size={36}
-                type="button"
-                isBorderless
+              <Button
+                size="icon-sm"
+                variant="ghost"
                 onClick={onClose}
+                aria-label="Close setup guide"
                 data-cy="close-drawer"
+                className="absolute top-5 right-5"
               >
-                <X size={20} aria-hidden="true" />
-              </StyledRoundButton>
+                <X size={20} />
+              </Button>
             )}
 
             {children}
