@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { ArrowRight, Check, ChevronDown, ChevronUp, LockKeyhole, SquareArrowOutUpRight } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,6 +12,7 @@ import { generateSetupGuideSteps } from '@/lib/setup-guide';
 import { cn } from '@/lib/utils';
 
 import { Drawer } from '@/components/Drawer';
+import { DocumentationLink } from '@/components/Link';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
@@ -151,9 +152,20 @@ const SetupStep = (props: Step & { account: SetupGuideQuery['account'] }) => {
               </TooltipTrigger>
             </Tooltip>
           )}
-          <p className="text-sm text-slate-800">{props.description}</p>
+          <p className="text-sm text-slate-800">
+            {props.description}{' '}
+            {props.documentation && (
+              <span className="inline-flex gap-1">
+                <FormattedMessage defaultMessage="See" id="SetupGuide.Step.SeeDocumentation" />{' '}
+                <DocumentationLink href={props.documentation.url} className="items-center">
+                  {props.documentation.title}.
+                </DocumentationLink>
+              </span>
+            )}
+          </p>
+
           {props.action && (
-            <Button onClick={props.action.onClick} size="sm" disabled={props.action.disabled}>
+            <Button onClick={props.action.onClick} size="xs" disabled={props.action.disabled}>
               {props.action.label}
             </Button>
           )}
@@ -175,7 +187,6 @@ const SetupDrawer = ({
   open: boolean;
 }) => {
   const steps = category?.steps || [];
-  const documentation = category?.documentation || [];
   const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade).length;
   const isCompleted = completedSteps === steps?.length;
 
@@ -214,47 +225,31 @@ const SetupDrawer = ({
             ))}
           </div>
         )}
-        {documentation.length > 0 && (
-          <div className="flex flex-col gap-3">
-            <h1 className="leading-5 font-medium">
-              <FormattedMessage defaultMessage="Documentation" id="menu.documentation" />
-            </h1>
-            <div className="flex flex-col gap-3 divide-slate-200 *:pb-3">
-              {documentation?.map(doc => (
-                <a
-                  href={doc.url}
-                  key={doc.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group rounded-xl border p-3 pl-4 text-sm shadow-sm transition-colors hover:bg-slate-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">{doc.title}</span>
-                    <SquareArrowOutUpRight
-                      className="text-muted-foreground transition-colors group-hover:text-foreground"
-                      size={14}
-                    />
-                  </div>
-                  <span className="mt-1 text-xs text-slate-600">{doc.description}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </Drawer>
   );
 };
 
-const CategoryButton = ({ img, title, description, className, onClick }) => {
+const CategoryButton = ({ img, title, description, className, onClick, steps }) => {
+  const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade).length;
+  const isCompleted = completedSteps === steps?.length;
   return (
     <button
       className={cn(
-        'flex w-full flex-col items-center justify-start gap-4 rounded-sm px-6 py-4 sm:min-h-40',
+        'relative isolate flex w-full cursor-pointer flex-col items-center justify-start gap-4 rounded-sm px-6 py-4 sm:min-h-40',
         className,
       )}
       onClick={onClick}
     >
+      <Label className="absolute top-2 right-2 flex cursor-pointer items-center rounded-full bg-white px-2 py-1 text-xs text-slate-600">
+        {isCompleted ? (
+          <Check size={12} />
+        ) : (
+          <React.Fragment>
+            <ListCheck size={12} className="mr-1" /> {completedSteps}/{steps.length}
+          </React.Fragment>
+        )}
+      </Label>
       {img}
       <div className="flex flex-col items-center gap-1 text-center">
         <h1 className="flex items-center gap-2 font-bold">
@@ -317,6 +312,7 @@ export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
                 img={category.image}
                 title={category.title}
                 description={category.description}
+                steps={category.steps}
                 onClick={() => setExpandedCategory(category)}
               />
             ))}

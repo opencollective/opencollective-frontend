@@ -4,7 +4,7 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting } from '@/lib/collective';
+import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import type { SetupGuideQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getPolicy } from '@/lib/policies';
@@ -22,6 +22,10 @@ export type Step = {
     onClick: () => void;
     disabled?: boolean;
   };
+  documentation?: {
+    title: string | ReactNode;
+    url: string;
+  };
 };
 
 export type Category = {
@@ -32,11 +36,6 @@ export type Category = {
   longDescription?: string | ReactNode;
   className?: string;
   steps?: Array<Step>;
-  documentation?: Array<{
-    title: string | ReactNode;
-    description: string | ReactNode;
-    url: string;
-  }>;
 };
 
 const sortSteps = (steps: Step[]) =>
@@ -53,8 +52,9 @@ export const generateSetupGuideSteps = ({
 }): Category[] => {
   const planFeatures = 'platformSubscription' in account && account.platformSubscription?.plan?.features;
   const hasHosting = hasAccountHosting(account);
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
 
-  const allSteps = {
+  const allSteps: Record<string, Step> = {
     inviteAdmins: {
       id: 'invite-admins',
       title: <FormattedMessage defaultMessage="Invite additional admins" id="SetupGuide.InviteAdmins" />,
@@ -70,6 +70,10 @@ export const generateSetupGuideSteps = ({
         onClick: () => {
           router.push(getDashboardRoute(account, 'team'));
         },
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Adding Team Members" id="SetupGuide.InviteAdmins.Documentation" />,
+        url: 'https://documentation.opencollective.com/getting-started/adding-and-removing-team-members',
       },
     },
     stripe: {
@@ -87,6 +91,10 @@ export const generateSetupGuideSteps = ({
         label: <FormattedMessage defaultMessage="Connect Stripe" id="SetupGuide.Stripe.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'receiving-money')),
       },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Stripe Payments" id="SetupGuide.Stripe.Documentation" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/receiving-money/stripe',
+      },
     },
     accountTwofa: {
       id: '2FA',
@@ -101,6 +109,10 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Set up 2FA" id="SetupGuide.2FA.Action" />,
         onClick: () => router.push(getDashboardRoute(LoggedInUser?.collective, 'user-security')),
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Security For Accounts" id="SetupGuide.2FA.Documentation" />,
+        url: 'https://documentation.opencollective.com/advanced/security-for-accounts',
       },
     },
     wise: {
@@ -117,6 +129,10 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Connect Wise" id="SetupGuide.Wise.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'sending-money')),
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Paying Expenses with Wise" id="SetupGuide.Wise.Documentation" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-with-wise',
       },
     },
     expensePolicy: {
@@ -136,6 +152,10 @@ export const generateSetupGuideSteps = ({
         label: <FormattedMessage defaultMessage="Set up expense policies" id="SetupGuide.Expenses" />,
         onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
       },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Fiscal Host Policies" id="FiscalHostPolicies" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-policies',
+      },
     },
     chartOfAccounts: {
       title: <FormattedMessage defaultMessage="Set up your chart of accounts" id="SetupGuide.ChartOfAccounts" />,
@@ -154,6 +174,10 @@ export const generateSetupGuideSteps = ({
         onClick: () => {
           router.push(getDashboardRoute(account, 'chart-of-accounts'));
         },
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/chart-of-accounts',
       },
     },
     profilePage: {
@@ -176,22 +200,55 @@ export const generateSetupGuideSteps = ({
           router.push(getDashboardRoute(account, 'info'));
         },
       },
+      documentation: {
+        title: (
+          <FormattedMessage defaultMessage="Editing your Profile Page" id="SetupGuide.PublicProfile.Documentation" />
+        ),
+        url: 'https://documentation.opencollective.com/getting-started/editing-your-profile-page',
+      },
     },
     hosting: {
-      title: <FormattedMessage defaultMessage="Enable hosting" id="SetupGuide.EnableHosting" />,
+      title: <FormattedMessage defaultMessage="Enable fiscal hosting" id="SetupGuide.EnableHosting" />,
       description: (
         <FormattedMessage
-          defaultMessage="Hosting enables you to manage other people’s money in addition to your own organization’s finances. Enable hosted collectives to allow other groups to manage their finances under your fiscal and legal umbrella. Enable hosted funds to hold institutional funds for grant distribution."
+          defaultMessage="Hosting enables you to manage other people's money in addition to your own organization's finances. Enable hosted collectives to allow other groups to manage their finances under your fiscal and legal umbrella. Enable hosted funds to hold institutional funds for grant distribution."
           id="SetupGuide.EnableHosting.Description"
         />
       ),
       id: 'enable-hosting',
       completed: hasHosting,
       action: {
-        label: <FormattedMessage defaultMessage="Enable hosting" id="SetupGuide.EnableHosting" />,
+        label: <FormattedMessage defaultMessage="Enable fiscal hosting" id="SetupGuide.EnableHosting" />,
         onClick: () => {
           router.push(getDashboardRoute(account, 'advanced'));
         },
+      },
+      documentation: {
+        title: (
+          <FormattedMessage defaultMessage="Setting up a Fiscal Host" id="SetupGuide.EnableHosting.Documentation" />
+        ),
+        url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host',
+      },
+    },
+    moneyManagement: {
+      id: 'money-management',
+      title: <FormattedMessage defaultMessage="Enable money management" id="SetupGuide.MoneyManagement" />,
+      description: (
+        <FormattedMessage
+          defaultMessage="Money management enables you to add funds to your account and pay expenses. This is a critical step towards being able to fully use the platform for your financial operations."
+          id="SetupGuide.MoneyManagement.Description"
+        />
+      ),
+      completed: hasMoneyManagement,
+      action: {
+        label: <FormattedMessage defaultMessage="Enable money management" id="SetupGuide.MoneyManagement" />,
+        onClick: () => {
+          router.push(getDashboardRoute(account, 'advanced'));
+        },
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Receiving Money" id="editCollective.receivingMoney" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/receiving-money',
       },
     },
     twofaPolicy: {
@@ -212,6 +269,10 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Require Organization 2FA" id="SetupGuide.2FARequirements.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'security')),
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Fiscal Host Security" id="SetupGuide.2FARequirements.Documentation" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-security',
       },
     },
     chartOfAccountsForCollectives: {
@@ -241,6 +302,10 @@ export const generateSetupGuideSteps = ({
         ),
         onClick: () => router.push(getDashboardRoute(account, 'chart-of-accounts')),
       },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/chart-of-accounts',
+      },
     },
     contributionPolicy: {
       title: <FormattedMessage defaultMessage="Set your contribution policy" id="SetupGuide.ContributionPolicy" />,
@@ -257,6 +322,10 @@ export const generateSetupGuideSteps = ({
           <FormattedMessage defaultMessage="Set up contribution policy" id="SetupGuide.ContributionPolicy.Action" />
         ),
         onClick: () => router.push(getDashboardRoute(account, 'policies')),
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Fiscal Host Policies" id="FiscalHostPolicies" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-policies',
       },
     },
 
@@ -276,6 +345,12 @@ export const generateSetupGuideSteps = ({
         label: <FormattedMessage defaultMessage="Set up hosting fees" id="SetupGuide.HostingFees.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
       },
+      documentation: {
+        title: (
+          <FormattedMessage defaultMessage="Setting your Fiscal Host Fees" id="SetupGuide.HostingFees.Documentation" />
+        ),
+        url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/setting-your-fiscal-host-fees',
+      },
     },
     hostApplications: {
       title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
@@ -291,6 +366,10 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Enable applications" id="SetupGuide.HostApplications.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
+      },
+      documentation: {
+        title: <FormattedMessage defaultMessage="Fiscal Hosts" id="helpAndSupport.fiscalHosts" />,
+        url: 'https://documentation.opencollective.com/fiscal-hosts/fiscal-hosts',
       },
     },
   };
@@ -314,50 +393,6 @@ export const generateSetupGuideSteps = ({
       ),
       className: 'bg-blue-50',
       steps: [allSteps.profilePage, allSteps.accountTwofa],
-      documentation: [
-        {
-          title: (
-            <FormattedMessage
-              defaultMessage="Getting Started with Open Collective"
-              id="SetupGuide.PlatformBasics.Doc1.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn how to create your account, set up your profile, and understand the dashboard."
-              id="SetupGuide.PlatformBasics.Doc1.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/getting-started/getting-started',
-        },
-        {
-          title: (
-            <FormattedMessage
-              defaultMessage="Submitting and Tracking Expenses"
-              id="SetupGuide.PlatformBasics.Doc2.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn how to submit invoices and reimbursements and track expense status from draft to payment."
-              id="SetupGuide.PlatformBasics.Doc2.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses',
-        },
-        {
-          title: (
-            <FormattedMessage defaultMessage="Understanding Contributions" id="SetupGuide.PlatformBasics.Doc3.Title" />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Discover how to support projects through one-time or recurring donations and various payment methods."
-              id="SetupGuide.PlatformBasics.Doc3.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/giving-to-collectives/contributing',
-        },
-      ],
     },
     {
       id: 'money-management',
@@ -370,48 +405,7 @@ export const generateSetupGuideSteps = ({
           id="Welcome.Organization.MoneyManagement.Description"
         />
       ),
-      steps: sortSteps([allSteps.inviteAdmins, allSteps.twofaPolicy]),
-      documentation: [
-        {
-          title: (
-            <FormattedMessage defaultMessage="Managing Money and Budgets" id="SetupGuide.MoneyManagement.Doc1.Title" />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Track your collective's finances with transparent budgets and manage projects with separate budgets."
-              id="SetupGuide.MoneyManagement.Doc1.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/collectives/managing-money',
-        },
-        {
-          title: (
-            <FormattedMessage
-              defaultMessage="Submitting and Tracking Expenses"
-              id="SetupGuide.PlatformBasics.Doc2.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn how to submit invoices and reimbursements and track expense status from draft to payment."
-              id="SetupGuide.PlatformBasics.Doc2.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses',
-        },
-        {
-          title: (
-            <FormattedMessage defaultMessage="Understanding the Ledger" id="SetupGuide.MoneyManagement.Doc3.Title" />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Access detailed transaction records showing all financial activity including contributions, expenses, and added funds."
-              id="SetupGuide.MoneyManagement.Doc3.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/advanced/ledger',
-        },
-      ],
+      steps: sortSteps([allSteps.moneyManagement, allSteps.inviteAdmins, allSteps.twofaPolicy]),
     },
     {
       id: 'crowdfunding',
@@ -425,43 +419,6 @@ export const generateSetupGuideSteps = ({
         />
       ),
       steps: sortSteps([allSteps.inviteAdmins, allSteps.stripe, allSteps.contributionPolicy]),
-      documentation: [
-        {
-          title: <FormattedMessage defaultMessage="Setting Goals and Tiers" id="SetupGuide.Crowdfunding.Doc1.Title" />,
-          description: (
-            <FormattedMessage
-              defaultMessage="Create contribution tiers to encourage donations and set financial goals to track your progress."
-              id="SetupGuide.Crowdfunding.Doc1.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/collectives/raising-money/setting-goals-and-tiers',
-        },
-        {
-          title: (
-            <FormattedMessage
-              defaultMessage="Creating Projects for Fundraising"
-              id="SetupGuide.Crowdfunding.Doc2.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Launch lightweight fundraising projects with their own balance, contribution tiers, and goals."
-              id="SetupGuide.Crowdfunding.Doc2.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/collectives/managing-money/projects',
-        },
-        {
-          title: <FormattedMessage defaultMessage="Custom Fundraising URLs" id="SetupGuide.Crowdfunding.Doc3.Title" />,
-          description: (
-            <FormattedMessage
-              defaultMessage="Create customized donation links with preset amounts, intervals, and contributor types."
-              id="SetupGuide.Crowdfunding.Doc3.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/collectives/raising-money/creating-custom-fundraising-urls',
-        },
-      ],
     },
     {
       id: 'expense-automations',
@@ -475,48 +432,6 @@ export const generateSetupGuideSteps = ({
         />
       ),
       steps: sortSteps([allSteps.wise, allSteps.expensePolicy, allSteps.chartOfAccounts, allSteps.twofaPolicy]),
-      documentation: [
-        {
-          title: (
-            <FormattedMessage
-              defaultMessage="Paying Expenses with Wise"
-              id="SetupGuide.ExpenseAutomations.Doc1.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="This integration can be used to automate expense payment by providing a one-click solution for paying expenses."
-              id="SetupGuide.ExpenseAutomations.Doc1.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-with-wise',
-        },
-        {
-          title: <FormattedMessage defaultMessage="Recurring Expenses" id="SetupGuide.ExpenseAutomations.Doc2.Title" />,
-          description: (
-            <FormattedMessage
-              defaultMessage="Set up expenses that automatically recur weekly, monthly, or yearly with optional end dates."
-              id="SetupGuide.ExpenseAutomations.Doc2.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses/recurring-expenses',
-        },
-        {
-          title: (
-            <FormattedMessage
-              defaultMessage="Tagging Expenses for Organization"
-              id="SetupGuide.ExpenseAutomations.Doc3.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Categorize and organize expenses with custom tags for budgeting and reporting purposes."
-              id="SetupGuide.ExpenseAutomations.Doc3.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/collectives/managing-money/tagging-expenses',
-        },
-      ],
     },
     {
       id: 'fund-grants',
@@ -535,28 +450,6 @@ export const generateSetupGuideSteps = ({
         allSteps.contributionPolicy,
         allSteps.expensePolicy,
       ]),
-      documentation: [
-        {
-          title: <FormattedMessage defaultMessage="Understanding Funds" id="SetupGuide.FundGrants.Doc1.Title" />,
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn the ins-and-outs of Funds on Open Collective."
-              id="SetupGuide.FundGrants.Doc1.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/fiscal-hosts/funds-and-grants/understanding-funds',
-        },
-        {
-          title: <FormattedMessage defaultMessage="Managing Grants" id="SetupGuide.FundGrants.Doc2.Title" />,
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn how to set up and manage grants from your fund to support projects and initiatives."
-              id="SetupGuide.FundGrants.Doc2.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/fiscal-hosts/funds-and-grants/grants',
-        },
-      ],
     },
     {
       id: 'fiscal-hosting',
@@ -575,45 +468,6 @@ export const generateSetupGuideSteps = ({
         allSteps.hostApplications,
         allSteps.chartOfAccountsForCollectives,
       ]),
-      documentation: [
-        {
-          title: (
-            <FormattedMessage defaultMessage="Understanding Fiscal Hosts" id="SetupGuide.FiscalHosting.Doc1.Title" />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn how fiscal hosts provide legal status and handle finances for collectives without formal incorporation."
-              id="SetupGuide.FiscalHosting.Doc1.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/fiscal-hosts/fiscal-hosts',
-        },
-        {
-          title: <FormattedMessage defaultMessage="Becoming a Fiscal Host" id="SetupGuide.FiscalHosting.Doc2.Title" />,
-          description: (
-            <FormattedMessage
-              defaultMessage="Learn why and how to become a fiscal host to support multiple collectives."
-              id="SetupGuide.FiscalHosting.Doc2.Description"
-            />
-          ),
-          url: 'https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host',
-        },
-        {
-          url: 'https://documentation.opencollective.com/fiscal-hosts/expense-payment/paying-expenses-as-a-fiscal-host',
-          title: (
-            <FormattedMessage
-              defaultMessage="Paying Expenses as a Fiscal Host"
-              id="SetupGuide.FiscalHosting.Doc3.Title"
-            />
-          ),
-          description: (
-            <FormattedMessage
-              defaultMessage="As a Fiscal Host admin, you will need to approve your Collective’s expenses and ensure they include all necessary information before being paid"
-              id="SetupGuide.FiscalHosting.Doc3.Description"
-            />
-          ),
-        },
-      ],
     },
   ];
 };

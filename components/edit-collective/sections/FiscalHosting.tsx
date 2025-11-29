@@ -8,6 +8,7 @@ import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
 import I18nFormatters from '@/components/I18nFormatters';
+import { DocumentationLink } from '@/components/Link';
 
 import { adminPanelQuery } from '../../dashboard/queries';
 import { useModal } from '../../ModalContext';
@@ -121,31 +122,39 @@ const FiscalHosting = ({ collective, account }) => {
         ),
         description: (
           <div className="flex flex-col text-sm text-foreground">
-            {hasHosting && data.host?.totalHostedAccounts > 0 ? (
-              <div className="text-sm text-red-500 [&>p]:mt-1">
+            <div className="text-sm [&>p]:mt-2">
+              {hasHosting && data.host?.totalHostedAccounts > 0 ? (
                 <FormattedMessage
-                  values={{ totalHostedAccounts: data.host?.totalHostedAccounts, ...I18nFormatters }}
+                  values={{
+                    totalHostedAccounts: data.host?.totalHostedAccounts,
+                    link: chunk => (
+                      <DocumentationLink href="https://documentation.opencollective.com/fiscal-hosts/closing-a-fiscal-host">
+                        {chunk}
+                      </DocumentationLink>
+                    ),
+                    ...I18nFormatters,
+                  }}
                   id="Advanced.FiscalHosting.deactivate.warning"
-                  defaultMessage="<p>It is not possible to deactivate your organization as a fiscal host because you are currently hosting {totalHostedAccounts} accounts.</p><p>To deactivate, they need to be moved to a different fiscal host or archived.</p>"
+                  defaultMessage="<p>It is not possible to deactivate your organization as a fiscal host because you are currently hosting {totalHostedAccounts} accounts.</p><p>To deactivate, they need to be moved to a different fiscal host or archived.</p><p>For more information on closing your fiscal host, please <link>read our documentation</link>.</p>"
                 />
-              </div>
-            ) : (
-              <div className="text-sm [&>p]:mt-2">
-                <FormattedMessage
-                  defaultMessage="<p>Deactivating money management functionalities will also remove any existing integration with Stripe, Wise and PayPal.</p><p>This will also remove any pending host application and access to all related dashboard tools.</p><p>After deactivation, you can easily reactivate it at any time.</p>"
-                  id="Advanced.MoneyManagement.deactivate.confirmation"
-                  values={I18nFormatters}
-                />
-                {hasHosting && (
-                  <p>
-                    <FormattedMessage
-                      id="FiscalHosting.moneyManagement.deactivate.warning"
-                      defaultMessage="Deactivating money management will also deactivate fiscal hosting."
-                    />
-                  </p>
-                )}
-              </div>
-            )}
+              ) : (
+                <React.Fragment>
+                  <FormattedMessage
+                    defaultMessage="<p>Deactivating money management functionalities will also remove any existing integration with Stripe, Wise and PayPal.</p><p>After deactivation, you can easily reactivate it at any time.</p>"
+                    id="Advanced.MoneyManagement.deactivate.confirmation"
+                    values={I18nFormatters}
+                  />
+                  {hasHosting && (
+                    <p>
+                      <FormattedMessage
+                        id="FiscalHosting.moneyManagement.deactivate.warning"
+                        defaultMessage="Deactivating money management will also deactivate fiscal hosting."
+                      />
+                    </p>
+                  )}
+                </React.Fragment>
+              )}
+            </div>
           </div>
         ),
         confirmDisabled: data.host?.totalHostedAccounts > 0,
@@ -173,15 +182,21 @@ const FiscalHosting = ({ collective, account }) => {
           <FormattedMessage id="Advanced.FiscalHosting.Deactivate.Title" defaultMessage="Deactivate as fiscal host?" />
         ),
         description: (
-          <div className="flex flex-col gap-4 text-foreground">
+          <div className="flex flex-col gap-4 text-sm text-foreground [&>p]:mt-2">
             {hasHosting && data.host?.totalHostedAccounts > 0 ? (
-              <div className="text-sm text-red-500 [&>p]:mt-1">
-                <FormattedMessage
-                  values={{ totalHostedAccounts: data.host?.totalHostedAccounts, ...I18nFormatters }}
-                  id="Advanced.FiscalHosting.deactivate.warning"
-                  defaultMessage="<p>It is not possible to deactivate your organization as a fiscal host because you are currently hosting {totalHostedAccounts} accounts.</p><p>To deactivate, they need to be moved to a different fiscal host or archived.</p>"
-                />
-              </div>
+              <FormattedMessage
+                values={{
+                  totalHostedAccounts: data.host?.totalHostedAccounts,
+                  link: chunk => (
+                    <DocumentationLink href="https://documentation.opencollective.com/fiscal-hosts/closing-a-fiscal-host">
+                      {chunk}
+                    </DocumentationLink>
+                  ),
+                  ...I18nFormatters,
+                }}
+                id="Advanced.FiscalHosting.deactivate.warning"
+                defaultMessage="<p>It is not possible to deactivate your organization as a fiscal host because you are currently hosting {totalHostedAccounts} accounts.</p><p>To deactivate, they need to be moved to a different fiscal host or archived.</p><p>For more information on closing your fiscal host, please <link>read our documentation</link>.</p>"
+              />
             ) : (
               <p className="text-sm">
                 <FormattedMessage
@@ -230,8 +245,8 @@ const FiscalHosting = ({ collective, account }) => {
           <div className="grow">
             <h1 className="mb-2 font-bold">
               <FormattedMessage
-                defaultMessage="Pay expenses, crowdfund and grant management"
-                id="FiscalHosting.moneyManagement.title"
+                defaultMessage="Money management"
+                id="fiscalHosting.whatAreTheBenefits.moneyManagement"
               />
             </h1>
             <p className="text-sm text-gray-700">
@@ -256,10 +271,10 @@ const FiscalHosting = ({ collective, account }) => {
         </div>
 
         <div className="flex items-center gap-4 rounded-lg border border-border px-6 py-4">
-          <Image src="/static/images/welcome/place.png" alt="Money Management Icon" width={52} height={49} />
+          <Image src="/static/images/welcome/place.png" alt="Fiscal Host Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
-              <FormattedMessage defaultMessage="Be a fiscal host" id="FiscalHosting.fiscalHost.title" />
+              <FormattedMessage defaultMessage="Be a Fiscal Host" id="FiscalHosting.fiscalHost.title" />
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
