@@ -117,7 +117,10 @@ export function OrgOverview() {
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
-        <OrgOverviewContent accountSlug={account.slug} />
+        <React.Fragment>
+          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+          <OrgOverviewContent accountSlug={account.slug} />
+        </React.Fragment>
       )}
     </div>
   );
