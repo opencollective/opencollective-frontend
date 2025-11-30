@@ -276,6 +276,7 @@ export const NewSimpleLocationFieldRenderer = ({
         required,
         error,
         info,
+        label,
         onChange: dispatchOnChange,
       },
       value => value !== undefined,
