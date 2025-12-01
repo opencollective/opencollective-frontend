@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Monthly Avg. Value of Contributions",
   "Contributions": "Wkłady",
   "contributions.description": "Otrzymuj wiadomości e-mail, gdy pojawią się nowe wkłady i inne powiadomienia związane z wkładem.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Składki powtarzalne",
   "contributions.startAccepting": "Zacznij akceptować wkłady",

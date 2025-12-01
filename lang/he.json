@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Monthly Avg. Value of Contributions",
   "Contributions": "תרומות",
   "contributions.description": "קבלת מיילים כשתרומות חדשות מגיעות וכן הודעות נוספות הקשורות להכנסות.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Recurring Contributions",
   "contributions.startAccepting": "התחלת קבלת תרומות",

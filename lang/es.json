@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Promedio mensual del valor de colaboraciones",
   "Contributions": "Contribuciones",
   "contributions.description": "Recibe correos electrónicos cuando llegan nuevas contribuciones y otras notificaciones relacionadas con las mismas.",
+  "contributions.id": "#",
   "contributions.question": "¿Qué debe suceder con las colaboraciones recurrentes?",
   "Contributions.Recurring": "Contribuciones Recurrentes",
   "contributions.startAccepting": "Comenzar a aceptar contribuciones",

@@ -42,7 +42,12 @@ const pausedContributionsQuery = gql`
           type
         }
       }
-      pausedIncoming: orders(filter: INCOMING, status: [PAUSED], includeIncognito: true, includeChildrenAccounts: true) {
+      pausedIncoming: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeChildrenAccounts: true
+      ) {
         totalCount
       }
       pausedResumable: orders(
@@ -99,10 +104,7 @@ export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomi
 
   // Don't show if loading, no account, or no resumable paused contributions
   const shouldShow =
-    !queryLoading &&
-    account?.canStartResumeContributionsProcess &&
-    pausedResumableCount > 0 &&
-    !account?.parent;
+    !queryLoading && account?.canStartResumeContributionsProcess && pausedResumableCount > 0 && !account?.parent;
 
   if (!shouldShow) {
     return null;

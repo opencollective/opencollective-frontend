@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Priemerná mesačná hodnota príspevkov",
   "Contributions": "Príspevky",
   "contributions.description": "Dostávajte e-maily o nových príspevkoch a ďalšie oznámenia týkajúce sa príspevkov.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Opakujúce sa príspevky",
   "contributions.startAccepting": "Začať prijímať príspevky",

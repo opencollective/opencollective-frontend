@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Monthly Avg. Value of Contributions",
   "Contributions": "Внески",
   "contributions.description": "Отримуйте електронні листи про надходження нових внесків та інші сповіщення, пов'язані з внесками.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Повторювані внески",
   "contributions.startAccepting": "Почати приймати внески",

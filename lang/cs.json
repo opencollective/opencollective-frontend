@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Monthly Avg. Value of Contributions",
   "Contributions": "Příspěvky",
   "contributions.description": "Dostávat e-maily, když se objeví nové příspěvky a další oznámení týkající se příspěvků.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Opakující se příspěvky",
   "contributions.startAccepting": "Začít přijímat příspěvky",

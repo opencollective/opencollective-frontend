@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Monthly Avg. Value of Contributions",
   "Contributions": "Beiträge",
   "contributions.description": "Erhalte E-Mails, wenn du neue Spenden oder andere Spenden bezogene Nachreden erhältst.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Wiederkehrende Spende",
   "contributions.startAccepting": "Beginne Spenden anzunehmen",

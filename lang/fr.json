@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Valeur moyenne mensuelle des contributions",
   "Contributions": "Contributions",
   "contributions.description": "Recevoir des courriels lorsque de nouvelles contributions arrivent, et autres notifications liées aux contributions.",
+  "contributions.id": "#",
   "contributions.question": "Qu'adviendra-t-il des contributions récurrentes ?",
   "Contributions.Recurring": "Contributions récurrentes",
   "contributions.startAccepting": "Accepter les contributions financières",

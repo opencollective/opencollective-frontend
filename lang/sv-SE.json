@@ -1042,6 +1042,7 @@
   "contributionMonthlyAverageTotal": "Monthly Avg. Value of Contributions",
   "Contributions": "Bidrag",
   "contributions.description": "Få e-post när nya bidrag kommer in samt andra relaterade meddelanden.",
+  "contributions.id": "#",
   "contributions.question": "What should happen to recurring contributions?",
   "Contributions.Recurring": "Återkommande bidrag",
   "contributions.startAccepting": "Börja acceptera bidrag",
