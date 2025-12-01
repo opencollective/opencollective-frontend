@@ -16354,9 +16354,8 @@ type Query {
     type: [AccountType]
 
     """
-    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    Admin only. Search by email address or name of a member.
     """
-    email: EmailAddress
     searchTerm: String
     relation: [CommunityRelationType!]
     limit: Int! = 100
