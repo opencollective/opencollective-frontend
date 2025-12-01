@@ -12,14 +12,14 @@ import ComboSelectFilter from './ComboSelectFilter';
 
 const schema = isMulti(z.string()).optional();
 
-export const TierNameFragment = gql`
+const tierNameFragment = gql`
   fragment TierName on Tier {
     id
     name
   }
 `;
 
-export const contributionsTiersQuery = gql`
+const contributionsTiersQuery = gql`
   query ContributionsTiers($slug: String!) {
     account(slug: $slug) {
       id
@@ -49,21 +49,21 @@ export const contributionsTiersQuery = gql`
       }
     }
   }
-  ${TierNameFragment}
+  ${tierNameFragment}
 `;
 
-export const contributionTierQuery = gql`
+const contributionTierQuery = gql`
   query ContributionTier($tierId: String!) {
     tier(tier: { id: $tierId }) {
       ...TierName
     }
   }
-  ${TierNameFragment}
+  ${tierNameFragment}
 `;
 
 function TierRenderer({ tierId }) {
   const { data: fragmentData } = useFragment({
-    fragment: TierNameFragment,
+    fragment: tierNameFragment,
     from: { __typename: 'Tier', id: tierId },
   });
   const { data: queryData } = useQuery(contributionTierQuery, {

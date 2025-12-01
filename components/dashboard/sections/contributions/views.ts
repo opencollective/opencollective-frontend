@@ -10,7 +10,7 @@ import type { FilterValues } from './filters';
 /**
  * Views used by IncomingContributions and OutgoingContributions
  */
-export enum OrderTabs {
+enum IncomingOutgoingContributionTabs {
   ALL = 'ALL',
   RECURRING = 'RECURRING',
   ONETIME = 'ONETIME',
@@ -59,9 +59,9 @@ interface UseContributionFlowViewsResult {
 }
 
 /**
- * Hook to fetch contribution flow metadata and return views with counts
+ * Hook to fetch views and their counts for incoming/outgoing contributions
  */
-export function useContributionFlowViews(
+export function useIncomingOutgoingContributionViews(
   slug: string,
   direction: 'INCOMING' | 'OUTGOING',
 ): UseContributionFlowViewsResult {
@@ -74,44 +74,44 @@ export function useContributionFlowViews(
   });
   const views = [
     {
-      id: OrderTabs.ALL,
+      id: IncomingOutgoingContributionTabs.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
-      count: data?.account?.[OrderTabs.ALL]?.totalCount,
+      count: data?.account?.[IncomingOutgoingContributionTabs.ALL]?.totalCount,
     },
     {
-      id: OrderTabs.RECURRING,
+      id: IncomingOutgoingContributionTabs.RECURRING,
       label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
       filter: {
         frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
         status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
       },
-      count: data?.account?.[OrderTabs.RECURRING]?.totalCount,
+      count: data?.account?.[IncomingOutgoingContributionTabs.RECURRING]?.totalCount,
     },
     {
-      id: OrderTabs.ONETIME,
+      id: IncomingOutgoingContributionTabs.ONETIME,
       label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
       filter: {
         frequency: [ContributionFrequency.ONETIME],
         status: [OrderStatus.PAID, OrderStatus.PROCESSING],
       },
-      count: data?.account?.[OrderTabs.ONETIME]?.totalCount,
+      count: data?.account?.[IncomingOutgoingContributionTabs.ONETIME]?.totalCount,
     },
     {
-      id: OrderTabs.PAUSED,
+      id: IncomingOutgoingContributionTabs.PAUSED,
       label: intl.formatMessage({ id: 'order.paused', defaultMessage: 'Paused' }),
       filter: {
         status: [OrderStatus.PAUSED],
       },
-      count: data?.account?.[OrderTabs.PAUSED]?.totalCount,
+      count: data?.account?.[IncomingOutgoingContributionTabs.PAUSED]?.totalCount,
     },
     {
-      id: OrderTabs.CANCELED,
+      id: IncomingOutgoingContributionTabs.CANCELED,
       label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
       filter: {
         status: [OrderStatus.CANCELLED],
       },
-      count: data?.account?.[OrderTabs.CANCELED]?.totalCount,
+      count: data?.account?.[IncomingOutgoingContributionTabs.CANCELED]?.totalCount,
     },
   ];
 

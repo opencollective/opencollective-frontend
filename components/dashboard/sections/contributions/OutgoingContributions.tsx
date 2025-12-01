@@ -14,16 +14,16 @@ import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import { useContributionFlowViews } from './views';
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta as BaseFilterMeta } from './filters';
 import {
-  filters as baseFilters,
   ContributionAccountingCategoryKinds,
+  filters as baseFilters,
   schema as baseSchema,
   toVariables as baseToVariables,
 } from './filters';
 import { dashboardOrdersQuery } from './queries';
+import { useIncomingOutgoingContributionViews } from './views';
 
 const schema = baseSchema.extend({ account: childAccountFilter.schema });
 
@@ -53,7 +53,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
   const { account } = useContext(DashboardContext);
 
-  const { views, refetch: refetchViews } = useContributionFlowViews(accountSlug, 'OUTGOING');
+  const { views, refetch: refetchViews } = useIncomingOutgoingContributionViews(accountSlug, 'OUTGOING');
 
   const filterMeta: FilterMeta = {
     currency: account?.currency,

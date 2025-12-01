@@ -15,7 +15,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
-import { filters, ContributionAccountingCategoryKinds, schema as baseSchema, toVariables } from './filters';
+import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 import { dashboardOrdersQuery } from './queries';
 

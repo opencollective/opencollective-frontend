@@ -14,6 +14,9 @@ export const dashboardOrdersQuery = gql`
     $includeIncognito: Boolean
     $amount: AmountRangeInput
     $paymentMethod: [PaymentMethodReferenceInput]
+    $paymentMethodService: [PaymentMethodService]
+    $paymentMethodType: [PaymentMethodType]
+    $accountingCategory: [String]
     $hostContext: HostContext
     $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
@@ -42,6 +45,9 @@ export const dashboardOrdersQuery = gql`
         offset: $offset
         limit: $limit
         paymentMethod: $paymentMethod
+        paymentMethodService: $paymentMethodService
+        paymentMethodType: $paymentMethodType
+        accountingCategory: $accountingCategory
         hostContext: $hostContext
         includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter

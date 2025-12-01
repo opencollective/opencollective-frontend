@@ -3,7 +3,10 @@ import type { ApolloError } from '@apollo/client';
 import type { VisibilityState } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
 
-import type { ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  DashboardOrdersQueryVariables,
+  ManagedOrderFieldsFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
@@ -17,11 +20,12 @@ import { Pagination } from '../../filters/Pagination';
 
 import { useContributionActions } from './actions';
 import { columns } from './columns';
+import { FilterMeta, schema } from './filters';
 
-export type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
+type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   accountSlug: string;
-  queryFilter: useQueryFilterReturnType<any, any, any>;
-  views: { id: string; label: string; filter: Partial<FilterValues>; count?: number }[];
+  queryFilter: useQueryFilterReturnType<typeof schema, DashboardOrdersQueryVariables, FilterMeta>;
+  views?: readonly { id: string; label: string; filter: Partial<FilterValues>; count?: number }[];
   orders: { nodes: ManagedOrderFieldsFragment[]; totalCount: number };
   loading?: boolean;
   nbPlaceholders?: number;

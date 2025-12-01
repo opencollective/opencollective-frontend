@@ -5,8 +5,8 @@ import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import type { Account, DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -14,17 +14,17 @@ import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import { tierFilter } from '../../filters/TierFilter';
 import type { DashboardSectionProps } from '../../types';
 
-import { useContributionFlowViews } from './views';
 import ContributionsTable from './ContributionsTable';
 import type { FilterMeta as BaseFilterMeta } from './filters';
 import {
-  filters as baseFilters,
   ContributionAccountingCategoryKinds,
+  filters as baseFilters,
   schema as baseSchema,
   toVariables as baseToVariables,
 } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 import { dashboardOrdersQuery } from './queries';
+import { useIncomingOutgoingContributionViews } from './views';
 
 const schema = baseSchema.extend({ tier: tierFilter.schema, account: childAccountFilter.schema });
 
@@ -56,7 +56,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
   const { account } = useContext(DashboardContext);
 
-  const { views, refetch: refetchViews } = useContributionFlowViews(accountSlug, 'INCOMING');
+  const { views, refetch: refetchViews } = useIncomingOutgoingContributionViews(accountSlug, 'INCOMING');
 
   const filterMeta: FilterMeta = {
     currency: account?.currency,

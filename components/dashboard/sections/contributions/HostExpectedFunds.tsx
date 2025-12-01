@@ -24,8 +24,8 @@ import ContributionsTable from './ContributionsTable';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import {
-  filters as baseFilters,
   ContributionAccountingCategoryKinds,
+  filters as baseFilters,
   schema as baseSchema,
   toVariables as baseToVariables,
 } from './filters';
