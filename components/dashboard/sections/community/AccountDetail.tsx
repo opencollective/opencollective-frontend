@@ -169,7 +169,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const legalName = account?.legalName !== account?.name && account?.legalName;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex h-full flex-col">
       <button className="mb-4 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
         <ArrowLeft size="14px" className="mr-1" />
         <FormattedMessage defaultMessage="Go Back" id="GoBack" />
@@ -259,7 +259,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </div>
         )}
       </div>
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="mt-4 flex flex-grow flex-col gap-4">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (

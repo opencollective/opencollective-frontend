@@ -179,7 +179,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
     return (
-      <div className="w-full">
+      <div className="h-full w-full">
         <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
       </div>
     );
