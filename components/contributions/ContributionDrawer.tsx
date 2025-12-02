@@ -186,6 +186,23 @@ const contributionDrawerQuery = gql`
       }
       approvedAt
     }
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            friendlyName
+            kind
+            appliesTo
+          }
+        }
+      }
+    }
 
     ... on AccountWithParent {
       parent {
