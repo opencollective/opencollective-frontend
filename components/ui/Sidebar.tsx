@@ -5,6 +5,7 @@ import { cva } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { pseudoRandomWithSeed } from '@/lib/math';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/Button';
@@ -561,14 +562,17 @@ function SidebarMenuBadge({ className, ...props }: React.ComponentProps<'div'>) 
 function SidebarMenuSkeleton({
   className,
   showIcon = false,
+  /** Used to generate a pseudo-random width for the skeleton. */
+  index = 0,
   ...props
 }: React.ComponentProps<'div'> & {
   showIcon?: boolean;
+  index?: number;
 }) {
   // Random width between 50 to 90%.
   const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`;
-  }, []);
+    return `${Math.floor(pseudoRandomWithSeed(index, 50, 90))}%`;
+  }, [index]);
 
   return (
     <div
