@@ -23,10 +23,8 @@ import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
@@ -508,12 +506,6 @@ const CollectiveNavbar = ({
 
   const loading = isLoading || dataLoading;
 
-  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
-
-  const isNewExpenseFlowEnabled =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
-
   const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
@@ -531,23 +523,11 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(
-    collective,
-    actionsArray,
-    LoggedInUser,
-    isNewExpenseFlowEnabled,
-    isNewGrantFlowEnabled,
-    () => setIsSubmitExpenseModalOpen(true),
-  );
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, () => setIsSubmitExpenseModalOpen(true));
   const secondAction =
     actionsArray.length === 2 &&
-    getMainAction(
-      collective,
-      without(actionsArray, mainAction?.type),
-      LoggedInUser,
-      isNewExpenseFlowEnabled,
-      isNewGrantFlowEnabled,
-      () => setIsSubmitExpenseModalOpen(true),
+    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, () =>
+      setIsSubmitExpenseModalOpen(true),
     );
   const navbarRef = useRef(undefined);
   const mainContainerRef = useRef(undefined);

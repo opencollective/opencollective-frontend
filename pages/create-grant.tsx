@@ -11,7 +11,6 @@ import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url-helpers';
 import { parseToBoolean } from '@/lib/utils';
 
@@ -31,7 +30,7 @@ const CreateGrantPageI18n = defineMessages({
 function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
-  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const { loadingLoggedInUser } = useLoggedInUser();
   const pageMetadata = React.useMemo(() => {
     if (!props.account) {
       return null;
@@ -54,10 +53,6 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
   }, [props.account, router]);
 
   const { queryResult } = props;
-  const isGrantPreviewEnabled =
-    !LoggedInUser ||
-    LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) ||
-    props.newFlowEnabledInUrl;
 
   if (queryResult.loading || loadingLoggedInUser) {
     return (
@@ -71,7 +66,7 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
     return <ErrorPage error={props.error} />;
   } else if (!props.account || isHiddenAccount(props.account)) {
     return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
-  } else if (!isGrantPreviewEnabled || !(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
+  } else if (!(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
     return <PageFeatureNotSupported />;
   }
 

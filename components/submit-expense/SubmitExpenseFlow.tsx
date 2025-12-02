@@ -25,6 +25,7 @@ type SubmitExpenseFlowProps = {
   duplicateExpense?: boolean;
   submitExpenseTo?: string;
   endFlowButtonLabel?: React.ReactNode;
+  customData: unknown;
 };
 
 const I18nMessages = defineMessages({
@@ -240,6 +241,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                   onSuccess={onSuccess}
                   onError={onError}
                   onExpenseInviteDeclined={onExpenseInviteDeclined}
+                  customData={props.customData}
                 />
               </div>
             </div>
@@ -264,6 +266,7 @@ function ExpenseFormikContainer(props: {
   onError: (err) => void;
   onSuccess: (result, type: 'edit' | 'new' | 'invite') => void;
   onExpenseInviteDeclined: () => void;
+  customData: unknown;
 }) {
   const formRef = React.useRef<HTMLFormElement>(undefined);
 
@@ -271,6 +274,7 @@ function ExpenseFormikContainer(props: {
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,
     expenseId: props.expenseId,
+    customData: props.customData,
   });
 
   const [activeStep, setActiveStep] = React.useState(Step.WHO_IS_PAYING);

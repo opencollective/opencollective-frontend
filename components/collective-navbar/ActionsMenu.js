@@ -8,16 +8,11 @@ import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { pickBy } from 'lodash';
-import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective';
-import { isSupportedExpenseType } from '../../lib/expenses';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
-import { parseToBoolean } from '@/lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -183,16 +178,6 @@ const CollectiveNavbarActionsMenu = ({
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
-  const router = useRouter();
-
-  const newExpenseFlowOptedOut = parseToBoolean(router?.query?.forceLegacyFlow);
-  const isNewGrantFlowEnabled =
-    !newExpenseFlowOptedOut && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
-
-  const isNewExpenseFlowEnabled =
-    !newExpenseFlowOptedOut &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -241,33 +226,17 @@ const CollectiveNavbarActionsMenu = ({
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        {isNewExpenseFlowEnabled ? (
-                          <StyledLink onClick={onOpenSubmitExpenseModalClick}>
-                            <Container p={ITEM_PADDING}>
-                              <Receipt size="20px" />
-                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                            </Container>
-                          </StyledLink>
-                        ) : (
-                          <StyledLink
-                            data-cy="submit-expense-dropdown"
-                            as={Link}
-                            href={`${getCollectivePageRoute(collective)}/expenses/new?forceLegacyFlow=true`}
-                          >
-                            <Container p={ITEM_PADDING}>
-                              <Receipt size="20px" />
-                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                            </Container>
-                          </StyledLink>
-                        )}
+                        <StyledLink onClick={onOpenSubmitExpenseModalClick}>
+                          <Container p={ITEM_PADDING}>
+                            <Receipt size="20px" />
+                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                          </Container>
+                        </StyledLink>
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink
-                          as={Link}
-                          href={`${getCollectivePageRoute(collective)}/${isNewGrantFlowEnabled ? 'grants' : 'expenses'}/new`}
-                        >
+                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/grants/new`}>
                           <Container p={ITEM_PADDING}>
                             <MoneyCheckAlt size="20px" />
                             <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
