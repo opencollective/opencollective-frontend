@@ -1111,6 +1111,26 @@ interface Account {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
 }
 
 """
@@ -3789,6 +3809,26 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4704,6 +4744,7 @@ type PlatformSubscriptionFeatures {
   RECEIVE_EXPENSES: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
+  KYC: Boolean!
 }
 
 type PlatformBilling {
@@ -6765,6 +6806,7 @@ type CollectiveFeatures {
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
+  KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7173,6 +7215,9 @@ enum ActivityType {
   COLLECTIVE_COMMENT_CREATED
   ORDER_PENDING_CRYPTO
   BACKYOURSTACK_DISPATCH_CONFIRMED
+  KYC_REQUESTED
+  KYC_REVOKED
+  KYC_VERIFIED
 }
 
 enum ActivityClassType {
@@ -7325,6 +7370,102 @@ type ActivityCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Activity!]
+}
+
+type KYCVerificationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [KYCVerification!]
+}
+
+"""
+A KYC Verification
+"""
+type KYCVerification {
+  """
+  Unique identifier for this KYC verification
+  """
+  id: String!
+
+  """
+  Provider used to make this KYC verification
+  """
+  provider: KYCProvider!
+
+  """
+  The account that requested the KYC verification
+  """
+  requestedByAccount: Account!
+
+  """
+  The account that is verified
+  """
+  account: Account!
+
+  """
+  Provider specific data
+  """
+  providerData: KYCProviderData!
+
+  """
+  Verified KYC data
+  """
+  verifiedData: KYCVerifiedData!
+  status: KYCVerificationStatus!
+  requestedAt: DateTime!
+  revokedAt: DateTime
+  verifiedAt: DateTime
+  permissions: KYCVerificationPermissions!
+}
+
+enum KYCProvider {
+  MANUAL
+}
+
+union KYCProviderData = ManualKYCProviderData
+
+"""
+Manual KYC data
+"""
+type ManualKYCProviderData {
+  """
+  Notes added during manual verification
+  """
+  notes: String!
+}
+
+"""
+Verified KYC data
+"""
+type KYCVerifiedData {
+  """
+  Account legal name as verified by KYC
+  """
+  legalName: String
+
+  """
+  Account legal address as verified by KYC
+  """
+  legalAddress: String
+}
+
+enum KYCVerificationStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  REVOKED
+  EXPIRED
+}
+
+"""
+KYC Verification permissions
+"""
+type KYCVerificationPermissions {
+  """
+  Whether this KYC Verification can be revoked by the logged in user
+  """
+  canRevokeKYCVerification: Boolean!
 }
 
 """
@@ -9795,6 +9936,26 @@ type Bot implements Account {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10768,6 +10929,26 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12299,6 +12480,26 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13544,6 +13745,26 @@ type Individual implements Account {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13614,6 +13835,36 @@ type Individual implements Account {
   """
   twoFactorMethods: [UserTwoFactorMethod]
   contributorProfiles(forAccount: AccountReferenceInput!): [ContributorProfile]!
+
+  """
+  KYC Verification requests to this account
+  """
+  kycVerifications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only KYC requests made by these accounts
+    """
+    requestedByAccounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
+
+  """
+  Verified KYC status, if any
+  """
+  kycStatus(
+    """
+    If set, returns only KYC requests made by these accounts
+    """
+    requestedByAccount: AccountReferenceInput!
+  ): KYCStatus!
 }
 
 """
@@ -13735,6 +13986,13 @@ type ContributorProfile {
     """
     since: DateTime
   ): Amount
+}
+
+"""
+A individual KYC verified status
+"""
+type KYCStatus {
+  manual: KYCVerification
 }
 
 """
@@ -14770,6 +15028,26 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15865,6 +16143,26 @@ type Vendor implements Account & AccountWithContributions {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -18790,6 +19088,9 @@ enum ActivityAndClassesType {
   COLLECTIVE_COMMENT_CREATED
   ORDER_PENDING_CRYPTO
   BACKYOURSTACK_DISPATCH_CONFIRMED
+  KYC_REQUESTED
+  KYC_REVOKED
+  KYC_VERIFIED
   COLLECTIVE
   EXPENSES
   CONTRIBUTIONS
@@ -19788,6 +20089,26 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -20908,6 +21229,26 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -23575,6 +23916,32 @@ type Mutation {
   Send In-App Survey response
   """
   sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
+
+  """
+  Requests an account to be verified using a KYC provider
+  """
+  requestKYCVerification(
+    """
+    Account request KYC Verification
+    """
+    requestedByAccount: AccountReferenceInput!
+
+    """
+    Account that will be verified
+    """
+    verifyAccount: AccountReferenceInput!
+    provider: KYCProvider!
+
+    """
+    Provider specific request data
+    """
+    request: RequestKYCVerificationInput!
+  ): KYCVerification!
+
+  """
+  Revoke the KYC Verification
+  """
+  revokeKYCVerification(kycVerification: KYCVerificationReferenceInput!): KYCVerification!
 }
 
 input CollectiveCreateInput {
@@ -26150,6 +26517,7 @@ input PlatformSubscriptionFeaturesFeatures {
   RECEIVE_EXPENSES: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
+  KYC: Boolean!
 }
 
 input PlatformSubscriptionPlanPricing {
@@ -26178,3 +26546,18 @@ input PlatformSubscriptionPlanPricing {
   """
   includedExpensesPerMonth: Int!
 }
+
+input RequestKYCVerificationInput {
+  manual: RequestManualKYCVerificationInput
+}
+
+input RequestManualKYCVerificationInput {
+  legalName: String!
+  legalAddress: String!
+  notes: String
+}
+
+"""
+A reference to a KYC Verification
+"""
+scalar KYCVerificationReferenceInput

@@ -1111,6 +1111,7 @@ type CollectiveFeatures {
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
+  KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
