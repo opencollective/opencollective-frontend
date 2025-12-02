@@ -35,6 +35,7 @@ export default function IntlProvider({ children, locale }) {
 
   const setLocale = React.useCallback((newLocale: string) => {
     document.cookie = `language=${newLocale};path=/`;
+    document.documentElement.setAttribute('lang', newLocale);
     setSelectedLocale(newLocale);
   }, []);
 
