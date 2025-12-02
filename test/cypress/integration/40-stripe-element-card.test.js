@@ -3,13 +3,7 @@ import { randomSlug } from '../support/faker';
 function contributeWithNewCard() {
   cy.contains('New payment method').click();
   cy.wait(2000);
-  cy.getStripePaymentElement().within(() => {
-    cy.get('#Field-numberInput').type('4242424242424242');
-    cy.get('#Field-expiryInput').type('1235');
-    cy.get('#Field-cvcInput').type('123');
-    cy.get('#Field-countryInput').select('US');
-    cy.get('#Field-postalCodeInput').type('90210');
-  });
+  cy.fillStripePaymentElementInput();
   cy.wait(2000);
   cy.get('button[data-cy="cf-next-step"]').click();
 }

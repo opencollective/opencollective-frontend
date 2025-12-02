@@ -3,7 +3,6 @@ import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { manageContributionsQuery } from '../../recurring-contributions/graphql/queries';
 import {
   getTotalCollectiveContributionsQueryVariables,
   totalCollectiveContributionsQuery,
@@ -12,7 +11,6 @@ import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../sectio
 import { budgetSectionContributionsQuery } from '../sections/Budget/ContributionsBudget';
 import { budgetSectionExpenseQuery } from '../sections/Budget/ExpenseBudget';
 import { conversationsSectionQuery, getConversationsSectionQueryVariables } from '../sections/Conversations';
-import { getRecurringContributionsSectionQueryVariables } from '../sections/RecurringContributions';
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
@@ -56,15 +54,6 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
         client.query({
           query: transactionsSectionQuery,
           variables: getTransactionsSectionQueryVariables(slug),
-          context: API_V2_CONTEXT,
-        }),
-      );
-    }
-    if (sectionsNames.includes('recurring-contributions')) {
-      queries.push(
-        client.query({
-          query: manageContributionsQuery,
-          variables: getRecurringContributionsSectionQueryVariables(slug),
           context: API_V2_CONTEXT,
         }),
       );

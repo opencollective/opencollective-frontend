@@ -221,6 +221,11 @@ const DashboardPage = () => {
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
+
+    // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
+    if (slug === 'me' && LoggedInUser) {
+      router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
+    }
   }, [activeSlug, LoggedInUser]);
 
   // Clear last visited workspace account if not admin
