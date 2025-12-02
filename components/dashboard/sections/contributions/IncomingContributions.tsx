@@ -60,9 +60,9 @@ const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
   const { views, refetch: refetchViews } = useIncomingOutgoingContributionViews(accountSlug, 'INCOMING');
 
   const filterMeta: FilterMeta = {
-    currency: account?.currency,
-    accountSlug: account?.slug,
-    childrenAccounts: account?.childrenAccounts?.nodes ?? [],
+    currency: account.currency,
+    accountSlug: account.slug,
+    childrenAccounts: account.childrenAccounts?.nodes ?? [],
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,

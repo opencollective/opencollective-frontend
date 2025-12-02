@@ -162,8 +162,8 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   ];
 
   const filterMeta: FilterMeta = {
-    currency: account?.currency,
-    accountSlug: account?.slug,
+    currency: account.currency,
+    accountSlug: account.slug,
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
