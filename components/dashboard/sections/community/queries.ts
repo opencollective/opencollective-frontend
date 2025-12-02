@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { kycVerificationFields } from '@/components/kyc/graphql';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -71,6 +72,11 @@ export const communityAccountDetailQuery = gql`
       isVerified
       ... on Individual {
         email
+        kycStatus(requestedByAccount: $host) {
+          manual {
+            ...KYCVerificationFields
+          }
+        }
       }
       memberOf {
         nodes {
@@ -113,6 +119,7 @@ export const communityAccountDetailQuery = gql`
     }
   }
   ${accountHoverCardFields}
+  ${kycVerificationFields}
 `;
 
 export const communityAccountActivitiesQuery = gql`

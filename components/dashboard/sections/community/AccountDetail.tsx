@@ -1,17 +1,24 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { pick } from 'lodash';
 import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import { CollectiveType } from '@/lib/constants/collectives';
+import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
+import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
+import { type AccountReferenceInput, KycProvider } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { cn } from '@/lib/utils';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
+import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
 import { DataTable } from '@/components/table/DataTable';
@@ -105,6 +112,7 @@ enum AccountDetailView {
   EXPENSES = 'EXPENSES',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   ACTIVITIES = 'ACTIVITIES',
+  KYC = 'KYC',
 }
 
 type ContributionDrawerProps = {
@@ -119,7 +127,9 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
 
-  const query = useQuery(communityAccountDetailQuery, {
+  const { LoggedInUser } = useLoggedInUser();
+
+  const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     context: API_V2_CONTEXT,
     variables: {
       accountId: props.account.id,
@@ -129,6 +139,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     nextFetchPolicy: 'standby',
   });
 
+  const kycStatus = query.data?.account && 'kycStatus' in query.data.account ? query.data.account['kycStatus'] : {};
   const tabs = React.useMemo(
     () => [
       {
@@ -149,8 +160,20 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         id: AccountDetailView.ACTIVITIES,
         label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
       },
+      ...(query.data?.account?.type === CollectiveType.INDIVIDUAL &&
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KYC)
+        ? [
+            {
+              id: AccountDetailView.KYC,
+              label: 'KYC',
+              count: Object.values(pick(kycStatus, [KycProvider.MANUAL.toLowerCase()])).filter(
+                status => status !== null,
+              ).length,
+            },
+          ]
+        : []),
     ],
-    [query.data],
+    [query.data, query.data?.account?.type, LoggedInUser, kycStatus],
   );
 
   const handleTabChange = React.useCallback(
@@ -164,7 +187,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const account = query.data?.account;
   const relations =
     account?.communityStats?.relations?.filter(
-      (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
+      (relation, _, relations) =>
+        !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
     ) || [];
   const legalName = account?.legalName !== account?.name && account?.legalName;
 
@@ -225,18 +249,18 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 {props.account.id.split('-')[0]}...
               </CopyID>
             </div>
-            {account.email && (
+            {account['email'] && (
               <React.Fragment>
                 <Dot size={14} />
                 <div className="flex items-center gap-1">
                   <Mail size={14} />
                   <CopyID
-                    value={account.email}
+                    value={account['email']}
                     tooltipLabel={<FormattedMessage defaultMessage="Copy Email" id="8NlxGY" />}
                     className="inline-flex items-center gap-1"
                     Icon={null}
                   >
-                    {account.email}
+                    {account['email']}
                   </CopyID>
                 </div>
               </React.Fragment>
@@ -313,7 +337,6 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 loading={isLoading}
               />
             </div>
-
             {selectedTab === AccountDetailView.CONTRIBUTIONS && (
               <ContributionsTab account={account} host={props.host} setOpenContributionId={setOpenContributionId} />
             )}
@@ -322,6 +345,9 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             )}
             {selectedTab === AccountDetailView.ACTIVITIES && (
               <ActivitiesTab account={account} host={props.host} setOpenExpenseId={setOpenExpenseId} />
+            )}
+            {selectedTab === AccountDetailView.KYC && (
+              <KYCTabPeopleDashboard requestedByAccount={props.host} verifyAccount={props.account} />
             )}
           </React.Fragment>
         )}

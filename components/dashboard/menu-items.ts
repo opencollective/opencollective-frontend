@@ -11,6 +11,7 @@ import {
   FileText,
   HandCoins,
   HeartHandshake,
+  IdCard,
   LayoutDashboard,
   Megaphone,
   Receipt,
@@ -325,6 +326,24 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
+    },
+    {
+      if: hasMoneyManagement && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KYC),
+      label: 'KYC',
+      Icon: IdCard,
+      type: 'group',
+      subMenu: [
+        {
+          section: ALL_SECTIONS.KYC,
+          label: intl.formatMessage({ defaultMessage: 'Requests', id: 'VirtualCards.Requests' }),
+        },
+      ],
+    },
+    {
+      if: isIndividual && account.kycVerifications.totalCount > 0,
+      label: 'KYC',
+      Icon: IdCard,
+      section: ALL_SECTIONS.INDIVIDUAL_KYC,
     },
     {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
