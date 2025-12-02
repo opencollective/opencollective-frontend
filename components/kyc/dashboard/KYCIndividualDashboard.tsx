@@ -95,13 +95,8 @@ export function KYCIndividualDashboard(props: DashboardSectionProps) {
         docs={[
           {
             href: 'https://documentation.opencollective.com',
-            title: <FormattedMessage defaultMessage="KYC Verification" id="odBeoC" />,
-            excerpt: (
-              <FormattedMessage
-                defaultMessage="Learn more about KYC verification and how organizations use this information."
-                id="7XVu6a"
-              />
-            ),
+            title: 'KYC Verification',
+            excerpt: 'Learn more about KYC verification and how organizations use this information.',
           },
         ]}
       />

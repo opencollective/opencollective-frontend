@@ -90,13 +90,8 @@ export function KYCRequests(props: DashboardSectionProps) {
         docs={[
           {
             href: 'https://documentation.opencollective.com',
-            title: <FormattedMessage defaultMessage="KYC Verification" id="odBeoC" />,
-            excerpt: (
-              <FormattedMessage
-                defaultMessage="Learn more about KYC verification and how to verify accounts on the platform."
-                id="of4fDg"
-              />
-            ),
+            title: 'KYC Verification',
+            excerpt: 'Learn more about KYC verification and how to verify accounts on the platform.',
           },
         ]}
       />
