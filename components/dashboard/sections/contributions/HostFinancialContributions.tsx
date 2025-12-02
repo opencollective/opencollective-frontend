@@ -161,7 +161,7 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     <div className="flex flex-col gap-4">
       <DashboardHeader
         title={
-          <div className="flex flex-1 items-center justify-between gap-4">
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
             <HostContextFilter
               value={queryFilter.values.hostContext}
