@@ -50,7 +50,6 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
         <div className="flex-1 flex-grow-2">
           <ExpenseSummary
             onDelete={() => {}}
-            onEdit={() => {}}
             openFileViewer={url => {
               window.open(url, '_blank');
             }}

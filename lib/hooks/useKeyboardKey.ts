@@ -146,16 +146,6 @@ export const E = {
   keyName: 'E',
 };
 
-export const H = {
-  key: 'h',
-  keyName: 'H',
-};
-
-export const I = {
-  key: 'i',
-  keyName: 'I',
-};
-
 export const A = {
   key: 'a',
   keyName: 'A',
