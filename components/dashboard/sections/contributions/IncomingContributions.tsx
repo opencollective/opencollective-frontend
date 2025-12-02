@@ -31,6 +31,7 @@ const schema = baseSchema.extend({ tier: tierFilter.schema, account: childAccoun
 type FilterValues = z.infer<typeof schema>;
 type FilterMeta = BaseFilterMeta & {
   childrenAccounts?: Account[];
+  selectedAccountSlug?: string;
 };
 
 const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
@@ -86,6 +87,12 @@ const IncomingContributions = ({ accountSlug }: DashboardSectionProps) => {
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
+
+  // Add dynamic values to meta
+  queryFilter.meta = {
+    ...filterMeta,
+    selectedAccountSlug: queryFilter.values.account || undefined,
+  };
 
   const handleRefetch = React.useCallback(() => {
     refetch();
