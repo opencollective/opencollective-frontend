@@ -21,10 +21,10 @@ import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { emailFilter } from '../../filters/EmailFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
+import { searchFilter } from '../../filters/SearchFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
@@ -175,16 +175,15 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       limit: integer.default(PAGE_SIZE),
       offset: integer.default(0),
       relation: relationTypeFilter.schema,
-      email: emailFilter.schema,
+      searchTerm: searchFilter.schema,
       account: z.string().optional(),
     }),
     toVariables: {
-      email: emailFilter.toVariables,
       account: hostedAccountFilter.toVariables,
     },
     filters: {
       relation: relationTypeFilter.filter,
-      email: emailFilter.filter,
+      searchTerm: searchFilter.filter,
       account: hostedAccountFilter.filter,
     },
     meta: { hostSlug: accountSlug },
