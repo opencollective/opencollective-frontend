@@ -3,50 +3,20 @@ import { useMutation, useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
 import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
+import { activateCollectiveAsHostMutation, deactivateCollectiveAsHostMutation } from '@/lib/graphql/v1/mutations';
 
 import I18nFormatters from '@/components/I18nFormatters';
 import { DocumentationLink } from '@/components/Link';
 
 import { adminPanelQuery } from '../../dashboard/queries';
+
 import { useModal } from '../../ModalContext';
 import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
-
-const activateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
-  mutation ActivateCollectiveAsHost($id: Int!) {
-    activateCollectiveAsHost(id: $id) {
-      id
-      currency
-      isActive
-      isDeletable
-      isHost
-      plan {
-        id
-        name
-      }
-    }
-  }
-`;
-
-const deactivateCollectiveAsHostMutation = gqlV1 /* GraphQL */ `
-  mutation DeactivateCollectiveAsHost($id: Int!) {
-    deactivateCollectiveAsHost(id: $id) {
-      id
-      currency
-      isActive
-      isDeletable
-      isHost
-      plan {
-        id
-        name
-      }
-    }
-  }
-`;
 
 const toggleHostAccountsSettingsQuery = gql`
   mutation ToggleHostAccounts($account: AccountReferenceInput!, $key: AccountSettingsKey!, $enabled: JSON!) {
