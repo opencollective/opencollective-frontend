@@ -65,7 +65,6 @@ describe('Recurring contributions', () => {
           cy.wait(500);
           cy.fillStripePaymentElementInput();
           cy.getByDataCy('recurring-contribution-submit-pm-button').click();
-          cy.getByDataCy('recurring-contribution-submit-pm-button').click();
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
         },
       );
