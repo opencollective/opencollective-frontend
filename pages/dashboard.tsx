@@ -221,7 +221,9 @@ const DashboardPage = () => {
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
-
+    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
+      router.replace('/signup/profile');
+    }
     // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
     if (slug === 'me' && LoggedInUser) {
       router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);

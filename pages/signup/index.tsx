@@ -72,7 +72,7 @@ export default function SignupPage() {
           return prev;
         } else {
           const step = requestedStep || nextStep;
-          const newQuery = omit({ ...pick(router.query, ['next', 'session']), ...query }, ['step']);
+          const newQuery = omit({ ...pick(router.query, ['next', 'session', 'active', 'host']), ...query }, ['step']);
           if (includeOrganizationFlow) {
             newQuery.organization = 'true';
           }

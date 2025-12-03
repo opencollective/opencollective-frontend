@@ -4607,7 +4607,7 @@ type AccountCollection implements Collection {
 }
 
 """
-An account that can have a Platform Subscription
+An account that can be hosted by a Host
 """
 interface AccountWithPlatformSubscription {
   """
@@ -22676,6 +22676,7 @@ type Mutation {
     If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
     """
     financiallyActive: Boolean = false
+    fiscalHostCapable: Boolean = false
   ): Organization
 
   """

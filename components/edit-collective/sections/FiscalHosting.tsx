@@ -240,7 +240,10 @@ const FiscalHosting = ({ collective, account }) => {
             />
           </p>
         </div>
-        <div className="flex items-center gap-4 rounded-lg border border-border px-6 py-4">
+        <div
+          className="flex items-center gap-4 rounded-lg border border-border px-6 py-4"
+          data-cy="money-management-section"
+        >
           <Image src="/static/images/welcome/jar.png" alt="Money Management Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
@@ -270,7 +273,10 @@ const FiscalHosting = ({ collective, account }) => {
           </Button>
         </div>
 
-        <div className="flex items-center gap-4 rounded-lg border border-border px-6 py-4">
+        <div
+          className="flex items-center gap-4 rounded-lg border border-border px-6 py-4"
+          data-cy="fiscal-hosting-section"
+        >
           <Image src="/static/images/welcome/place.png" alt="Fiscal Host Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
@@ -298,17 +304,6 @@ const FiscalHosting = ({ collective, account }) => {
           </Button>
         </div>
       </div>
-
-      {/*       
-        {collective.plan.hostedCollectives > 0 && (
-          <MessageBox type="warning">
-            <FormattedMessage
-              values={{ hostedCollectives: collective.plan.hostedCollectives }}
-              id="collective.hostAccount.deactivate.isHost"
-              defaultMessage="You are currently hosting {hostedCollectives} Collectives. To deactivate, they need to be moved to a different Host or archived."
-            />
-          </MessageBox>
-        )} */}
     </div>
   );
 };
