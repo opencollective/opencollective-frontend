@@ -172,9 +172,15 @@ export function uploadImageWithXHR(file, kind, { onProgress, onSuccess, onFailur
 
         resolve(JSON.parse(xhr.responseText).url);
       } else {
-        reject();
+        let error;
+        try {
+          error = JSON.parse(xhr.responseText).error;
+        } catch {
+          error = xhr.statusText;
+        }
+        reject(error);
         if (onFailure) {
-          onFailure();
+          onFailure(error);
         }
       }
     };

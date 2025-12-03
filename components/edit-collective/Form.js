@@ -153,7 +153,9 @@ class EditCollectiveForm extends React.Component {
         return (
           <div>
             {collective.type === USER && <EditUserEmailForm />}
-            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
+            {collective.type === ORGANIZATION && (
+              <FiscalHosting collective={collective} account={this.props.account} LoggedInUser={LoggedInUser} />
+            )}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
