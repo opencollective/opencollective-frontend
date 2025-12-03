@@ -968,7 +968,7 @@ function buildFormSchema(
                 return true;
               }
 
-              return v > 0 && v < 1;
+              return v >= 0 && v < 1;
             },
             () => ({
               message: intl.formatMessage(

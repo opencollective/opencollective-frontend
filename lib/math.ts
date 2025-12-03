@@ -19,3 +19,13 @@ export function scaleValue(
 }
 
 export const toNegative = n => (n > 0 ? -n : n);
+
+/**
+ * Generate a pseudo-random number between `min` and `max` using the seed. Providing the same seed will always return the same number.
+ * Do NOT use this for security-sensitive purposes.
+ */
+export const pseudoRandomWithSeed = (seed: number, min: number, max: number) => {
+  const x = Math.sin(seed) * 10_000;
+  const r = x - Math.floor(x); // fractional part
+  return min + r * (max - min);
+};

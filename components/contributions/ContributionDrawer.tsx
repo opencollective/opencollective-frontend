@@ -186,6 +186,23 @@ const contributionDrawerQuery = gql`
       }
       approvedAt
     }
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            friendlyName
+            kind
+            appliesTo
+          }
+        }
+      }
+    }
 
     ... on AccountWithParent {
       parent {
@@ -310,7 +327,8 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 ) : (
                   query.data?.order?.permissions?.canUpdateAccountingCategory &&
                   query.data.order.toAccount &&
-                  'host' in query.data.order.toAccount && (
+                  'host' in query.data.order.toAccount &&
+                  query.data.order.toAccount['host'] && (
                     <OrderAdminAccountingCategoryPill
                       order={query.data?.order}
                       account={query.data?.order.toAccount}
