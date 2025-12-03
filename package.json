@@ -79,7 +79,7 @@
     "dayjs": "1.11.19",
     "debug": "4.4.1",
     "diff": "7.0.0",
-    "dotenv": "17.2.2",
+    "dotenv": "17.2.3",
     "embla-carousel-react": "^8.6.0",
     "express": "4.22.0",
     "express-basic-auth": "1.2.1",
