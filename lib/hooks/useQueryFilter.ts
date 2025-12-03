@@ -1,5 +1,5 @@
 import React from 'react';
-import { forEach, isEmpty, isNil, isUndefined, omit, omitBy } from 'lodash';
+import { forEach, isEmpty, isNil, isUndefined, omit, omitBy, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import type { z } from 'zod';
@@ -96,6 +96,7 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, F
   skipRouter?: boolean; // Used when not updating the URL query is desired, this will instead use internal state.
   activeViewId?: string; // To use as a control for the active view
   shallow?: boolean; // If true, the router will not reload the page when updating the query
+  skipFiltersOnReset?: string[];
 };
 
 export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta = unknown>(
@@ -164,7 +165,8 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
 
   const resetFilters = React.useCallback(
     (newFilters, newPath?: string) => {
-      const result = opts.schema.safeParse(newFilters);
+      const filtersToKeep = pick(values, opts.skipFiltersOnReset);
+      const result = opts.schema.safeParse({ ...filtersToKeep, ...newFilters });
 
       if (result.success) {
         const filterValues = result.data;

@@ -3,50 +3,60 @@ import { FormattedMessage } from 'react-intl';
 
 import { ConfirmContributionForm } from './contributions/ConfirmContributionForm';
 import { Button } from './ui/Button';
-import Container from './Container';
-import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog';
+import Avatar from './Avatar';
+import type { BaseModalProps } from './ModalContext';
 
-interface ContributionConfirmationModalProps {
+interface ContributionConfirmationModalProps extends BaseModalProps {
   /** the order that is being confirmed */
-  order?: {
-    toAccount: React.ComponentProps<typeof CollectiveModalHeader>['collective'];
-  } & React.ComponentProps<typeof ConfirmContributionForm>['order'];
-  /** handles how the modal is closed */
-  onClose(...args: unknown[]): unknown;
+  order?: React.ComponentProps<typeof ConfirmContributionForm>['order'];
   /** Called if the action request is successful */
   onSuccess?(...args: unknown[]): unknown;
 }
 
-const ContributionConfirmationModal = ({ order, onClose, onSuccess }: ContributionConfirmationModalProps) => {
+const ContributionConfirmationModal = ({
+  order,
+  open,
+  setOpen,
+  onCloseFocusRef,
+  onSuccess,
+}: ContributionConfirmationModalProps) => {
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <StyledModal onClose={onClose}>
-      <CollectiveModalHeader
-        collective={order.toAccount}
-        customText={
-          <FormattedMessage
-            defaultMessage="Confirm contribution to {payee}"
-            id="nvYvGO"
-            values={{ payee: order.toAccount.name }}
-          />
-        }
-      />
-      <ConfirmContributionForm
-        order={order}
-        onSubmit={() => setSubmitting(true)}
-        onFailure={() => setSubmitting(false)}
-        onSuccess={() => {
-          onClose();
-          onSuccess();
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent
+        onCloseAutoFocus={e => {
+          if (onCloseFocusRef?.current) {
+            e.preventDefault();
+            onCloseFocusRef.current.focus();
+          }
         }}
-        FormBodyContainer={ModalBody}
-        footer={
-          <ModalFooter isFullWidth>
-            <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="wrap">
+      >
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Avatar collective={order?.toAccount} radius={32} />
+            <FormattedMessage
+              defaultMessage="Confirm contribution to {payee}"
+              id="nvYvGO"
+              values={{ payee: order?.toAccount?.name }}
+            />
+          </DialogTitle>
+        </DialogHeader>
+        <ConfirmContributionForm
+          order={order}
+          onSubmit={() => setSubmitting(true)}
+          onFailure={() => setSubmitting(false)}
+          onSuccess={() => {
+            setOpen(false);
+            onSuccess?.();
+          }}
+          FormBodyContainer={({ children }) => <div className="mt-2">{children}</div>}
+          footer={
+            <div className="mt-4 flex flex-wrap justify-center border-t border-slate-100 pt-4 sm:justify-end">
               <Button
-                variant="secondary"
-                onClick={onClose}
+                variant="outline"
+                onClick={() => setOpen(false)}
                 type="button"
                 disabled={submitting}
                 className="mr-0 mb-4 min-w-[268px] md:mr-4 md:mb-0 md:min-w-0"
@@ -62,11 +72,11 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }: Contributi
               >
                 <FormattedMessage defaultMessage="Confirm contribution" id="k/uy+b" />
               </Button>
-            </Container>
-          </ModalFooter>
-        }
-      />
-    </StyledModal>
+            </div>
+          }
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 
