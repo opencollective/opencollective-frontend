@@ -67,7 +67,7 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
   );
 
   const kycVerifications =
-    query?.data?.verifyAccount && 'kycVerifications' in query.data.verifyAccount
+    query.data?.verifyAccount && 'kycVerifications' in query.data.verifyAccount
       ? (query.data.verifyAccount.kycVerifications as KycVerificationCollection)
       : { nodes: [], limit: 0, offset: 0, totalCount: 0 };
 

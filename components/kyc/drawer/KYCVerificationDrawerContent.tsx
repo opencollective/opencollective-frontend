@@ -32,7 +32,7 @@ export function KYCVerificationDrawerContent(props: KYCVerificationDrawerContent
     <React.Fragment>
       <DrawerHeader
         entityName={<FormattedMessage defaultMessage="KYC Verification" id="odBeoC" />}
-        entityIdentifier={<CopyID value={verification?.id}>{verification?.id}</CopyID>}
+        entityIdentifier={<CopyID value={verification.id}>{verification.id}</CopyID>}
         entityLabel={
           <AccountHoverCard
             account={verification.account}

@@ -77,7 +77,7 @@ function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
     initialValues: {
       legalName: props.initialValues.legalName ?? '',
       legalAddress: props.initialValues.legalAddress ?? '',
-      notes: props.initialValues?.notes ?? '',
+      notes: props.initialValues.notes ?? '',
     },
     async onSubmit(values) {
       const errors = await form.validateForm();
