@@ -46,6 +46,14 @@ describe('/signup', () => {
       cy.url().should('include', '/signup/profile');
     });
 
+    it('should coerce user to complete their profile', () => {
+      cy.visit('/home', visitParams);
+      cy.url().should('include', '/signup/profile');
+
+      cy.visit('/dashboard', visitParams);
+      cy.url().should('include', '/signup/profile');
+    });
+
     it('should complete profile and redirect to welcome page', () => {
       cy.getByDataCy('complete-profile-form').as('form');
       cy.get('@form').find('h1').contains("Let's complete your profile");
@@ -128,6 +136,45 @@ describe('/signup', () => {
         });
 
         cy.url().should('include', `/dashboard/${slug}/overview`);
+      });
+
+      it('should create active organization', () => {
+        const slug = randomSlug();
+        cy.visit('/signup/organization?active=true', visitParams);
+        cy.get('[data-cy="create-organization-form"]').as('form');
+        cy.getByDataCy('organization-country-trigger').click();
+        cy.getByDataCy('organization-country-search').focus().type('Puerto');
+        cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
+        cy.get('@form').find('input[name="organization.legalName"]').type('Active Org Inc.');
+        cy.get('@form').find('input[name="organization.name"]').type('Active Org');
+        cy.get('@form').find('input[name="organization.description"]').type('We manage money and stuff');
+        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('button[type="submit"]').click();
+        cy.getByDataCy('skip-to-dashboard').click();
+        cy.getByDataCy('menu-item-Settings').click();
+        cy.getByDataCy('menu-item-advanced').click();
+        cy.getByDataCy('money-management-section').find('button').contains('Deactivate');
+
+        cy.getByDataCy('fiscal-hosting-section').find('button').contains('Activate');
+      });
+
+      it('should create active fiscal host', () => {
+        const slug = randomSlug();
+        cy.visit('/signup/organization?host=true', visitParams);
+        cy.get('[data-cy="create-organization-form"]').as('form');
+        cy.getByDataCy('organization-country-trigger').click();
+        cy.getByDataCy('organization-country-search').focus().type('Puerto');
+        cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
+        cy.get('@form').find('input[name="organization.legalName"]').type('Fiscal Host Inc.');
+        cy.get('@form').find('input[name="organization.name"]').type('Fiscal Host');
+        cy.get('@form').find('input[name="organization.description"]').type('We fiscally sponsor collectives');
+        cy.get('@form').find('input[name="organization.slug"]').type(`{selectall}${slug}`);
+        cy.get('@form').find('button[type="submit"]').click();
+        cy.getByDataCy('skip-to-dashboard').click();
+        cy.getByDataCy('menu-item-Settings').click();
+        cy.getByDataCy('menu-item-advanced').click();
+        cy.getByDataCy('money-management-section').find('button').contains('Deactivate');
+        cy.getByDataCy('fiscal-hosting-section').find('button').contains('Deactivate');
       });
     },
   );

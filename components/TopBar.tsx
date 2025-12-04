@@ -3,6 +3,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -102,6 +103,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const router = useRouter();
   const ref = useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
@@ -115,6 +117,12 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
 
   const menuItems = parseToBoolean(getEnvVar('NEW_PRICING')) ? newMarketingTopbarItems : legacyTopBarItems;
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
+
+  React.useLayoutEffect(() => {
+    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
+      router.push('/signup/profile');
+    }
+  }, [LoggedInUser, router]);
 
   return (
     <Flex

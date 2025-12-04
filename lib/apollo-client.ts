@@ -438,6 +438,9 @@ function createInMemoryCache() {
           },
         },
       },
+      Tier: {
+        keyFields: ['id'],
+      },
     },
   });
 

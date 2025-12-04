@@ -16651,9 +16651,8 @@ type Query {
     type: [AccountType]
 
     """
-    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    Admin only. Search by email address or name of a member.
     """
-    email: EmailAddress
     searchTerm: String
     relation: [CommunityRelationType!]
     limit: Int! = 100
@@ -23017,6 +23016,7 @@ type Mutation {
     If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
     """
     financiallyActive: Boolean = false
+    fiscalHostCapable: Boolean = false
   ): Organization
 
   """

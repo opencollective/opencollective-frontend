@@ -265,15 +265,15 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       subMenu: [
         {
           if: hasHosting,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
-          if: !isIndividual,
+          if: !isIndividual && !hasHosting,
           label: intl.formatMessage(
             {
-              id: 'hZhgoW',
-              defaultMessage: 'To {accountName}',
+              defaultMessage: 'Incoming Contributions',
+              id: 'IncomingContributions',
             },
             { accountName: account.name },
           ),

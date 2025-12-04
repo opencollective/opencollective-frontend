@@ -486,7 +486,7 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
                       onSuccess={({ url }) => form.setFieldValue(field.name, url)}
                       onReject={() => form.setFieldValue(field.name, null)}
                       minSize={1024}
-                      maxSize={2e3 * 1024}
+                      maxSize={5e3 * 1024}
                     />
                   )}
                 </FormField>

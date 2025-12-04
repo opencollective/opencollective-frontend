@@ -88,17 +88,15 @@ export function OrgOverview() {
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={
-          hasMoneyManagement && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
-                {showSetupGuide ? (
-                  <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-                ) : (
-                  <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-                )}
-              </Button>
-            </div>
-          )
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
+              {showSetupGuide ? (
+                <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
+              ) : (
+                <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
+              )}
+            </Button>
+          </div>
         }
       />
       {hasMoneyManagement ? (
@@ -117,7 +115,10 @@ export function OrgOverview() {
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
-        <OrgOverviewContent accountSlug={account.slug} />
+        <React.Fragment>
+          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+          <OrgOverviewContent accountSlug={account.slug} />
+        </React.Fragment>
       )}
     </div>
   );

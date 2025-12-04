@@ -273,6 +273,7 @@ type UserDetails {
   Has the account a password set?
   """
   hasPassword: Boolean
+  requiresProfileCompletion: Boolean
   isRoot: Boolean!
 }
 
