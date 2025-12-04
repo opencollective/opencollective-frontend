@@ -1,8 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import type { ApolloClient } from '@apollo/client';
-import { useMutation } from '@apollo/client';
 import type { FetchMoreFunction } from '@apollo/client/react/hooks/useSuspenseQuery';
-import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lodash';
@@ -14,48 +12,35 @@ import { css, styled } from 'styled-components';
 import { getCollectiveTypeForUrl } from '../../lib/collective';
 import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
-import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { formatErrorMessage } from '../../lib/errors';
+import { getFilesFromExpense } from '../../lib/expenses';
 import type { Account } from '../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
-import { itemHasOCR } from './lib/ocr';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 import type { AccountWithHost, Expense as ExpenseType } from '@/lib/graphql/types/v2/schema';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
 
-import ConfirmationModal from '../ConfirmationModal';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
 import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
-import { WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
-import StyledCheckbox from '../StyledCheckbox';
-import StyledLink from '../StyledLink';
 import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
-import { H1, Span } from '../Text';
+import { H1 } from '../Text';
 
-import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
-import { ConfirmOCRValues } from './ConfirmOCRValues';
-import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
 import ExpenseInviteWelcome from './ExpenseInviteWelcome';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
-import ExpenseNotesForm from './ExpenseNotesForm';
-import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
 import TaxFormMessage from './TaxFormMessage';
@@ -122,7 +107,6 @@ interface ExpenseProps {
     expense: React.ComponentProps<typeof ExpenseInviteWelcome> &
       React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
       React.ComponentProps<typeof ExpenseInviteWelcome> &
-      React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
       Pick<
         ExpenseType,
         | 'id'
@@ -160,18 +144,9 @@ function Expense(props: ExpenseProps) {
     enableKeyboardShortcuts,
     onClose,
   } = props;
-  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const { loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
-
-  const isNewExpenseSubmissionFlow =
-    (([expenseTypes.INVOICE, expenseTypes.RECEIPT] as string[]).includes(data?.expense?.type) &&
-      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-        router.query.newExpenseFlowEnabled)) ||
-    (([expenseTypes.GRANT] as string[]).includes(data?.expense?.type) &&
-      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-        router.query.newGrantFlowEnabled));
-
   const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
 
   const onContinueSubmissionClick = React.useCallback(() => {
@@ -191,12 +166,7 @@ function Expense(props: ExpenseProps) {
 
   const [state, setState] = useState({
     error: error || null,
-    status:
-      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
-        ? isNewExpenseSubmissionFlow
-          ? PAGE_STATUS.VIEW
-          : PAGE_STATUS.EDIT
-        : PAGE_STATUS.VIEW,
+    status: draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.VIEW : PAGE_STATUS.EDIT,
     editedExpense: null,
     isSubmitting: false,
     isPollingEnabled: true,
@@ -207,26 +177,13 @@ function Expense(props: ExpenseProps) {
   });
   const [openUrl, setOpenUrl] = useState(router.query.attachmentUrl as string);
   const [replyingToComment, setReplyingToComment] = useState(null);
-  const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
-  const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
-  const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
+
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
   const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
-    const shouldEditDraft = isNewExpenseSubmissionFlow
-      ? false
-      : data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
-    if (shouldEditDraft) {
-      setState(state => ({
-        ...state,
-        status: PAGE_STATUS.EDIT,
-        editedExpense: data?.expense,
-      }));
-    }
-
     handlePolling();
     document.addEventListener('mousemove', handlePolling);
 
@@ -266,16 +223,11 @@ function Expense(props: ExpenseProps) {
 
   // Update status when data or draftKey changes
   useEffect(() => {
-    const status =
-      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
-        ? isNewExpenseSubmissionFlow
-          ? PAGE_STATUS.VIEW
-          : PAGE_STATUS.EDIT
-        : PAGE_STATUS.VIEW;
+    const status = draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.VIEW : PAGE_STATUS.EDIT;
     if (status !== state.status) {
       setState(state => ({ ...state, status }));
     }
-  }, [props.data, draftKey, isNewExpenseSubmissionFlow]);
+  }, [props.data, draftKey]);
 
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
@@ -311,17 +263,12 @@ function Expense(props: ExpenseProps) {
     },
   });
 
-  const [editExpense] = useMutation(editExpenseMutation, {
-    context: API_V2_CONTEXT,
-  });
-
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;
   const { viewport } = useWindowResize(null, { useMinWidth: true });
   const isDesktop = viewport === VIEWPORTS.LARGE;
 
   const expense = data?.expense;
-  const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = expense?.host ?? collective?.host;
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
@@ -331,10 +278,6 @@ function Expense(props: ExpenseProps) {
     expense?.permissions?.canEdit &&
     expense?.items?.every(item => !item.url);
   const isRecurring = expense?.recurringExpense;
-  const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
-  const [showResetModal, setShowResetModal] = useState(false);
-  const payoutProfiles = getPayoutProfiles(loggedInAccount);
-  const canEditPayoutMethod = !expense || isDraft || expense.permissions.canSeePayoutMethodPrivateDetails;
 
   const inDrawer = Boolean(drawerActionsContainer);
 
@@ -349,7 +292,6 @@ function Expense(props: ExpenseProps) {
     isFeatureEnabled(expense?.account, 'TAX_FORMS') &&
     includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') &&
     !isEditing;
-  const isEditingExistingExpense = isEditing && expense !== undefined;
 
   const handlePolling = debounce(() => {
     if (state.isPollingEnabled) {
@@ -383,12 +325,9 @@ function Expense(props: ExpenseProps) {
 
   const onEditBtnClick = async () => {
     props.stopPolling?.();
+    throw 'Not implemented';
+    // TODO: trigger edit items
     return setState(state => ({ ...state, status: PAGE_STATUS.EDIT, editedExpense: data?.expense }));
-  };
-
-  const onCancel = () => {
-    props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
-    return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
   };
 
   const onDelete = async expense => {
@@ -399,53 +338,12 @@ function Expense(props: ExpenseProps) {
     return router.replace(`${parentCollectiveSlugRoute}${collectiveTypeRoute}${collective.slug}/expenses`);
   };
 
-  const onSummarySubmit = async editedExpense => {
-    try {
-      setState(state => ({ ...state, isSubmitting: true, error: null }));
-
-      if (!editedExpense.payee.id && state.newsletterOptIn) {
-        editedExpense.payee.newsletterOptIn = state.newsletterOptIn;
-      }
-      const preparedValues = prepareExpenseForSubmit(editedExpense);
-      if (!canEditPayoutMethod) {
-        delete preparedValues.payoutMethod;
-      }
-      await editExpense({
-        variables: {
-          expense: preparedValues,
-          draftKey: data?.expense?.status === ExpenseStatus.DRAFT ? draftKey : null,
-        },
-      });
-      if (data?.expense?.type === expenseTypes.CHARGE) {
-        await refetch();
-      }
-      const createdUser = editedExpense.payee;
-      props.startPolling?.(EXPENSE_PAGE_POLLING_INTERVAL);
-      setState(state => ({
-        ...state,
-        status: PAGE_STATUS.VIEW,
-        isSubmitting: false,
-        editedExpense: undefined,
-        error: null,
-        createdUser,
-      }));
-    } catch (e) {
-      setState(state => ({ ...state, error: getErrorFromGraphqlException(e), isSubmitting: false }));
-      scrollToExpenseTop();
-    }
-  };
-
   const scrollToExpenseTop = () => {
     if (expenseTopRef?.current) {
       expenseTopRef?.current.scrollIntoView({ behavior: 'smooth' });
     } else {
       window.scrollTo(0, 0);
     }
-  };
-  const onNotesChanges = e => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setState(state => ({ ...state, editedExpense: { ...state.editedExpense, [name]: value } }));
   };
 
   const onCommentAdded = comment => {
@@ -501,74 +399,6 @@ function Expense(props: ExpenseProps) {
     setOpenUrl(files?.[0]?.url || null);
   }, [files, isDesktop, isDrawer]);
 
-  const confirmSaveButtons = (
-    <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>
-      <StyledButton
-        minWidth={175}
-        whiteSpace="nowrap"
-        data-cy="edit-expense-btn"
-        onClick={() => setState(state => ({ ...state, status: PAGE_STATUS.EDIT }))}
-        disabled={state.isSubmitting}
-      >
-        ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
-      </StyledButton>
-      <StyledButton
-        buttonStyle="primary"
-        minWidth={175}
-        whiteSpace="nowrap"
-        data-cy="save-expense-btn"
-        onClick={() => onSummarySubmit(state.editedExpense)}
-        loading={state.isSubmitting}
-        disabled={isDraft ? !loggedInAccount && !state.tos : mustConfirmOCR}
-      >
-        {isDraft && !loggedInAccount ? (
-          <FormattedMessage id="Expense.JoinAndSubmit" defaultMessage="Join and Submit" />
-        ) : (
-          <FormattedMessage id="Expense.SaveExpense" defaultMessage="Save Expense" />
-        )}
-      </StyledButton>
-
-      {showResetModal ? (
-        <ConfirmationModal
-          onClose={() => setShowResetModal(false)}
-          header={
-            isEditingExistingExpense
-              ? intl.formatMessage(expenseFormMsg.cancelEditExpense)
-              : intl.formatMessage(expenseFormMsg.clearExpenseForm)
-          }
-          body={
-            isEditingExistingExpense
-              ? intl.formatMessage(expenseFormMsg.confirmCancelEditExpense)
-              : intl.formatMessage(expenseFormMsg.confirmClearExpenseForm)
-          }
-          continueHandler={() => {
-            onCancel();
-            setShowResetModal(false);
-          }}
-          {...(isEditingExistingExpense && {
-            continueLabel: intl.formatMessage({ defaultMessage: 'Yes, cancel editing', id: 'b++lom' }),
-            cancelLabel: intl.formatMessage({ defaultMessage: 'No, continue editing', id: 'fIsGOi' }),
-          })}
-        />
-      ) : (
-        <StyledButton
-          type="button"
-          buttonStyle="borderless"
-          color="red.500"
-          whiteSpace="nowrap"
-          marginLeft="auto"
-          onClick={() => setShowResetModal(true)}
-        >
-          <Undo size={11} />
-          <Span mx={1}>
-            {intl.formatMessage(
-              isEditingExistingExpense ? expenseFormMsg.cancelEditExpense : expenseFormMsg.clearExpenseForm,
-            )}
-          </Span>
-        </StyledButton>
-      )}
-    </Flex>
-  );
   return (
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
@@ -617,19 +447,15 @@ function Expense(props: ExpenseProps) {
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
-          {isNewExpenseSubmissionFlow &&
-            (expense?.permissions?.canDeclineExpenseInvite ||
-              (expense?.status === ExpenseStatus.DRAFT &&
-                !isRecurring &&
-                draftKey &&
-                expense?.draft?.recipientNote)) && (
-              <ExpenseInviteWelcome
-                onContinueSubmissionClick={onContinueSubmissionClick}
-                className="mb-6"
-                expense={expense}
-                draftKey={draftKey}
-              />
-            )}
+          {(expense?.permissions?.canDeclineExpenseInvite ||
+            (expense?.status === ExpenseStatus.DRAFT && !isRecurring && draftKey && expense?.draft?.recipientNote)) && (
+            <ExpenseInviteWelcome
+              onContinueSubmissionClick={onContinueSubmissionClick}
+              className="mb-6"
+              expense={expense}
+              draftKey={draftKey}
+            />
+          )}
           <ExpenseSummary
             expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
             host={host}
@@ -637,7 +463,6 @@ function Expense(props: ExpenseProps) {
             isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
             isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
             collective={collective}
-            onEdit={onEditBtnClick}
             onDelete={onDelete}
             canEditTags={get(expense, 'permissions.canEditTags', false)}
             showProcessButtons
@@ -653,115 +478,6 @@ function Expense(props: ExpenseProps) {
               }
             }}
           />
-
-          {status === PAGE_STATUS.EDIT_SUMMARY && (
-            <Box mt={24}>
-              {isDraft && !loggedInAccount && (
-                <Fragment>
-                  <MessageBox type="info" fontSize="12px">
-                    <FormattedMessage
-                      id="Expense.SignUpInfoBox"
-                      defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}."
-                      values={{ collectiveName: collective.name, WebsiteName }}
-                    />
-                  </MessageBox>
-                  <Box mt={3}>
-                    <StyledCheckbox
-                      name="tos"
-                      label={
-                        <FormattedMessage
-                          id="TOSAndPrivacyPolicyAgreement"
-                          defaultMessage="I agree with the {toslink} and {privacylink} of Open Collective."
-                          values={{
-                            toslink: (
-                              <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>
-                                <FormattedMessage id="tos" defaultMessage="terms of service" />
-                              </StyledLink>
-                            ),
-                            privacylink: (
-                              <StyledLink href="/privacypolicy" openInNewTab onClick={e => e.stopPropagation()}>
-                                <FormattedMessage id="privacypolicy" defaultMessage="privacy policy" />
-                              </StyledLink>
-                            ),
-                          }}
-                        />
-                      }
-                      required
-                      onChange={({ checked }) => {
-                        setState({ ...state, tos: checked });
-                      }}
-                    />
-                  </Box>
-                  <Box mt={3}>
-                    <StyledCheckbox
-                      name="newsletterOptIn"
-                      label={
-                        <span>
-                          <FormattedMessage defaultMessage="Subscribe to our monthly newsletter" id="cNkrNr" />.
-                        </span>
-                      }
-                      required
-                      onChange={({ checked }) => {
-                        setState(state => ({ ...state, newsletterOptIn: checked }));
-                      }}
-                    />
-                  </Box>
-                </Fragment>
-              )}
-              {!isDraft && <ExpenseNotesForm onChange={onNotesChanges} defaultValue={expense.privateMessage} />}
-              {hasItemsWithOCR && (
-                <ConfirmOCRValues
-                  onConfirm={setConfirmedOCR}
-                  items={state.editedExpense.items}
-                  currency={state.editedExpense.currency}
-                />
-              )}
-              {isRecurring && <ExpenseRecurringBanner expense={expense} />}
-              {drawerActionsContainer ? (
-                createPortal(confirmSaveButtons, drawerActionsContainer)
-              ) : (
-                <Flex flexWrap="wrap" mt="4">
-                  {confirmSaveButtons}
-                </Flex>
-              )}
-            </Box>
-          )}
-        </Box>
-      )}
-      {status === PAGE_STATUS.EDIT && (
-        <Box mb={3}>
-          {loading || loadingLoggedInUser ? (
-            <LoadingPlaceholder width="100%" height={400} />
-          ) : (
-            <ExpenseForm
-              collective={collective}
-              host={host}
-              loading={isRefetchingDataForUser}
-              expense={editedExpense || expense}
-              originalExpense={expense}
-              payoutProfiles={payoutProfiles}
-              loggedInAccount={loggedInAccount}
-              onCancel={() => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }))}
-              canEditPayoutMethod={canEditPayoutMethod}
-              onSubmit={editedExpense => {
-                if (skipSummary) {
-                  setState(state => ({
-                    ...state,
-                    editedExpense,
-                  }));
-                  onSummarySubmit(editedExpense);
-                } else {
-                  setState(state => ({
-                    ...state,
-                    editedExpense,
-                    status: PAGE_STATUS.EDIT_SUMMARY,
-                  }));
-                }
-              }}
-              validateOnChange
-              drawerActionsContainer={drawerActionsContainer}
-            />
-          )}
         </Box>
       )}
       {!(isEditing && inDrawer) && (

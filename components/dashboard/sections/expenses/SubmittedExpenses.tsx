@@ -7,7 +7,6 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import type { FilterComponentConfigs } from '@/lib/filters/filter-types';
 import type { Currency } from '@/lib/graphql/types/v2/schema';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
@@ -94,9 +93,6 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
-  const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
-
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
   if (error) {
@@ -112,18 +108,16 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
             <FormattedMessage defaultMessage="Expenses that you have submitted to other accounts." id="aKfm6V" />
           }
           actions={
-            hasNewSubmitExpenseFlow ? (
-              <Button
-                onClick={() => {
-                  setDuplicateExpenseId(null);
-                  setIsExpenseFlowOpen(true);
-                }}
-                size="sm"
-                className="gap-1"
-              >
-                <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
-              </Button>
-            ) : null
+            <Button
+              onClick={() => {
+                setDuplicateExpenseId(null);
+                setIsExpenseFlowOpen(true);
+              }}
+              size="sm"
+              className="gap-1"
+            >
+              <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
+            </Button>
           }
         />
         <Filterbar {...queryFilter} meta={filterMeta} />

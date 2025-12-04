@@ -63,13 +63,6 @@ const wrangleAddressData = addressInfo => {
   return addressFormFields;
 };
 
-export const serializeAddress = address => {
-  return Object.keys(address)
-    .sort()
-    .map(k => address[k])
-    .join('\n');
-};
-
 /** Upon changing selectedCountry, if previous address fields are no longer needed,
  * it clears them i.e. changing from Canada to Germany in the Expense form we no
  * longer need 'zone' in our payeeLocation.address object.
