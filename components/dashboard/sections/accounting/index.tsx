@@ -18,6 +18,8 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
+
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { UpgradePlanCTA } from '../../../platform-subscriptions/UpgradePlanCTA.tsx';
@@ -45,20 +47,12 @@ const accountingCategoriesQuery = gql`
       accountingCategories {
         totalCount
         nodes {
-          id
-          kind
-          code
-          hostOnly
-          instructions
-          name
-          friendlyName
-          expensesTypes
-          createdAt
-          appliesTo
+          ...AccountingCategorySelectFields
         }
       }
     }
   }
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 // TODO adapt for host types other than organization
@@ -73,22 +67,14 @@ const editAccountingCategoryMutation = gql`
           accountingCategories {
             totalCount
             nodes {
-              id
-              kind
-              code
-              name
-              hostOnly
-              instructions
-              friendlyName
-              expensesTypes
-              createdAt
-              appliesTo
+              ...AccountingCategorySelectFields
             }
           }
         }
       }
     }
   }
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {

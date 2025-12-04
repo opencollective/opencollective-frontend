@@ -42,7 +42,7 @@ import {
 } from './lib/graphql';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
-import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
 import Avatar from '../../../Avatar';
@@ -113,11 +113,11 @@ const transactionsImportHostFieldsFragment = gql`
       totalCount
       nodes {
         id
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 const transactionsImportStatsQuery = gql`

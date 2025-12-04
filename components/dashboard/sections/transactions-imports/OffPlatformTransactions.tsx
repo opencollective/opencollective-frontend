@@ -23,7 +23,7 @@ import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
-import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { getI18nLink } from '@/components/I18nFormatters';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import StackedAvatars from '@/components/StackedAvatars';
@@ -86,7 +86,7 @@ const offPlatformTransactionsQuery = gql`
         totalCount
         nodes {
           id
-          ...AccountingCategoryFields
+          ...AccountingCategorySelectFields
         }
       }
       transactionsImports(status: ACTIVE, type: [PLAID, GOCARDLESS], limit: 100) @skip(if: $fetchOnlyRowIds) {
@@ -144,7 +144,7 @@ const offPlatformTransactionsQuery = gql`
     }
   }
   ${TransactionsImportRowFieldsFragment}
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
   ${TransactionsImportStatsFragment}
 `;
 

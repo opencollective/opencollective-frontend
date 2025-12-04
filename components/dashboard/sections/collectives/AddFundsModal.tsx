@@ -258,6 +258,7 @@ const addFundsAccountQueryHostFieldsFragment = gql`
         id
         code
         name
+        friendlyName
         kind
         appliesTo
       }
@@ -744,6 +745,7 @@ const AddFundsModalContentWithCollective = ({
                         account={account}
                         selectedCategory={field.value}
                         allowNone={true}
+                        showCode={true}
                       />
                     )}
                   </Field>

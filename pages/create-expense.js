@@ -37,7 +37,6 @@ import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
 import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
-  accountingCategoryFields,
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
@@ -55,6 +54,7 @@ import { SubmitExpenseFlow } from '../components/submit-expense/SubmitExpenseFlo
 import { Survey, SURVEY_KEY } from '../components/Survey';
 import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
@@ -539,7 +539,7 @@ const hostFieldsFragment = gql`
     accountingCategories {
       nodes {
         id
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
     policies {
@@ -552,7 +552,7 @@ const hostFieldsFragment = gql`
     supportedPayoutMethods
     isTrustedHost
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 const createExpensePageQuery = gql`
