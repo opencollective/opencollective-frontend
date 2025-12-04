@@ -10978,7 +10978,6 @@ export type PlatformSubscriptionFeatures = {
   EXPECTED_FUNDS: Scalars['Boolean']['output'];
   EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['output'];
   FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['output'];
-  KYC: Scalars['Boolean']['output'];
   OFF_PLATFORM_TRANSACTIONS: Scalars['Boolean']['output'];
   PAYPAL_PAYOUTS: Scalars['Boolean']['output'];
   RECEIVE_EXPENSES: Scalars['Boolean']['output'];
@@ -10999,7 +10998,6 @@ export type PlatformSubscriptionFeaturesFeatures = {
   EXPECTED_FUNDS: Scalars['Boolean']['input'];
   EXPENSE_SECURITY_CHECKS: Scalars['Boolean']['input'];
   FUNDS_GRANTS_MANAGEMENT: Scalars['Boolean']['input'];
-  KYC: Scalars['Boolean']['input'];
   OFF_PLATFORM_TRANSACTIONS: Scalars['Boolean']['input'];
   PAYPAL_PAYOUTS: Scalars['Boolean']['input'];
   RECEIVE_EXPENSES: Scalars['Boolean']['input'];

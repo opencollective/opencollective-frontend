@@ -4744,7 +4744,6 @@ type PlatformSubscriptionFeatures {
   RECEIVE_EXPENSES: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
-  KYC: Boolean!
 }
 
 type PlatformBilling {
@@ -26517,7 +26516,6 @@ input PlatformSubscriptionFeaturesFeatures {
   RECEIVE_EXPENSES: Boolean!
   ACCOUNT_MANAGEMENT: Boolean!
   OFF_PLATFORM_TRANSACTIONS: Boolean!
-  KYC: Boolean!
 }
 
 input PlatformSubscriptionPlanPricing {
