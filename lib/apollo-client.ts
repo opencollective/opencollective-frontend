@@ -253,6 +253,7 @@ function createInMemoryCache() {
       AccountWithParent: ['Event', 'Project'],
       AccountWithContributions: ['Collective', 'Organization', 'Event', 'Fund', 'Project', 'Host'],
       AccountWithPlatformSubscription: ['Organization', 'Collective'],
+      KYCProviderData: ['ManualKYCProviderData'],
     },
     // Documentation:
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#merging-non-normalized-objects

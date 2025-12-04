@@ -20,7 +20,7 @@ import { Pagination } from '../../filters/Pagination';
 
 import { useContributionActions } from './actions';
 import { columns } from './columns';
-import { FilterMeta, schema } from './filters';
+import type { FilterMeta, schema } from './filters';
 
 type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   accountSlug: string;

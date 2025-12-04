@@ -6,6 +6,8 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
+import { KYCIndividualDashboard } from '../kyc/dashboard/KYCIndividualDashboard';
+import { KYCRequests } from '../kyc/dashboard/KYCRequests';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import AccountSettingsForm from '../root-actions/AccountSettings';
@@ -103,6 +105,8 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.PEOPLE]: PeopleRouter,
+  [SECTIONS.KYC]: KYCRequests,
+  [SECTIONS.INDIVIDUAL_KYC]: KYCIndividualDashboard,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
@@ -179,7 +183,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
     return (
-      <div className="w-full">
+      <div className="h-full w-full">
         <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
       </div>
     );
