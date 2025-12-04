@@ -184,7 +184,7 @@ const FiscalHosting = ({ collective, account }) => {
   return (
     <div className="mb-10 flex w-full flex-col gap-4">
       <p>
-        <FormattedMessage defaultMessage="Manage the platform functionalities for your organisation" id="lVkMQs" />
+        <FormattedMessage defaultMessage="Manage the platform functionalities for your organization" id="lVkMQs" />
       </p>
       <div className="mt-4 flex w-full flex-col gap-4">
         <div>
@@ -194,7 +194,7 @@ const FiscalHosting = ({ collective, account }) => {
           <p className="text-sm text-gray-700 md:max-w-4/5">
             <FormattedMessage
               id="FiscalHosting.Functionalities.description"
-              defaultMessage="Making contributions on the platform or getting paid on behalf of the organisation are platform basics, activate additional functionalities to do more on the platform."
+              defaultMessage="Making contributions on the platform or getting paid on behalf of the organization are platform basics, activate additional functionalities to do more on the platform."
             />
           </p>
         </div>
