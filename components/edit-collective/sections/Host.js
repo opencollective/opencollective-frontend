@@ -1,11 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
+import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import { hasAccountHosting } from '@/lib/collective';
 
 import { Separator } from '@/components/ui/Separator';
 
@@ -18,7 +20,7 @@ import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
 import { H4 } from '../../Text';
 import { Button } from '../../ui/Button';
-import CreateHostFormWithData from '../CreateHostFormWithData';
+import SelectOwnFiscalHost from '../SelectOwnFiscalHost';
 
 import { ActiveFiscalHost } from './fiscal-host/ActiveFiscalHost';
 import AppliedToFiscalHost from './fiscal-host/AppliedToFiscalHost';
@@ -104,6 +106,15 @@ class Host extends React.Component {
     );
   }
 
+  getAdministratedHosts = memoizeOne(LoggedInUser => {
+    return (
+      LoggedInUser?.memberOf
+        ?.filter(membership => membership.role === 'ADMIN' && hasAccountHosting(membership.collective))
+        .map(membership => membership.collective)
+        .filter(Boolean) || []
+    );
+  });
+
   render() {
     const { LoggedInUser, collective, router, intl, editCollectiveMutation } = this.props;
     const { locale } = intl;
@@ -111,6 +122,7 @@ class Host extends React.Component {
     const selectedOption = get(router, 'query.selectedOption', 'noHost');
 
     const showLegalNameInfoBox = LoggedInUser?.isHostAdmin(collective) && !collective.host?.legalName;
+    const administratedHosts = this.getAdministratedHosts(LoggedInUser);
 
     if (get(collective, 'host.id') === collective.id) {
       return (
@@ -242,43 +254,48 @@ class Host extends React.Component {
           </Flex>
         </div>
 
-        <div id="ownHost">
-          <Flex>
-            <Box flex="0 0 35px" mr={2} pl={2}>
-              <StyledInput
-                type="radio"
-                id="host-radio-ownHost"
-                name="host-radio"
-                checked={selectedOption === 'ownHost'}
-                onChange={() => this.updateSelectedOption('ownHost')}
-                className="hostRadio"
-              />
-            </Box>
-            <Box mb={4}>
-              <OptionLabel htmlFor="host-radio-ownHost">
-                <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our Own Fiscal Host" />
-              </OptionLabel>
-              <FormattedMessage
-                id="collective.edit.host.useOwn.description"
-                defaultMessage="Select or create your own Fiscal Host, which you manage to hold funds for multiple Collectives, to hold funds and do associated admin for this Collective."
-              />
-              &nbsp;
-              <StyledLink
-                href="https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host"
-                openInNewTab
-              >
-                <FormattedMessage id="moreInfo" defaultMessage="More info" />
-              </StyledLink>
-              {selectedOption === 'ownHost' && LoggedInUser && (
-                <CreateHostFormWithData
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  onSubmit={hostCollective => this.changeHost(hostCollective)}
+        {administratedHosts.length > 0 && (
+          <div id="ownHost">
+            <Flex>
+              <Box flex="0 0 35px" mr={2} pl={2}>
+                <StyledInput
+                  type="radio"
+                  id="host-radio-ownHost"
+                  name="host-radio"
+                  checked={selectedOption === 'ownHost'}
+                  onChange={() => this.updateSelectedOption('ownHost')}
+                  className="hostRadio"
                 />
-              )}
-            </Box>
-          </Flex>
-        </div>
+              </Box>
+              <Box mb={4}>
+                <OptionLabel htmlFor="host-radio-ownHost">
+                  <FormattedMessage
+                    id="acceptContributions.organization.subtitle"
+                    defaultMessage="Our Own Fiscal Host"
+                  />
+                </OptionLabel>
+                <FormattedMessage
+                  id="collective.edit.host.useOwn.description"
+                  defaultMessage="Select your own Fiscal Host, which you manage to hold funds for multiple Collectives, to hold funds and do associated admin for this Collective."
+                />
+                &nbsp;
+                <StyledLink
+                  href="https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host"
+                  openInNewTab
+                >
+                  <FormattedMessage id="moreInfo" defaultMessage="More info" />
+                </StyledLink>
+                {selectedOption === 'ownHost' && (
+                  <SelectOwnFiscalHost
+                    administratedHosts={administratedHosts}
+                    collective={collective}
+                    onSubmit={hostCollective => this.changeHost(hostCollective)}
+                  />
+                )}
+              </Box>
+            </Flex>
+          </div>
+        )}
 
         <Separator className="mt-4 mb-6" />
 
