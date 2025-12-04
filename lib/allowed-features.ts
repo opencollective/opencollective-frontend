@@ -42,6 +42,8 @@ export const FEATURES = {
 
   // Not implemented in API features endpoint yet
   SUBMIT_EXPENSE_ON_BEHALF: 'SUBMIT_EXPENSE_ON_BEHALF',
+
+  KYC: 'KYC',
 };
 
 /**

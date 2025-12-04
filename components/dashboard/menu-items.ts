@@ -328,7 +328,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Users2,
     },
     {
-      if: hasMoneyManagement && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KYC),
+      if: hasMoneyManagement && isFeatureEnabled(account, FEATURES.KYC),
       label: 'KYC',
       Icon: IdCard,
       type: 'group',

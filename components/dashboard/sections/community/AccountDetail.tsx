@@ -5,6 +5,7 @@ import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
 import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
@@ -12,7 +13,6 @@ import { type AccountReferenceInput, KycProvider } from '@/lib/graphql/types/v2/
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { cn } from '@/lib/utils';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
@@ -32,6 +32,7 @@ import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
@@ -122,6 +123,7 @@ type ContributionDrawerProps = {
 };
 
 export function ContributorDetails(props: ContributionDrawerProps) {
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
   const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.DETAILS);
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
@@ -160,8 +162,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         id: AccountDetailView.ACTIVITIES,
         label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
       },
-      ...(query.data?.account?.type === CollectiveType.INDIVIDUAL &&
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KYC)
+      ...(query.data?.account?.type === CollectiveType.INDIVIDUAL && isFeatureEnabled(dashboardAccount, FEATURES.KYC)
         ? [
             {
               id: AccountDetailView.KYC,

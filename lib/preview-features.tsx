@@ -19,7 +19,6 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
   PEOPLE_DASHBOARD = 'PEOPLE_DASHBOARD',
-  KYC = 'KYC',
 }
 
 enum Categories {
@@ -192,15 +191,6 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD,
     title: 'People Dashboard',
     description: 'Access a new dashboard to manage and engage with your community members.',
-    publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-    category: Categories.HOSTING,
-    alwaysEnableInDev: true,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.KYC,
-    title: 'KYC',
-    description: 'KYC verification for individuals',
     publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     category: Categories.HOSTING,
