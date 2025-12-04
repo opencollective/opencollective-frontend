@@ -90,7 +90,6 @@ export const PlatformSubscriptionTierFeatures: Record<
     EXPECTED_FUNDS: false,
     CHARGE_HOSTING_FEES: false,
     AGREEMENTS: false,
-    KYC: false,
   },
   Basic: {
     RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
@@ -105,7 +104,6 @@ export const PlatformSubscriptionTierFeatures: Record<
     EXPECTED_FUNDS: true,
     CHARGE_HOSTING_FEES: true,
     AGREEMENTS: false,
-    KYC: false,
   },
   Pro: {
     RECEIVE_FINANCIAL_CONTRIBUTIONS: true,
@@ -120,7 +118,6 @@ export const PlatformSubscriptionTierFeatures: Record<
     EXPECTED_FUNDS: true,
     CHARGE_HOSTING_FEES: true,
     AGREEMENTS: true,
-    KYC: true,
   },
 };
 
@@ -172,9 +169,5 @@ export const PlatformSubscriptionFeatureTitles = defineMessages<(typeof Platform
   CHARGE_HOSTING_FEES: {
     defaultMessage: 'Charge hosting fees',
     id: 'solutions.features.item.charge-hosting-fees.title',
-  },
-  KYC: {
-    defaultMessage: 'KYC verification',
-    id: 'xEY8bM',
   },
 });
