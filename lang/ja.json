@@ -2629,6 +2629,7 @@
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.failed": "ログインに失敗しました: {message}",
   "login.twoFactorAuth.reset": "2FA をリセット",
+  "Logo": "Logo",
   "LOtm7B": "コレクティブ、組織などを検索",
   "LP8cIK": "Related Activity",
   "lpal5V": "This value is an estimate",

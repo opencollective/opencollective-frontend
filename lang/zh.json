@@ -2629,6 +2629,7 @@
   "login.askAnother": "你可以使用下面的表单请求一个新的登录链接。",
   "login.failed": "登录失败：{message}",
   "login.twoFactorAuth.reset": "重置两步验证",
+  "Logo": "Logo",
   "LOtm7B": "按集体、组织等搜索",
   "LP8cIK": "Related Activity",
   "lpal5V": "这是一个估计值",

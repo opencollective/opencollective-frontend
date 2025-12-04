@@ -2629,6 +2629,7 @@
   "login.askAnother": "Du kan be om en ny inloggningslänk via formuläret nedan.",
   "login.failed": "Inloggning misslyckades: {message}.",
   "login.twoFactorAuth.reset": "Återställ 2FA",
+  "Logo": "Logo",
   "LOtm7B": "Sök efter kollektiv, organisationer och mer...",
   "LP8cIK": "Related Activity",
   "lpal5V": "This value is an estimate",

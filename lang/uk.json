@@ -2629,6 +2629,7 @@
   "login.askAnother": "You can ask for a new sign in link using the form below.",
   "login.failed": "Не вдалося увійти: {message}.",
   "login.twoFactorAuth.reset": "Скинути 2FA",
+  "Logo": "Logo",
   "LOtm7B": "Search for Collectives, organizations, and more...",
   "LP8cIK": "Related Activity",
   "lpal5V": "This value is an estimate",
