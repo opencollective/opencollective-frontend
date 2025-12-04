@@ -216,10 +216,7 @@ const FiscalHosting = ({ collective, account }) => {
           <Image src="/static/images/welcome/jar.png" alt="Money Management Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
-              <FormattedMessage
-                defaultMessage="Money management"
-                id="fiscalHosting.whatAreTheBenefits.moneyManagement"
-              />
+              <FormattedMessage defaultMessage="Money Management" id="Welcome.Organization.MoneyManagement" />
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
@@ -249,7 +246,7 @@ const FiscalHosting = ({ collective, account }) => {
           <Image src="/static/images/welcome/place.png" alt="Fiscal Host Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
-              <FormattedMessage defaultMessage="Be a Fiscal Host" id="FiscalHosting.fiscalHost.title" />
+              <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
