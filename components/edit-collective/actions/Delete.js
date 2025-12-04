@@ -3,9 +3,10 @@ import { useMutation } from '@apollo/client';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { getErrorFromGraphqlException } from '@/lib/errors';
+import { gqlV1 } from '@/lib/graphql/helpers';
 
 import MessageBox from '@/components/MessageBox';
 
@@ -56,6 +57,7 @@ const DeleteCollective = ({ collective, ...props }) => {
 
   const { deleting, error } = deleteStatus;
   const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
 
   const closeModal = () => setShowModal(false);
 
@@ -86,7 +88,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             values={{ type: collective.type }}
           />
         </MessageBox>
-      ) : collective.isHost ? (
+      ) : hasMoneyManagement ? (
         <MessageBox type="warning">
           {collective.type === CollectiveType.COLLECTIVE ? (
             <FormattedMessage
@@ -116,7 +118,7 @@ const DeleteCollective = ({ collective, ...props }) => {
       <Button
         onClick={() => setShowModal(true)}
         loading={deleting}
-        disabled={collective.isHost || !collective.isDeletable}
+        disabled={hasMoneyManagement || !collective.isDeletable}
         variant="outline"
       >
         <FormattedMessage

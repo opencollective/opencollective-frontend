@@ -265,6 +265,11 @@ interface Account {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
+
+  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -2923,6 +2928,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
+
+  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -4609,7 +4619,7 @@ type AccountCollection implements Collection {
 }
 
 """
-An account that can be hosted by a Host
+An account that can have a Platform Subscription
 """
 interface AccountWithPlatformSubscription {
   """
@@ -7052,6 +7062,7 @@ enum ActivityType {
   COLLECTIVE_UNHOSTED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_CONVERSATION_CREATED
@@ -8935,6 +8946,11 @@ type Bot implements Account {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
+
+  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -9907,6 +9923,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
+
+  """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -11441,6 +11462,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
+
+  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -12689,6 +12715,11 @@ type Individual implements Account {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
+
+  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -13916,6 +13947,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
+
+  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -15018,6 +15054,11 @@ type Vendor implements Account & AccountWithContributions {
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
+
+  """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -18689,6 +18730,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_UNHOSTED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_CONVERSATION_CREATED
@@ -18946,6 +18988,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
+
+  """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -20067,6 +20114,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
+
+  """
+  Whether this account is deletable
+  """
+  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -22723,10 +22775,14 @@ type Mutation {
     captcha: CaptchaInputType
 
     """
-    If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
+    If true, the organization will be created with Money Management activated, allowing the organization to receive contributions and pay for expenses. Defaults to false.
     """
-    financiallyActive: Boolean = false
-    fiscalHostCapable: Boolean = false
+    hasMoneyManagement: Boolean = false
+
+    """
+    If true, the organization will be created with Hosting activated, allowing the organization to host Collectives and Funds. Defaults to false.
+    """
+    hasHosting: Boolean = false
   ): Organization
 
   """
@@ -22763,6 +22819,16 @@ type Mutation {
     """
     hasHosting: Boolean
   ): Organization!
+
+  """
+  Convert an Organization to a Collective. Scope: "account".
+  """
+  convertOrganizationToCollective(
+    """
+    Account to convert.
+    """
+    organization: AccountReferenceInput!
+  ): Collective!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".
