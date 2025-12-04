@@ -21,7 +21,6 @@ export const platformSubscriptionFeatures = gql`
     RECEIVE_FINANCIAL_CONTRIBUTIONS
     RECEIVE_EXPENSES
     ACCOUNT_MANAGEMENT
-    KYC
   }
 `;
 

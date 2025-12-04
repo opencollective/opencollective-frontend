@@ -17,7 +17,6 @@ export const PlatformSubscriptionFeatures = [
   'OFF_PLATFORM_TRANSACTIONS',
   'FUNDS_GRANTS_MANAGEMENT',
   'AGREEMENTS',
-  'KYC',
 ] satisfies PlatformSubscriptionFeaturesType[];
 
 export type PlatformSubscriptionTierType = 'Discover' | 'Basic' | 'Pro';
