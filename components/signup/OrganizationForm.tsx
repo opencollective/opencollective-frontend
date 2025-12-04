@@ -38,6 +38,7 @@ const createOrganizationMutation = gql`
     $captcha: CaptchaInputType
     $roleDescription: String
     $financiallyActive: Boolean
+    $fiscalHostCapable: Boolean
   ) {
     createOrganization(
       individual: $individual
@@ -45,6 +46,7 @@ const createOrganizationMutation = gql`
       captcha: $captcha
       roleDescription: $roleDescription
       financiallyActive: $financiallyActive
+      fiscalHostCapable: $fiscalHostCapable
     ) {
       id
       name
@@ -174,7 +176,8 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
           organization: organization,
           captcha: captchaResult,
           roleDescription,
-          financiallyActive: router.query?.active !== 'false',
+          financiallyActive: router.query?.active === 'true',
+          fiscalHostCapable: router.query?.host === 'true',
         },
       });
 
@@ -560,7 +563,14 @@ export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepPro
           </Card>
           <div className="grow sm:hidden" />
           <div className="flex w-full max-w-lg flex-col-reverse gap-4 sm:flex-row sm:justify-between">
-            <Button type="button" variant="outline" className="grow" disabled={loading} onClick={() => nextStep()}>
+            <Button
+              type="button"
+              variant="outline"
+              className="grow"
+              disabled={loading}
+              onClick={() => nextStep()}
+              data-cy="skip-to-dashboard"
+            >
               <FormattedMessage defaultMessage="Skip to Dashboard" id="SkipToDashboard" />
             </Button>
             <Button

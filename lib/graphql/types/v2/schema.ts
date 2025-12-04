@@ -920,7 +920,7 @@ export type AccountWithParent = {
   parent?: Maybe<Account>;
 };
 
-/** An account that can have a Platform Subscription */
+/** An account that can be hosted by a Host */
 export type AccountWithPlatformSubscription = {
   legacyPlan: HostPlan;
   platformBilling: PlatformBilling;
@@ -929,7 +929,7 @@ export type AccountWithPlatformSubscription = {
 };
 
 
-/** An account that can have a Platform Subscription */
+/** An account that can be hosted by a Host */
 export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
   billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
@@ -8478,6 +8478,7 @@ export type MutationCreateOrderArgs = {
 export type MutationCreateOrganizationArgs = {
   captcha?: InputMaybe<CaptchaInputType>;
   financiallyActive?: InputMaybe<Scalars['Boolean']['input']>;
+  fiscalHostCapable?: InputMaybe<Scalars['Boolean']['input']>;
   individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;
@@ -11749,7 +11750,6 @@ export type QueryCollectiveArgs = {
 /** This is the root query */
 export type QueryCommunityArgs = {
   account?: InputMaybe<AccountReferenceInput>;
-  email?: InputMaybe<Scalars['EmailAddress']['input']>;
   host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];

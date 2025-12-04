@@ -16,6 +16,7 @@ class LoggedInUser {
   public CollectiveId: number;
   public collective: GraphQLV1Collective;
   public isRoot: boolean;
+  public requiresProfileCompletion: boolean;
   public id: number;
   public image: string;
   public hasTwoFactorAuth: boolean;
