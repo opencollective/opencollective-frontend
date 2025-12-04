@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { Edit, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountingCategoryTableQuery,
@@ -59,7 +58,12 @@ const columns = [
   },
   {
     accessorKey: 'hostOnly',
-    header: () => <FormattedMessage defaultMessage="Visible only to host admins" id="NvBPFR" />,
+    header: ({ table }) =>
+      table.options.meta.hasHosting ? (
+        <FormattedMessage defaultMessage="Visible only to Host admins" id="JM47p6" />
+      ) : (
+        <FormattedMessage defaultMessage="Visible only to Organization admins" id="pWKR0F" />
+      ),
     cell: ({ cell }) => {
       return cell.getValue() ? (
         <FormattedMessage defaultMessage="Yes" id="a5msuh" />
@@ -153,6 +157,7 @@ type AccountingCategoriesTableProps = {
   isAdmin?: boolean;
   onDelete: (category: AccountingCategory) => void;
   onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
+  hasHosting: boolean;
 };
 
 export function AccountingCategoriesTable(props: AccountingCategoriesTableProps) {
@@ -181,11 +186,9 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
     },
   );
 
-  const isIndependentCollective = query.data?.host?.type === CollectiveType.COLLECTIVE;
-
   const visibleColumns = React.useMemo(
-    () => (isIndependentCollective ? columns.filter(c => c.accessorKey !== 'appliesTo') : columns),
-    [isIndependentCollective],
+    () => (!props.hasHosting ? columns.filter(c => c.accessorKey !== 'appliesTo') : columns),
+    [props.hasHosting],
   );
 
   if (query.loading) {
@@ -206,6 +209,7 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
         }
         meta={
           {
+            hasHosting: props.hasHosting,
             disabled: !props.isAdmin,
             onDelete: props.onDelete,
             onRowEdit: category => {
@@ -217,7 +221,7 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
         onClickRow={row => setSelectedCategoryId(row.original.id)}
       />
       <AccountingCategoryDrawer
-        isIndependentCollective={isIndependentCollective}
+        hasHosting={props.hasHosting}
         open={!!selectedCategory}
         accountingCategory={selectedCategory}
         onClose={() => setSelectedCategoryId(null)}

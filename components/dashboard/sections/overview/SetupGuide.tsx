@@ -11,6 +11,7 @@ import type { Category, Step } from '@/lib/setup-guide';
 import { generateSetupGuideSteps } from '@/lib/setup-guide';
 import { cn } from '@/lib/utils';
 
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { Drawer } from '@/components/Drawer';
 import { DocumentationLink } from '@/components/Link';
 import { Button } from '@/components/ui/Button';
@@ -87,16 +88,7 @@ const setupGuideQuery = gql`
           accountingCategories {
             totalCount
             nodes {
-              id
-              kind
-              code
-              name
-              hostOnly
-              instructions
-              friendlyName
-              expensesTypes
-              createdAt
-              appliesTo
+              ...AccountingCategorySelectFields
             }
           }
         }
@@ -104,6 +96,7 @@ const setupGuideQuery = gql`
     }
   }
   ${planFeatures}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 const SetupStep = (props: Step & { account: SetupGuideQuery['account'] }) => {
