@@ -33,6 +33,8 @@ const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
+const { COLLECTIVE, PROJECT, EVENT } = CollectiveType;
+
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
@@ -56,7 +58,6 @@ const DeleteCollective = ({ collective, ...props }) => {
   };
 
   const { deleting, error } = deleteStatus;
-  const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
   const hasMoneyManagement = hasAccountMoneyManagement(collective);
 
   const closeModal = () => setShowModal(false);
@@ -78,9 +79,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         />
       </p>
       {error && <MessageBox type="error">{error}</MessageBox>}
-      {!collective.isDeletable &&
-      collective.type !== CollectiveType.EVENT &&
-      collective.type !== CollectiveType.PROJECT ? (
+      {!collective.isDeletable && ![EVENT, PROJECT].includes(collective.type) ? (
         <MessageBox type="warning">
           <FormattedMessage
             id="collective.delete.isNotDeletable-message"
@@ -90,7 +89,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         </MessageBox>
       ) : hasMoneyManagement ? (
         <MessageBox type="warning">
-          {collective.type === CollectiveType.COLLECTIVE ? (
+          {collective.type === COLLECTIVE ? (
             <FormattedMessage
               id="collective.delete.selfHost"
               defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
@@ -104,9 +103,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             />
           )}
         </MessageBox>
-      ) : hasBalance &&
-        !collective.isDeletable &&
-        (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) ? (
+      ) : !collective.isDeletable && [EVENT, PROJECT].includes(collective.type) ? (
         <MessageBox type="warning">
           <FormattedMessage
             id="collective.event.delete.isNotDeletable-message"
