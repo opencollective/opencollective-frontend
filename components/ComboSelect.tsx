@@ -86,7 +86,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           )}
           id={props.id}
           data-cy={props['data-cy']}
-          data-testid={props['data-cy']}
+          data-testid={props['data-testid']}
           data-disabled={props.disabled ? true : undefined}
           name={props.name}
         >

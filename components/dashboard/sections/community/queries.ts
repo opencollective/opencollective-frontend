@@ -8,7 +8,7 @@ export const peopleHostDashboardQuery = gql`
     $offset: Int
     $limit: Int
     $relation: [CommunityRelationType!]
-    $email: EmailAddress
+    $searchTerm: String
     $account: AccountReferenceInput
   ) {
     community(
@@ -16,7 +16,7 @@ export const peopleHostDashboardQuery = gql`
       relation: $relation
       account: $account
       type: [INDIVIDUAL]
-      email: $email
+      searchTerm: $searchTerm
       offset: $offset
       limit: $limit
     ) {

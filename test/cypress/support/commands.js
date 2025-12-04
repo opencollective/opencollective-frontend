@@ -574,6 +574,16 @@ Cypress.Commands.add('restoreLocalStorage', () => {
 
 Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
+Cypress.Commands.add('fillStripePaymentElementInput', () => {
+  cy.getStripePaymentElement().within(() => {
+    cy.get('#Field-numberInput').type('4242424242424242');
+    cy.get('#Field-expiryInput').type('1235');
+    cy.get('#Field-cvcInput').type('123');
+    cy.get('#Field-countryInput').select('US');
+    cy.get('#Field-postalCodeInput').type('90210');
+  });
+});
+
 Cypress.Commands.add(
   'createCollectiveV2',
   ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData, skipApproval = false } = {}) => {

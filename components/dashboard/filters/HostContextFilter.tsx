@@ -17,7 +17,7 @@ export const hostContextFilter: FilterConfig<z.infer<typeof schema>> = {
   },
 };
 
-function HostContextFilter({ value, onChange }: FilterComponentProps<string>) {
+export function HostContextFilter({ value, onChange }: FilterComponentProps<z.infer<typeof schema>>) {
   return (
     <Tabs value={value} onValueChange={onChange}>
       <TabsList className="h-9">

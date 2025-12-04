@@ -623,14 +623,13 @@ export default function OrderPage(props) {
                               >
                                 <FormattedMessage id="contribution.edit" defaultMessage="Edit Contribution" />
                               </StyledButton>
-                              {showCreatePendingOrderModal && (
-                                <CreatePendingOrderModal
-                                  hostSlug={account.host.slug}
-                                  onClose={() => setShowCreatePendingOrderModal(false)}
-                                  onSuccess={() => queryResult.refetch()}
-                                  edit={order}
-                                />
-                              )}{' '}
+                              <CreatePendingOrderModal
+                                hostSlug={account.host.slug}
+                                open={showCreatePendingOrderModal}
+                                setOpen={setShowCreatePendingOrderModal}
+                                onSuccess={() => queryResult.refetch()}
+                                edit={order}
+                              />{' '}
                             </React.Fragment>
                           )}
                         </ButtonsContainer>

@@ -74,7 +74,7 @@ export function DashboardSidebar({ isLoading }: { isLoading: boolean }) {
                 {isLoading
                   ? [...Array(6)].map((_, i) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <SidebarMenuSkeleton key={i} />
+                      <SidebarMenuSkeleton key={i} index={i} />
                     ))
                   : menuItems
                     ? menuItems.map(item => {

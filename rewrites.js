@@ -363,27 +363,6 @@ exports.REWRITES = [
     source: '/:slug/accept-financial-contributions/host/:state(success)?',
     destination: '/accept-financial-contributions',
   },
-  // New recurring contributions page
-  {
-    source: '/:slug/manage-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/manage-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/recurring-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/:slug/subscriptions',
-    destination: '/manage-contributions',
-  },
   // Path routing: all the rewrites below are ready to be removed as soon as we
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
   {
