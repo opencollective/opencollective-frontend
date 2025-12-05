@@ -190,10 +190,7 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
               <React.Fragment>
                 <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
                   {includeOrganizationFlow ? (
-                    <FormattedMessage
-                      defaultMessage="Register your personal account"
-                      id="signup.individual.orgFlow.title"
-                    />
+                    <FormattedMessage defaultMessage="Create your personal account" id="OkoBON" />
                   ) : (
                     <FormattedMessage defaultMessage="Create your account" id="signup.individual.title" />
                   )}
@@ -201,13 +198,13 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                 <p className="text-sm break-words text-slate-700 sm:text-base">
                   {includeOrganizationFlow ? (
                     <FormattedMessage
-                      defaultMessage="You need to register your personal account to create an organisation.{newLine}Sign in or create a personal account to continue"
+                      defaultMessage="You need a personal account to create an organization. {newLine}Sign in or create one to continue."
                       id="signup.individual.orgFlow.description"
                       values={I18nFormatters}
                     />
                   ) : (
                     <FormattedMessage
-                      defaultMessage="Join Open Collective to start contributing to open source projects and communities."
+                      defaultMessage="Start contributing, fundraising, or managing your group on a transparent, community powered platform."
                       id="signup.individual.description"
                       values={I18nFormatters}
                     />
