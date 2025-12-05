@@ -8,6 +8,7 @@ import StyledLink from './StyledLink';
 
 export const getI18nLink = linkProps => chunks => (
   <StyledLink color="var(--color-primary)" {...linkProps}>
+    {linkProps?.icon || null}
     {linkProps?.children || chunks}
   </StyledLink>
 );
