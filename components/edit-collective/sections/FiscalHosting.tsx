@@ -3,16 +3,15 @@ import { useMutation, useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
 import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
-import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
+import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
 import { activateCollectiveAsHostMutation, deactivateCollectiveAsHostMutation } from '@/lib/graphql/v1/mutations';
+import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
 import I18nFormatters from '@/components/I18nFormatters';
 import { DocumentationLink } from '@/components/Link';
 
 import { adminPanelQuery } from '../../dashboard/queries';
-
 import { useModal } from '../../ModalContext';
 import { Button } from '../../ui/Button';
 
