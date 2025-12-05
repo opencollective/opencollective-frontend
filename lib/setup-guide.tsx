@@ -4,7 +4,6 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import type { SetupGuideQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
 import { getPolicy } from '@/lib/policies';
@@ -51,10 +50,10 @@ export const generateSetupGuideSteps = ({
   LoggedInUser: LoggedInUser;
 }): Category[] => {
   const planFeatures = 'platformSubscription' in account && account.platformSubscription?.plan?.features;
-  const hasHosting = hasAccountHosting(account);
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hasHosting = account['hasHosting'];
+  const hasMoneyManagement = account['hasMoneyManagement'];
 
-  const allSteps: Record<string, Step> = {
+  const allSteps = {
     inviteAdmins: {
       id: 'invite-admins',
       title: <FormattedMessage defaultMessage="Invite additional admins" id="SetupGuide.InviteAdmins" />,
@@ -90,6 +89,7 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Connect Stripe" id="SetupGuide.Stripe.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'receiving-money')),
+        disabled: !hasMoneyManagement,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Stripe Payments" id="SetupGuide.Stripe.Documentation" />,
@@ -129,6 +129,7 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Connect Wise" id="SetupGuide.Wise.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'sending-money')),
+        disabled: !hasMoneyManagement,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Paying Expenses with Wise" id="SetupGuide.Wise.Documentation" />,
@@ -151,6 +152,7 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Set up expense policies" id="SetupGuide.Expenses" />,
         onClick: () => router.push(getDashboardRoute(account, 'policies#expenses')),
+        disabled: !hasMoneyManagement,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Fiscal Host Policies" id="FiscalHostPolicies" />,
@@ -174,6 +176,7 @@ export const generateSetupGuideSteps = ({
         onClick: () => {
           router.push(getDashboardRoute(account, 'chart-of-accounts'));
         },
+        disabled: !hasMoneyManagement,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />,
@@ -301,6 +304,7 @@ export const generateSetupGuideSteps = ({
           />
         ),
         onClick: () => router.push(getDashboardRoute(account, 'chart-of-accounts')),
+        disabled: !hasMoneyManagement,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />,
@@ -322,13 +326,13 @@ export const generateSetupGuideSteps = ({
           <FormattedMessage defaultMessage="Set up contribution policy" id="SetupGuide.ContributionPolicy.Action" />
         ),
         onClick: () => router.push(getDashboardRoute(account, 'policies')),
+        disabled: !hasMoneyManagement,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Fiscal Host Policies" id="FiscalHostPolicies" />,
         url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-policies',
       },
     },
-
     hostingFees: {
       title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
       description: (
@@ -344,6 +348,7 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Set up hosting fees" id="SetupGuide.HostingFees.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
+        disabled: !hasHosting,
       },
       documentation: {
         title: (
@@ -366,6 +371,7 @@ export const generateSetupGuideSteps = ({
       action: {
         label: <FormattedMessage defaultMessage="Enable applications" id="SetupGuide.HostApplications.Action" />,
         onClick: () => router.push(getDashboardRoute(account, 'fiscal-hosting')),
+        disabled: !hasHosting,
       },
       documentation: {
         title: <FormattedMessage defaultMessage="Fiscal Hosts" id="helpAndSupport.fiscalHosts" />,
@@ -418,7 +424,7 @@ export const generateSetupGuideSteps = ({
           id="Welcome.Organization.Crowdfunding.Description"
         />
       ),
-      steps: sortSteps([allSteps.inviteAdmins, allSteps.stripe, allSteps.contributionPolicy]),
+      steps: sortSteps([allSteps.inviteAdmins, allSteps.moneyManagement, allSteps.stripe, allSteps.contributionPolicy]),
     },
     {
       id: 'expense-automations',
@@ -431,7 +437,13 @@ export const generateSetupGuideSteps = ({
           id="Welcome.Organization.ExpenseAutomations.Description"
         />
       ),
-      steps: sortSteps([allSteps.wise, allSteps.expensePolicy, allSteps.chartOfAccounts, allSteps.twofaPolicy]),
+      steps: sortSteps([
+        allSteps.moneyManagement,
+        allSteps.wise,
+        allSteps.expensePolicy,
+        allSteps.chartOfAccounts,
+        allSteps.twofaPolicy,
+      ]),
     },
     {
       id: 'fund-grants',
@@ -445,6 +457,7 @@ export const generateSetupGuideSteps = ({
         />
       ),
       steps: sortSteps([
+        allSteps.moneyManagement,
         allSteps.stripe,
         allSteps.chartOfAccounts,
         allSteps.contributionPolicy,
