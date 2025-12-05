@@ -265,11 +265,6 @@ interface Account {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
-
-  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -2926,11 +2921,6 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
-
-  """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -8946,11 +8936,6 @@ type Bot implements Account {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
-
-  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -9923,11 +9908,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
-
-  """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -11462,11 +11442,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
-
-  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -12715,11 +12690,6 @@ type Individual implements Account {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
-
-  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -13947,11 +13917,6 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
-
-  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -15054,11 +15019,6 @@ type Vendor implements Account & AccountWithContributions {
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
-
-  """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -18990,11 +18950,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
-
-  """
   Returns true if the remote user is an admin of this account
   """
   isAdmin: Boolean!
@@ -20114,11 +20069,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   isHost: Boolean!
     @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
-
-  """
-  Whether this account is deletable
-  """
-  isDeletable: Boolean!
 
   """
   Returns true if the remote user is an admin of this account

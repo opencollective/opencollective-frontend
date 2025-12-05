@@ -85,8 +85,6 @@ export type Account = {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -1593,8 +1591,6 @@ export type Bot = Account & {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -2128,8 +2124,6 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isApproved: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -4233,8 +4227,6 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isApproved: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -5514,8 +5506,6 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isApproved: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -6156,8 +6146,6 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Returns whether the host is trusted or not */
   isFirstPartyHost: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
@@ -7240,8 +7228,6 @@ export type Individual = Account & {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   isFollowingConversation: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
@@ -9816,8 +9802,6 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -11155,8 +11139,6 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isApproved: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
@@ -13558,8 +13540,6 @@ export type Vendor = Account & AccountWithContributions & {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
-  /** Whether this account is deletable */
-  isDeletable: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /**
