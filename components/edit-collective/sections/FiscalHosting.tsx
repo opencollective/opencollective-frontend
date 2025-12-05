@@ -194,7 +194,7 @@ const FiscalHosting = ({ collective, account }) => {
           <p className="text-sm text-gray-700 md:max-w-4/5">
             <FormattedMessage
               id="FiscalHosting.Functionalities.description"
-              defaultMessage="Making contributions on the platform or getting paid on behalf of the organization are platform basics, activate additional functionalities to do more on the platform."
+              defaultMessage="Making contributions on the platform or getting paid on behalf of the organization are platform basics. Activate additional functionalities to do more on the platform."
             />
           </p>
         </div>
