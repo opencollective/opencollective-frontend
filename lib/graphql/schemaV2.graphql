@@ -4609,7 +4609,7 @@ type AccountCollection implements Collection {
 }
 
 """
-An account that can be hosted by a Host
+An account that can have a Platform Subscription
 """
 interface AccountWithPlatformSubscription {
   """
@@ -7052,6 +7052,7 @@ enum ActivityType {
   COLLECTIVE_UNHOSTED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_CONVERSATION_CREATED
@@ -18689,6 +18690,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_UNHOSTED
   COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_CONVERSATION_CREATED
@@ -22723,10 +22725,14 @@ type Mutation {
     captcha: CaptchaInputType
 
     """
-    If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
+    If true, the organization will be created with Money Management activated, allowing the organization to receive contributions and pay for expenses. Defaults to false.
     """
-    financiallyActive: Boolean = false
-    fiscalHostCapable: Boolean = false
+    hasMoneyManagement: Boolean = false
+
+    """
+    If true, the organization will be created with Hosting activated, allowing the organization to host Collectives and Funds. Defaults to false.
+    """
+    hasHosting: Boolean = false
   ): Organization
 
   """
@@ -22763,6 +22769,16 @@ type Mutation {
     """
     hasHosting: Boolean
   ): Organization!
+
+  """
+  Convert an Organization to a Collective. Scope: "account".
+  """
+  convertOrganizationToCollective(
+    """
+    Account to convert.
+    """
+    organization: AccountReferenceInput!
+  ): Collective!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".

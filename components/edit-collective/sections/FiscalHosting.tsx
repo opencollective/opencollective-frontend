@@ -5,23 +5,31 @@ import { FormattedMessage } from 'react-intl';
 
 import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
-import { activateCollectiveAsHostMutation, deactivateCollectiveAsHostMutation } from '@/lib/graphql/v1/mutations';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
 import I18nFormatters from '@/components/I18nFormatters';
 import { DocumentationLink } from '@/components/Link';
 
-import { adminPanelQuery } from '../../dashboard/queries';
 import { useModal } from '../../ModalContext';
 import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const toggleHostAccountsSettingsQuery = gql`
-  mutation ToggleHostAccounts($account: AccountReferenceInput!, $key: AccountSettingsKey!, $enabled: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $enabled) {
+const editMoneyManagementAndHostingMutation = gql`
+  mutation EditMoneyManagementAndHosting(
+    $organization: AccountReferenceInput!
+    $hasMoneyManagement: Boolean
+    $hasHosting: Boolean
+  ) {
+    editOrganizationMoneyManagementAndHosting(
+      organization: $organization
+      hasMoneyManagement: $hasMoneyManagement
+      hasHosting: $hasHosting
+    ) {
       id
-      name
+      isHost
+      hasMoneyManagement
+      hasHosting
       settings
     }
   }
@@ -29,16 +37,9 @@ const toggleHostAccountsSettingsQuery = gql`
 
 const fiscalHostingQuery = gql`
   query FiscalHosting($id: String!) {
-    account(id: $id) {
-      id
-      isHost
-      settings
-    }
     host(id: $id) {
       id
-      ... on Host {
-        totalHostedAccounts
-      }
+      totalHostedAccounts
     }
   }
 `;
@@ -50,12 +51,13 @@ const FiscalHosting = ({ collective, account }) => {
     context: API_V2_CONTEXT,
   });
 
-  const hasMoneyManagement = hasAccountMoneyManagement(data?.account);
-  const hasHosting = hasAccountHosting(data?.account);
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const hasHosting = hasAccountHosting(account);
+
+  const totalHostedAccounts = data?.totalHostedAccounts;
 
   const refetchAdminPanelMutationParams = {
     refetchQueries: [
-      { query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT },
       {
         query: editCollectivePageQuery,
         variables: {
@@ -64,22 +66,15 @@ const FiscalHosting = ({ collective, account }) => {
       },
     ],
   };
-  const [activateAsFiscalEntity] = useMutation(activateCollectiveAsHostMutation);
-  const [deactivateAsFiscalEntity] = useMutation(deactivateCollectiveAsHostMutation, refetchAdminPanelMutationParams);
-  const [toggleHostAccountsSetting] = useMutation(toggleHostAccountsSettingsQuery, {
+  const [editMoneyManagementAndHosting] = useMutation(editMoneyManagementAndHostingMutation, {
     ...refetchAdminPanelMutationParams,
     context: API_V2_CONTEXT,
   });
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
     if (activate) {
-      await activateAsFiscalEntity({ variables: { id: collective.id } });
-      await toggleHostAccountsSetting({
-        variables: {
-          account: { id: account.id },
-          key: 'canHostAccounts',
-          enabled: false,
-        },
+      await editMoneyManagementAndHosting({
+        variables: { organization: { slug: collective.slug }, hasMoneyManagement: true },
       });
     } else {
       showConfirmationModal({
@@ -92,10 +87,10 @@ const FiscalHosting = ({ collective, account }) => {
         description: (
           <div className="flex flex-col text-sm text-foreground">
             <div className="text-sm [&>p]:mt-2">
-              {hasHosting && data.host?.totalHostedAccounts > 0 ? (
+              {hasHosting && totalHostedAccounts > 0 ? (
                 <FormattedMessage
                   values={{
-                    totalHostedAccounts: data.host?.totalHostedAccounts,
+                    totalHostedAccounts,
                     link: chunk => (
                       <DocumentationLink href="https://documentation.opencollective.com/fiscal-hosts/closing-a-fiscal-host">
                         {chunk}
@@ -126,9 +121,11 @@ const FiscalHosting = ({ collective, account }) => {
             </div>
           </div>
         ),
-        confirmDisabled: data.host?.totalHostedAccounts > 0,
+        confirmDisabled: totalHostedAccounts > 0,
         onConfirm: async () => {
-          await deactivateAsFiscalEntity({ variables: { id: collective.id } });
+          await editMoneyManagementAndHosting({
+            variables: { organization: { slug: collective.slug }, hasMoneyManagement: false, hasHosting: false },
+          });
         },
         confirmLabel: <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />,
         variant: 'destructive',
@@ -138,12 +135,8 @@ const FiscalHosting = ({ collective, account }) => {
 
   const handleFiscalHostUpdate = async ({ activate }) => {
     if (activate) {
-      await toggleHostAccountsSetting({
-        variables: {
-          account: { id: account.id },
-          key: 'canHostAccounts',
-          enabled: true,
-        },
+      await editMoneyManagementAndHosting({
+        variables: { organization: { slug: collective.slug }, hasHosting: true },
       });
     } else {
       showConfirmationModal({
@@ -152,10 +145,10 @@ const FiscalHosting = ({ collective, account }) => {
         ),
         description: (
           <div className="flex flex-col gap-4 text-sm text-foreground [&>p]:mt-2">
-            {hasHosting && data.host?.totalHostedAccounts > 0 ? (
+            {hasHosting && totalHostedAccounts > 0 ? (
               <FormattedMessage
                 values={{
-                  totalHostedAccounts: data.host?.totalHostedAccounts,
+                  totalHostedAccounts,
                   link: chunk => (
                     <DocumentationLink href="https://documentation.opencollective.com/fiscal-hosts/closing-a-fiscal-host">
                       {chunk}
@@ -176,14 +169,10 @@ const FiscalHosting = ({ collective, account }) => {
             )}
           </div>
         ),
-        confirmDisabled: data.host?.totalHostedAccounts > 0,
+        confirmDisabled: totalHostedAccounts > 0,
         onConfirm: () => {
-          return toggleHostAccountsSetting({
-            variables: {
-              account: { id: account.id },
-              key: 'canHostAccounts',
-              enabled: activate ? true : false,
-            },
+          return editMoneyManagementAndHosting({
+            variables: { organization: { slug: collective.slug }, hasHosting: false },
           });
         },
         confirmLabel: <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />,
@@ -195,7 +184,7 @@ const FiscalHosting = ({ collective, account }) => {
   return (
     <div className="mb-10 flex w-full flex-col gap-4">
       <p>
-        <FormattedMessage defaultMessage="Manage the platform functionalities for your organisation" id="lVkMQs" />
+        <FormattedMessage defaultMessage="Manage the platform functionalities for your organization" id="CETJRY" />
       </p>
       <div className="mt-4 flex w-full flex-col gap-4">
         <div>
@@ -205,7 +194,7 @@ const FiscalHosting = ({ collective, account }) => {
           <p className="text-sm text-gray-700 md:max-w-4/5">
             <FormattedMessage
               id="FiscalHosting.Functionalities.description"
-              defaultMessage="Making contributions on the platform or getting paid on behalf of the organisation are platform basics, activate additional functionalities to do more on the platform."
+              defaultMessage="Making contributions on the platform or getting paid on behalf of the organization are platform basics. Activate additional functionalities to do more on the platform."
             />
           </p>
         </div>
@@ -216,10 +205,7 @@ const FiscalHosting = ({ collective, account }) => {
           <Image src="/static/images/welcome/jar.png" alt="Money Management Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
-              <FormattedMessage
-                defaultMessage="Money management"
-                id="fiscalHosting.whatAreTheBenefits.moneyManagement"
-              />
+              <FormattedMessage defaultMessage="Money Management" id="Welcome.Organization.MoneyManagement" />
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
@@ -249,7 +235,7 @@ const FiscalHosting = ({ collective, account }) => {
           <Image src="/static/images/welcome/place.png" alt="Fiscal Host Icon" width={52} height={49} />
           <div className="grow">
             <h1 className="mb-2 font-bold">
-              <FormattedMessage defaultMessage="Be a Fiscal Host" id="FiscalHosting.fiscalHost.title" />
+              <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage

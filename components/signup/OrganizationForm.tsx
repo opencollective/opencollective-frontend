@@ -16,7 +16,7 @@ import { CountryIso, Currency } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nCountryName } from '@/lib/i18n';
 import { getCountryCodeFromLocalBrowserLanguage, getFlagEmoji } from '@/lib/i18n/countries';
-import { cn } from '@/lib/utils';
+import { cn, parseToBoolean } from '@/lib/utils';
 
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import { FormField } from '../FormField';
@@ -37,16 +37,16 @@ const createOrganizationMutation = gql`
     $organization: OrganizationCreateInput!
     $captcha: CaptchaInputType
     $roleDescription: String
-    $financiallyActive: Boolean
-    $fiscalHostCapable: Boolean
+    $hasMoneyManagement: Boolean
+    $hasHosting: Boolean
   ) {
     createOrganization(
       individual: $individual
       organization: $organization
       captcha: $captcha
       roleDescription: $roleDescription
-      financiallyActive: $financiallyActive
-      fiscalHostCapable: $fiscalHostCapable
+      hasMoneyManagement: $hasMoneyManagement
+      hasHosting: $hasHosting
     ) {
       id
       name
@@ -176,8 +176,8 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
           organization: organization,
           captcha: captchaResult,
           roleDescription,
-          financiallyActive: router.query?.active === 'true',
-          fiscalHostCapable: router.query?.host === 'true',
+          hasMoneyManagement: parseToBoolean(router.query?.active) || parseToBoolean(router.query?.hasMoneyManagement),
+          hasHosting: parseToBoolean(router.query?.host) || parseToBoolean(router.query?.hasHosting),
         },
       });
 

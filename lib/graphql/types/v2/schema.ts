@@ -920,7 +920,7 @@ export type AccountWithParent = {
   parent?: Maybe<Account>;
 };
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscription = {
   legacyPlan: HostPlan;
   platformBilling: PlatformBilling;
@@ -929,7 +929,7 @@ export type AccountWithPlatformSubscription = {
 };
 
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
   billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
@@ -1149,6 +1149,7 @@ export enum ActivityAndClassesType {
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE = 'ORGANIZATION_CONVERTED_TO_COLLECTIVE',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
@@ -1343,6 +1344,7 @@ export enum ActivityType {
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE = 'ORGANIZATION_CONVERTED_TO_COLLECTIVE',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
@@ -7980,6 +7982,8 @@ export type Mutation = {
   connectPlaidAccount: PlaidConnectAccountResponse;
   /** Convert an account to an Organization. Scope: "account". */
   convertAccountToOrganization: Account;
+  /** Convert an Organization to a Collective. Scope: "account". */
+  convertOrganizationToCollective: Collective;
   /** Convert an organization to a vendor */
   convertOrganizationToVendor: Vendor;
   createApplication?: Maybe<Application>;
@@ -8379,6 +8383,12 @@ export type MutationConvertAccountToOrganizationArgs = {
 
 
 /** This is the root mutation */
+export type MutationConvertOrganizationToCollectiveArgs = {
+  organization: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationConvertOrganizationToVendorArgs = {
   host: AccountReferenceInput;
   organization: AccountReferenceInput;
@@ -8477,8 +8487,8 @@ export type MutationCreateOrderArgs = {
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
   captcha?: InputMaybe<CaptchaInputType>;
-  financiallyActive?: InputMaybe<Scalars['Boolean']['input']>;
-  fiscalHostCapable?: InputMaybe<Scalars['Boolean']['input']>;
+  hasHosting?: InputMaybe<Scalars['Boolean']['input']>;
+  hasMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
   individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;

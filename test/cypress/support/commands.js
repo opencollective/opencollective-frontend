@@ -278,14 +278,14 @@ Cypress.Commands.add('createHostOrganization', (userEmail, variables = {}) => {
         mutation CreateOrganization(
           $organization: OrganizationCreateInput!
           $inviteMembers: [InviteMemberInput!]
-          $financiallyActive: Boolean
-          $fiscalHostCapable: Boolean
+          $hasMoneyManagement: Boolean
+          $hasHosting: Boolean
         ) {
           createOrganization(
             organization: $organization
             inviteMembers: $inviteMembers
-            financiallyActive: $financiallyActive
-            fiscalHostCapable: $fiscalHostCapable
+            hasMoneyManagement: $hasMoneyManagement
+            hasHosting: $hasHosting
           ) {
             id
             legacyId
@@ -294,8 +294,8 @@ Cypress.Commands.add('createHostOrganization', (userEmail, variables = {}) => {
         }
       `,
       variables: {
-        financiallyActive: true,
-        fiscalHostCapable: true,
+        hasMoneyManagement: true,
+        hasHosting: true,
         ...variables,
         organization: {
           slug: randomSlug(),
