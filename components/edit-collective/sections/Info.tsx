@@ -323,7 +323,16 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         );
         return (
           <Form className="flex flex-col gap-4">
-            <FormField name="image" label={<FormattedMessage defaultMessage="Avatar" id="Avatar" />}>
+            <FormField
+              name="image"
+              label={
+                account.type === INDIVIDUAL ? (
+                  <FormattedMessage defaultMessage="Avatar" id="Avatar" />
+                ) : (
+                  <FormattedMessage defaultMessage="Logo" id="Logo" />
+                )
+              }
+            >
               {({ field, form }) => (
                 <EditAvatar
                   size={120}
