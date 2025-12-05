@@ -68,8 +68,8 @@ const Footer = ({ className, isDashboard }: { className?: string; isDashboard?: 
   const footerItems = usingNewPricing ? newFooterItems : legacyFooterItems;
 
   return (
-    <footer className={cn('border-t bg-background px-3 pt-16 pb-12 antialiased md:px-6', className)}>
-      <div className="mx-auto max-w-(--breakpoint-xl)">
+    <footer className={cn('border-t bg-background pt-16 antialiased', className)}>
+      <div className="mx-auto max-w-(--breakpoint-xl) px-3 md:px-6">
         <div className="xl:flex xl:gap-12">
           <div className="max-w-xs space-y-6">
             <div className="space-y-4">
@@ -142,7 +142,7 @@ const Footer = ({ className, isDashboard }: { className?: string; isDashboard?: 
       </div>
 
       {!isDashboard && (
-        <div className="bg-muted">
+        <div className="mt-16 bg-muted">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
             <p className="text-sm text-muted-foreground">&nbsp;</p>
             <SocialLinks className="gap-2" iconSize={18} />
