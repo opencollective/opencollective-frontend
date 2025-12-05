@@ -91,7 +91,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
             <div className="relative">
               <div className="space-y-3">
                 <Link
-                  href="/signup/organization?active=true"
+                  href="/signup/organization"
                   className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <div>
