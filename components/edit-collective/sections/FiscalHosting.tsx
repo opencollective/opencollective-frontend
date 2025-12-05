@@ -184,7 +184,7 @@ const FiscalHosting = ({ collective, account }) => {
   return (
     <div className="mb-10 flex w-full flex-col gap-4">
       <p>
-        <FormattedMessage defaultMessage="Manage the platform functionalities for your organization" id="lVkMQs" />
+        <FormattedMessage defaultMessage="Manage the platform functionalities for your organization" id="CETJRY" />
       </p>
       <div className="mt-4 flex w-full flex-col gap-4">
         <div>
