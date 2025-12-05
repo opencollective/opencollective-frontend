@@ -166,6 +166,7 @@ export default defineConfig([
     plugins: { '@graphql-eslint': graphqlPlugin },
     languageOptions: { parser: graphqlPlugin.parser },
     rules: {
+      '@graphql-eslint/unique-operation-name': 'error',
       '@graphql-eslint/no-deprecated': 'warn',
       '@graphql-eslint/fields-on-correct-type': 'error',
       '@graphql-eslint/no-duplicate-fields': 'error',
