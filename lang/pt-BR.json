@@ -3689,7 +3689,7 @@
   "signup.completeProfile.password.hint": "You can always sign-in using just your e-mail.",
   "signup.completeProfile.title": "Let's complete your profile",
   "signup.createOrganization.title": "Create an organization",
-  "signup.individual.description": "Start contributing, fundraising, or managing your group on a transparent, community powered platform.",
+  "signup.individual.description": "Join Open Collective to start contributing, fundraising, or managing your group on a transparent, community powered platform.",
   "signup.individual.orgFlow.description": "You need a personal account to create an organization. {newLine}Sign in or create one to continue.",
   "signup.individual.resendOTP": "Didn't receive a code? Resend{secondsLeft, select, 0 {} other { ({secondsLeft}s)}}",
   "signup.individual.title": "Create your account",

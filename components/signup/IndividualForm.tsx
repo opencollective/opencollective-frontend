@@ -204,7 +204,7 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                     />
                   ) : (
                     <FormattedMessage
-                      defaultMessage="Start contributing, fundraising, or managing your group on a transparent, community powered platform."
+                      defaultMessage="Join Open Collective to start contributing, fundraising, or managing your group on a transparent, community powered platform."
                       id="signup.individual.description"
                       values={I18nFormatters}
                     />
