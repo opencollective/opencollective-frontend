@@ -74,6 +74,8 @@ const setupGuideQuery = gql`
         contributionPolicy
       }
       ... on Organization {
+        hasHosting
+        hasMoneyManagement
         host {
           id
           slug
