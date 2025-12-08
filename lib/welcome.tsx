@@ -14,7 +14,9 @@ import {
 } from '@/components/edit-collective/sections/FiscalHosting';
 import { Button } from '@/components/ui/Button';
 
+import type { WelcomeOrganizationQuery } from './graphql/types/v2/graphql';
 import { hasAccountHosting, hasAccountMoneyManagement } from './collective';
+import type LoggedInUser from './LoggedInUser';
 
 export type Step = {
   id?: string;
@@ -30,6 +32,14 @@ export type Step = {
   };
 };
 
+type MakeStepParams = {
+  account: WelcomeOrganizationQuery['account'];
+  router: AppRouterInstance;
+  LoggedInUser: LoggedInUser;
+};
+
+type MakeStep = (params: MakeStepParams) => Step;
+
 export type Category = {
   id: string;
   image: ReactNode;
@@ -37,7 +47,7 @@ export type Category = {
   description: string | ReactNode;
   longDescription?: string | ReactNode;
   className?: string;
-  steps?: Array<({ account, router, LoggedInUser }) => Step>;
+  steps?: Array<MakeStep>;
 };
 
 const RedirectButton = ({
@@ -61,7 +71,7 @@ const RedirectButton = ({
 export const sortSteps = (steps: Step[]) =>
   orderBy(compact(steps), step => (step.requiresUpgrade ? -1 : step.completed ? 1 : 0), ['desc', 'desc']);
 
-const ALL_STEPS = {
+const ALL_STEPS: Record<string, MakeStep> = {
   inviteAdmins: ({ account, router }) => ({
     id: 'invite-admins',
     title: <FormattedMessage defaultMessage="Invite additional admins" id="SetupGuide.InviteAdmins" />,
@@ -259,7 +269,7 @@ const ALL_STEPS = {
     id: 'enable-hosting',
     completed: hasAccountHosting(account),
     action: (
-      <ToggleFiscalHostingButton account={account} refetchQueries={['SetupGuide']} size="xs">
+      <ToggleFiscalHostingButton account={account} refetchQueries={['WelcomeOrganization']} size="xs">
         {hasAccountHosting(account) ? (
           <FormattedMessage defaultMessage="Disable fiscal hosting" id="SetupGuide.DisableEnableHosting" />
         ) : (
@@ -286,7 +296,7 @@ const ALL_STEPS = {
     ),
     completed: hasAccountMoneyManagement(account),
     action: (
-      <ToggleMoneyManagementButton account={account} refetchQueries={['SetupGuide']} size="xs">
+      <ToggleMoneyManagementButton account={account} refetchQueries={['WelcomeOrganization']} size="xs">
         {hasAccountMoneyManagement(account) ? (
           <FormattedMessage defaultMessage="Disable Money Management" id="SetupGuide.DisableMoneyManagement" />
         ) : (
@@ -448,7 +458,7 @@ const ALL_STEPS = {
   }),
 };
 
-export const ALL_CATEGORIES = {
+export const ORG_CATEGORIES = {
   platformBasics: {
     image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
     title: <FormattedMessage defaultMessage="Platform Basics" id="Welcome.Organization.PlatformBasics" />,

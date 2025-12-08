@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type { SetupGuideQuery } from '@/lib/graphql/types/v2/graphql';
+import type { WelcomeOrganizationQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import type { Category, Step } from '@/lib/setup-guide';
-import { ALL_CATEGORIES, sortSteps } from '@/lib/setup-guide';
 import { cn } from '@/lib/utils';
+import type { Category, Step } from '@/lib/welcome';
+import { ORG_CATEGORIES, sortSteps } from '@/lib/welcome';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { Drawer } from '@/components/Drawer';
@@ -21,8 +21,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 
 import { planFeatures } from '../subscriptions/queries';
 
-const setupGuideQuery = gql`
-  query SetupGuide($accountSlug: String!) {
+const welcomeOrganizationQuery = gql`
+  query WelcomeOrganization($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
       slug
@@ -99,7 +99,7 @@ const setupGuideQuery = gql`
   ${AccountingCategorySelectFieldsFragment}
 `;
 
-const SetupStep = (props: Step & { account: SetupGuideQuery['account'] }) => {
+const ActionStep = (props: Step) => {
   const [isExpanded, setIsExpanded] = useState(!props.completed);
 
   return (
@@ -168,22 +168,22 @@ const SetupStep = (props: Step & { account: SetupGuideQuery['account'] }) => {
   );
 };
 
-const SetupDrawer = ({
+const WelcomeDrawer = ({
   category,
   account,
   onClose,
   open,
 }: {
   category: Category | null;
-  account: SetupGuideQuery['account'];
+  account: WelcomeOrganizationQuery['account'];
   onClose: () => void;
   open: boolean;
 }) => {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const steps = category?.steps ? sortSteps(category.steps.map(step => step({ account, router, LoggedInUser }))) : [];
-  const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade).length;
-  const isCompleted = completedSteps === steps?.length;
+  const completedSteps = steps.filter(step => step.completed && !step.requiresUpgrade).length;
+  const isCompleted = completedSteps === steps.length;
 
   return (
     <Drawer open={open} onClose={onClose} className="w-full max-w-xl" showCloseButton>
@@ -215,8 +215,8 @@ const SetupDrawer = ({
       <div className="flex grow flex-col justify-between gap-6">
         {steps.length > 0 && (
           <div className="flex flex-col gap-4">
-            {steps?.map(step => (
-              <SetupStep key={step.id} account={account} {...step} />
+            {steps.map(step => (
+              <ActionStep key={step.id} {...step} />
             ))}
           </div>
         )}
@@ -225,7 +225,7 @@ const SetupDrawer = ({
   );
 };
 
-const CategoryButton = ({ img, title, description, className, onClick, steps: _steps, account }) => {
+const WelcomeCategoryButton = ({ img, title, description, className, onClick, steps: _steps, account }) => {
   const { LoggedInUser } = useLoggedInUser();
   const steps = _steps?.map(step => step({ account, LoggedInUser }));
   const completedSteps = (account && steps?.filter(step => step.completed && !step.requiresUpgrade).length) || 0;
@@ -260,8 +260,8 @@ const CategoryButton = ({ img, title, description, className, onClick, steps: _s
   );
 };
 
-export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
-  const { data } = useQuery(setupGuideQuery, {
+export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
+  const { data } = useQuery(welcomeOrganizationQuery, {
     variables: { accountSlug: _account?.slug },
     skip: !_account,
     context: API_V2_CONTEXT,
@@ -299,8 +299,8 @@ export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
             </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(ALL_CATEGORIES).map(([key, category]) => (
-              <CategoryButton
+            {Object.entries(ORG_CATEGORIES).map(([key, category]) => (
+              <WelcomeCategoryButton
                 key={key}
                 className={category.className}
                 img={category.image}
@@ -312,8 +312,8 @@ export const SetupGuideCard = ({ account: _account, setOpen, open }) => {
               />
             ))}
           </CardContent>
-          <SetupDrawer
-            category={ALL_CATEGORIES[expandedCategory]}
+          <WelcomeDrawer
+            category={ORG_CATEGORIES[expandedCategory]}
             account={data?.account}
             onClose={() => setExpandedCategory(null)}
             open={expandedCategory !== null}
