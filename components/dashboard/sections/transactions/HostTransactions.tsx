@@ -10,6 +10,7 @@ import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/ty
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import Image from '@/components/Image';
 import Link from '@/components/Link';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -75,15 +76,12 @@ const hostTransactionsMetaDataQuery = gql`
       settings
       accountingCategories {
         nodes {
-          id
-          code
-          name
-          kind
-          appliesTo
+          ...AccountingCategorySelectFields
         }
       }
     }
   }
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSectionProps) => {

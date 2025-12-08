@@ -1,12 +1,15 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { get, groupBy } from 'lodash';
+import { get } from 'lodash';
+import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import { getWebsiteUrl } from '../../../lib/utils';
+import { hasAccountHosting } from '@/lib/collective';
+
+import { Separator } from '@/components/ui/Separator';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -17,8 +20,7 @@ import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
 import { H4 } from '../../Text';
 import { Button } from '../../ui/Button';
-import CreateHostFormWithData from '../CreateHostFormWithData';
-import EditConnectedAccount from '../EditConnectedAccount';
+import SelectOwnFiscalHost from '../SelectOwnFiscalHost';
 
 import { ActiveFiscalHost } from './fiscal-host/ActiveFiscalHost';
 import AppliedToFiscalHost from './fiscal-host/AppliedToFiscalHost';
@@ -96,13 +98,22 @@ class Host extends React.Component {
           id="collective.edit.host.legalName.info"
           defaultMessage="Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes."
           values={{
-            SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}` }),
+            SettingsLink: getI18nLink({ as: Link, href: `/dashboard/${collective.host?.slug}` }),
             isSelfHosted: collective.id === collective.host?.id,
           }}
         />
       </MessageBox>
     );
   }
+
+  getAdministratedHosts = memoizeOne(LoggedInUser => {
+    return (
+      LoggedInUser?.memberOf
+        ?.filter(membership => membership.role === 'ADMIN' && hasAccountHosting(membership.collective))
+        .map(membership => membership.collective)
+        .filter(Boolean) || []
+    );
+  });
 
   render() {
     const { LoggedInUser, collective, router, intl, editCollectiveMutation } = this.props;
@@ -111,6 +122,7 @@ class Host extends React.Component {
     const selectedOption = get(router, 'query.selectedOption', 'noHost');
 
     const showLegalNameInfoBox = LoggedInUser?.isHostAdmin(collective) && !collective.host?.legalName;
+    const administratedHosts = this.getAdministratedHosts(LoggedInUser);
 
     if (get(collective, 'host.id') === collective.id) {
       return (
@@ -171,9 +183,6 @@ class Host extends React.Component {
       );
     }
 
-    const connectedAccounts = groupBy(collective.connectedAccounts, 'service');
-    const stripeAccount = connectedAccounts['stripe']?.[0];
-
     return (
       <EditCollectiveHostSection>
         <H4 fontSize="15px" mb={3}>
@@ -202,103 +211,6 @@ class Host extends React.Component {
                 id="collective.edit.host.noHost.description"
                 defaultMessage="You can't receive financial contributions or use the budget features. You can still edit your profile page, submit expenses to be paid later, and post updates."
               />
-            </Box>
-          </Flex>
-        </div>
-
-        <div id="selfHost">
-          <Flex>
-            <Box flex="0 0 35px" mr={2} pl={2}>
-              <StyledInput
-                type="radio"
-                name="host-radio"
-                id="host-radio-selfHost"
-                checked={selectedOption === 'selfHost'}
-                onChange={() => this.updateSelectedOption('selfHost')}
-                className="hostRadio"
-              />
-            </Box>
-            <Box mb={4}>
-              <OptionLabel htmlFor="host-radio-selfHost">
-                <FormattedMessage id="acceptContributions.picker.ourselves" defaultMessage="Independent Collective" />
-              </OptionLabel>
-              <FormattedMessage
-                id="collective.edit.host.selfHost.description"
-                defaultMessage="Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability."
-              />
-              &nbsp;
-              <StyledLink
-                href="https://documentation.opencollective.com/independent-collectives/independent-collectives"
-                openInNewTab
-              >
-                <FormattedMessage id="moreInfo" defaultMessage="More info" />
-              </StyledLink>
-              {selectedOption === 'selfHost' && LoggedInUser && (
-                <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div>
-                    <Button
-                      onClick={() => this.changeHost({ id: collective.id })}
-                      loading={this.state.isSubmitting}
-                      minWidth={200}
-                      size="sm"
-                    >
-                      <FormattedMessage
-                        id="host.selfHost.confirm"
-                        defaultMessage="Yes, Activate Independent Collective"
-                      />
-                    </Button>
-                  </div>
-                  {!stripeAccount && (
-                    <div className="md:text-right">
-                      <EditConnectedAccount
-                        collective={collective}
-                        service="stripe"
-                        options={{
-                          redirect: `${getWebsiteUrl()}/dashboard/${collective.slug}/host?selectedOption=selfHost`,
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </Box>
-          </Flex>
-        </div>
-
-        <div id="ownHost">
-          <Flex>
-            <Box flex="0 0 35px" mr={2} pl={2}>
-              <StyledInput
-                type="radio"
-                id="host-radio-ownHost"
-                name="host-radio"
-                checked={selectedOption === 'ownHost'}
-                onChange={() => this.updateSelectedOption('ownHost')}
-                className="hostRadio"
-              />
-            </Box>
-            <Box mb={4}>
-              <OptionLabel htmlFor="host-radio-ownHost">
-                <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our Own Fiscal Host" />
-              </OptionLabel>
-              <FormattedMessage
-                id="collective.edit.host.useOwn.description"
-                defaultMessage="Select or create your own Fiscal Host, which you manage to hold funds for multiple Collectives, to hold funds and do associated admin for this Collective."
-              />
-              &nbsp;
-              <StyledLink
-                href="https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host"
-                openInNewTab
-              >
-                <FormattedMessage id="moreInfo" defaultMessage="More info" />
-              </StyledLink>
-              {selectedOption === 'ownHost' && LoggedInUser && (
-                <CreateHostFormWithData
-                  collective={collective}
-                  LoggedInUser={LoggedInUser}
-                  onSubmit={hostCollective => this.changeHost(hostCollective)}
-                />
-              )}
             </Box>
           </Flex>
         </div>
@@ -340,6 +252,69 @@ class Host extends React.Component {
               )}
             </Box>
           </Flex>
+        </div>
+
+        {administratedHosts.length > 0 && (
+          <div id="ownHost">
+            <Flex>
+              <Box flex="0 0 35px" mr={2} pl={2}>
+                <StyledInput
+                  type="radio"
+                  id="host-radio-ownHost"
+                  name="host-radio"
+                  checked={selectedOption === 'ownHost'}
+                  onChange={() => this.updateSelectedOption('ownHost')}
+                  className="hostRadio"
+                />
+              </Box>
+              <Box mb={4}>
+                <OptionLabel htmlFor="host-radio-ownHost">
+                  <FormattedMessage
+                    id="acceptContributions.organization.subtitle"
+                    defaultMessage="Our Own Fiscal Host"
+                  />
+                </OptionLabel>
+                <FormattedMessage
+                  id="collective.edit.host.useOwn.description"
+                  defaultMessage="Select your own Fiscal Host, which you manage to hold funds for multiple Collectives, to hold funds and do associated admin for this Collective."
+                />
+                &nbsp;
+                <StyledLink
+                  href="https://documentation.opencollective.com/fiscal-hosts/why-become-a-fiscal-host"
+                  openInNewTab
+                >
+                  <FormattedMessage id="moreInfo" defaultMessage="More info" />
+                </StyledLink>
+                {selectedOption === 'ownHost' && (
+                  <SelectOwnFiscalHost
+                    administratedHosts={administratedHosts}
+                    collective={collective}
+                    onSubmit={hostCollective => this.changeHost(hostCollective)}
+                  />
+                )}
+              </Box>
+            </Flex>
+          </div>
+        )}
+
+        <Separator className="mt-4 mb-6" />
+
+        <div>
+          <p className="text-black-900 mb-2 font-bold">
+            <FormattedMessage defaultMessage="Already have a legal entity?" id="/9OXGy" />
+          </p>
+          <p className="text-black-700 mb-3 text-sm">
+            <FormattedMessage
+              id="collective.edit.host.convertToOrg.description"
+              defaultMessage="<Link>Convert this account to an Organization</Link> to enable money management."
+              values={{
+                Link: getI18nLink({
+                  as: Link,
+                  href: `/dashboard/${collective.slug}/advanced?convertToOrg=true`,
+                }),
+              }}
+            />
+          </p>
         </div>
       </EditCollectiveHostSection>
     );

@@ -269,14 +269,24 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   });
 });
 
-Cypress.Commands.add('createHostOrganization', (userEmail, variables) => {
+Cypress.Commands.add('createHostOrganization', (userEmail, variables = {}) => {
   return signinRequest({ email: userEmail }, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQueryV2(token, {
       operationName: 'CreateOrganization',
       query: gql`
-        mutation CreateOrganization($organization: OrganizationCreateInput!, $inviteMembers: [InviteMemberInput!]) {
-          createOrganization(organization: $organization, inviteMembers: $inviteMembers) {
+        mutation CreateOrganization(
+          $organization: OrganizationCreateInput!
+          $inviteMembers: [InviteMemberInput!]
+          $hasMoneyManagement: Boolean
+          $hasHosting: Boolean
+        ) {
+          createOrganization(
+            organization: $organization
+            inviteMembers: $inviteMembers
+            hasMoneyManagement: $hasMoneyManagement
+            hasHosting: $hasHosting
+          ) {
             id
             legacyId
             slug
@@ -284,6 +294,8 @@ Cypress.Commands.add('createHostOrganization', (userEmail, variables) => {
         }
       `,
       variables: {
+        hasMoneyManagement: true,
+        hasHosting: true,
         ...variables,
         organization: {
           slug: randomSlug(),
@@ -293,18 +305,7 @@ Cypress.Commands.add('createHostOrganization', (userEmail, variables) => {
         },
       },
     }).then(({ body }) => {
-      const host = body.data.createOrganization;
-      return graphqlQuery(token, {
-        operationName: 'ActivateCollectiveAsHost',
-        query: gqlV1`
-          mutation ActivateCollectiveAsHost($id: Int!) {
-            activateCollectiveAsHost(id: $id) {
-              id
-            }
-          }
-        `,
-        variables: { id: host.legacyId },
-      }).then(() => host);
+      return body.data.createOrganization;
     });
   });
 });

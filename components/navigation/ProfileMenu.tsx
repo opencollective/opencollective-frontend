@@ -21,13 +21,11 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
-import { cn, parseToBoolean } from '../../lib/utils';
-import { getEnvVar } from '@/lib/env-utils';
+import { cn } from '../../lib/utils';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
-import LoginBtn from '../LoginBtn';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
 import SignupLogin from '../SignupLogin';
 import { Badge } from '../ui/Badge';
@@ -120,7 +118,6 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
     // We ignore errors here because the logout action can trigger refetch before LoggedInUser is set to null and we don't really care if this query fails
     errorPolicy: 'ignore',
   });
-  const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
 
   React.useEffect(() => {
     const handler = () => setMenuOpen(false);
@@ -131,10 +128,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   }, []);
 
   if (!LoggedInUser) {
-    if (usingNewPricing) {
-      return <SignupLogin whitelabel={whitelabel} />;
-    }
-    return <LoginBtn whitelabel={whitelabel} />;
+    return <SignupLogin whitelabel={whitelabel} />;
   }
 
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;

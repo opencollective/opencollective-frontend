@@ -232,7 +232,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
         cy.contains('You have been invited to submit an expense').should('exist');
         cy.contains('Decline invitation').should('exist');
         cy.contains('Continue submission').click();
-        cy.contains('Sign In').click({ force: true });
+        cy.contains('Log In').click({ force: true });
         cy.location().its('pathname').should('eql', `/signin`);
         cy.location()
           .its('search')
@@ -264,7 +264,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       cy.contains('Continue submission').click();
       cy.contains(newUser).should('exist');
       cy.contains(`oc-test-${newUser}@opencollective.com`).should('exist');
-      cy.contains('Sign In').should('exist');
+      cy.contains('Log In').should('exist');
       fillNewPayoutMethod({
         type: 'OTHER',
         slug: randomSlug(),

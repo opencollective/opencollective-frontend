@@ -13,6 +13,7 @@ import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyID } from '../CopyId';
 import DateTime from '../DateTime';
@@ -175,12 +176,7 @@ const contributionDrawerQuery = gql`
         type
         accountingCategories {
           nodes {
-            id
-            code
-            name
-            friendlyName
-            kind
-            appliesTo
+            ...AccountingCategorySelectFields
           }
         }
       }
@@ -193,12 +189,7 @@ const contributionDrawerQuery = gql`
         type
         accountingCategories {
           nodes {
-            id
-            code
-            name
-            friendlyName
-            kind
-            appliesTo
+            ...AccountingCategorySelectFields
           }
         }
       }
@@ -251,6 +242,7 @@ const contributionDrawerQuery = gql`
     paymentProcessorUrl
   }
   ${accountHoverCardFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 type ContributionDrawerProps = {

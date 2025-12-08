@@ -11,6 +11,7 @@ export const adminPanelQuery = gql`
       currency
       slug
       name
+      legalName
       isHost
       type
       supportedExpenseTypes
@@ -107,6 +108,8 @@ export const adminPanelQuery = gql`
         REQUIRE_2FA_FOR_ADMINS
       }
       ... on Organization {
+        hasHosting
+        hasMoneyManagement
         host {
           id
           type

@@ -49,6 +49,7 @@ import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
@@ -437,14 +438,7 @@ const formSchemaQuery = gql`
 
     accountingCategories(kind: EXPENSE) {
       nodes {
-        id
-        name
-        kind
-        expensesTypes
-        friendlyName
-        code
-        instructions
-        appliesTo
+        ...AccountingCategorySelectFields
       }
     }
   }
@@ -590,6 +584,7 @@ const formSchemaQuery = gql`
   }
 
   ${accountHoverCardFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 type ExpenseFormOptions = {

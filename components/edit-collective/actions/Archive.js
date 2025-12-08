@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { getErrorFromGraphqlException } from '@/lib/errors';
+import { API_V2_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import { adminPanelQuery } from '../../dashboard/queries';
 import { getI18nLink } from '../../I18nFormatters';
@@ -81,7 +82,8 @@ const ArchiveCollective = ({ collective }) => {
     }
   };
 
-  const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
+  const hasBalance = collective.stats.balance > 0;
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
 
   const closeModal = () => setModal({ ...modal, show: false });
 
@@ -121,7 +123,7 @@ const ArchiveCollective = ({ collective }) => {
           />
         </MessageBox>
       )}
-      {!isArchived && collective.isHost && (
+      {!isArchived && hasMoneyManagement && (
         <MessageBox type="warning">
           {collective.type === CollectiveType.COLLECTIVE ? (
             <FormattedMessage
@@ -147,7 +149,7 @@ const ArchiveCollective = ({ collective }) => {
         <Button
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
-          disabled={collective.isHost || hasBalance}
+          disabled={hasMoneyManagement || hasBalance}
           variant="outline"
         >
           <FormattedMessage

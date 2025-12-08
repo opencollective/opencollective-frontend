@@ -10,6 +10,8 @@ import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
@@ -40,11 +42,7 @@ const budgetSectionAccountFieldsFragment = gql`
         name
         accountingCategories {
           nodes {
-            id
-            code
-            name
-            kind
-            appliesTo
+            ...AccountingCategorySelectFields
           }
         }
       }
@@ -56,11 +54,7 @@ const budgetSectionAccountFieldsFragment = gql`
         name
         accountingCategories {
           nodes {
-            id
-            code
-            name
-            kind
-            appliesTo
+            ...AccountingCategorySelectFields
           }
         }
       }
@@ -96,6 +90,7 @@ const budgetSectionAccountFieldsFragment = gql`
       }
     }
   }
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 const budgetSectionQuery = gql`
