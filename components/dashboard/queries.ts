@@ -101,6 +101,7 @@ export const adminPanelQuery = gql`
         FUNDS_GRANTS_MANAGEMENT
         EXPECTED_FUNDS
         CHARGE_HOSTING_FEES
+        KYC
       }
       policies {
         id
@@ -153,6 +154,11 @@ export const adminPanelQuery = gql`
               freeze
             }
           }
+        }
+      }
+      ... on Individual {
+        kycVerifications {
+          totalCount
         }
       }
     }
