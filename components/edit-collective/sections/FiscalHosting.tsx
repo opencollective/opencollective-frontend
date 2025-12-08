@@ -1,16 +1,19 @@
 import React from 'react';
+import type { InternalRefetchQueriesInclude } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
 import I18nFormatters from '@/components/I18nFormatters';
 import { DocumentationLink } from '@/components/Link';
 
 import { useModal } from '../../ModalContext';
+import type { ButtonProps } from '../../ui/Button';
 import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -44,37 +47,34 @@ const fiscalHostingQuery = gql`
   }
 `;
 
-const FiscalHosting = ({ collective, account }) => {
+export const ToggleMoneyManagementButton = ({
+  account,
+  refetchQueries,
+  children,
+  ...props
+}: {
+  account: any;
+  refetchQueries?: InternalRefetchQueriesInclude;
+  children?: React.ReactNode;
+} & ButtonProps) => {
   const { showConfirmationModal } = useModal();
-  const { data, loading } = useQuery(fiscalHostingQuery, {
+  const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
+    context: API_V2_CONTEXT,
+    refetchQueries,
+  });
+  const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
     context: API_V2_CONTEXT,
   });
 
-  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const totalHostedAccounts = data?.host?.totalHostedAccounts;
   const hasHosting = hasAccountHosting(account);
-
-  const totalHostedAccounts = data?.totalHostedAccounts;
-
-  const refetchAdminPanelMutationParams = {
-    refetchQueries: [
-      {
-        query: editCollectivePageQuery,
-        variables: {
-          slug: collective.slug,
-        },
-      },
-    ],
-  };
-  const [editMoneyManagementAndHosting] = useMutation(editMoneyManagementAndHostingMutation, {
-    ...refetchAdminPanelMutationParams,
-    context: API_V2_CONTEXT,
-  });
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
     if (activate) {
       await editMoneyManagementAndHosting({
-        variables: { organization: { slug: collective.slug }, hasMoneyManagement: true },
+        variables: { organization: { id: account.id }, hasMoneyManagement: true },
       });
     } else {
       showConfirmationModal({
@@ -124,7 +124,7 @@ const FiscalHosting = ({ collective, account }) => {
         confirmDisabled: totalHostedAccounts > 0,
         onConfirm: async () => {
           await editMoneyManagementAndHosting({
-            variables: { organization: { slug: collective.slug }, hasMoneyManagement: false, hasHosting: false },
+            variables: { organization: { id: account.id }, hasMoneyManagement: false, hasHosting: false },
           });
         },
         confirmLabel: <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />,
@@ -133,10 +133,52 @@ const FiscalHosting = ({ collective, account }) => {
     }
   };
 
+  return (
+    <Button
+      onClick={() => handleMoneyManagementUpdate({ activate: !hasMoneyManagement })}
+      variant={loading || hasMoneyManagement ? 'outlineDestructive' : 'default'}
+      loading={loading || mutating}
+      {...props}
+    >
+      {children ||
+        (hasMoneyManagement ? (
+          <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />
+        ) : (
+          <FormattedMessage id="Activate" defaultMessage="Activate" />
+        ))}
+    </Button>
+  );
+};
+
+export const ToggleFiscalHostingButton = ({
+  account,
+  refetchQueries,
+  children,
+  ...props
+}: {
+  account: any;
+  refetchQueries?: InternalRefetchQueriesInclude;
+  children?: React.ReactNode;
+} & ButtonProps) => {
+  const { showConfirmationModal } = useModal();
+  const hasHosting = hasAccountHosting(account);
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
+    variables: { id: account.id },
+    context: API_V2_CONTEXT,
+  });
+
+  const totalHostedAccounts = data?.host?.totalHostedAccounts;
+
+  const [editMoneyManagementAndHosting] = useMutation(editMoneyManagementAndHostingMutation, {
+    refetchQueries,
+    context: API_V2_CONTEXT,
+  });
+
   const handleFiscalHostUpdate = async ({ activate }) => {
     if (activate) {
       await editMoneyManagementAndHosting({
-        variables: { organization: { slug: collective.slug }, hasHosting: true },
+        variables: { organization: { id: account.id }, hasHosting: true },
       });
     } else {
       showConfirmationModal({
@@ -172,7 +214,7 @@ const FiscalHosting = ({ collective, account }) => {
         confirmDisabled: totalHostedAccounts > 0,
         onConfirm: () => {
           return editMoneyManagementAndHosting({
-            variables: { organization: { slug: collective.slug }, hasHosting: false },
+            variables: { organization: { id: account.id }, hasHosting: false },
           });
         },
         confirmLabel: <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />,
@@ -180,6 +222,35 @@ const FiscalHosting = ({ collective, account }) => {
       });
     }
   };
+
+  return (
+    <Button
+      onClick={() => handleFiscalHostUpdate({ activate: !hasHosting })}
+      disabled={!hasMoneyManagement}
+      variant={loading || hasHosting ? 'outlineDestructive' : 'default'}
+      loading={loading}
+      {...props}
+    >
+      {children ||
+        (hasHosting ? (
+          <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />
+        ) : (
+          <FormattedMessage id="Activate" defaultMessage="Activate" />
+        ))}
+    </Button>
+  );
+};
+
+const FiscalHosting = ({ collective, account }) => {
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+  const refetchQueries = [
+    {
+      query: editCollectivePageQuery,
+      variables: {
+        slug: collective.slug,
+      },
+    },
+  ];
 
   return (
     <div className="mb-10 flex w-full flex-col gap-4">
@@ -211,18 +282,7 @@ const FiscalHosting = ({ collective, account }) => {
               />
             </p>
           </div>
-          <Button
-            onClick={() => handleMoneyManagementUpdate({ activate: !hasMoneyManagement })}
-            variant={loading || hasMoneyManagement ? 'outlineDestructive' : 'default'}
-            className="my-2 w-fit"
-            loading={loading}
-          >
-            {hasMoneyManagement ? (
-              <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />
-            ) : (
-              <FormattedMessage id="Activate" defaultMessage="Activate" />
-            )}
-          </Button>
+          <ToggleMoneyManagementButton className="my-2 w-fit" account={account} refetchQueries={refetchQueries} />
         </div>
 
         <div
@@ -231,8 +291,16 @@ const FiscalHosting = ({ collective, account }) => {
         >
           <Image src="/static/images/welcome/place.png" alt="Fiscal Host Icon" width={52} height={49} />
           <div className="grow">
-            <h1 className="mb-2 font-bold">
+            <h1 className="mb-2 flex items-center font-bold">
               <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />
+              {!hasMoneyManagement && (
+                <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                  <FormattedMessage
+                    defaultMessage="Requires Money Management"
+                    id="SetupGuide.RequiresMoneyManagement"
+                  />
+                </span>
+              )}
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
@@ -241,19 +309,7 @@ const FiscalHosting = ({ collective, account }) => {
               />
             </p>
           </div>
-          <Button
-            onClick={() => handleFiscalHostUpdate({ activate: !hasHosting })}
-            disabled={!hasMoneyManagement}
-            variant={loading || hasHosting ? 'outlineDestructive' : 'default'}
-            className="my-2 w-fit"
-            loading={loading}
-          >
-            {hasHosting ? (
-              <FormattedMessage id="Deactivate" defaultMessage="Deactivate" />
-            ) : (
-              <FormattedMessage id="Activate" defaultMessage="Activate" />
-            )}
-          </Button>
+          <ToggleFiscalHostingButton className="my-2 w-fit" account={account} refetchQueries={refetchQueries} />
         </div>
       </div>
     </div>
