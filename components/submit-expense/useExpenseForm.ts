@@ -1594,6 +1594,7 @@ type ExpenseFormStartOptions = {
   draftKey?: string;
   isInlineEdit?: boolean;
   pickSchemaFields?: Record<string, boolean>;
+  customData?: unknown;
 };
 
 /**
@@ -1751,7 +1752,7 @@ export function useExpenseForm(opts: {
               : null,
             attachedFiles,
             currency: formOptions.expenseCurrency,
-            customData: null,
+            customData: opts.startOptions.customData,
             invoiceInfo: values.invoiceInfo || null,
             invoiceFile:
               values.hasInvoiceOption === YesNoOption.NO

@@ -1,15 +1,14 @@
-import type { FormikProps } from 'formik';
 import { omit } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 
-import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
+import type { ExpenseItemFormValues } from '../types/FormValues';
 
 /**
  * When building expenses from drafts, amounts are returned in the database format.
  */
-export const getExpenseItemAmountV2FromNewAttrs = (
+const getExpenseItemAmountV2FromNewAttrs = (
   attrs,
   expenseCurrency: string,
 ): ExpenseItemFormValues['amountV2'] | undefined => {
@@ -47,17 +46,6 @@ export const newExpenseItem = (attrs = {}, expenseCurrency: string): ExpenseItem
   ...omit(attrs, ['amount', 'amountV2']),
   amountV2: getExpenseItemAmountV2FromNewAttrs(attrs, expenseCurrency),
 });
-
-/** Helper to add a new item to the form */
-export const addNewExpenseItem = (
-  formik: FormikProps<ExpenseFormValues>,
-  defaultValues: Partial<ExpenseItemFormValues> = {},
-): void => {
-  formik.setFieldValue('items', [
-    ...(formik.values.items || []),
-    newExpenseItem(defaultValues, formik.values.currency),
-  ]);
-};
 
 /**
  * Returns true if the attachment require adding a file
