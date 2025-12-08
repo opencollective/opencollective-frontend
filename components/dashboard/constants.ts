@@ -20,7 +20,6 @@ export const SECTIONS = {
   CONTRIBUTORS: 'contributors',
   PEOPLE: 'people',
   KYC: 'kyc',
-  INDIVIDUAL_KYC: 'individual-kyc',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
   HOST_EXPECTED_FUNDS: 'expected-funds',

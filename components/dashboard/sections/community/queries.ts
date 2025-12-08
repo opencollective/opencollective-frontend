@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
-import { kycVerificationFields } from '@/components/kyc/graphql';
+import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -40,6 +40,9 @@ export const peopleHostDashboardQuery = gql`
           location {
             country
           }
+          kycStatus(requestedByAccount: { slug: $slug }) {
+            ...KYCStatusFields
+          }
         }
         communityStats(host: { slug: $slug }) {
           relations
@@ -47,6 +50,7 @@ export const peopleHostDashboardQuery = gql`
       }
     }
   }
+  ${kycStatusFields}
 `;
 
 export const communityAccountDetailQuery = gql`

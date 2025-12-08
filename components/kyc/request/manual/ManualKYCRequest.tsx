@@ -7,6 +7,7 @@ import z from 'zod';
 
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 
+import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import { FormField } from '@/components/FormField';
 import { useFormikZod } from '@/components/FormikZod';
 import { Button } from '@/components/ui/Button';
@@ -27,6 +28,7 @@ type ManualKYCRequestProps = {
   requestedByAccount: AccountReferenceInput;
   verifyAccount: AccountReferenceInput;
   refetchQueries?: string[];
+  backLabel: React.ReactNode;
 };
 
 enum Steps {
@@ -42,6 +44,7 @@ export function ManualKYCRequest(props: ManualKYCRequestProps) {
     <React.Fragment>
       {step === Steps.FORM && (
         <ManualKYCRequestForm
+          backLabel={props.backLabel}
           initialValues={request}
           onBack={props.onBack}
           onNext={r => {
@@ -69,6 +72,7 @@ type ManualKYCRequestFormProps = {
   onBack: () => void;
   onNext: (request: z.infer<typeof ManualKYCRequestFormSchema>) => void;
   initialValues: z.infer<typeof ManualKYCRequestFormSchema>;
+  backLabel: React.ReactNode;
 };
 
 function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
@@ -147,11 +151,24 @@ function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
           </FormField>
         </form>
       </div>
+      <div>
+        <DocumentationCardList
+          className="mt-auto"
+          docs={[
+            {
+              href: 'https://documentation.opencollective.com/fiscal-hosts/know-your-customer-kyc/manual-kyc',
+              title: 'Manual KYC Verification',
+              excerpt:
+                'Manual KYC verification is a process that allows you to verify the identity and legal information of an account holder manually. This is useful when the automatic verification process fails or when you need to verify the information manually.',
+            },
+          ]}
+        />
+      </div>
       <DialogFooter>
         {props.onBack && (
           <Button variant="outline" onClick={props.onBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            <FormattedMessage defaultMessage="Return to KYC Introduction" id="gL+IfB" />
+            {props.backLabel}
           </Button>
         )}
         <Button onClick={() => form.submitForm()}>

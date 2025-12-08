@@ -1,7 +1,5 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
-
 const kycVerificationManualProviderDataFields = gql`
   fragment ManualKYCProviderDataFields on ManualKYCProviderData {
     notes
@@ -53,9 +51,6 @@ export const kycVerificationCollectionFields = gql`
   fragment KYCVerificationCollectionFields on KYCVerificationCollection {
     nodes {
       ...KYCVerificationFields
-      account {
-        ...AccountHoverCardFields
-      }
     }
     limit
     offset
@@ -63,5 +58,14 @@ export const kycVerificationCollectionFields = gql`
   }
 
   ${kycVerificationFields}
-  ${accountHoverCardFields}
+`;
+
+export const kycStatusFields = gql`
+  fragment KYCStatusFields on KYCStatus {
+    manual {
+      ...KYCVerificationFields
+    }
+  }
+
+  ${kycVerificationFields}
 `;

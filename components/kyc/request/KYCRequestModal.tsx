@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type {
@@ -10,6 +11,7 @@ import type {
   KycRequestModalQuery,
   KycRequestModalQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
+import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
@@ -20,9 +22,11 @@ import { kycVerificationFields } from '../graphql';
 
 import { ManualKYCRequest } from './manual/ManualKYCRequest';
 import { KYCRequestIntroduction } from './KYCRequestIntroduction';
+import { KYCRequestPickUser } from './KYCRequestPickUser';
 
 enum Steps {
   INTRODUCTION = 'INTRODUCTION',
+  PICK_USER = 'PICK_USER',
   MANUAL_REQUEST_FORM = 'MANUAL_REQUEST_FORM',
 }
 
@@ -33,15 +37,16 @@ type KYCRequestModalProps = {
 } & BaseModalProps;
 
 export function KYCRequestModal(props: KYCRequestModalProps) {
+  const isAccountSelected = !!props.verifyAccount;
   const query = useQuery<KycRequestModalQuery, KycRequestModalQueryVariables>(
     gql`
-      query KYCRequestModal($requestedByAccountSlug: String!, $verifyAccountId: String!) {
+      query KYCRequestModal($requestedByAccountSlug: String!, $verifyAccountId: String, $isAccountSelected: Boolean!) {
         requestedByAccount: account(slug: $requestedByAccountSlug) {
           id
           name
           settings
         }
-        verifyAccount: account(id: $verifyAccountId) {
+        verifyAccount: account(id: $verifyAccountId) @include(if: $isAccountSelected) {
           id
           name
           type
@@ -60,7 +65,8 @@ export function KYCRequestModal(props: KYCRequestModalProps) {
       context: API_V2_CONTEXT,
       variables: {
         requestedByAccountSlug: props.requestedByAccount.slug,
-        verifyAccountId: props.verifyAccount.id,
+        verifyAccountId: props.verifyAccount?.id,
+        isAccountSelected,
       },
     },
   );
@@ -70,11 +76,16 @@ export function KYCRequestModal(props: KYCRequestModalProps) {
       <DialogContent className="sm:min-w-[600px]">
         {query.loading && <Loading />}
         {query.error && <MessageBoxGraphqlError error={query.error} />}
-        {query.data?.verifyAccount?.type && query.data?.verifyAccount?.type !== CollectiveType.INDIVIDUAL && (
-          <MessageBox type="error" withIcon>
-            <FormattedMessage defaultMessage="The account you are trying to verify is not an individual." id="2o+1Ic" />
-          </MessageBox>
-        )}
+        {isAccountSelected &&
+          query.data?.verifyAccount?.type &&
+          query.data?.verifyAccount?.type !== CollectiveType.INDIVIDUAL && (
+            <MessageBox type="error" withIcon>
+              <FormattedMessage
+                defaultMessage="The account you are trying to verify is not an individual."
+                id="2o+1Ic"
+              />
+            </MessageBox>
+          )}
 
         {query.data && (
           <KYCRequestModalContent
@@ -103,8 +114,11 @@ type KYCRequestModalContentProps = {
 };
 
 function KYCRequestModalContent(props: KYCRequestModalContentProps) {
+  const [selectedAccount, setSelectedAccount] = React.useState<Account>(null);
+  const hasPickUserStep = !props.verifyAccount;
+
   const [step, setStep] = React.useState<Steps>(
-    props.skipIntroductionSet ? Steps.MANUAL_REQUEST_FORM : Steps.INTRODUCTION,
+    props.skipIntroductionSet ? (hasPickUserStep ? Steps.PICK_USER : Steps.MANUAL_REQUEST_FORM) : Steps.INTRODUCTION,
   );
 
   return (
@@ -114,16 +128,31 @@ function KYCRequestModalContent(props: KYCRequestModalContentProps) {
           skipIntroductionSet={
             get(props.data.requestedByAccount.settings, 'kyc.skipRequestIntroduction', false) === true
           }
-          onNext={() => setStep(Steps.MANUAL_REQUEST_FORM)}
+          onNext={() => setStep(hasPickUserStep ? Steps.PICK_USER : Steps.MANUAL_REQUEST_FORM)}
           requestedByAccount={props.requestedByAccount}
+        />
+      )}
+      {step === Steps.PICK_USER && (
+        <KYCRequestPickUser
+          onNext={() => setStep(Steps.MANUAL_REQUEST_FORM)}
+          selectedAccount={selectedAccount}
+          onSelectedAccountChange={account => setSelectedAccount(account)}
+          onBack={() => setStep(Steps.INTRODUCTION)}
         />
       )}
       {step === Steps.MANUAL_REQUEST_FORM && (
         <ManualKYCRequest
+          backLabel={
+            hasPickUserStep ? (
+              <FormattedMessage defaultMessage="Back" id="Back" />
+            ) : (
+              <FormattedMessage defaultMessage="Return to KYC Introduction" id="gL+IfB" />
+            )
+          }
           onNext={() => props.setOpen(false)}
-          onBack={() => setStep(Steps.INTRODUCTION)}
+          onBack={() => setStep(hasPickUserStep ? Steps.PICK_USER : Steps.INTRODUCTION)}
           requestedByAccount={props.requestedByAccount}
-          verifyAccount={props.verifyAccount}
+          verifyAccount={getAccountReferenceInput(props.verifyAccount ?? selectedAccount)}
           refetchQueries={props.refetchQueries}
         />
       )}

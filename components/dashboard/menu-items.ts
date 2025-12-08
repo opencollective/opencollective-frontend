@@ -340,12 +340,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isIndividual && account.kycVerifications.totalCount > 0,
-      label: 'KYC',
-      Icon: IdCard,
-      section: ALL_SECTIONS.INDIVIDUAL_KYC,
-    },
-    {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
       Icon: FileText,
       label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),

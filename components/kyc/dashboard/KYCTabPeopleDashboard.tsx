@@ -9,6 +9,7 @@ import type { KycTabPeopleDashboardQuery, KycVerificationCollection } from '@/li
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
+import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
@@ -50,11 +51,19 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
           ... on Individual {
             kycVerifications(requestedByAccounts: [$requestedByAccount], limit: $limit, offset: $offset) {
               ...KYCVerificationCollectionFields
+              nodes {
+                ... on KYCVerification {
+                  account {
+                    ...AccountHoverCardFields
+                  }
+                }
+              }
             }
           }
         }
       }
       ${kycVerificationCollectionFields}
+      ${accountHoverCardFields}
     `,
     {
       variables: {
@@ -114,9 +123,10 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
         className="mt-auto pt-6"
         docs={[
           {
-            href: 'https://documentation.opencollective.com',
-            title: 'KYC Verification',
-            excerpt: 'Learn more about KYC verification and how to verify accounts on the platform.',
+            href: 'https://documentation.opencollective.com/fiscal-hosts/know-your-customer-kyc',
+            title: 'Know Your Customer (KYC)',
+            excerpt:
+              'KYC (Know Your Customer) verification is a critical process that helps organizations ensure compliance with regulatory requirements. It involves verifying the identity and legal information of account holders to prevent fraud and maintain security standards.',
           },
         ]}
       />

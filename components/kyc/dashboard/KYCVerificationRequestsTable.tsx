@@ -2,7 +2,11 @@ import React from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useIntl } from 'react-intl';
 
-import type { KycVerificationCollectionFieldsFragment, KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
+import type {
+  AccountHoverCardFieldsFragment,
+  KycVerificationCollectionFieldsFragment,
+  KycVerificationStatus,
+} from '@/lib/graphql/types/v2/graphql';
 import type { KycProvider } from '@/lib/graphql/types/v2/schema';
 
 import Avatar from '@/components/Avatar';
@@ -14,7 +18,9 @@ import { KYCVerificationDrawer } from '../drawer/KYCVerificationDrawer';
 import { KYCVerificationProviderBadge } from '../drawer/KYCVerificationProviderBadge';
 import { KYCVerificationStatusBadge } from '../KYCVerificationStatusBadge';
 
-export type KYCVerificationRow = KycVerificationCollectionFieldsFragment['nodes'][number];
+export type KYCVerificationRow = KycVerificationCollectionFieldsFragment['nodes'][number] & {
+  account: AccountHoverCardFieldsFragment;
+};
 
 function dateCell({ cell }) {
   const date = cell.getValue();

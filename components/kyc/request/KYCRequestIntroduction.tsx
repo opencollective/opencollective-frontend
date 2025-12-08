@@ -94,7 +94,7 @@ export function KYCRequestIntroduction(props: KYCRequestIntroductionProps) {
             className="mt-6"
             docs={[
               {
-                href: 'https://documentation.opencollective.com',
+                href: 'https://documentation.opencollective.com/fiscal-hosts/know-your-customer-kyc',
                 title: 'Know Your Customer (KYC)',
                 excerpt:
                   'KYC (Know Your Customer) verification is a critical process that helps organizations ensure compliance with regulatory requirements. It involves verifying the identity and legal information of account holders to prevent fraud and maintain security standards.',
