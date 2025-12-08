@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import type { FormikProps } from 'formik';
-import { Field } from 'formik';
+import { FastField, Field } from 'formik';
 import { pickBy } from 'lodash';
 import type { InputHTMLAttributes } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -26,6 +26,7 @@ export function FormField({
   privateMessage,
   validate,
   className,
+  isFastField = false,
   ...props
 }: {
   label?: string | React.ReactNode;
@@ -51,13 +52,15 @@ export function FormField({
   ref?: React.ForwardedRef<HTMLInputElement>;
   onFocus?: () => void;
   onChange?: (e) => void;
+  isFastField?: boolean;
 }) {
   const intl = useIntl();
   const htmlFor = props.htmlFor || `input-${name}`;
   const { schema } = useContext(FormikZodContext);
+  const FieldComponent = isFastField ? FastField : Field;
 
   return (
-    <Field name={name} validate={validate}>
+    <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => {
         const hasError = Boolean(meta.error && (meta.touched || form.submitCount)) || Boolean(customError);
         const error = customError || meta.error;
@@ -126,6 +129,6 @@ export function FormField({
           </div>
         );
       }}
-    </Field>
+    </FieldComponent>
   );
 }
