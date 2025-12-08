@@ -382,7 +382,7 @@ const Pricing = () => {
             </ListWrapper>
           </Box>
           <Container display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
-            <Link href="/signup/organization?active=true">
+            <Link href="/signup/organization?host=true">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', null, '160px']}

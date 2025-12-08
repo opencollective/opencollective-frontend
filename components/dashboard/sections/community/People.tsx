@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
@@ -11,13 +11,17 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Contributor } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 
+import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
+
 import Avatar from '../../../Avatar';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -51,7 +55,7 @@ const relationTypeFilter: FilterConfig<z.infer<typeof RelationTypeSchema>> = {
   },
 };
 
-const getColumns = ({ intl }) => {
+const getColumns = ({ intl, hasKYCFeature }) => {
   const account = {
     accessorKey: 'account',
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
@@ -120,7 +124,18 @@ const getColumns = ({ intl }) => {
     },
   };
 
-  return [account, email, country, relations];
+  let kycColumn = null;
+  if (hasKYCFeature) {
+    kycColumn = {
+      accessorKey: 'kycStatus',
+      header: 'KYC',
+      cell: ({ row }) => {
+        return <IndividualKYCStatus kycStatus={row.original.kycStatus} />;
+      },
+    };
+  }
+
+  return [account, email, kycColumn, country, relations].filter(Boolean);
 };
 
 enum ContributorsTab {
@@ -205,7 +220,14 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
   const loading = queryLoading;
   const error = queryError;
 
-  const columns = React.useMemo(() => getColumns({ intl }), [intl, queryFilter.activeViewId]);
+  const { account: dashboardAccount } = useContext(DashboardContext);
+
+  const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
+
+  const columns = React.useMemo(
+    () => getColumns({ intl, hasKYCFeature }),
+    [intl, queryFilter.activeViewId, hasKYCFeature],
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -247,7 +269,7 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
 
   if (!isEmpty(id)) {
     return (
-      <div className="max-w-(--breakpoint-lg)">
+      <div className="h-full max-w-(--breakpoint-lg)">
         <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
       </div>
     );

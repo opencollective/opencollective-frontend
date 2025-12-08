@@ -35,10 +35,7 @@ const accountConversionsQuery = gql`
   }
 `;
 
-const shouldDisplayConvertedAccountMessage = (
-  account: { host: Pick<Host, 'id'> },
-  activity: AccountConversionsQuery['activities']['nodes'][0],
-) => {
+const shouldDisplayConvertedAccountMessage = (activity: AccountConversionsQuery['activities']['nodes'][0]) => {
   if (!activity) {
     return false;
   }
@@ -75,7 +72,7 @@ export function ConvertedAccountMessage({
   );
 
   const latestConversionActivity = conversionData?.activities?.nodes?.[0]; // Activities are sorted by most recent first
-  if (!shouldDisplayConvertedAccountMessage(account, latestConversionActivity)) {
+  if (!shouldDisplayConvertedAccountMessage(latestConversionActivity)) {
     return null;
   }
 

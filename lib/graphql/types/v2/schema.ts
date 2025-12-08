@@ -24,6 +24,8 @@ export type Scalars = {
   JSON: { input: any; output: any; }
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { input: any; output: any; }
+  /** A reference to a KYC Verification */
+  KYCVerificationReferenceInput: { input: any; output: any; }
   /** The locale in the format of a BCP 47 (RFC 5646) standard string */
   Locale: { input: any; output: any; }
   /** A string that cannot be passed as an empty value */
@@ -98,6 +100,8 @@ export type Account = {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   /**
    * The internal database identifier of the collective (ie: 580)
    * @deprecated 2020-01-01: should only be used during the transition to GraphQL API v2.
@@ -284,6 +288,14 @@ export type AccountHostApplicationRequestsArgs = {
 export type AccountImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -1128,6 +1140,9 @@ export enum ActivityAndClassesType {
   FUND_EVENTS = 'FUND_EVENTS',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
+  KYC_REQUESTED = 'KYC_REQUESTED',
+  KYC_REVOKED = 'KYC_REVOKED',
+  KYC_VERIFIED = 'KYC_VERIFIED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1323,6 +1338,9 @@ export enum ActivityType {
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
+  KYC_REQUESTED = 'KYC_REQUESTED',
+  KYC_REVOKED = 'KYC_REVOKED',
+  KYC_VERIFIED = 'KYC_VERIFIED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1604,6 +1622,8 @@ export type Bot = Account & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -1786,6 +1806,14 @@ export type BotHostApplicationRequestsArgs = {
 export type BotImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents a Bot account */
+export type BotKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -2137,6 +2165,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   legacyPlan: HostPlan;
   /** The legal documents associated with this account */
@@ -2365,6 +2395,14 @@ export type CollectiveHostFeePercentArgs = {
 export type CollectiveImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents a Collective account */
+export type CollectiveKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -2658,6 +2696,7 @@ export type CollectiveFeatures = {
   EXPENSE_SECURITY_CHECKS?: Maybe<CollectiveFeatureStatus>;
   FUNDS_GRANTS_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
+  KYC?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
   ORDER?: Maybe<CollectiveFeatureStatus>;
@@ -4240,6 +4279,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -4472,6 +4513,14 @@ export type EventHostFeePercentArgs = {
 export type EventImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents an Event account */
+export type EventKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -5519,6 +5568,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -5743,6 +5794,14 @@ export type FundHostFeePercentArgs = {
 export type FundImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents an Project account */
+export type FundKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -6164,6 +6223,8 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   isTrustedHost: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   legacyPlan: HostPlan;
   /** The legal documents associated with this account */
@@ -6554,6 +6615,14 @@ export type HostHostedVirtualCardsArgs = {
 export type HostImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents an Host account */
+export type HostKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -7243,6 +7312,12 @@ export type Individual = Account & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** Verified KYC status, if any */
+  kycStatus: KycStatus;
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
+  /** KYC Verification requests to this account */
+  kycVerifications: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -7450,6 +7525,28 @@ export type IndividualImageUrlArgs = {
 /** This represents an Individual account */
 export type IndividualIsFollowingConversationArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/** This represents an Individual account */
+export type IndividualKycStatusArgs = {
+  requestedByAccount: AccountReferenceInput;
+};
+
+
+/** This represents an Individual account */
+export type IndividualKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Individual account */
+export type IndividualKycVerificationsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  requestedByAccounts?: InputMaybe<Array<AccountReferenceInput>>;
 };
 
 
@@ -7705,6 +7802,72 @@ export type InviteMemberInput = {
   since?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export enum KycProvider {
+  MANUAL = 'MANUAL'
+}
+
+export type KycProviderData = ManualKycProviderData;
+
+/** A individual KYC verified status */
+export type KycStatus = {
+  __typename?: 'KYCStatus';
+  manual?: Maybe<KycVerification>;
+};
+
+/** A KYC Verification */
+export type KycVerification = {
+  __typename?: 'KYCVerification';
+  /** The account that is verified */
+  account: Account;
+  /** Unique identifier for this KYC verification */
+  id: Scalars['String']['output'];
+  permissions: KycVerificationPermissions;
+  /** Provider used to make this KYC verification */
+  provider: KycProvider;
+  /** Provider specific data */
+  providerData: KycProviderData;
+  requestedAt: Scalars['DateTime']['output'];
+  /** The account that requested the KYC verification */
+  requestedByAccount: Account;
+  revokedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: KycVerificationStatus;
+  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Verified KYC data */
+  verifiedData: KycVerifiedData;
+};
+
+export type KycVerificationCollection = Collection & {
+  __typename?: 'KYCVerificationCollection';
+  limit?: Maybe<Scalars['Int']['output']>;
+  nodes?: Maybe<Array<KycVerification>>;
+  offset?: Maybe<Scalars['Int']['output']>;
+  totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+/** KYC Verification permissions */
+export type KycVerificationPermissions = {
+  __typename?: 'KYCVerificationPermissions';
+  /** Whether this KYC Verification can be revoked by the logged in user */
+  canRevokeKYCVerification: Scalars['Boolean']['output'];
+};
+
+export enum KycVerificationStatus {
+  EXPIRED = 'EXPIRED',
+  FAILED = 'FAILED',
+  PENDING = 'PENDING',
+  REVOKED = 'REVOKED',
+  VERIFIED = 'VERIFIED'
+}
+
+/** Verified KYC data */
+export type KycVerifiedData = {
+  __typename?: 'KYCVerifiedData';
+  /** Account legal address as verified by KYC */
+  legalAddress?: Maybe<Scalars['String']['output']>;
+  /** Account legal name as verified by KYC */
+  legalName?: Maybe<Scalars['String']['output']>;
+};
+
 /** Defines role of the last comment author */
 export enum LastCommentBy {
   /** Collective Admin */
@@ -7819,6 +7982,13 @@ export type Maximum_Virtual_Card_Limit_Amount_For_Interval = {
   PER_AUTHORIZATION?: Maybe<Amount>;
   WEEKLY?: Maybe<Amount>;
   YEARLY?: Maybe<Amount>;
+};
+
+/** Manual KYC data */
+export type ManualKycProviderData = {
+  __typename?: 'ManualKYCProviderData';
+  /** Notes added during manual verification */
+  notes: Scalars['String']['output'];
 };
 
 export enum MarkAsUnPaidExpenseStatus {
@@ -8166,6 +8336,8 @@ export type Mutation = {
   removeTwoFactorAuthTokenFromIndividual: Individual;
   /** Endpoint to accept or reject an invitation to become a member. Scope: "account". */
   replyToMemberInvitation: Scalars['Boolean']['output'];
+  /** Requests an account to be verified using a KYC provider */
+  requestKYCVerification: KycVerification;
   /** Request Virtual Card to host. Scope: "virtualCards". */
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
@@ -8174,6 +8346,8 @@ export type Mutation = {
   restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
+  /** Revoke the KYC Verification */
+  revokeKYCVerification: KycVerification;
   /** Revoke an OAuth authorization. Scope: "account". */
   revokeOAuthAuthorization: OAuthAuthorization;
   /** [Root only] Anonymizes an account */
@@ -9107,6 +9281,15 @@ export type MutationReplyToMemberInvitationArgs = {
 
 
 /** This is the root mutation */
+export type MutationRequestKycVerificationArgs = {
+  provider: KycProvider;
+  request: RequestKycVerificationInput;
+  requestedByAccount: AccountReferenceInput;
+  verifyAccount: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationRequestVirtualCardArgs = {
   account: AccountReferenceInput;
   budget?: InputMaybe<Scalars['Int']['input']>;
@@ -9132,6 +9315,12 @@ export type MutationRestorePayoutMethodArgs = {
 /** This is the root mutation */
 export type MutationResumeVirtualCardArgs = {
   virtualCard: VirtualCardReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationRevokeKycVerificationArgs = {
+  kycVerification: Scalars['KYCVerificationReferenceInput']['input'];
 };
 
 
@@ -9815,6 +10004,8 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   legacyPlan: HostPlan;
   /** The legal documents associated with this account */
@@ -10032,6 +10223,14 @@ export type OrganizationHostApplicationRequestsArgs = {
 export type OrganizationImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents an Organization account */
+export type OrganizationKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -11152,6 +11351,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -11378,6 +11579,14 @@ export type ProjectHostFeePercentArgs = {
 export type ProjectImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents an Project account */
+export type ProjectKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 
@@ -12178,6 +12387,16 @@ export enum RefundKind {
   /** Rejection issued by the host or collective admin */
   REJECT = 'REJECT'
 }
+
+export type RequestKycVerificationInput = {
+  manual?: InputMaybe<RequestManualKycVerificationInput>;
+};
+
+export type RequestManualKycVerificationInput = {
+  legalAddress: Scalars['String']['input'];
+  legalName: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type SearchResponse = {
   __typename?: 'SearchResponse';
@@ -13553,6 +13772,8 @@ export type Vendor = Account & AccountWithContributions & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -13763,6 +13984,14 @@ export type VendorHostApplicationRequestsArgs = {
 export type VendorImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents a Vendor account */
+export type VendorKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
 };
 
 

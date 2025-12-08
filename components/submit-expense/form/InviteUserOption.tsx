@@ -1,10 +1,12 @@
 import React from 'react';
+import { useFormikContext } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { suggestSlug } from '@/lib/collective';
 import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
-import StyledInputFormikField from '../../StyledInputFormikField';
-import { InputGroup } from '../../ui/Input';
+import { FormField } from '../../FormField';
+import { Input, InputGroup } from '../../ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { Textarea } from '../../ui/Textarea';
 import { type ExpenseForm, InviteeAccountType } from '../useExpenseForm';
@@ -49,7 +51,11 @@ export function InviteUserOption(props: InviteUserOptionProps) {
               <NewIndividualInviteeForm disableEmailField={lockEmail} hideNotesField={props.hideNotesField} />
             </TabsContent>
             <TabsContent value={InviteeAccountType.ORGANIZATION}>
-              <NewOrganizationInviteeForm disableEmailField={lockEmail} hideNotesField={props.hideNotesField} />
+              <NewOrganizationInviteeForm
+                disableEmailField={lockEmail}
+                hideNotesField={props.hideNotesField}
+                setFieldValue={setFieldValue}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -62,13 +68,13 @@ function NewIndividualInviteeForm(props: { hideNotesField?: boolean; disableEmai
   const intl = useIntl();
   return (
     <fieldset className="flex flex-col gap-4">
-      <StyledInputFormikField
+      <FormField
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Contact name', id: 'ContactName' })}
         name="inviteeNewIndividual.name"
       />
 
-      <StyledInputFormikField
+      <FormField
         disabled={props.disableEmailField}
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Email address', id: 'User.EmailAddress' })}
@@ -76,29 +82,50 @@ function NewIndividualInviteeForm(props: { hideNotesField?: boolean; disableEmai
       />
 
       {!props.hideNotesField && (
-        <StyledInputFormikField
+        <FormField
           isFastField
-          label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
+          label={intl.formatMessage({ defaultMessage: 'Notes for the recipient', id: '1Wu0qx' })}
+          required={false}
           name="inviteNote"
         >
           {({ field }) => <Textarea className="w-full" {...field} />}
-        </StyledInputFormikField>
+        </FormField>
       )}
     </fieldset>
   );
 }
 
-function NewOrganizationInviteeForm(props: { hideNotesField?: boolean; disableEmailField?: boolean }) {
+function NewOrganizationInviteeForm(props: {
+  hideNotesField?: boolean;
+  disableEmailField?: boolean;
+  setFieldValue: ExpenseForm['setFieldValue'];
+}) {
   const intl = useIntl();
+  const { touched } = useFormikContext<ExpenseForm['values']>();
   return (
     <fieldset className="flex flex-col gap-4">
-      <StyledInputFormikField
+      <FormField
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Name of the organization', id: 'KZfQ/g' })}
         name="inviteeNewOrganization.organization.name"
-      />
+      >
+        {({ field }) => (
+          <Input
+            className="w-full"
+            type="text"
+            {...field}
+            onChange={e => {
+              field.onChange(e);
+              props.setFieldValue('inviteeNewOrganization.organization.name', e.target.value);
+              if (!touched.inviteeNewOrganization?.organization?.slug) {
+                props.setFieldValue('inviteeNewOrganization.organization.slug', suggestSlug(e.target.value));
+              }
+            }}
+          />
+        )}
+      </FormField>
 
-      <StyledInputFormikField
+      <FormField
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Set profile URL', id: 'ieO6cP' })}
         name="inviteeNewOrganization.organization.slug"
@@ -106,28 +133,29 @@ function NewOrganizationInviteeForm(props: { hideNotesField?: boolean; disableEm
         {({ field }) => (
           <InputGroup className="w-full" prepend="opencollective.com/" id="organizationSlug" type="text" {...field} />
         )}
-      </StyledInputFormikField>
+      </FormField>
 
-      <StyledInputFormikField
+      <FormField
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Organization Website', id: 'uN6AOo' })}
         name="inviteeNewOrganization.organization.website"
+        required={false}
       >
         {({ field }) => <InputGroup className="w-full" prepend="https://" type="text" {...field} />}
-      </StyledInputFormikField>
+      </FormField>
 
-      <StyledInputFormikField
+      <FormField
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Organization Description', id: 'rClz3r' })}
         name="inviteeNewOrganization.organization.description"
       />
-      <StyledInputFormikField
+      <FormField
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Contact name', id: 'ContactName' })}
         name="inviteeNewOrganization.name"
       />
 
-      <StyledInputFormikField
+      <FormField
         disabled={props.disableEmailField}
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Email Address', id: 'xxQxLE' })}
@@ -135,13 +163,14 @@ function NewOrganizationInviteeForm(props: { hideNotesField?: boolean; disableEm
       />
 
       {!props.hideNotesField && (
-        <StyledInputFormikField
+        <FormField
           isFastField
-          label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
+          label={intl.formatMessage({ defaultMessage: 'Notes for the recipient', id: '1Wu0qx' })}
+          required={false}
           name="inviteNote"
         >
           {({ field }) => <Textarea className="w-full" {...field} />}
-        </StyledInputFormikField>
+        </FormField>
       )}
     </fieldset>
   );

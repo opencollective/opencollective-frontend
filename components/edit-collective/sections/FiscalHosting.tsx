@@ -183,9 +183,6 @@ const FiscalHosting = ({ collective, account }) => {
 
   return (
     <div className="mb-10 flex w-full flex-col gap-4">
-      <p>
-        <FormattedMessage defaultMessage="Manage the platform functionalities for your organization" id="CETJRY" />
-      </p>
       <div className="mt-4 flex w-full flex-col gap-4">
         <div>
           <SettingsSectionTitle className="mb-2">
@@ -194,7 +191,7 @@ const FiscalHosting = ({ collective, account }) => {
           <p className="text-sm text-gray-700 md:max-w-4/5">
             <FormattedMessage
               id="FiscalHosting.Functionalities.description"
-              defaultMessage="Making contributions on the platform or getting paid on behalf of the organization are platform basics. Activate additional functionalities to do more on the platform."
+              defaultMessage="Making financial contributions or getting paid are basic platform functionalities. Activate additional functionalities to do more on the platform."
             />
           </p>
         </div>
@@ -209,7 +206,7 @@ const FiscalHosting = ({ collective, account }) => {
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
-                defaultMessage="Receive and disburse money on the platform along with crowdfunding. Additionally manage funds and grants."
+                defaultMessage="Receive contributions, hold a balance, and pay expenses on the platform. Create and manage projects and events to organize your work."
                 id="FiscalHosting.moneyManagement.description"
               />
             </p>
@@ -239,7 +236,7 @@ const FiscalHosting = ({ collective, account }) => {
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
-                defaultMessage="Provide fiscal services for collectives and manage funds for grant distribution along with fundraising and paying expenses."
+                defaultMessage="Host collectives, hold their balances, and manage their contributions and expenses. Support groups through funds and grants."
                 id="FiscalHosting.fiscalHost.description"
               />
             </p>
