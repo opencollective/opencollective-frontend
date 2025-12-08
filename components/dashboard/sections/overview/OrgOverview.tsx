@@ -99,6 +99,7 @@ export function OrgOverview() {
           </div>
         }
       />
+      <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
       {hasMoneyManagement ? (
         <React.Fragment>
           {account.platformSubscription && (
@@ -111,12 +112,10 @@ export function OrgOverview() {
               </CollapsibleContent>
             </Collapsible>
           )}
-          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <OrgOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       )}
