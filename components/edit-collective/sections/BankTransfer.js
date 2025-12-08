@@ -144,7 +144,7 @@ const BankTransfer = props => {
           </SettingsSectionTitle>
 
           <Box>
-            <p className="text-sm">
+            <p className="text-sm text-gray-700">
               {data.host.plan.manualPayments ? (
                 <FormattedMessage
                   id="paymentMethods.manual.add.info"
