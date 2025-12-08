@@ -1252,16 +1252,7 @@ function buildFormSchema(
 
               return true;
             }, requiredMessage),
-          website: z
-            .string()
-            .nullish()
-            .refine(website => {
-              if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-                return !isEmpty(website);
-              }
-
-              return true;
-            }, requiredMessage),
+          website: z.string().nullish(),
           description: z
             .string()
             .nullish()
