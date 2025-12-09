@@ -116,7 +116,7 @@ export function ConvertedAccountMessage({
                     <React.Fragment>
                       <FormattedMessage
                         id="Organization.Converted.Description"
-                        defaultMessage="We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to."
+                        defaultMessage="We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to."
                       />
                       <div className="mt-3">
                         <Link
