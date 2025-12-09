@@ -1,11 +1,15 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
+import { AlertTriangle, Settings } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import { getI18nLink } from '@/components/I18nFormatters';
+import Link from '@/components/Link';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 
 import { Button } from '../../../ui/Button';
@@ -101,6 +105,27 @@ export function OrgOverview() {
         }
       />
       <ConvertedAccountMessage account={account} />
+      {!account.legalName && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>
+            <FormattedMessage defaultMessage="Missing a legal name" id="WgAAJo" />
+          </AlertTitle>
+          <AlertDescription className="mt-2">
+            <FormattedMessage
+              defaultMessage="Organizations need to set a legal name to be compliant with regulations. <Link>Set your legal name</Link> to ensure compliance."
+              id="PVdvtY"
+              values={{
+                Link: getI18nLink({
+                  as: Link,
+                  href: `/dashboard/${account.slug}/info?autofocus=legalName`,
+                  icon: <Settings className="mr-1 inline-block h-4 w-4 align-middle" />,
+                }),
+              }}
+            />
+          </AlertDescription>
+        </Alert>
+      )}
       <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
       {hasMoneyManagement ? (
         <React.Fragment>

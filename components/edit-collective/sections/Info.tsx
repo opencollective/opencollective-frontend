@@ -4,6 +4,7 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { get, isEqual, isNil, isUndefined, pick } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -185,6 +186,7 @@ type FormValuesSchema = z.infer<typeof formSchema>;
 
 const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 'slug'> }) => {
   const intl = useIntl();
+  const router = useRouter();
   const { showConfirmationModal } = useModal();
   const { refetchLoggedInUser } = useLoggedInUser();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
@@ -361,6 +363,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
               <FormField
                 name="legalName"
                 label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
+                autoFocus={router.query.autofocus === 'legalName'}
                 placeholder={
                   account.type === INDIVIDUAL
                     ? 'e.g. Miles Davis, John Coltrane, Ella Fitzgerald'
