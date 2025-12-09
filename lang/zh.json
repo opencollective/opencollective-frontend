@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "没有匹配给定过滤的贡献。<ResetLink>重置</ResetLink>以查看所有贡献。",
   "organization": "我的组织",
   "organization.collective.memberOf.collective.host.title": "我们正在托管 {n, plural, other {{n} 个集体}}的财务",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "创建组织",
   "organization.created": "你的组织已创建。",
   "organization.created.description": "你现在可以作为组织提供财务贡献。 你也可以编辑你的个人资料，添加团队成员，并且将信用卡与每月限额联系起来。",

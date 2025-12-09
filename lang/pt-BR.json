@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "Nenhuma contribuição corresponde aos filtros indicados. <ResetLink>Redefinir</ResetLink> para ver tudo.",
   "organization": "Minhas Organizações",
   "organization.collective.memberOf.collective.host.title": "Estamos hospedando fiscalmente {n, plural, one {este Coletivo} other {{n} Coletivos}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Criar Organização",
   "organization.created": "Sua Organização foi criada.",
   "organization.created.description": "Agora você pode fazer contribuições financeiras como uma Organização. Você também pode editar seu perfil, adicionar membros da equipe e associar um cartão de crédito a um limite mensal.",

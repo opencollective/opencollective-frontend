@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "Keine Beiträge stimmen mit den angegebenen Filtern überein. <ResetLink>Zurücksetzen</ResetLink> um alle anzuzeigen.",
   "organization": "Meine Organisationen",
   "organization.collective.memberOf.collective.host.title": "Wir sind Finanzträger von {n, plural, one {diesem Kollektiv} other {{n} Kollektiven}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Erstelle eine Organisation",
   "organization.created": "Deine Organisation wurde erstellt.",
   "organization.created.description": "Du kannst jetzt als Organisation finanzielle Beiträge leisten. Du kannst auch dein Profil bearbeiten, Teammitglieder hinzufügen und eine Kreditkarte mit einem monatlichen Limit verknüpfen.",

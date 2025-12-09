@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "Inga bidrag matchar de angivna filterna. <ResetLink>Återställ</ResetLink> för att se alla.",
   "organization": "Mina organisationer",
   "organization.collective.memberOf.collective.host.title": "Vi är värdar för {n, plural, one {detta kollektiv} other {{n} kollektiv}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Skapa organisation",
   "organization.created": "Din organisation har skapats.",
   "organization.created.description": "Du kan nu göra ekonomiska bidrag som en organisation. Du kan också redigera din profil, lägga till teammedlemmar och associera ett kreditkort med en månatlig gräns.",

@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "אין תרומות בפילוח המבוקש. אפשר <ResetLink>לאפס</ResetLink> כדי לראות את הכל.",
   "organization": "הארגונים שלי",
   "organization.collective.memberOf.collective.host.title": "אנחנו מארחים את {n, plural,one {הקבוצה הזו}other {{n} הקבוצות}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "יצירת ארגון",
   "organization.created": "הארגון שלך נוצר.",
   "organization.created.description": "כעת ניתן לתמוך כארגון. ניתן גם לערוך את הפרופיל, להוסיף חברי צוות, ולחבר כרטיס אשראי עם תקרת חיוב חדשית.",

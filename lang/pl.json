@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "Żaden wkład nie pasuje do podanych filtrów. <ResetLink>Resetuj</ResetLink>, aby zobaczyć wszystkie.",
   "organization": "Moje organizacje",
   "organization.collective.memberOf.collective.host.title": "Jesteśmy gospodarzem podatkowym {n, plural, one {{n} zbiórki} few {{n} zbiórek} many {{n} zbiórek} other {{n} zbiórek}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Stwórz organizację",
   "organization.created": "Twoja organizacja została utworzona.",
   "organization.created.description": "Teraz możesz wnosić wkłady finansowe jako Organizacja. Możesz również edytować swój profil, dodawać członków zespołu i powiązać kartę kredytową z miesięcznym limitem.",

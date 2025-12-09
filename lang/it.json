@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "No contributions match the given filters. <ResetLink>Reset</ResetLink> to see all.",
   "organization": "My Organizations",
   "organization.collective.memberOf.collective.host.title": "We are fiscally hosting {n, plural, one {this Collective} other {{n} Collectives}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Crea organizzazione",
   "organization.created": "La tua Organizzazione è stata creata.",
   "organization.created.description": "You can now make financial contributions as an Organization. You can also edit your profile, add team members, and associate a credit card with a monthly limit.",

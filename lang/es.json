@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "No hay contribuciones que coincidan con los filtros dados. <ResetLink>Reinicia</ResetLink> para ver todo.",
   "organization": "Mis Organizaciones",
   "organization.collective.memberOf.collective.host.title": "Somos anfitriones fiscales para {n, plural, one {este Colectivo} other {{n} Colectivos}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Crear una Organización",
   "organization.created": "Se ha creado su organización.",
   "organization.created.description": "Ahora puedes hacer contribuciones financieras como Organización. También puedes editar tu perfil, añadir miembros del equipo y asociar una tarjeta de crédito con un límite mensual.",

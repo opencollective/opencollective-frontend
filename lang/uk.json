@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "No contributions match the given filters. <ResetLink>Reset</ResetLink> to see all.",
   "organization": "Мої організації",
   "organization.collective.memberOf.collective.host.title": "Ми фіскальний агент {n, plural, one {цього Колективу} other {{n} Колективів}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Створити організацію",
   "organization.created": "Вашу організацію створено.",
   "organization.created.description": "You can now make financial contributions as an Organization. You can also edit your profile, add team members, and associate a credit card with a monthly limit.",

@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "Zadaným filtrom nevyhovuje žiadny príspevok. <ResetLink>Resetovať</ResetLink> pre zobrazenie všetkých príspevkov.",
   "organization": "Moje organizácie",
   "organization.collective.memberOf.collective.host.title": "Fiškálne hostíme {n, plural, one {tento Kolektív} few {{n} Kolektívy} other {{n} Kolektívov}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Vytvoriť organizáciu",
   "organization.created": "Vaša organizácia bola vytvorená.",
   "organization.created.description": "Odteraz môžete poskytovať finančné príspevky ako Organizácia. Môžete tiež upravovať váš profil, pridávať členov tímu a priradiť kreditnú kartu s mesačným limitom.",

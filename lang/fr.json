@@ -3069,7 +3069,7 @@
   "OrdersList.Empty": "Aucune contribution ne correspond aux filtres sélectionnés. <ResetLink>Réinitialiser</ResetLink> pour tout voir.",
   "organization": "Mes organisations",
   "organization.collective.memberOf.collective.host.title": "Nous hébergeons fiscalement {n, plural, one {ce collectif} other {{n} collectifs}}",
-  "Organization.Converted.Description": "We've automatically converted your independent collective to an Organization. This has no impact on the features you have access to.",
+  "Organization.Converted.Description": "We've automatically converted your Independent Collective to an Organization. This has no impact on the features you have access to.",
   "organization.create": "Créer une Organisation",
   "organization.created": "Votre Organisation a été créée.",
   "organization.created.description": "Vous pouvez maintenant effectuer des contributions en tant qu'Organisation. Vous pouvez également modifier le profil de votre Organisation, ajouter des membres et des administrateurs, et ajouter une carte de crédit avec une limite mensuelle.",
