@@ -216,6 +216,10 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: '<Account></Account> converted to Organization',
     id: 'Gj4ZS9',
   },
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE: {
+    defaultMessage: '<Account></Account> converted to Collective',
+    id: 'fwgTtu',
+  },
   COLLECTIVE_REJECTED: {
     defaultMessage: '<Account></Account> application rejected',
     id: 'BZnKES',

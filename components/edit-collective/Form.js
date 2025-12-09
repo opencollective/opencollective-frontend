@@ -45,6 +45,7 @@ import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserSecurity from './sections/UserSecurity';
 import Webhooks from './sections/Webhooks';
+import { ConvertToCollective } from './ConvertToCollective';
 import { ConvertToOrganization } from './ConvertToOrganization';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -162,6 +163,7 @@ class EditCollectiveForm extends React.Component {
             )}
             <Archive collective={collective} />
             {[COLLECTIVE].includes(collective.type) && <ConvertToOrganization collective={collective} />}
+            {collective.type === ORGANIZATION && <ConvertToCollective collective={collective} />}
             <Delete collective={collective} />
           </div>
         );

@@ -26,6 +26,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
@@ -237,6 +238,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
             </Popover>
           }
         />
+        <ConvertedAccountMessage account={account} />
         <Filterbar hideSeparator {...queryFilter} />
 
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">

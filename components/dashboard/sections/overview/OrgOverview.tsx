@@ -12,6 +12,7 @@ import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
 import { PlatformBillingOverviewCard } from './PlatformBillingOverviewCard';
@@ -99,6 +100,7 @@ export function OrgOverview() {
           </div>
         }
       />
+      <ConvertedAccountMessage account={account} />
       <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
       {hasMoneyManagement ? (
         <React.Fragment>
