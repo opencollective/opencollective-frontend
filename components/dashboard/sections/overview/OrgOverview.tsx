@@ -16,7 +16,7 @@ import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
 import { PlatformBillingOverviewCard } from './PlatformBillingOverviewCard';
-import { SetupGuideCard } from './SetupGuide';
+import { WelcomeOrganization } from './Welcome';
 
 const editAccountSettingMutation = gql`
   mutation UpdateSetupGuideState($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -101,6 +101,7 @@ export function OrgOverview() {
         }
       />
       <ConvertedAccountMessage account={account} />
+      <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
       {hasMoneyManagement ? (
         <React.Fragment>
           {account.platformSubscription && (
@@ -113,12 +114,10 @@ export function OrgOverview() {
               </CollapsibleContent>
             </Collapsible>
           )}
-          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <OrgOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       )}

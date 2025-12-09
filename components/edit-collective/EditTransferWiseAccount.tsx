@@ -201,7 +201,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
           </MessageBox>
         )}
 
-        <Button size="sm" className="mt-2 w-fit" variant="outline" type="submit" onClick={handleConnect}>
+        <Button size="sm" className="w-fit" type="submit" onClick={handleConnect}>
           <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
         </Button>
       </React.Fragment>

@@ -79,7 +79,7 @@ export function ConvertedAccountMessage({
   return (
     <DismissibleMessage messageId={HELP_MESSAGE.ORGANIZATION_CONVERTED} accountId={account.legacyId}>
       {({ dismiss }) => (
-        <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+        <div className="mb-6 rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
           <div className="flex items-start gap-3">
             <Info className="mt-0.5 h-5 w-5 shrink-0" />
             <div className="flex-1">
