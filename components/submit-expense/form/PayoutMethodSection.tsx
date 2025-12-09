@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import {
   type EditPayoutMethodMutation,
   type EditPayoutMethodMutationVariables,
@@ -39,6 +39,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { updateAccountLegalNameMutation } from './mutations';
 import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type PayoutMethodSectionProps = {
@@ -551,39 +552,18 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const [keepNameDifferent, setKeepNameDifferent] = React.useState(false);
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
 
-  const [submitLegalNameMutation, { loading }] = useMutation(
-    gqlV1`
-    mutation UpdatePayoutProfileLegalName($input: CollectiveInputType!) {
-      editCollective(collective: $input) {
-        id
-        legalName
-      }
-    }
-  `,
-    {
-      variables: {
-        input: {
-          id: props.payee?.legacyId,
-          legalName: props.payoutMethod.data?.accountHolderName,
-        },
-      },
-      update(cache, result) {
-        cache.writeFragment({
-          id: `Individual:${props.payee?.id}`,
-          fragment: gql`
-            fragment PayoutProfile on Account {
-              legalName
-            }
-          `,
-          data: {
-            legalName: result.data.editCollective.legalName,
-          },
-        });
-
-        props.refresh?.();
+  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
+    context: API_V2_CONTEXT,
+    variables: {
+      account: {
+        id: props.payee?.id,
+        legalName: props.payoutMethod.data?.accountHolderName,
       },
     },
-  );
+    onCompleted: () => {
+      props.refresh?.();
+    },
+  });
 
   const onUpdateLegalNameToMatch = React.useCallback(async () => {
     try {

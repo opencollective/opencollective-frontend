@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash';
 import { Lock } from 'lucide-react';
@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
@@ -34,6 +34,7 @@ import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
 import { InviteUserOption } from './InviteUserOption';
+import { updateAccountLegalNameMutation } from './mutations';
 
 type WhoIsGettingPaidSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -425,37 +426,15 @@ function LegalNameWarning(props: {
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
   const timeoutRef = React.useRef(null);
 
-  const [submitLegalNameMutation, { loading }] = useMutation(
-    gqlV1`
-    mutation UpdatePayoutProfileLegalName($input: CollectiveInputType!) {
-      editCollective(collective: $input) {
-        id
-        legalName
-      }
-    }
-  `,
-    {
-      variables: {
-        input: {
-          id: props.account.legacyId,
-          legalName,
-        },
-      },
-      update(cache, result) {
-        cache.writeFragment({
-          id: `Individual:${props.account.id}`,
-          fragment: gql`
-            fragment PayoutProfile on Account {
-              legalName
-            }
-          `,
-          data: {
-            legalName: result.data.editCollective.legalName,
-          },
-        });
+  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
+    context: API_V2_CONTEXT,
+    variables: {
+      account: {
+        id: props.account.id,
+        legalName,
       },
     },
-  );
+  });
 
   const { onLegalNameUpdate } = props;
   const handleLegalNameUpdate = React.useCallback(() => {
