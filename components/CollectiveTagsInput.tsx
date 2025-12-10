@@ -109,7 +109,7 @@ function CollectiveTagsInput({
   suggestedTags?: string[];
 }) {
   const intl = useIntl();
-  const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery, {});
+  const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery);
   const [debouncing, setDebouncing] = useState<boolean>(false);
   const loading = fetching || debouncing;
   const [input, setInput] = useState<string>('');

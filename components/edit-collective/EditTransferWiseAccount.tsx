@@ -3,12 +3,12 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import { connectAccount } from '@/lib/api';
-import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 import { i18nGraphqlException } from '@/lib/errors';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { EditTransferWiseAccountQuery } from '@/lib/graphql/types/v2/graphql';
 import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
+import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';

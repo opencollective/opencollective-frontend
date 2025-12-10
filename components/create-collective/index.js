@@ -177,7 +177,6 @@ const tagStatsQuery = gql`
 
 const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   name: 'createCollective',
-  options: {},
 });
 
 const addTagStatsQuery = graphql(tagStatsQuery, {

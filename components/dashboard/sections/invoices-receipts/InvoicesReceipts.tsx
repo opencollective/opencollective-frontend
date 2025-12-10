@@ -8,8 +8,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { editCollectiveSettingsMutation } from '../../../../lib/graphql/v1/mutations';
-import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import { hasAccountHosting } from '@/lib/collective';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';

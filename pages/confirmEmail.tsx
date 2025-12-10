@@ -140,7 +140,6 @@ const confirmUserEmailMutation = gql`
 
 const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
   name: 'confirmEmail',
-  options: {},
 });
 
 // next.js export

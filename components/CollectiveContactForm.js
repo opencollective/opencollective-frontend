@@ -27,7 +27,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose = undefine
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
-  const [submit, { data, loading }] = useMutation(sendMessageMutation, {});
+  const [submit, { data, loading }] = useMutation(sendMessageMutation);
   const { toast } = useToast();
 
   // Dispatch changes to onChange if set

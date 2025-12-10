@@ -374,7 +374,6 @@ const removePayoutMethodMutation = gql`
 
 const addRemovePayoutMethodMutation = graphql<PayoutMethodSelectProps>(removePayoutMethodMutation, {
   name: 'removePayoutMethod',
-  options: {},
 });
 
 export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect)));

@@ -121,8 +121,7 @@ const MoveReceivedContributions = () => {
   const tiersOptions = React.useMemo(() => getTiersOptions(tiersNodes, accountSettings), [tiersNodes, accountSettings]);
 
   // Move contributions mutation
-  const mutationOptions = {};
-  const [submitMoveContributions] = useMutation(moveOrdersMutation, mutationOptions);
+  const [submitMoveContributions] = useMutation(moveOrdersMutation);
   const moveContributions = async () => {
     try {
       // Prepare variables

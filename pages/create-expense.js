@@ -660,7 +660,6 @@ const createExpenseMutation = gql`
 
 const addCreateExpenseMutation = graphql(createExpenseMutation, {
   name: 'createExpense',
-  options: {},
 });
 
 const draftExpenseAndInviteUserMutation = gql`
@@ -675,7 +674,6 @@ const draftExpenseAndInviteUserMutation = gql`
 
 const addDraftExpenseAndInviteUserMutation = graphql(draftExpenseAndInviteUserMutation, {
   name: 'draftExpenseAndInviteUser',
-  options: {},
 });
 
 const addHoc = compose(

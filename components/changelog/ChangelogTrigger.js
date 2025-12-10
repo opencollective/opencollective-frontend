@@ -64,7 +64,6 @@ const setChangelogViewDateMutation = gql`
 
 const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
   name: 'setChangelogViewDate',
-  options: {},
 });
 
 export default withNewsAndUpdates(setChangelogViewDate(withApollo(ChangelogTrigger)));

@@ -62,8 +62,6 @@ const isAutoFocused = id => {
   return id && typeof window !== 'undefined' && get(window, 'location.hash') === `#${id}`;
 };
 
-const mutationOptions = {};
-
 /** A small helper to make the form work with params from both API V1 & V2 */
 const prepareCommentParams = (html, conversationId, expenseId, updateId, hostApplicationId) => {
   const comment = { html };
@@ -111,7 +109,7 @@ const CommentForm = ({
   submitButtonJustify,
   submitButtonVariant,
 }) => {
-  const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
+  const [createComment, { loading, error }] = useMutation(createCommentMutation);
   const intl = useIntl();
   const [html, setHtml] = useState('');
   const [resetValue, setResetValue] = useState();

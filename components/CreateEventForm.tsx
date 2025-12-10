@@ -136,7 +136,7 @@ export default function CreateEventForm({
 }) {
   const { toast } = useToast();
   const intl = useIntl();
-  const [createEventMutation, { loading: mutationLoading }] = useMutation(CREATE_EVENT_MUTATION, {});
+  const [createEventMutation, { loading: mutationLoading }] = useMutation(CREATE_EVENT_MUTATION);
   const eventSchema = React.useMemo(() => getSchema(intl), [intl]);
   const timezoneOptions = React.useMemo(
     () =>

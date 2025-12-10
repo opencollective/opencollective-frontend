@@ -371,7 +371,6 @@ class ConversationPage extends React.Component {
                           <H2 fontSize="24px" lineHeight="32px" mb={4} wordBreak="break-word">
                             <InlineEditField
                               mutation={editConversationMutation}
-                              mutationOptions={{}}
                               canEdit={canEdit}
                               values={conversation}
                               field="title"
@@ -464,7 +463,6 @@ class ConversationPage extends React.Component {
                               canEdit={canEdit}
                               values={conversation}
                               mutation={editConversationMutation}
-                              mutationOptions={{}}
                               prepareVariables={(value, draft) => ({
                                 ...value,
                                 tags: draft,

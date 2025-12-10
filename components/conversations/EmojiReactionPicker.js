@@ -116,8 +116,6 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
   }
 };
 
-const mutationOptions = {};
-
 /**
  * A component to render the reaction picker on comments.
  */
@@ -126,8 +124,8 @@ const EmojiReactionPicker = ({ comment = null, update = null }) => {
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
   const wrapperRef = React.useRef(undefined);
-  const [addReaction] = useMutation(addReactionMutation, mutationOptions);
-  const [removeReaction] = useMutation(removeReactionMutation, mutationOptions);
+  const [addReaction] = useMutation(addReactionMutation);
+  const [removeReaction] = useMutation(removeReactionMutation);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {

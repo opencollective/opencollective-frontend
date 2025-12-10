@@ -122,7 +122,6 @@ const createProjectMutation = gql`
 
 const addCreateProjectMutation = graphql(createProjectMutation, {
   name: 'createProject',
-  options: {},
 });
 
 export default withRouter(withUser(addCreateProjectMutation(CreateProject)));

@@ -1092,7 +1092,6 @@ const addCreateOrderMutation = graphql(
   `,
   {
     name: 'createOrder',
-    options: {},
   },
 );
 
@@ -1107,7 +1106,6 @@ const addConfirmOrderMutation = graphql(
   `,
   {
     name: 'confirmOrder',
-    options: {},
   },
 );
 

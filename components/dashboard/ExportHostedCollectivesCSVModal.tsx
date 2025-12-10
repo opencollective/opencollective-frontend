@@ -169,10 +169,8 @@ const ExportHostedCollectivesCSVModal = ({
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
 
-  const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] = useMutation(
-    editAccountSettingsMutation,
-    {},
-  );
+  const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
+    useMutation(editAccountSettingsMutation);
 
   const customFields = React.useMemo(
     () =>

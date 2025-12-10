@@ -138,7 +138,6 @@ const createFundMutation = gql`
 
 const addCreateFundMutation = graphql(createFundMutation, {
   name: 'createFund',
-  options: {},
 });
 
 export default withRouter(withUser(addCreateFundMutation(injectIntl(CreateFund))));

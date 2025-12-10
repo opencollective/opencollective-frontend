@@ -311,7 +311,6 @@ const deleteUpdateMutation = gql`
 
 const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   name: 'deleteUpdate',
-  options: {},
 });
 
 const addGraphql = compose(addDeleteUpdateMutation);

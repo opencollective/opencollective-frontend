@@ -45,8 +45,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const mutationOptions = {};
-  const [processOrder, { loading }] = useMutation(processPendingOrderMutation, mutationOptions);
+  const [processOrder, { loading }] = useMutation(processPendingOrderMutation);
   const [hasConfirm, setConfirm] = React.useState(false);
   const [showContributionConfirmationModal, setShowContributionConfirmationModal] = React.useState(false);
 

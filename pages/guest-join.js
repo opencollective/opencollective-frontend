@@ -52,8 +52,6 @@ const EmailRadioEntry = styled.div.attrs({ 'data-cy': 'guest-email-entry' })`
   }
 `;
 
-const MUTATION_OPTS = {};
-
 const JoinAsGuest = () => {
   const theme = useTheme();
   const [status, setStatus] = React.useState(STATUS.SUBMITTING);
@@ -61,7 +59,7 @@ const JoinAsGuest = () => {
   const guestEmails = getAllGuestEmails();
   const query = router?.query || {};
   const [selectedEmail, setSelectedEmail] = React.useState(null);
-  const [callSendGuestConfirmationEmail, { error }] = useMutation(confirmGuestAccountMutation, MUTATION_OPTS);
+  const [callSendGuestConfirmationEmail, { error }] = useMutation(confirmGuestAccountMutation);
   const submittedEmail = selectedEmail || guestEmails[0];
 
   const sendGuestConfirmationEmail = async email => {

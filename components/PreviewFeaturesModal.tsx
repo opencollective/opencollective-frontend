@@ -46,7 +46,7 @@ const FeatureListItem = ({
 const useTogglePreviewFeature = (feature: PreviewFeature, onManualFeatureUpdate: () => void) => {
   const { LoggedInUser, updateLoggedInUserFromCache } = useLoggedInUser();
   const [loading, setLoading] = React.useState(false);
-  const [submitEditSettings] = useMutation(editAccountSettingsMutation, {});
+  const [submitEditSettings] = useMutation(editAccountSettingsMutation);
 
   const togglePreviewFeature = async checked => {
     setLoading(true);

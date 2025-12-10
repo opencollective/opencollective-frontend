@@ -374,7 +374,6 @@ class SectionContribute extends React.PureComponent {
 
 const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
-  options: {},
 });
 
 export default addEditAccountSettingMutation(SectionContribute);

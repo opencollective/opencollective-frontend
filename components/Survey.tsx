@@ -47,7 +47,7 @@ export function Survey({
   hasParentTitle?: boolean;
 }) {
   const { LoggedInUser } = useLoggedInUser();
-  const [sendInAppSurveyResponse] = useMutation(sendSurveyResponseMutation, {});
+  const [sendInAppSurveyResponse] = useMutation(sendSurveyResponseMutation);
   const [score, setScore] = React.useState(null);
   const [text, setText] = React.useState('');
   const [completed, setCompleted] = React.useState(false);

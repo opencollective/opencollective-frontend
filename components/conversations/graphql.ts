@@ -94,5 +94,3 @@ export const editCommentMutation = gql`
   }
   ${commentFieldsFragment}
 `;
-
-export const mutationOptions = {};

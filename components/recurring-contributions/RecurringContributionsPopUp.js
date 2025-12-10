@@ -87,7 +87,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
   const intl = useIntl();
   const [cancelReason, setCancelReason] = useState('NO_LONGER_WANT_TO_SUPPORT');
   const [cancelReasonMessage, setCancelReasonMessage] = useState('');
-  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {});
+  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation);
 
   const mainMenu =
     menuState === 'mainMenu' &&

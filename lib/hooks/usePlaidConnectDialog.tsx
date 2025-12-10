@@ -107,14 +107,12 @@ export const usePlaidConnectDialog = ({
   const [generatePlaidToken, { data: plaidTokenData, reset: resetPlaidToken }] = useMutation<
     GeneratePlaidLinkTokenMutation,
     GeneratePlaidLinkTokenMutationVariables
-  >(generatePlaidLinkTokenMutation, {});
+  >(generatePlaidLinkTokenMutation);
   const [connectPlaidAccount] = useMutation<ConnectPlaidAccountMutation, ConnectPlaidAccountMutationVariables>(
     connectPlaidAccountMutation,
-    {},
   );
   const [refreshPlaidAccount] = useMutation<RefreshPlaidAccountMutation, RefreshPlaidAccountMutationVariables>(
     refreshPlaidAccountMutation,
-    {},
   );
   const linkToken = plaidTokenData?.generatePlaidLinkToken?.linkToken;
   const { open, ready } = usePlaidLink({

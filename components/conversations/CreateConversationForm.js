@@ -32,8 +32,6 @@ const createConversationMutation = gql`
   }
 `;
 
-const mutationOptions = {};
-
 const messages = defineMessages({
   titlePlaceholder: {
     id: 'CreateConversation.Title.Placeholder',
@@ -73,7 +71,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const intl = useIntl();
   const { slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
-  const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
+  const [createConversation, { error: submitError }] = useMutation(createConversationMutation);
   const [formPersister] = React.useState(new FormPersister());
   const [uploading, setUploading] = React.useState(false);
 

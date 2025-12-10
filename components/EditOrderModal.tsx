@@ -71,7 +71,7 @@ const cancelRecurringContributionMutation = gql`
 const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const intl = useIntl();
 
-  const [submitCancellation] = useMutation(cancelRecurringContributionMutation, {});
+  const [submitCancellation] = useMutation(cancelRecurringContributionMutation);
 
   const onSubmit = async values => {
     try {

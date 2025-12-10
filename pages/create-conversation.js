@@ -178,9 +178,7 @@ const createConversationPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const addCreateConversationPageData = graphql(createConversationPageQuery, {
-  options: {},
-});
+const addCreateConversationPageData = graphql(createConversationPageQuery);
 
 // next.js export
 // ts-unused-exports:disable-next-line

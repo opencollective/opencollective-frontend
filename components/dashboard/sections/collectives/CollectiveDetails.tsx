@@ -235,7 +235,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
   const [expenseTypes, setExpenseTypes] = React.useState(() => collective.settings?.expenseTypes || {});
   const isUsingGlobalSetttings = isEmpty(expenseTypes);
 
-  const [submitEditSettings, { loading, data }] = useMutation(editAccountSettingsMutation, {});
+  const [submitEditSettings, { loading, data }] = useMutation(editAccountSettingsMutation);
   const handleUpdate = async value => {
     const previousState = cloneDeep(expenseTypes);
     const variables = {

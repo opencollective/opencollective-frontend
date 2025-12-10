@@ -23,10 +23,7 @@ export const getServerSideProps = pricingPageQueryHelpers.getServerSideProps;
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function PricingPage() {
-  const { data } = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(
-    pricingPageQuery,
-    {},
-  );
+  const { data } = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(pricingPageQuery);
   return (
     <Page>
       <NewPricing data={data} />

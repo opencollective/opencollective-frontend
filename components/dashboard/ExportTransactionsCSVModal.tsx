@@ -262,10 +262,8 @@ const ExportTransactionsCSVModal = ({
     [isHostReport],
   );
 
-  const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] = useMutation(
-    editAccountSettingsMutation,
-    {},
-  );
+  const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
+    useMutation(editAccountSettingsMutation);
 
   const customFields = React.useMemo(
     () =>

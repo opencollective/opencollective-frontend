@@ -107,8 +107,6 @@ export const confirmCreditCardMutation = gql`
   ${paymentMethodResponseFragment}
 `;
 
-const mutationOptions = {};
-
 const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
   if (!paymentMethods) {
     return null;
@@ -166,7 +164,7 @@ const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentM
 
 export const useUpdatePaymentMethod = contribution => {
   const { toast } = useToast();
-  const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation, mutationOptions);
+  const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation);
 
   return {
     isSubmitting: loading,
@@ -226,8 +224,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
 
     fetchPolicy: 'network-only',
   });
-  const [submitAddPaymentMethod] = useMutation(addCreditCardMutation, mutationOptions);
-  const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation, mutationOptions);
+  const [submitAddPaymentMethod] = useMutation(addCreditCardMutation);
+  const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation);
 
   const handleAddPaymentMethodResponse = async response => {
     const { paymentMethod, stripeError } = response;

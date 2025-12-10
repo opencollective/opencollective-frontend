@@ -140,8 +140,6 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-const mutationOptions = {};
-
 const CommentActions = ({
   comment,
   anchorHash,
@@ -160,7 +158,7 @@ const CommentActions = ({
   const [showAdminActions, setShowAdminActions] = React.useState(false);
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
-  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
+  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation);
   const { styles, attributes, state } = usePopper(refElement, popperElement, {
     placement: 'bottom-end',
     modifiers: REACT_POPPER_MODIFIERS,

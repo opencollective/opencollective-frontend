@@ -175,7 +175,6 @@ class ConnectedCollectives extends React.PureComponent {
 
 const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
-  options: {},
 });
 
 export default injectIntl(addEditAccountSettingMutation(ConnectedCollectives));

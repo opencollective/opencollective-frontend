@@ -299,7 +299,6 @@ const setPasswordMutation = gql`
 const addGraphql = compose(
   graphql(setPasswordMutation, {
     name: 'setPassword',
-    options: {},
   }),
   graphql(accountHasTwoFactorAuthQuery, {
     options: props => ({

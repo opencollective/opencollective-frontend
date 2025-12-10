@@ -159,7 +159,6 @@ const confirmOrderMutation = gql`
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   name: 'confirmOrder',
-  options: {},
 });
 
 // next.js export
