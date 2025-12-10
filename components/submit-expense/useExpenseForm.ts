@@ -695,9 +695,30 @@ function buildFormSchema(
         return slug && !slug.startsWith('__');
       }, requiredMessage)
       .refine(
-        accountSlug =>
-          accountSlug &&
-          (values.expenseTypeOption === ExpenseType.GRANT || supportsBaseExpenseTypes(options.supportedExpenseTypes)),
+        accountSlug => {
+          if (!accountSlug) {
+            return false;
+          }
+          if (!options.supportedExpenseTypes) {
+            return true;
+          }
+
+          if (
+            values.expenseTypeOption === ExpenseType.GRANT &&
+            !options.supportedExpenseTypes.includes(ExpenseType.GRANT)
+          ) {
+            return false;
+          }
+
+          if (
+            values.expenseTypeOption !== ExpenseType.GRANT &&
+            !supportsBaseExpenseTypes(options.supportedExpenseTypes)
+          ) {
+            return false;
+          }
+
+          return true;
+        },
         () => ({
           message: intl.formatMessage({
             defaultMessage: 'The selected account does not support expense submissions.',
@@ -1425,19 +1446,7 @@ async function buildFormOptions(
 
     if (account?.supportedExpenseTypes) {
       options.supportedExpenseTypes = account.supportedExpenseTypes;
-      if (
-        values.expenseTypeOption === ExpenseType.GRANT &&
-        account.type === CollectiveType.FUND &&
-        !options.supportedExpenseTypes.includes(ExpenseType.GRANT)
-      ) {
-        options.supportedExpenseTypes.push(ExpenseType.GRANT);
-      }
-
-      if (
-        values.expenseTypeOption !== ExpenseType.GRANT &&
-        !supportsBaseExpenseTypes(options.supportedExpenseTypes) &&
-        !query.loading
-      ) {
+      if (!supportsBaseExpenseTypes(options.supportedExpenseTypes) && !query.loading) {
         options.hasInvalidAccount = true;
       }
     }
