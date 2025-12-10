@@ -7,7 +7,7 @@ import { Popper } from 'react-popper';
 import { styled } from 'styled-components';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import withViewport from '../lib/withViewport';
 
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
@@ -136,7 +136,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
   }
 
   return createPortal(
-    <Mutation mutation={editPublicMessageMutation}>
+    <Mutation mutation={editPublicMessageMutation} context={API_V1_CONTEXT}>
       {(submitMessage, { loading, error }) => (
         <Popper
           referenceElement={cardRef.current}
