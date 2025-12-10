@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { useMutation } from '@apollo/client';
 import { Megaphone, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
@@ -13,13 +16,45 @@ import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
+import { editAccountSettingMutation } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
+import { WelcomeIndividual } from './Welcome';
 
 const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
-  const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showWelcomeGuide, setShowWelcomeGuide] = useState(
+    LoggedInUser?.collective?.settings?.showSetupGuide?.[`id${LoggedInUser.collective.id}`] || undefined,
+  );
   const slug = router.query?.as || accountSlug;
+  const [editAccountSetting] = useMutation(editAccountSettingMutation, {
+    context: API_V2_CONTEXT,
+  });
+
+  const handleSetupGuideToggle = useCallback(
+    async (open: boolean) => {
+      setShowWelcomeGuide(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showSetupGuide.id${LoggedInUser.collective.id}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
+
+  useLayoutEffect(() => {
+    if (LoggedInUser) {
+      const showSetupGuide = LoggedInUser.collective.settings?.showSetupGuide?.[`id${LoggedInUser.collective.id}`];
+      setShowWelcomeGuide(showSetupGuide !== undefined ? showSetupGuide : true);
+    }
+  }, [LoggedInUser, setShowWelcomeGuide]);
 
   return (
     <div className="flex flex-col-reverse xl:flex-row">
@@ -32,7 +67,19 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
               defaultMessage="The latest news and updates you need to know in Open Collective."
             />
           }
+          actions={
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showWelcomeGuide)}>
+                {showWelcomeGuide ? (
+                  <FormattedMessage defaultMessage="Hide Welcome Guide" id="SetupGuide.HideWelcome" />
+                ) : (
+                  <FormattedMessage defaultMessage="Show Welcome Guide" id="SetupGuide.ShowWelcome" />
+                )}
+              </Button>
+            </div>
+          }
         />
+        <WelcomeIndividual open={showWelcomeGuide} setOpen={handleSetupGuideToggle} />
         <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <AccountTodoList />
           <div className="space-y-3">

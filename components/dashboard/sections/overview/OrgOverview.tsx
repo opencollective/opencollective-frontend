@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
@@ -16,16 +16,8 @@ import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
 import { PlatformBillingOverviewCard } from './PlatformBillingOverviewCard';
+import { editAccountSettingMutation } from './queries';
 import { WelcomeOrganization } from './Welcome';
-
-const editAccountSettingMutation = gql`
-  mutation UpdateSetupGuideState($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      settings
-    }
-  }
-`;
 
 export function OrgOverview() {
   const { account } = useContext(DashboardContext);

@@ -9,11 +9,12 @@ import type { WelcomeOrganizationQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 import type { Category, Step } from '@/lib/welcome';
-import { ORG_CATEGORIES, sortSteps } from '@/lib/welcome';
+import { INDIVIDUAL_CATEGORIES, ORG_CATEGORIES, sortSteps } from '@/lib/welcome';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { Drawer } from '@/components/Drawer';
 import { DocumentationLink } from '@/components/Link';
+import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -225,10 +226,22 @@ const WelcomeDrawer = ({
   );
 };
 
-const WelcomeCategoryButton = ({ img, title, description, className, onClick, steps: _steps, account }) => {
+const WelcomeCategoryButton = ({
+  image,
+  title,
+  description,
+  className,
+  onClick,
+  steps: _steps,
+  account,
+}: Partial<Category> & {
+  onClick?: () => void;
+  account?: WelcomeOrganizationQuery['account'];
+}) => {
   const { LoggedInUser } = useLoggedInUser();
-  const steps = _steps?.map(step => step({ account, LoggedInUser }));
-  const completedSteps = (account && steps?.filter(step => step.completed && !step.requiresUpgrade).length) || 0;
+  const router = useRouter();
+  const steps = account && _steps?.map(step => step({ account, LoggedInUser, router }));
+  const completedSteps = steps?.filter(step => step.completed && !step.requiresUpgrade)?.length || 0;
   const isCompleted = completedSteps === steps?.length;
 
   return (
@@ -239,16 +252,18 @@ const WelcomeCategoryButton = ({ img, title, description, className, onClick, st
       )}
       onClick={onClick}
     >
-      <div className="absolute top-2 right-2 flex cursor-pointer items-center rounded-full bg-white px-2 py-1 text-xs text-slate-600">
-        {isCompleted ? (
-          <Check size={12} />
-        ) : (
-          <React.Fragment>
-            <ListCheck size={12} className="mr-1" /> {completedSteps}/{steps.length}
-          </React.Fragment>
-        )}
-      </div>
-      {img}
+      {steps && (
+        <div className="absolute top-2 right-2 flex cursor-pointer items-center rounded-full bg-white px-2 py-1 text-xs text-slate-600">
+          {isCompleted ? (
+            <Check size={12} />
+          ) : (
+            <React.Fragment>
+              <ListCheck size={12} className="mr-1" /> {completedSteps}/{steps?.length}
+            </React.Fragment>
+          )}
+        </div>
+      )}
+      {image}
       <div className="flex flex-col items-center gap-1 text-center">
         <h1 className="flex items-center gap-2 font-bold">
           {title}
@@ -302,11 +317,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
             {Object.entries(ORG_CATEGORIES).map(([key, category]) => (
               <WelcomeCategoryButton
                 key={key}
-                className={category.className}
-                img={category.image}
-                title={category.title}
-                description={category.description}
-                steps={category.steps}
+                {...category}
                 account={data?.account}
                 onClick={() => setExpandedCategory(key)}
               />
@@ -321,5 +332,57 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
         </Card>
       </CollapsibleContent>
     </Collapsible>
+  );
+};
+
+export const WelcomeIndividual = ({ open, setOpen }) => {
+  const router = useRouter();
+  const [isExpenseFlowOpen, setIsExpenseFlowOpen] = useState(false);
+
+  return (
+    <React.Fragment>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleContent>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">
+                <FormattedMessage
+                  defaultMessage="What would like to do with the platform?"
+                  id="Welcome.Organization.Title"
+                />
+              </CardTitle>
+              <CardDescription>
+                <FormattedMessage
+                  defaultMessage="Get started with the basics or set up additional functionalities."
+                  id="Welcome.Organization.Description"
+                />
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <WelcomeCategoryButton
+                {...INDIVIDUAL_CATEGORIES.submitExpense}
+                onClick={() => setIsExpenseFlowOpen(true)}
+              />
+              <WelcomeCategoryButton {...INDIVIDUAL_CATEGORIES.contribute} onClick={() => router.push('/search')} />
+              <WelcomeCategoryButton
+                {...INDIVIDUAL_CATEGORIES.createOrg}
+                onClick={() => router.push('/signup/organization')}
+              />
+              <WelcomeCategoryButton
+                {...INDIVIDUAL_CATEGORIES.createCollective}
+                onClick={() => router.push('/create')}
+              />
+            </CardContent>
+          </Card>
+        </CollapsibleContent>
+      </Collapsible>
+      {isExpenseFlowOpen && (
+        <SubmitExpenseFlow
+          onClose={() => {
+            setIsExpenseFlowOpen(false);
+          }}
+        />
+      )}
+    </React.Fragment>
   );
 };
