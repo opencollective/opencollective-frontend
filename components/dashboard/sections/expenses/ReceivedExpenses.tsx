@@ -20,6 +20,8 @@ import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { sortSelectOptions } from '@/lib/utils';
 
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+
 import ExpensesList from '../../../expenses/ExpensesList';
 import StyledButton from '../../../StyledButton';
 import { SubmitExpenseFlow } from '../../../submit-expense/SubmitExpenseFlow';
@@ -147,7 +149,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     filters: hostSlug ? filters : filtersWithoutHost,
   });
 
-  const { data, loading, refetch } = useQuery(accountExpensesQuery, {
+  const { data, loading, refetch, error } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
@@ -210,7 +212,9 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         )}
         <Filterbar {...queryFilter} />
 
-        {!loading && !data.expenses?.nodes.length ? (
+        {!loading && error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : !loading && !data.expenses?.nodes.length ? (
           <EmptyResults
             entityType="EXPENSES"
             onResetFilters={() => queryFilter.resetFilters({})}

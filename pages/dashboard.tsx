@@ -36,6 +36,7 @@ import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequire
 import { useWorkspace } from '../components/WorkspaceProvider';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
@@ -198,7 +199,7 @@ const DashboardPage = () => {
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
-  const { data, loading } = useQuery(adminPanelQuery, {
+  const { data, loading, error } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
     skip: !activeSlug || !LoggedInUser || isRootProfile,
@@ -243,6 +244,10 @@ const DashboardPage = () => {
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const accountIdentifier = account && (account.name || `@${account.slug}`);
+
+  if (!loading && !account && error) {
+    return <ErrorPage error={error} />;
+  }
 
   return (
     <DashboardContext.Provider
