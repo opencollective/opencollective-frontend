@@ -156,11 +156,6 @@ export const adminPanelQuery = gql`
           }
         }
       }
-      ... on Individual {
-        kycVerifications {
-          totalCount
-        }
-      }
     }
   }
   ${accountNavbarFieldsFragment}
