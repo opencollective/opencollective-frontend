@@ -20,7 +20,6 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/hosted-collectives-csv';
 import type { CSVField } from '../../lib/export-csv/transactions-csv';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
@@ -172,7 +171,7 @@ const ExportHostedCollectivesCSVModal = ({
 
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] = useMutation(
     editAccountSettingsMutation,
-    { context: API_V2_CONTEXT },
+    {},
   );
 
   const customFields = React.useMemo(

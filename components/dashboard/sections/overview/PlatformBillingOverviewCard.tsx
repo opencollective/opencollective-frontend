@@ -4,7 +4,6 @@ import { X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountHosting } from '@/lib/collective';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   PlatformBillingOverviewCardQuery,
   PlatformBillingOverviewCardQueryVariables,
@@ -42,7 +41,6 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
       ${platformSubscriptionFragment}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.accountSlug,
       },

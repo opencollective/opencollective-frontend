@@ -8,7 +8,6 @@ import Image from 'next/image';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   PlatformBillingFieldsFragment,
   PlatformSubscriptionFieldsFragment,
@@ -90,9 +89,7 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
       }
       ${platformSubscriptionFeatures}
     `,
-    {
-      context: API_V2_CONTEXT,
-    },
+    {},
   );
 
   const [updatePlanMutation] = useMutation<
@@ -112,7 +109,6 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
       ${platformSubscriptionFragment}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: props.accountSlug,
         planId: '',

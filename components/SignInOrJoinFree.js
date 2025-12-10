@@ -9,7 +9,7 @@ import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
 
 import { toast } from './ui/useToast';
@@ -374,6 +374,6 @@ const signupMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
+const addSignupMutation = graphql(signupMutation, { name: 'createUser', context: API_V1_CONTEXT });
 
 export default withUser(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));

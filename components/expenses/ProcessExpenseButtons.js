@@ -10,7 +10,7 @@ import { styled } from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/schema';
@@ -141,7 +141,7 @@ const ProcessExpenseButtons = ({
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
-  const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
+  const mutationOptions = { update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
   const { toast } = useToast();
@@ -160,9 +160,7 @@ const ProcessExpenseButtons = ({
 
       ${expensePageExpenseFieldsFragment}
     `,
-    {
-      context: API_V2_CONTEXT,
-    },
+    {},
   );
 
   const waitExpenseStatus = React.useCallback(async () => {
@@ -211,7 +209,7 @@ const ProcessExpenseButtons = ({
       if (action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') {
         refetchQueries.push({
           query: scheduledExpensesQuery,
-          context: API_V2_CONTEXT,
+
           variables: getScheduledExpensesQueryVariables(host.slug),
         });
       }

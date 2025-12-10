@@ -13,7 +13,7 @@ import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
@@ -909,7 +909,6 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
   const formMutation = isEditing ? editTierMutation : createTierMutation;
 
   const [submitFormMutation] = useMutation(formMutation, {
-    context: API_V2_CONTEXT,
     update: cache => {
       // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
       const __typename = collective.type === CollectiveType.EVENT ? 'Event' : 'Collective';
@@ -925,7 +924,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
     },
   });
 
-  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, {});
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
   const { toast } = useToast();

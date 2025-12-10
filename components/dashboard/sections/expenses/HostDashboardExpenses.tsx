@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
@@ -126,7 +125,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     refetch: refetchMetaData,
   } = useQuery(hostDashboardMetadataQuery, {
     variables: { hostSlug, withHoverCard: true },
-    context: API_V2_CONTEXT,
   });
 
   const views: Views<FilterValues> = [
@@ -215,7 +213,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');

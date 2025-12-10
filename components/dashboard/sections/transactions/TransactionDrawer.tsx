@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
@@ -249,7 +248,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const id = transactionId || prevTransactionId;
   const { data, refetch, loading, error } = useQuery(transactionQuery, {
     variables: { transaction: { legacyId: Number(id) } },
-    context: API_V2_CONTEXT,
   });
   const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };

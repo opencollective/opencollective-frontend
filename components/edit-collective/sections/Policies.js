@@ -8,7 +8,7 @@ import { hasAccountHosting, hasAccountMoneyManagement } from '../../../lib/colle
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations';
 import { stripHTML } from '../../../lib/html';
 import { omitDeep } from '../../../lib/utils';
@@ -194,19 +194,16 @@ const Policies = ({ collective }) => {
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
   const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] = useMutation(
     updateFilterCategoriesMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
+    {},
   );
-  const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] =
-    useMutation(editCollectivePolicyMutation);
-  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] = useMutation(
+    editCollectivePolicyMutation,
+    { context: API_V1_CONTEXT },
+  );
+  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation, {});
   const error = categoriesError || settingsError || policiesError;
 
   // Data and data handling

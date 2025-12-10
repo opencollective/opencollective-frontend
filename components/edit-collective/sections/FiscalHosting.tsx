@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
@@ -59,12 +59,10 @@ export const ToggleMoneyManagementButton = ({
 } & ButtonProps) => {
   const { showConfirmationModal } = useModal();
   const [editMoneyManagementAndHosting, { loading: mutating }] = useMutation(editMoneyManagementAndHostingMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries,
   });
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
-    context: API_V2_CONTEXT,
   });
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
@@ -165,14 +163,12 @@ export const ToggleFiscalHostingButton = ({
   const hasMoneyManagement = hasAccountMoneyManagement(account);
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },
-    context: API_V2_CONTEXT,
   });
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
 
   const [editMoneyManagementAndHosting] = useMutation(editMoneyManagementAndHostingMutation, {
     refetchQueries,
-    context: API_V2_CONTEXT,
   });
 
   const handleFiscalHostUpdate = async ({ activate }) => {

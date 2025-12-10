@@ -2,7 +2,7 @@ import React from 'react';
 import { ApolloError, useApolloClient } from '@apollo/client';
 import type { SetupIntent, Stripe } from '@stripe/stripe-js';
 
-import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import { gql } from '../graphql/helpers';
 import type { AccountReferenceInput, SetupIntent as GraphQLSetupIntent } from '../graphql/types/v2/schema';
 import { loadScriptAsync } from '../utils';
 
@@ -44,7 +44,7 @@ export default function useSetupIntent({
 
       const createSetupIntentResp = await apolloClient.mutate<{ createSetupIntent: GraphQLSetupIntent }>({
         mutation: createSetupIntentMutation,
-        context: API_V2_CONTEXT,
+
         variables: {
           account,
           host,

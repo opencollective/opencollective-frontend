@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { Currency as CurrencyOptions } from '@/lib/constants/currency';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
@@ -191,11 +191,9 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const { toast } = useToast();
   const { data, loading } = useQuery(infoSettingsDashboardQuery, {
-    context: API_V2_CONTEXT,
     variables: { id: accountFromParent.id },
   });
   const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries: [
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(accountFromParent.slug) },
     ],
@@ -259,7 +257,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
       const update = async () => {
         await updateAccount({
           variables,
-          context: API_V2_CONTEXT,
         });
         await refetchLoggedInUser();
         toast({

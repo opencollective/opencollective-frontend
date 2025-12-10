@@ -4,7 +4,6 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { limit, offset } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   HostApplicationRequestsQuery,
   HostApplicationRequestsQueryVariables,
@@ -59,7 +58,6 @@ export default function HostApplicationRequests({
     `,
     {
       variables: { accountSlug, ...queryFilter.variables },
-      context: API_V2_CONTEXT,
     },
   );
 

@@ -10,7 +10,7 @@ import { usePopper } from 'react-popper';
 import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
@@ -140,7 +140,7 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-const mutationOptions = { context: API_V2_CONTEXT };
+const mutationOptions = {};
 
 const CommentActions = ({
   comment,

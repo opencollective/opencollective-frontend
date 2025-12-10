@@ -5,7 +5,6 @@ import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { getDashboardRoute, isRelativeHref } from '@/lib/url-helpers';
 
 import Body from '@/components/Body';
@@ -56,7 +55,7 @@ export default function SignupPage() {
     [includeOrganizationFlow],
   );
   const [createdOrganization, setCreatedOrganization] = React.useState(null);
-  const { data, loading } = useQuery(signupPageQuery, { context: API_V2_CONTEXT, fetchPolicy: 'network-only' });
+  const { data, loading } = useQuery(signupPageQuery, { fetchPolicy: 'network-only' });
   const [step, setStep] = React.useState<SignupSteps>(
     STEP_URLS[router.query?.step as SignupSteps] ? (router.query?.step as SignupSteps) : steps[0],
   );

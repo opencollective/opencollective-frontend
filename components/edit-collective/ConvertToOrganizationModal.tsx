@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { getAccountReferenceInput } from '@/lib/collective';
 import type { Account } from '@/lib/graphql/types/v2/graphql';
 
@@ -48,9 +48,7 @@ export function ConvertToOrganizationModal({ open, setOpen, collective }: Conver
   const intl = useIntl();
   const { toast } = useToast();
 
-  const [convertToOrganization, { loading: isConverting }] = useMutation(convertAccountToOrganizationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [convertToOrganization, { loading: isConverting }] = useMutation(convertAccountToOrganizationMutation, {});
 
   const onSubmit = React.useCallback(
     async (values: z.infer<typeof convertToOrganizationSchema>) => {
@@ -61,7 +59,6 @@ export function ConvertToOrganizationModal({ open, setOpen, collective }: Conver
             hasMoneyManagement: true,
             legalName: values.legalName,
           },
-          context: API_V2_CONTEXT,
         });
 
         try {

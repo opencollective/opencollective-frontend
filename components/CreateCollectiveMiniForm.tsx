@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { isValidEmail } from '../lib/utils';
 import type LoggedInUser from '@/lib/LoggedInUser';
 
@@ -257,7 +257,7 @@ const CreateCollectiveMiniForm = ({
   const isVendor = type === CollectiveType.VENDOR;
   const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? createUserMutation : createCollectiveMutation;
-  const [createCollective, { error: submitError }] = useMutation(mutation);
+  const [createCollective, { error: submitError }] = useMutation(mutation, { context: API_V1_CONTEXT });
   const intl = useIntl();
   const { formatMessage } = intl;
 

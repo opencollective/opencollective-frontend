@@ -6,7 +6,6 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
@@ -163,7 +162,6 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const query = useQuery<AdminAccountingCategoriesQuery, AdminAccountingCategoriesQueryVariables>(
     accountingCategoriesQuery,
     {
-      context: API_V2_CONTEXT,
       variables: {
         hostSlug: accountSlug,
       },
@@ -219,7 +217,6 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(query.data?.host)); // Accountants can't edit accounting categories
 
   const [editAccountingCategories] = useMutation(editAccountingCategoryMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       hostSlug: accountSlug,
     },

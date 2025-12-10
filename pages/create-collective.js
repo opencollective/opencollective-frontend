@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { isHiddenAccount } from '@/lib/collective';
 
 import CreateCollective from '../components/create-collective';
@@ -38,7 +38,6 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const slug = router.query.hostCollectiveSlug || (router.query.category === 'opensource' ? 'opensource' : undefined);
   const skipQuery = !LoggedInUser || !slug;
   const { loading, error, data } = useQuery(createCollectiveHostQuery, {
-    context: API_V2_CONTEXT,
     skip: skipQuery,
     variables: { slug },
   });

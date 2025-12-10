@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { updateTransactionsImportRows } from './lib/graphql';
@@ -385,7 +384,7 @@ export const MatchDebitDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPENSES_UNPAID);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [updateRows] = useMutation(updateTransactionsImportRows, {});
   const queryFilter = useMatchDebitDialogQueryFilter(activeViewId, row, host, accounts);
 
   // Query for expenses
@@ -394,7 +393,6 @@ export const MatchDebitDialog = ({
     loading: expensesLoading,
     error: expensesError,
   } = useQuery(findExpenseMatchForOffPlatformDebitQuery, {
-    context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.id },
     fetchPolicy: 'cache-and-network',
     skip: queryFilter.activeViewId === TabType.CONTRIBUTIONS,
@@ -406,7 +404,6 @@ export const MatchDebitDialog = ({
     loading: contributionsLoading,
     error: contributionsError,
   } = useQuery(findContributionsMatchForOffPlatformDebitQuery, {
-    context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.slug },
     fetchPolicy: 'cache-and-network',
     skip: queryFilter.activeViewId !== TabType.CONTRIBUTIONS,

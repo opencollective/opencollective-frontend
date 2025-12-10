@@ -2,8 +2,6 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-
 import Avatar from '../Avatar';
 import Image from '../Image';
 import Link from '../Link';
@@ -37,7 +35,6 @@ const HostApplySuccessQuery = gql`
 export const SuccessPage = ({ collective, hostSlug }) => {
   const { data, error, loading } = useQuery(HostApplySuccessQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
 
   if (loading) {

@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import { Dialog, DialogContent, DialogHeader, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
 
@@ -48,11 +48,10 @@ const InviteMemberModal = props => {
 
   const [member, setMember] = React.useState(null);
   const mutationOptions = {
-    context: API_V2_CONTEXT,
     refetchQueries: [
       {
         query: teamSectionQuery,
-        context: API_V2_CONTEXT,
+
         variables: {
           collectiveSlug: get(collective, 'slug'),
           account: { slug: get(collective, 'slug') },

@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import { useToast } from './ui/useToast';
 import StyledInputAmount from './StyledInputAmount';
@@ -33,7 +32,7 @@ export const StyledInputAmountWithDynamicFxRate = ({
   const { toast } = useToast();
   const { loading } = useQuery(currencyExchangeRateQuery, {
     skip: !fromCurrency || !toCurrency || fromCurrency === toCurrency,
-    context: API_V2_CONTEXT,
+
     variables: {
       requests: [{ fromCurrency, toCurrency, date }],
     },

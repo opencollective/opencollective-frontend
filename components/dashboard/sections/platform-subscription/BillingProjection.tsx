@@ -5,7 +5,6 @@ import { Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { hasAccountHosting } from '@/lib/collective';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { BillingProjectionQuery, BillingProjectionQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import type { PlatformSubscription, PlatformUtilization } from '@/lib/graphql/types/v2/schema';
 
@@ -43,7 +42,6 @@ export function BillingProjection(props: BillingProjectionProps) {
       ${platformBillingFragment}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: props.accountSlug,
       },

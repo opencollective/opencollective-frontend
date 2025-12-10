@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { isHeavyAccount } from '../../../lib/collective';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
 import Link from '../../Link';
@@ -69,7 +69,7 @@ export const getTransactionsSectionQueryVariables = slug => {
 const SectionTransactions = props => {
   const transactionsQueryResult = useQuery(transactionsSectionQuery, {
     variables: getTransactionsSectionQueryVariables(props.collective.slug),
-    context: API_V2_CONTEXT,
+
     // We keep notifyOnNetworkStatusChange to remove the flash of collectiveHasNoTransactions bug
     // See https://github.com/apollographql/apollo-client/blob/9c80adf65ccbbb88ea5b9313c002f85976c225e3/src/core/ObservableQuery.ts#L274-L304
     notifyOnNetworkStatusChange: true,

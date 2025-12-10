@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { getErrorFromGraphqlException } from '@/lib/errors';
-import { gqlV1 } from '@/lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import MessageBox from '@/components/MessageBox';
 
@@ -38,8 +38,8 @@ const { COLLECTIVE, PROJECT, EVENT } = CollectiveType;
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(deleteCollectiveMutation);
-  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
+  const [deleteCollective] = useMutation(deleteCollectiveMutation, { context: API_V1_CONTEXT });
+  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation, { context: API_V1_CONTEXT });
 
   const handleDelete = async () => {
     try {

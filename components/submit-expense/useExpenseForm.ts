@@ -16,7 +16,6 @@ import { z } from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
@@ -639,7 +638,7 @@ const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
-      context: API_V2_CONTEXT,
+
       variables: variables,
       errorPolicy: 'all',
       fetchPolicy: refresh ? 'network-only' : 'cache-first',
@@ -1677,7 +1676,6 @@ export function useExpenseForm(opts: {
     `,
     {
       context: {
-        ...API_V2_CONTEXT,
         headers: {
           'x-is-new-expense-flow': 'true',
         },
@@ -1702,7 +1700,6 @@ export function useExpenseForm(opts: {
     `,
     {
       context: {
-        ...API_V2_CONTEXT,
         headers: {
           'x-is-new-expense-flow': 'true',
         },
@@ -1721,7 +1718,6 @@ export function useExpenseForm(opts: {
     `,
     {
       context: {
-        ...API_V2_CONTEXT,
         headers: {
           'x-is-new-expense-flow': 'true',
         },
@@ -2285,9 +2281,7 @@ export function useExpenseForm(opts: {
               }
             }
           `,
-          context: {
-            ...API_V2_CONTEXT,
-          },
+          context: {},
           variables: {
             exchangeRateRequests,
           },

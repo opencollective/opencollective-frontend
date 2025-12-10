@@ -8,7 +8,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { sortConnectedCollectives, updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
 
@@ -176,7 +175,7 @@ class ConnectedCollectives extends React.PureComponent {
 
 const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
-  options: { context: API_V2_CONTEXT },
+  options: {},
 });
 
 export default injectIntl(addEditAccountSettingMutation(ConnectedCollectives));

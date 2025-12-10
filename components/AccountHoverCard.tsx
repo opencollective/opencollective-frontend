@@ -8,7 +8,7 @@ import { BadgeCheck, Banknote, Building, Calendar, FileText, Mail, PencilRuler, 
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
@@ -313,7 +313,6 @@ export const AccountHoverCard = ({
     // Skip query if account is not an individual, if there no accountSlug or hostSlug in `includeAdminMembership`, or if the hover card is not open or hovered
     skip: !isIndividual || !account?.slug || !(accountSlug || hostSlug) || !(open || hasBeenHovered),
     fetchPolicy: 'cache-first',
-    context: API_V2_CONTEXT,
   });
 
   const handleMouseEnter = () => {

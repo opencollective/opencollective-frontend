@@ -4,7 +4,7 @@ import { AlertCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Individual } from '../../lib/graphql/types/v2/schema';
 import { TwoFactorAuthenticationHeader } from '../../lib/two-factor-authentication';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
@@ -56,7 +56,6 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
     try {
       await removeTwoFactorAuthentication({
         context: {
-          ...API_V2_CONTEXT,
           headers: {
             [TwoFactorAuthenticationHeader]: `${twoFactorResult.type} ${twoFactorResult.code}`,
           },

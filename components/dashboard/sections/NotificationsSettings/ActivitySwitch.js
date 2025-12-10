@@ -4,7 +4,7 @@ import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityClasses, ActivityTypes } from '../../../../lib/constants/activities';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import { Box, Flex } from '../../../Grid';
@@ -52,8 +52,7 @@ const ActivitySwitch = ({ account, activityType }) => {
   const isOverridedByAll = activityType !== 'ACTIVITY_ALL' && existingSetting?.type === ActivityTypes.ACTIVITY_ALL;
 
   const [setEmailNotification] = useMutation(setEmailNotificationMutation, {
-    context: API_V2_CONTEXT,
-    refetchQueries: [{ query: refetchEmailNotificationQuery, variables: { id: account.id }, context: API_V2_CONTEXT }],
+    refetchQueries: [{ query: refetchEmailNotificationQuery, variables: { id: account.id } }],
   });
 
   React.useEffect(() => {

@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
@@ -27,7 +26,7 @@ const LegacyPlatformSubscribers = () => {
 
   const { data, error, loading } = useQuery(subscribersQuery, {
     variables: { ...queryFilter.variables, plan: ['LEGACY'] },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'network-only',
   });
 

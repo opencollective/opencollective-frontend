@@ -12,7 +12,7 @@ import { getLegacyIdForCollective } from '../../../../lib/collective';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -461,7 +461,6 @@ const AddFundsModalContentWithCollective = ({
     loading,
     error: fetchAccountError,
   } = useQuery(addFundsAccountQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
   });
   const account = data?.account;
@@ -473,10 +472,8 @@ const AddFundsModalContentWithCollective = ({
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
     isEdit ? editAddedFundsMutation : addFundsMutation,
     {
-      context: API_V2_CONTEXT,
       refetchQueries: [
         {
-          context: API_V2_CONTEXT,
           query: getBudgetSectionQuery(true, false),
           variables: getBudgetSectionQueryVariables(collective.slug, false, host),
         },

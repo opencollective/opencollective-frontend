@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
@@ -77,7 +76,7 @@ export const useTransactionsImportActions = ({
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
-  const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [updateRows] = useMutation(updateTransactionsImportRows, {});
   const { showModal, hideModal } = useModal();
 
   const setRowsStatus = async (

@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { includes } from 'lodash';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ExpensePageQuery, ExpensePageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { isFeatureEnabled } from '@/lib/allowed-features';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
@@ -20,7 +19,6 @@ type SubmittedExpenseProps = {
 
 export function SubmittedExpense(props: SubmittedExpenseProps) {
   const query = useQuery<ExpensePageQuery, ExpensePageQueryVariables>(expensePageQuery, {
-    context: API_V2_CONTEXT,
     skip: !props.expenseId,
     variables: {
       legacyExpenseId: props.expenseId,

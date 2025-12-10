@@ -4,7 +4,7 @@ import { Form, Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -38,7 +38,6 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
   const { toast } = useToast();
   const [isWaitingForOnSuccess, setIsWaitingForOnSuccess] = React.useState(false);
   const [createApplication] = useMutation(createApplicationMutation, {
-    context: API_V2_CONTEXT,
     update: cache => {
       const accountCacheId = cache.identify(account);
       cache.modify({ id: accountCacheId, fields: { oAuthApplications: (_, { DELETE }) => DELETE } });

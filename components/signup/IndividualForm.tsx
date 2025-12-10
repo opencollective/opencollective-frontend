@@ -9,7 +9,6 @@ import { z } from 'zod';
 
 import { resendOTP, signup, verifyEmail } from '@/lib/api';
 import { formatErrorMessage, i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 
@@ -388,13 +387,9 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
   const { toast } = useToast();
   const { refetchLoggedInUser, LoggedInUser, login } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<CompleteProfileFormValuesSchema>>(undefined);
-  const { data, refetch: refetchMe } = useQuery(profileQuery, { context: API_V2_CONTEXT, skip: !LoggedInUser });
-  const [updateAccount] = useMutation(completeProfileMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [setPassword] = useMutation(setPasswordMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const { data, refetch: refetchMe } = useQuery(profileQuery, { skip: !LoggedInUser });
+  const [updateAccount] = useMutation(completeProfileMutation, {});
+  const [setPassword] = useMutation(setPasswordMutation, {});
   const [loading, setLoading] = React.useState(false);
   const [passwordScore, setPasswordScore] = React.useState(0);
 

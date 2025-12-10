@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 
 import dayjs from '../../lib/dayjs';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { cn } from '../../lib/utils';
 
 import Avatar from '../Avatar';
@@ -125,7 +124,6 @@ export function GoalProgress({ accountSlug, goal, editButton = undefined, classN
       thisYearStart: now.startOf('year').toISOString(),
       now: now.toISOString(),
     },
-    context: API_V2_CONTEXT,
   });
   if (!goal?.amount) {
     return null;

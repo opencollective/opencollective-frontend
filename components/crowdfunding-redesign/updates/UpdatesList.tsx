@@ -7,8 +7,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-
 import { EmptyResults } from '../../dashboard/EmptyResults';
 import { Button } from '../../ui/Button';
 import { Separator } from '../../ui/Separator';
@@ -21,7 +19,6 @@ export function UpdatesList() {
   const router = useRouter();
   const { data } = useQuery(updatesQuery, {
     variables: { slug: router.query.accountSlug ?? router.query.collectiveSlug },
-    context: API_V2_CONTEXT,
   });
   const account = data?.account;
   return (

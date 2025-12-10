@@ -9,7 +9,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
   type Currency,
   type CurrencyExchangeRateInput,
@@ -92,7 +91,6 @@ const EditPaidBy = ({ expense, handleClose }) => {
       accountSlug: expense.account.parent?.slug ?? expense.account.slug,
       limit: 100, // TODO: This is the max limit of childrenAccounts, when refactoring the Collective Picker Async to work with GQL v2, this limitation can be worked around
     },
-    context: API_V2_CONTEXT,
   });
 
   const activeAccounts = React.useMemo(
@@ -102,9 +100,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
   );
 
   const intl = useIntl();
-  const [moveExpense, { loading: submitting }] = useMutation(moveExpenseMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [moveExpense, { loading: submitting }] = useMutation(moveExpenseMutation, {});
 
   const onSubmit = React.useCallback(
     async values => {
@@ -964,9 +960,7 @@ export default function EditExpenseDialog({
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
-  const [editExpense] = useMutation(editExpenseMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editExpense] = useMutation(editExpenseMutation, {});
 
   const handleClose = () => setOpen(false);
 

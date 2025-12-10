@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { hasAccountHosting } from '@/lib/collective';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   DashboardPlatformSubscriptionQuery,
   DashboardPlatformSubscriptionQueryVariables,
@@ -56,7 +55,6 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
       ${platformBillingFragment}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.accountSlug,
       },

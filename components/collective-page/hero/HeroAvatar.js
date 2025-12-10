@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import { upload } from '../../../lib/api';
 import { isIndividualAccount } from '../../../lib/collective';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
 
@@ -89,7 +90,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
-  const [editImage] = useMutation(editCollectiveAvatarMutation);
+  const [editImage] = useMutation(editCollectiveAvatarMutation, { context: API_V1_CONTEXT });
   const { toast, dismissToasts } = useToast();
 
   const onDropImage = async ([image]) => {
@@ -243,7 +244,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     );
   } else {
     return uploadedImage || collective.imageUrl ? (
-      <Mutation mutation={editCollectiveAvatarMutation}>
+      <Mutation mutation={editCollectiveAvatarMutation} context={API_V1_CONTEXT}>
         {editAvatar => (
           <Fragment>
             <EditingAvatarContainer borderRadius={borderRadius}>

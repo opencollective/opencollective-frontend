@@ -4,7 +4,6 @@ import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { elementFromClass } from '../../lib/react-utils';
 
 import Avatar from '../Avatar';
@@ -53,7 +52,7 @@ const VendorDetails = ({ vendor: v, vendorId, onCancel, editVendor }: VendorDeta
   const drawerActionsContainer = useDrawerActionsContainer();
   const { data, loading: loadingVendorInfo } = useQuery(vendorDetailQuery, {
     variables: { id: vendorId },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
     skip: !vendorId || Boolean(v?.id),
   });

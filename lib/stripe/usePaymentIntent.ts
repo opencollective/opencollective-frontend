@@ -2,7 +2,7 @@ import React from 'react';
 import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
-import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import { gql } from '../graphql/helpers';
 import type {
   AccountReferenceInput,
   ContributionFrequency,
@@ -74,7 +74,7 @@ export default function usePaymentIntent({
       try {
         const createPaymentIntentResp = await apolloClient.mutate({
           mutation: expense ? createExpenseStripePaymentIntentMutation : createPaymentIntentMutation,
-          context: { ...API_V2_CONTEXT, fetchOptions: { signal: abort.current.signal } },
+          context: { fetchOptions: { signal: abort.current.signal } },
           variables: expense
             ? {
                 expense,

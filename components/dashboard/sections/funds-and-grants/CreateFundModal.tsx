@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { suggestSlug } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 import type {
   CreateFundModalQuery,
   CreateFundModalQueryVariables,
@@ -47,7 +47,6 @@ export function CreateFundModal(props: { open: boolean; setOpen: (open: boolean)
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         hostSlug: props.hostSlug,
       },
@@ -67,7 +66,6 @@ export function CreateFundModal(props: { open: boolean; setOpen: (open: boolean)
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         hostSlug: props.hostSlug,
         fund: {

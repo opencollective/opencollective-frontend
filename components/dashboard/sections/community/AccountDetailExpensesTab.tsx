@@ -4,7 +4,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '@/lib/filters/schemas';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 
@@ -109,7 +108,6 @@ export function ExpensesTab({ account, host, setOpenExpenseId }) {
     skipRouter: true,
   });
   const { data, loading } = useQuery(communityAccountExpensesDetailQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       accountId: account.id,
       host: host,

@@ -8,7 +8,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import {
   type EditPayoutMethodMutation,
   type EditPayoutMethodMutationVariables,
@@ -317,7 +316,6 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         payoutMethod: { ...props.newPayoutMethod },
         payeeSlug: props.payeeSlug,
@@ -586,7 +584,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
         }
       }
     `,
-    { context: API_V2_CONTEXT },
+    {},
   );
 
   const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(
@@ -601,7 +599,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
         }
       }
     `,
-    { context: API_V2_CONTEXT },
+    {},
   );
 
   const { showConfirmationModal } = useModal();

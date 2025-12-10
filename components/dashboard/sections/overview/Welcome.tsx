@@ -4,7 +4,6 @@ import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole } fro
 import { useRouter } from 'next/navigation';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { WelcomeOrganizationQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
@@ -279,7 +278,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
   const { data } = useQuery<WelcomeOrganizationQuery>(welcomeOrganizationQuery, {
     variables: { accountSlug: _account?.slug },
     skip: !_account,
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
   });
   const { LoggedInUser } = useLoggedInUser();

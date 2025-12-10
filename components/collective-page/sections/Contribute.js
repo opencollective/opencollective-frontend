@@ -9,7 +9,6 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import {
   getCollectiveTicketsOrder,
   sortTickets,
@@ -375,7 +374,7 @@ class SectionContribute extends React.PureComponent {
 
 const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
-  options: { context: API_V2_CONTEXT },
+  options: {},
 });
 
 export default addEditAccountSettingMutation(SectionContribute);

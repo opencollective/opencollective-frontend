@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import dayjs from '@/lib/dayjs';
 import { type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -66,7 +65,6 @@ export function OrgOverviewContent({ accountSlug }: DashboardSectionProps) {
       ...queryFilter.variables,
     },
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
 
   if (error) {

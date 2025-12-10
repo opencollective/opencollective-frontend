@@ -7,7 +7,7 @@ import { Edit, X } from 'lucide-react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
@@ -98,12 +98,11 @@ const renderBankInstructions = (instructions, bankAccountInfo) => {
 const BankTransfer = props => {
   const { toast } = useToast();
   const { loading, data } = useQuery(hostQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
-  const [createPayoutMethod] = useMutation(createPayoutMethodMutation, { context: API_V2_CONTEXT });
-  const [removePayoutMethod] = useMutation(removePayoutMethodMutation, { context: API_V2_CONTEXT });
-  const [editBankTransfer] = useMutation(editBankTransferMutation, { context: API_V2_CONTEXT });
+  const [createPayoutMethod] = useMutation(createPayoutMethodMutation, {});
+  const [removePayoutMethod] = useMutation(removePayoutMethodMutation, {});
+  const [editBankTransfer] = useMutation(editBankTransferMutation, {});
   const [showForm, setShowForm] = React.useState(false);
   const [showRemoveBankConfirmationModal, setShowRemoveBankConfirmationModal] = React.useState(false);
 
@@ -226,9 +225,7 @@ const BankTransfer = props => {
                 value: instructions,
                 account: { slug: props.collectiveSlug },
               },
-              refetchQueries: [
-                { query: hostQuery, context: API_V2_CONTEXT, variables: { slug: props.collectiveSlug } },
-              ],
+              refetchQueries: [{ query: hostQuery, variables: { slug: props.collectiveSlug } }],
               awaitRefetchQueries: true,
             });
             setSubmitting(false);
@@ -332,9 +329,7 @@ const BankTransfer = props => {
                 value: modifiedPaymentMethods,
                 account: { slug: props.collectiveSlug },
               },
-              refetchQueries: [
-                { query: hostQuery, context: API_V2_CONTEXT, variables: { slug: props.collectiveSlug } },
-              ],
+              refetchQueries: [{ query: hostQuery, variables: { slug: props.collectiveSlug } }],
               awaitRefetchQueries: true,
             });
             setShowRemoveBankConfirmationModal(false);

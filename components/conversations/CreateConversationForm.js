@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import EditTags from '../EditTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
@@ -32,7 +32,7 @@ const createConversationMutation = gql`
   }
 `;
 
-const mutationOptions = { context: API_V2_CONTEXT };
+const mutationOptions = {};
 
 const messages = defineMessages({
   titlePlaceholder: {

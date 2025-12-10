@@ -7,7 +7,6 @@ import { injectIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 
 import Container from '../components/Container';
@@ -154,7 +153,6 @@ class NewContributionFlowPage extends React.Component {
 const addContributionFlowData = graphql(contributionFlowAccountQuery, {
   options: props => ({
     variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
-    context: API_V2_CONTEXT,
   }),
 });
 

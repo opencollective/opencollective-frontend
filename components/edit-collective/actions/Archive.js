@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { getErrorFromGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import { adminPanelQuery } from '../../dashboard/queries';
 import { getI18nLink } from '../../I18nFormatters';
@@ -45,10 +45,16 @@ const ArchiveCollective = ({ collective }) => {
   const [modal, setModal] = useState({ type: defaultAction, show: false });
 
   const adminPanelMutationParams = {
-    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT }],
+    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug } }],
   };
-  const [archiveCollective] = useMutation(archiveCollectiveMutation, adminPanelMutationParams);
-  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, adminPanelMutationParams);
+  const [archiveCollective] = useMutation(archiveCollectiveMutation, {
+    ...adminPanelMutationParams,
+    context: API_V1_CONTEXT,
+  });
+  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, {
+    ...adminPanelMutationParams,
+    context: API_V1_CONTEXT,
+  });
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });

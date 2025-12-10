@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   OffPlatformTransactionsQuery,
   OffPlatformTransactionsQueryVariables,
@@ -325,7 +324,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     OffPlatformTransactionsQuery,
     OffPlatformTransactionsQueryVariables
   >(offPlatformTransactionsQuery, {
-    context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
     pollInterval,
@@ -353,7 +351,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
         OffPlatformTransactionsQueryVariables
       >({
         query: offPlatformTransactionsQuery,
-        context: API_V2_CONTEXT,
+
         variables: { ...variables, limit: 100_000, fetchOnlyRowIds: true, hasImportFilter: false },
       });
 

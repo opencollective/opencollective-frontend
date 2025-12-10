@@ -17,7 +17,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
@@ -640,7 +640,6 @@ const createExpensePageQuery = gql`
 
 const addCreateExpensePageData = graphql(createExpensePageQuery, {
   options: {
-    context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
   },
 });
@@ -661,7 +660,7 @@ const createExpenseMutation = gql`
 
 const addCreateExpenseMutation = graphql(createExpenseMutation, {
   name: 'createExpense',
-  options: { context: API_V2_CONTEXT },
+  options: {},
 });
 
 const draftExpenseAndInviteUserMutation = gql`
@@ -676,7 +675,7 @@ const draftExpenseAndInviteUserMutation = gql`
 
 const addDraftExpenseAndInviteUserMutation = graphql(draftExpenseAndInviteUserMutation, {
   name: 'draftExpenseAndInviteUser',
-  options: { context: API_V2_CONTEXT },
+  options: {},
 });
 
 const addHoc = compose(

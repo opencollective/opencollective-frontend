@@ -11,7 +11,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
 
 import { Button } from './ui/Button';
@@ -679,6 +679,7 @@ const collectiveSourcePaymentMethodsQuery = gqlV1 /* GraphQL */ `
 
 const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMethodsQuery, {
   options: props => ({
+    context: API_V1_CONTEXT,
     variables: { id: props.collectiveId },
     fetchPolicy: 'network-only',
   }),
@@ -732,6 +733,7 @@ const createGiftCardsMutation = gqlV1 /* GraphQL */ `
 
 const addCreateGiftCardsMutation = graphql(createGiftCardsMutation, {
   name: 'createGiftCards',
+  options: { context: API_V1_CONTEXT },
 });
 
 const addGraphql = compose(addCollectiveSourcePaymentMethodsQuery, addCreateGiftCardsMutation);

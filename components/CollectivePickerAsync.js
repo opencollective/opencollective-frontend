@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
@@ -151,7 +151,7 @@ const CollectivePickerAsync = ({
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
-  const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { fetchPolicy });
+  const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { context: API_V1_CONTEXT, fetchPolicy });
   const [term, setTerm] = React.useState(null);
   const intl = useIntl();
 

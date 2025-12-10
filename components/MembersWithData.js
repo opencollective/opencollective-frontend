@@ -6,7 +6,7 @@ import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Error from './Error';
@@ -179,6 +179,7 @@ const membersQuery = gqlV1 /* GraphQL */ `
 
 const addMembersData = graphql(membersQuery, {
   options: props => ({
+    context: API_V1_CONTEXT,
     variables: {
       collectiveSlug: props.collective.slug,
       offset: 0,

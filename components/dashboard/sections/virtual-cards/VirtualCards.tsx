@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { AccountVirtualCardsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -73,7 +72,6 @@ const VitualCards = ({ accountSlug }: DashboardSectionProps) => {
     filters,
   });
   const { loading, data } = useQuery(accountVirtualCardsQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,

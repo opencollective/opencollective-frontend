@@ -1,7 +1,5 @@
 import { gql } from '@apollo/client';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-
 export const updateFieldsFragment = gql`
   fragment UpdateFields on Update {
     id
@@ -136,7 +134,6 @@ export const getRefetchQueries = account => [
       onlyPublishedUpdates: true,
       orderBy: 'CREATED_AT,DESC',
     },
-    context: API_V2_CONTEXT,
   },
   {
     query: updatesDashboardQuery,
@@ -147,7 +144,6 @@ export const getRefetchQueries = account => [
       isDraft: true,
       orderBy: 'CREATED_AT,DESC',
     },
-    context: API_V2_CONTEXT,
   },
-  { query: updatesDashboardMetadataQuery, variables: { slug: account.slug }, context: API_V2_CONTEXT },
+  { query: updatesDashboardMetadataQuery, variables: { slug: account.slug } },
 ];

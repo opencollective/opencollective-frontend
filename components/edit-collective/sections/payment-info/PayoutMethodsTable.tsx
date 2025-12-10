@@ -4,7 +4,7 @@ import { orderBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { PayoutMethodType } from '@/lib/constants/payout-method';
 
 import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/PayoutMethodSection';
@@ -28,9 +28,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
       }
       ${PayoutMethodFragment}
     `,
-    {
-      context: API_V2_CONTEXT,
-    },
+    {},
   );
   const [restorePayoutMethod] = useMutation(
     gql`
@@ -42,9 +40,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
       }
       ${PayoutMethodFragment}
     `,
-    {
-      context: API_V2_CONTEXT,
-    },
+    {},
   );
 
   const actions = React.useMemo(

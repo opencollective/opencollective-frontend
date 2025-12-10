@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
 import { isMulti, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { HostVirtualCardRequestsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import type { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/schema';
 import { VirtualCardRequestStatus } from '../../../lib/graphql/types/v2/schema';
@@ -143,7 +143,6 @@ const hostVirtualCardRequestsQuery = gql`
 export default function HostVirtualCardRequests({ accountSlug: hostSlug }: DashboardSectionProps) {
   const intl = useIntl();
   const { data: metaData } = useQuery(hostVirtualCardRequestsMetaDataQuery, {
-    context: API_V2_CONTEXT,
     variables: { hostSlug },
     errorPolicy: 'all',
   });
@@ -188,7 +187,6 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
     host: Pick<Host, 'legacyId'>;
     account: Account;
   }>(hostVirtualCardRequestsQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       hostSlug,
       ...queryFilter.variables,

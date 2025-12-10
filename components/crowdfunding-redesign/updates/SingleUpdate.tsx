@@ -5,8 +5,6 @@ import { Markup } from 'interweave';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-
 import CommentForm from '../../conversations/CommentForm';
 import EmojiReactionPicker from '../../conversations/EmojiReactionPicker';
 import EmojiReactions from '../../conversations/EmojiReactions';
@@ -25,7 +23,6 @@ export function SingleUpdate() {
     variables: {
       id: router.query.updateSlug,
     },
-    context: API_V2_CONTEXT,
   });
   const update = data?.update;
   const comments = update?.comments;

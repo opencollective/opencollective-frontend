@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 
 import { isHeavyAccount } from '../../../lib/collective';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -60,7 +60,6 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
       slug: collective.slug,
       heavyAccount: isHeavyAccount(collective.slug),
     },
-    context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
 

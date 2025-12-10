@@ -8,7 +8,7 @@ import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
@@ -141,12 +141,8 @@ export const ActionsButton = props => {
     [toast],
   );
 
-  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {});
+  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {});
 
   const isActive = virtualCard.data.status === 'active' || virtualCard.data.state === 'OPEN';
   const isCanceled = virtualCard.data.status === 'canceled';

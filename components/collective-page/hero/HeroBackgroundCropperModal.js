@@ -10,6 +10,7 @@ import { styled } from 'styled-components';
 
 import { upload } from '../../../lib/api';
 import { formatErrorMessage, getErrorFromXhrUpload, i18nGraphqlException } from '../../../lib/errors';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveBackgroundMutation } from '../../../lib/graphql/v1/mutations';
 import { useElementSize } from '../../../lib/hooks/useElementSize';
 import { mergeRefs } from '../../../lib/react-utils';
@@ -64,7 +65,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const [isSubmitting, setSubmitting] = React.useState(false); // Not using Apollo to have a common flag with file upload
   const intl = useIntl();
   const { toast } = useToast();
-  const [editBackground] = useMutation(editCollectiveBackgroundMutation);
+  const [editBackground] = useMutation(editCollectiveBackgroundMutation, { context: API_V1_CONTEXT });
   const containerSize = useElementSize({ defaultWidth: 600 });
   const [mediaSize, setMediaSize] = React.useState();
   const [crop, onCropChange] = React.useState(getCrop(collective));

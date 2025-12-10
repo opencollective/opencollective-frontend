@@ -22,7 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -495,7 +495,6 @@ const CollectiveNavbar = ({
   isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: collective?.slug },
     skip: !collective?.slug || !LoggedInUser,
   });
