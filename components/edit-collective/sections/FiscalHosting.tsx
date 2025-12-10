@@ -242,6 +242,7 @@ const FiscalHosting = ({ collective, account }) => {
   const refetchQueries = [
     {
       query: editCollectivePageQuery,
+      context: API_V1_CONTEXT,
       variables: {
         slug: collective.slug,
       },

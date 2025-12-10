@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '@/lib/filters/schemas';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { KycTabPeopleDashboardQuery, KycVerificationCollection } from '@/lib/graphql/types/v2/graphql';
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
@@ -71,7 +70,6 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
         requestedByAccount: props.requestedByAccount,
         ...queryFilter.variables,
       },
-      context: API_V2_CONTEXT,
     },
   );
 

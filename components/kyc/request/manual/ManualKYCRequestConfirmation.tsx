@@ -5,7 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type z from 'zod';
 
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 
 import { Button } from '@/components/ui/Button';
@@ -53,7 +52,6 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
         verifyAccount: props.verifyAccount,
         request: { manual: props.request },
       },
-      context: API_V2_CONTEXT,
     },
   );
 
