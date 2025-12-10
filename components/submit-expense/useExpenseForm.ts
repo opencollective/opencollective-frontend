@@ -690,8 +690,30 @@ function buildFormSchema(
         return slug && !slug.startsWith('__');
       }, requiredMessage)
       .refine(
-        accountSlug =>
-          accountSlug && (!options.supportedExpenseTypes || supportsBaseExpenseTypes(options.supportedExpenseTypes)),
+        accountSlug => {
+          if (!accountSlug) {
+            return false;
+          }
+          if (!options.supportedExpenseTypes) {
+            return true;
+          }
+
+          if (
+            values.expenseTypeOption === ExpenseType.GRANT &&
+            !options.supportedExpenseTypes.includes(ExpenseType.GRANT)
+          ) {
+            return false;
+          }
+
+          if (
+            values.expenseTypeOption !== ExpenseType.GRANT &&
+            !supportsBaseExpenseTypes(options.supportedExpenseTypes)
+          ) {
+            return false;
+          }
+
+          return true;
+        },
         () => ({
           message: intl.formatMessage({
             defaultMessage: 'The selected account does not support expense submissions.',
