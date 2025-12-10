@@ -26,6 +26,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
@@ -158,7 +159,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     const metric = metrics.find(m => m.id === queryFilter.values.subpath);
     if (metric) {
       return (
-        <div className="flex max-w-(--breakpoint-lg) flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <DashboardHeader
             title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
             subpathTitle={metric.label}
@@ -176,7 +177,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   }
 
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col gap-3">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
@@ -237,6 +238,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
             </Popover>
           }
         />
+        <ConvertedAccountMessage account={account} />
         <Filterbar hideSeparator {...queryFilter} />
 
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">

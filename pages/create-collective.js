@@ -52,7 +52,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   return (
-    <Page showFooter={Boolean(LoggedInUser)}>
+    <Page showFooter={Boolean(LoggedInUser)} showMenuItems={false}>
       <CreateCollective host={data && data.host} />
     </Page>
   );

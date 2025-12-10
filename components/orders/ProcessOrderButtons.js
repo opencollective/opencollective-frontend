@@ -149,13 +149,12 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
           )}
         </ConfirmationModal>
       )}
-      {showContributionConfirmationModal && (
-        <ContributionConfirmationModal
-          order={order}
-          onClose={() => setShowContributionConfirmationModal(false)}
-          onSuccess={onSuccess}
-        />
-      )}
+      <ContributionConfirmationModal
+        order={order}
+        open={showContributionConfirmationModal}
+        setOpen={setShowContributionConfirmationModal}
+        onSuccess={onSuccess}
+      />
     </React.Fragment>
   );
 };

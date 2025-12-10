@@ -12,10 +12,11 @@ import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
 import { PlatformBillingOverviewCard } from './PlatformBillingOverviewCard';
-import { SetupGuideCard } from './SetupGuide';
+import { WelcomeOrganization } from './Welcome';
 
 const editAccountSettingMutation = gql`
   mutation UpdateSetupGuideState($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -84,23 +85,23 @@ export function OrgOverview() {
   const hasMoneyManagement = hasAccountMoneyManagement(account);
 
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div className="space-y-6">
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={
-          hasMoneyManagement && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
-                {showSetupGuide ? (
-                  <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-                ) : (
-                  <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-                )}
-              </Button>
-            </div>
-          )
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
+              {showSetupGuide ? (
+                <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
+              ) : (
+                <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
+              )}
+            </Button>
+          </div>
         }
       />
+      <ConvertedAccountMessage account={account} />
+      <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
       {hasMoneyManagement ? (
         <React.Fragment>
           {account.platformSubscription && (
@@ -113,11 +114,12 @@ export function OrgOverview() {
               </CollapsibleContent>
             </Collapsible>
           )}
-          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
-        <OrgOverviewContent accountSlug={account.slug} />
+        <React.Fragment>
+          <OrgOverviewContent accountSlug={account.slug} />
+        </React.Fragment>
       )}
     </div>
   );

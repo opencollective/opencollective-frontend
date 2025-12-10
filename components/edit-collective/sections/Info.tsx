@@ -323,7 +323,16 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         );
         return (
           <Form className="flex flex-col gap-4">
-            <FormField name="image" label={<FormattedMessage defaultMessage="Avatar" id="Avatar" />}>
+            <FormField
+              name="image"
+              label={
+                account.type === INDIVIDUAL ? (
+                  <FormattedMessage defaultMessage="Avatar" id="Avatar" />
+                ) : (
+                  <FormattedMessage defaultMessage="Logo" id="Logo" />
+                )
+              }
+            >
               {({ field, form }) => (
                 <EditAvatar
                   size={120}
@@ -331,9 +340,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   type={account.type}
                   value={field.value}
                   onSuccess={({ url }) => form.setFieldValue(field.name, url)}
-                  onReject={() => form.setFieldValue(field.name, null)}
-                  minSize={1024}
-                  maxSize={2e3 * 1024}
+                  maxSize={5e3 * 1024}
                 />
               )}
             </FormField>

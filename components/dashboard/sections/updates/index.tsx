@@ -152,14 +152,14 @@ const UpdatesList = () => {
   const updates = data?.account?.updates;
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
+    <div className="flex flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-6">
         <DashboardHeader
           title={<FormattedMessage id="updates" defaultMessage="Updates" />}
           description={
             <FormattedMessage
               id="Dashboard.Updates.Subtitle"
-              defaultMessage="Updates from your account that are visible to people following your account"
+              defaultMessage="Updates from your account that are visible to people following you"
             />
           }
           actions={

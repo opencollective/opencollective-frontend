@@ -19,7 +19,7 @@ import {
 type CreateAccountingCategoryModalProps = {
   onClose: () => void;
   onCreate: (category: Pick<AccountingCategory, EditableAccountingCategoryFields>) => Promise<void>;
-  isIndependentCollective: boolean;
+  hasHosting: boolean;
 };
 
 export function CreateAccountingCategoryModal(props: CreateAccountingCategoryModalProps) {
@@ -32,7 +32,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
     [onCreate],
   );
 
-  const defaultAppliesTo = props.isIndependentCollective ? AccountingCategoryAppliesTo.HOST : null;
+  const defaultAppliesTo = !props.hasHosting ? AccountingCategoryAppliesTo.HOST : null;
 
   const formik = useAccountingCategoryFormik({
     initialValues: {
@@ -62,7 +62,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
           values.expensesTypes && values.expensesTypes.length > 0 ? values.expensesTypes.map(t => t.value) : null,
         appliesTo: values.appliesTo
           ? values.appliesTo.value
-          : props.isIndependentCollective
+          : !props.hasHosting
             ? AccountingCategoryAppliesTo.HOST
             : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
       });
@@ -75,7 +75,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         <FormattedMessage defaultMessage="Create accounting category" id="M+dnU9" />
       </ModalHeader>
       <ModalBody>
-        <AccountingCategoryForm formik={formik} isIndependentCollective={props.isIndependentCollective} />
+        <AccountingCategoryForm formik={formik} hasHosting={props.hasHosting} />
       </ModalBody>
       <ModalFooter showDivider={false}>
         <form onSubmit={e => formik.handleSubmit(e)}>

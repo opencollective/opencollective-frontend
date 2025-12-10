@@ -11,6 +11,7 @@ export const adminPanelQuery = gql`
       currency
       slug
       name
+      legalName
       isHost
       type
       supportedExpenseTypes
@@ -100,12 +101,15 @@ export const adminPanelQuery = gql`
         FUNDS_GRANTS_MANAGEMENT
         EXPECTED_FUNDS
         CHARGE_HOSTING_FEES
+        KYC
       }
       policies {
         id
         REQUIRE_2FA_FOR_ADMINS
       }
       ... on Organization {
+        hasHosting
+        hasMoneyManagement
         host {
           id
           type
@@ -150,6 +154,11 @@ export const adminPanelQuery = gql`
               freeze
             }
           }
+        }
+      }
+      ... on Individual {
+        kycVerifications {
+          totalCount
         }
       }
     }

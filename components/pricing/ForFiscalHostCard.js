@@ -298,7 +298,7 @@ const ForFiscalHosts = () => {
       </Flex>
 
       <Flex justifyContent={['center', 'left']} alignItems={['flex-start', 'center']} mt={10}>
-        <Link href="/signup/organization">
+        <Link href="/signup/organization?host=true">
           <StyledButton px={3} py={2} buttonStyle="primary" width="160px" whiteSpace="nowrap" mb={4}>
             <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
           </StyledButton>

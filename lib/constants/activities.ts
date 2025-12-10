@@ -11,6 +11,8 @@ export const ActivityClasses = {
 export const ActivityTypes = {
   ACTIVATED_COLLECTIVE_AS_HOST: 'activated.collective.as.host',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT: 'activated.collective.as.independent',
+  ACTIVATED_HOSTING: 'activated.hosting',
+  ACTIVATED_MONEY_MANAGEMENT: 'activated.moneyManagement',
   ACTIVITY_ALL: 'all',
   BACKYOURSTACK_DISPATCH_CONFIRMED: 'backyourstack.dispatch.confirmed',
   COLLECTIVE_APPLY: 'collective.apply',
@@ -62,6 +64,8 @@ export const ActivityTypes = {
   CONTRIBUTION_REJECTED: 'contribution.rejected',
   CONVERSATION_COMMENT_CREATED: 'conversation.comment.created',
   DEACTIVATED_COLLECTIVE_AS_HOST: 'deactivated.collective.as.host',
+  DEACTIVATED_HOSTING: 'deactivated.hosting',
+  DEACTIVATED_MONEY_MANAGEMENT: 'deactivated.moneyManagement',
   EXPENSE_COMMENT_CREATED: 'expense.comment.created',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE: 'order.canceled.archived.collective',
   ORDER_PENDING_CONTRIBUTION_NEW: 'order.new.pendingFinancialContribution',

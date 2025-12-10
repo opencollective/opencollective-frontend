@@ -293,6 +293,7 @@ const useMatchDebitDialogQueryFilter = (
       hostSlug: host.slug,
       hostedAccounts: accounts,
       disableHostedAccountsSearch: Boolean(accounts?.length),
+      accountingCategoryKinds: ExpenseFilters.ExpenseAccountingCategoryKinds,
     };
 
     if (activeViewId === TabType.EXPENSES_UNPAID || activeViewId === TabType.EXPENSES_PAID) {

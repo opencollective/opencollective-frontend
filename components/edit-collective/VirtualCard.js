@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
+import { EllipsisVertical } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 import { margin } from 'styled-system';
@@ -175,7 +176,7 @@ export const ActionsButton = props => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <As>
-            <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+            <EllipsisVertical size="18px" />
           </As>
         </DropdownMenuTrigger>
         <DropdownMenuContent align={props.openVirtualCardDrawer ? 'end' : 'center'}>

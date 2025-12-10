@@ -19,6 +19,7 @@ export const SECTIONS = {
   HOST_TAX_FORMS: 'host-tax-forms',
   CONTRIBUTORS: 'contributors',
   PEOPLE: 'people',
+  KYC: 'kyc',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
   HOST_EXPECTED_FUNDS: 'expected-funds',

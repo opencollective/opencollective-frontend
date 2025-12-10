@@ -20,6 +20,8 @@ import {
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
 
+import { ContributionCategoryPicker } from '@/components/accept-financial-contributions/ContributionCategoryPicker';
+
 import Container from '../../Container';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
@@ -29,7 +31,7 @@ import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import { H3, P } from '../../Text';
+import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
@@ -259,22 +261,8 @@ class SectionContribute extends React.PureComponent {
       <Fragment>
         {/* "Start accepting financial contributions" for admins */}
         {isAdmin && !hasHost && !isHost && (
-          <ContainerSectionContent py={4}>
-            <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-              <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
-                <FormattedMessage
-                  id="contributions.subtitle"
-                  defaultMessage="To accept financial contributions, you need to complete your setup and decide where your funds will be held."
-                />
-              </P>
-            </Flex>
-            <Box my={5}>
-              <Link href={`/${collective.parentCollective?.slug || collective.slug}/accept-financial-contributions`}>
-                <StyledButton buttonStyle="primary" buttonSize="large">
-                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-                </StyledButton>
-              </Link>
-            </Box>
+          <ContainerSectionContent pb={6}>
+            <ContributionCategoryPicker collective={collective} />
           </ContainerSectionContent>
         )}
 

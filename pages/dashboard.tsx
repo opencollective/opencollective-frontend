@@ -26,17 +26,18 @@ import {
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
-import { getMenuItems } from '../components/dashboard/Menu';
 import { adminPanelQuery } from '../components/dashboard/queries';
-import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
 import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import Header from '@/components/Header';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -220,6 +221,13 @@ const DashboardPage = () => {
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
+    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
+      router.replace('/signup/profile');
+    }
+    // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
+    if (slug === 'me' && LoggedInUser) {
+      router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
+    }
   }, [activeSlug, LoggedInUser]);
 
   // Clear last visited workspace account if not admin
@@ -234,7 +242,6 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
 
   return (
@@ -251,53 +258,58 @@ const DashboardPage = () => {
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
-      <div className="flex min-h-screen flex-col justify-between">
-        <Page
-          noRobots
-          collective={account}
-          title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
-          pageTitle={titleBase}
-          showFooter={false}
-        >
-          {Boolean(notification) && <NotificationBar {...notification} />}
-          {blocker ? (
-            <div className="my-32 flex flex-col items-center">
-              <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-                <p>{blocker}</p>
-                {LoggedInUser && (
-                  <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                    <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
-                  </Link>
+      <Header
+        title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
+        noRobots
+        collective={account}
+        withTopBar={Boolean(blocker)}
+        showMenuItems={false}
+      />
+      {blocker ? (
+        <div className="my-32 flex flex-col items-center">
+          <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+            <p>{blocker}</p>
+            {LoggedInUser && (
+              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+              </Link>
+            )}
+          </MessageBox>
+          {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+        </div>
+      ) : (
+        <SidebarProvider>
+          <DashboardSidebar isLoading={isLoading} />
+          <SidebarInset className="min-w-0">
+            <DashboardTopbar />
+            <div className="flex-1 px-3 md:px-6">
+              {Boolean(notification) && <NotificationBar {...notification} />}
+
+              <div
+                className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
+                data-cy="admin-panel-container"
+              >
+                {LoggedInUser &&
+                require2FAForAdmins(account) &&
+                !LoggedInUser.hasTwoFactorAuth &&
+                selectedSection !== 'user-security' ? (
+                  <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+                ) : (
+                  <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
+                    <DashboardSection
+                      section={selectedSection}
+                      isLoading={isLoading}
+                      account={account}
+                      subpath={subpath}
+                    />
+                  </div>
                 )}
-              </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+              </div>
             </div>
-          ) : (
-            <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
-              data-cy="admin-panel-container"
-            >
-              <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-              {LoggedInUser &&
-              require2FAForAdmins(account) &&
-              !LoggedInUser.hasTwoFactorAuth &&
-              selectedSection !== 'user-security' ? (
-                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-              ) : (
-                <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </Page>
-        <Footer />
-      </div>
+            <Footer isDashboard />
+          </SidebarInset>
+        </SidebarProvider>
+      )}
     </DashboardContext.Provider>
   );
 };

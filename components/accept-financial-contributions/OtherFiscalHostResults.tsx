@@ -24,12 +24,10 @@ export default function OtherFiscalHostResults({
   hosts,
   totalCount,
   collective,
-  onHostApplyClick,
 }: {
   hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
   totalCount: number;
   collective: Pick<Account, 'slug'>;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   return (
     <Box>
@@ -49,9 +47,7 @@ export default function OtherFiscalHostResults({
       </Flex>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
-          return (
-            <ApplyToHostCard key={host.slug} host={host} collective={collective} onHostApplyClick={onHostApplyClick} />
-          );
+          return <ApplyToHostCard key={host.slug} host={host} collective={collective} />;
         })}
       </HostCardContainer>
     </Box>

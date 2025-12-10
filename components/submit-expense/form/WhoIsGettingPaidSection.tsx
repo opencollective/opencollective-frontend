@@ -12,8 +12,8 @@ import { AccountType, ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import { FormField } from '@/components/FormField';
 import LoginBtn from '@/components/LoginBtn';
-import StyledInputFormikField from '@/components/StyledInputFormikField';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 import VendorForm from '@/components/vendors/VendorForm';
@@ -235,14 +235,15 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 <React.Fragment>
                   <Separator className="mt-3" />
                   <div className="mt-3">
-                    <StyledInputFormikField
+                    <FormField
                       disabled={props.isSubmitting}
                       isFastField
-                      label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
+                      label={intl.formatMessage({ defaultMessage: 'Notes for the recipient', id: '1Wu0qx' })}
+                      required={false}
                       name="inviteNote"
                     >
                       {({ field }) => <Textarea className="w-full" {...field} />}
-                    </StyledInputFormikField>
+                    </FormField>
                   </div>
                 </React.Fragment>
               )}

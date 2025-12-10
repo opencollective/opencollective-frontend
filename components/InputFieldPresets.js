@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from 'styled-components';
 
-import Container from './Container';
-import InputField from './InputField';
+import InputAmount from './InputAmount';
 
 const InputFieldPresetsContainer = styled.div`
   .inputField {
@@ -20,10 +19,9 @@ const InputFieldPresetsContainer = styled.div`
 class InputFieldPresets extends React.Component {
   static propTypes = {
     defaultValue: PropTypes.arrayOf(PropTypes.number),
-    pre: PropTypes.string,
-    options: PropTypes.object,
     onChange: PropTypes.func,
     min: PropTypes.number,
+    currency: PropTypes.currency,
   };
 
   constructor(props) {
@@ -49,14 +47,13 @@ class InputFieldPresets extends React.Component {
 
   renderSingleInput(defaultValue, index) {
     return (
-      <InputField
+      <InputAmount
         key={`currency${index}`}
         name={`currency${index}`}
-        type="currency"
-        defaultValue={defaultValue}
-        value={this.state.values[index]}
-        options={this.props.options}
-        pre={this.props.pre}
+        id={`currency${index}`}
+        currency={this.props.currency}
+        currencyDisplay="CODE"
+        value={this.state.values[index] ?? 0}
         min={this.props.min}
         onChange={val => this.handleChange(index, val)}
       />
@@ -70,9 +67,7 @@ class InputFieldPresets extends React.Component {
     }
     return (
       <InputFieldPresetsContainer>
-        <Container flexWrap="wrap" display="flex">
-          {values.map(this.renderSingleInput)}
-        </Container>
+        <div className="flex flex-wrap gap-2">{values.map(this.renderSingleInput)}</div>
       </InputFieldPresetsContainer>
     );
   }
