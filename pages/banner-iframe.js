@@ -429,9 +429,8 @@ class BannerIframe extends React.Component {
 }
 
 const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
-  context: API_V1_CONTEXT,
   options({ collectiveSlug, useNewFormat }) {
-    return { skip: !collectiveSlug || useNewFormat };
+    return { context: API_V1_CONTEXT, skip: !collectiveSlug || useNewFormat };
   },
 });
 

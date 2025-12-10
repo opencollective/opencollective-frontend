@@ -361,12 +361,16 @@ class OnboardingModal extends React.Component {
 
 const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   name: 'editCollectiveMembers',
-  context: API_V1_CONTEXT,
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
   name: 'editCollectiveContact',
-  context: API_V1_CONTEXT,
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addMemberInvitationQuery = graphql(

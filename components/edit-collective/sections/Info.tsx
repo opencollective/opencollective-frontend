@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { gql } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Currency as CurrencyOptions } from '@/lib/constants/currency';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
@@ -195,7 +195,11 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   });
   const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
     refetchQueries: [
-      { query: collectivePageQuery, variables: getCollectivePageQueryVariables(accountFromParent.slug) },
+      {
+        query: collectivePageQuery,
+        context: API_V1_CONTEXT,
+        variables: getCollectivePageQueryVariables(accountFromParent.slug),
+      },
     ],
   });
 

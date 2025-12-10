@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 
+import { API_V1_CONTEXT } from '../lib/graphql/helpers';
+
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
 import Container from '../components/Container';
@@ -53,6 +55,7 @@ class AcceptFinancialContributionsPage extends React.Component {
 
 const addCollectivePageData = graphql(collectivePageQuery, {
   options: props => ({
+    context: API_V1_CONTEXT,
     variables: { slug: props.slug },
   }),
 });

@@ -201,6 +201,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           const queries = [
                             {
                               query: collectivePageQuery,
+                              context: API_V1_CONTEXT,
                               variables: {
                                 slug: collectiveSlug,
                                 nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
@@ -210,6 +211,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           if (tier) {
                             queries.push({
                               query: tierPageQuery,
+                              context: API_V1_CONTEXT,
                               variables: { tierId: tier.id },
                             });
                           }

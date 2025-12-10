@@ -31,7 +31,7 @@ const AccountSettings = ({ account, section }) => {
     context: API_V1_CONTEXT,
   });
   const collective = data?.Collective;
-  const [editCollective] = useMutation(editCollectivePageMutation);
+  const [editCollective] = useMutation(editCollectivePageMutation, { context: API_V1_CONTEXT });
 
   const handleEditCollective = async updatedCollective => {
     const collective = { ...updatedCollective };

@@ -743,6 +743,7 @@ function getLoggedInUserFromToken(token) {
   return graphqlQuery(token, {
     operationName: 'LoggedInUser',
     query: loggedInUserQuery.loc.source.body,
+    context: API_V1_CONTEXT,
   }).then(({ body }) => {
     return body.data.LoggedInUser;
   });

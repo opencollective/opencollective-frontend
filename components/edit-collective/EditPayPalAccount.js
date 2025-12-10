@@ -75,7 +75,9 @@ const EditPayPalAccount = props => {
     createConnectedAccountMutation,
     mutationOptions,
   );
-  const [setSettings, { loading: mutating, error: settingUpdateError }] = useMutation(editCollectiveSettingsMutation);
+  const [setSettings, { loading: mutating, error: settingUpdateError }] = useMutation(editCollectiveSettingsMutation, {
+    context: API_V1_CONTEXT,
+  });
 
   const formik = useFormik({
     initialValues: {

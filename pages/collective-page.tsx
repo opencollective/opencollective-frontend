@@ -8,6 +8,7 @@ import type { Context } from '../lib/apollo-client';
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
+import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -59,6 +60,7 @@ const collectivePageQueryHelper = getSSRQueryHelpers<
   { Collective: { slug: string; id: number; name: string; isHost: boolean; host?: { slug: string } } }
 >({
   query: collectivePageQuery,
+  context: API_V1_CONTEXT,
   getVariablesFromContext,
   getPropsFromContext,
   preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.Collective),

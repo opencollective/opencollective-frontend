@@ -8,7 +8,7 @@ import { styled } from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
 
@@ -388,9 +388,15 @@ const subscriptionsQuery = gqlV1 /* GraphQL */ `
 
 const addReplaceCreditCardMutation = graphql(replaceCreditCardMutation, {
   name: 'replaceCreditCard',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addSubscriptionsData = graphql(subscriptionsQuery, {
+  options: {
+    context: API_V1_CONTEXT,
+  },
   skip: props => {
     return props.loadingLoggedInUser || !props.LoggedInUser;
   },

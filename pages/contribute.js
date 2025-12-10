@@ -9,7 +9,7 @@ import { CONNECTED_COLLECTIVES_ORDER_KEY, PROJECTS_ORDER_KEY } from '../lib/cons
 import { TierTypes } from '../lib/constants/tiers-types';
 import { EMPTY_ARRAY } from '../lib/constants/utils';
 import { sortEvents } from '../lib/events';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getCollectiveTicketsOrder, sortTickets, sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
@@ -462,6 +462,7 @@ const contributePageQuery = gqlV1 /* GraphQL */ `
 
 const addContributePageData = ssrGraphQLQuery({
   query: contributePageQuery,
+  context: API_V1_CONTEXT,
   getVariablesFromProps: props => ({
     slug: props.slug,
     nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
