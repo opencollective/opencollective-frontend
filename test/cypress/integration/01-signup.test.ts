@@ -54,13 +54,12 @@ describe('/signup', () => {
       cy.url().should('include', '/signup/profile');
     });
 
-    it('should complete profile and redirect to welcome page', () => {
+    it('should complete profile and redirect to dashboard', () => {
       cy.getByDataCy('complete-profile-form').as('form');
       cy.get('@form').find('h1').contains("Let's complete your profile");
       cy.get('@form').find('input[name="name"]').type('John Doe');
       cy.get('@form').find('button[type="submit"]').click();
-      cy.url().should('include', '/welcome');
-      cy.getByDataCy('welcome-username').contains('John Doe');
+      cy.url().should('include', '/dashboard');
     });
   });
 
