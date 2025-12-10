@@ -21,7 +21,6 @@ export const ssrGraphQLQuery = ({
   fetchDataFromTree,
   preload,
   useLegacyDataStructure,
-  context,
   ...queryParams
 }: QueryParams) => {
   return ComposedComponent => {
@@ -75,7 +74,7 @@ export const ssrGraphQLQuery = ({
       render() {
         const variables = this.props[APOLLO_VARIABLES_PROP_NAME];
         return (
-          <Query {...queryParams} variables={variables} context={context}>
+          <Query {...queryParams} variables={variables}>
             {queryProps => {
               if (!useLegacyDataStructure) {
                 return <ComposedComponent {...this.props} {...queryProps} />;

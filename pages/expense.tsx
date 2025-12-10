@@ -55,7 +55,6 @@ const expensePageQueryHelper = getSSRQueryHelpers<
   ReturnType<typeof getPropsFromQuery>
 >({
   query: expensePageQuery,
-
   getVariablesFromContext: context => getVariablesFromQuery(context.query),
   getPropsFromContext: context => getPropsFromQuery(context.query),
 });

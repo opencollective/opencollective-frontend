@@ -12,7 +12,7 @@ import { getLegacyIdForCollective } from '../../../../lib/collective';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
-import { gql } from '../../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -477,7 +477,11 @@ const AddFundsModalContentWithCollective = ({
           query: getBudgetSectionQuery(true, false),
           variables: getBudgetSectionQueryVariables(collective.slug, false, host),
         },
-        { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
+        {
+          query: collectivePageQuery,
+          context: API_V1_CONTEXT,
+          variables: getCollectivePageQueryVariables(collective.slug),
+        },
       ],
       awaitRefetchQueries: true,
     },

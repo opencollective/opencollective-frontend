@@ -1,6 +1,7 @@
 import { isIndividualAccount } from '../../../lib/collective';
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 
 import {
   getTotalCollectiveContributionsQueryVariables,
@@ -75,6 +76,7 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
       queries.push(
         client.query({
           query: totalCollectiveContributionsQuery,
+          context: API_V1_CONTEXT,
           variables: getTotalCollectiveContributionsQueryVariables(slug),
         }),
       );

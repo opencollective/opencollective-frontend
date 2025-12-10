@@ -12,7 +12,6 @@ import Page from '../components/Page';
 
 const pricingPageQueryHelpers = getSSRQueryHelpers({
   query: pricingPageQuery,
-
   skipClientIfSSRThrows404: true,
 });
 
