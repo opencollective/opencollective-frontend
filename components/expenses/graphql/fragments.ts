@@ -542,6 +542,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canReject
       canMarkAsSpam
       canPay
+      canMarkAsPaid
       canMarkAsUnpaid
       canMarkAsIncomplete
       canComment
@@ -760,6 +761,7 @@ export const expensesListFieldsFragment = gql`
       canReject
       canMarkAsSpam
       canPay
+      canMarkAsPaid
       canMarkAsUnpaid
       canMarkAsIncomplete
       canSeeInvoiceInfo

@@ -63,6 +63,7 @@ export const hasProcessButtons = permissions => {
     permissions.canUnapprove ||
     permissions.canReject ||
     permissions.canPay ||
+    permissions.canMarkAsPaid ||
     permissions.canMarkAsUnpaid ||
     permissions.canMarkAsSpam ||
     permissions.canDelete ||
@@ -261,7 +262,7 @@ const ProcessExpenseButtons = ({
             }
           />
         )}
-      {permissions.canPay && (
+      {(permissions.canPay || permissions.canMarkAsPaid) && (
         <PayExpenseButton
           {...getButtonProps('PAY')}
           onSubmit={triggerAction}
@@ -270,6 +271,7 @@ const ProcessExpenseButtons = ({
           host={host}
           error={error}
           enableKeyboardShortcuts={enableKeyboardShortcuts}
+          canPayWithAutomaticPayment={permissions.canPay}
         />
       )}
       {permissions.canReject && !isViewingExpenseInHostContext && (

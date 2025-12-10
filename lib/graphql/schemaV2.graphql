@@ -8578,6 +8578,11 @@ type ExpensePermissions {
   canPay: Boolean!
 
   """
+  Whether the current user can mark this expense as paid
+  """
+  canMarkAsPaid: Boolean!
+
+  """
   Whether the current user can approve this expense
   """
   canApprove: Boolean!
@@ -8658,6 +8663,7 @@ type ExpensePermissions {
   delete: Permission!
   seeInvoiceInfo: Permission!
   pay: Permission!
+  markAsPaid: Permission!
   approve: Permission!
   unapprove: Permission!
   reject: Permission!

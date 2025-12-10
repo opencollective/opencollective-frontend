@@ -75,7 +75,16 @@ const PayoutMethodTypeIcon = ({ type, host, ...props }) => {
   }
 };
 
-const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
+const PayExpenseButton = ({
+  expense,
+  collective,
+  host,
+  disabled,
+  onSubmit,
+  error,
+  canPayWithAutomaticPayment,
+  ...props
+}) => {
   const [hasModal, showModal] = React.useState(false);
   const [hasSecurityModal, showSecurityModal] = React.useState(false);
   const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
@@ -115,6 +124,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
           host={host}
           onClose={() => showModal(false)}
           error={error}
+          canPayWithAutomaticPayment={canPayWithAutomaticPayment}
           onSubmit={async values => {
             const { action, ...data } = values;
             const success = await onSubmit(action, data);
