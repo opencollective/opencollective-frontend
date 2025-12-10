@@ -19,7 +19,7 @@ export const TransactionsImportRowNoteForm = ({
   row: Pick<TransactionsImportRow, 'id' | 'note'>;
   autoFocus?: boolean;
 }) => {
-  const [updateRows, { loading }] = useMutation(updateTransactionsImportRows, {});
+  const [updateRows, { loading }] = useMutation(updateTransactionsImportRows);
   const [newText, setNewText] = React.useState(row.note || '');
   const { toast } = useToast();
   const intl = useIntl();

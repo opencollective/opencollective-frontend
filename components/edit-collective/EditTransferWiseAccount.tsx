@@ -65,7 +65,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   const { data, loading, refetch } = useQuery<EditTransferWiseAccountQuery>(editTransferWiseAccountQuery, {
     variables: { slug: collective.slug },
   });
-  const [deleteTransferWiseAccount, { loading: deleting }] = useMutation(deleteTransferWiseAccountMutation, {});
+  const [deleteTransferWiseAccount, { loading: deleting }] = useMutation(deleteTransferWiseAccountMutation);
   const [setSettings, { loading: mutating }] = useMutation(editCollectiveSettingsMutation, { context: API_V1_CONTEXT });
   const connectedAccounts = data?.account?.connectedAccounts;
   const userIsConnected = connectedAccounts?.some(

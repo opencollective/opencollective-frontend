@@ -141,7 +141,7 @@ function HostApplication({
   const intl = useIntl();
   const { toast } = useToast();
 
-  const [callProcessApplication, { loading: loadingMutation }] = useMutation(processApplicationMutation, {});
+  const [callProcessApplication, { loading: loadingMutation }] = useMutation(processApplicationMutation);
 
   const [threadItems, setThreadItems] = React.useState<
     HostApplicationThreadQuery['hostApplication']['threadComments']['nodes']

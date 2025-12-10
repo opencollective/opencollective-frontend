@@ -131,11 +131,11 @@ const FormBody = ({ update, accountSlug }) => {
   const { account } = React.useContext(DashboardContext);
   const [uploading, setUploading] = React.useState(false);
 
-  const [createUpdate] = useMutation(createUpdateMutation, {});
+  const [createUpdate] = useMutation(createUpdateMutation);
   const [editUpdate] = useMutation(editUpdateMutation, { variables: { id: update?.id } });
-  const [unpublishUpdate] = useMutation(unpublishUpdateMutation, {});
-  const [publishUpdate] = useMutation(publishUpdateMutation, {});
-  const [getAudienceData, { loading: audienceLoading }] = useLazyQuery(updateAudienceQuery, {});
+  const [unpublishUpdate] = useMutation(unpublishUpdateMutation);
+  const [publishUpdate] = useMutation(publishUpdateMutation);
+  const [getAudienceData, { loading: audienceLoading }] = useLazyQuery(updateAudienceQuery);
 
   const refetchQueries = React.useMemo(
     () =>

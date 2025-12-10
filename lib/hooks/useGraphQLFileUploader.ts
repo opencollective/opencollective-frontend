@@ -77,7 +77,7 @@ export const useGraphQLFileUploader = ({
   maxSize = undefined,
 }: useGraphQLFileUploaderProps) => {
   const [isUploading, setIsUploading] = React.useState(false);
-  const [callUploadFile] = useMutation(uploadFileMutation, {});
+  const [callUploadFile] = useMutation(uploadFileMutation);
   const { toast } = useToast();
   const intl = useIntl();
 

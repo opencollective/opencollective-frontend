@@ -384,7 +384,7 @@ export const MatchDebitDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPENSES_UNPAID);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows, {});
+  const [updateRows] = useMutation(updateTransactionsImportRows);
   const queryFilter = useMatchDebitDialogQueryFilter(activeViewId, row, host, accounts);
 
   // Query for expenses

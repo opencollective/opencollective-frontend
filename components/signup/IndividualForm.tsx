@@ -388,8 +388,8 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
   const { refetchLoggedInUser, LoggedInUser, login } = useLoggedInUser();
   const formikRef = React.useRef<FormikProps<CompleteProfileFormValuesSchema>>(undefined);
   const { data, refetch: refetchMe } = useQuery(profileQuery, { skip: !LoggedInUser });
-  const [updateAccount] = useMutation(completeProfileMutation, {});
-  const [setPassword] = useMutation(setPasswordMutation, {});
+  const [updateAccount] = useMutation(completeProfileMutation);
+  const [setPassword] = useMutation(setPasswordMutation);
   const [loading, setLoading] = React.useState(false);
   const [passwordScore, setPasswordScore] = React.useState(0);
 

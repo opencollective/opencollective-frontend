@@ -55,7 +55,7 @@ export const OrderAdminAccountingCategoryPill = ({
   host,
 }: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
-  const [updateOrder, { loading }] = useMutation(updateOrderAccountingCategoryMutation, {});
+  const [updateOrder, { loading }] = useMutation(updateOrderAccountingCategoryMutation);
   const { toast } = useToast();
   return (
     <AccountingCategorySelect

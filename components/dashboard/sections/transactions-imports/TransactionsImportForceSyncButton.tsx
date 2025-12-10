@@ -32,7 +32,7 @@ export const TransactionsImportForceSyncButton = ({
 } & ButtonProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation, {});
+  const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation);
   const setHasRequestedSyncTimeout = useRef(null);
   const prevIsSyncing = usePrevious(isSyncing);
 

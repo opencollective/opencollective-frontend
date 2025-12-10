@@ -99,7 +99,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
   const { toast } = useToast();
   const intl = useIntl();
   const { loading, error, data } = useQuery(leaveHostQuery, { variables });
-  const [removeHost, { loading: submitting }] = useMutation(leaveHostMutation, {});
+  const [removeHost, { loading: submitting }] = useMutation(leaveHostMutation);
   const portabilitySummary = getPortabilitySummary(data?.account);
   return (
     <StyledModal onClose={onClose}>

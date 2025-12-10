@@ -856,8 +856,8 @@ const CreatePendingContributionModal = ({
   });
 
   const host = data?.host;
-  const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation, {});
-  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation, {});
+  const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation);
+  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation);
 
   // No modal if logged-out
   if (!LoggedInUser) {

@@ -57,7 +57,7 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
   const [isSubmitted, setSubmitted] = React.useState(true);
 
   // GraphQL & data
-  const [postPublicMessage] = useMutation(postContributionPublicMessageMutation, {});
+  const [postPublicMessage] = useMutation(postContributionPublicMessageMutation);
 
   // Formik
   const initialValues = {

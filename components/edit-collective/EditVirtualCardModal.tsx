@@ -198,8 +198,8 @@ export default function EditVirtualCardModal({
   const isEditing = virtualCard?.id ? true : false;
   const formMutation = isEditing ? editVirtualCardMutation : createVirtualCardMutation;
 
-  const [submitForm, { loading: isBusy }] = useMutation(formMutation, {});
-  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {});
+  const [submitForm, { loading: isBusy }] = useMutation(formMutation);
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
 
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);

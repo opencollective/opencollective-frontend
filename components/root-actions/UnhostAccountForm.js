@@ -29,7 +29,7 @@ const unhostAccountMutation = gql`
 
 const UnhostAccountForm = () => {
   const [account, setAccount] = React.useState(null);
-  const [unhostAccount, { loading }] = useMutation(unhostAccountMutation, {});
+  const [unhostAccount, { loading }] = useMutation(unhostAccountMutation);
   const { toast } = useToast();
   const intl = useIntl();
   return (

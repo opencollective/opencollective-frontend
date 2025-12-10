@@ -72,8 +72,8 @@ const keysDeep = (obj: object, prefix?: string, omit?: string[]) =>
 const SubscriberForm = (props: SubscriberFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { data, loading } = useQuery(availablePlansQuery, {});
-  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation, {});
+  const { data, loading } = useQuery(availablePlansQuery);
+  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation);
   const [disclaimerChecked, setDisclaimerChecked] = React.useState(false);
   const planOptions = data?.platformSubscriptionTiers.map(plan => ({
     value: plan.id,

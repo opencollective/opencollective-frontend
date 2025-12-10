@@ -27,7 +27,7 @@ const AccountType = () => {
   const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
-  const [editAccountType, { loading }] = useMutation(editAccountTypeMutation, {});
+  const [editAccountType, { loading }] = useMutation(editAccountTypeMutation);
   const [isConfirmationModelOpen, setIsConfirmationModelOpen] = React.useState(false);
 
   const callToAction = selectedAccountOption?.value

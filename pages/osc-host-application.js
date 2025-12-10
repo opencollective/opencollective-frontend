@@ -114,7 +114,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
 
-  const { data: hostData } = useQuery(oscHostApplicationPageQuery, {});
+  const { data: hostData } = useQuery(oscHostApplicationPageQuery);
 
   const { data, loading: loadingCollective } = useQuery(oscCollectiveApplicationQuery, {
     variables: { slug: collectiveSlug },

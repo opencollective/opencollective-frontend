@@ -59,38 +59,35 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
   const [step, setStep] = React.useState<Step>(Step.TIER);
   const intl = useIntl();
 
-  const query = useQuery<PlatformSubscriptionFormQuery, PlatformSubscriptionFormQueryVariables>(
-    gql`
-      query PlatformSubscriptionForm {
-        platformSubscriptionTiers {
-          id
-          title
-          type
-          pricing {
-            pricePerMonth {
-              valueInCents
-              currency
-            }
-            pricePerAdditionalCollective {
-              valueInCents
-              currency
-            }
-            pricePerAdditionalExpense {
-              valueInCents
-              currency
-            }
-            includedCollectives
-            includedExpensesPerMonth
+  const query = useQuery<PlatformSubscriptionFormQuery, PlatformSubscriptionFormQueryVariables>(gql`
+    query PlatformSubscriptionForm {
+      platformSubscriptionTiers {
+        id
+        title
+        type
+        pricing {
+          pricePerMonth {
+            valueInCents
+            currency
           }
-          features {
-            ...PlatformSubscriptionFeatures
+          pricePerAdditionalCollective {
+            valueInCents
+            currency
           }
+          pricePerAdditionalExpense {
+            valueInCents
+            currency
+          }
+          includedCollectives
+          includedExpensesPerMonth
+        }
+        features {
+          ...PlatformSubscriptionFeatures
         }
       }
-      ${platformSubscriptionFeatures}
-    `,
-    {},
-  );
+    }
+    ${platformSubscriptionFeatures}
+  `);
 
   const [updatePlanMutation] = useMutation<
     UpdatePlatformSubscriptionMutation,

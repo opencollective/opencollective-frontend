@@ -92,7 +92,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const { data, loading, error } = useQuery(personalTokenQuery, { variables: { id } });
-  const [updateToken] = useMutation(updatePersonalTokenMutation, {});
+  const [updateToken] = useMutation(updatePersonalTokenMutation);
 
   return (
     <div data-cy="personal-token-settings">

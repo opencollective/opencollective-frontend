@@ -161,7 +161,7 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
   const { data, loading, error } = useQuery(userActivitySubscriptionsQuery, {
     variables: { slug: accountSlug },
   });
-  const [setNewsletterOptIn, { loading: setNewsletterOptInLoading }] = useMutation(setNewsletterOptInMutation, {});
+  const [setNewsletterOptIn, { loading: setNewsletterOptInLoading }] = useMutation(setNewsletterOptInMutation);
 
   const accounts = data?.account.memberOf.nodes.map(member => member.account) || [];
   const hosts = accounts.filter(a => !!a.host);

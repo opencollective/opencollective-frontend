@@ -40,7 +40,7 @@ export const InvalidateTaxFormModal = ({
   const intl = useIntl();
   const [message, setMessage] = React.useState('');
   const { toast } = useToast();
-  const [editLegalDocumentStatus, { loading }] = useMutation(editLegalDocumentStatusMutation, {});
+  const [editLegalDocumentStatus, { loading }] = useMutation(editLegalDocumentStatusMutation);
   const onTextChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value),
     [setMessage],

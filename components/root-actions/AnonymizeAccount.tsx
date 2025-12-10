@@ -26,7 +26,7 @@ const anonymizeAccountMutation = gql`
 export const AnonymizeAccount = () => {
   const [showModal, setShowModal] = React.useState(false);
   const [selectedAccount, setSelectedAccount] = React.useState(null);
-  const [_anonymizeAccount, { loading }] = useMutation(anonymizeAccountMutation, {});
+  const [_anonymizeAccount, { loading }] = useMutation(anonymizeAccountMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccount);

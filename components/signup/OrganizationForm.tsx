@@ -91,7 +91,7 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-  const [createOrganization] = useMutation(createOrganizationMutation, {});
+  const [createOrganization] = useMutation(createOrganizationMutation);
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
@@ -429,7 +429,7 @@ export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepPro
   const intl = useIntl();
   const formikRef = useRef<FormikProps<InviteAdminsValuesSchema>>(undefined);
   const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
-  const [inviteOrganizationAdmins] = useMutation(inviteOrganizationAdminsMutation, {});
+  const [inviteOrganizationAdmins] = useMutation(inviteOrganizationAdminsMutation);
   const [loading, setLoading] = React.useState(false);
 
   const onSubmit = async (values: InviteAdminsValuesSchema) => {

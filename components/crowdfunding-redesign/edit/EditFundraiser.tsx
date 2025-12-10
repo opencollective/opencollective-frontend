@@ -135,7 +135,7 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
 };
 
 export function EditFundraiser({ account }) {
-  const [submitEditSettings] = useMutation(editCrowdfundingSettingsMutation, {});
+  const [submitEditSettings] = useMutation(editCrowdfundingSettingsMutation);
 
   const intl = useIntl();
   const initialValues = getDefaultFundraiserValues(account);

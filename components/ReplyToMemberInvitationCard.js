@@ -61,7 +61,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
   const [acceptedTOS, setAcceptedTOS] = React.useState(!hostTermsUrl); // Automatically accepts the TOS if there is no TOS URL
   const [accepted, setAccepted] = React.useState();
   const [isSubmitting, setSubmitting] = React.useState(false);
-  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation, {});
+  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
   const isDisabled = isSubmitting;
   const hasReplied = data && typeof data.replyToMemberInvitation !== 'undefined';
 

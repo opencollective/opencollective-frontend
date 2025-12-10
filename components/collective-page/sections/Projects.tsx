@@ -92,7 +92,7 @@ export default function Projects(props: ProjectsProps) {
   const deboucedSearchTerm = useDebounced(searchTerm, 1000);
   const isSearching = !isEmpty(deboucedSearchTerm);
 
-  const [editAccountSettings, { loading: isSaving }] = useMutation(editAccountSettingMutation, {});
+  const [editAccountSettings, { loading: isSaving }] = useMutation(editAccountSettingMutation);
   const query = useQuery<ProjectsSectionSearchQuery, ProjectsSectionSearchQueryVariables>(
     gql`
       query ProjectsSectionSearch($slug: String, $searchTerm: String) {

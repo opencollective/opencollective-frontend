@@ -310,7 +310,7 @@ function Expense(props: ExpenseProps) {
     },
   });
 
-  const [editExpense] = useMutation(editExpenseMutation, {});
+  const [editExpense] = useMutation(editExpenseMutation);
 
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;

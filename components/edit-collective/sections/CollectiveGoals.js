@@ -318,7 +318,9 @@ class CollectiveGoals extends React.Component {
 
 const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
   name: 'editCollectiveSettings',
-  context: API_V1_CONTEXT,
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));

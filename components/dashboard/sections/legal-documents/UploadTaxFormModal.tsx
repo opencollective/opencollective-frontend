@@ -40,7 +40,7 @@ export const UploadTaxFormModal = ({
   const intl = useIntl();
   const [file, setFile] = React.useState<File | null>(null);
   const { toast } = useToast();
-  const [uploadTaxForm, { loading }] = useMutation(uploadTaxFormMutation, {});
+  const [uploadTaxForm, { loading }] = useMutation(uploadTaxFormMutation);
   return (
     <Dialog {...props} onOpenChange={loading ? null : props.setOpen}>
       <DialogContent>

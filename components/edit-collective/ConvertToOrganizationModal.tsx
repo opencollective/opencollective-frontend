@@ -48,7 +48,7 @@ export function ConvertToOrganizationModal({ open, setOpen, collective }: Conver
   const intl = useIntl();
   const { toast } = useToast();
 
-  const [convertToOrganization, { loading: isConverting }] = useMutation(convertAccountToOrganizationMutation, {});
+  const [convertToOrganization, { loading: isConverting }] = useMutation(convertAccountToOrganizationMutation);
 
   const onSubmit = React.useCallback(
     async (values: z.infer<typeof convertToOrganizationSchema>) => {

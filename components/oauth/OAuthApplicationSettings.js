@@ -91,7 +91,7 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const { data, loading, error } = useQuery(applicationQuery, { variables: { id } });
-  const [updateApplication] = useMutation(updateApplicationMutation, {});
+  const [updateApplication] = useMutation(updateApplicationMutation);
   return (
     <div data-cy="oauth-app-settings">
       <P mt={3} mb={4}>

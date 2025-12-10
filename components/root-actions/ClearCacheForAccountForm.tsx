@@ -32,10 +32,7 @@ const clearCacheMutation = gql`
 const ClearCacheForAccountForm = () => {
   const [account, setAccount] = React.useState(null);
   const [cacheTypes, setCacheTypes] = React.useState<AccountCacheType[]>(() => [...CACHE_TYPES]);
-  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(
-    clearCacheMutation,
-    {},
-  );
+  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation);
   const { toast } = useToast();
   const isValid = account && cacheTypes.length > 0;
   const intl = useIntl();

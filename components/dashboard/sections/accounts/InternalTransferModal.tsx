@@ -85,7 +85,7 @@ export default function InternalTransferModal({
     }
   }, [data?.accout]);
 
-  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation, {});
+  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation);
 
   const isLoading = loadingMutation || loading;
 

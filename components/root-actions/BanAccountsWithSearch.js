@@ -124,7 +124,7 @@ const BanAccountsWithSearch = () => {
   const [selectedAccounts, setSelectedAccounts] = React.useState([]);
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
-  const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation, {});
+  const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccounts?.length);

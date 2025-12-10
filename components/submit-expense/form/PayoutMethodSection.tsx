@@ -551,7 +551,6 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
 
   const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: props.payee?.id,
@@ -576,31 +575,25 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     }
   }, [submitLegalNameMutation, toast, intl]);
 
-  const [deletePayoutMethod] = useMutation(
-    gql`
-      mutation DeletePayoutMethod($payoutMethodId: String!) {
-        removePayoutMethod(payoutMethodId: $payoutMethodId) {
-          id
-        }
+  const [deletePayoutMethod] = useMutation(gql`
+    mutation DeletePayoutMethod($payoutMethodId: String!) {
+      removePayoutMethod(payoutMethodId: $payoutMethodId) {
+        id
       }
-    `,
-    {},
-  );
+    }
+  `);
 
-  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(
-    gql`
-      mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
-        editPayoutMethod(payoutMethod: $payoutMethod) {
-          id
-          name
-          data
-          isSaved
-          type
-        }
+  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(gql`
+    mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
+      editPayoutMethod(payoutMethod: $payoutMethod) {
+        id
+        name
+        data
+        isSaved
+        type
       }
-    `,
-    {},
-  );
+    }
+  `);
 
   const { showConfirmationModal } = useModal();
 

@@ -18,7 +18,7 @@ interface PendingApplicationActionsProps {
 export default function PendingApplicationActions({ collective, refetch }: PendingApplicationActionsProps) {
   const intl = useIntl();
   const { toast } = useToast();
-  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {});
+  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation);
 
   const processApplication = async (action: string, message?: string) => {
     try {

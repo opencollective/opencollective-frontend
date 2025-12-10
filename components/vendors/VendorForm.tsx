@@ -204,8 +204,8 @@ const validateVendorForm = values => {
 const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxForm, ...props }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation, {});
-  const [editVendor, { loading: isEditing }] = useMutation(editVendorMutation, {});
+  const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation);
+  const [editVendor, { loading: isEditing }] = useMutation(editVendorMutation);
   const drawerActionsContainer = useDrawerActionsContainer();
 
   const handleSubmit = async values => {

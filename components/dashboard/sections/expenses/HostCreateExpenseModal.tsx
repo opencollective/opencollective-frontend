@@ -188,7 +188,7 @@ export const HostCreateExpenseModal = ({
 } & BaseModalProps) => {
   const intl = useIntl();
   const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(transactionsImportRow?.amount?.valueInCents));
-  const [createExpense, { client }] = useMutation(hostCreateExpenseMutation, {});
+  const [createExpense, { client }] = useMutation(hostCreateExpenseMutation);
   const { toast } = useToast();
   const expenseTypeOptions = React.useMemo(
     () => SUPPORTED_EXPENSE_TYPES.map(value => getExpenseTypeOption(intl, value)),

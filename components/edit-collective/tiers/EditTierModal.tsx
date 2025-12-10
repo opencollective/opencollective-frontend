@@ -924,7 +924,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setForm
     },
   });
 
-  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, {});
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation);
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
   const { toast } = useToast();

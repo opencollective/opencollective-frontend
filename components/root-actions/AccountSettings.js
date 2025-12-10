@@ -42,7 +42,7 @@ const AccountSettings = () => {
   const [trustedHostFlag, setTrustedHostFlag] = React.useState();
   const [twoFactorEnabledFlag, setTwoFactorEnabledFlag] = React.useState();
   const [enableSave, setEnableSave] = React.useState(false);
-  const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation, {});
+  const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation);
 
   useEffect(() => {
     setArchivedFlag(selectedAccountOption?.value?.isArchived);

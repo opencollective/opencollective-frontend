@@ -53,7 +53,7 @@ const TransactionRejectModal = ({
   setOpen,
   onCloseFocusRef,
 }: TransactionRejectModalProps) => {
-  const [rejectTransaction, { loading }] = useMutation(rejectTransactionMutation, {});
+  const [rejectTransaction, { loading }] = useMutation(rejectTransactionMutation);
   const [message, setMessage] = React.useState('');
 
   const handleRejectTransaction = async () => {

@@ -43,7 +43,7 @@ const ExpenseAdminAccountingCategoryPill = ({
   showCodeInSelect,
 }: Omit<ExpenseAccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
-  const [editExpense, { loading }] = useMutation(editExpenseCategoryMutation, {});
+  const [editExpense, { loading }] = useMutation(editExpenseCategoryMutation);
   const { toast } = useToast();
   return (
     <AccountingCategorySelect

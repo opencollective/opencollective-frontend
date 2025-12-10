@@ -78,7 +78,7 @@ const Tiers = ({ collective }) => {
 
   const variables = { accountSlug: collective.slug };
   const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables });
-  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {});
+  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation);
   const intl = useIntl();
   const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);
   const contributeCards = React.useMemo(

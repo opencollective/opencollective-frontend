@@ -165,8 +165,7 @@ const MoveAuthoredContributions = () => {
   // GraphQL
   const { data, loading, error: ordersQueryError } = useQuery(ordersQuery, getOrdersQueryOptions(fromAccount));
   const allOptions = React.useMemo(() => getOrdersOptionsFromData(intl, data), [intl, data]);
-  const mutationOptions = {};
-  const [submitMoveContributions] = useMutation(moveOrdersMutation, mutationOptions);
+  const [submitMoveContributions] = useMutation(moveOrdersMutation);
   const moveContributions = async () => {
     try {
       // Prepare variables

@@ -46,7 +46,7 @@ const MembersTable = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [inviteMember] = useMutation(inviteMemberMutation, {});
+  const [inviteMember] = useMutation(inviteMemberMutation);
 
   const handleResendInvite = async (member: MemberTableRecord) => {
     try {

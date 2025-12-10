@@ -12,7 +12,7 @@ import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { WebhookEvents } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
@@ -448,9 +448,17 @@ const editCollectiveWebhooksMutation = gqlV1 /* GraphQL */ `
 
 const addEditCollectiveWebhooksData = graphql<Props, GraphQLV1Collective, { collectiveSlug: string }>(
   editCollectiveWebhooksQuery,
+  {
+    options: {
+      context: API_V1_CONTEXT,
+    },
+  },
 );
 
 const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
+  options: {
+    context: API_V1_CONTEXT,
+  },
   props: ({ mutate, ownProps }: { mutate: MutationFunction; ownProps: OwnProps }) => ({
     editWebhooks: (variables: { collectiveId: number; notifications: Notification[] }) =>
       mutate({

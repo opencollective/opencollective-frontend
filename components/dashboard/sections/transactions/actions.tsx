@@ -52,7 +52,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
 
   const { LoggedInUser } = useLoggedInUser();
 
-  const [refundTransaction] = useMutation(refundTransactionMutation, {});
+  const [refundTransaction] = useMutation(refundTransactionMutation);
 
   const { callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
 

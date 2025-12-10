@@ -102,7 +102,7 @@ const OTHER_LABEL = 'Other';
 
 export const useUpdateOrder = ({ contribution, onSuccess }) => {
   const { toast } = useToast();
-  const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation, {});
+  const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation);
   return {
     isSubmittingOrder: loading,
     updateOrder: async (selectedTier, selectedAmountOption, inputAmountValue, paypalSubscriptionId = null) => {

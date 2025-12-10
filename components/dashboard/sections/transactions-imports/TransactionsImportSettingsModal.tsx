@@ -90,18 +90,11 @@ export default function TransactionsImportSettingsModal({
 }) {
   const { toast } = useToast();
   const intl = useIntl();
-  const mutationParams = {};
   const apolloClient = useApolloClient();
   const { redirectToGoCardlessConnect, isRedirecting } = useRedirectToGoCardlessConnect();
-  const [editTransactionsImport] = useMutation(editTransactionsImportMutation, mutationParams);
-  const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(
-    deleteConnectedAccountMutation,
-    mutationParams,
-  );
-  const [deleteTransactionsImport, { loading: isDeleting }] = useMutation(
-    deleteTransactionsImportMutation,
-    mutationParams,
-  );
+  const [editTransactionsImport] = useMutation(editTransactionsImportMutation);
+  const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(deleteConnectedAccountMutation);
+  const [deleteTransactionsImport, { loading: isDeleting }] = useMutation(deleteTransactionsImportMutation);
 
   const handleDisconnect = async () => {
     try {

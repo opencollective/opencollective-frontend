@@ -100,7 +100,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
   );
 
   const intl = useIntl();
-  const [moveExpense, { loading: submitting }] = useMutation(moveExpenseMutation, {});
+  const [moveExpense, { loading: submitting }] = useMutation(moveExpenseMutation);
 
   const onSubmit = React.useCallback(
     async values => {
@@ -960,7 +960,7 @@ export default function EditExpenseDialog({
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
-  const [editExpense] = useMutation(editExpenseMutation, {});
+  const [editExpense] = useMutation(editExpenseMutation);
 
   const handleClose = () => setOpen(false);
 

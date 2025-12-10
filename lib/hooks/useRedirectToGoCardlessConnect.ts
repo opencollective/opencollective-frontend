@@ -16,7 +16,7 @@ const generateGoCardlessLinkMutation = gql`
 
 export const useRedirectToGoCardlessConnect = () => {
   const [isRedirecting, setIsRedirecting] = React.useState(false);
-  const [generateGoCardlessLink] = useMutation(generateGoCardlessLinkMutation, {});
+  const [generateGoCardlessLink] = useMutation(generateGoCardlessLinkMutation);
 
   const redirectToGoCardlessConnect = async (
     hostId: string,

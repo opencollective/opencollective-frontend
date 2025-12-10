@@ -138,7 +138,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expe
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [payeeType, setPayeeType] = React.useState(values.payee?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER);
-  const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery, {});
+  const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery);
 
   const changePayeeType = e => {
     e.stopPropagation();

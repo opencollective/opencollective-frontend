@@ -105,7 +105,7 @@ export const TransactionsImportAssignmentsForm = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation, {});
+  const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation);
 
   return (
     <Formik<AssignmentFormValues>

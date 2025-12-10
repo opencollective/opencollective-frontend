@@ -31,7 +31,7 @@ const setTagsMutation = gql`
  * Display expense tags, with the ability to edit them. Triggers a migration whenever a tag changes.
  */
 const TagsForAdmins = ({ expense, order, suggestedTags }) => {
-  const [setTags, { loading }] = useMutation(setTagsMutation, {});
+  const [setTags, { loading }] = useMutation(setTagsMutation);
   const tagList = expense?.tags || order?.tags;
   const { toast } = useToast();
   const intl = useIntl();

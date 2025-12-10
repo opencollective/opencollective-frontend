@@ -136,7 +136,7 @@ const FreezeAccountModal = ({
   const { data, loading, error } = useQuery(freezeAccountModalQuery, {
     variables: { accountId: collective.id },
   });
-  const [editAccountFreezeStatus, { loading: submitting }] = useMutation(editAccountFreezeStatusMutation, {});
+  const [editAccountFreezeStatus, { loading: submitting }] = useMutation(editAccountFreezeStatusMutation);
   const setMessageForAccountAdminsFromInputEvent = React.useCallback(
     e => _setMessageForAccountAdmins(e.target.value),
     [],

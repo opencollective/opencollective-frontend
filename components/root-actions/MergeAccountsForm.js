@@ -33,7 +33,7 @@ const mergeAccountsMutation = gql`
 `;
 
 const MergeAccountsForm = () => {
-  const [submitMergeAccounts, { loading }] = useMutation(mergeAccountsMutation, {});
+  const [submitMergeAccounts, { loading }] = useMutation(mergeAccountsMutation);
   const [mergeSummary, setMergeSummary] = React.useState(false);
   const [fromAccount, setFromAccount] = React.useState(null);
   const [toAccount, setToAccount] = React.useState(null);

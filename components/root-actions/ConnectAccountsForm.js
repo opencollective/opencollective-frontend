@@ -31,7 +31,7 @@ const CONNECTED_ACCOUNT_ACCEPTED_TYPES = [
 ];
 
 const ConnectAccountsForm = () => {
-  const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation, {});
+  const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation);
   const [memberAccount, setMemberAccount] = React.useState(null);
   const [account, setAccount] = React.useState(null);
   const { toast } = useToast();

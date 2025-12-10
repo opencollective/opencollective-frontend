@@ -171,7 +171,7 @@ export const StepMapCSVColumns = ({
   const [nbRowsDisplayed, setNbRowsDisplayed] = React.useState(5);
   const [csvConfig, setCSVConfig] = React.useState<CSVConfig>(() => getDefaultCSVConfig(currency));
   const [parsingError, setParsingError] = React.useState<string | null>(null);
-  const [importTransactions, { loading }] = useMutation(uploadTransactionsImportMutation, {});
+  const [importTransactions, { loading }] = useMutation(uploadTransactionsImportMutation);
   const parsedData = React.useMemo<TransactionsImportRowCreateInput[]>(
     () => rawCSVData.map(row => applyCSVConfig(row, csvConfig)),
     [rawCSVData, csvConfig],

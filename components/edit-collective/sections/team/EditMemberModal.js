@@ -96,12 +96,10 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     },
   });
 
-  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation, {});
+  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation);
 
-  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] = useMutation(
-    editMemberInvitationMutation,
-    {},
-  );
+  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] =
+    useMutation(editMemberInvitationMutation);
 
   const [removeMemberAccount, { loading: isRemovingMember }] = useMutation(removeMemberMutation, {
     refetchQueries: [

@@ -100,9 +100,9 @@ const BankTransfer = props => {
   const { loading, data } = useQuery(hostQuery, {
     variables: { slug: props.collectiveSlug },
   });
-  const [createPayoutMethod] = useMutation(createPayoutMethodMutation, {});
-  const [removePayoutMethod] = useMutation(removePayoutMethodMutation, {});
-  const [editBankTransfer] = useMutation(editBankTransferMutation, {});
+  const [createPayoutMethod] = useMutation(createPayoutMethodMutation);
+  const [removePayoutMethod] = useMutation(removePayoutMethodMutation);
+  const [editBankTransfer] = useMutation(editBankTransferMutation);
   const [showForm, setShowForm] = React.useState(false);
   const [showRemoveBankConfirmationModal, setShowRemoveBankConfirmationModal] = React.useState(false);
 

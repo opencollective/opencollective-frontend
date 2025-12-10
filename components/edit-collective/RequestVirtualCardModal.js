@@ -66,10 +66,7 @@ const RequestVirtualCardModal = props => {
   }));
 
   const { toast } = useToast();
-  const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(
-    requestVirtualCardMutation,
-    {},
-  );
+  const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation);
   const formik = useFormik({
     initialValues: { ...initialValues, collective: props.collective },
     async onSubmit(values) {

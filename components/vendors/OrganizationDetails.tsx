@@ -77,7 +77,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
     variables: { organizationSlug: organization.slug },
   });
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
-  const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation, {});
+  const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation);
 
   const handleConvert = async () => {
     try {

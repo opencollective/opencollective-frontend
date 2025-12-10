@@ -34,7 +34,7 @@ const ButtonLabel = styled(Span).attrs({
  * Because it fires a request, this button should **not** be used in lists.
  */
 const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedInUser, loadingLoggedInUser }) => {
-  const [followConversation, { loading: submitting }] = useMutation(followConversationMutation, {});
+  const [followConversation, { loading: submitting }] = useMutation(followConversationMutation);
 
   const { data, loading } = useQuery(isUserFollowingConversationQuery, {
     variables: { id: conversationId },

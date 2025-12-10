@@ -141,8 +141,8 @@ export const ActionsButton = props => {
     [toast],
   );
 
-  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {});
-  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {});
+  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation);
+  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation);
 
   const isActive = virtualCard.data.status === 'active' || virtualCard.data.state === 'OPEN';
   const isCanceled = virtualCard.data.status === 'canceled';

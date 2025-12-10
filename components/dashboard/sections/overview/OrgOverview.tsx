@@ -23,7 +23,7 @@ export function OrgOverview() {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showSetupGuide, setShowSetupGuide] = useState(undefined);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(undefined);
-  const [editAccountSetting] = useMutation(editAccountSettingMutation, {});
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
 
   useEffect(() => {
     if (!LoggedInUser || !account) {

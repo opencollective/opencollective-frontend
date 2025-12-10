@@ -57,7 +57,7 @@ const getInitialValues = account => {
 const FiscalHost = ({ account }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {});
+  const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation);
 
   const { account: accountFromDashboardQuery } = React.useContext(DashboardContext);
   const isUpgradeRequiredForSettingHostFee = requiresUpgrade(accountFromDashboardQuery, FEATURES.CHARGE_HOSTING_FEES);

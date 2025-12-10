@@ -401,7 +401,7 @@ export const MatchCreditDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPECTED_FUNDS);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows, {});
+  const [updateRows] = useMutation(updateTransactionsImportRows);
   const queryFilter = useMatchCreditDialogQueryFilter(activeViewId, row, host, accounts);
   const [isConfirming, setIsConfirming] = React.useState(false);
 

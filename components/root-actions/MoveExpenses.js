@@ -33,7 +33,7 @@ const moveExpensesMutation = gql`
 export default function MoveExpenses() {
   const intl = useIntl();
   const { toast } = useToast();
-  const [submitMoveExpenses] = useMutation(moveExpensesMutation, {});
+  const [submitMoveExpenses] = useMutation(moveExpensesMutation);
 
   const [sourceAccount, setSourceAccount] = React.useState(null);
   const [destinationAccount, setDestinationAccount] = React.useState(null);

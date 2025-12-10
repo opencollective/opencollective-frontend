@@ -93,7 +93,7 @@ export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomi
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
-  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(startResumeContributionsProcess, {});
+  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(startResumeContributionsProcess);
 
   const account = data?.account;
   const pausedCount = account?.pausedIncoming?.totalCount ?? 0;

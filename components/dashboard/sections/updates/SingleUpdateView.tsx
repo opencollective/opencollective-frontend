@@ -56,7 +56,7 @@ const SingleUpdateView = ({ updateId }) => {
     },
   });
 
-  const [deleteUpdate] = useMutation(deleteUpdateMutation, {});
+  const [deleteUpdate] = useMutation(deleteUpdateMutation);
 
   const refetchQueries = getRefetchQueries(account);
   const update = data?.update;

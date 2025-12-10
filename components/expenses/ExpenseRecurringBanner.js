@@ -31,7 +31,7 @@ const deleteExpenseMutation = gql`
 
 const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   const { recurringExpense } = expense;
-  const [deleteExpense, { loading }] = useMutation(deleteExpenseMutation, {});
+  const [deleteExpense, { loading }] = useMutation(deleteExpenseMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const router = useRouter();

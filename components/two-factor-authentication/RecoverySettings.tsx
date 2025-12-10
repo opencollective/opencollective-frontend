@@ -30,7 +30,6 @@ export function RecoverySettings(props: RecoverySettingsProps) {
 
   const [regenerateRecoveryCodes, { loading }] = useMutation<{ regenerateRecoveryCodes: string[] }>(
     regenerateRecoveryCodesMutation,
-    {},
   );
 
   const onRegenerateConfirmation = React.useCallback(async () => {

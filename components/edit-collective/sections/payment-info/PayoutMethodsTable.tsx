@@ -18,30 +18,24 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
   const { toast } = useToast();
   const intl = useIntl();
 
-  const [removePayoutMethod] = useMutation(
-    gql`
-      mutation PaymentInfoRemovePayoutMethod($payoutMethodId: String!) {
-        removePayoutMethod(payoutMethodId: $payoutMethodId) {
-          id
-          ...PayoutMethodFields
-        }
+  const [removePayoutMethod] = useMutation(gql`
+    mutation PaymentInfoRemovePayoutMethod($payoutMethodId: String!) {
+      removePayoutMethod(payoutMethodId: $payoutMethodId) {
+        id
+        ...PayoutMethodFields
       }
-      ${PayoutMethodFragment}
-    `,
-    {},
-  );
-  const [restorePayoutMethod] = useMutation(
-    gql`
-      mutation PaymentInfoRestorePayoutMethod($payoutMethod: PayoutMethodReferenceInput!) {
-        restorePayoutMethod(payoutMethod: $payoutMethod) {
-          id
-          ...PayoutMethodFields
-        }
+    }
+    ${PayoutMethodFragment}
+  `);
+  const [restorePayoutMethod] = useMutation(gql`
+    mutation PaymentInfoRestorePayoutMethod($payoutMethod: PayoutMethodReferenceInput!) {
+      restorePayoutMethod(payoutMethod: $payoutMethod) {
+        id
+        ...PayoutMethodFields
       }
-      ${PayoutMethodFragment}
-    `,
-    {},
-  );
+    }
+    ${PayoutMethodFragment}
+  `);
 
   const actions = React.useMemo(
     () => ({

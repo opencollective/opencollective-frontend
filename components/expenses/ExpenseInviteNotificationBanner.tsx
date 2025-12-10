@@ -28,7 +28,7 @@ const resendDraftExpenseInviteMutation = gql`
 const ResendDraftInviteButton = ({ expense }) => {
   const { toast } = useToast();
   const intl = useIntl();
-  const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {});
+  const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation);
   const success = !error && data?.resendDraftExpenseInvite?.id;
 
   return (

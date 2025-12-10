@@ -29,7 +29,7 @@ export default function ApproveExpenseModal({
   expense,
 }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
-  const [editExpense] = useMutation(editExpenseCategoryMutation, {});
+  const [editExpense] = useMutation(editExpenseCategoryMutation);
   const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory || undefined);
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();

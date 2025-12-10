@@ -91,7 +91,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
     hostFeesStructure: collective.hostFeesStructure,
     hostFeePercent: collective.hostFeePercent || host.hostFeePercent,
   });
-  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee, {});
+  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee);
   const handleFeeStructureChange = async ({ hostFeesStructure, hostFeePercent }) => {
     const previousState = cloneDeep(feeStructure);
     const isCustomFee = hostFeesStructure === HOST_FEE_STRUCTURE.CUSTOM_FEE;

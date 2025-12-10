@@ -74,7 +74,7 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
 };
 
 export function EditProfile({ account }) {
-  const [submitEditSettings] = useMutation(editCrowdfundingSettingsMutation, {});
+  const [submitEditSettings] = useMutation(editCrowdfundingSettingsMutation);
   const intl = useIntl();
   const initialValues = getDefaultProfileValues(account);
   const onSubmit = async values => {

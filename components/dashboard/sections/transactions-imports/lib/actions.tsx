@@ -76,7 +76,7 @@ export const useTransactionsImportActions = ({
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
-  const [updateRows] = useMutation(updateTransactionsImportRows, {});
+  const [updateRows] = useMutation(updateTransactionsImportRows);
   const { showModal, hideModal } = useModal();
 
   const setRowsStatus = async (

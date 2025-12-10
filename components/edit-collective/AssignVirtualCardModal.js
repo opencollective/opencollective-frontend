@@ -77,8 +77,8 @@ const throttledCall = debounce((searchFunc, variables) => {
 
 const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClose, ...modalProps }) => {
   const { toast } = useToast();
-  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation, {});
-  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {});
+  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation);
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
 
   const formik = useFormik({
     initialValues: {

@@ -55,7 +55,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
 
-  const [expireOrder] = useMutation(expireOrderMutation, {});
+  const [expireOrder] = useMutation(expireOrderMutation);
 
   const getActions: GetActions<T> = (
     order: T,

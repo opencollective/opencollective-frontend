@@ -100,7 +100,7 @@ const applyToHostMutation = gql`
 `;
 
 const useApplicationMutation = canApplyWithCollective =>
-  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {});
+  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation);
 
 const ApplicationForm = ({
   LoggedInUser,

@@ -91,7 +91,7 @@ const Security = ({ collective }) => {
   const { data, loading } = useQuery(securityAccountQuery, {
     variables: { slug: collective.slug },
   });
-  const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation, {});
+  const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation);
 
   if (loading) {
     return <LoadingPlaceholder height={300} />;

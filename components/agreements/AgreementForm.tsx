@@ -137,7 +137,7 @@ const AgreementForm = ({
   const drawerActionsContainer = useDrawerActionsContainer();
   const isEditing = Boolean(agreement);
   const mutation = isEditing ? EDIT_AGREEMENT_MUTATION : ADD_AGREEMENT_MUTATION;
-  const [submitAgreement] = useMutation(mutation, {});
+    const [submitAgreement] = useMutation(mutation);
   return (
     <div>
       <H4 mb={32}>

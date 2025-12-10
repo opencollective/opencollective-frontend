@@ -195,15 +195,13 @@ const Policies = ({ collective }) => {
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
   });
-  const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] = useMutation(
-    updateFilterCategoriesMutation,
-    {},
-  );
+  const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] =
+    useMutation(updateFilterCategoriesMutation);
   const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] = useMutation(
     editCollectivePolicyMutation,
     { context: API_V1_CONTEXT },
   );
-  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation, {});
+  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation);
   const error = categoriesError || settingsError || policiesError;
 
   // Data and data handling

@@ -59,9 +59,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
   const { toast } = useToast();
 
-  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation, {});
+  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation);
 
-  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation, {});
+  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation);
 
   const startWebauthnDeviceRegistration = React.useCallback(async () => {
     const response = await createPublicKeyRequestOptions({

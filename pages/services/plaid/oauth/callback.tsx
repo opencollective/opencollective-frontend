@@ -55,7 +55,6 @@ const PlaidOAuthCallbackPage = () => {
   >(connectPlaidAccountMutation);
   const [refreshPlaidAccount] = useMutation<RefreshPlaidAccountMutation, RefreshPlaidAccountMutationVariables>(
     refreshPlaidAccountMutation,
-    {},
   );
   const { open, ready } = usePlaidLink({
     receivedRedirectUri: windowData.receivedRedirectUri,
