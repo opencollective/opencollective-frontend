@@ -155,7 +155,7 @@ export const expensesPageQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
       }
     }
     # limit: 1 as current best practice to avoid the API fetching entries it doesn't need

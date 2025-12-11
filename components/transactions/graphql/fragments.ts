@@ -3,7 +3,7 @@ import { gql } from '../../../lib/graphql/helpers';
 import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 
 export const transactionsQueryCollectionFragment = gql`
-  fragment TransactionsQueryCollectionFragment on TransactionCollection {
+  fragment TransactionsQueryCollection on TransactionCollection {
     offset
     limit
     nodes {
