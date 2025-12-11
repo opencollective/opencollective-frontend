@@ -1,3 +1,24 @@
+// RFC 011: HOC variable naming rule
+// GraphQL HOC should be assigned to a variable named like the query/mutation, prefixed by 'add'.
+const ENABLE_HOC_NAME_RULE = true;
+
+function checkHocNameRule(file, i, line) {
+  // Look for: const addCreateCollectiveMutation = graphql(createCollectiveMutation);
+  const hocAssignRegex =
+    /const\s+(add([A-Z][a-zA-Z0-9]+)(Mutation|Query|Fragment))\s*=\s*graphql\((\s*([a-zA-Z0-9_]+)\s*)\)/;
+  const match = line.match(hocAssignRegex);
+  if (match) {
+    const varName = match[1];
+    const opName = match[5];
+    // Ensure opName is PascalCase for the expected variable name
+    const pascalOpName = opName.charAt(0).toUpperCase() + opName.slice(1);
+    const expectedVar = `add${pascalOpName}`;
+    if (varName !== expectedVar) {
+      console.log(`[HOC Name] ${file}:${i + 1} -> "${varName}" should be "${expectedVar}"`);
+      errorCount++;
+    }
+  }
+}
 // RFC 011 audit script for GraphQL best practices
 
 // Usage: node scripts/rfc011-audit.js
@@ -74,6 +95,10 @@ function auditFile(file) {
   const lines = content.split('\n');
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    // HOC assignment rule
+    if (ENABLE_HOC_NAME_RULE && line.includes('graphql(')) {
+      checkHocNameRule(file, i, line);
+    }
 
     // Simple and reliable: look for lines with gql and a backtick, then collect until closing backtick
     if (ENABLE_OPERATION_NAME_RULE && line.match(/gql(V1)?`/)) {
