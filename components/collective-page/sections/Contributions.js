@@ -216,6 +216,7 @@ const contributionsSectionQuery = gql`
         orderByRoles: true
         isApproved: true
         isArchived: false
+        isFrozen: false
         orderBy: $orderBy
       ) {
         offset
