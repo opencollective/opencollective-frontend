@@ -19,7 +19,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from '@/components/dashboard/sections/expenses/filters';
-import { expenseHostFields, expensesListFieldsFragment } from '@/components/expenses/graphql/fragments';
+import { expenseHostFieldsFragment, expensesListFieldsFragment } from '@/components/expenses/graphql/fragments';
 
 import { Filterbar } from '../dashboard/filters/Filterbar';
 import ScheduledExpensesBanner from '../dashboard/sections/expenses/ScheduledExpensesBanner';
@@ -172,7 +172,7 @@ export const expensesPageQuery = gql`
 
   ${expensesListFieldsFragment}
   ${accountNavbarFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 export const schema = commonSchema.extend({ direction: expenseDirectionFilter.schema });

@@ -1,6 +1,6 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const paymentMethodFragment = gql`
@@ -149,7 +149,7 @@ export const managedOrderFragment = gql`
       code
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
   ${paymentMethodFragment}
 `;
 

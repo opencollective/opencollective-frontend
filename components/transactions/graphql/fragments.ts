@@ -1,6 +1,6 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 
 export const transactionsQueryCollectionFragment = gql`
   fragment TransactionsQueryCollectionFragment on TransactionCollection {
@@ -183,5 +183,5 @@ export const transactionsQueryCollectionFragment = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;

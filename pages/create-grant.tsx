@@ -86,7 +86,7 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
   );
 }
 
-const CollectivePageMetadataFieldsFragment = gql`
+const collectivePageMetadataFieldsFragment = gql`
   fragment CollectivePageMetadataFields on Account {
     ... on AccountWithParent {
       parent {
@@ -131,7 +131,7 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
         }
       }
 
-      ${CollectivePageMetadataFieldsFragment}
+      ${collectivePageMetadataFieldsFragment}
     `,
     variables: {
       collectiveSlug,

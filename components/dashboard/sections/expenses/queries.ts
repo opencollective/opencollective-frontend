@@ -1,8 +1,8 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import {
-  expenseHostFields,
+  expenseHostFieldsFragment,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../../../expenses/graphql/fragments';
@@ -97,7 +97,7 @@ export const accountExpensesQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 export const accountExpensesMetadataQuery = gql`
@@ -146,7 +146,7 @@ export const accountExpensesMetadataQuery = gql`
       }
     }
   }
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 export const hostDashboardExpensesQuery = gql`
@@ -220,10 +220,10 @@ export const hostDashboardExpensesQuery = gql`
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
-export const hostInfoCardFields = gql`
+export const hostInfoCardFieldsFragment = gql`
   fragment HostInfoCardFields on Host {
     id
     legacyId
@@ -318,6 +318,6 @@ export const hostDashboardMetadataQuery = gql`
     }
   }
 
-  ${accountHoverCardFields}
-  ${hostInfoCardFields}
+  ${accountHoverCardFieldsFragment}
+  ${hostInfoCardFieldsFragment}
 `;
