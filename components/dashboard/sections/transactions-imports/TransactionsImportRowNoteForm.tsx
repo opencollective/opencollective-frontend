@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { updateTransactionsImportRows } from './lib/graphql';
+import { updateTransactionsImportRowsMutation } from './lib/graphql';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
 
@@ -19,7 +19,7 @@ export const TransactionsImportRowNoteForm = ({
   row: Pick<TransactionsImportRow, 'id' | 'note'>;
   autoFocus?: boolean;
 }) => {
-  const [updateRows, { loading }] = useMutation(updateTransactionsImportRows);
+  const [updateRows, { loading }] = useMutation(updateTransactionsImportRowsMutation);
   const [newText, setNewText] = React.useState(row.note || '');
   const { toast } = useToast();
   const intl = useIntl();
@@ -49,7 +49,7 @@ export const TransactionsImportRowNoteForm = ({
               const result = await updateRows({
                 variables: { rows: [{ id: row.id, note: newText }], action: 'UPDATE_ROWS' },
               });
-              const responseText = get(result, 'data.updateTransactionsImportRows.rows.0.note');
+              const responseText = get(result, 'data.updateTransactionsImportRowsMutation.rows.0.note');
               if (typeof responseText === 'string') {
                 setNewText(responseText);
               }

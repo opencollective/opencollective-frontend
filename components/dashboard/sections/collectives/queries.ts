@@ -1,8 +1,8 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 
-export const HostApplicationFields = gql`
+export const hostApplicationFieldsFragment = gql`
   fragment HostApplicationFields on HostApplication {
     id
     message
@@ -72,11 +72,11 @@ export const HostApplicationFields = gql`
     }
   }
 
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
-const processApplicationAccountFields = gql`
-  fragment ProcessHostApplicationFields on AccountWithHost {
+const processApplicationAccountFieldsFragment = gql`
+  fragment ProcesshostApplicationFields on AccountWithHost {
     isActive
     approvedAt
     isApproved
@@ -146,7 +146,7 @@ export const hostApplicationsQuery = gql`
       }
     }
   }
-  ${HostApplicationFields}
+  ${hostApplicationFieldsFragment}
 `;
 
 export const processApplicationMutation = gql`
@@ -167,7 +167,7 @@ export const processApplicationMutation = gql`
       account {
         id
         ... on AccountWithHost {
-          ...ProcessHostApplicationFields
+          ...ProcesshostApplicationFields
         }
       }
       conversation {
@@ -179,11 +179,11 @@ export const processApplicationMutation = gql`
       }
     }
   }
-  ${processApplicationAccountFields}
-  ${HostApplicationFields}
+  ${processApplicationAccountFieldsFragment}
+  ${hostApplicationFieldsFragment}
 `;
 
-const hostedCollectiveFields = gql`
+const hostedCollectiveFieldsFragment = gql`
   fragment HostedCollectiveFields on Account {
     id
     legacyId
@@ -310,7 +310,7 @@ const hostedCollectiveFields = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const hostedCollectivesMetadataQuery = gql`
@@ -394,7 +394,7 @@ export const hostedCollectivesQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;
 
 export const hostedCollectiveDetailQuery = gql`
@@ -467,7 +467,7 @@ export const hostedCollectiveDetailQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;
 
 export const allCollectivesQuery = gql`
@@ -504,5 +504,5 @@ export const allCollectivesQuery = gql`
     }
   }
 
-  ${hostedCollectiveFields}
+  ${hostedCollectiveFieldsFragment}
 `;

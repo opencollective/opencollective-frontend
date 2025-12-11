@@ -54,7 +54,7 @@ import { SubmitExpenseFlow } from '../components/submit-expense/SubmitExpenseFlo
 import { Survey, SURVEY_KEY } from '../components/Survey';
 import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
@@ -552,7 +552,7 @@ const hostFieldsFragment = gql`
     supportedPayoutMethods
     isTrustedHost
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 const createExpensePageQuery = gql`

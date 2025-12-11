@@ -11,7 +11,7 @@ import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-h
 
 import LinkCollective from '@/components/LinkCollective';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
@@ -60,7 +60,7 @@ const legalDocumentDrawerQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export default function LegalDocumentDrawer({

@@ -25,7 +25,7 @@ import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import Spinner from './Spinner';
 
-export const accountHoverCardFields = gql`
+export const accountHoverCardFieldsFragment = gql`
   fragment AccountHoverCardFields on Account {
     id
     name

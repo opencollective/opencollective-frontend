@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 import { expensesListFieldsFragment } from '@/components/expenses/graphql/fragments';
 
-export const platformSubscriptionFeatures = gql`
+export const platformSubscriptionFeaturesFragment = gql`
   fragment PlatformSubscriptionFeatures on PlatformSubscriptionFeatures {
     TRANSFERWISE
     PAYPAL_PAYOUTS
@@ -54,7 +54,7 @@ export const platformSubscriptionFragment = gql`
     }
   }
 
-  ${platformSubscriptionFeatures}
+  ${platformSubscriptionFeaturesFragment}
 `;
 
 export const platformBillingFragment = gql`

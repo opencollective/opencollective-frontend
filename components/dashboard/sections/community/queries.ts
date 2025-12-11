@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
 
 export const peopleHostDashboardQuery = gql`
@@ -135,7 +135,7 @@ export const communityAccountDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
   ${kycVerificationFields}
 `;
 
@@ -229,7 +229,7 @@ export const communityAccountActivitiesQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const communityAccountExpensesDetailQuery = gql`
@@ -284,7 +284,7 @@ export const communityAccountExpensesDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const communityAccountContributionsDetailQuery = gql`
@@ -338,5 +338,5 @@ export const communityAccountContributionsDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
