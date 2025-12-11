@@ -12,7 +12,7 @@ import { formatErrorMessage, i18nGraphqlException } from '@/lib/errors';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 
-import I18nFormatters from '@/components/I18nFormatters';
+import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import Image from '@/components/Image';
 import { Card, CardContent } from '@/components/ui/Card';
 
@@ -20,8 +20,6 @@ import { EditAvatar } from '../Avatar';
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
-import type { LinkProps } from '../Link';
-import Link from '../Link';
 import { PasswordInput } from '../PasswordInput';
 import { PasswordStrengthBar } from '../PasswordStrengthBar';
 import { Button } from '../ui/Button';
@@ -30,10 +28,6 @@ import { useToast } from '../ui/useToast';
 
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
-
-const makeLink = (props: Omit<LinkProps, 'children'>) => (children: React.ReactNode) => (
-  <Link {...props}>{children}</Link>
-);
 
 const emailVerificationFormSchema = z.union([
   z.object({
@@ -297,7 +291,7 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                     defaultMessage="Already have an account? <SignInLink>Sign in</SignInLink>"
                     id="signup.alreadyHaveAccount"
                     values={{
-                      SignInLink: makeLink({
+                      SignInLink: getI18nLink({
                         href: '/signin',
                         className: 'text-primary hover:underline',
                       }),
@@ -311,12 +305,12 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                       id="signup.individual.tosAgreement"
                       values={{
                         ...I18nFormatters,
-                        TOSLink: makeLink({
+                        TOSLink: getI18nLink({
                           href: '/tos',
                           openInNewTab: true,
                           className: 'underline',
                         }),
-                        PrivacyPolicyLink: makeLink({
+                        PrivacyPolicyLink: getI18nLink({
                           href: '/privacypolicy',
                           openInNewTab: true,
                           className: 'underline',

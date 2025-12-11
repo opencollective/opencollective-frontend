@@ -5,13 +5,13 @@ import Link from './Link';
 import StyledLink from './StyledLink';
 
 // utility library
-
 export const getI18nLink = linkProps => chunks => (
   <StyledLink color="var(--color-primary)" {...linkProps}>
     {linkProps?.icon || null}
     {linkProps?.children || chunks}
   </StyledLink>
 );
+
 // ts-unused-exports:disable-next-line
 export const I18nParagraph = chunks => <p>{chunks}</p>;
 export const I18nBold = chunks => <strong>{chunks}</strong>;
