@@ -241,8 +241,10 @@ class LoggedInUser {
       return feature.isEnabled();
     }
 
-    const enabledByDefault = feature.enabledByDefaultFor?.some(
-      slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+    const enabledByDefault = Boolean(
+      feature.enabledByDefaultFor?.some(
+        slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+      ),
     );
     const isTurnedOn = earlyAccess[featureKey] === true;
     const isTurnedOff = earlyAccess[featureKey] === false;
