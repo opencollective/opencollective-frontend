@@ -103,13 +103,13 @@ const budgetSectionQuery = gql`
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
     expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
         host {
           id
           ...ExpenseHostFields
@@ -136,13 +136,13 @@ const budgetSectionForIndividualQuery = gql`
       includeIncognitoTransactions: true
       includeGiftCardTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
     expenses(createdByAccount: { slug: $slug }, limit: $limit) {
       totalCount
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
         host {
           id
           ...ExpenseHostFields
@@ -188,13 +188,13 @@ const budgetSectionWithHostQuery = gql`
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
     expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
       }
     }
     account(slug: $slug) {

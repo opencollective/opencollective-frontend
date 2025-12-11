@@ -114,7 +114,7 @@ export const platformBillingFragment = gql`
     }
     dueDate
     expenses {
-      ...ExpensesListFieldsFragment
+      ...ExpensesListFields
     }
   }
   ${platformSubscriptionFragment}

@@ -60,7 +60,7 @@ export const accountExpensesQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
         amountInCreatedByAccountCurrency: amountV2(currencySource: CREATED_BY_ACCOUNT)
           @include(if: $hasAmountInCreatedByAccountCurrency) {
           value
@@ -196,8 +196,8 @@ export const hostDashboardExpensesQuery = gql`
       limit
       nodes {
         id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+        ...ExpensesListFields
+        ...ExpensesListAdminFields
 
         payee {
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })

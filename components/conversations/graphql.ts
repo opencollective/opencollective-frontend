@@ -34,7 +34,7 @@ export const commentFieldsFragment = gql`
 `;
 
 export const conversationListFragment = gql`
-  fragment ConversationListFragment on ConversationCollection {
+  fragment ConversationList on ConversationCollection {
     totalCount
     offset
     limit
