@@ -139,8 +139,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isSimpleOrganization = isOrganization && !hasMoneyManagement;
   const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);
 
-  const hasPlatformBillingEnabled =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription;
+  const hasPlatformBillingEnabled = Boolean(
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PLATFORM_BILLING) || account.platformSubscription,
+  );
+
   const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
   const hasReceivedGrantRequests = account.receivedGrantRequests?.totalCount > 0;
   const showReceivedGrantRequests =
@@ -614,14 +616,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   return (
     items
       // filter root items
-      .filter(item => item.if !== false)
+      .filter(item => ('if' in item ? Boolean(item['if']) : true))
       // filter subMenu items and add labels where missing
       .map(item => {
         if (item.type === 'group') {
           return {
             ...item,
             subMenu: item.subMenu
-              .filter(item => item.if !== false)
+              .filter(item => ('if' in item ? Boolean(item['if']) : true))
               .map(item => ({ ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) })),
           };
         }
