@@ -516,7 +516,7 @@ function LegalNameWarning(props: {
         onChange={e => setLegalName(e.target.value)}
       />
       <Button variant="outline" onClick={onSubmitLegalName} disabled={isEmpty(legalName) || loading} loading={loading}>
-        <FormattedMessage defaultMessage=" Save legal name" id="WslCdZ" />
+        <FormattedMessage defaultMessage="Save legal name" id="WslCdZ" />
       </Button>
     </MessageBox>
   );

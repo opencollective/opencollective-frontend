@@ -578,7 +578,7 @@ const CollectiveDetails = ({
                 </Badge>
                 {collective.parent && (
                   <FormattedMessage
-                    defaultMessage=" by {parentAccount}"
+                    defaultMessage="by {parentAccount}"
                     id="LGPYM7"
                     values={{
                       parentAccount: (

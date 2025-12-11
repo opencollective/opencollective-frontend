@@ -807,8 +807,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 <P mt={2} fontSize="12px" lineHeight="18px">
                   <FormattedMessage
                     id="PayExpenseModal.NotEnoughFundsOnWise"
-                    defaultMessage="Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}.
-Please add funds to your Wise {currency} account."
+                    defaultMessage="Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}. Please add funds to your Wise {currency} account."
                     values={{
                       currency: amountInBalance.currency,
                       totalNeeded: formatCurrency(

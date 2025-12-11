@@ -149,7 +149,7 @@ const WhatAreTheBenefits = () => {
             <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
               <FormattedMessage
                 id="becomeAHost.aBetterExperience.description"
-                defaultMessage="Reporting is automatic and real-time, so everyone can see the up to date budget at any time. Projects can have more direct control over their funds, while fiscal sponsors can ensure everything is done according to their policies. "
+                defaultMessage="Reporting is automatic and real-time, so everyone can see the up to date budget at any time. Projects can have more direct control over their funds, while fiscal sponsors can ensure everything is done according to their policies."
               />
             </P>
           </Box>
