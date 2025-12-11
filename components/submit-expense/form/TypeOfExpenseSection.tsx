@@ -227,6 +227,13 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
     [intl],
   );
 
+  const handleReferenceChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFieldValue('invoiceNumber', e.target.value?.replace(/[^a-zA-Z\d\s]/gi, ''));
+    },
+    [setFieldValue],
+  );
+
   return (
     <div className="mt-4 rounded-md border border-gray-300 p-4">
       <Label>
@@ -296,6 +303,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
               label={<FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />}
               placeholder="e.g. INV 001"
               hint={<FormattedMessage defaultMessage="The unique identifier mentioned on your invoice" id="lct/39" />}
+              onChange={handleReferenceChange}
             />
           </div>
         </TabsContent>
