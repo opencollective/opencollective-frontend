@@ -1,8 +1,8 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
@@ -110,7 +110,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
-export const expenseHostFields = gql`
+export const expenseHostFieldsFragment = gql`
   fragment ExpenseHostFields on Host {
     id
     legacyId
@@ -172,7 +172,7 @@ export const expenseHostFields = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 export const expenseValuesByRoleFragment = gql`
@@ -194,7 +194,7 @@ export const expenseValuesByRoleFragment = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 export const expensePayeeFieldsFragment = gql`
@@ -667,10 +667,10 @@ export const expensePageExpenseFieldsFragment = gql`
     }
   }
 
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
   ${accountNavbarFieldsFragment}
-  ${AccountingCategorySelectFieldsFragment}
-  ${accountHoverCardFields}
+  ${accountingCategorySelectFieldsFragment}
+  ${accountHoverCardFieldsFragment}
   ${expenseValuesByRoleFragment}
   ${expensePayeeFieldsFragment}
 `;
@@ -815,9 +815,9 @@ export const expensesListFieldsFragment = gql`
       ...AccountHoverCardFields
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
   ${expenseValuesByRoleFragment}
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const expensesListAdminFieldsFragment = gql`

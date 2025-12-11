@@ -1,6 +1,6 @@
 import { gql } from '../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 
 export const commentFieldsFragment = gql`
   fragment CommentFields on Comment {
@@ -30,7 +30,7 @@ export const commentFieldsFragment = gql`
       ...AccountHoverCardFields
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const conversationListFragment = gql`

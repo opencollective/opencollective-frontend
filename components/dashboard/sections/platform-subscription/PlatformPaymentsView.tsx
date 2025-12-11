@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { type ExpensesListFieldsFragmentFragment, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+import { type ExpensesListFieldsFragment, ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import DateTime from '@/components/DateTime';
@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 
 type PlatformPaymentsViewProps = {
-  expenses: ExpensesListFieldsFragmentFragment[];
+  expenses: ExpensesListFieldsFragment[];
   accountSlug: string;
 };
 

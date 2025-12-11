@@ -62,8 +62,8 @@ const setChangelogViewDateMutation = gql`
   }
 `;
 
-const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
+const addSetChangelogViewDateMutation = graphql(setChangelogViewDateMutation, {
   name: 'setChangelogViewDate',
 });
 
-export default withNewsAndUpdates(setChangelogViewDate(withApollo(ChangelogTrigger)));
+export default withNewsAndUpdates(addSetChangelogViewDateMutation(withApollo(ChangelogTrigger)));
