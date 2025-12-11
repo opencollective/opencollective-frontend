@@ -873,8 +873,8 @@ const ExpenseFormBody = ({
                       </div>
                       <p className="text-xs text-gray-500">
                         <FormattedMessage
-                          id="InvoiceReferenceDescription"
-                          defaultMessage="If the invoice being submitted has a reference number, add it here"
+                          defaultMessage="The unique identifier mentioned on your invoice"
+                          id="lct/39"
                         />
                       </p>
                       <Field
