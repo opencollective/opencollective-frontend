@@ -7,7 +7,7 @@ import { integer } from '@/lib/filters/schemas';
 import type { KycRequestsDashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { EmptyResults } from '@/components/dashboard/EmptyResults';
 import { Filterbar } from '@/components/dashboard/filters/Filterbar';
@@ -56,7 +56,7 @@ export function KYCRequests(props: DashboardSectionProps) {
         }
       }
       ${kycVerificationCollectionFieldsFragment}
-      ${accountHoverCardFields}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: {
