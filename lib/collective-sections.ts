@@ -10,19 +10,21 @@
  */
 
 import { cloneDeep, flatten, get } from 'lodash';
+import type { IntlShape } from 'react-intl';
 
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 
 import { CollectiveType } from './constants/collectives';
+import type { AccountType } from './graphql/types/v2/schema';
 import i18nNavbarCategory from './i18n/navbar-categories';
 import { FEATURES, isFeatureEnabled } from './allowed-features';
-import { isEmptyCollectiveLocation } from './collective';
+import { hasAccountHosting, hasAccountMoneyManagement, isEmptyCollectiveLocation } from './collective';
 
 const RichCollectiveType = {
   ...CollectiveType,
-  HOST_ORGANIZATION: 'HOST_ORGANIZATION',
-  ACTIVE_HOST_ORGANIZATION: 'ACTIVE_HOST_ORGANIZATION',
+  ORGANIZATION_WITH_MONEY_MANAGEMENT: 'ORGANIZATION_WITH_MONEY_MANAGEMENT',
+  ORGANIZATION_WITH_HOSTING: 'ORGANIZATION_WITH_HOSTING',
 };
 
 /**
@@ -37,7 +39,7 @@ const DEFAULT_SECTIONS = {
     [Sections.ABOUT]: true,
     [Sections.OUR_TEAM]: true,
   },
-  [RichCollectiveType.HOST_ORGANIZATION]: {
+  [RichCollectiveType.ORGANIZATION_WITH_HOSTING]: {
     [Sections.CONTRIBUTIONS]: true,
     [Sections.CONNECTED_COLLECTIVES]: true,
     [Sections.TRANSACTIONS]: true,
@@ -46,14 +48,13 @@ const DEFAULT_SECTIONS = {
     [Sections.ABOUT]: true,
     [Sections.OUR_TEAM]: true,
   },
-  [RichCollectiveType.ACTIVE_HOST_ORGANIZATION]: {
+  [RichCollectiveType.ORGANIZATION_WITH_MONEY_MANAGEMENT]: {
     [Sections.CONTRIBUTE]: true,
-    [Sections.PROJECTS]: false,
+    [Sections.PROJECTS]: true,
     [Sections.EVENTS]: true,
     [Sections.CONNECTED_COLLECTIVES]: true,
     [Sections.TOP_FINANCIAL_CONTRIBUTORS]: true,
     [Sections.CONTRIBUTORS]: true,
-    [Sections.CONTRIBUTIONS]: true,
     [Sections.BUDGET]: true,
     [Sections.UPDATES]: true,
     [Sections.CONVERSATIONS]: true,
@@ -112,12 +113,18 @@ const DEFAULT_SECTIONS = {
   },
 };
 
-const getCollectiveTypeKey = (type, isHost, isActive) => {
+const getCollectiveTypeKey = (type: AccountType, hasMoneyManagement: boolean, hasHosting: boolean) => {
   if (type === 'INDIVIDUAL') {
     // Layer of compatibility with GQLV2
     return CollectiveType.USER;
-  } else if (type === 'ORGANIZATION' && isHost) {
-    return isActive ? RichCollectiveType.ACTIVE_HOST_ORGANIZATION : RichCollectiveType.HOST_ORGANIZATION;
+  } else if (type === 'ORGANIZATION') {
+    if (hasHosting) {
+      return RichCollectiveType.ORGANIZATION_WITH_HOSTING;
+    } else if (hasMoneyManagement) {
+      return RichCollectiveType.ORGANIZATION_WITH_MONEY_MANAGEMENT;
+    } else {
+      return RichCollectiveType.ORGANIZATION;
+    }
   }
 
   return type;
@@ -126,8 +133,8 @@ const getCollectiveTypeKey = (type, isHost, isActive) => {
 /**
  * Returns all the sections than can be used for this collective type
  */
-const getDefaultSectionsForCollectiveType = (type, isHost, isActive) => {
-  const typeKey = getCollectiveTypeKey(type, isHost, isActive);
+const getDefaultSectionsForCollectiveType = (type: AccountType, hasMoneyManagement: boolean, hasHosting: boolean) => {
+  const typeKey = getCollectiveTypeKey(type, hasMoneyManagement, hasHosting);
   return DEFAULT_SECTIONS[typeKey] || [];
 };
 
@@ -357,7 +364,9 @@ export const addDefaultSections = (collective, sections) => {
   }
 
   const newSections = cloneDeep(sections || []);
-  const defaultSections = getDefaultSectionsForCollectiveType(collective.type, collective.isHost, collective.isActive);
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
+  const hasHosting = hasAccountHosting(collective);
+  const defaultSections = getDefaultSectionsForCollectiveType(collective.type, hasMoneyManagement, hasHosting);
 
   Object.entries(defaultSections).forEach(([section, defaultIsEnabled]) => {
     const sectionPath = getSectionPath(sections, section);
@@ -379,9 +388,11 @@ export const addDefaultSections = (collective, sections) => {
   return newSections;
 };
 
-export const isType = (c, collectiveType) => getCollectiveTypeKey(c.type) === collectiveType;
+/** @deprecated This should not be here, and not sure if we need an helper at all */
+export const isType = (c, collectiveType) => c.type === collectiveType;
 
-export const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(getCollectiveTypeKey(c.type));
+/** @deprecated This should not be here, and not sure if we need an helper at all */
+export const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(c.type);
 
 export const SECTIONS_CATEGORY_ICON = {
   ABOUT: '/static/images/collective-navigation/CollectiveNavbarIconAbout.png',
@@ -392,9 +403,23 @@ export const SECTIONS_CATEGORY_ICON = {
   EVENTS: '/static/images/collective-navigation/CollectiveNavbarIconEvents.png',
 };
 
-export const getSectionsCategoryDetails = (intl, collective, category) => {
+type SectionCategoryDetails = {
+  img: string;
+  title: string;
+  subtitle?: string;
+  info?: string;
+};
+
+export const getSectionsCategoryDetails = (
+  intl: IntlShape,
+  collective,
+  category: keyof typeof NAVBAR_CATEGORIES,
+): SectionCategoryDetails | null => {
   // Default category details
-  const details = { img: SECTIONS_CATEGORY_ICON[category], title: i18nNavbarCategory(intl, category) };
+  const details: SectionCategoryDetails = {
+    img: SECTIONS_CATEGORY_ICON[category],
+    title: i18nNavbarCategory(intl, category),
+  };
   if (!details.title) {
     return null;
   }

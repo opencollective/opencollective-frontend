@@ -4,7 +4,7 @@
 export const Dimensions = {
   PADDING_X: [15, 30],
   MAX_SECTION_WIDTH: 1260,
-};
+} as const;
 
 export const Sections = {
   TOP_FINANCIAL_CONTRIBUTORS: 'top-financial-contributors',
@@ -32,4 +32,4 @@ export const Sections = {
   ABOUT: 'about',
   // EMPTY for new collectives/no data in any category sections
   EMPTY: 'empty',
-};
+} as const;

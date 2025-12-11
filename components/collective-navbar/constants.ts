@@ -5,4 +5,4 @@ export const NAVBAR_CATEGORIES = {
   CONTRIBUTE: 'CONTRIBUTE',
   CONTRIBUTIONS: 'CONTRIBUTIONS',
   EVENTS: 'EVENTS', // Events, projects, connected collectives
-};
+} as const;
