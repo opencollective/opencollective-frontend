@@ -1,27 +1,5 @@
-// RFC 011: HOC variable naming rule
-// GraphQL HOC should be assigned to a variable named like the query/mutation, prefixed by 'add'.
-const ENABLE_HOC_NAME_RULE = true;
-
-function checkHocNameRule(file, i, line) {
-  // Look for: const addCreateCollectiveMutation = graphql(createCollectiveMutation);
-  const hocAssignRegex =
-    /const\s+(add([A-Z][a-zA-Z0-9]+)(Mutation|Query|Fragment))\s*=\s*graphql\((\s*([a-zA-Z0-9_]+)\s*)\)/;
-  const match = line.match(hocAssignRegex);
-  if (match) {
-    const varName = match[1];
-    const opName = match[5];
-    // Ensure opName is PascalCase for the expected variable name
-    const pascalOpName = opName.charAt(0).toUpperCase() + opName.slice(1);
-    const expectedVar = `add${pascalOpName}`;
-    if (varName !== expectedVar) {
-      console.log(`[HOC Name] ${file}:${i + 1} -> "${varName}" should be "${expectedVar}"`);
-      errorCount++;
-    }
-  }
-}
 // RFC 011 audit script for GraphQL best practices
-
-// Usage: node scripts/rfc011-audit.js
+// Usage: node scripts/rfc011-audit.js [-o] [-v] [-h]
 
 const fs = require('fs');
 const path = require('path');
@@ -29,19 +7,26 @@ const path = require('path');
 const SRC_DIR = './';
 const FILE_EXTENSIONS = ['.js', '.ts', '.tsx'];
 
-// CLI flags: -o for operation name rule, -v for variable name rule
+// CLI flags: -o for operation name, -v for variable name, -h for HOC rule
 const args = process.argv.slice(2);
-let ENABLE_OPERATION_NAME_RULE = true;
-let ENABLE_VARIABLE_NAME_RULE = true;
+const enabledRules = {
+  operation: true,
+  variable: true,
+  hoc: true,
+};
 if (args.length) {
   // If any flags are provided, disable all by default
-  ENABLE_OPERATION_NAME_RULE = false;
-  ENABLE_VARIABLE_NAME_RULE = false;
-  if (args.includes('-o')) {
-    ENABLE_OPERATION_NAME_RULE = true;
-  }
-  if (args.includes('-v')) {
-    ENABLE_VARIABLE_NAME_RULE = true;
+  Object.keys(enabledRules).forEach(k => (enabledRules[k] = false));
+  for (const arg of args) {
+    if (arg === '-o') {
+      enabledRules.operation = true;
+    }
+    if (arg === '-v') {
+      enabledRules.variable = true;
+    }
+    if (arg === '-h') {
+      enabledRules.hoc = true;
+    }
   }
 }
 
@@ -65,6 +50,7 @@ function walk(dir, filelist = []) {
   return filelist;
 }
 
+// --- Rule: GraphQL operation name ---
 function checkOperationNameRule(file, i, block) {
   const declRegex = /^\s*(fragment|query|mutation)\s+([A-Za-z0-9_]+)/gm;
   let m;
@@ -82,6 +68,7 @@ function checkOperationNameRule(file, i, block) {
   }
 }
 
+// --- Rule: GraphQL variable name ---
 function checkVariableNameRule(file, i, varName) {
   // RFC 011: camelCase and ends with Mutation, Query, or Fragment
   if (!/^[a-z][a-zA-Z0-9]*(Mutation|Query|Fragment)$/.test(varName)) {
@@ -90,18 +77,46 @@ function checkVariableNameRule(file, i, varName) {
   }
 }
 
+// --- Rule: GraphQL HOC variable name ---
+function checkHocNameRule(file, i, line) {
+  // Match any variable assigned to graphql(...)
+  const hocAssignRegex = /const\s+([a-zA-Z0-9_]+)\s*=\s*graphql\(([^)]*)\)/;
+  const match = line.match(hocAssignRegex);
+  if (match) {
+    const varName = match[1];
+    // Accept any PascalCase name prefixed with 'add' and ending with allowed suffix
+    if (!/^add[A-Z][a-zA-Z0-9]+(Mutation|Query|Fragment|Data)$/.test(varName)) {
+      console.log(
+        `[HOC Name] ${file}:${i + 1} -> "${varName}" should be prefixed with 'add' and PascalCase, ending with Query, Data, Mutation, or Fragment`,
+      );
+      errorCount++;
+    }
+  }
+}
+
+// --- Main audit logic ---
 function auditFile(file) {
   const content = fs.readFileSync(file, 'utf8');
   const lines = content.split('\n');
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    // HOC assignment rule
-    if (ENABLE_HOC_NAME_RULE && line.includes('graphql(')) {
-      checkHocNameRule(file, i, line);
+
+    // HOC assignment rule (handle multi-line)
+    if (enabledRules.hoc && line.includes('graphql(')) {
+      let hocBlock = line;
+      let j = i + 1;
+      while (j < lines.length && !/\);?\s*$/.test(hocBlock)) {
+        hocBlock += `\n${lines[j]}`;
+        j++;
+      }
+      checkHocNameRule(file, i, hocBlock);
+      if (j > i + 1) {
+        i = j - 1;
+      }
     }
 
-    // Simple and reliable: look for lines with gql and a backtick, then collect until closing backtick
-    if (ENABLE_OPERATION_NAME_RULE && line.match(/gql(V1)?`/)) {
+    // GraphQL operation name rule
+    if (enabledRules.operation && line.match(/gql(V1)?`/)) {
       let block = `${line.substring(line.indexOf('gql'))}\n`;
       let j = i + 1;
       let closed = false;
@@ -120,17 +135,15 @@ function auditFile(file) {
       }
     }
 
-    // Detect variable assignments to gql/gqlV1 blocks
-    if (ENABLE_VARIABLE_NAME_RULE) {
+    // GraphQL variable name rule
+    if (enabledRules.variable) {
       const varAssignMatch = line.match(/(?:const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*gql(V1)?/);
       if (varAssignMatch) {
         const varName = varAssignMatch[1];
         let foundTemplate = false;
-        // Check current line for backtick
         if (line.includes('`')) {
           foundTemplate = true;
         } else {
-          // Look ahead for up to 10 lines for a template literal
           for (let k = i + 1; k <= i + 10 && k < lines.length; k++) {
             if (lines[k].includes('`')) {
               foundTemplate = true;
@@ -146,10 +159,9 @@ function auditFile(file) {
   }
 }
 
+// --- Run audit ---
 walk(SRC_DIR).forEach(auditFile);
-
 console.log('RFC 011 audit complete.');
-
 if (errorCount > 0) {
   process.exit(1);
 }
