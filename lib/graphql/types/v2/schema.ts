@@ -1839,6 +1839,7 @@ export type BotMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -2428,6 +2429,7 @@ export type CollectiveMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -4546,6 +4548,7 @@ export type EventMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -5830,6 +5833,7 @@ export type FundMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -6651,6 +6655,7 @@ export type HostMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -7575,6 +7580,7 @@ export type IndividualMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -10259,6 +10265,7 @@ export type OrganizationMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -11615,6 +11622,7 @@ export type ProjectMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -14020,6 +14028,7 @@ export type VendorMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
