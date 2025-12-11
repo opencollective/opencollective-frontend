@@ -256,7 +256,7 @@ export function BillingProjection(props: BillingProjectionProps) {
         <div className="mt-4 flex items-center justify-end gap-2">
           <div className="text-base">
             <FormattedMessage
-              defaultMessage="Estimated total: <b>{amount}</b> "
+              defaultMessage="Estimated total: <b>{amount}</b>"
               id="cKkeFO"
               values={{
                 b: I18nBold,

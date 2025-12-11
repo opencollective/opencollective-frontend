@@ -310,7 +310,7 @@ const FiscalHost = () => {
                 >
                   <FormattedMessage
                     id="home.learnMore.documentation"
-                    defaultMessage="Support your community with fundholding and fiscal sponsorship services. "
+                    defaultMessage="Support your community with fundholding and fiscal sponsorship services."
                   />
                 </P>
               </Box>

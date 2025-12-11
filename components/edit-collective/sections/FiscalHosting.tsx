@@ -262,7 +262,7 @@ const FiscalHosting = ({ collective, account }) => {
           <p className="text-sm text-gray-700 md:max-w-4/5">
             <FormattedMessage
               id="FiscalHosting.Functionalities.description"
-              defaultMessage="Making financial contributions or getting paid are basic platform functionalities. Activate additional functionalities to do more on the platform."
+              defaultMessage="Your organization can be used to make contributions on the platform and to submit payment requests. See the options below for more advanced financial capabilities."
             />
           </p>
         </div>
@@ -277,7 +277,7 @@ const FiscalHosting = ({ collective, account }) => {
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
-                defaultMessage="Receive contributions, hold a balance, and pay expenses on the platform. Create and manage projects and events to organize your work."
+                defaultMessage="Hold a balance & create accounts to manage your money. Use your accounts to receive contributions and pay expenses on the platform."
                 id="FiscalHosting.moneyManagement.description"
               />
             </p>
@@ -304,7 +304,7 @@ const FiscalHosting = ({ collective, account }) => {
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
-                defaultMessage="Host collectives, hold their balances, and manage their contributions and expenses. Support groups through funds and grants."
+                defaultMessage="Host collectives and hold money on their behalf (oversee their contributions and expenses). Setup funds and distribute grants on the platform. "
                 id="FiscalHosting.fiscalHost.description"
               />
             </p>

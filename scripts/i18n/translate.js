@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import lodash from 'lodash';
 import { sync as mkdirpSync } from 'mkdirp';
 
-import locales from '../lib/constants/locales';
+import locales from '../../lib/constants/locales';
 
 const { difference, has, invertBy, mapValues, orderBy } = lodash;
 

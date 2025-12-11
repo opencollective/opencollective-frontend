@@ -733,7 +733,7 @@ export const MatchDebitDialog = ({
                   </strong>
                   <p className="mt-2">
                     <FormattedMessage
-                      defaultMessage="You are matching a bank transaction with an expense that has not been approved by the collective admin. If you match this expense it will override the approval process and mark the expense as paid. The collective admins will be informed. "
+                      defaultMessage="You are matching a bank transaction with an expense that has not been approved by the collective admin. If you match this expense it will override the approval process and mark the expense as paid. The collective admins will be informed."
                       id="6ymIia"
                     />
                   </p>

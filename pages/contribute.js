@@ -246,7 +246,7 @@ class ContributePage extends React.Component {
           subtitle: (
             <FormattedMessage
               id="ContributePage.Description"
-              defaultMessage="These are all the ways you can help make our community sustainable. "
+              defaultMessage="These are all the ways you can help make our community sustainable."
             />
           ),
         };

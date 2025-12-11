@@ -307,7 +307,7 @@ export default function Pricing({ data }) {
               </h3>
               <p className="text-muted-foreground">
                 <FormattedMessage
-                  defaultMessage="Since October 2024, the platform is managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
+                  defaultMessage="Since October 2024, the platform is managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives."
                   id="8/YzW7"
                   values={{
                     oficoLink: (
