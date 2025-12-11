@@ -71,9 +71,9 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showWelcomeGuide)}>
                 {showWelcomeGuide ? (
-                  <FormattedMessage defaultMessage="Hide Welcome Guide" id="SetupGuide.HideWelcome" />
+                  <FormattedMessage defaultMessage="Hide welcome guide" id="SetupGuide.HideWelcome" />
                 ) : (
-                  <FormattedMessage defaultMessage="Show Welcome Guide" id="SetupGuide.ShowWelcome" />
+                  <FormattedMessage defaultMessage="Show welcome guide" id="SetupGuide.ShowWelcome" />
                 )}
               </Button>
             </div>
