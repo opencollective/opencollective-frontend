@@ -97,7 +97,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
     title: <FormattedMessage defaultMessage="Set up Stripe for receiving contributions" id="SetupGuide.Stripe" />,
     description: (
       <FormattedMessage
-        defaultMessage="We use Stripe as a payment processor for receiving payments and contributions. Stripe itself provides many payment options including credit cards and bank transfers. Connect your account to Stripe in order to receive payments and contributions into your organization's account."
+        defaultMessage="We use Stripe as a payment processor for receiving payments and contributions. Stripe itself provides many payment options including credit cards and bank transfers. Connect your account to Stripe in order to receive payments and contributions into your Organization's account."
         id="SetupGuide.Stripe.Description"
       />
     ),
@@ -128,7 +128,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
     completed: LoggedInUser?.hasTwoFactorAuth,
     description: (
       <FormattedMessage
-        defaultMessage="Two Factor Authentication (2FA) adds an extra layer of protection to your personal account (and therefore also to your organization) . 2FA will require a second (in addition to your password) unique to you identifier when logging in. This prevents unauthorized access and is critical when using the platform for real world financial activities."
+        defaultMessage="Two Factor Authentication (2FA) adds an extra layer of protection to your personal account (and therefore also to your Organization) . 2FA will require a second (in addition to your password) unique to you identifier when logging in. This prevents unauthorized access and is critical when using the platform for real world financial activities."
         id="SetupGuide.2FA.Description"
       />
     ),
@@ -236,7 +236,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
     title: <FormattedMessage defaultMessage="Create your public profile page" id="SetupGuide.PublicProfile" />,
     description: (
       <FormattedMessage
-        defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your organization , your mission and what are your goals using the platform."
+        defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your Organization , your mission and what are your goals using the platform."
         id="SetupGuide.PublicProfile.Description"
       />
     ),
@@ -262,7 +262,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
     title: <FormattedMessage defaultMessage="Enable fiscal hosting" id="SetupGuide.EnableHosting" />,
     description: (
       <FormattedMessage
-        defaultMessage="Hosting enables you to manage other people's money in addition to your own organization's finances. Enable hosted collectives to allow other groups to manage their finances under your fiscal and legal umbrella. Enable hosted funds to hold institutional funds for grant distribution."
+        defaultMessage="Fiscal hosting enables you to manage other Collectives and groups' money under your fiscal and legal umbrella. In addition to your own Organization's finances."
         id="SetupGuide.EnableHosting.Description"
       />
     ),
@@ -318,7 +318,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
     ),
     description: (
       <FormattedMessage
-        defaultMessage="To fully protect your organization, It is important that all your admins enable Two Factor Authentication (2FA) in their accounts. We recommend you enable the setting that forces all admins to also setup 2FA."
+        defaultMessage="To fully protect your Organization, It is important that all your admins enable Two Factor Authentication (2FA) in their accounts. We recommend you enable the setting that forces all admins to also setup 2FA."
         id="SetupGuide.2FARequirements.Description"
       />
     ),
@@ -343,7 +343,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
     ),
     description: (
       <FormattedMessage
-        defaultMessage="Adapt your chart of accounts to include accounting categories specific to hosted collectives and managed funds. This ensures that all expenses and added funds are clearly accounted for separate from your own organizational finances."
+        defaultMessage="Adapt your chart of accounts to include accounting categories specific to hosted Collectives and managed funds. This ensures that all expenses and added funds are clearly accounted for separate from your own organizational finances."
         id="SetupGuide.ChartOfAccountsForCollectives.Description"
       />
     ),
@@ -395,10 +395,10 @@ const ALL_STEPS: Record<string, MakeStep> = {
     },
   }),
   hostingFees: ({ account, router }) => ({
-    title: <FormattedMessage defaultMessage="Set collective hosting fees" id="SetupGuide.HostingFees" />,
+    title: <FormattedMessage defaultMessage="Set Collective hosting fees" id="SetupGuide.HostingFees" />,
     description: (
       <FormattedMessage
-        defaultMessage="The platform enables you to automatically collect hosting fees from your hosted collectives. Fees are applied to contributions and added funds. Set your default hosting fees, they will be applied to all collectives (while allowing you to also set custom fees for specific collectives)."
+        defaultMessage="The platform enables you to automatically collect hosting fees from your hosted Collectives. Fees are applied to contributions and added funds. Set your default hosting fees, they will be applied to all Collectives (while allowing you to also set custom fees for specific Collectives)."
         id="SetupGuide.HostingFees.Description"
       />
     ),
@@ -427,10 +427,10 @@ const ALL_STEPS: Record<string, MakeStep> = {
     },
   }),
   hostApplications: ({ account, router }) => ({
-    title: <FormattedMessage defaultMessage="Enable collective applications" id="SetupGuide.HostApplications" />,
+    title: <FormattedMessage defaultMessage="Enable Collective applications" id="SetupGuide.HostApplications" />,
     description: (
       <FormattedMessage
-        defaultMessage="Open your doors to collectives. Interested groups will be able to submit applications from your public profile page."
+        defaultMessage="Open your doors to Collectives. Interested groups will be able to submit applications from your public profile page."
         id="SetupGuide.HostApplications.Description"
       />
     ),
@@ -543,7 +543,7 @@ export const ORG_CATEGORIES = {
     title: <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />,
     description: (
       <FormattedMessage
-        defaultMessage="Manage money on behalf of other groups and collectives"
+        defaultMessage="Manage money on behalf of Collectives and other groups"
         id="Welcome.Organization.FiscalHosting.Description"
       />
     ),
