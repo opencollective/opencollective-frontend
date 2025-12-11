@@ -29,6 +29,7 @@ import { Select, SelectContent, SelectTrigger } from '../ui/Select';
 import { toast } from '../ui/useToast';
 
 import type { SignupStepProps } from './common';
+import I18nFormatters, { getI18nLink } from '../I18nFormatters';
 
 const createOrganizationMutation = gql`
   mutation OrganizationSignup(
@@ -401,6 +402,27 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
             <Button type="submit" disabled={!isValid || (isCaptchaEnabled() && !captchaResult)} loading={loading}>
               <FormattedMessage defaultMessage="Create Organization" id="organization.create" />
             </Button>
+          </div>
+          <div className="grow text-center text-sm text-muted-foreground sm:order-none sm:flex sm:items-end sm:justify-center">
+            <p>
+              <FormattedMessage
+                defaultMessage="By creating an account, you agree to our{newLine}<TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+                id="signup.individual.tosAgreement"
+                values={{
+                  ...I18nFormatters,
+                  TOSLink: getI18nLink({
+                    href: '/tos',
+                    openInNewTab: true,
+                    className: 'underline',
+                  }),
+                  PrivacyPolicyLink: getI18nLink({
+                    href: '/privacypolicy',
+                    openInNewTab: true,
+                    className: 'underline',
+                  }),
+                }}
+              />
+            </p>
           </div>
         </Form>
       )}
