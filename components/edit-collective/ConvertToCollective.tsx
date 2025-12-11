@@ -11,8 +11,10 @@ import { Button } from '../ui/Button';
 import SettingsSectionTitle from './sections/SettingsSectionTitle';
 import { ConvertToCollectiveModal } from './ConvertToCollectiveModal';
 
-const getBlockReason = (account): 'MONEY_MANAGEMENT' | 'HOSTING' | null => {
-  if (hasAccountMoneyManagement(account)) {
+const getBlockReason = (account, collective): 'MONEY_MANAGEMENT' | 'HOSTING' | 'ZERO_BALANCE' | null => {
+  if (collective.stats.balance > 0) {
+    return 'ZERO_BALANCE';
+  } else if (hasAccountMoneyManagement(account)) {
     return 'MONEY_MANAGEMENT';
   } else if (hasAccountHosting(account)) {
     return 'HOSTING';
@@ -24,7 +26,8 @@ export function ConvertToCollective({ collective }: { collective: GraphQLV1Colle
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { account } = React.useContext(DashboardContext); // The convert to collective modal needs an Account from GraphQL V2
 
-  const blockReason = getBlockReason(account);
+  const blockReason = getBlockReason(account, collective);
+
   return (
     <div className="mb-8 flex flex-col items-start gap-2">
       <SettingsSectionTitle>
@@ -48,6 +51,11 @@ export function ConvertToCollective({ collective }: { collective: GraphQLV1Colle
             <FormattedMessage
               defaultMessage="You must deactivate Fiscal Hosting before converting to a Collective."
               id="convertToCollective.block.hosting"
+            />
+          ) : blockReason === 'ZERO_BALANCE' ? (
+            <FormattedMessage
+              defaultMessage="Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid."
+              id="convertToCollective.block.balanceNotEmpty"
             />
           ) : null}
         </MessageBox>

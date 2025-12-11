@@ -1082,6 +1082,7 @@
   "conversations.noMatch": "Ingen konversation matchar de angivna kriterierna.",
   "conversations.subtitle": "Låt oss få igång diskussionen! Detta är ett utrymme för medlemmar att chatta, ställa frågor, säga tack, och få saker gjorda tillsammans.",
   "Conversations.ViewAll": "Visa forumet",
+  "convertToCollective.block.balanceNotEmpty": "Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid.",
   "convertToCollective.block.hosting": "You must deactivate Fiscal Hosting before converting to a Collective.",
   "convertToCollective.block.moneyManagement": "You must deactivate Money Management before converting to a Collective.",
   "convertToCollective.button": "Convert to Collective",

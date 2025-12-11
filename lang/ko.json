@@ -1082,6 +1082,7 @@
   "conversations.noMatch": "해당 정보로 찾을 수 있는 대화가 없어요.",
   "conversations.subtitle": "Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together.",
   "Conversations.ViewAll": "View all Conversations",
+  "convertToCollective.block.balanceNotEmpty": "Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid.",
   "convertToCollective.block.hosting": "You must deactivate Fiscal Hosting before converting to a Collective.",
   "convertToCollective.block.moneyManagement": "You must deactivate Money Management before converting to a Collective.",
   "convertToCollective.button": "Convert to Collective",
