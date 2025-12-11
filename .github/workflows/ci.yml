@@ -1,15 +1,3 @@
-  rfc011-audit:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Setup project
-        uses: ./.github/actions/setup-project
-        with:
-          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-      - name: Run RFC 011 audit
-        run: npm run rfc011-audit
 name: CI
 
 on:
@@ -192,6 +180,23 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - run: npm run type:check
+
+  rfc011-audit:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Run RFC 011 audit
+        run: node scripts/rfc011-audit.js
 
   e2e:
     if: github.ref_name != 'i18n/crowdin'
