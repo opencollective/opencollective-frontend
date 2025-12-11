@@ -176,7 +176,7 @@ export const expenseHostFieldsFragment = gql`
 `;
 
 export const expenseValuesByRoleFragment = gql`
-  fragment ExpenseValuesByRoleFragment on ExpenseValuesByRole {
+  fragment ExpenseValuesByRole on ExpenseValuesByRole {
     id
     submitter {
       accountingCategory {
@@ -269,7 +269,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     valuesByRole {
       id
-      ...ExpenseValuesByRoleFragment
+        ...ExpenseValuesByRole
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -676,7 +676,7 @@ export const expensePageExpenseFieldsFragment = gql`
 `;
 
 export const expensesListFieldsFragment = gql`
-  fragment ExpensesListFieldsFragment on Expense {
+  fragment ExpensesListFields on Expense {
     id
     legacyId
     description
@@ -694,7 +694,7 @@ export const expensesListFieldsFragment = gql`
     }
     valuesByRole {
       id
-      ...ExpenseValuesByRoleFragment
+        ...ExpenseValuesByRole
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -821,7 +821,7 @@ export const expensesListFieldsFragment = gql`
 `;
 
 export const expensesListAdminFieldsFragment = gql`
-  fragment ExpensesListAdminFieldsFragment on Expense {
+  fragment ExpensesListAdminFields on Expense {
     id
     onHold
     account {
