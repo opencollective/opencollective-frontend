@@ -12,7 +12,7 @@ import { DataList, DataListItem } from '@/components/ui/DataList';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { useToast } from '@/components/ui/useToast';
 
-import { kycVerificationFields } from '../../graphql';
+import { kycVerificationFieldsFragment } from '../../graphql';
 
 import type { ManualKYCRequestFormSchema } from './ManualKYCRequest';
 
@@ -43,7 +43,7 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
           ...KYCVerificationFields
         }
       }
-      ${kycVerificationFields}
+      ${kycVerificationFieldsFragment}
     `,
     {
       refetchQueries: props.refetchQueries,
