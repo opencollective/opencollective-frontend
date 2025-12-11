@@ -1,22 +1,22 @@
 import { gql } from '@apollo/client';
 
-const kycVerificationManualProviderDataFields = gql`
+const kycVerificationManualProviderDataFieldsFragment = gql`
   fragment ManualKYCProviderDataFields on ManualKYCProviderData {
     notes
   }
 `;
 
-const kycVerificationProviderDataFields = gql`
+const kycVerificationProviderDataFieldsFragment = gql`
   fragment KYCProviderDataFields on KYCProviderData {
     ... on ManualKYCProviderData {
       ...ManualKYCProviderDataFields
     }
   }
 
-  ${kycVerificationManualProviderDataFields}
+  ${kycVerificationManualProviderDataFieldsFragment}
 `;
 
-const kycVerificationActionsFields = gql`
+const kycVerificationActionsFieldsFragment = gql`
   fragment KYCVerificationActionsFields on KYCVerification {
     id
     permissions {
@@ -25,7 +25,7 @@ const kycVerificationActionsFields = gql`
   }
 `;
 
-export const kycVerificationFields = gql`
+export const kycVerificationFieldsFragment = gql`
   fragment KYCVerificationFields on KYCVerification {
     id
     status
@@ -88,11 +88,11 @@ export const kycVerificationFields = gql`
     ...KYCVerificationActionsFields
   }
 
-  ${kycVerificationProviderDataFields}
-  ${kycVerificationActionsFields}
+  ${kycVerificationProviderDataFieldsFragment}
+  ${kycVerificationActionsFieldsFragment}
 `;
 
-export const kycVerificationCollectionFields = gql`
+export const kycVerificationCollectionFieldsFragment = gql`
   fragment KYCVerificationCollectionFields on KYCVerificationCollection {
     nodes {
       ...KYCVerificationFields
@@ -102,15 +102,15 @@ export const kycVerificationCollectionFields = gql`
     totalCount
   }
 
-  ${kycVerificationFields}
+  ${kycVerificationFieldsFragment}
 `;
 
-export const kycStatusFields = gql`
+export const kycStatusFieldsFragment = gql`
   fragment KYCStatusFields on KYCStatus {
     manual {
       ...KYCVerificationFields
     }
   }
 
-  ${kycVerificationFields}
+  ${kycVerificationFieldsFragment}
 `;

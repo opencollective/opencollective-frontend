@@ -269,7 +269,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     valuesByRole {
       id
-        ...ExpenseValuesByRole
+      ...ExpenseValuesByRole
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -694,7 +694,7 @@ export const expensesListFieldsFragment = gql`
     }
     valuesByRole {
       id
-        ...ExpenseValuesByRole
+      ...ExpenseValuesByRole
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
