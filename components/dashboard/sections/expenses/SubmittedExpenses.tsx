@@ -99,10 +99,6 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
 
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
-  if (error) {
-    return <MessageBoxGraphqlError error={error} />;
-  }
-
   return (
     <React.Fragment>
       <div className="flex flex-col gap-4">
@@ -128,7 +124,9 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         />
         <Filterbar {...queryFilter} meta={filterMeta} />
 
-        {!loading && !data.expenses?.nodes.length ? (
+        {!loading && error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : !loading && !data.expenses?.nodes.length ? (
           <EmptyResults
             entityType="EXPENSES"
             onResetFilters={() => queryFilter.resetFilters({})}

@@ -78,6 +78,7 @@ import {
   SETTINGS_SECTIONS,
 } from './constants';
 import { DashboardContext } from './DashboardContext';
+import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
@@ -173,7 +174,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
       <div className="w-full">
-        <RootComponent subpath={subpath} isDashboard />
+        <DashboardErrorBoundary>
+          <RootComponent subpath={subpath} isDashboard />
+        </DashboardErrorBoundary>
       </div>
     );
   }
@@ -182,7 +185,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (DashboardComponent) {
     return (
       <div className="h-full w-full">
-        <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
+        <DashboardErrorBoundary>
+          <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
+        </DashboardErrorBoundary>
       </div>
     );
   }
@@ -194,7 +199,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
 
-        <AccountSettings account={account} section={section} />
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
+        </DashboardErrorBoundary>
       </div>
     );
   }
@@ -204,7 +211,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   if (SettingsComponent) {
     return (
       <div className="mx-auto w-full max-w-(--breakpoint-md)">
-        <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        <DashboardErrorBoundary>
+          <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        </DashboardErrorBoundary>
       </div>
     );
   }
@@ -215,7 +224,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
-        <AccountSettings account={account} section={section} />
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
+        </DashboardErrorBoundary>
       </div>
     );
   }
