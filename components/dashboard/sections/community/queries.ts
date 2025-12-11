@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
-import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
+import { kycStatusFieldsFragment, kycVerificationFieldsFragment } from '@/components/kyc/graphql';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -63,7 +63,7 @@ export const peopleHostDashboardQuery = gql`
       }
     }
   }
-  ${kycStatusFields}
+  ${kycStatusFieldsFragment}
 `;
 
 export const communityAccountDetailQuery = gql`
@@ -136,7 +136,7 @@ export const communityAccountDetailQuery = gql`
     }
   }
   ${accountHoverCardFieldsFragment}
-  ${kycVerificationFields}
+  ${kycVerificationFieldsFragment}
 `;
 
 export const communityAccountActivitiesQuery = gql`

@@ -8,7 +8,7 @@ import type { KycTabPeopleDashboardQuery, KycVerificationCollection } from '@/li
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
@@ -62,7 +62,7 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
         }
       }
       ${kycVerificationCollectionFieldsFragment}
-      ${accountHoverCardFields}
+      ${accountHoverCardFieldsFragment}
     `,
     {
       variables: {
