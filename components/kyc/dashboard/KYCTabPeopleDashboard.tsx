@@ -15,7 +15,7 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { useModal } from '@/components/ModalContext';
 import { Button } from '@/components/ui/Button';
 
-import { kycVerificationCollectionFields } from '../graphql';
+import { kycVerificationCollectionFieldsFragment } from '../graphql';
 import { KYCRequestModal } from '../request/KYCRequestModal';
 
 import { KYCVerificationRequestsTable } from './KYCVerificationRequestsTable';
@@ -61,7 +61,7 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
           }
         }
       }
-      ${kycVerificationCollectionFields}
+      ${kycVerificationCollectionFieldsFragment}
       ${accountHoverCardFields}
     `,
     {
