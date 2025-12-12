@@ -1082,6 +1082,7 @@
   "conversations.noMatch": "No conversation matching the given criteria.",
   "conversations.subtitle": "Laten we de discussie starten! Dit is een plek voor de gemeenschap om vragen te stellen, dankbaar te zijn en samen oplossingen te vinden.",
   "Conversations.ViewAll": "Alle gesprekken weergeven",
+  "convertToCollective.block.balanceNotEmpty": "Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid.",
   "convertToCollective.block.hosting": "You must deactivate Fiscal Hosting before converting to a Collective.",
   "convertToCollective.block.moneyManagement": "You must deactivate Money Management before converting to a Collective.",
   "convertToCollective.button": "Convert to Collective",

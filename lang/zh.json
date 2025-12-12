@@ -1082,6 +1082,7 @@
   "conversations.noMatch": "没有符合条件的对话",
   "conversations.subtitle": "Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together.",
   "Conversations.ViewAll": "查看所有对话",
+  "convertToCollective.block.balanceNotEmpty": "Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid.",
   "convertToCollective.block.hosting": "You must deactivate Fiscal Hosting before converting to a Collective.",
   "convertToCollective.block.moneyManagement": "You must deactivate Money Management before converting to a Collective.",
   "convertToCollective.button": "Convert to Collective",

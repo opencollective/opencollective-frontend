@@ -1082,6 +1082,7 @@
   "conversations.noMatch": "לא נמצאו שיחות מסוג זה.",
   "conversations.subtitle": "בואו נדבר על זה! כאן המרחב לקהילה לדון, לשאול שאלות, להגיד תודה, ולעשות דברים יחד.",
   "Conversations.ViewAll": "הצגת כל הדיונים",
+  "convertToCollective.block.balanceNotEmpty": "Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid.",
   "convertToCollective.block.hosting": "You must deactivate Fiscal Hosting before converting to a Collective.",
   "convertToCollective.block.moneyManagement": "You must deactivate Money Management before converting to a Collective.",
   "convertToCollective.button": "Convert to Collective",

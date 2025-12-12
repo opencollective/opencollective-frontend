@@ -123,7 +123,7 @@ const ArchiveCollective = ({ collective }) => {
           />
         </MessageBox>
       )}
-      {!isArchived && hasMoneyManagement && (
+      {!isArchived && !hasBalance && hasMoneyManagement && (
         <MessageBox type="warning">
           {collective.type === CollectiveType.COLLECTIVE ? (
             <FormattedMessage

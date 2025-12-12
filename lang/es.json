@@ -1082,6 +1082,7 @@
   "conversations.noMatch": "Ninguna conversación coincide con los criterios dados.",
   "conversations.subtitle": "¡Pongamos en marcha la discusión! Este es un espacio para que la comunidad converse, haga preguntas, de las gracias, y haga las cosas juntos.",
   "Conversations.ViewAll": "Ver todas las Conversaciones",
+  "convertToCollective.block.balanceNotEmpty": "Only Organizations with a zero balance can be converted to a Collective. To pay out remaining funds, submit an expense and mark it as paid.",
   "convertToCollective.block.hosting": "You must deactivate Fiscal Hosting before converting to a Collective.",
   "convertToCollective.block.moneyManagement": "You must deactivate Money Management before converting to a Collective.",
   "convertToCollective.button": "Convert to Collective",
