@@ -833,7 +833,7 @@ describe('Expense flow', () => {
 
     it('Displays expense policy', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
-      cy.get('[data-cy="edit-collective-btn"]:visible').click();
+      cy.get('[data-cy=""go-to-dashboard-btn"]').click();
       cy.getByDataCy('menu-item-Settings').click();
       cy.getByDataCy('menu-item-policies').should('be.visible').click();
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');

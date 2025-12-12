@@ -5,7 +5,6 @@ import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
-import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { pickBy } from 'lodash';
 import { useRouter } from 'next/router';
@@ -226,19 +225,6 @@ const CollectiveNavbarActionsMenu = ({
                 <DropdownArrow />
                 <DropdownContent>
                   <Box as="ul" p={0} m={0} minWidth={184}>
-                    {callsToAction.hasSettings && (
-                      <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
-                        <StyledLink
-                          as={Link}
-                          href={getDashboardRoute(collective, 'info')}
-                          p={ITEM_PADDING}
-                          data-cy="edit-collective-btn"
-                        >
-                          <Settings size={20} />
-                          <FormattedMessage id="Settings" defaultMessage="Settings" />
-                        </StyledLink>
-                      </MenuItem>
-                    )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
                         {isNewExpenseFlowEnabled ? (

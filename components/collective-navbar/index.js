@@ -7,7 +7,6 @@ import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
-import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
@@ -320,7 +319,7 @@ const getDefaultCallsToActions = (
   const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
-    hasContact: isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM'),
+    hasContact: !isAdmin && (isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM')),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
@@ -329,7 +328,6 @@ const getDefaultCallsToActions = (
     hasRequestGrant:
       isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
-    hasSettings: isAdmin || isAccountant,
   };
 };
 
@@ -349,21 +347,7 @@ const getMainAction = (
   }
 
   // Order of the condition defines main call to action: first match gets displayed
-  if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
-    return {
-      type: NAVBAR_ACTION_TYPE.SETTINGS,
-      component: (
-        <Link href={getDashboardRoute(collective)} data-cy="edit-collective-btn">
-          <ActionButton tabIndex="-1">
-            <Settings size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-            </Span>
-          </ActionButton>
-        </Link>
-      ),
-    };
-  } else if (callsToAction.includes('hasContribute')) {
+  if (callsToAction.includes('hasContribute')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
