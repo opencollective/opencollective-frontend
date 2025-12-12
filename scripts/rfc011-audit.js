@@ -127,9 +127,7 @@ function auditFile(file) {
           break;
         }
       }
-      if (block) {
-        checkOperationNameRule(file, i, block);
-      }
+      checkOperationNameRule(file, i, block);
       if (closed) {
         i = j;
       }
