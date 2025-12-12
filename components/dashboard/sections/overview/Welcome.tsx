@@ -306,7 +306,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
             </CardTitle>
             <CardDescription>
               <FormattedMessage
-                defaultMessage="Get started with the basics or set up additional functionalities."
+                defaultMessage="Choose your desired capabilities and follow the steps to setup & configure your organization."
                 id="Welcome.Organization.Description"
               />
             </CardDescription>
@@ -351,7 +351,7 @@ export const WelcomeIndividual = ({ open, setOpen }) => {
               </CardTitle>
               <CardDescription>
                 <FormattedMessage
-                  defaultMessage="Get started with the basics or set up additional functionalities."
+                  defaultMessage="Choose your desired capabilities and follow the steps to setup & configure your organization."
                   id="Welcome.Organization.Description"
                 />
               </CardDescription>
