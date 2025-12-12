@@ -33,3 +33,5 @@ export const Sections = {
   // EMPTY for new collectives/no data in any category sections
   EMPTY: 'empty',
 } as const;
+
+export const SectionsValues = Object.values(Sections);

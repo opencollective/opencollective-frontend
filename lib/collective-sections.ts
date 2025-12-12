@@ -13,7 +13,7 @@ import { cloneDeep, flatten, get } from 'lodash';
 import type { IntlShape } from 'react-intl';
 
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
+import { Sections, SectionsValues } from '../components/collective-page/_constants';
 
 import { CollectiveType } from './constants/collectives';
 import type { AccountType } from './graphql/types/v2/schema';
@@ -26,6 +26,22 @@ const RichCollectiveType = {
   ORGANIZATION_WITH_MONEY_MANAGEMENT: 'ORGANIZATION_WITH_MONEY_MANAGEMENT',
   ORGANIZATION_WITH_HOSTING: 'ORGANIZATION_WITH_HOSTING',
 };
+
+type CollectivePageSection = {
+  name: string;
+  type: 'SECTION';
+  isEnabled: boolean;
+  restrictedTo?: string[];
+};
+
+type CollectivePageCategory = {
+  name: string;
+  type: 'CATEGORY';
+  sections: CollectivePageSection[];
+  restrictedTo?: string[];
+};
+
+type CollectivePageSectionRoot = CollectivePageSection[] | CollectivePageCategory[];
 
 /**
  * A map of default sections by collective type.
@@ -143,6 +159,10 @@ const getDefaultSectionsForCollectiveType = (type: AccountType, hasMoneyManageme
   return DEFAULT_SECTIONS[typeKey] || [];
 };
 
+const removeEmptyCategories = (sections: CollectivePageSectionRoot) => {
+  return sections.filter(e => e.type !== 'CATEGORY' || e.sections.length > 0);
+};
+
 const filterSectionsByData = (sections, collective, isAdmin, isHostAdmin) => {
   const toRemove = getSectionsToRemoveForUser(collective, isAdmin);
   const checkSectionActive = section => {
@@ -163,7 +183,7 @@ const filterSectionsByData = (sections, collective, isAdmin, isHostAdmin) => {
   });
 
   // Filter empty categories
-  return sections.filter(e => e.type !== 'CATEGORY' || e.sections.length > 0);
+  return removeEmptyCategories(sections);
 };
 
 /**
@@ -233,12 +253,32 @@ const getSectionsToRemoveForUser = (collective, isAdmin) => {
   return toRemove;
 };
 
+const isValidSection = (section: CollectivePageSection | CollectivePageCategory) => {
+  if (section.type === 'CATEGORY') {
+    return section.name in NAVBAR_CATEGORIES;
+  } else {
+    return (SectionsValues as string[]).includes(section.name);
+  }
+};
+
+const removeUnknownSections = (sections: CollectivePageSectionRoot) => {
+  const filterRoot = sections.filter(section => isValidSection(section));
+  for (const section of filterRoot) {
+    if (section.type === 'CATEGORY') {
+      section.sections = section.sections.filter(isValidSection);
+    }
+  }
+  return filterRoot;
+};
+
 /**
  * Loads collective's sections from settings, adding the default sections to them
  */
 export const getCollectiveSections = collective => {
-  const sections = get(collective, 'settings.collectivePage.sections');
-  return addDefaultSections(collective, sections || []);
+  const sections = cloneDeep(get(collective, 'settings.collectivePage.sections') || []);
+  const filteredSections = removeUnknownSections(sections || []);
+  const withDefaults = addDefaultSections(collective, filteredSections);
+  return removeEmptyCategories(withDefaults);
 };
 
 /**
@@ -254,7 +294,7 @@ export const getFilteredSectionsForCollective = (collective, isAdmin, isHostAdmi
  * Map sections to their categories. Any section that's not in this object will be considered
  * as a "Widget" (aka. a section without navbar category).
  */
-const SECTIONS_CATEGORIES = {
+const SECTIONS_CATEGORIES: Record<string, keyof typeof NAVBAR_CATEGORIES> = {
   // About
   [Sections.OUR_TEAM]: NAVBAR_CATEGORIES.ABOUT,
   [Sections.ABOUT]: NAVBAR_CATEGORIES.ABOUT,
