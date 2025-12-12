@@ -465,7 +465,7 @@ export const ORG_CATEGORIES = {
     title: <FormattedMessage defaultMessage="Platform Basics" id="Welcome.Organization.PlatformBasics" />,
     description: (
       <FormattedMessage
-        defaultMessage="Make contributions, submit expenses and get paid"
+        defaultMessage="Make contributions, submit expenses and get paid on behalf of the organization"
         id="Welcome.Organization.PlatformBasics.Description"
       />
     ),
@@ -484,7 +484,7 @@ export const ORG_CATEGORIES = {
     title: <FormattedMessage defaultMessage="Money Management" id="Welcome.Organization.MoneyManagement" />,
     description: (
       <FormattedMessage
-        defaultMessage="Create accounts, add funds and pay expenses"
+        defaultMessage="Track your balance, create accounts, add funds and manually pay expenses"
         id="Welcome.Organization.MoneyManagement.Description"
       />
     ),
@@ -496,7 +496,7 @@ export const ORG_CATEGORIES = {
     title: <FormattedMessage defaultMessage="Crowdfunding" id="solutions.features.crowdfunding" />,
     description: (
       <FormattedMessage
-        defaultMessage="Receive crowdfunding contributions and fundraise"
+        defaultMessage="Setup crowdfunding campaigns and receive contributions"
         id="Welcome.Organization.Crowdfunding.Description"
       />
     ),
@@ -505,7 +505,7 @@ export const ORG_CATEGORIES = {
   expenseAutomations: {
     className: 'bg-yellow-50',
     image: <Image src="/static/images/welcome/stars.png" alt="PlatformBasics" width={42} height={40} />,
-    title: <FormattedMessage defaultMessage="Expense Automations" id="Welcome.Organization.ExpenseAutomations" />,
+    title: <FormattedMessage defaultMessage="Automate Payments" id="Welcome.Organization.ExpenseAutomations" />,
     description: (
       <FormattedMessage
         defaultMessage="Pay expenses through payment processors"
@@ -544,7 +544,7 @@ export const ORG_CATEGORIES = {
     title: <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />,
     description: (
       <FormattedMessage
-        defaultMessage="Manage money on behalf of Collectives and other groups"
+        defaultMessage="Manage money for other groups & projects, manage applications and charge hosting fees"
         id="Welcome.Organization.FiscalHosting.Description"
       />
     ),

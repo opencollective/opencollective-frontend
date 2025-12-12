@@ -304,7 +304,7 @@ const FiscalHosting = ({ collective, account }) => {
             </h1>
             <p className="text-sm text-gray-700">
               <FormattedMessage
-                defaultMessage="Host collectives and hold money on their behalf (oversee their contributions and expenses). Setup funds and distribute grants on the platform. "
+                defaultMessage="Host collectives and hold money on their behalf (oversee their contributions and expenses). Setup funds and distribute grants on the platform."
                 id="FiscalHosting.fiscalHost.description"
               />
             </p>
