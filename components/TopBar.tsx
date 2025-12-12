@@ -98,6 +98,15 @@ const TopBarIcon = ({ provider }) => {
   );
 };
 
+const getDashboardUrl = router => {
+  const collectiveSlug = router.query.collectiveSlug || router.query.slug || router.query.parentCollectiveSlug;
+  if (!collectiveSlug) {
+    return `/dashboard`;
+  } else {
+    return `/dashboard/${collectiveSlug}`;
+  }
+};
+
 const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangelogMenu = true }) => {
   const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
@@ -229,8 +238,14 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
               <ChangelogTrigger />
             </div>
             {LoggedInUser && (
-              <Button asChild variant="outline" className="mr-3 hidden whitespace-nowrap sm:flex" size="sm">
-                <Link href="/dashboard">
+              <Button
+                asChild
+                variant="outline"
+                className="mr-3 hidden whitespace-nowrap sm:flex"
+                size="sm"
+                data-cy="go-to-dashboard-btn"
+              >
+                <Link href={getDashboardUrl(router)}>
                   <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
                 </Link>
               </Button>

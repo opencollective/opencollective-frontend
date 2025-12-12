@@ -7,7 +7,6 @@ import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
-import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
@@ -16,11 +15,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective';
+import { expenseSubmissionAllowed, getContributeRoute, isIndividualAccount } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
-import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
 import { gql } from '../../lib/graphql/helpers';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
@@ -304,15 +302,7 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (
-  collective,
-  sections,
-  isAdmin,
-  isAccountant,
-  LoggedInUser,
-  isAllowedAddFunds,
-  isHostAdmin,
-) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin) => {
   if (!collective) {
     return {};
   }
@@ -320,16 +310,16 @@ const getDefaultCallsToActions = (
   const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
-    hasContact: isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM'),
+    hasContact: !isAdmin && (isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM')),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
-    hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
+    hasManageSubscriptions:
+      isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
       isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
-    hasSettings: isAdmin || isAccountant,
   };
 };
 
@@ -349,21 +339,7 @@ const getMainAction = (
   }
 
   // Order of the condition defines main call to action: first match gets displayed
-  if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
-    return {
-      type: NAVBAR_ACTION_TYPE.SETTINGS,
-      component: (
-        <Link href={getDashboardRoute(collective)} data-cy="edit-collective-btn">
-          <ActionButton tabIndex="-1">
-            <Settings size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-            </Span>
-          </ActionButton>
-        </Link>
-      ),
-    };
-  } else if (callsToAction.includes('hasContribute')) {
+  if (callsToAction.includes('hasContribute')) {
     return {
       type: NAVBAR_ACTION_TYPE.CONTRIBUTE,
       component: (
@@ -407,7 +383,7 @@ const getMainAction = (
           </Span>
         </ActionButton>
       ) : (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`} data-cy="submit-expense-dropdown">
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
@@ -491,7 +467,6 @@ const CollectiveNavbar = ({
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
-  const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
   isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
@@ -518,15 +493,7 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(
-      collective,
-      sections,
-      isAdmin,
-      isAccountant,
-      LoggedInUser,
-      isAllowedAddFunds,
-      isHostAdmin,
-    ),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));

@@ -60,6 +60,8 @@ export const StyledHeroBackground = styled.div`
     mask-size: cover;
     mask-position-x: 100%;
     mask-position-y: -150px;
+    -webkit-mask-position-x: 100%;
+    -webkit-mask-position-y: -150px;
 
     @media (max-width: 900px) {
       mask-position-x: 20%;
