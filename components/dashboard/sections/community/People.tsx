@@ -19,8 +19,11 @@ import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
 
 import Avatar from '../../../Avatar';
+import { CopyID } from '../../../CopyId';
+import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -34,6 +37,7 @@ import { makePushSubpath } from '../../utils';
 
 import { ContributorDetails } from './AccountDetail';
 import { peopleHostDashboardQuery } from './queries';
+import { usePersonActions } from './usePersonActions';
 
 const RelationTypeSchema = isMulti(z.nativeEnum(CommunityRelationType)).optional();
 const relationTypeFilter: FilterConfig<z.infer<typeof RelationTypeSchema>> = {
@@ -77,7 +81,27 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     header: intl.formatMessage({ defaultMessage: 'Email', id: 'Email' }),
     cell: ({ cell }) => {
       const email = cell.getValue();
-      return email ? email : <span className="text-muted-foreground">—</span>;
+      return email ? (
+        <div className="flex items-center gap-1">
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <div className="max-w-[250px] truncate text-xs">{email}</div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="max-w-sm break-all">{email}</div>
+            </TooltipContent>
+          </Tooltip>
+          <CopyID
+            value={email}
+            tooltipLabel={intl.formatMessage({ defaultMessage: 'Copy to clipboard', id: 'Clipboard.Copy' })}
+            className="shrink-0"
+            stopEventPropagation
+            toastOnCopy
+          />
+        </div>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      );
     },
   };
 
@@ -110,7 +134,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
           (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
         ) || [];
       return (
-        <div className="flex gap-1 align-middle">
+        <div className="flex flex-wrap gap-1 align-middle">
           {relations.map(role => (
             <div
               key={role}
@@ -119,6 +143,50 @@ const getColumns = ({ intl, hasKYCFeature }) => {
               {formatCommunityRelation(intl, role)}
             </div>
           ))}
+        </div>
+      );
+    },
+  };
+
+  const expenses = {
+    accessorKey: 'expenses',
+    header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
+    cell: ({ row }) => {
+      const account = row.original;
+      const summary = account?.communityStats?.transactionSummary?.[0];
+      const total = summary?.expenseTotalAcc;
+      const count = summary?.expenseCountAcc || 0;
+
+      if (!total || count === 0) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+
+      return (
+        <div className="text-sm">
+          <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+          <span className="ml-1 text-muted-foreground">({count})</span>
+        </div>
+      );
+    },
+  };
+
+  const contributions = {
+    accessorKey: 'contributions',
+    header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
+    cell: ({ row }) => {
+      const account = row.original;
+      const summary = account?.communityStats?.transactionSummary?.[0];
+      const total = summary?.contributionTotalAcc;
+      const count = summary?.contributionCountAcc || 0;
+
+      if (!total || count === 0) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+
+      return (
+        <div className="text-xs">
+          <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+          <span className="ml-1 text-muted-foreground">({count})</span>
         </div>
       );
     },
@@ -135,7 +203,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
     };
   }
 
-  return [account, email, kycColumn, country, relations].filter(Boolean);
+  return [account, email, kycColumn, country, relations, expenses, contributions, actionsColumn].filter(Boolean);
 };
 
 enum ContributorsTab {
@@ -224,6 +292,8 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
 
   const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
 
+  const getActions = usePersonActions({ accountSlug, hasKYCFeature });
+
   const columns = React.useMemo(
     () => getColumns({ intl, hasKYCFeature }),
     [intl, queryFilter.activeViewId, hasKYCFeature],
@@ -254,6 +324,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
               pushSubpath(row.original.id as string);
             }}
             mobileTableView
+            getActions={getActions}
           />
           <Pagination queryFilter={queryFilter} total={data?.community?.totalCount} />
         </div>
