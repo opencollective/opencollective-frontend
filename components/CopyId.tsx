@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import useClipboard from '../lib/hooks/useClipboard';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
+import { useToast } from './ui/useToast';
 
 export const CopyID = ({
   children = null,
@@ -12,8 +13,11 @@ export const CopyID = ({
   tooltipLabel = <FormattedMessage defaultMessage="Copy ID" id="wtLjP6" />,
   Icon = <Copy className="shrink-0 select-none" size={12} />,
   className = 'inline-flex min-h-5 w-full cursor-pointer select-text items-center gap-1 rounded-sm bg-slate-50 px-1 text-left font-mono text-muted-foreground transition-colors hover:bg-slate-100 hover:text-foreground',
+  stopEventPropagation = false,
+  toastOnCopy = false,
 }) => {
   const { isCopied, copy } = useClipboard();
+  const { toast } = useToast();
 
   return (
     <Tooltip delayDuration={100}>
@@ -23,6 +27,14 @@ export const CopyID = ({
           onClick={e => {
             e.preventDefault(); // Prevent tooltip from closing when copying
             copy(value ?? children);
+            if (toastOnCopy) {
+              toast({
+                title: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
+              });
+            }
+            if (stopEventPropagation) {
+              e.stopPropagation();
+            }
           }}
           className={className}
         >
