@@ -156,11 +156,8 @@ export const adminPanelQuery = gql`
           }
         }
       }
-      ... on Individual {
-        kycVerifications {
-          totalCount
-        }
-      }
+      # kycVerifications field removed - requires special permissions and was causing query failures
+      # If needed in the future, it can be conditionally included based on permissions
     }
   }
   ${accountNavbarFieldsFragment}

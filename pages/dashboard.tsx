@@ -198,10 +198,11 @@ const DashboardPage = () => {
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
-  const { data, loading } = useQuery(adminPanelQuery, {
+  const { data, loading, error: queryError } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
     skip: !activeSlug || !LoggedInUser || isRootProfile,
+    errorPolicy: 'all',
   });
   const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
@@ -224,9 +225,17 @@ const DashboardPage = () => {
     if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
       router.replace('/signup/profile');
     }
+    // If user doesn't have a slug, redirect to profile completion
+    if (LoggedInUser && !LoggedInUser.collective?.slug && router.route !== '/signup/profile') {
+      router.replace('/signup/profile');
+    }
     // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
     if (slug === 'me' && LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
+      if (LoggedInUser.collective?.slug) {
+        router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
+      } else {
+        router.replace('/signup/profile');
+      }
     }
   }, [activeSlug, LoggedInUser]);
 
@@ -269,9 +278,14 @@ const DashboardPage = () => {
         <div className="my-32 flex flex-col items-center">
           <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
             <p>{blocker}</p>
-            {LoggedInUser && (
+            {LoggedInUser && LoggedInUser.collective?.slug && (
               <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
                 <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+              </Link>
+            )}
+            {LoggedInUser && !LoggedInUser.collective?.slug && (
+              <Link className="mt-2 block" href="/signup/profile">
+                <FormattedMessage defaultMessage="Complete your profile" id="signup.completeProfile" />
               </Link>
             )}
           </MessageBox>
