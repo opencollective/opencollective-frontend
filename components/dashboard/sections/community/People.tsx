@@ -102,7 +102,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
 
   const relations = {
     accessorKey: 'relations',
-    header: intl.formatMessage({ defaultMessage: 'Relations', id: 'mn5pjI' }),
+    header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
     cell: ({ row }) => {
       const account = row.original;
       const relations =

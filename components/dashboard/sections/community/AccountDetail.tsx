@@ -63,7 +63,7 @@ const associatedCollectiveColumns = intl => [
   },
   {
     accessorKey: 'relations',
-    header: intl.formatMessage({ defaultMessage: 'Relations', id: 'mn5pjI' }),
+    header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
     cell: ({ row }) => {
       const relations =
         row.original.relations?.filter(
