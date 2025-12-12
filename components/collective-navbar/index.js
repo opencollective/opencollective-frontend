@@ -15,11 +15,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective';
+import { expenseSubmissionAllowed, getContributeRoute, isIndividualAccount } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
-import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
@@ -303,15 +302,7 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (
-  collective,
-  sections,
-  isAdmin,
-  isAccountant,
-  LoggedInUser,
-  isAllowedAddFunds,
-  isHostAdmin,
-) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin) => {
   if (!collective) {
     return {};
   }
@@ -323,7 +314,8 @@ const getDefaultCallsToActions = (
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
-    hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
+    hasManageSubscriptions:
+      isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
       isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
@@ -475,7 +467,6 @@ const CollectiveNavbar = ({
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
-  const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
   isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
@@ -503,15 +494,7 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(
-      collective,
-      sections,
-      isAdmin,
-      isAccountant,
-      LoggedInUser,
-      isAllowedAddFunds,
-      isHostAdmin,
-    ),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
