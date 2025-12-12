@@ -258,7 +258,7 @@ const WelcomeCategoryButton = ({
             <Check size={12} />
           ) : (
             <React.Fragment>
-              <ListCheck size={12} className="mr-1" /> {completedSteps}/{steps?.length}
+              <ListCheck size={12} className="mr-1" /> {completedSteps}/{steps.length}
             </React.Fragment>
           )}
         </div>
@@ -276,7 +276,7 @@ const WelcomeCategoryButton = ({
 };
 
 export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
-  const { data } = useQuery(welcomeOrganizationQuery, {
+  const { data } = useQuery<WelcomeOrganizationQuery>(welcomeOrganizationQuery, {
     variables: { accountSlug: _account?.slug },
     skip: !_account,
     context: API_V2_CONTEXT,
@@ -288,9 +288,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
 
   useEffect(() => {
     if (LoggedInUser && open === undefined && data?.account) {
-      const showGuideKey = `id${data?.account.legacyId}`;
-      const showGuide = LoggedInUser?.collective.settings?.showSetupGuide?.[showGuideKey];
-
+      const showGuide = LoggedInUser?.shouldDisplaySetupGuide(data.account);
       setOpen(showGuide !== false ? true : false);
     }
   }, [data?.account, open, setOpen, LoggedInUser]);

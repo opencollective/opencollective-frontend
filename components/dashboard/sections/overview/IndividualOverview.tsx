@@ -26,7 +26,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [showWelcomeGuide, setShowWelcomeGuide] = useState(
-    LoggedInUser?.collective?.settings?.showSetupGuide?.[`id${LoggedInUser.collective.id}`] || undefined,
+    LoggedInUser?.shouldDisplaySetupGuide?.(LoggedInUser?.collective) ?? undefined,
   );
   const slug = router.query?.as || accountSlug;
   const [editAccountSetting] = useMutation(editAccountSettingMutation, {
@@ -51,7 +51,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
 
   useLayoutEffect(() => {
     if (LoggedInUser) {
-      const showSetupGuide = LoggedInUser.collective.settings?.showSetupGuide?.[`id${LoggedInUser.collective.id}`];
+      const showSetupGuide = LoggedInUser?.shouldDisplaySetupGuide?.(LoggedInUser?.collective);
       setShowWelcomeGuide(showSetupGuide !== undefined ? showSetupGuide : true);
     }
   }, [LoggedInUser, setShowWelcomeGuide]);
