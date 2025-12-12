@@ -5212,6 +5212,8 @@ export type ExpensePermissions = {
   canHold: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as incomplete */
   canMarkAsIncomplete: Scalars['Boolean']['output'];
+  /** Whether the current user can mark this expense as paid */
+  canMarkAsPaid: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as spam */
   canMarkAsSpam: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as unpaid */
@@ -5248,6 +5250,7 @@ export type ExpensePermissions = {
   editType: Permission;
   hold: Permission;
   id: Scalars['String']['output'];
+  markAsPaid: Permission;
   markAsSpam: Permission;
   markAsUnpaid: Permission;
   pay: Permission;

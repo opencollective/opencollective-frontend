@@ -392,6 +392,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
 };
 
 type PayExpenseModalProps = {
+  canPayWithAutomaticPayment: boolean;
   expense: Expense & { amountInHostCurrency?: { valueInCents: number; currency?: string } };
   collective: Pick<Account, 'currency'>;
   host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings' | 'features' | 'platformSubscription'>;
@@ -404,21 +405,27 @@ type PayExpenseModalProps = {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }: PayExpenseModalProps) => {
+const PayExpenseModal = ({
+  onClose,
+  onSubmit,
+  expense,
+  collective,
+  host,
+  error,
+  canPayWithAutomaticPayment,
+}: PayExpenseModalProps) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const blockAutomaticPayment = requiresUpgrade(host, FEATURES.TRANSFERWISE);
+  const blockAutomaticPayment = !canPayWithAutomaticPayment || requiresUpgrade(host, FEATURES.TRANSFERWISE);
   const initialValues = getInitialValues(expense, host, blockAutomaticPayment);
   const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
   const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
-  const hasAutomaticManualPicker = ![
-    PayoutMethodType.OTHER,
-    PayoutMethodType.ACCOUNT_BALANCE,
-    PayoutMethodType.STRIPE,
-  ].includes(payoutMethodType);
+  const hasAutomaticManualPicker =
+    canPayWithAutomaticPayment &&
+    ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(payoutMethodType);
   const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
 
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !blockAutomaticPayment;
