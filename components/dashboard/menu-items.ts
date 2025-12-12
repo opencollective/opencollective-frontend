@@ -275,10 +275,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           label: intl.formatMessage(
-            {
-              id: 'PVqJoO',
-              defaultMessage: 'From {accountName}',
-            },
+            { id: 'OutgoingContributions', defaultMessage: 'Outgoing Contributions' },
             { accountName: account.name },
           ),
           section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
