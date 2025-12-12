@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/Dialog';
 import { toast } from '@/components/ui/useToast';
 
-import { kycVerificationFields } from '../graphql';
+import { kycVerificationFieldsFragment } from '../graphql';
 
 type RevokeKYCConfirmationDialogProps = {
   refetchQueries?: string[];
@@ -34,7 +34,7 @@ export function RevokeKYCConfirmationDialog(props: RevokeKYCConfirmationDialogPr
           ...KYCVerificationFields
         }
       }
-      ${kycVerificationFields}
+      ${kycVerificationFieldsFragment}
     `,
     {
       refetchQueries,

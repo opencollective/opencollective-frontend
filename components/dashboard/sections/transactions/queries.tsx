@@ -1,9 +1,9 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 
 export const transactionsTableQueryCollectionFragment = gql`
-  fragment TransactionsTableQueryCollectionFragment on TransactionCollection {
+  fragment TransactionsTableQueryCollection on TransactionCollection {
     totalCount
     offset
     limit
@@ -79,7 +79,7 @@ export const transactionsTableQueryCollectionFragment = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const transactionsTableQuery = gql`
@@ -154,7 +154,7 @@ export const transactionsTableQuery = gql`
       paymentMethod: $paymentMethod
       payoutMethod: $payoutMethod
     ) {
-      ...TransactionsTableQueryCollectionFragment
+      ...TransactionsTableQueryCollection
     }
   }
   ${transactionsTableQueryCollectionFragment}

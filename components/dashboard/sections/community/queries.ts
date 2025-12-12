@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
-import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
+import { kycStatusFieldsFragment, kycVerificationFieldsFragment } from '@/components/kyc/graphql';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -50,7 +50,7 @@ export const peopleHostDashboardQuery = gql`
       }
     }
   }
-  ${kycStatusFields}
+  ${kycStatusFieldsFragment}
 `;
 
 export const communityAccountDetailQuery = gql`
@@ -122,8 +122,8 @@ export const communityAccountDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
-  ${kycVerificationFields}
+  ${accountHoverCardFieldsFragment}
+  ${kycVerificationFieldsFragment}
 `;
 
 export const communityAccountActivitiesQuery = gql`
@@ -216,7 +216,7 @@ export const communityAccountActivitiesQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const communityAccountExpensesDetailQuery = gql`
@@ -271,7 +271,7 @@ export const communityAccountExpensesDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const communityAccountContributionsDetailQuery = gql`
@@ -325,5 +325,5 @@ export const communityAccountContributionsDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;

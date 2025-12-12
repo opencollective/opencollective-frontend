@@ -54,7 +54,7 @@ const I18nMessages = defineMessages({
   },
 });
 
-const AddAuthenticatorAppToIndividualMutation = gql`
+const addAuthenticatorAppToIndividualMutation = gql`
   mutation AddAuthenticatorAppToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token, type: TOTP) {
       account {
@@ -138,7 +138,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
       account: Pick<Individual, 'twoFactorMethods'>;
       recoveryCodes: string[];
     };
-  }>(AddAuthenticatorAppToIndividualMutation, {
+  }>(addAuthenticatorAppToIndividualMutation, {
     variables: {
       account: {
         id: props.individual.id,

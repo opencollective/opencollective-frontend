@@ -19,7 +19,7 @@ import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanC
 import { useAgreementActions } from '../../agreements/actions';
 import AgreementDrawer from '../../agreements/AgreementDrawer';
 import AgreementsTable from '../../agreements/AgreementsTable';
-import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../../agreements/fragments';
+import { agreementViewFieldsFragment } from '../../agreements/fragments';
 import FilesViewerModal from '../../FilesViewerModal';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import ConfirmationModal from '../../NewConfirmationModal';
@@ -48,10 +48,10 @@ const hostDashboardAgreementsQuery = gql`
       }
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${agreementViewFieldsFragment}
 `;
 
-const DELETE_AGREEMENT_MUTATION = gql`
+const deleteAgreementMutation = gql`
   mutation DeleteAgreement($id: String!) {
     deleteAgreement(agreement: { id: $id }) {
       id
@@ -86,7 +86,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
   const [isEditingAgreement, setIsEditingAgreement] = React.useState(false);
   const [agreementToDelete, setAgreementToDelete] = React.useState<Agreement | null>(null);
-  const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION);
+  const [deleteAgreement] = useMutation(deleteAgreementMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
