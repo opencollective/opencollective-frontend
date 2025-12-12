@@ -573,7 +573,7 @@ export const MatchDebitDialog = ({
                     </Link>
                   ) : (
                     <Link
-                      href={`/${selectedContribution.toAccount.slug}/orders/${selectedContribution.legacyId}`}
+                      href={`/${selectedContribution.toAccount.slug}/outgoing-contributions/${selectedContribution.legacyId}`}
                       className="text-sm underline"
                       openInNewTab
                     >

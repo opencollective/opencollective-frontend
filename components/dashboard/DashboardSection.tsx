@@ -32,7 +32,6 @@ import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
 import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
-import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
@@ -87,7 +86,6 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
   [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
-  [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,

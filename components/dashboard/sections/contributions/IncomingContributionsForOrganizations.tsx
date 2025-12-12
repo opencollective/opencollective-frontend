@@ -7,6 +7,7 @@ import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { hasAccountHosting } from '@/lib/collective';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -65,7 +66,7 @@ const hostFinancialContributionsMetadataQuery = gql`
 
 const schema = baseSchema.extend({ hostContext: hostContextFilter.schema });
 
-export default function HostFinancialContributions({ accountSlug }: DashboardSectionProps) {
+export default function IncomingContributionsForOrganizations({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
@@ -122,10 +123,11 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
     skipFiltersOnReset: ['hostContext'],
   });
 
+  const hasHosting = hasAccountHosting(account);
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostFinancialContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: queryFilter.values.hostContext,
+      hostContext: hasHosting ? queryFilter.values.hostContext : undefined,
     },
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -156,25 +158,30 @@ export default function HostFinancialContributions({ accountSlug }: DashboardSec
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
-
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
-            <HostContextFilter
-              value={queryFilter.values.hostContext}
-              onChange={val => queryFilter.setFilter('hostContext', val)}
-              intl={intl}
-            />
+            {hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
           </div>
         }
         description={
-          <FormattedMessage
-            defaultMessage="Contributions made to your organization and Collectives you host."
-            id="IZotDb"
-          />
+          hasHosting ? (
+            <FormattedMessage
+              defaultMessage="Contributions made to your Organization and Collectives you host."
+              id="To33FZ"
+            />
+          ) : (
+            <FormattedMessage defaultMessage="Contributions made to your Organization." id="2IsUyp" />
+          )
         }
       />
 

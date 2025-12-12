@@ -167,7 +167,7 @@ const VendorDetails = ({ vendor: v, vendorId, onCancel, editVendor }: VendorDeta
             <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${vendor.slug}`} className="text-sm">
               {vendor.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
             </Link>
-            <Link href={`${dashboardLink}/orders?searchTerm=%40${vendor.slug}`} className="text-sm">
+            <Link href={`${dashboardLink}/incoming-contributions?searchTerm=%40${vendor.slug}`} className="text-sm">
               {vendor.orders.totalCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
             </Link>
           </div>
