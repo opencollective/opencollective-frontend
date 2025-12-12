@@ -15,10 +15,6 @@ exports.REWRITES = [
     destination: '/tax-form',
   },
   {
-    source: '/welcome',
-    destination: '/welcome',
-  },
-  {
     source: '/organizations',
     destination: '/solutions',
   },

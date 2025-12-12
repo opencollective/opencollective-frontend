@@ -295,6 +295,14 @@ class LoggedInUser {
 
     return availablePreviewFeatures;
   }
+
+  shouldDisplaySetupGuide(account: { legacyId: number } | { id: number }) {
+    if (!account || !this.collective) {
+      return false;
+    }
+
+    return this.collective.settings?.showSetupGuide?.[`id${'legacyId' in account ? account.legacyId : account.id}`];
+  }
 }
 
 export default LoggedInUser;

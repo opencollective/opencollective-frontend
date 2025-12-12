@@ -67,7 +67,7 @@ export default function SignupPage() {
         if (!requestedStep && !nextStep) {
           const pathname =
             getRedirectPathSafe(router) ||
-            (createdOrganization ? getDashboardRoute(createdOrganization, '/overview') : '/welcome');
+            (createdOrganization ? getDashboardRoute(createdOrganization, '/overview') : '/dashboard');
           router.push(pathname);
           return prev;
         } else {

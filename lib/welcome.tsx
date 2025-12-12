@@ -48,6 +48,7 @@ export type Category = {
   longDescription?: string | ReactNode;
   className?: string;
   steps?: Array<MakeStep>;
+  onClick?: () => void;
 };
 
 const RedirectButton = ({
@@ -554,5 +555,52 @@ export const ORG_CATEGORIES = {
       ALL_STEPS.hostApplications,
       ALL_STEPS.chartOfAccountsForCollectives,
     ],
+  },
+};
+
+export const INDIVIDUAL_CATEGORIES = {
+  submitExpense: {
+    image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
+    title: <FormattedMessage defaultMessage="Submit expenses" id="Welcome.Individual.SubmitExpenses" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Submit expenses to existing collectives and get paid"
+        id="Welcome.Individual.SubmitExpenses.Description"
+      />
+    ),
+    className: 'bg-blue-50',
+  },
+  contribute: {
+    className: 'bg-yellow-50',
+    image: <Image src="/static/images/welcome/stars.png" alt="PlatformBasics" width={42} height={40} />,
+    title: <FormattedMessage defaultMessage="Contribute to projects" id="Welcome.Individual.Contribute" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Explore and discover projects to contribute to"
+        id="Welcome.Individual.Contribute.Description"
+      />
+    ),
+  },
+  createOrg: {
+    className: 'bg-green-50',
+    image: <Image src="/static/images/welcome/stars.png" alt="PlatformBasics" width={42} height={40} />,
+    title: <FormattedMessage defaultMessage="Create an organization" id="signup.createOrganization.title" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Foundations, Non-Profits, Companies, Public Sector or Co-ops"
+        id="Welcome.Individual.CreateOrg.Description"
+      />
+    ),
+  },
+  createCollective: {
+    className: 'bg-red-50',
+    image: <Image src="/static/images/welcome/jar.png" alt="Crowdfunding" width={42} height={40} />,
+    title: <FormattedMessage defaultMessage="Create a collective" id="Welcome.Individual.CreateCollective" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Collectives, Groups and Projects without a legal identity"
+        id="Welcome.Individual.CreateCollective.Description"
+      />
+    ),
   },
 };

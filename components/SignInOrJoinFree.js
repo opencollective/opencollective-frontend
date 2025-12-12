@@ -131,7 +131,7 @@ class SignInOrJoinFree extends React.Component {
     }
     let redirectUrl = this.props.redirect;
     if (currentPath.includes('/create-account') && redirectUrl === '/') {
-      redirectUrl = '/welcome';
+      redirectUrl = '/dashboard';
     }
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
