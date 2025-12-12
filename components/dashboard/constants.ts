@@ -11,7 +11,6 @@ export const SECTIONS = {
   CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
-  HOST_FINANCIAL_CONTRIBUTIONS: 'orders',
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
@@ -114,7 +113,6 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.EXPENSE_REPORTS,
   ALL_SECTIONS.PAYMENT_RECEIPTS,
   ALL_SECTIONS.HOST_EXPENSES,
-  ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
   ALL_SECTIONS.TRANSACTIONS,
   ALL_SECTIONS.EXPENSES,
   ALL_SECTIONS.HOST_AGREEMENTS,
@@ -144,10 +142,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.ACTIVITY_LOG]: {
     id: 't0lUqz',
     defaultMessage: 'Activity log',
-  },
-  [ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: {
-    id: 'FinancialContributions',
-    defaultMessage: 'Financial Contributions',
   },
   [ALL_SECTIONS.HOST_APPLICATIONS]: {
     id: 'Menu.HostApplications',

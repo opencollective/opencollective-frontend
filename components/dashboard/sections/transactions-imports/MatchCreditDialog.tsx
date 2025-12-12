@@ -636,7 +636,7 @@ export const MatchCreditDialog = ({
                         </Link>
                       ) : (
                         <Link
-                          href={`/${selectedContribution.toAccount.slug}/orders/${selectedContribution.legacyId}`}
+                          href={`/${selectedContribution.toAccount.slug}/incoming-contributions/${selectedContribution.legacyId}`}
                           className="text-sm underline"
                           openInNewTab
                         >

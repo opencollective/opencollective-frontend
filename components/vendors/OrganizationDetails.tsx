@@ -141,7 +141,10 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
             <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${organization.slug}`} className="text-sm">
               {activity.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
             </Link>
-            <Link href={`${dashboardLink}/orders?searchTerm=%40${organization.slug}`} className="text-sm">
+            <Link
+              href={`${dashboardLink}/incoming-contributions?searchTerm=%40${organization.slug}`}
+              className="text-sm"
+            >
               {activity.orders.totalCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
             </Link>
           </div>
