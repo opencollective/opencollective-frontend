@@ -9,7 +9,7 @@ import { PAYMENT_METHOD_SERVICE } from '../lib/constants/payment-methods';
 import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { EditPaymentMethodModalQuery } from '../lib/graphql/types/v2/graphql';
 import type { AccountReferenceInput, PaymentMethod, SetupIntentInput } from '../lib/graphql/types/v2/schema';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
@@ -71,9 +71,7 @@ const cancelRecurringContributionMutation = gql`
 const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const intl = useIntl();
 
-  const [submitCancellation] = useMutation(cancelRecurringContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitCancellation] = useMutation(cancelRecurringContributionMutation);
 
   const onSubmit = async values => {
     try {
@@ -176,7 +174,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const OTHER_LABEL = 'Other';
   // GraphQL mutations and queries
   const queryVariables = { slug: props.order.toAccount.slug };
-  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables });
 
   // state management
   const { locale } = useIntl();
@@ -405,7 +403,6 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         order: {
           id: props.order.id,
@@ -434,7 +431,6 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         account: {
           slug: order?.fromAccount?.slug,

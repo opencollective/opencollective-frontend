@@ -6,7 +6,7 @@ import { groupBy, uniq } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../../lib/transactions';
 
@@ -186,6 +186,7 @@ const PaymentReceipts = ({ collective }) => {
   };
   const [activeFilter, setActiveFilter] = React.useState(defaultFilter);
   const { data, loading, error } = useQuery(invoicesQuery, {
+    context: API_V1_CONTEXT,
     variables: {
       fromCollectiveSlug: collective.slug,
     },

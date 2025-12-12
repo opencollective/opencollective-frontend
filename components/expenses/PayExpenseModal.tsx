@@ -14,7 +14,7 @@ import { EXPENSE_PAYMENT_METHOD_SERVICES, PAYMENT_METHOD_SERVICE } from '../../l
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
@@ -137,7 +137,6 @@ const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFie
   const generateReference = host.settings?.transferwise?.generateReference !== false;
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
-    context: API_V2_CONTEXT,
   });
 
   useEffect(() => {
@@ -431,7 +430,7 @@ const PayExpenseModal = ({
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !blockAutomaticPayment;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
-    context: API_V2_CONTEXT,
+
     skip: !canQuote,
   });
 

@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Contributor } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -213,7 +212,6 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       slug: accountSlug,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
   });
 
   const contributors = data?.community?.nodes || [];

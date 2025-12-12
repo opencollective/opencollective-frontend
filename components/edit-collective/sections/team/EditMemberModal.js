@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import roles from '../../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
 import { Dialog, DialogContent, DialogHeader, DialogPortal, DialogTitle } from '@/components/ui/Dialog';
@@ -96,21 +96,16 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     },
   });
 
-  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editMemberAccount, { loading: isEditingMember }] = useMutation(editMemberMutation);
 
-  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] = useMutation(
-    editMemberInvitationMutation,
-    { context: API_V2_CONTEXT },
-  );
+  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] =
+    useMutation(editMemberInvitationMutation);
 
   const [removeMemberAccount, { loading: isRemovingMember }] = useMutation(removeMemberMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries: [
       {
         query: teamSectionQuery,
-        context: API_V2_CONTEXT,
+
         variables: {
           collectiveSlug: get(collective, 'slug'),
           account: { slug: get(collective, 'slug') },

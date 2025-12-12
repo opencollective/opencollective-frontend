@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -42,7 +42,7 @@ const AccountSettings = () => {
   const [trustedHostFlag, setTrustedHostFlag] = React.useState();
   const [twoFactorEnabledFlag, setTwoFactorEnabledFlag] = React.useState();
   const [enableSave, setEnableSave] = React.useState(false);
-  const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation, { context: API_V2_CONTEXT });
+  const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation);
 
   useEffect(() => {
     setArchivedFlag(selectedAccountOption?.value?.isArchived);

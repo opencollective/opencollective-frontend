@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -33,7 +33,7 @@ const mergeAccountsMutation = gql`
 `;
 
 const MergeAccountsForm = () => {
-  const [submitMergeAccounts, { loading }] = useMutation(mergeAccountsMutation, { context: API_V2_CONTEXT });
+  const [submitMergeAccounts, { loading }] = useMutation(mergeAccountsMutation);
   const [mergeSummary, setMergeSummary] = React.useState(false);
   const [fromAccount, setFromAccount] = React.useState(null);
   const [toAccount, setToAccount] = React.useState(null);

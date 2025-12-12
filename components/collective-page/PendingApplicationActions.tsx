@@ -3,7 +3,6 @@ import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import AcceptRejectButtons from '../dashboard/sections/collectives/AcceptRejectButtons';
 import { processApplicationMutation } from '../dashboard/sections/collectives/queries';
@@ -19,9 +18,7 @@ interface PendingApplicationActionsProps {
 export default function PendingApplicationActions({ collective, refetch }: PendingApplicationActionsProps) {
   const intl = useIntl();
   const { toast } = useToast();
-  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation);
 
   const processApplication = async (action: string, message?: string) => {
     try {

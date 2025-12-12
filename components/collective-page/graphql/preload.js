@@ -1,7 +1,7 @@
 import { isIndividualAccount } from '../../../lib/collective';
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 
 import {
   getTotalCollectiveContributionsQueryVariables,
@@ -28,14 +28,12 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
           client.query({
             query: budgetSectionExpenseQuery,
             variables: { slug, from: null, to: null },
-            context: API_V2_CONTEXT,
           }),
         );
         queries.push(
           client.query({
             query: budgetSectionContributionsQuery,
             variables: { slug, from: null, to: null },
-            context: API_V2_CONTEXT,
           }),
         );
       } else {
@@ -43,7 +41,6 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
           client.query({
             query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
             variables: getBudgetSectionQueryVariables(slug, isIndividual, collective.host),
-            context: API_V2_CONTEXT,
           }),
         );
       }
@@ -54,7 +51,6 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
         client.query({
           query: transactionsSectionQuery,
           variables: getTransactionsSectionQueryVariables(slug),
-          context: API_V2_CONTEXT,
         }),
       );
     }
@@ -63,7 +59,6 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
         client.query({
           query: updatesSectionQuery,
           variables: getUpdatesSectionQueryVariables(slug),
-          context: API_V2_CONTEXT,
         }),
       );
     }
@@ -72,7 +67,6 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
         client.query({
           query: conversationsSectionQuery,
           variables: getConversationsSectionQueryVariables(slug),
-          context: API_V2_CONTEXT,
         }),
       );
     }
@@ -82,6 +76,7 @@ export const preloadCollectivePageGraphqlQueries = async (client, collective) =>
       queries.push(
         client.query({
           query: totalCollectiveContributionsQuery,
+          context: API_V1_CONTEXT,
           variables: getTotalCollectiveContributionsQueryVariables(slug),
         }),
       );

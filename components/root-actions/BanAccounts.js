@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -44,7 +44,7 @@ const BanAccount = () => {
   const [selectedAccountsOptions, setSelectedAccountsOptions] = React.useState([]);
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
-  const [_banAccounts, { loading }] = useMutation(banAccountsMutation, { context: API_V2_CONTEXT });
+  const [_banAccounts, { loading }] = useMutation(banAccountsMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccountsOptions?.length);

@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import type { Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 
 import type { FilterValues } from './filters';
@@ -69,7 +69,7 @@ export function useIncomingOutgoingContributionViews(
 
   const { data, loading, refetch } = useQuery(incomingOutgoingContributionViewCountsQuery, {
     variables: { slug, filter: direction },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
   const views = [

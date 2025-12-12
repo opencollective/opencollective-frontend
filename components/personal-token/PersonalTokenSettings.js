@@ -9,7 +9,7 @@ import { styled } from 'styled-components';
 
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -91,8 +91,8 @@ const PersonalTokenSettings = ({ backPath, id }) => {
   const router = useRouter();
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
-  const { data, loading, error } = useQuery(personalTokenQuery, { variables: { id }, context: API_V2_CONTEXT });
-  const [updateToken] = useMutation(updatePersonalTokenMutation, { context: API_V2_CONTEXT });
+  const { data, loading, error } = useQuery(personalTokenQuery, { variables: { id } });
+  const [updateToken] = useMutation(updatePersonalTokenMutation);
 
   return (
     <div data-cy="personal-token-settings">

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
 import { formatDate } from '../lib/utils';
 
@@ -61,9 +61,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
   const [acceptedTOS, setAcceptedTOS] = React.useState(!hostTermsUrl); // Automatically accepts the TOS if there is no TOS URL
   const [accepted, setAccepted] = React.useState();
   const [isSubmitting, setSubmitting] = React.useState(false);
-  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation);
   const isDisabled = isSubmitting;
   const hasReplied = data && typeof data.replyToMemberInvitation !== 'undefined';
 

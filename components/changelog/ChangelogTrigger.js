@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash';
 import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { changelogTriggerLoggedInUserQuery } from '../../lib/graphql/v1/queries';
 
 import { WebsiteName } from '../I18nFormatters';
@@ -13,7 +13,7 @@ import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
-  const { data } = useQuery(changelogTriggerLoggedInUserQuery, { fetchPolicy: 'cache-only' });
+  const { data } = useQuery(changelogTriggerLoggedInUserQuery, { fetchPolicy: 'cache-only', context: API_V1_CONTEXT });
   const LoggedInUser = data?.LoggedInUser;
   const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
 
@@ -64,9 +64,6 @@ const setChangelogViewDateMutation = gql`
 
 const setChangelogViewDate = graphql(setChangelogViewDateMutation, {
   name: 'setChangelogViewDate',
-  options: {
-    context: API_V2_CONTEXT,
-  },
 });
 
 export default withNewsAndUpdates(setChangelogViewDate(withApollo(ChangelogTrigger)));

@@ -4,7 +4,7 @@ import { ArrowRight, Building, Coins, MailOpen, Receipt } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDashboardRoute } from '../../../../lib/url-helpers';
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -76,7 +76,6 @@ export const HostTodoList = () => {
     variables: {
       hostSlug: account.slug,
     },
-    context: API_V2_CONTEXT,
   });
 
   const filteredTodoList = React.useMemo(

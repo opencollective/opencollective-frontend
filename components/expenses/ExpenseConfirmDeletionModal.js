@@ -3,7 +3,7 @@ import { Mutation } from '@apollo/client/react/components';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../ui/useToast';
@@ -38,7 +38,7 @@ const ExpenseConfirmDeletion = ({ onDelete, showDeleteConfirmMoreActions, expens
   const { toast } = useToast();
   const intl = useIntl();
   return (
-    <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT} update={removeExpenseFromCache}>
+    <Mutation mutation={deleteExpenseMutation} update={removeExpenseFromCache}>
       {deleteExpense => (
         <ConfirmationModal
           isDanger

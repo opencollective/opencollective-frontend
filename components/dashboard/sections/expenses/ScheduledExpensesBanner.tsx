@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../../../lib/api';
 import { formatCurrency } from '../../../../lib/currency-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { getWebsiteUrl } from '../../../../lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';
@@ -60,7 +60,6 @@ interface ScheduledExpensesBannerProps {
 const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }: ScheduledExpensesBannerProps) => {
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
     variables: getScheduledExpensesQueryVariables(hostSlug),
-    context: API_V2_CONTEXT,
   });
 
   const { toast } = useToast();

@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '@/lib/filters/schemas';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { KycRequestsDashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
@@ -64,7 +63,6 @@ export function KYCRequests(props: DashboardSectionProps) {
         slug: props.accountSlug,
         ...queryFilter.variables,
       },
-      context: API_V2_CONTEXT,
     },
   );
 

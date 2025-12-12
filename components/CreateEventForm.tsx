@@ -10,7 +10,7 @@ import timezones from '../lib/constants/timezones';
 import dayjs from '../lib/dayjs';
 import { RICH_ERROR_MESSAGES } from '../lib/form-utils';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 import type { CreateEventMutation } from '@/lib/graphql/types/v2/graphql';
 import type { Account } from '@/lib/graphql/types/v2/schema';
 
@@ -136,9 +136,7 @@ export default function CreateEventForm({
 }) {
   const { toast } = useToast();
   const intl = useIntl();
-  const [createEventMutation, { loading: mutationLoading }] = useMutation(CREATE_EVENT_MUTATION, {
-    context: API_V2_CONTEXT,
-  });
+  const [createEventMutation, { loading: mutationLoading }] = useMutation(CREATE_EVENT_MUTATION);
   const eventSchema = React.useMemo(() => getSchema(intl), [intl]);
   const timezoneOptions = React.useMemo(
     () =>

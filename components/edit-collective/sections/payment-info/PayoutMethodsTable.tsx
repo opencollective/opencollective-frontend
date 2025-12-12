@@ -4,7 +4,7 @@ import { orderBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { PayoutMethodType } from '@/lib/constants/payout-method';
 
 import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/PayoutMethodSection';
@@ -18,34 +18,24 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
   const { toast } = useToast();
   const intl = useIntl();
 
-  const [removePayoutMethod] = useMutation(
-    gql`
-      mutation PaymentInfoRemovePayoutMethod($payoutMethodId: String!) {
-        removePayoutMethod(payoutMethodId: $payoutMethodId) {
-          id
-          ...PayoutMethodFields
-        }
+  const [removePayoutMethod] = useMutation(gql`
+    mutation PaymentInfoRemovePayoutMethod($payoutMethodId: String!) {
+      removePayoutMethod(payoutMethodId: $payoutMethodId) {
+        id
+        ...PayoutMethodFields
       }
-      ${PayoutMethodFragment}
-    `,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
-  const [restorePayoutMethod] = useMutation(
-    gql`
-      mutation PaymentInfoRestorePayoutMethod($payoutMethod: PayoutMethodReferenceInput!) {
-        restorePayoutMethod(payoutMethod: $payoutMethod) {
-          id
-          ...PayoutMethodFields
-        }
+    }
+    ${PayoutMethodFragment}
+  `);
+  const [restorePayoutMethod] = useMutation(gql`
+    mutation PaymentInfoRestorePayoutMethod($payoutMethod: PayoutMethodReferenceInput!) {
+      restorePayoutMethod(payoutMethod: $payoutMethod) {
+        id
+        ...PayoutMethodFields
       }
-      ${PayoutMethodFragment}
-    `,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
+    }
+    ${PayoutMethodFragment}
+  `);
 
   const actions = React.useMemo(
     () => ({

@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 import dayjs from '../../../../lib/dayjs';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { AccountConversionsQuery, AccountConversionsQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import type { Host } from '@/lib/graphql/types/v2/schema';
 
@@ -65,7 +64,6 @@ export function ConvertedAccountMessage({
     accountConversionsQuery,
     {
       variables: { slug: account?.slug },
-      context: API_V2_CONTEXT,
       skip: !account?.slug,
       fetchPolicy: 'network-only',
     },

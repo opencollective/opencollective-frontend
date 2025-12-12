@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { omitDeep } from '@/lib/utils';
 
@@ -73,10 +72,8 @@ const keysDeep = (obj: object, prefix?: string, omit?: string[]) =>
 const SubscriberForm = (props: SubscriberFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { data, loading } = useQuery(availablePlansQuery, { context: API_V2_CONTEXT });
-  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const { data, loading } = useQuery(availablePlansQuery);
+  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation);
   const [disclaimerChecked, setDisclaimerChecked] = React.useState(false);
   const planOptions = data?.platformSubscriptionTiers.map(plan => ({
     value: plan.id,

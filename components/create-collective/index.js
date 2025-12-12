@@ -6,7 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -177,13 +177,11 @@ const tagStatsQuery = gql`
 
 const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   name: 'createCollective',
-  options: { context: API_V2_CONTEXT },
 });
 
 const addTagStatsQuery = graphql(tagStatsQuery, {
   options: props => {
     return {
-      context: API_V2_CONTEXT,
       variables: {
         host: props.host ? { slug: props.host.slug } : undefined,
       },

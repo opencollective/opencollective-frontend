@@ -3,7 +3,6 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
 import { getMessageForRejectedDropzoneFiles } from '../../../../lib/hooks/useImageUploader';
 
@@ -41,7 +40,7 @@ export const UploadTaxFormModal = ({
   const intl = useIntl();
   const [file, setFile] = React.useState<File | null>(null);
   const { toast } = useToast();
-  const [uploadTaxForm, { loading }] = useMutation(uploadTaxFormMutation, { context: API_V2_CONTEXT });
+  const [uploadTaxForm, { loading }] = useMutation(uploadTaxFormMutation);
   return (
     <Dialog {...props} onOpenChange={loading ? null : props.setOpen}>
       <DialogContent>

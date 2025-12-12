@@ -4,7 +4,6 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { Currency } from '@/lib/graphql/types/v2/schema';
@@ -80,7 +79,6 @@ const AllTransactions = () => {
       includeChildrenTransactions: true,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
   });
   const { transactions } = data || {};
 

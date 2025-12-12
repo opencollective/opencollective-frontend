@@ -6,7 +6,6 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -106,7 +105,6 @@ const UpdatesList = () => {
     variables: {
       slug: account.slug,
     },
-    context: API_V2_CONTEXT,
   });
 
   const views: Views<z.infer<typeof schema>> = [
@@ -144,7 +142,6 @@ const UpdatesList = () => {
       slug: account.slug,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
   });
 
   const loading = metadataLoading || queryLoading;

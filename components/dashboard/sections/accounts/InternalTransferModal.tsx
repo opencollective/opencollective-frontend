@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { AccountsDashboardQuery, DashboardAccountsQueryFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import type { Account } from '@/lib/graphql/types/v2/schema';
 import { Currency } from '@/lib/graphql/types/v2/schema';
@@ -71,7 +70,6 @@ export default function InternalTransferModal({
       accountSlug: parentAccount.slug,
       limit: 10,
     },
-    context: API_V2_CONTEXT,
   });
 
   const activeAccounts = React.useMemo(
@@ -87,9 +85,7 @@ export default function InternalTransferModal({
     }
   }, [data?.accout]);
 
-  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation);
 
   const isLoading = loadingMutation || loading;
 

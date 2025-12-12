@@ -6,7 +6,6 @@ import { AlertTriangle, ArchiveIcon, Plug } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
 import { useRedirectToGoCardlessConnect } from '@/lib/hooks/useRedirectToGoCardlessConnect';
@@ -91,18 +90,11 @@ export default function TransactionsImportSettingsModal({
 }) {
   const { toast } = useToast();
   const intl = useIntl();
-  const mutationParams = { context: API_V2_CONTEXT };
   const apolloClient = useApolloClient();
   const { redirectToGoCardlessConnect, isRedirecting } = useRedirectToGoCardlessConnect();
-  const [editTransactionsImport] = useMutation(editTransactionsImportMutation, mutationParams);
-  const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(
-    deleteConnectedAccountMutation,
-    mutationParams,
-  );
-  const [deleteTransactionsImport, { loading: isDeleting }] = useMutation(
-    deleteTransactionsImportMutation,
-    mutationParams,
-  );
+  const [editTransactionsImport] = useMutation(editTransactionsImportMutation);
+  const [deleteConnectedAccount, { loading: isDisconnecting }] = useMutation(deleteConnectedAccountMutation);
+  const [deleteTransactionsImport, { loading: isDeleting }] = useMutation(deleteTransactionsImportMutation);
 
   const handleDisconnect = async () => {
     try {

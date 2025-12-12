@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type Amount, Currency, type TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/schema';
 import { applyCSVConfig, getDefaultCSVConfig, guessCSVColumnsConfig, parseTransactionsCSVFile } from './lib/parse-csv';
 import type { CSVConfig } from './lib/types';
@@ -172,7 +171,7 @@ export const StepMapCSVColumns = ({
   const [nbRowsDisplayed, setNbRowsDisplayed] = React.useState(5);
   const [csvConfig, setCSVConfig] = React.useState<CSVConfig>(() => getDefaultCSVConfig(currency));
   const [parsingError, setParsingError] = React.useState<string | null>(null);
-  const [importTransactions, { loading }] = useMutation(uploadTransactionsImportMutation, { context: API_V2_CONTEXT });
+  const [importTransactions, { loading }] = useMutation(uploadTransactionsImportMutation);
   const parsedData = React.useMemo<TransactionsImportRowCreateInput[]>(
     () => rawCSVData.map(row => applyCSVConfig(row, csvConfig)),
     [rawCSVData, csvConfig],

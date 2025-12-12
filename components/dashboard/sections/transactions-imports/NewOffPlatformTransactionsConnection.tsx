@@ -4,7 +4,6 @@ import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { ArrowLeft, Building2, ExternalLink, Globe, Loader2, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { getEnvVar } from '@/lib/env-utils';
 import type {
   OffPlatformTransactionsInstitutionsQuery,
@@ -309,7 +308,6 @@ const InstitutionStep = ({
   } = useQuery<OffPlatformTransactionsInstitutionsQuery, OffPlatformTransactionsInstitutionsQueryVariables>(
     offPlatformTransactionsInstitutionsQuery,
     {
-      context: API_V2_CONTEXT,
       variables: {
         country: selectedCountry,
         provider: OffPlatformTransactionsProvider.GOCARDLESS,

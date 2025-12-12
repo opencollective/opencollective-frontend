@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import type { PreviewFeature } from '../lib/preview-features';
 
@@ -46,9 +46,7 @@ const FeatureListItem = ({
 const useTogglePreviewFeature = (feature: PreviewFeature, onManualFeatureUpdate: () => void) => {
   const { LoggedInUser, updateLoggedInUserFromCache } = useLoggedInUser();
   const [loading, setLoading] = React.useState(false);
-  const [submitEditSettings] = useMutation(editAccountSettingsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitEditSettings] = useMutation(editAccountSettingsMutation);
 
   const togglePreviewFeature = async checked => {
     setLoading(true);

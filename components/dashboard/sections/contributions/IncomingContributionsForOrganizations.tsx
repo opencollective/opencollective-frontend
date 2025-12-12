@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { hasAccountHosting } from '@/lib/collective';
@@ -129,7 +129,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
       slug: accountSlug,
       hostContext: hasHosting ? queryFilter.values.hostContext : undefined,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
@@ -140,7 +140,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
       includeIncognito: true,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 

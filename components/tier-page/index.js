@@ -8,7 +8,6 @@ import { styled } from 'styled-components';
 
 // Open Collective Frontend imports
 import INTERVALS from '../../lib/constants/intervals';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
@@ -181,7 +180,6 @@ class TierPage extends Component {
     return {
       prepareVariables: (tier, newValue) => ({ id: tier.idV2, [graphqlV2FieldName]: newValue }),
       mutationOptions: {
-        context: API_V2_CONTEXT,
         update: (cache, { data: { editTier } }) => {
           cache.modify({
             id: cache.identify(graphQLV1Tier),

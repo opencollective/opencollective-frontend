@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { Edit, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountingCategoryTableQuery,
   AccountingCategoryTableQueryVariables,
@@ -179,7 +178,6 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         hostSlug: props.hostSlug,
       },

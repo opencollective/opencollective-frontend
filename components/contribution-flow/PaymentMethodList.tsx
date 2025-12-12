@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/schema';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -126,7 +126,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     error: paymentMethodsError,
   } = useQuery(paymentMethodsQuery, {
     variables: { slug: props.stepProfile.slug },
-    context: API_V2_CONTEXT,
+
     skip: !props.stepProfile.slug,
     fetchPolicy: 'no-cache',
   });

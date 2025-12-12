@@ -8,7 +8,7 @@ import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -311,9 +311,6 @@ const deleteUpdateMutation = gql`
 
 const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   name: 'deleteUpdate',
-  options: {
-    context: API_V2_CONTEXT,
-  },
 });
 
 const addGraphql = compose(addDeleteUpdateMutation);

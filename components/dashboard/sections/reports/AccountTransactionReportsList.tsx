@@ -5,7 +5,6 @@ import { z } from 'zod';
 
 import dayjs from '../../../../lib/dayjs';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -71,7 +70,7 @@ const AccountTransactionReportList = ({ accountSlug }: DashboardSectionProps) =>
       ...queryFilter.variables,
       includeGroups: false,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-first',
   });
   const columns = getColumns(intl);

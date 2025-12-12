@@ -6,8 +6,9 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';
 
-import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
-import defaultTheme from '../../../lib/theme';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
+import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
+import defaultTheme from '@/lib/theme';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -54,7 +55,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   };
 
   return (
-    <Mutation mutation={editCollectiveSettingsMutation}>
+    <Mutation mutation={editCollectiveSettingsMutation} context={API_V1_CONTEXT}>
       {(editSettings, { loading }) => (
         <StyledCard
           data-cy="collective-color-picker-card"

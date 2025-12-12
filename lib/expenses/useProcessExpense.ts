@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 
 import { expensePageExpenseFieldsFragment } from '../../components/expenses/graphql/fragments';
 
-import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import { gql } from '../graphql/helpers';
 import type { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/schema';
 
 type ProcessExpenseAction = (params?: {
@@ -73,7 +73,6 @@ const processExpenseMutation = gql`
 export default function useProcessExpense(opts: UseProcessExpenseOptions): UseProcessExpenseHook {
   const [currentAction, setCurrentAction] = React.useState<ProcessExpenseActionName | null>(null);
   const [processExpense, mutationResult] = useMutation(processExpenseMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries: ['ExpensePage'],
   });
 

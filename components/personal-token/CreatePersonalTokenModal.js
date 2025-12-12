@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -46,7 +46,6 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, disabled, ...pr
   const { toast } = useToast();
   const [isWaitingForOnSuccess, setIsWaitingForOnSuccess] = React.useState(false);
   const [createPersonalToken] = useMutation(createPersonalTokenMutation, {
-    context: API_V2_CONTEXT,
     update: cache => {
       const accountCacheId = cache.identify(account);
       cache.modify({ id: accountCacheId, fields: { personalTokens: (_, { DELETE }) => DELETE } });

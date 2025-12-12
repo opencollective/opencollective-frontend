@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getAccountReferenceInput } from '@/lib/collective';
 import type { Account } from '@/lib/graphql/types/v2/graphql';
 
@@ -33,9 +32,7 @@ export function ConvertToCollectiveModal({ open, setOpen, collective }: ConvertT
   const intl = useIntl();
   const { toast } = useToast();
   const router = useRouter();
-  const [convertToCollective, { loading: isConverting }] = useMutation(convertOrganizationToCollectiveMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [convertToCollective, { loading: isConverting }] = useMutation(convertOrganizationToCollectiveMutation);
 
   const handleConvert = React.useCallback(async () => {
     try {
@@ -43,7 +40,6 @@ export function ConvertToCollectiveModal({ open, setOpen, collective }: ConvertT
         variables: {
           organization: getAccountReferenceInput(collective),
         },
-        context: API_V2_CONTEXT,
       });
 
       toast({

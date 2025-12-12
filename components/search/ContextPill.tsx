@@ -2,8 +2,6 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { X } from 'lucide-react';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-
 import Avatar from '../Avatar';
 
 import { contextQuery } from './queries';
@@ -11,7 +9,7 @@ import { contextQuery } from './queries';
 export const ContextPill = ({ slug, onRemove }: { slug: string; onRemove?: () => void }) => {
   const { data } = useQuery(contextQuery, {
     variables: { slug },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-first',
   });
   return (

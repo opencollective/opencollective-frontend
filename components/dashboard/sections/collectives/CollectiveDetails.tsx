@@ -11,7 +11,6 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQuery } from '../../../../lib/graphql/types/v2/graphql';
 import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -92,7 +91,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
     hostFeesStructure: collective.hostFeesStructure,
     hostFeePercent: collective.hostFeePercent || host.hostFeePercent,
   });
-  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee, { context: API_V2_CONTEXT });
+  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee);
   const handleFeeStructureChange = async ({ hostFeesStructure, hostFeePercent }) => {
     const previousState = cloneDeep(feeStructure);
     const isCustomFee = hostFeesStructure === HOST_FEE_STRUCTURE.CUSTOM_FEE;
@@ -195,7 +194,7 @@ const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetai
         }
       }
     `,
-    { context: API_V2_CONTEXT },
+    {},
   );
   const handleUpdate = async value => {
     try {
@@ -236,7 +235,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
   const [expenseTypes, setExpenseTypes] = React.useState(() => collective.settings?.expenseTypes || {});
   const isUsingGlobalSetttings = isEmpty(expenseTypes);
 
-  const [submitEditSettings, { loading, data }] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
+  const [submitEditSettings, { loading, data }] = useMutation(editAccountSettingsMutation);
   const handleUpdate = async value => {
     const previousState = cloneDeep(expenseTypes);
     const variables = {
@@ -490,7 +489,7 @@ const CollectiveDetails = ({
   const drawerActionsContainer = useDrawerActionsContainer();
   const { data, loading: loadingCollectiveInfo } = useQuery(hostedCollectiveDetailQuery, {
     variables: { id: collectiveId || c?.id },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
   });
   const collective = data?.account || c;

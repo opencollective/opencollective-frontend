@@ -5,7 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { updateTransactionsImportRows } from './lib/graphql';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
 
 import { Button } from '@/components/ui/Button';
@@ -20,7 +19,7 @@ export const TransactionsImportRowNoteForm = ({
   row: Pick<TransactionsImportRow, 'id' | 'note'>;
   autoFocus?: boolean;
 }) => {
-  const [updateRows, { loading }] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [updateRows, { loading }] = useMutation(updateTransactionsImportRows);
   const [newText, setNewText] = React.useState(row.note || '');
   const { toast } = useToast();
   const intl = useIntl();

@@ -10,7 +10,6 @@ import { DEFAULT_ASSIGNMENT_ACCOUNT_ID } from './lib/types';
 import { getAccountReferenceInput } from '@/lib/collective';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account, TransactionsImport } from '@/lib/graphql/types/v2/schema';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
 
@@ -106,9 +105,7 @@ export const TransactionsImportAssignmentsForm = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editTransactionsImportAssignments] = useMutation(editTransactionsImportAssignmentsMutation);
 
   return (
     <Formik<AssignmentFormValues>

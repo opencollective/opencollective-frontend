@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
 
 import { AccountingCategorySelectFieldsFragment, getCategoryLabel } from '../../AccountingCategorySelect';
@@ -56,7 +56,7 @@ function AccountingCategoryFilter({
 >) {
   const { data, loading } = useQuery(accountingCategoriesQuery, {
     variables: { hostSlug, kind: accountingCategoryKinds },
-    context: API_V2_CONTEXT,
+
     skip: !hostSlug,
   });
 

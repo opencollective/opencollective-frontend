@@ -5,7 +5,6 @@ import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -257,7 +256,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
   const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       orderId: props.orderId,
     },

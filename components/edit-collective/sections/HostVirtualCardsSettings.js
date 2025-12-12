@@ -4,7 +4,7 @@ import { Info } from '@styled-icons/feather/Info';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
@@ -45,7 +45,6 @@ const HostVirtualCards = props => {
   const { toast } = useToast();
 
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
-    context: API_V2_CONTEXT,
     onError: e => {
       toast({
         variant: 'error',

@@ -4,7 +4,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import { expenseTagsQuery } from './dashboard/filters/ExpenseTagsFilter';
 import { useToast } from './ui/useToast';
@@ -31,7 +31,7 @@ const setTagsMutation = gql`
  * Display expense tags, with the ability to edit them. Triggers a migration whenever a tag changes.
  */
 const TagsForAdmins = ({ expense, order, suggestedTags }) => {
-  const [setTags, { loading }] = useMutation(setTagsMutation, { context: API_V2_CONTEXT });
+  const [setTags, { loading }] = useMutation(setTagsMutation);
   const tagList = expense?.tags || order?.tags;
   const { toast } = useToast();
   const intl = useIntl();

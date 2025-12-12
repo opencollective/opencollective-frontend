@@ -9,7 +9,7 @@ import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-
 import { OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import { useToast } from './ui/useToast';
@@ -166,7 +166,6 @@ const applyToHostMutation = gql`
   ${hostFields}
 `;
 
-const GQL_CONTEXT = { context: API_V2_CONTEXT };
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };
 const STEPS = {
   INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" id="E80WrK" /> },
@@ -239,11 +238,10 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
 const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ...props }) => {
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const { data, loading, error } = useQuery(query, {
-    ...GQL_CONTEXT,
     variables: { hostSlug, collectiveSlug: collective?.slug },
     fetchPolicy: 'network-only',
   });
-  const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation, GQL_CONTEXT);
+  const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation);
   const intl = useIntl();
   const { toast } = useToast();
   const [step, setStep] = React.useState(STEPS.INFORMATION);

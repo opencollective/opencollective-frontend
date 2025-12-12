@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { PROJECTS_ORDER_KEY } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import type {
   ProjectsSectionSearchQuery,
   ProjectsSectionSearchQueryVariables,
@@ -93,9 +92,7 @@ export default function Projects(props: ProjectsProps) {
   const deboucedSearchTerm = useDebounced(searchTerm, 1000);
   const isSearching = !isEmpty(deboucedSearchTerm);
 
-  const [editAccountSettings, { loading: isSaving }] = useMutation(editAccountSettingMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editAccountSettings, { loading: isSaving }] = useMutation(editAccountSettingMutation);
   const query = useQuery<ProjectsSectionSearchQuery, ProjectsSectionSearchQueryVariables>(
     gql`
       query ProjectsSectionSearch($slug: String, $searchTerm: String) {
@@ -112,7 +109,6 @@ export default function Projects(props: ProjectsProps) {
       ${ProjectSectionCardFields}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.collective.slug,
         searchTerm: deboucedSearchTerm,

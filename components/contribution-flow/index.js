@@ -23,7 +23,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { AccountType } from '../../lib/graphql/types/v2/schema';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
@@ -1092,7 +1092,6 @@ const addCreateOrderMutation = graphql(
   `,
   {
     name: 'createOrder',
-    options: { context: API_V2_CONTEXT },
   },
 );
 
@@ -1107,7 +1106,6 @@ const addConfirmOrderMutation = graphql(
   `,
   {
     name: 'confirmOrder',
-    options: { context: API_V2_CONTEXT },
   },
 );
 

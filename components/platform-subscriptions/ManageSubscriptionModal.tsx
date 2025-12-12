@@ -8,7 +8,6 @@ import Image from 'next/image';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   PlatformBillingFieldsFragment,
   PlatformSubscriptionFieldsFragment,
@@ -60,40 +59,35 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
   const [step, setStep] = React.useState<Step>(Step.TIER);
   const intl = useIntl();
 
-  const query = useQuery<PlatformSubscriptionFormQuery, PlatformSubscriptionFormQueryVariables>(
-    gql`
-      query PlatformSubscriptionForm {
-        platformSubscriptionTiers {
-          id
-          title
-          type
-          pricing {
-            pricePerMonth {
-              valueInCents
-              currency
-            }
-            pricePerAdditionalCollective {
-              valueInCents
-              currency
-            }
-            pricePerAdditionalExpense {
-              valueInCents
-              currency
-            }
-            includedCollectives
-            includedExpensesPerMonth
+  const query = useQuery<PlatformSubscriptionFormQuery, PlatformSubscriptionFormQueryVariables>(gql`
+    query PlatformSubscriptionForm {
+      platformSubscriptionTiers {
+        id
+        title
+        type
+        pricing {
+          pricePerMonth {
+            valueInCents
+            currency
           }
-          features {
-            ...PlatformSubscriptionFeatures
+          pricePerAdditionalCollective {
+            valueInCents
+            currency
           }
+          pricePerAdditionalExpense {
+            valueInCents
+            currency
+          }
+          includedCollectives
+          includedExpensesPerMonth
+        }
+        features {
+          ...PlatformSubscriptionFeatures
         }
       }
-      ${platformSubscriptionFeatures}
-    `,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
+    }
+    ${platformSubscriptionFeatures}
+  `);
 
   const [updatePlanMutation] = useMutation<
     UpdatePlatformSubscriptionMutation,
@@ -112,7 +106,6 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
       ${platformSubscriptionFragment}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: props.accountSlug,
         planId: '',

@@ -4,7 +4,6 @@ import { max } from 'lodash';
 import { FilePenLine } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { AccountTaxInformationQuery, AccountTaxInformationQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { LegalDocumentRequestStatus } from '@/lib/graphql/types/v2/graphql';
 
@@ -123,7 +122,7 @@ const TaxFormSuccessView = () => {
  * A page for users to fill their info for W9/W8 tax forms.
  */
 export const TaxInformationSettingsSection = ({ account }) => {
-  const queryParams = { variables: { id: account.id }, context: API_V2_CONTEXT };
+  const queryParams = { variables: { id: account.id } };
   const { data, error, loading, refetch } = useQuery<AccountTaxInformationQuery, AccountTaxInformationQueryVariables>(
     accountTaxInformationQuery,
     queryParams,

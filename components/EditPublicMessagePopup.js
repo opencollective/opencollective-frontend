@@ -7,7 +7,7 @@ import { Popper } from 'react-popper';
 import { styled } from 'styled-components';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import withViewport from '../lib/withViewport';
 
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
@@ -136,7 +136,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
   }
 
   return createPortal(
-    <Mutation mutation={editPublicMessageMutation}>
+    <Mutation mutation={editPublicMessageMutation} context={API_V1_CONTEXT}>
       {(submitMessage, { loading, error }) => (
         <Popper
           referenceElement={cardRef.current}
@@ -201,6 +201,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           const queries = [
                             {
                               query: collectivePageQuery,
+                              context: API_V1_CONTEXT,
                               variables: {
                                 slug: collectiveSlug,
                                 nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
@@ -210,6 +211,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           if (tier) {
                             queries.push({
                               query: tierPageQuery,
+                              context: API_V1_CONTEXT,
                               variables: { tierId: tier.id },
                             });
                           }

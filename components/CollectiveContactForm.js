@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import { useToast } from './ui/useToast';
 import { Box } from './Grid';
@@ -27,7 +27,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose = undefine
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
-  const [submit, { data, loading }] = useMutation(sendMessageMutation, { context: API_V2_CONTEXT });
+  const [submit, { data, loading }] = useMutation(sendMessageMutation);
   const { toast } = useToast();
 
   // Dispatch changes to onChange if set

@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import { isHeavyAccount, isIndividualAccount } from '../../../lib/collective';
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
@@ -331,7 +331,6 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   const isIndividual = isIndividualAccount(collective) && !collective.isHost;
   const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
     variables: getBudgetSectionQueryVariables(collective.slug, isIndividual, collective.host),
-    context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
 

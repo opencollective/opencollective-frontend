@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { defaultBackgroundImage } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectivePageMutation } from '../../../lib/graphql/v1/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/v1/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
@@ -28,9 +28,10 @@ const AccountSettings = ({ account, section }) => {
     fetchPolicy: 'network-only',
     ssr: false,
     skip: !LoggedInUser,
+    context: API_V1_CONTEXT,
   });
   const collective = data?.Collective;
-  const [editCollective] = useMutation(editCollectivePageMutation);
+  const [editCollective] = useMutation(editCollectivePageMutation, { context: API_V1_CONTEXT });
 
   const handleEditCollective = async updatedCollective => {
     const collective = { ...updatedCollective };
@@ -107,7 +108,7 @@ const AccountSettings = ({ account, section }) => {
         variables: { collective: CollectiveInputType },
         // It's heavy, but we need to refetch the information of the account after a mutation as fundamental
         // properties like its name or whether it's a fiscal host can change.
-        refetchQueries: [{ query: adminPanelQuery, variables: { slug: account.slug }, context: API_V2_CONTEXT }],
+        refetchQueries: [{ query: adminPanelQuery, variables: { slug: account.slug } }],
       });
       const updatedCollective = response.data.editCollective;
       setState({ ...state, status: 'saved', result: { error: null } });

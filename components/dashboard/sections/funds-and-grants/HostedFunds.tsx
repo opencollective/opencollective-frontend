@@ -10,7 +10,6 @@ import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { HostFeeStructure } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
@@ -139,7 +138,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
     {
       variables: { hostSlug },
       fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
-      context: API_V2_CONTEXT,
+
       skip: isUpgradeRequired,
     },
   );
@@ -194,7 +193,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
   });

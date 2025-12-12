@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
@@ -33,7 +32,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
       limit: PAGE_SIZE,
       classes: ['EXPENSES', 'VIRTUAL_CARDS', 'CONTRIBUTIONS', 'ACTIVITIES_UPDATES', 'COLLECTIVE'],
     },
-    context: API_V2_CONTEXT,
+
     notifyOnNetworkStatusChange: true,
   });
   const activities: TimelineQuery['account']['feed'] = data?.account.feed || [];

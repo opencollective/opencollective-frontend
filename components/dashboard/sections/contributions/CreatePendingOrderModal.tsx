@@ -10,7 +10,7 @@ import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -290,7 +290,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
     createPendingContributionModalCollectiveQuery,
     {
-      context: API_V2_CONTEXT,
       variables: { slug: host.slug },
     },
   );
@@ -853,17 +852,12 @@ const CreatePendingContributionModal = ({
   const { toast } = useToast();
 
   const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: hostSlug },
   });
 
   const host = data?.host;
-  const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation);
+  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation);
 
   // No modal if logged-out
   if (!LoggedInUser) {

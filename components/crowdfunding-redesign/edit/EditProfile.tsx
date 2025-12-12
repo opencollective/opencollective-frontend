@@ -5,7 +5,6 @@ import { Form } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { isValidUrl } from '../../../lib/utils';
 
 import Dropzone, { DROPZONE_ACCEPT_IMAGES } from '../../Dropzone';
@@ -75,9 +74,7 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
 };
 
 export function EditProfile({ account }) {
-  const [submitEditSettings] = useMutation(editCrowdfundingSettingsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitEditSettings] = useMutation(editCrowdfundingSettingsMutation);
   const intl = useIntl();
   const initialValues = getDefaultProfileValues(account);
   const onSubmit = async values => {

@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
@@ -111,7 +110,6 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       ...(account.parent && { includeChildren: false }),
     },
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
 
   if (error) {

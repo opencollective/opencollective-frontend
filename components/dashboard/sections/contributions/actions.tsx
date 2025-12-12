@@ -4,7 +4,6 @@ import { ArrowLeftRightIcon, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
@@ -56,9 +55,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
 
-  const [expireOrder] = useMutation(expireOrderMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [expireOrder] = useMutation(expireOrderMutation);
 
   const getActions: GetActions<T> = (
     order: T,

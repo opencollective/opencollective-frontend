@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 
 import { DISMISSABLE_HELP_MESSAGE_KEY } from '../lib/constants/dismissable-help-message';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
 
 import { withUser } from './UserProvider';
@@ -68,11 +68,8 @@ const DismissibleMessage = ({
 }) => {
   const settingsKeys = getSettingsKeys(messageId, accountId);
   const [isDismissedLocally, setDismissedLocally] = React.useState(() => getIsDismissedLocally(settingsKeys));
-  const [dismissMessage] = useMutation(dismissMessageMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [dismissMessage] = useMutation(dismissMessageMutation);
   const { data, loading } = useQuery(accountSettingsQuery, {
-    context: API_V2_CONTEXT,
     skip: !LoggedInUser,
     fetchPolicy: 'network-only',
   });

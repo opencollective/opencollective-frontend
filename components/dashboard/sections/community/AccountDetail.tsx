@@ -4,7 +4,6 @@ import { pick } from 'lodash';
 import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
@@ -132,7 +131,6 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       accountId: props.account.id,
       host: props.host,

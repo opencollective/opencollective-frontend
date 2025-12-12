@@ -9,7 +9,7 @@ import { getAccountReferenceInput } from '../../lib/collective';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Account, Agreement } from '../../lib/graphql/types/v2/schema';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
@@ -137,7 +137,7 @@ const AgreementForm = ({
   const drawerActionsContainer = useDrawerActionsContainer();
   const isEditing = Boolean(agreement);
   const mutation = isEditing ? EDIT_AGREEMENT_MUTATION : ADD_AGREEMENT_MUTATION;
-  const [submitAgreement] = useMutation(mutation, { context: API_V2_CONTEXT });
+  const [submitAgreement] = useMutation(mutation);
   return (
     <div>
       <H4 mb={32}>

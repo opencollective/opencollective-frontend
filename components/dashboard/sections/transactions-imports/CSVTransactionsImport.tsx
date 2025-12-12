@@ -24,7 +24,6 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
@@ -321,7 +320,6 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
     TransactionsImportQuery,
     TransactionsImportQueryVariables
   >(transactionsImportQuery, {
-    context: API_V2_CONTEXT,
     variables: { importId, ...queryFilter.variables, fetchOnlyRowIds: false },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
@@ -340,13 +338,12 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
         query: transactionsImportStatsQuery,
         variables: { importId },
         fetchPolicy: 'network-only',
-        context: API_V2_CONTEXT,
       }),
     skipOptimisticResponse: true,
     getAllRowsIds: async () => {
       const { data, error } = await apolloClient.query<TransactionsImportQuery, TransactionsImportQueryVariables>({
         query: transactionsImportQuery,
-        context: API_V2_CONTEXT,
+
         variables: { ...variables, limit: 100_000, fetchOnlyRowIds: true },
       });
 

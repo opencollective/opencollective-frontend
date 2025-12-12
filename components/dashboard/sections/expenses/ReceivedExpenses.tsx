@@ -6,7 +6,6 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import {
   type Account,
@@ -121,7 +120,6 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     refetch: refetchMetadata,
   } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
-    context: API_V2_CONTEXT,
   });
 
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
@@ -160,7 +158,6 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
         : {}),
     },
-    context: API_V2_CONTEXT,
   });
 
   const hasNewSubmitExpenseFlow =

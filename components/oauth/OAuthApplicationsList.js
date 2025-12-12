@@ -2,7 +2,7 @@ import React from 'react';
 import { NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { getOauthAppSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -44,7 +44,6 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
   const [showCreateApplicationModal, setShowCreateApplicationModal] = React.useState(false);
   const { data, loading, error, networkStatus } = useQuery(applicationsQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const showLoadingState = loading || networkStatus === NetworkStatus.refetch;

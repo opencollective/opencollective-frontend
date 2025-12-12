@@ -4,7 +4,6 @@ import { Plus } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
@@ -36,7 +35,6 @@ enum Modals {
 export default function PaymentInfoDashboard(props: ManagePaymentMethodsProps) {
   const router = useRouter();
   const query = useQuery<ManagePaymentMethodsQuery, ManagePaymentMethodsQueryVariables>(managePaymentMethodsQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       accountSlug: props.account.slug,
     },

@@ -4,7 +4,6 @@ import { isUndefined } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
@@ -30,7 +29,7 @@ export default function ApproveExpenseModal({
   expense,
 }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
-  const [editExpense] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
+  const [editExpense] = useMutation(editExpenseCategoryMutation);
   const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory || undefined);
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();

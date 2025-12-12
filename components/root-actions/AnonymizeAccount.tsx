@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 import { getAccountReferenceInput } from '../../lib/collective';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -26,7 +26,7 @@ const anonymizeAccountMutation = gql`
 export const AnonymizeAccount = () => {
   const [showModal, setShowModal] = React.useState(false);
   const [selectedAccount, setSelectedAccount] = React.useState(null);
-  const [_anonymizeAccount, { loading }] = useMutation(anonymizeAccountMutation, { context: API_V2_CONTEXT });
+  const [_anonymizeAccount, { loading }] = useMutation(anonymizeAccountMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccount);

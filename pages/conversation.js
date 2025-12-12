@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/html';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -371,7 +371,6 @@ class ConversationPage extends React.Component {
                           <H2 fontSize="24px" lineHeight="32px" mb={4} wordBreak="break-word">
                             <InlineEditField
                               mutation={editConversationMutation}
-                              mutationOptions={{ context: API_V2_CONTEXT }}
                               canEdit={canEdit}
                               values={conversation}
                               field="title"
@@ -464,7 +463,6 @@ class ConversationPage extends React.Component {
                               canEdit={canEdit}
                               values={conversation}
                               mutation={editConversationMutation}
-                              mutationOptions={{ context: API_V2_CONTEXT }}
                               prepareVariables={(value, draft) => ({
                                 ...value,
                                 tags: draft,
@@ -515,7 +513,6 @@ class ConversationPage extends React.Component {
 const getData = graphql(conversationPageQuery, {
   options: {
     pollInterval: 60000, // Will refresh the data every 60s to get new comments
-    context: API_V2_CONTEXT,
   },
 });
 

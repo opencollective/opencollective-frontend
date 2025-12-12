@@ -5,8 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-
 import Link from '../Link';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { Button } from '../ui/Button';
@@ -23,7 +21,6 @@ export function FundraiserLayout({ children, activeTab }) {
   const router = useRouter();
   const { data, error, loading } = useQuery(profilePageQuery, {
     variables: { slug: router.query.accountSlug },
-    context: API_V2_CONTEXT,
   });
   const account = data?.account;
   const fundraiser = getDefaultFundraiserValues(account);

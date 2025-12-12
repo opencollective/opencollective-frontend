@@ -2,8 +2,6 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-
 import Link from '../../Link';
 
 import { TransactionGroupCard } from './TransactionGroupCard';
@@ -49,7 +47,6 @@ export function TransactionGroups({ queryFilter }) {
       type: queryFilter.variables.type,
     },
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
   return (
     <div>

@@ -7,7 +7,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { generateNotFoundError } from '@/lib/errors';
 import { loadGoogleMaps } from '@/lib/google-maps';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CreateEventPageQuery, CreateEventPageQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute } from '@/lib/url-helpers';
@@ -59,7 +58,6 @@ function CreateEventPage({ parentCollectiveSlug }: { parentCollectiveSlug: strin
     loading: loadingParent,
   } = useQuery<CreateEventPageQuery, CreateEventPageQueryVariables>(createEventPageQuery, {
     variables: { slug: parentCollectiveSlug },
-    context: API_V2_CONTEXT,
   });
   const title = intl.formatMessage({ defaultMessage: 'New event', id: 'C+Npdp' });
   const parent = data?.account;

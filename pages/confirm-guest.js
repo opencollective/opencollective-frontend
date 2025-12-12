@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { useTheme } from 'styled-components';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { removeGuestTokens } from '../lib/guest-accounts';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
@@ -45,15 +45,13 @@ const MESSAGES = defineMessages({
   },
 });
 
-const MUTATION_OPTS = { context: API_V2_CONTEXT };
-
 const ConfirmGuestPage = () => {
   const intl = useIntl();
   const theme = useTheme();
   const router = useRouter();
   const { login } = useLoggedInUser();
   const [status, setStatus] = React.useState(STATUS.SUBMITTING);
-  const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation, MUTATION_OPTS);
+  const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation);
   const { token, email } = router.query;
 
   const confirmGuestAccount = async () => {

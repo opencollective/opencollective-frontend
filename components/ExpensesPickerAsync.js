@@ -3,7 +3,7 @@ import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { FormattedDate } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -81,7 +81,7 @@ const formatOptionLabel = option => {
 const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
   const variables = { account: getAccountInput(account), status };
-  const queryParameters = { fetchPolicy, variables, context: API_V2_CONTEXT };
+  const queryParameters = { fetchPolicy, variables };
   const [searchExpenses, { loading, data }] = useLazyQuery(expensesSearchQuery, queryParameters);
   const [searchTerm, setSearchTerm] = React.useState('');
   const options = React.useMemo(() => getOptionsFromExpenses(data?.expenses?.nodes), [data?.expenses?.nodes]);

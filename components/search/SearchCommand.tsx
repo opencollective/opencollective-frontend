@@ -5,7 +5,6 @@ import { pick } from 'lodash';
 import { ChevronRight, SearchIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
@@ -161,7 +160,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   } = useQuery(searchCommandQuery, {
     variables: { ...queryFilter.variables, imageHeight: 72, __infiniteScroll: true },
     notifyOnNetworkStatusChange: true,
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm,
   });

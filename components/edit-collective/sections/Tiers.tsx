@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import { sortTiersForCollective, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
@@ -77,10 +77,8 @@ const Tiers = ({ collective }) => {
   const [error, setError] = React.useState(null);
 
   const variables = { accountSlug: collective.slug };
-  const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
-  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables });
+  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation);
   const intl = useIntl();
   const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);
   const contributeCards = React.useMemo(
@@ -154,7 +152,9 @@ const Tiers = ({ collective }) => {
               </P>
               <Mutation
                 mutation={editAccountSettingsMutation}
-                refetchQueries={[{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }]}
+                refetchQueries={[
+                  { query: collectiveSettingsQuery, context: API_V1_CONTEXT, variables: { slug: collective.slug } },
+                ]}
                 awaitRefetchQueries
               >
                 {(editSettings, { loading }) => (
@@ -175,7 +175,6 @@ const Tiers = ({ collective }) => {
                           key: 'disableCustomContributions',
                           value: !target.value,
                         },
-                        context: API_V2_CONTEXT,
                       });
                     }}
                   />

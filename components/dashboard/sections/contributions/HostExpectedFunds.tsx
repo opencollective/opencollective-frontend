@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
@@ -182,7 +182,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       slug: accountSlug,
       expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
   });
@@ -195,7 +195,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       hostContext: 'ALL',
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
     skip: isUpgradeRequired,
   });

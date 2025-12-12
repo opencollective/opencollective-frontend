@@ -11,7 +11,6 @@ import { z } from 'zod';
 import { suggestSlug } from '@/lib/collective';
 import { getCurrencyForCountry } from '@/lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { CountryIso, Currency } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nCountryName } from '@/lib/i18n';
@@ -92,7 +91,7 @@ export function OrganizationForm({ nextStep, setCreatedOrganization }: SignupSte
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-  const [createOrganization] = useMutation(createOrganizationMutation, { context: API_V2_CONTEXT });
+  const [createOrganization] = useMutation(createOrganizationMutation);
   const [showCountrySelect, setShowCountrySelect] = useState(false);
   const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [captchaResult, setCaptchaResult] = useState(null);
@@ -430,9 +429,7 @@ export function InviteAdminForm({ nextStep, createdOrganization }: SignupStepPro
   const intl = useIntl();
   const formikRef = useRef<FormikProps<InviteAdminsValuesSchema>>(undefined);
   const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
-  const [inviteOrganizationAdmins] = useMutation(inviteOrganizationAdminsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [inviteOrganizationAdmins] = useMutation(inviteOrganizationAdminsMutation);
   const [loading, setLoading] = React.useState(false);
 
   const onSubmit = async (values: InviteAdminsValuesSchema) => {

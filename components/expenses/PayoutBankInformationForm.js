@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { ComboSelect } from '../ComboSelect';
 import CurrencyPicker from '../CurrencyPicker';
@@ -255,7 +255,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
   const intl = useIntl();
   const needsRefetchRef = React.useRef(false);
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
-    context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
     //    then `host` is not set and we'll use the Platform Wise account
     // B) If `host` is set, we expect to be in 2 cases:
@@ -494,7 +493,6 @@ const PayoutBankInformationForm = ({
   alwaysSave,
 }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: WISE_PLATFORM_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
     // Skip fetching/loading if the currency is fixed (2) (3)
     // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)

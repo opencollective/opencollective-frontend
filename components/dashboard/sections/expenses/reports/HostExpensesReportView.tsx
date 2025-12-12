@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { boolean } from '../../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import {
   type HostExpensesReportQuery,
   type HostExpensesReportQueryVariables,
@@ -67,7 +66,6 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: props.accountSlug,
         ...variables,

@@ -9,7 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -374,7 +374,6 @@ const removePayoutMethodMutation = gql`
 
 const addRemovePayoutMethodMutation = graphql<PayoutMethodSelectProps>(removePayoutMethodMutation, {
   name: 'removePayoutMethod',
-  options: { context: API_V2_CONTEXT },
 });
 
 export default React.memo(injectIntl(addRemovePayoutMethodMutation(PayoutMethodSelect)));

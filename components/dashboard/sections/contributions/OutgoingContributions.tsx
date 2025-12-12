@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -79,7 +78,7 @@ const OutgoingContributions = ({ accountSlug }: DashboardSectionProps) => {
       includeIncognito: true,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 

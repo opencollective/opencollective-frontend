@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -114,15 +114,14 @@ const MoveReceivedContributions = () => {
 
   // Fetch tiers
   const tiersQueryVariables = { accountSlug: receiverAccount?.slug };
-  const tiersQueryOptions = { skip: !receiverAccount, variables: tiersQueryVariables, context: API_V2_CONTEXT };
+  const tiersQueryOptions = { skip: !receiverAccount, variables: tiersQueryVariables };
   const { data: tiersData, loading: tiersLoading } = useQuery(accountTiersQuery, tiersQueryOptions);
   const tiersNodes = tiersData?.account.tiers?.nodes;
   const accountSettings = tiersData?.account.settings;
   const tiersOptions = React.useMemo(() => getTiersOptions(tiersNodes, accountSettings), [tiersNodes, accountSettings]);
 
   // Move contributions mutation
-  const mutationOptions = { context: API_V2_CONTEXT };
-  const [submitMoveContributions] = useMutation(moveOrdersMutation, mutationOptions);
+  const [submitMoveContributions] = useMutation(moveOrdersMutation);
   const moveContributions = async () => {
     try {
       // Prepare variables

@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { VirtualCardRequest } from '../../lib/graphql/types/v2/schema';
 import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/schema';
 import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
@@ -79,7 +79,6 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
   const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(RejectVirtualCardRequestMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       virtualCardRequest: {
         id: virtualCardRequest.id,
@@ -145,7 +144,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
   const intl = useIntl();
   const query = useQuery<{ virtualCardRequest: VirtualCardRequest }>(virtualCardRequestQuery, {
     skip: !props.open,
-    context: API_V2_CONTEXT,
+
     variables: {
       virtualCardRequest: {
         legacyId: props.virtualCardRequestId,

@@ -4,7 +4,6 @@ import { SearchIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
@@ -148,7 +147,7 @@ export const SearchResults = () => {
       includeHostApplications: true,
     },
     notifyOnNetworkStatusChange: true,
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
     skip: !queryFilter.values.searchTerm,
   });

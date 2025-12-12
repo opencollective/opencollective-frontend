@@ -4,7 +4,7 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 import ReactAnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import { Button } from './ui/Button';
@@ -47,7 +47,7 @@ export function Survey({
   hasParentTitle?: boolean;
 }) {
   const { LoggedInUser } = useLoggedInUser();
-  const [sendInAppSurveyResponse] = useMutation(sendSurveyResponseMutation, { context: API_V2_CONTEXT });
+  const [sendInAppSurveyResponse] = useMutation(sendSurveyResponseMutation);
   const [score, setScore] = React.useState(null);
   const [text, setText] = React.useState('');
   const [completed, setCompleted] = React.useState(false);

@@ -4,7 +4,7 @@ import * as webauthn from '@simplewebauthn/browser';
 import { Plus } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 
@@ -59,13 +59,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
   const { toast } = useToast();
 
-  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation);
 
-  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [addWebauthnDevice] = useMutation(AddTwoFactorAuthToIndividualMutation);
 
   const startWebauthnDeviceRegistration = React.useCallback(async () => {
     const response = await createPublicKeyRequestOptions({

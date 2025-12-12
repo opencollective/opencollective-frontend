@@ -3,7 +3,6 @@ import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
@@ -24,9 +23,7 @@ export function OrgOverview() {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showSetupGuide, setShowSetupGuide] = useState(undefined);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(undefined);
-  const [editAccountSetting] = useMutation(editAccountSettingMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
 
   useEffect(() => {
     if (!LoggedInUser || !account) {

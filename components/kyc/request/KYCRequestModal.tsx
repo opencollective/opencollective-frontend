@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 import type {
   AccountReferenceInput,
   KycRequestModalQuery,
@@ -62,7 +62,6 @@ export function KYCRequestModal(props: KYCRequestModalProps) {
       ${kycVerificationFields}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         requestedByAccountSlug: props.requestedByAccount.slug,
         verifyAccountId: props.verifyAccount?.id,

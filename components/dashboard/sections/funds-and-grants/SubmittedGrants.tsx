@@ -4,7 +4,6 @@ import { compact, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { isIndividualAccount } from '@/lib/collective';
@@ -56,7 +55,6 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
 
   const { data, loading, error, refetch } = useQuery(accountExpensesQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const filterMeta: FilterMeta = {

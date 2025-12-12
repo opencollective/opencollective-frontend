@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { isIndividualAccount } from '../../lib/collective';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
@@ -142,7 +142,7 @@ const formatOrderOption = (option, intl) => {
 const getOrdersQueryOptions = selectedProfile => {
   return {
     skip: !selectedProfile,
-    context: API_V2_CONTEXT,
+
     variables: selectedProfile ? { account: { legacyId: selectedProfile.id } } : null,
     fetchPolicy: 'network-only',
   };
@@ -165,8 +165,7 @@ const MoveAuthoredContributions = () => {
   // GraphQL
   const { data, loading, error: ordersQueryError } = useQuery(ordersQuery, getOrdersQueryOptions(fromAccount));
   const allOptions = React.useMemo(() => getOrdersOptionsFromData(intl, data), [intl, data]);
-  const mutationOptions = { context: API_V2_CONTEXT };
-  const [submitMoveContributions] = useMutation(moveOrdersMutation, mutationOptions);
+  const [submitMoveContributions] = useMutation(moveOrdersMutation);
   const moveContributions = async () => {
     try {
       // Prepare variables

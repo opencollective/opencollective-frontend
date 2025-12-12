@@ -4,7 +4,6 @@ import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import { Button } from './ui/Button';
@@ -41,7 +40,6 @@ export function FeedbackModal({
   const { LoggedInUser } = useLoggedInUser();
   //   const [open, setOpen] = React.useState(false);
   const [sendInAppSurveyResponse, { loading }] = useMutation(sendSurveyResponseMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       score: -1, // the sendSurveyResponse mutation requires a score, but we don't use it here
       surveyKey: feedbackKey,

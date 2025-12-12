@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { ActiveFiscalHostQuery, ActiveFiscalHostQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
@@ -76,7 +75,6 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         collectiveSlug: props.collectiveSlug,
       },

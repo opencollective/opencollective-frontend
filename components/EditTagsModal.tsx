@@ -4,7 +4,7 @@ import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../lib/graphql/helpers';
 import type { Collective } from '../lib/graphql/types/v2/schema';
 import { editTagsMutation } from '../lib/graphql/v1/mutations';
 
@@ -33,11 +33,10 @@ type EditTagsModalProps = {
 };
 
 export default function EditTagsModal({ collective, onClose }: EditTagsModalProps) {
-  const [editTags, { loading }] = useMutation(editTagsMutation);
+  const [editTags, { loading }] = useMutation(editTagsMutation, { context: API_V1_CONTEXT });
 
   const { data: { tagStats } = { tagStats: null } } = useQuery(tagStatsQuery, {
     variables: { ...(collective.host?.slug ? { host: { slug: collective.host.slug } } : {}) },
-    context: API_V2_CONTEXT,
   });
 
   const initialValues = {

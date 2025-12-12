@@ -5,7 +5,6 @@ import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   AccountStripePaymentMethodsQuery,
   AccountStripePaymentMethodsQueryVariables,
@@ -55,7 +54,6 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
     data: paymentMethodsData,
     error: paymentMethodsQueryError,
   } = useQuery<AccountStripePaymentMethodsQuery, AccountStripePaymentMethodsQueryVariables>(paymentMethodsQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       slug: props.expense.account.slug,
     },

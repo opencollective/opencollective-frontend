@@ -4,7 +4,6 @@ import { DialogClose } from '@radix-ui/react-dialog';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { getI18nLink } from '../../../I18nFormatters';
@@ -90,13 +89,11 @@ export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomi
 
   const { data, loading: queryLoading } = useQuery(pausedContributionsQuery, {
     variables: { slug: accountSlug },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
-  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(startResumeContributionsProcess, {
-    context: API_V2_CONTEXT,
-  });
+  const [resumeContributionsProcess, { loading: mutationLoading }] = useMutation(startResumeContributionsProcess);
 
   const account = data?.account;
   const pausedCount = account?.pausedIncoming?.totalCount ?? 0;

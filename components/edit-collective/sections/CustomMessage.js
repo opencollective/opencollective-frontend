@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -35,7 +35,6 @@ const CustomMessage = ({ collective }) => {
   const { toast } = useToast();
 
   const [updateCustomEmailMessage, { loading }] = useMutation(updateCustomMessageMutation, {
-    context: API_V2_CONTEXT,
     onError: e => {
       toast({
         variant: 'error',

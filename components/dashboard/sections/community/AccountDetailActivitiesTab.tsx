@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '@/lib/filters/schemas';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
@@ -22,7 +21,6 @@ export function ActivitiesTab({ account, host, setOpenExpenseId }) {
   });
 
   const { data, loading } = useQuery(communityAccountActivitiesQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       accountId: account.id,
       host: host,

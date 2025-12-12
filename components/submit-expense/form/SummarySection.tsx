@@ -11,7 +11,6 @@ import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
@@ -766,7 +765,6 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         exchangeRateRequests,
       },

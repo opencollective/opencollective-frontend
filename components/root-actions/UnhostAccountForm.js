@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { unhostAccountCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -29,7 +29,7 @@ const unhostAccountMutation = gql`
 
 const UnhostAccountForm = () => {
   const [account, setAccount] = React.useState(null);
-  const [unhostAccount, { loading }] = useMutation(unhostAccountMutation, { context: API_V2_CONTEXT });
+  const [unhostAccount, { loading }] = useMutation(unhostAccountMutation);
   const { toast } = useToast();
   const intl = useIntl();
   return (

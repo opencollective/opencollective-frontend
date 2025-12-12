@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   HostedCollectiveFieldsFragment,
   HostedCollectivesQueryVariables,
@@ -124,7 +123,7 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
 
   const { data, error, loading, refetch } = useQuery(allCollectivesQuery, {
     variables: queryFilter.variables,
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
     skip: isEmpty(query),
   });

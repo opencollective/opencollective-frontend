@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
@@ -62,7 +61,6 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
   const router = useRouter();
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const { data, loading, refetch, error } = useQuery(ledgerCSVImportsQuery, {
-    context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     skip: isUpgradeRequired,
   });

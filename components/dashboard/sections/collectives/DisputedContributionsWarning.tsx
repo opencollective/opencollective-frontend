@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import { Box, Flex } from '../../../Grid';
 import Link from '../../../Link';
@@ -28,7 +28,7 @@ const disputesQuery = gql`
 `;
 
 export const DisputedContributionsWarning = ({ hostSlug }: DisputedContributionsWarningProps) => {
-  const { data, loading } = useQuery(disputesQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(disputesQuery, { variables: { hostSlug } });
   const { host } = data || {};
   if (!host || (!host.hasDisputedOrders && !host.hasInReviewOrders)) {
     return null;

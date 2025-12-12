@@ -4,7 +4,6 @@ import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/schema';
 import { cn } from '../../lib/utils';
 
@@ -56,7 +55,7 @@ export const OrderAdminAccountingCategoryPill = ({
   host,
 }: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
-  const [updateOrder, { loading }] = useMutation(updateOrderAccountingCategoryMutation, { context: API_V2_CONTEXT });
+  const [updateOrder, { loading }] = useMutation(updateOrderAccountingCategoryMutation);
   const { toast } = useToast();
   return (
     <AccountingCategorySelect

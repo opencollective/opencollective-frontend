@@ -1,6 +1,6 @@
 import 'cypress-mailpit';
 
-import { API_V2_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
 import { CreditCards } from '../../stripe-helpers';
@@ -110,6 +110,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
           }
         }
       `,
+      context: API_V1_CONTEXT,
       variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
@@ -138,6 +139,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
           }
         }
       `,
+      context: API_V1_CONTEXT,
       variables: { collective },
     }).then(({ body }) => {
       return body.data.createCollective;
@@ -233,6 +235,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
           }
         }
       `,
+      context: API_V1_CONTEXT,
       variables: { collective },
     }).then(({ body }) => {
       return body.data.createCollectiveFromGithub;
@@ -515,7 +518,6 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
         }
       `,
       variables: { slug: userSlug },
-      options: { context: API_V2_CONTEXT },
     })
       .then(({ body }) => {
         const account = {
@@ -534,12 +536,12 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
                     hasTwoFactorAuth
                   }
                 }
+
                 recoveryCodes
               }
             }
           `,
           variables: { account, token },
-          options: { context: API_V2_CONTEXT },
         });
       })
       .then(({ body }) => {
@@ -741,6 +743,7 @@ function getLoggedInUserFromToken(token) {
   return graphqlQuery(token, {
     operationName: 'LoggedInUser',
     query: loggedInUserQuery.loc.source.body,
+    context: API_V1_CONTEXT,
   }).then(({ body }) => {
     return body.data.LoggedInUser;
   });

@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { Account, AccountWithHost } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
@@ -188,7 +188,7 @@ const orderPageQuery = gql`
 
 const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; collectiveSlug: string }>({
   query: orderPageQuery,
-  context: API_V2_CONTEXT,
+
   fetchPolicy: 'network-only',
   getVariablesFromContext: ({ query }) => ({
     legacyId: toNumber(query.OrderId),

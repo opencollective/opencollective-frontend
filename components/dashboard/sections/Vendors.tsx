@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { HELP_MESSAGE } from '../../../lib/constants/dismissable-help-message';
 import type { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
 import { boolean, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
@@ -347,11 +347,9 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
       ...queryFilter.variables,
     },
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
 
   const [archiveVendor] = useMutation(setVendorArchiveMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries: ['DashboardVendors'],
     awaitRefetchQueries: true,
   });

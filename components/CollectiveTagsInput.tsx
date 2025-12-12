@@ -12,7 +12,7 @@ import { components as ReactSelectComponents } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 
 import { Flex } from './Grid';
@@ -109,9 +109,7 @@ function CollectiveTagsInput({
   suggestedTags?: string[];
 }) {
   const intl = useIntl();
-  const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery);
   const [debouncing, setDebouncing] = useState<boolean>(false);
   const loading = fetching || debouncing;
   const [input, setInput] = useState<string>('');

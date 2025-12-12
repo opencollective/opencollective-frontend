@@ -3,8 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-
 import Link from '@/components/Link';
 
 import { CommandGroup } from '../ui/Command';
@@ -127,7 +125,7 @@ function RecentVisit({
   const { getLinkProps } = useGetLinkProps();
 
   const { query, Component, pickData } = entities[entity];
-  const { data, loading, error } = useQuery(query, { context: API_V2_CONTEXT, variables: { imageHeight: 72, id } });
+  const { data, loading, error } = useQuery(query, { variables: { imageHeight: 72, id } });
 
   const linkProps = data && !error ? getLinkProps({ entity, data: pickData(data) }) : null;
 

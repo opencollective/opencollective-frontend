@@ -1,4 +1,4 @@
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 
@@ -94,5 +94,3 @@ export const editCommentMutation = gql`
   }
   ${commentFieldsFragment}
 `;
-
-export const mutationOptions = { context: API_V2_CONTEXT };

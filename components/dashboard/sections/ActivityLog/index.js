@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { parseDateInterval } from '../../../../lib/date-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import Container from '../../../Container';
 import { Box } from '../../../Grid';
@@ -211,7 +211,7 @@ const ActivityLog = ({ accountSlug }) => {
   const queryVariables = getQueryVariables(accountSlug, router);
   const { data, loading, error } = useQuery(activityLogQuery, {
     variables: queryVariables,
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'network-only',
   });
 

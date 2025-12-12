@@ -4,7 +4,6 @@ import { get } from 'lodash';
 import { styled } from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { sortTickets, TICKETS_ORDER_KEY } from '../../../lib/tier-utils';
 import { TierTypes } from '@/lib/constants/tiers-types';
 import { EMPTY_ARRAY } from '@/lib/constants/utils';
@@ -52,10 +51,8 @@ const Tickets = ({ collective }) => {
   const [error, setError] = React.useState(null);
 
   const variables = { accountSlug: collective.slug };
-  const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
-  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const { data, loading, error: queryError, refetch } = useQuery(listTierQuery, { variables });
+  const [editAccountSettings, { loading: isSubmitting }] = useMutation(editAccountSettingsMutation);
 
   // Sort tickets based on saved order
   const tiers = get(data, 'account.tiers.nodes', EMPTY_ARRAY);

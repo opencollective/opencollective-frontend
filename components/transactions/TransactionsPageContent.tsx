@@ -7,7 +7,6 @@ import { isIndividualAccount } from '../../lib/collective';
 import roles from '../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account, PaymentMethod, PaymentMethodType, Transaction } from '@/lib/graphql/types/v2/schema';
 import { TransactionKind } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
@@ -353,7 +352,6 @@ const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) =>
       ...queryFilter.variables,
     },
     fetchPolicy: 'cache-first',
-    context: API_V2_CONTEXT,
   });
 
   const transactions = data?.transactions || previousData?.transactions || props.transactions;

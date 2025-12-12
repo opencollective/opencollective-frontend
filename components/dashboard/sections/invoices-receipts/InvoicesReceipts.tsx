@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { editCollectiveSettingsMutation } from '../../../../lib/graphql/v1/mutations';
 import { hasAccountHosting } from '@/lib/collective';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';
@@ -41,7 +42,9 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
   const { toast } = useToast();
   const defaultReceipt = useReceipt({ template: ReceiptTemplate.Default, settings: account.settings });
   const alternativeReceipt = useReceipt({ template: ReceiptTemplate.Alternative, settings: account.settings });
-  const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
+  const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation, {
+    context: API_V1_CONTEXT,
+  });
   const [hasAlternativeReceipt, setHasAlternativeReceipt] = React.useState(
     alternativeReceipt.values.title !== undefined,
   );

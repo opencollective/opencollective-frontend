@@ -231,9 +231,9 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
    * v1 or the api v2.
    */
   const httpLink = ApolloLink.split(
-    operation => operation.getContext().apiVersion === '2', // Routes the query to the proper client
-    apiV2Link,
+    operation => operation.getContext().apiVersion === '1', // Routes the query to the proper client
     apiV1Link,
+    apiV2Link,
   );
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);

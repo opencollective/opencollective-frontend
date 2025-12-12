@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
@@ -34,7 +33,7 @@ const PlatformSubscribers = () => {
 
   const { data, error, loading } = useQuery(subscribersQuery, {
     variables: { ...queryFilter.variables, isPlatformSubscriber: true },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'network-only',
   });
 

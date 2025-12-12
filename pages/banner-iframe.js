@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../lib/graphql/helpers';
 import { collectiveBannerIframeQuery } from '../lib/graphql/v1/queries';
 import { getRequestIntl } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
@@ -276,7 +276,6 @@ class BannerIframe extends React.Component {
         <Query
           query={topContributorsQuery}
           variables={{ collectiveSlug: this.props.collectiveSlug }}
-          context={API_V2_CONTEXT}
           onCompleted={this.onSizeUpdate}
         >
           {({ data, error, loading }) =>
@@ -431,7 +430,7 @@ class BannerIframe extends React.Component {
 
 const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
   options({ collectiveSlug, useNewFormat }) {
-    return { skip: !collectiveSlug || useNewFormat };
+    return { context: API_V1_CONTEXT, skip: !collectiveSlug || useNewFormat };
   },
 });
 

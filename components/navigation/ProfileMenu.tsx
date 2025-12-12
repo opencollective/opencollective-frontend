@@ -17,7 +17,7 @@ import {
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
@@ -114,7 +114,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   const { data } = useQuery(memberInvitationsCountQuery, {
     variables: { memberAccount: { slug: LoggedInUser?.collective?.slug } },
     skip: !LoggedInUser,
-    context: API_V2_CONTEXT,
+
     // We ignore errors here because the logout action can trigger refetch before LoggedInUser is set to null and we don't really care if this query fails
     errorPolicy: 'ignore',
   });

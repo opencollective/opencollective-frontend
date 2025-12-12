@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
@@ -200,7 +199,6 @@ const DashboardPage = () => {
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
   const { data, loading, error } = useQuery(adminPanelQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
     skip: !activeSlug || !LoggedInUser || isRootProfile,
   });

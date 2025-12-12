@@ -5,7 +5,6 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
@@ -192,7 +191,6 @@ const AccountDetails = ({ accountId, getActions }: AccountDetailsProps) => {
   const id = accountId || prevAccountId; // To keep data while closing the drawer
   const { data, loading, refetch } = useQuery(accountDetailQuery, {
     variables: { id },
-    context: API_V2_CONTEXT,
   });
 
   const dropdownTriggerRef = React.useRef(undefined);

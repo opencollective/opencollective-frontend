@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import DismissibleMessage from '../../../DismissibleMessage';
@@ -29,9 +28,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
     LoggedInUser?.shouldDisplaySetupGuide?.(LoggedInUser?.collective) ?? undefined,
   );
   const slug = router.query?.as || accountSlug;
-  const [editAccountSetting] = useMutation(editAccountSettingMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
 
   const handleSetupGuideToggle = useCallback(
     async (open: boolean) => {

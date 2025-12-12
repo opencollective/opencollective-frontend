@@ -5,7 +5,7 @@ import { get, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
@@ -57,9 +57,7 @@ const getInitialValues = account => {
 const FiscalHost = ({ account }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation);
 
   const { account: accountFromDashboardQuery } = React.useContext(DashboardContext);
   const isUpgradeRequiredForSettingHostFee = requiresUpgrade(accountFromDashboardQuery, FEATURES.CHARGE_HOSTING_FEES);

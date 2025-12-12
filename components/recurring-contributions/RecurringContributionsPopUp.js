@@ -9,7 +9,7 @@ import { styled } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -87,9 +87,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
   const intl = useIntl();
   const [cancelReason, setCancelReason] = useState('NO_LONGER_WANT_TO_SUPPORT');
   const [cancelReasonMessage, setCancelReasonMessage] = useState('');
-  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation);
 
   const mainMenu =
     menuState === 'mainMenu' &&

@@ -7,7 +7,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { UpdateNotificationAudienceLabels } from '../../../../lib/constants/updates';
 import { getDateFromValue, toIsoDateStr } from '../../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 import { formatDate } from '../../../../lib/utils';
 
@@ -55,10 +54,9 @@ const SingleUpdateView = ({ updateId }) => {
     variables: {
       id: updateId,
     },
-    context: API_V2_CONTEXT,
   });
 
-  const [deleteUpdate] = useMutation(deleteUpdateMutation, { context: API_V2_CONTEXT });
+  const [deleteUpdate] = useMutation(deleteUpdateMutation);
 
   const refetchQueries = getRefetchQueries(account);
   const update = data?.update;

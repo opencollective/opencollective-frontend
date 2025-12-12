@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -178,11 +178,7 @@ const createConversationPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const addCreateConversationPageData = graphql(createConversationPageQuery, {
-  options: {
-    context: API_V2_CONTEXT,
-  },
-});
+const addCreateConversationPageData = graphql(createConversationPageQuery);
 
 // next.js export
 // ts-unused-exports:disable-next-line

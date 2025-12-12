@@ -8,7 +8,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import {
   type EditPayoutMethodMutation,
   type EditPayoutMethodMutationVariables,
@@ -317,7 +316,6 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         payoutMethod: { ...props.newPayoutMethod },
         payeeSlug: props.payeeSlug,
@@ -553,7 +551,6 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
 
   const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: props.payee?.id,
@@ -578,31 +575,25 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     }
   }, [submitLegalNameMutation, toast, intl]);
 
-  const [deletePayoutMethod] = useMutation(
-    gql`
-      mutation DeletePayoutMethod($payoutMethodId: String!) {
-        removePayoutMethod(payoutMethodId: $payoutMethodId) {
-          id
-        }
+  const [deletePayoutMethod] = useMutation(gql`
+    mutation DeletePayoutMethod($payoutMethodId: String!) {
+      removePayoutMethod(payoutMethodId: $payoutMethodId) {
+        id
       }
-    `,
-    { context: API_V2_CONTEXT },
-  );
+    }
+  `);
 
-  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(
-    gql`
-      mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
-        editPayoutMethod(payoutMethod: $payoutMethod) {
-          id
-          name
-          data
-          isSaved
-          type
-        }
+  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(gql`
+    mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
+      editPayoutMethod(payoutMethod: $payoutMethod) {
+        id
+        name
+        data
+        isSaved
+        type
       }
-    `,
-    { context: API_V2_CONTEXT },
-  );
+    }
+  `);
 
   const { showConfirmationModal } = useModal();
 

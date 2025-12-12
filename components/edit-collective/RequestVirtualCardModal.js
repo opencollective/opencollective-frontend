@@ -4,7 +4,7 @@ import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -66,9 +66,7 @@ const RequestVirtualCardModal = props => {
   }));
 
   const { toast } = useToast();
-  const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation);
   const formik = useFormik({
     initialValues: { ...initialValues, collective: props.collective },
     async onSubmit(values) {

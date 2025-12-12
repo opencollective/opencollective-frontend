@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Account, Host } from '../../lib/graphql/types/v2/schema';
 
 import { Box, Flex } from '../Grid';
@@ -114,7 +114,6 @@ export default function FindAHostSearch(props: {
       limit: NB_HOST_PER_PAGE,
       offset: (queryPage - 1) * NB_HOST_PER_PAGE,
     },
-    context: API_V2_CONTEXT,
   });
 
   const cachedNonEmptyResult = useNonEmptyResultCache(data);

@@ -5,7 +5,6 @@ import { AlertTriangle, ExternalLink, LinkIcon, ShieldCheck } from 'lucide-react
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   HostApplicationThreadQuery,
   HostApplicationThreadQueryVariables,
@@ -142,9 +141,7 @@ function HostApplication({
   const intl = useIntl();
   const { toast } = useToast();
 
-  const [callProcessApplication, { loading: loadingMutation }] = useMutation(processApplicationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [callProcessApplication, { loading: loadingMutation }] = useMutation(processApplicationMutation);
 
   const [threadItems, setThreadItems] = React.useState<
     HostApplicationThreadQuery['hostApplication']['threadComments']['nodes']
@@ -192,7 +189,6 @@ function HostApplication({
       ${HostApplicationFields}
     `,
     {
-      context: API_V2_CONTEXT,
       fetchPolicy: 'cache-and-network',
       variables: {
         hostApplication: {

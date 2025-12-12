@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/schema';
 import { VirtualCardStatus } from '../../lib/graphql/types/v2/schema';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
@@ -85,7 +85,6 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
 
   const query = useQuery<{ virtualCard: GraphQLVirtualCard }>(virtualCardQuery, {
-    context: API_V2_CONTEXT,
     skip: !props.open,
     variables: {
       virtualCard: {

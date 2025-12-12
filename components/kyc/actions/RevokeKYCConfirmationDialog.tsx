@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT, gql } from '@/lib/graphql/helpers';
+import { gql } from '@/lib/graphql/helpers';
 import type { KycVerificationActionsFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import type { BaseModalProps } from '@/components/ModalContext';
@@ -37,7 +37,6 @@ export function RevokeKYCConfirmationDialog(props: RevokeKYCConfirmationDialogPr
       ${kycVerificationFields}
     `,
     {
-      context: API_V2_CONTEXT,
       refetchQueries,
       variables: {
         kycVerification: kycVerification.id,

@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box } from '../../Grid';
@@ -33,6 +33,7 @@ export const getTotalCollectiveContributionsQueryVariables = slug => {
 const HeroTotalCollectiveContributionsWithData = ({ collective }) => {
   const { data, loading, error } = useQuery(totalCollectiveContributionsQuery, {
     variables: getTotalCollectiveContributionsQueryVariables(collective.slug),
+    context: API_V1_CONTEXT,
   });
 
   if (error || loading || !get(data, 'Collective.stats.totalAmountSpent')) {

@@ -7,7 +7,6 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import formatMemberRole from '../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
@@ -47,7 +46,7 @@ const MembersTable = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [inviteMember] = useMutation(inviteMemberMutation, { context: API_V2_CONTEXT });
+  const [inviteMember] = useMutation(inviteMemberMutation);
 
   const handleResendInvite = async (member: MemberTableRecord) => {
     try {
@@ -206,7 +205,6 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
   const [showEditModal, setShowEditModal] = React.useState<MemberTableRecord | null>(null);
   const intl = useIntl();
   const { loading, data, refetch, error } = useQuery<TeamSectionQuery>(teamSectionQuery, {
-    context: API_V2_CONTEXT,
     variables: { collectiveSlug: accountSlug, account: { slug: accountSlug } },
   });
   const host = data?.account && 'host' in data.account && data.account.host;

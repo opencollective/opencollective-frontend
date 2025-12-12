@@ -6,7 +6,6 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
@@ -135,7 +134,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     `,
     {
       variables: { hostSlug, withHoverCard: true },
-      context: API_V2_CONTEXT,
+
       skip: isUpgradeRequired,
     },
   );
@@ -196,7 +195,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
-    context: API_V2_CONTEXT,
+
     skip: isUpgradeRequired,
   });
 

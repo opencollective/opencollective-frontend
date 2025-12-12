@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { CreditCard } from 'lucide-react';
 
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 const virtualCardQuery = gql`
   query VirtualCardFilter($id: String!) {
@@ -18,7 +18,6 @@ export const VirtualCardRenderer = ({ id }: { id: string }) => {
   const { data } = useQuery(virtualCardQuery, {
     variables: { id },
     fetchPolicy: 'cache-first',
-    context: API_V2_CONTEXT,
   });
   const label = data?.virtualCard ? (
     <span className="flex items-center gap-1 truncate">
