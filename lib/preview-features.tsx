@@ -45,13 +45,17 @@ export type PreviewFeature = {
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
 const ENGINEERS = ['znarf', 'betree', 'leokewitz', 'henrique-silva', 'gustavlrsn', 'sudharaka-palamakumbura'];
-export const FIRST_PARTY_HOSTS = [
+export const OFICO_MEMBER_ORGANIZATIONS = [
+  'europe',
+  'giftcollective',
+  'oce-foundation-eur',
+  'oce-foundation-usd',
   'opencollective',
   'opensource',
-  'europe',
-  'oce-foundation-usd',
-  'oce-foundation-eur',
   'raft',
+  'the-social-change-nest-eu',
+  'the-social-change-nest',
+  // TODO: Remove after new pricing is fully launched
   'metagov',
 ];
 
@@ -82,7 +86,7 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'New platform billing dashboard',
     alwaysEnableInDev: true,
     publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.GENERAL,
   },
   {
@@ -134,7 +138,7 @@ export const previewFeatures: PreviewFeature[] = [
     ),
     alwaysEnableInDev: true,
     publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.GENERAL,
   },
   {
@@ -192,7 +196,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'People Dashboard',
     description: 'Access a new dashboard to manage and engage with your community members.',
     publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     category: Categories.HOSTING,
     alwaysEnableInDev: true,
   },
