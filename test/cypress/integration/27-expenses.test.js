@@ -833,15 +833,14 @@ describe('Expense flow', () => {
 
     it('Displays expense policy', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
-      cy.get('[data-cy=""go-to-dashboard-btn"]').click();
+      cy.get('[data-cy="go-to-dashboard-btn"]').click();
       cy.getByDataCy('menu-item-Settings').click();
       cy.getByDataCy('menu-item-policies').should('be.visible').click();
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.visit(`${expenseUrl}?forceLegacyFlow=true`);
-      cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
-      cy.getByDataCy('submit-expense-dropdown').click();
+      cy.get('[data-cy="submit-expense-dropdown"]:visible:first').click();
       cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
     });
 

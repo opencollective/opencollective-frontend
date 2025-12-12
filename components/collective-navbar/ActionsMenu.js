@@ -214,7 +214,7 @@ const CollectiveNavbarActionsMenu = ({
                 <Box display={['block', 'none']} width={'32px'} ml={2}>
                   <StyledHr borderStyle="solid" borderColor="primary.600" />
                 </Box>
-                <StyledActionButton data-cy="collective-navbar-actions-btn" my={2} {...triggerProps}>
+                <StyledActionButton my={2} {...triggerProps}>
                   <Span>
                     <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
                   </Span>

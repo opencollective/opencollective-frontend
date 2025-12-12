@@ -99,7 +99,7 @@ const TopBarIcon = ({ provider }) => {
 };
 
 const getDashboardUrl = router => {
-  const collectiveSlug = router.query.collectiveSlug || router.query.slug;
+  const collectiveSlug = router.query.collectiveSlug || router.query.slug || router.query.parentCollectiveSlug;
   if (!collectiveSlug) {
     return `/dashboard`;
   } else {

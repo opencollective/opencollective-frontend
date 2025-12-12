@@ -383,7 +383,7 @@ const getMainAction = (
           </Span>
         </ActionButton>
       ) : (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`} data-cy="submit-expense-dropdown">
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
