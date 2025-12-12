@@ -116,6 +116,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
   const isFund = collective.type === CollectiveType.FUND;
+  const isOrganization = collective.type === CollectiveType.ORGANIZATION;
   const parentIsHost = host && collective.parentCollective?.id === host.id;
   const firstConnectedAccount = first(collective.connectedTo);
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
@@ -198,7 +199,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
 
           {!isEvent && (
             <Fragment>
-              {(isCollective || isFund || isProject) && (
+              {(isCollective || isOrganization || isFund || isProject) && (
                 <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
                   <StyledTag
                     textTransform="uppercase"
