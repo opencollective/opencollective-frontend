@@ -3026,6 +3026,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     isArchived: Boolean
 
     """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
+
+    """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -9165,6 +9170,11 @@ type Bot implements Account {
     isArchived: Boolean
 
     """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
+
+    """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -10157,6 +10167,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -11711,6 +11726,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     isArchived: Boolean
 
     """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
+
+    """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -12977,6 +12997,11 @@ type Individual implements Account {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -14263,6 +14288,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     isArchived: Boolean
 
     """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
+
+    """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -15385,6 +15415,11 @@ type Vendor implements Account & AccountWithContributions {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -19339,6 +19374,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     isArchived: Boolean
 
     """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
+
+    """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
     """
     includeIncognito: Boolean = true
@@ -20478,6 +20518,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
