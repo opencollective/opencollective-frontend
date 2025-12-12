@@ -46,6 +46,19 @@ export const peopleHostDashboardQuery = gql`
         }
         communityStats(host: { slug: $slug }) {
           relations
+          transactionSummary {
+            year
+            expenseTotalAcc {
+              valueInCents
+              currency
+            }
+            expenseCountAcc
+            contributionTotalAcc {
+              valueInCents
+              currency
+            }
+            contributionCountAcc
+          }
         }
       }
     }
