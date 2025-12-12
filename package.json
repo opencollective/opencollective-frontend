@@ -77,7 +77,7 @@
     "csv-parse": "6.1.0",
     "currency-symbol-map": "5.1.0",
     "dayjs": "1.11.19",
-    "debug": "4.4.1",
+    "debug": "4.4.3",
     "diff": "7.0.0",
     "dotenv": "17.2.3",
     "embla-carousel-react": "^8.6.0",
