@@ -217,6 +217,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/apollo-upload-client": "17.0.5",
     "@types/jest": "^30.0.0",
+    "@types/jscodeshift": "^17.3.0",
     "@types/lodash": "^4.17.14",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",

@@ -295,12 +295,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
               privateMessage={privateInfoYouCollectiveAndHost}
               label={<FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />}
               placeholder="e.g. INV 001"
-              hint={
-                <FormattedMessage
-                  id="InvoiceReferenceDescription"
-                  defaultMessage="If the invoice being submitted has a reference number, add it here"
-                />
-              }
+              hint={<FormattedMessage defaultMessage="The unique identifier mentioned on your invoice" id="lct/39" />}
             />
           </div>
         </TabsContent>
