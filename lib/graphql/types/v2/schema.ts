@@ -317,6 +317,7 @@ export type AccountMemberOfArgs = {
   accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
