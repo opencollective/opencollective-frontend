@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 // config file
 // ts-unused-exports:disable-next-line
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   // Note: only need to check presence rootRedirectDashboard cookie, not its value
   const redirectToDashboard = req.cookies.get('rootRedirectDashboard');
 
