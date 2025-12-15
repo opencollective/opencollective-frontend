@@ -10,7 +10,6 @@ import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import MessageBox from '@/components/MessageBox';
 
-import { getI18nLink } from '../../I18nFormatters';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import { Button } from '../../ui/Button';
@@ -33,7 +32,7 @@ const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const { COLLECTIVE, PROJECT, EVENT } = CollectiveType;
+const { PROJECT, EVENT } = CollectiveType;
 
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
