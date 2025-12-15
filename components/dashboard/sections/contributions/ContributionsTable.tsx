@@ -39,6 +39,7 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
 const defaultVisibility: VisibilityState = {
   legacyId: false,
   expectedAt: false,
+  createdAt: false,
 };
 
 export default function ContributionsTable<FilterValues extends Record<string, unknown>>({

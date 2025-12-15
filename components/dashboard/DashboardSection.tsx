@@ -33,6 +33,7 @@ import HostedCollectives from './sections/collectives/HostedCollectives';
 import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import IncomingContributions from './sections/contributions/IncomingContributions';
+import IncompleteContributions from './sections/contributions/IncompleteContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
@@ -107,6 +108,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
+  [SECTIONS.INCOMPLETE_CONTRIBUTIONS]: IncompleteContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.UPDATES]: Updates,

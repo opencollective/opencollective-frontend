@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
+import dayjs from '@/lib/dayjs';
 import type { ManagedOrderFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { type Account, AccountType } from '@/lib/graphql/types/v2/schema';
 import formatCollectiveType from '@/lib/i18n/collective-type';
@@ -157,11 +158,28 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
       return (
         <div className="whitespace-nowrap">
           <DateTime value={lastChargedAt} dateStyle="medium" timeStyle={undefined} />
-          {createdAt !== lastChargedAt && (
+          {!dayjs(createdAt).isSame(lastChargedAt, 'day') && (
             <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
-              <DateTime value={createdAt} dateStyle="medium" timeStyle={undefined} />
+              <FormattedMessage
+                defaultMessage="Since {date}"
+                id="x9TypM"
+                values={{ date: <DateTime value={createdAt} dateStyle="medium" timeStyle={undefined} /> }}
+              />
             </div>
           )}
+        </div>
+      );
+    },
+  }),
+  columnHelper.accessor('createdAt', {
+    meta: { labelMsg: defineMessage({ defaultMessage: 'Created at', id: 'AbXVP4' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ row }) => {
+      const order = row.original;
+      const createdAt = order.createdAt;
+      return (
+        <div className="whitespace-nowrap">
+          <DateTime value={createdAt} dateStyle="medium" timeStyle={undefined} />
         </div>
       );
     },

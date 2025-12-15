@@ -262,11 +262,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       subMenu: [
         {
           if: !isIndividual,
-          label: intl.formatMessage(
-            { defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' },
-            { accountName: account.name },
-          ),
+          label: intl.formatMessage({ defaultMessage: 'Incoming Contributions', id: 'IncomingContributions' }),
           section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
+        },
+        {
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
+          section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
         },
         {
           label: intl.formatMessage(
