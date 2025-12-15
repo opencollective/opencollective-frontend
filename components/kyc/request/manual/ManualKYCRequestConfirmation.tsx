@@ -13,6 +13,7 @@ import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { useToast } from '@/components/ui/useToast';
 
 import { kycVerificationFields } from '../../graphql';
+import { KYCRequestAccountCard } from '../KYCRequestAccountCard';
 
 import type { ManualKYCRequestFormSchema } from './ManualKYCRequest';
 
@@ -87,6 +88,7 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
       </DialogHeader>
 
       <div className="space-y-6 py-4">
+        {props.verifyAccount && <KYCRequestAccountCard account={props.verifyAccount} />}
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm text-slate-700">
             <FormattedMessage

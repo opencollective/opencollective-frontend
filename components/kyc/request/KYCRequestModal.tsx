@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { getAccountReferenceInput } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { gql } from '@/lib/graphql/helpers';
 import type {
@@ -120,6 +119,15 @@ function KYCRequestModalContent(props: KYCRequestModalContentProps) {
     props.skipIntroductionSet ? (hasPickUserStep ? Steps.PICK_USER : Steps.MANUAL_REQUEST_FORM) : Steps.INTRODUCTION,
   );
 
+  const verifyAccountReferenceInput = React.useMemo(() => {
+    if (selectedAccount) {
+      return {
+        slug: selectedAccount.slug,
+      };
+    }
+    return props.verifyAccount;
+  }, [selectedAccount, props.verifyAccount]);
+
   return (
     <React.Fragment>
       {step === Steps.INTRODUCTION && (
@@ -151,7 +159,7 @@ function KYCRequestModalContent(props: KYCRequestModalContentProps) {
           onNext={() => props.setOpen(false)}
           onBack={() => setStep(hasPickUserStep ? Steps.PICK_USER : Steps.INTRODUCTION)}
           requestedByAccount={props.requestedByAccount}
-          verifyAccount={getAccountReferenceInput(props.verifyAccount ?? selectedAccount)}
+          verifyAccount={verifyAccountReferenceInput}
           refetchQueries={props.refetchQueries}
         />
       )}
