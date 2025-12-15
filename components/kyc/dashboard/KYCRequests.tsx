@@ -140,6 +140,7 @@ export function KYCRequests(props: DashboardSectionProps) {
             data={kycVerifications.nodes}
             loading={loading}
             nbPlaceholders={queryFilter.values?.limit || 10}
+            refetchQueries={['KYCRequestsDashboard']}
           />
           <Pagination queryFilter={queryFilter} total={kycVerifications.totalCount} />
         </div>

@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/Button';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Textarea } from '@/components/ui/Textarea';
 
+import { KYCRequestAccountCard } from '../KYCRequestAccountCard';
+
 import { ManualKYCRequestConfirmation } from './ManualKYCRequestConfirmation';
 
 export const ManualKYCRequestFormSchema = z.object({
@@ -47,6 +49,7 @@ export function ManualKYCRequest(props: ManualKYCRequestProps) {
           backLabel={props.backLabel}
           initialValues={request}
           onBack={props.onBack}
+          verifyAccount={props.verifyAccount}
           onNext={r => {
             setStep(Steps.CONFIRMATION);
             setRequest(r);
@@ -73,6 +76,7 @@ type ManualKYCRequestFormProps = {
   onNext: (request: z.infer<typeof ManualKYCRequestFormSchema>) => void;
   initialValues: z.infer<typeof ManualKYCRequestFormSchema>;
   backLabel: React.ReactNode;
+  verifyAccount: AccountReferenceInput;
 };
 
 function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
@@ -103,6 +107,7 @@ function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
       </DialogHeader>
 
       <div className="space-y-6 py-4">
+        {props.verifyAccount && <KYCRequestAccountCard account={props.verifyAccount} />}
         <form onSubmit={form.handleSubmit} className="space-y-4">
           <FormField
             name="legalName"
@@ -135,6 +140,7 @@ function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
               id: 'pSd3BY',
             })}
             isPrivate
+            required={false}
             privateMessage={'Will only be visible to host'}
           >
             {({ field, meta }) => (
