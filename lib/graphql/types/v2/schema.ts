@@ -296,6 +296,7 @@ export type AccountKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -317,6 +318,7 @@ export type AccountMemberOfArgs = {
   accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
@@ -1814,6 +1816,7 @@ export type BotKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -2404,6 +2407,7 @@ export type CollectiveKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -4523,6 +4527,7 @@ export type EventKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -5808,6 +5813,7 @@ export type FundKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -6630,6 +6636,7 @@ export type HostKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -7547,6 +7554,7 @@ export type IndividualKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -10240,6 +10248,7 @@ export type OrganizationKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -11597,6 +11606,7 @@ export type ProjectKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
@@ -12404,7 +12414,7 @@ export type RequestKycVerificationInput = {
 };
 
 export type RequestManualKycVerificationInput = {
-  legalAddress: Scalars['String']['input'];
+  legalAddress?: InputMaybe<Scalars['String']['input']>;
   legalName: Scalars['String']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
 };
@@ -14003,6 +14013,7 @@ export type VendorKycVerificationRequestsArgs = {
   accounts?: InputMaybe<Array<AccountReferenceInput>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  status?: InputMaybe<Array<KycVerificationStatus>>;
 };
 
 
