@@ -16,7 +16,7 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ConversationsList from '../components/conversations/ConversationsList';
-import { conversationListFragment } from '../components/conversations/graphql'; // variable name unchanged
+import { conversationListFragment } from '../components/conversations/graphql';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
