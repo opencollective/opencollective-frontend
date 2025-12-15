@@ -94,7 +94,7 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
       <div className="flex-1 space-y-6">
         <div className="flex items-center justify-end">
           <Button onClick={onRequestKYCClick} size="sm">
-            <FormattedMessage defaultMessage="Request KYC Verification" id="Kio9p/" />
+            <FormattedMessage defaultMessage="Submit KYC Verification" id="fS9N/M" />
           </Button>
         </div>
         {query.error ? (

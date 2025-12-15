@@ -18,7 +18,7 @@ import { ManualKYCRequestConfirmation } from './ManualKYCRequestConfirmation';
 
 export const ManualKYCRequestFormSchema = z.object({
   legalName: z.string().min(1),
-  legalAddress: z.string().min(1),
+  legalAddress: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -122,8 +122,8 @@ function ManualKYCRequestForm(props: ManualKYCRequestFormProps) {
               defaultMessage: 'The legal address of the account holder',
               id: 'O9zUS8',
             })}
-            required
             isPrivate
+            required={false}
             privateMessage={'Will only be visible to host and user'}
           />
           <FormField
