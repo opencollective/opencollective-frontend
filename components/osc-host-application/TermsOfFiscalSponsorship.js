@@ -38,7 +38,7 @@ const getGithubConnectUrl = collectiveSlug => {
     urlParams.set('access_token', accessToken);
   }
 
-  return `/api/connected-accounts/github/oauthUrl?${urlParams.toString()}`;
+  return `${process.env.API_URL}/connected-accounts/github/oauthUrl?${urlParams.toString()}`;
 };
 
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
