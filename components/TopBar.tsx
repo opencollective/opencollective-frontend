@@ -11,6 +11,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
 import theme from '../lib/theme';
 import { getEnvVar } from '@/lib/env-utils';
+import { MemberRole } from '@/lib/graphql/types/v2/schema';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { parseToBoolean } from '@/lib/utils';
 
@@ -98,13 +99,36 @@ const TopBarIcon = ({ provider }) => {
   );
 };
 
-const getDashboardUrl = router => {
-  const collectiveSlug = router.query.collectiveSlug || router.query.slug || router.query.parentCollectiveSlug;
-  if (!collectiveSlug) {
-    return `/dashboard`;
-  } else {
-    return `/dashboard/${collectiveSlug}`;
-  }
+const GoToDashboardButton = () => {
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+  const slugParams = router.query.collectiveSlug || router.query.slug || router.query.parentCollectiveSlug;
+  const parentSlugParams = router.query.parentCollectiveSlug;
+  const parentSlug = Array.isArray(parentSlugParams) ? parentSlugParams[0] : parentSlugParams;
+  const collectiveSlug = Array.isArray(slugParams) ? slugParams[0] : slugParams;
+
+  const hasDashboardForSlug = slug =>
+    LoggedInUser?.hasRole([MemberRole.ADMIN, MemberRole.ACCOUNTANT, MemberRole.COMMUNITY_MANAGER], { slug });
+
+  return (
+    <Button
+      asChild
+      variant="outline"
+      className="mr-3 hidden whitespace-nowrap sm:flex"
+      size="sm"
+      data-cy="go-to-dashboard-btn"
+    >
+      <Link
+        href={
+          collectiveSlug && (hasDashboardForSlug(collectiveSlug) || hasDashboardForSlug(parentSlug))
+            ? `/dashboard/${collectiveSlug}`
+            : `/dashboard`
+        }
+      >
+        <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
+      </Link>
+    </Button>
+  );
 };
 
 const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangelogMenu = true }) => {
@@ -237,19 +261,7 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
             <div className="mr-2 hidden sm:block">
               <ChangelogTrigger />
             </div>
-            {LoggedInUser && (
-              <Button
-                asChild
-                variant="outline"
-                className="mr-3 hidden whitespace-nowrap sm:flex"
-                size="sm"
-                data-cy="go-to-dashboard-btn"
-              >
-                <Link href={getDashboardUrl(router)}>
-                  <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
-                </Link>
-              </Button>
-            )}
+            {LoggedInUser && <GoToDashboardButton />}
             <ProfileMenu />
           </React.Fragment>
         )}
