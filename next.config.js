@@ -28,17 +28,15 @@ const nextConfig = {
     disableStaticImages: true,
     unoptimized: isHeroku, // See https://github.com/vercel/next.js/issues/54482. Should try to remove after updating to NextJS 15.
   },
-  experimental: {
-    outputFileTracingExcludes: {
-      '*': [
-        'node_modules/@swc/core-linux-x64-gnu',
-        'node_modules/@swc/core-linux-x64-musl',
-        'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
-      ],
-    },
-    outputFileTracingIncludes: {
-      '/_document': ['./.next/language-manifest.json'],
-    },
+  outputFileTracingIncludes: {
+    '/_document': ['./.next/language-manifest.json'],
+  },
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/core-linux-x64-gnu',
+      'node_modules/@swc/core-linux-x64-musl',
+      'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
+    ],
   },
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
@@ -84,6 +82,7 @@ const nextConfig = {
           include: /components|pages|server/,
           failOnError: true,
           cwd: process.cwd(),
+          exclude: /node_modules/,
         }),
       );
     }
