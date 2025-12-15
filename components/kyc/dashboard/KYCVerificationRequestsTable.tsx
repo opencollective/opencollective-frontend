@@ -38,7 +38,7 @@ function dateCell({ cell }) {
 function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
   const account: ColumnDef<KYCVerificationRow> = {
     accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+    header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
     cell: ({ row }) => {
       const account = row.original.account;
       const mainName = account.legalName || account.name;

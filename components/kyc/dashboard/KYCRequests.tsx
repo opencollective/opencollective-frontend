@@ -93,7 +93,7 @@ export function KYCRequests(props: DashboardSectionProps) {
               });
             }}
           >
-            <FormattedMessage defaultMessage="Request KYC Verification" id="Kio9p/" />
+            <FormattedMessage defaultMessage="Submit KYC Verification" id="fS9N/M" />
           </Button>
         }
       />

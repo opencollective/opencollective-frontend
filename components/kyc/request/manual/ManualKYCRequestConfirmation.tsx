@@ -112,17 +112,19 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
                 value={<span className="font-medium text-slate-900">{props.request.legalName}</span>}
               />
 
-              <DataListItem
-                label={
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-slate-500" />
-                    <FormattedMessage id="LegalAddress" defaultMessage="Legal Address" />
-                  </div>
-                }
-                value={
-                  <div className="font-medium whitespace-pre-line text-slate-900">{props.request.legalAddress}</div>
-                }
-              />
+              {props.request.legalAddress && (
+                <DataListItem
+                  label={
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-slate-500" />
+                      <FormattedMessage id="LegalAddress" defaultMessage="Legal Address" />
+                    </div>
+                  }
+                  value={
+                    <div className="font-medium whitespace-pre-line text-slate-900">{props.request.legalAddress}</div>
+                  }
+                />
+              )}
 
               {props.request.notes && (
                 <DataListItem
