@@ -36,7 +36,7 @@ export function KYCRequestAccountCard(props: KYCRequestAccountCardProps) {
         id: accountRef.id as string | undefined,
         slug: accountRef.slug as string | undefined,
       },
-      skip: !accountRef || (!accountRef.id && !accountRef.slug),
+      skip: !accountRef.id && !accountRef.slug,
     },
   );
 
