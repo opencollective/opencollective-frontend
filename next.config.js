@@ -9,8 +9,6 @@ const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
-const isHeroku = process.env.IS_HEROKU === 'true';
-
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
@@ -26,7 +24,6 @@ const nextConfig = {
   },
   images: {
     disableStaticImages: true,
-    unoptimized: isHeroku, // See https://github.com/vercel/next.js/issues/54482. Should try to remove after updating to NextJS 15.
   },
   outputFileTracingIncludes: {
     '/_document': ['./.next/language-manifest.json'],
