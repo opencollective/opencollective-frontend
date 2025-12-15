@@ -9,7 +9,7 @@ function contributeWithNewUsBankAccount({ name } = {}) {
     if (name) {
       cy.get('#Field-nameInput').type(name);
     }
-    cy.contains('Test Institution').click();
+    cy.contains('Test (Non-OAuth)').click();
   });
   cy.wait(2000);
 
