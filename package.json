@@ -148,7 +148,6 @@
     "@radix-ui/react-focus-scope": "^1.0.4"
   },
   "scripts": {
-    "rfc011-audit": "node scripts/rfc011-audit.js",
     "build": "npm-run-all build:updates build:next build:server",
     "build:e2e": "cross-env NODE_ENV=development OC_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
@@ -168,6 +167,7 @@
     "dev": "node server",
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "git:clean": "cross-env ./scripts/git_clean.sh",
+    "graphql:audit": "node scripts/graphql-audit.js",
     "graphql:codegen": "graphql-codegen --config scripts/config/graphql-codegen.ts",
     "graphql:get-schema": "npm-run-all graphql:updateV1 graphql:updateV2",
     "graphql:update": "npm-run-all graphql:updateV1 graphql:updateV2 graphql:codegen",

@@ -1,5 +1,5 @@
 // RFC 011 audit script for GraphQL best practices
-// Usage: node scripts/rfc011-audit.js [-o] [-v] [-h]
+// Usage: node scripts/graphql-audit.js [-o] [-v] [-h]
 
 const fs = require('fs');
 const path = require('path');
@@ -159,7 +159,7 @@ function auditFile(file) {
 
 // --- Run audit ---
 walk(SRC_DIR).forEach(auditFile);
-console.log('RFC 011 audit complete.');
+console.log('GraphQL audit complete.');
 if (errorCount > 0) {
   process.exit(1);
 }
