@@ -1,11 +1,13 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
+import { Settings } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
@@ -78,15 +80,22 @@ export function OrgOverview() {
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
-              {showSetupGuide ? (
-                <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-              ) : (
-                <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-              )}
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon-sm" variant="outline">
+                <Settings size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
+                {showSetupGuide ? (
+                  <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
+                ) : (
+                  <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
       <ConvertedAccountMessage account={account} />
