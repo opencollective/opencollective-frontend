@@ -362,7 +362,7 @@ const Policies = ({ collective }) => {
               )}
             </StyledInputField>
 
-            {/* Mandatory Fields: For Organizations and Independent Collectives */}
+            {/* Mandatory Fields: For Organizations */}
             {hasMoneyManagement && (
               <div className="mt-4 flex flex-col gap-2">
                 <div className="font-bold">
@@ -898,7 +898,7 @@ const Policies = ({ collective }) => {
           />
         </Container>
 
-        {/* Expense Types: For Organizations and Independent Collectives */}
+        {/* Expense Types: For Organizations */}
         {hasMoneyManagement && (
           <React.Fragment>
             <Container>

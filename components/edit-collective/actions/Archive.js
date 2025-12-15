@@ -131,19 +131,11 @@ const ArchiveCollective = ({ collective }) => {
       )}
       {!isArchived && !hasBalance && hasMoneyManagement && (
         <MessageBox type="warning">
-          {collective.type === CollectiveType.COLLECTIVE ? (
-            <FormattedMessage
-              id="collective.archive.selfHosted"
-              defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.archive.balance.warning"
-              defaultMessage="You can't archive {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
-              values={{ type: collective.type }}
-            />
-          )}
+          <FormattedMessage
+            id="collective.archive.balance.warning"
+            defaultMessage="You can't archive {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+            values={{ type: collective.type }}
+          />
         </MessageBox>
       )}
       {isArchived && confirmationMsg && (
