@@ -10,7 +10,6 @@ require('./env');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
