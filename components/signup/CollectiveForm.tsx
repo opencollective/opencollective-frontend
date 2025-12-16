@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';
@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { suggestSlug } from '@/lib/collective';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
 import { loadGoogleMaps } from '@/lib/google-maps';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CollectiveSignupMutation } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
@@ -68,9 +67,7 @@ export function CollectiveForm({ nextStep, setCreatedAccount }: SignupStepProps)
   const intl = useIntl();
   const formikRef = useRef<FormikProps<CreateCollectiveValuesSchema>>(undefined);
   const { refetchLoggedInUser } = useLoggedInUser();
-  const [createCollective] = useMutation<CollectiveSignupMutation>(collectiveSignupMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createCollective] = useMutation<CollectiveSignupMutation>(collectiveSignupMutation);
   const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const [loading, setLoading] = useState(false);
   const suggestedTags = useMemo(
@@ -110,6 +107,18 @@ export function CollectiveForm({ nextStep, setCreatedAccount }: SignupStepProps)
       });
     }
   };
+
+  const handleTagUpdate = useCallback(
+    tags => {
+      if (formikRef.current) {
+        formikRef.current.setFieldValue(
+          'collective.tags',
+          tags.map(t => t.value.toLowerCase()),
+        );
+      }
+    },
+    [formikRef],
+  );
 
   useEffect(() => {
     loadGoogleMaps().finally(() => setIsLoadingGoogleMaps(false));
@@ -182,12 +191,7 @@ export function CollectiveForm({ nextStep, setCreatedAccount }: SignupStepProps)
                 {({ field }) => (
                   <EditTags
                     {...field}
-                    onChange={tags =>
-                      setFieldValue(
-                        field.name,
-                        tags.map(t => t.value.toLowerCase()),
-                      )
-                    }
+                    onChange={handleTagUpdate}
                     placeholder={
                       field.value?.length ? null : (
                         <FormattedMessage defaultMessage="Add tags to improve discoverability" id="Tags.Placeholder" />

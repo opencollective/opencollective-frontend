@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 import roles from '@/lib/constants/roles';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   CollectiveSignupMutation,
   InviteMembersMutation,
@@ -72,9 +71,7 @@ export function InviteAdminForm({ nextStep, createdAccount }: SignupStepProps) {
   const intl = useIntl();
   const formikRef = useRef<FormikProps<InviteAdminsValuesSchema>>(undefined);
   const [inviteFieldsCount, setInviteFieldsCount] = useState(0);
-  const [inviteMembers] = useMutation<InviteMembersMutation, InviteMembersMutationVariables>(inviteMembersMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [inviteMembers] = useMutation<InviteMembersMutation, InviteMembersMutationVariables>(inviteMembersMutation);
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (values: InviteAdminsValuesSchema) => {

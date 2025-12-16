@@ -83,9 +83,9 @@ export default function SignupPage() {
             getRedirectPathSafe(router) ||
             (createdAccount
               ? createdAccount.type === 'COLLECTIVE'
-                ? `/${createdAccount.slug}/onboarding`
+                ? `/${createdAccount.slug}`
                 : getDashboardRoute(createdAccount, '/overview')
-              : '/welcome');
+              : '/dashboard');
           router.push(pathname);
           return prev;
         } else {
