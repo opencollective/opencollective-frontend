@@ -41,7 +41,7 @@ const TheFutureIsCollective = () => {
             </MainDescription>
           </Box>
           <Box mb="40px" display="flex" flexDirection={['column', 'row']} alignItems="center">
-            <Link href="/create">
+            <Link href="/signup/collective">
               <StyledButton
                 minWidth={['288px', '125px']}
                 my={['12px', null, 0]}
