@@ -22806,6 +22806,21 @@ type Mutation {
   ): MemberInvitation!
 
   """
+  Creates and invites admins to an existing Account. Scope: "account".
+  """
+  inviteMembers(
+    """
+    Reference to the account to invite admins to, must be an Organization, Collective, Fund, Event or Project.
+    """
+    account: AccountReferenceInput!
+
+    """
+    List of members to invite as admins.
+    """
+    members: [InviteMemberInput!]!
+  ): [MemberInvitation!]!
+
+  """
   Edit an existing member invitation of the Collective. Scope: "account".
   """
   editMemberInvitation(
@@ -23143,21 +23158,6 @@ type Mutation {
     If true, the organization will be created with Hosting activated, allowing the organization to host Collectives and Funds. Defaults to false.
     """
     hasHosting: Boolean = false
-  ): Organization
-
-  """
-  Creates and invites admins to an existing Organization. Scope: "account".
-  """
-  inviteOrganizationAdmins(
-    """
-    Reference to the organization to invite admins to
-    """
-    organization: AccountReferenceInput!
-
-    """
-    List of members to invite as admins.
-    """
-    inviteMembers: [InviteMemberInput!]!
   ): Organization
 
   """
