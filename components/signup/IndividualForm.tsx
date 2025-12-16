@@ -88,7 +88,7 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   );
 };
 
-export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow }: SignupStepProps) {
+export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: SignupStepProps) {
   const router = useRouter();
   const intl = useIntl();
   const { toast } = useToast();
@@ -182,18 +182,18 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
             ) : (
               <React.Fragment>
                 <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                  {includeOrganizationFlow ? (
+                  {nextActionFlow ? (
                     <FormattedMessage defaultMessage="Create your personal account" id="OkoBON" />
                   ) : (
                     <FormattedMessage defaultMessage="Create your account" id="signup.individual.title" />
                   )}
                 </h1>
                 <p className="text-sm break-words text-slate-700 sm:text-base">
-                  {includeOrganizationFlow ? (
+                  {nextActionFlow ? (
                     <FormattedMessage
-                      defaultMessage="You need a personal account to create an organization. {newLine}Sign in or create one to continue."
+                      defaultMessage="You need a personal account to create {type, select, organization {an organization} other {a collective}}. {newLine}Sign in or create one to continue."
                       id="signup.individual.orgFlow.description"
-                      values={I18nFormatters}
+                      values={{ ...I18nFormatters, type: nextActionFlow }}
                     />
                   ) : (
                     <FormattedMessage
