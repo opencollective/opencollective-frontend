@@ -55,7 +55,7 @@ const HowOCWorks = () => {
             />
           </P>
         </Box>
-        <Link href="/create">
+        <Link href="/signup/collective">
           <StyledButton minWidth={158} mt={['56px', '24px']} buttonStyle="marketing" whiteSpace="nowrap">
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
           </StyledButton>

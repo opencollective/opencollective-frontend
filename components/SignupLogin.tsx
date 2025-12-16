@@ -106,7 +106,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
                 </Link>
 
                 <Link
-                  href="/create"
+                  href="/signup/collective"
                   className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <div>
