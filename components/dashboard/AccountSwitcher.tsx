@@ -30,7 +30,7 @@ import { ROOT_PROFILE_KEY } from './constants';
 const CREATE_NEW_LINKS = {
   ORGANIZATION: '/signup/organization',
   FUND: '/fund/create',
-  COLLECTIVE: '/create',
+  COLLECTIVE: '/signup/collective',
 };
 
 const EMPTY_GROUP_STATE = {
