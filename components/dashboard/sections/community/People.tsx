@@ -302,7 +302,6 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       <DashboardHeader
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
-          // Should ideally be "your collective" for Independent Collectives but it will be deprecated soon
           <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
         }
       />

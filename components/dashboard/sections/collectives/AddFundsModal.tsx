@@ -431,7 +431,7 @@ const checkCanAddHostFee = account => {
     return account.host.id !== account.parent.id;
   }
 
-  // No host fees for Host Organizations or Independent Collectives
+  // No host fees for Host Organizations
   return account.host.id !== account.id;
 };
 
