@@ -5,6 +5,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+  html {
+    @apply antialiased;
+  }
+}
 
 @theme inline {
   --color-border: var(--border);

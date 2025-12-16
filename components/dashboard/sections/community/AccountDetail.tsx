@@ -38,6 +38,7 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { ContributionsTab } from './AccountDetailContributionsTab';
 import { ExpensesTab } from './AccountDetailExpensesTab';
 import { communityAccountDetailQuery } from './queries';
+import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 
 const associatedCollectiveColumns = intl => [
   {
@@ -190,7 +191,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
     ) || [];
   const legalName = account?.legalName !== account?.name && account?.legalName;
-
+  console.log({ account });
   return (
     <div className="flex h-full flex-col">
       <button className="mb-4 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
@@ -208,7 +209,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             ) : (
               <React.Fragment>
                 <Avatar collective={account} size={36} />
-                {account.name}
+                {account.name || account.slug}
                 {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
                 <div className="flex flex-wrap gap-1 align-middle">
                   {relations.map(role => (
@@ -282,59 +283,73 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </div>
         )}
       </div>
-      <div className="mt-4 flex flex-grow flex-col gap-4">
+      <div className="mt-4 flex flex-grow flex-col gap-8">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
-              className="flex flex-col gap-4 aria-hidden:hidden"
+              className="grid grid-cols-3 gap-12 aria-hidden:hidden"
               aria-hidden={selectedTab !== AccountDetailView.DETAILS}
             >
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {(account?.location?.address || account?.location?.country) && (
-                  <SummaryCard
-                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
-                    isLoading={isLoading}
-                    className={account.location.address && 'col-span-2'}
-                  >
-                    <LocationAddress location={account.location} />
-                  </SummaryCard>
-                )}
-                <SummaryCard
-                  title={<FormattedMessage defaultMessage="On the Platform Since" id="OnThePlatformSince" />}
-                  isLoading={isLoading}
-                >
-                  {account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
-                </SummaryCard>
-                <SummaryCard
-                  title={<FormattedMessage defaultMessage="Interactions with Host" id="InteractionsWithHost" />}
-                  isLoading={isLoading}
-                  className="text-sm"
-                >
-                  {account?.communityStats?.firstInteractionAt && (
-                    <div>
-                      <FormattedMessage defaultMessage="First" id="First" />:{' '}
-                      <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
-                    </div>
-                  )}
-                  {account?.communityStats?.lastInteractionAt && (
-                    <div>
-                      <FormattedMessage defaultMessage="Last" id="Last" />:{' '}
-                      <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
-                    </div>
-                  )}
-                </SummaryCard>
+              <div className="col-span-2 space-y-4">
+                <h2 className="text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
+                </h2>
+                <DataTable
+                  data={account?.communityStats?.associatedCollectives || []}
+                  columns={associatedCollectiveColumns(intl)}
+                  loading={isLoading}
+                />
               </div>
-              <h1 className="font-medium">
-                <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
-              </h1>
-              <DataTable
-                data={account?.communityStats?.associatedCollectives || []}
-                columns={associatedCollectiveColumns(intl)}
-                loading={isLoading}
-              />
+              <div className="space-y-4">
+                <h2 className="tight text-xl font-bold text-slate-800">Account</h2>
+                <InfoList variant="compact">
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Legal name" id="t9hfyI" />}
+                    value={account?.legalName}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Display name" id="dOQCL8" />}
+                    value={account?.name || account?.slug}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
+                    value={
+                      (account?.location?.country || account?.location?.address) && (
+                        <LocationAddress location={account.location} />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Joined the platform on" id="Vf1x2A" />}
+                    value={account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
+                    value={
+                      account?.communityStats?.firstInteractionAt && (
+                        <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
+                    value={
+                      account?.communityStats?.lastInteractionAt && (
+                        <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                </InfoList>
+              </div>
             </div>
             {selectedTab === AccountDetailView.CONTRIBUTIONS && (
               <ContributionsTab account={account} host={props.host} setOpenContributionId={setOpenContributionId} />

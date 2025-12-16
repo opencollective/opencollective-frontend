@@ -13,6 +13,7 @@ import { InfoList, InfoListItem, InfoListItemTitle } from '../../../ui/InfoList'
 import ActivityDescription from './ActivityDescription';
 import ActivityDetails, { activityHasDetails } from './ActivityDetails';
 import { ActivityUser } from './ActivityUser';
+import { Separator } from '@/components/ui/Separator';
 
 type ActivityDrawerProps = {
   open: boolean;
@@ -59,9 +60,9 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
             }
             onClose={onClose}
           />
-
           <InfoList className="sm:grid-cols-2">
             <InfoListItem
+              className="sm:col-span-2"
               title={<FormattedMessage id="Tags.USER" defaultMessage="User" />}
               value={<ActivityUser activity={activity} />}
             />

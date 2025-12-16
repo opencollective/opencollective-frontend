@@ -335,7 +335,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 </div>
               </div>
               <div className="text-sm">
-                <InfoList className="mb-6 sm:grid-cols-2">
+                <InfoList className="mt-4 mb-6 sm:grid-cols-2">
                   <InfoListItem
                     className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
