@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
@@ -237,23 +237,17 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
                 {i18nTransactionType(intl, transaction.type)}
                 &nbsp;
-                {
-                  <Fragment>
-                    <FormattedMessage
-                      id="Transaction.from"
-                      defaultMessage="from {name}"
-                      values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={fromAccount} /> }}
-                    />
-                    &nbsp;
-                  </Fragment>
-                }
-                {
-                  <FormattedMessage
-                    id="Transaction.to"
-                    defaultMessage="to {name}"
-                    values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={toAccount} /> }}
-                  />
-                }
+                <FormattedMessage
+                  id="Transaction.from"
+                  defaultMessage="from {name}"
+                  values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={fromAccount} /> }}
+                />
+                &nbsp;
+                <FormattedMessage
+                  id="Transaction.to"
+                  defaultMessage="to {name}"
+                  values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={toAccount} /> }}
+                />
                 {giftCardEmitterAccount && (
                   <React.Fragment>
                     &nbsp;
