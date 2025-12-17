@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, ChevronUp, ListCheck, LockKeyhole, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { WelcomeOrganizationQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
@@ -14,7 +14,8 @@ import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingC
 import { Drawer } from '@/components/Drawer';
 import { DocumentationLink } from '@/components/Link';
 import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
@@ -275,6 +276,7 @@ const WelcomeCategoryButton = ({
 };
 
 export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
+  const intl = useIntl();
   const { data } = useQuery<WelcomeOrganizationQuery>(welcomeOrganizationQuery, {
     variables: { accountSlug: _account?.slug },
     skip: !_account,
@@ -309,6 +311,16 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
                 id="Welcome.Organization.Description"
               />
             </CardDescription>
+            <CardAction>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setOpen(false)}
+                aria-label={intl.formatMessage({ defaultMessage: 'Hide setup guide', id: 'SetupGuide.HideSetupGuide' })}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardAction>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Object.entries(ORG_CATEGORIES).map(([key, category]) => (
@@ -334,6 +346,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
 
 export const WelcomeIndividual = ({ open, setOpen }) => {
   const router = useRouter();
+  const intl = useIntl();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = useState(false);
 
   return (
@@ -354,6 +367,19 @@ export const WelcomeIndividual = ({ open, setOpen }) => {
                   id="Welcome.Organization.Description"
                 />
               </CardDescription>
+              <CardAction>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => setOpen(false)}
+                  aria-label={intl.formatMessage({
+                    defaultMessage: 'Hide setup guide',
+                    id: 'SetupGuide.HideSetupGuide',
+                  })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardAction>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <WelcomeCategoryButton
