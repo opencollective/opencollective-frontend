@@ -42,7 +42,7 @@ import SocialLinksFormField from '../SocialLinksFormField';
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, INDIVIDUAL } = AccountType;
 
 const editAccountFragment = gql`
-  fragment EditAccountFragment on Account {
+  fragment EditAccount on Account {
     id
     legacyId
     name
@@ -94,7 +94,7 @@ const editAccountMutation = gql`
   mutation EditAccount($account: AccountUpdateInput!) {
     editAccount(account: $account) {
       id
-      ...EditAccountFragment
+      ...EditAccount
     }
   }
   ${editAccountFragment}
@@ -104,7 +104,7 @@ export const infoSettingsDashboardQuery = gql`
   query InfoSettingsDashboard($id: String!) {
     account(id: $id) {
       id
-      ...EditAccountFragment
+      ...EditAccount
     }
   }
   ${editAccountFragment}

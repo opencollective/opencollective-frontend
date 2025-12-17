@@ -550,7 +550,7 @@ const orderSuccessQuery = gql`
   query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
       id
-      ...OrderSuccessFragment
+      ...OrderSuccess
     }
   }
   ${orderSuccessFragment}

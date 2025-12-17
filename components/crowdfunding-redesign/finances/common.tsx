@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 
 // TODO: Similar to `profileAccountsQuery`, migrate to single query if behavior is adopted and should be identical
 export const financesQuery = gql`
@@ -202,5 +202,5 @@ export const financesQuery = gql`
       # }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;

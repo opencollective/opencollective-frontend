@@ -326,6 +326,11 @@ interface Account {
     isArchived: Boolean
 
     """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
+
+    """
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]

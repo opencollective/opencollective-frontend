@@ -26,7 +26,7 @@ function useNonEmptyResultCache<T extends { hosts: { nodes: unknown[] } }>(data:
   return nonEmptyResult.current;
 }
 
-const FindAFiscalHostQuery = gql`
+const findAFiscalHostQuery = gql`
   query FindAFiscalHost(
     $tags: [String]
     $limit: Int
@@ -105,7 +105,7 @@ export default function FindAHostSearch(props: {
       offset: number;
       nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[];
     };
-  }>(FindAFiscalHostQuery, {
+  }>(findAFiscalHostQuery, {
     variables: {
       searchTerm: props.searchTerm,
       tags: props.communityTags.length !== 0 ? props.communityTags : undefined,

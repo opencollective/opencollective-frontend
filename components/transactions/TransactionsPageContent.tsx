@@ -228,7 +228,7 @@ export const transactionsPageQuery = gql`
       paymentMethod: $paymentMethod
       payoutMethod: $payoutMethod
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
       kinds
       paymentMethodTypes
       totalCount

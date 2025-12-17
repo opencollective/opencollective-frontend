@@ -1,6 +1,6 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 import { expensePageExpenseFieldsFragment, expenseValuesByRoleFragment } from './fragments';
 
@@ -21,7 +21,7 @@ export const editExpenseCategoryMutation = gql`
       id
       valuesByRole {
         id
-        ...ExpenseValuesByRoleFragment
+        ...ExpenseValuesByRole
       }
       accountingCategory {
         id
@@ -29,7 +29,7 @@ export const editExpenseCategoryMutation = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
   ${expenseValuesByRoleFragment}
 `;
 
