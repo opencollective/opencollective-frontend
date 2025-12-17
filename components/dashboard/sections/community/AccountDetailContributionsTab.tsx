@@ -1,8 +1,12 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { truncate } from 'lodash';
+import { ArrowRight, ArrowRightLeft, RefreshCcw } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { TransactionKind } from '@/lib/constants/transactions';
 import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '@/lib/i18n/expense';
@@ -10,11 +14,12 @@ import { i18nExpenseType } from '@/lib/i18n/expense';
 import Avatar from '@/components/Avatar';
 import DateTime from '@/components/DateTime';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import Link from '@/components/Link';
 import LinkCollective from '@/components/LinkCollective';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
-import { DataTable } from '@/components/table/DataTable';
+import { actionsColumn, DataTable } from '@/components/table/DataTable';
+import { Button } from '@/components/ui/Button';
 
-import { Pagination } from '../../filters/Pagination';
 import { Metric } from '../overview/Metric';
 
 import { communityAccountContributionsDetailQuery } from './queries';
@@ -85,7 +90,7 @@ const contributionSummaryColumns = [
   },
   {
     accessorKey: 'contributionCount',
-    header: () => <FormattedMessage defaultMessage="Charged Processed" id="ChargesProcessed" />,
+    header: () => <FormattedMessage defaultMessage="Charges" id="Dx5IBb" />,
     cell: ({ cell }) => {
       return cell.getValue();
     },
@@ -98,16 +103,18 @@ const contributionSummaryColumns = [
       return <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />;
     },
   },
+  actionsColumn,
 ];
 export function ContributionsTab({ account, host, setOpenContributionId }) {
   const intl = useIntl();
+  const router = useRouter();
   const pagination = useQueryFilter({
     schema: z.object({ limit: integer.default(5), offset: integer.default(0) }),
     filters: {},
     skipRouter: true,
   });
 
-  const { data, loading } = useQuery(communityAccountContributionsDetailQuery, {
+  const { data, previousData, loading } = useQuery(communityAccountContributionsDetailQuery, {
     variables: {
       accountId: account.id,
       host: host,
@@ -115,12 +122,39 @@ export function ContributionsTab({ account, host, setOpenContributionId }) {
     },
   });
 
-  const totalContributed = data?.account?.communityStats?.transactionSummary[0]?.contributionTotalAcc || {
+  const getYearlySummaryActions = summary => ({
+    primary: [
+      {
+        key: 'view-transactions',
+        Icon: ArrowRightLeft,
+        label: intl.formatMessage({ defaultMessage: 'View transactions', id: 'DfQJQ6' }),
+        onClick: () => {
+          router.push({
+            pathname: `/dashboard/${host.slug}/host-transactions`,
+            query: {
+              searchTerm: `@${account.slug}`,
+              'date[type]': 'BETWEEN',
+              'date[gte]': `${summary.year}-01-01`,
+              'date[lte]': `${summary.year}-12-31`,
+              kind: [TransactionKind.CONTRIBUTION, TransactionKind.ADDED_FUNDS],
+            },
+          });
+        },
+      },
+    ],
+  });
+
+  const canUsePreviousData = previousData?.account?.id === account.id;
+  const accountData = data?.account || (canUsePreviousData ? previousData?.account : null);
+  const totalContributions = accountData?.orders.totalCount || 0;
+  const currentLimit = pagination.values.limit;
+  const hasMore = currentLimit < totalContributions;
+  const totalContributed = accountData?.communityStats?.transactionSummary[0]?.contributionTotalAcc || {
     valueInCents: 0,
     currency: host.currency,
   };
-  const ordersCount = data?.account?.orders.totalCount || 0;
-  const chargeCount = data?.account?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0;
+  const ordersCount = accountData?.orders.totalCount || 0;
+  const chargeCount = accountData?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0;
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -135,26 +169,56 @@ export function ContributionsTab({ account, host, setOpenContributionId }) {
           loading={loading}
         />
         <Metric
-          label={<FormattedMessage defaultMessage="Processed Charges" id="NumberProcessedCharges" />}
+          label={<FormattedMessage defaultMessage="Charges" id="Dx5IBb" />}
           count={{ current: chargeCount }}
           loading={loading}
         />
       </div>
-      <DataTable
-        columns={contributionSummaryColumns}
-        data={data?.account?.communityStats?.transactionSummary?.filter(curr => curr.contributionCount > 0) || []}
-        loading={loading}
-      />
       <h1 className="font-medium">
-        <FormattedMessage defaultMessage="Contributions" id="Contributions" />
+        <FormattedMessage defaultMessage="Summary by Year" id="SummaryByYear" />
       </h1>
       <DataTable
-        data={data?.account?.orders.nodes || []}
+        columns={contributionSummaryColumns}
+        data={accountData?.communityStats?.transactionSummary?.filter(curr => curr.contributionCount > 0) || []}
+        loading={loading && !accountData?.communityStats?.transactionSummary}
+        getActions={getYearlySummaryActions}
+      />
+      <h1 className="font-medium">
+        <FormattedMessage defaultMessage="Recent Contributions" id="RecentContributions" />
+      </h1>
+      <DataTable
+        data={accountData?.orders.nodes || []}
         columns={contributionColumns(intl)}
         onClickRow={row => setOpenContributionId(row.original.legacyId)}
-        loading={loading}
+        loading={loading && !accountData}
       />
-      <Pagination queryFilter={pagination} total={data?.account?.orders.totalCount} />
+      <div className="flex flex-wrap justify-end gap-2">
+        {hasMore && (
+          <Button
+            variant="outline"
+            loading={Boolean(loading && accountData)}
+            onClick={() => {
+              const currentLimit = pagination.values.limit;
+              pagination.setFilter('limit', currentLimit + 5);
+            }}
+          >
+            <RefreshCcw size={14} className="shrink-0" />
+            <span className="capitalize">
+              <FormattedMessage defaultMessage="load more" id="loadMore" />
+            </span>
+          </Button>
+        )}
+        <Button variant="outline" asChild>
+          <Link href={`/dashboard/${host.slug}/incoming-contributions?searchTerm=@${account.slug}`}>
+            <FormattedMessage
+              defaultMessage="See all of {name}'s contributions"
+              id="SeeAllContributions"
+              values={{ name: truncate(account.name, { length: 20 }) }}
+            />
+            <ArrowRight size={16} className="shrink-0" />
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
