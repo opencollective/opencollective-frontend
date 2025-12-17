@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { Megaphone, X } from 'lucide-react';
+import { Megaphone, Settings, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,6 +12,7 @@ import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
 import Image from '../../../Image';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
@@ -65,15 +66,22 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
             />
           }
           actions={
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showWelcomeGuide)}>
-                {showWelcomeGuide ? (
-                  <FormattedMessage defaultMessage="Hide welcome guide" id="SetupGuide.HideWelcome" />
-                ) : (
-                  <FormattedMessage defaultMessage="Show welcome guide" id="SetupGuide.ShowWelcome" />
-                )}
-              </Button>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon-sm" variant="outline">
+                  <Settings size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleSetupGuideToggle(!showWelcomeGuide)}>
+                  {showWelcomeGuide ? (
+                    <FormattedMessage defaultMessage="Hide welcome guide" id="SetupGuide.HideWelcome" />
+                  ) : (
+                    <FormattedMessage defaultMessage="Show welcome guide" id="SetupGuide.ShowWelcome" />
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           }
         />
         <WelcomeIndividual open={showWelcomeGuide} setOpen={handleSetupGuideToggle} />
