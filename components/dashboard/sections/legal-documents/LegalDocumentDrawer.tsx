@@ -4,10 +4,11 @@ import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { Account, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
+import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
+import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -29,9 +30,9 @@ import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
 type LegalDocumentDrawerProps = {
   open: boolean;
   onClose: () => void;
-  document?: LegalDocument;
+  document?: LegalDocumentFieldsFragment;
   host: Pick<Account, 'id' | 'slug'>;
-  getActions: GetActions<LegalDocument>;
+  getActions: GetActions<LegalDocumentFieldsFragment>;
 };
 
 const legalDocumentDrawerQuery = gql`

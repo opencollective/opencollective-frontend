@@ -262,31 +262,21 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </div>
         )}
       </div>
-      <div className="mt-4 flex flex-grow flex-col gap-8">
+      <div className="@container mt-4 flex flex-grow flex-col gap-8">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
-              className="grid grid-cols-3 gap-12 aria-hidden:hidden"
+              className="grid grid-cols-1 gap-12 aria-hidden:hidden @4xl:grid-cols-3"
               aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
-              <div className="col-span-2 space-y-4">
-                <h2 className="text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
-                </h2>
-                <DataTable
-                  data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedCollectiveColumns(intl)}
-                  loading={isLoading}
-                />
-              </div>
-              <div className="space-y-4">
+              <div className="space-y-4 @4xl:order-2">
                 <h2 className="tight text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Details" id="Details" />
                 </h2>
-                <InfoList variant="compact">
+                <InfoList variant="compact" className="grid-cols-1 @lg:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-1">
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                     value={account?.legalName}
@@ -332,10 +322,10 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
                     value={
-                      taxForms[0] && (
+                      taxForms?.nodes[0] && (
                         <div className="flex flex-col items-start gap-1">
                           <AccountTaxFormStatus
-                            taxForm={taxForms[0]}
+                            taxForm={taxForms.nodes[0]}
                             host={query.data?.host}
                             onRefetch={() => query.refetch()}
                           />
@@ -353,6 +343,17 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                     isLoading={isLoading}
                   />
                 </InfoList>
+              </div>
+
+              <div className="space-y-4 @4xl:order-1 @4xl:col-span-2">
+                <h2 className="text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
+                </h2>
+                <DataTable
+                  data={account?.communityStats?.associatedCollectives || []}
+                  columns={associatedCollectiveColumns(intl)}
+                  loading={isLoading}
+                />
               </div>
             </div>
             {selectedTab === AccountDetailView.CONTRIBUTIONS && (

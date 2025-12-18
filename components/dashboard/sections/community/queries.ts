@@ -3,6 +3,8 @@ import { gql } from '@apollo/client';
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
 
+import { legalDocumentFields } from '../legal-documents/HostDashboardTaxForms';
+
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
     $slug: String!
@@ -147,28 +149,14 @@ export const communityAccountDetailQuery = gql`
       ) {
         totalCount
         nodes {
-          id
-          year
-          type
-          status
-          service
-          requestedAt
-          updatedAt
-          documentLink
-          isExpired
-          account {
-            id
-            name
-            slug
-            type
-            imageUrl(height: 128)
-          }
+          ...LegalDocumentFields
         }
       }
     }
   }
   ${accountHoverCardFields}
   ${kycVerificationFields}
+  ${legalDocumentFields}
 `;
 
 export const communityAccountActivitiesQuery = gql`
