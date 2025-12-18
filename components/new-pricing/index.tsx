@@ -363,20 +363,6 @@ export default function Pricing({ data }) {
                 values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
               />
             </div>
-
-            <div className="p-6">
-              <h3 className="mb-2 text-xl font-medium text-foreground">
-                <FormattedMessage
-                  defaultMessage="What's happening to Independent Collectives?"
-                  id="pricing.new.faq.independentcollective.question"
-                />
-              </h3>
-              <FormattedMessage
-                defaultMessage="<p><strong>Independent Collectives</strong> are being converted to <strong>Organizations</strong>.</p><p>This change removes a confusing account type and makes the platform more consistent. <strong>Collectives</strong> are always hosted, while <strong>Organizations</strong> represent legal entities that can hold and manage money themselves.</p><p>If you previously had an <strong>Independent Collective</strong>, it is now being converted to an <strong>Organization</strong>. You can continue using the same tools to receive contributions, pay expenses, and manage your budget.</p><p><strong>Independent Collectives</strong> converted to <strong>Organizations</strong> are subject to the updated pricing, and fees may apply if you process many expenses or need advanced features.</p>"
-                id="pricing.new.faq.independentcollective.answer"
-                values={{ ...I18nFormatters, p: chunks => <p className="my-4 text-muted-foreground">{chunks}</p> }}
-              />
-            </div>
           </div>
         </div>
 
