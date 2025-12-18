@@ -12,7 +12,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle, css, ThemeProvider } from 'styled-components';
 import { display } from 'styled-system';
 
 import { expenseSubmissionAllowed, getContributeRoute, isIndividualAccount } from '../../lib/collective';
@@ -26,6 +26,7 @@ import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import theme from '@/lib/theme';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -665,15 +666,18 @@ const CollectiveNavbar = ({
         <React.Suspense
           fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setIsSubmitExpenseModalOpen(false)} />}
         >
-          <SubmitExpenseFlow
-            onClose={(isSubmitted, hasSelectedViewAll) => {
-              setIsSubmitExpenseModalOpen(false);
-              if (isSubmitted && hasSelectedViewAll) {
-                router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
-              }
-            }}
-            submitExpenseTo={collective?.slug}
-          />
+          {/* Reset the theme, to avoid collective's custom color to leak on StyledSelect */}
+          <ThemeProvider theme={theme}>
+            <SubmitExpenseFlow
+              onClose={(isSubmitted, hasSelectedViewAll) => {
+                setIsSubmitExpenseModalOpen(false);
+                if (isSubmitted && hasSelectedViewAll) {
+                  router.push(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+                }
+              }}
+              submitExpenseTo={collective?.slug}
+            />
+          </ThemeProvider>
         </React.Suspense>
       )}
     </Fragment>
