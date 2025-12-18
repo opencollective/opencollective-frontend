@@ -7333,6 +7333,7 @@ type TransactionsAmountGroup {
 
 type CommunityStats {
   associatedCollectives: [CommunityAssociatedCollective]
+  associatedOrganizations: [CommunityAssociatedCollective]
   relations: [CommunityRelationType]!
   transactionSummary: [CommunityTransactionSummary!]!
   lastInteractionAt: DateTime
