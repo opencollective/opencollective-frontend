@@ -7,7 +7,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import { hasAccountHosting } from '@/lib/collective';
 
 import { Separator } from '@/components/ui/Separator';
 
@@ -109,7 +108,7 @@ class Host extends React.Component {
   getAdministratedHosts = memoizeOne(LoggedInUser => {
     return (
       LoggedInUser?.memberOf
-        ?.filter(membership => membership.role === 'ADMIN' && hasAccountHosting(membership.collective))
+        ?.filter(membership => membership.role === 'ADMIN' && membership.collective.hasHosting)
         .map(membership => membership.collective)
         .filter(Boolean) || []
     );

@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting } from '@/lib/collective';
 import type {
   PlatformBillingOverviewCardQuery,
   PlatformBillingOverviewCardQueryVariables,
@@ -31,6 +30,9 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
           isHost
           type
           settings
+          ... on Organization {
+            hasHosting
+          }
           ... on AccountWithPlatformSubscription {
             platformSubscription {
               ...PlatformSubscriptionFields
@@ -55,8 +57,7 @@ export function PlatformBillingOverviewCard(props: PlatformBillingOverviewCardPr
     return null;
   }
 
-  const hasHosting = hasAccountHosting(query.data.account);
-
+  const hasHosting = Boolean(query.data.account?.['hasHosting']);
   return (
     <MessageBox className="relative" type="info">
       <Button onClick={props.onDismiss ?? (() => {})} className="absolute top-0 right-0" variant="ghost" size="icon">

@@ -28,12 +28,7 @@ import {
 } from 'lucide-react';
 
 import hasFeature, { FEATURES, isFeatureEnabled, isFeatureSupported } from '../../lib/allowed-features';
-import {
-  hasAccountHosting,
-  hasAccountMoneyManagement,
-  isIndividualAccount,
-  isOrganizationAccount,
-} from '../../lib/collective';
+import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { ExpenseType } from '../../lib/graphql/types/v2/schema';
@@ -134,7 +129,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
   const hasMoneyManagement = hasAccountMoneyManagement(account);
-  const hasHosting = hasAccountHosting(account);
+  const hasHosting = account.hasHosting;
   const isSimpleIndividual = isIndividual && !hasHosting;
   const isSimpleOrganization = isOrganization && !hasMoneyManagement;
   const isHostedType = isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]);

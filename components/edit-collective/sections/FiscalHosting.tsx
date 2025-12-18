@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting, hasAccountMoneyManagement } from '@/lib/collective';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
@@ -66,7 +66,7 @@ export const ToggleMoneyManagementButton = ({
   });
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
-  const hasHosting = hasAccountHosting(account);
+  const hasHosting = account.hasHosting;
   const hasMoneyManagement = hasAccountMoneyManagement(account);
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
@@ -159,7 +159,7 @@ export const ToggleFiscalHostingButton = ({
   children?: React.ReactNode;
 } & ButtonProps) => {
   const { showConfirmationModal } = useModal();
-  const hasHosting = hasAccountHosting(account);
+  const hasHosting = account.hasHosting;
   const hasMoneyManagement = hasAccountMoneyManagement(account);
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },

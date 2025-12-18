@@ -15,7 +15,6 @@ import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema'
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
-import { hasAccountHosting } from '@/lib/collective.js';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
 
@@ -132,7 +131,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
   const [deleteCategoryConfirmation, setDeleteCategoryConfirmation] = React.useState(null);
 
-  const hasHosting = hasAccountHosting(account);
+  const hasHosting = account.hasHosting;
 
   const queryFilter = useQueryFilter({
     schema: React.useMemo(

@@ -11,7 +11,6 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
-import { hasAccountHosting } from '@/lib/collective';
 
 import { AccountTrustBadge } from '@/components/AccountTrustBadge';
 
@@ -125,7 +124,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
   const numberOfHiddenTags = hiddenTags?.length;
-  const hasHosting = hasAccountHosting(collective);
+  const hasHosting = collective.hasHosting;
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {

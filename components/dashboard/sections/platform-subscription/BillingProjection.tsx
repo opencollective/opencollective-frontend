@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import { Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting } from '@/lib/collective';
 import type { BillingProjectionQuery, BillingProjectionQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import type { PlatformSubscription, PlatformUtilization } from '@/lib/graphql/types/v2/schema';
 
@@ -28,6 +27,9 @@ export function BillingProjection(props: BillingProjectionProps) {
           isHost
           type
           settings
+          ... on Organization {
+            hasHosting
+          }
           ... on AccountWithPlatformSubscription {
             platformSubscription {
               ...PlatformSubscriptionFields
@@ -58,7 +60,7 @@ export function BillingProjection(props: BillingProjectionProps) {
   const subscription = account && 'platformSubscription' in account ? account.platformSubscription : null;
   const currentPlan = subscription?.plan;
   const billedSubscriptions = billing?.base?.subscriptions ?? [];
-  const hasHosting = hasAccountHosting(account);
+  const hasHosting = Boolean(account?.['hasHosting']);
 
   if (!billing || !currentPlan) {
     return null;
