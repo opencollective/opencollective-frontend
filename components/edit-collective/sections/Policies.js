@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, isNil, set, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { hasAccountHosting, hasAccountMoneyManagement } from '../../../lib/collective';
+import { hasAccountMoneyManagement } from '../../../lib/collective';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
@@ -187,7 +187,7 @@ const Policies = ({ collective }) => {
   const [selected, setSelected] = React.useState([]);
   const { toast } = useToast();
   const hasMoneyManagement = hasAccountMoneyManagement(collective);
-  const hasHosting = hasAccountHosting(collective);
+  const hasHosting = collective.hasHosting;
   const { account } = React.useContext(DashboardContext);
   const isUpgradeRequiredForChartOfAccounts = requiresUpgrade(account, FEATURES.CHART_OF_ACCOUNTS);
 

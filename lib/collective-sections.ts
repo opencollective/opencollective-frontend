@@ -19,7 +19,7 @@ import { CollectiveType } from './constants/collectives';
 import type { AccountType } from './graphql/types/v2/schema';
 import i18nNavbarCategory from './i18n/navbar-categories';
 import { FEATURES, isFeatureEnabled } from './allowed-features';
-import { hasAccountHosting, hasAccountMoneyManagement, isEmptyCollectiveLocation } from './collective';
+import { hasAccountMoneyManagement, isEmptyCollectiveLocation } from './collective';
 
 const RichCollectiveType = {
   ...CollectiveType,
@@ -410,7 +410,7 @@ export const addDefaultSections = (collective, sections) => {
 
   const newSections = cloneDeep(sections || []);
   const hasMoneyManagement = hasAccountMoneyManagement(collective);
-  const hasHosting = hasAccountHosting(collective);
+  const hasHosting = collective.hasHosting;
   const defaultSections = getDefaultSectionsForCollectiveType(collective.type, hasMoneyManagement, hasHosting);
 
   Object.entries(defaultSections).forEach(([section, defaultIsEnabled]) => {

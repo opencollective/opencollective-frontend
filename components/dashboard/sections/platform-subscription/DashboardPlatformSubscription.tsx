@@ -4,7 +4,6 @@ import { ChevronDown, Pencil, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { hasAccountHosting } from '@/lib/collective';
 import type {
   DashboardPlatformSubscriptionQuery,
   DashboardPlatformSubscriptionQueryVariables,
@@ -41,6 +40,9 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
           type
           isHost
           settings
+          ... on Organization {
+            hasHosting
+          }
           ... on AccountWithPlatformSubscription {
             platformSubscription {
               ...PlatformSubscriptionFields
@@ -75,7 +77,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
 
   const isFreeTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
 
-  const hasHosting = hasAccountHosting(query.data?.account);
+  const hasHosting = Boolean(query.data?.account?.['hasHosting']);
 
   React.useEffect(() => {
     if (!desiredFeature || !activeSubscription?.plan || !billing) {

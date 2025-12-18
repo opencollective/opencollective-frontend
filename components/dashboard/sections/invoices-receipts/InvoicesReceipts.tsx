@@ -8,7 +8,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { editCollectiveSettingsMutation } from '../../../../lib/graphql/v1/mutations';
-import { hasAccountHosting } from '@/lib/collective';
 import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account } from '@/lib/graphql/types/v2/schema';
 
@@ -37,7 +36,11 @@ const BILL_TO_OPTIONS = [
   { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
 ] as const;
 
-const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'settings'> }) => {
+const InvoicesReceipts = ({
+  account,
+}: {
+  account: Pick<Account, 'legacyId' | 'settings'> & { hasHosting?: boolean };
+}) => {
   const intl = useIntl();
   const { toast } = useToast();
   const defaultReceipt = useReceipt({ template: ReceiptTemplate.Default, settings: account.settings });
@@ -62,8 +65,6 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
       defaultReceipt.values.embeddedImage &&
     get(data, 'editCollective.settings.invoice.templates.alternative.embeddedImage') ===
       alternativeReceipt.values.embeddedImage;
-
-  const hasHosting = hasAccountHosting(account);
 
   // For Bill To
   const getInExpenseTemplate = (account, field: string) =>
@@ -132,7 +133,7 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </SettingsSectionTitle>
 
-        {hasHosting && (
+        {account.hasHosting && (
           <div className="mt-4">
             <Label htmlFor="expense-bill-to-select" className="text-black-800 text-base leading-6 font-bold">
               {intl.formatMessage({ defaultMessage: 'Bill To', id: 'izhuHE' })}

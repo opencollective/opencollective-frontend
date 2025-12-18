@@ -7,7 +7,6 @@ import type { Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { hasAccountHosting } from '@/lib/collective';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -123,11 +122,10 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
     skipFiltersOnReset: ['hostContext'],
   });
 
-  const hasHosting = hasAccountHosting(account);
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostFinancialContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -164,7 +162,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
-            {hasHosting && (
+            {account.hasHosting && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}
@@ -174,7 +172,7 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
           </div>
         }
         description={
-          hasHosting ? (
+          account.hasHosting ? (
             <FormattedMessage
               defaultMessage="Contributions made to your Organization and Collectives you host."
               id="To33FZ"

@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 
 import type { WelcomeOrganizationQuery } from './graphql/types/v2/graphql';
-import { hasAccountHosting, hasAccountMoneyManagement } from './collective';
+import { hasAccountMoneyManagement } from './collective';
 import type LoggedInUser from './LoggedInUser';
 
 export type Step = {
@@ -268,10 +268,10 @@ const ALL_STEPS: Record<string, MakeStep> = {
       />
     ),
     id: 'enable-hosting',
-    completed: hasAccountHosting(account),
+    completed: Boolean(account['hasHosting']),
     action: (
       <ToggleFiscalHostingButton account={account} refetchQueries={['WelcomeOrganization']} size="xs">
-        {hasAccountHosting(account) ? (
+        {account['hasHosting'] ? (
           <FormattedMessage defaultMessage="Disable fiscal hosting" id="SetupGuide.DisableEnableHosting" />
         ) : (
           <FormattedMessage defaultMessage="Enable fiscal hosting" id="SetupGuide.EnableHosting" />
@@ -412,12 +412,12 @@ const ALL_STEPS: Record<string, MakeStep> = {
       <RedirectButton
         url={getDashboardRoute(account, 'fiscal-hosting')}
         router={router}
-        disabled={!hasAccountHosting(account)}
+        disabled={!account['hasHosting']}
       >
         <FormattedMessage defaultMessage="Set up hosting fees" id="SetupGuide.HostingFees.Action" />
       </RedirectButton>
     ),
-    disabledMessage: !hasAccountHosting(account) && (
+    disabledMessage: !account['hasHosting'] && (
       <FormattedMessage defaultMessage="Requires Fiscal Hosting" id="SetupGuide.RequiresFiscalHosting" />
     ),
     documentation: {
@@ -444,12 +444,12 @@ const ALL_STEPS: Record<string, MakeStep> = {
       <RedirectButton
         url={getDashboardRoute(account, 'fiscal-hosting')}
         router={router}
-        disabled={!hasAccountHosting(account)}
+        disabled={!account['hasHosting']}
       >
         <FormattedMessage defaultMessage="Enable applications" id="SetupGuide.HostApplications.Action" />
       </RedirectButton>
     ),
-    disabledMessage: !hasAccountHosting(account) && (
+    disabledMessage: !account['hasHosting'] && (
       <FormattedMessage defaultMessage="Requires Fiscal Hosting" id="SetupGuide.RequiresFiscalHosting" />
     ),
     documentation: {

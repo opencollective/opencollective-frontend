@@ -11,6 +11,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       slug
       path
       name
+      hasHosting
       description
       longDescription
       backgroundImage

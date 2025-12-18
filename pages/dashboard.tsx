@@ -7,7 +7,6 @@ import roles from '../lib/constants/roles';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
-import { hasAccountHosting } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -63,7 +62,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (loggedInUser?.isAccountantOnly(account) && hasAccountHosting(account)) {
+  } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
