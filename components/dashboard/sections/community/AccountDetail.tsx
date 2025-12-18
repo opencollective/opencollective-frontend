@@ -23,6 +23,7 @@ import LocationAddress from '@/components/LocationAddress';
 import { DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
+import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 
 import Avatar from '../../../Avatar';
 import { CopyID } from '../../../CopyId';
@@ -38,7 +39,6 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { ContributionsTab } from './AccountDetailContributionsTab';
 import { ExpensesTab } from './AccountDetailExpensesTab';
 import { communityAccountDetailQuery } from './queries';
-import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 
 const associatedCollectiveColumns = intl => [
   {
@@ -109,7 +109,7 @@ const SummaryCard = ({
 };
 
 enum AccountDetailView {
-  DETAILS = 'DETAILS',
+  OVERVIEW = 'OVERVIEW',
   EXPENSES = 'EXPENSES',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   ACTIVITIES = 'ACTIVITIES',
@@ -125,7 +125,7 @@ type ContributionDrawerProps = {
 export function ContributorDetails(props: ContributionDrawerProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
-  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.DETAILS);
+  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.OVERVIEW);
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
 
@@ -144,8 +144,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const tabs = React.useMemo(
     () => [
       {
-        id: AccountDetailView.DETAILS,
-        label: <FormattedMessage defaultMessage="Details" id="Details" />,
+        id: AccountDetailView.OVERVIEW,
+        label: <FormattedMessage defaultMessage="Overview" id="9uOFF3" />,
       },
       {
         id: AccountDetailView.EXPENSES,
@@ -191,7 +191,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
     ) || [];
   const legalName = account?.legalName !== account?.name && account?.legalName;
-  console.log({ account });
+
   return (
     <div className="flex h-full flex-col">
       <button className="mb-4 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
@@ -291,7 +291,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
               className="grid grid-cols-3 gap-12 aria-hidden:hidden"
-              aria-hidden={selectedTab !== AccountDetailView.DETAILS}
+              aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
               <div className="col-span-2 space-y-4">
                 <h2 className="text-xl font-bold text-slate-800">
@@ -304,7 +304,9 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 />
               </div>
               <div className="space-y-4">
-                <h2 className="tight text-xl font-bold text-slate-800">Account</h2>
+                <h2 className="tight text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Details" id="Details" />
+                </h2>
                 <InfoList variant="compact">
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Legal name" id="t9hfyI" />}
