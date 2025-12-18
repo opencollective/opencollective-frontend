@@ -131,7 +131,11 @@ export default function SignupPage() {
         nextStep(SignupSteps.CREATE_COLLECTIVE);
       } else {
         // If the user is already logged in and not creating an org, redirect to home page
-        router.push(getRedirectPathSafe(router) || '/dashboard');
+        router.push(
+          getRedirectPathSafe(router) || (nextActionFlow === NEXT_ACTION_FLOWS.COLLECTIVE && createdAccount)
+            ? `/${createdAccount.slug}`
+            : '/dashboard',
+        );
       }
     } else if (
       !me &&
