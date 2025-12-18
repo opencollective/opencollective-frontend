@@ -55,9 +55,7 @@ const userInfoToAdminMember = ({ email, name }) => {
 };
 
 const inviteAdminsSchema = z.object({
-  get invitedAdmins() {
-    return z.array(memberInfoSchema).optional();
-  },
+  invitedAdmins: z.array(memberInfoSchema).optional(),
 });
 
 type InviteAdminsValuesSchema = z.infer<typeof inviteAdminsSchema>;
