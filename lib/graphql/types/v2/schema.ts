@@ -2791,8 +2791,8 @@ export type CommentUpdateInput = {
   id: Scalars['String']['input'];
 };
 
-export type CommunityAssociatedCollective = {
-  __typename?: 'CommunityAssociatedCollective';
+export type CommunityAssociatedAccount = {
+  __typename?: 'CommunityAssociatedAccount';
   account?: Maybe<Account>;
   relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
 };
@@ -2810,7 +2810,8 @@ export enum CommunityRelationType {
 export type CommunityStats = {
   __typename?: 'CommunityStats';
   activities?: Maybe<ActivityCollection>;
-  associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedCollective>>>;
+  associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedAccount>>>;
+  associatedOrganizations?: Maybe<Array<Maybe<CommunityAssociatedAccount>>>;
   firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   relations: Array<Maybe<CommunityRelationType>>;

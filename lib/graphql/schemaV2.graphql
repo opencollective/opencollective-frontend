@@ -7333,7 +7333,8 @@ type TransactionsAmountGroup {
 }
 
 type CommunityStats {
-  associatedCollectives: [CommunityAssociatedCollective]
+  associatedCollectives: [CommunityAssociatedAccount]
+  associatedOrganizations: [CommunityAssociatedAccount]
   relations: [CommunityRelationType]!
   transactionSummary: [CommunityTransactionSummary!]!
   lastInteractionAt: DateTime
@@ -7351,7 +7352,7 @@ type CommunityStats {
   ): ActivityCollection
 }
 
-type CommunityAssociatedCollective {
+type CommunityAssociatedAccount {
   account: Account
   relations: [CommunityRelationType]
 }
