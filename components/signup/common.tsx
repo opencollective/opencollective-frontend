@@ -15,12 +15,12 @@ import type {
   OrganizationSignupMutation,
 } from '@/lib/graphql/types/v2/graphql';
 
-import { FormField } from '../FormField';
+import Avatar from '../Avatar';
 import { FormikZod } from '../FormikZod';
 import Image from '../Image';
+import { InviteUserModalTrigger, memberInfoSchema } from '../InviteUserModal';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
-import { Input } from '../ui/Input';
 import { toast } from '../ui/useToast';
 
 export enum SignupSteps {
@@ -55,14 +55,9 @@ const userInfoToAdminMember = ({ email, name }) => {
 };
 
 const inviteAdminsSchema = z.object({
-  invitedAdmins: z
-    .array(
-      z.object({
-        email: z.string().email(),
-        name: z.string().min(1),
-      }),
-    )
-    .optional(),
+  get invitedAdmins() {
+    return z.array(memberInfoSchema).optional();
+  },
 });
 
 type InviteAdminsValuesSchema = z.infer<typeof inviteAdminsSchema>;
@@ -139,65 +134,70 @@ export function InviteAdminForm({ nextStep, createdAccount }: SignupStepProps) {
           </div>
           <Card className="w-full max-w-lg">
             <CardContent className="flex flex-col gap-4">
-              {inviteFieldsCount > 0 && (
-                <div className="flex flex-col gap-4">
-                  {Array.from({ length: inviteFieldsCount }).map((_, index) => (
-                    <div
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`invitedAdmin-${index}`}
-                      className="flex items-start gap-2"
-                    >
-                      <div className="flex flex-1 flex-col gap-4 rounded-lg border border-border p-4">
-                        <FormField
-                          name={`invitedAdmins.${index}.name`}
-                          label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
-                        >
-                          {({ field }) => <Input {...field} placeholder="e.g. Jane Smith" />}
-                        </FormField>
-                        <FormField
-                          name={`invitedAdmins.${index}.email`}
-                          label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                          type="email"
-                        >
-                          {({ field }) => <Input {...field} placeholder="e.g. jane@example.com" />}
-                        </FormField>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
+              <div className="flex flex-col gap-1">
+                <label className="text-sm leading-normal font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  <FormattedMessage id="signup.inviteAdmins.teamMembers" defaultMessage="Team Members (up to 5)" />
+                </label>
+                {inviteFieldsCount > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from({ length: inviteFieldsCount }).map((_, index) => (
+                      <InviteUserModalTrigger
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`invite-admin-trigger-${index}`}
+                        title={<FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />}
+                        onAddMember={memberInfo => {
                           const newInvitedAdmins = [...(values.invitedAdmins || [])];
-                          newInvitedAdmins.splice(index, 1);
+                          newInvitedAdmins[index] = memberInfo;
                           setFieldValue('invitedAdmins', newInvitedAdmins);
-                          setInviteFieldsCount(inviteFieldsCount - 1);
                         }}
-                        className="mt-1 h-8 w-8 p-0"
+                        initialValue={values.invitedAdmins?.[index]}
                       >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
+                        <div className="flex cursor-pointer items-center rounded-full border px-1 py-1 text-sm transition-colors hover:border-blue-400 hover:bg-blue-100">
+                          <Avatar size={20} name={values.invitedAdmins?.[index].name} className="mr-2" fontSize={10} />
+                          <span>{values.invitedAdmins?.[index]?.name}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={e => {
+                              e.stopPropagation();
+                              const newInvitedAdmins = [...(values.invitedAdmins || [])];
+                              newInvitedAdmins.splice(index, 1);
+                              setFieldValue('invitedAdmins', newInvitedAdmins);
+                              setInviteFieldsCount(inviteFieldsCount - 1);
+                            }}
+                            className="ml-1 size-5"
+                          >
+                            <X className="size-3" />
+                          </Button>
+                        </div>
+                      </InviteUserModalTrigger>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <InviteUserModalTrigger
+                title={<FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />}
+                onAddMember={memberInfo => {
                   if (inviteFieldsCount < 5) {
                     setInviteFieldsCount(inviteFieldsCount + 1);
                     const newInvitedAdmins = [...(values.invitedAdmins || [])];
-                    newInvitedAdmins.push({ name: '', email: '' });
+                    newInvitedAdmins.push(memberInfo);
                     setFieldValue('invitedAdmins', newInvitedAdmins);
                   }
                 }}
-                disabled={inviteFieldsCount >= 5 || loading}
-                className="w-full"
-                data-cy="add-team-member"
               >
-                <Plus className="h-4 w-4" />
-                <FormattedMessage defaultMessage="Add Team Member" id="InviteTeamMember.add" />
-              </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={inviteFieldsCount >= 5 || loading}
+                  className="w-full"
+                  data-cy="add-team-member"
+                >
+                  <Plus className="h-4 w-4" />
+                  <FormattedMessage defaultMessage="Add Team Member" id="InviteTeamMember.add" />
+                </Button>
+              </InviteUserModalTrigger>
             </CardContent>
           </Card>
           <div className="grow sm:hidden" />
