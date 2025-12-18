@@ -12,7 +12,7 @@ import { type AccountReferenceInput, KycProvider } from '@/lib/graphql/types/v2/
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { cn } from '@/lib/utils';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
@@ -38,6 +38,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { ContributionsTab } from './AccountDetailContributionsTab';
 import { ExpensesTab } from './AccountDetailExpensesTab';
+import { AccountTaxFormStatus } from './AccountTaxFormStatus';
 import { communityAccountDetailQuery } from './queries';
 
 const associatedCollectiveColumns = intl => [
@@ -85,29 +86,6 @@ const associatedCollectiveColumns = intl => [
   },
 ];
 
-const SummaryCard = ({
-  title,
-  isLoading,
-  children,
-  className,
-}: {
-  title: string | React.ReactNode;
-  isLoading?: boolean;
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn('group flex flex-col gap-1 rounded-xl border transition-all', className)}>
-      <div className="w-full space-y-1 p-3">
-        <div className="flex items-center gap-1">
-          <span className="block text-sm font-medium tracking-tight">{title}</span>
-        </div>
-        <div>{isLoading ? <Skeleton className="h-6 w-48" /> : children}</div>
-      </div>
-    </div>
-  );
-};
-
 enum AccountDetailView {
   OVERVIEW = 'OVERVIEW',
   EXPENSES = 'EXPENSES',
@@ -134,7 +112,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
       accountId: props.account.id,
-      host: props.host,
+      hostSlug: props.host.slug,
     },
     // Since tabs data is loaded on demand, we don't want to refetch when switching tabs
     nextFetchPolicy: 'standby',
@@ -145,7 +123,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     () => [
       {
         id: AccountDetailView.OVERVIEW,
-        label: <FormattedMessage defaultMessage="Overview" id="9uOFF3" />,
+        label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
       },
       {
         id: AccountDetailView.EXPENSES,
@@ -191,6 +169,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
     ) || [];
   const legalName = account?.legalName !== account?.name && account?.legalName;
+  const taxForms = query.data?.host?.hostedLegalDocuments;
 
   return (
     <div className="flex h-full flex-col">
@@ -309,12 +288,12 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </h2>
                 <InfoList variant="compact">
                   <InfoListItem
-                    title={<FormattedMessage defaultMessage="Legal name" id="t9hfyI" />}
+                    title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                     value={account?.legalName}
                     isLoading={isLoading}
                   />
                   <InfoListItem
-                    title={<FormattedMessage defaultMessage="Display name" id="dOQCL8" />}
+                    title={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
                     value={account?.name || account?.slug}
                     isLoading={isLoading}
                   />
@@ -346,6 +325,29 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                     value={
                       account?.communityStats?.lastInteractionAt && (
                         <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
+                    value={
+                      taxForms[0] && (
+                        <div className="flex flex-col items-start gap-1">
+                          <AccountTaxFormStatus
+                            taxForm={taxForms[0]}
+                            host={query.data?.host}
+                            onRefetch={() => query.refetch()}
+                          />
+                          {taxForms?.totalCount > 1 && (
+                            <Link
+                              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account.slug}`)}
+                            >
+                              <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
+                            </Link>
+                          )}
+                        </div>
                       )
                     }
                     isLoading={isLoading}

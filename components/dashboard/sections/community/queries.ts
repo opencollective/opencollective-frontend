@@ -67,7 +67,7 @@ export const peopleHostDashboardQuery = gql`
 `;
 
 export const communityAccountDetailQuery = gql`
-  query CommunityAccountDetail($accountId: String!, $host: AccountReferenceInput!) {
+  query CommunityAccountDetail($accountId: String!, $hostSlug: String!) {
     account(id: $accountId) {
       id
       legacyId
@@ -89,7 +89,7 @@ export const communityAccountDetailQuery = gql`
       isVerified
       ... on Individual {
         email
-        kycStatus(requestedByAccount: $host) {
+        kycStatus(requestedByAccount: { slug: $hostSlug }) {
           manual {
             ...KYCVerificationFields
           }
@@ -115,7 +115,7 @@ export const communityAccountDetailQuery = gql`
           }
         }
       }
-      communityStats(host: $host) {
+      communityStats(host: { slug: $hostSlug }) {
         associatedCollectives {
           account {
             id
@@ -132,6 +132,38 @@ export const communityAccountDetailQuery = gql`
         }
         lastInteractionAt
         firstInteractionAt
+      }
+    }
+
+    host(slug: $hostSlug) {
+      id
+      legacyId
+      slug
+      hostedLegalDocuments(
+        type: US_TAX_FORM
+        account: { id: $accountId }
+        limit: 1
+        orderBy: { field: CREATED_AT, direction: DESC }
+      ) {
+        totalCount
+        nodes {
+          id
+          year
+          type
+          status
+          service
+          requestedAt
+          updatedAt
+          documentLink
+          isExpired
+          account {
+            id
+            name
+            slug
+            type
+            imageUrl(height: 128)
+          }
+        }
       }
     }
   }

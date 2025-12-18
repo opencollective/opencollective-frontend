@@ -15,7 +15,7 @@ import { InvalidateTaxFormModal } from './InvalidateTaxFormModal';
 import { UploadTaxFormModal } from './UploadTaxFormModal';
 
 export function useLegalDocumentActions(
-  host: Host,
+  host: Pick<Host, 'id'>,
   refetch: () => void,
   isUpgradeRequired: boolean,
 ): GetActions<LegalDocument> {

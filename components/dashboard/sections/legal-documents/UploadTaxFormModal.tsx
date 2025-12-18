@@ -34,7 +34,7 @@ export const UploadTaxFormModal = ({
   ...props
 }: {
   legalDocument: LegalDocument;
-  host: Account | Host;
+  host: Pick<Account | Host, 'id'>;
   onSuccess?: () => void;
 } & BaseModalProps) => {
   const intl = useIntl();

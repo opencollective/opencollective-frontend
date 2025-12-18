@@ -30,7 +30,7 @@ type LegalDocumentDrawerProps = {
   open: boolean;
   onClose: () => void;
   document?: LegalDocument;
-  host: Account;
+  host: Pick<Account, 'id' | 'slug'>;
   getActions: GetActions<LegalDocument>;
 };
 

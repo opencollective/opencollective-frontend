@@ -13,7 +13,6 @@ import { InfoList, InfoListItem, InfoListItemTitle } from '../../../ui/InfoList'
 import ActivityDescription from './ActivityDescription';
 import ActivityDetails, { activityHasDetails } from './ActivityDetails';
 import { ActivityUser } from './ActivityUser';
-import { Separator } from '@/components/ui/Separator';
 
 type ActivityDrawerProps = {
   open: boolean;

@@ -3,6 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../lib/utils';
+
 import { Skeleton } from './Skeleton';
 
 // ui library
