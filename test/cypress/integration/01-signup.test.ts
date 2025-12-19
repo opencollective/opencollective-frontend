@@ -123,8 +123,10 @@ describe('/signup', () => {
         cy.get('[data-cy="invite-admins-form"]').as('form');
         cy.get('@form').find('h1').contains('Invite your team');
         cy.getByDataCy('add-team-member').click();
-        cy.get('@form').find('input[name="invitedAdmins.0.name"]').type(`Leo ${randomSlug()}`);
-        cy.get('@form').find('input[name="invitedAdmins.0.email"]').type(inviteeEmail);
+        cy.getByDataCy('invite-user-modal-form').as('modalform');
+        cy.get('@modalform').find('input[name="name"]').type(`Leo ${randomSlug()}`);
+        cy.get('@modalform').find('input[name="email"]').type(inviteeEmail);
+        cy.get('@modalform').find('button').click();
         cy.get('@form').find('button[type="submit"]').click();
 
         cy.openEmail(
@@ -234,8 +236,10 @@ describe('/signup', () => {
         cy.get('[data-cy="invite-admins-form"]').as('form');
         cy.get('@form').find('h1').contains('Invite your team');
         cy.getByDataCy('add-team-member').click();
-        cy.get('@form').find('input[name="invitedAdmins.0.name"]').type(`Leo ${randomSlug()}`);
-        cy.get('@form').find('input[name="invitedAdmins.0.email"]').type(inviteeEmail);
+        cy.getByDataCy('invite-user-modal-form').as('modalform');
+        cy.get('@modalform').find('input[name="name"]').type(`Leo ${randomSlug()}`);
+        cy.get('@modalform').find('input[name="email"]').type(inviteeEmail);
+        cy.get('@modalform').find('button').click();
         cy.get('@form').find('button[type="submit"]').click();
 
         cy.openEmail(

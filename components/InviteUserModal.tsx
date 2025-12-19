@@ -75,12 +75,12 @@ export const InviteUserModalTrigger = ({
           initialValues={initialValue || {}}
           innerRef={formikRef}
         >
-          {() => (
+          {({ submitForm }) => (
             <Form className="flex flex-col gap-2" data-cy="invite-user-modal-form">
               <FormField name="name" label={<FormattedMessage defaultMessage="Name" id="Fields.name" />} />
               <FormField name="email" label={<FormattedMessage id="Email" defaultMessage="Email" />} type="email" />
               <DialogFooter>
-                <Button type="submit" className="mt-2 w-full">
+                <Button type="button" onClick={submitForm} className="mt-2 w-full">
                   {initialValue ? (
                     <FormattedMessage id="InviteUserModal.UpdateUser" defaultMessage="Edit User" />
                   ) : (
