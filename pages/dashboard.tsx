@@ -284,9 +284,8 @@ const DashboardPage = () => {
           <DashboardSidebar isLoading={isLoading} />
           <SidebarInset className="min-w-0">
             <DashboardTopbar />
+            {Boolean(notification) && <NotificationBar {...notification} />}
             <div className="flex-1 px-3 md:px-6">
-              {Boolean(notification) && <NotificationBar {...notification} />}
-
               <div
                 className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
                 data-cy="admin-panel-container"
