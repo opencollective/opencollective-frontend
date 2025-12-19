@@ -70,8 +70,8 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
         }
         description={
           <FormattedMessage
-            defaultMessage="Manual bank transfer contributions that have not been reconciled."
-            id="DL+ejA"
+            defaultMessage="Contributions with a manual payment that have not been reconciled."
+            id="NOpFmL"
           />
         }
       />
