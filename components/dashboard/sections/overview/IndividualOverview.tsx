@@ -12,7 +12,12 @@ import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
 import Image from '../../../Image';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../../../ui/DropdownMenu';
 import DashboardHeader from '../../DashboardHeader';
 import type { DashboardSectionProps } from '../../types';
 
@@ -73,13 +78,12 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleSetupGuideToggle(!showWelcomeGuide)}>
-                  {showWelcomeGuide ? (
-                    <FormattedMessage defaultMessage="Hide welcome guide" id="SetupGuide.HideWelcome" />
-                  ) : (
-                    <FormattedMessage defaultMessage="Show welcome guide" id="SetupGuide.ShowWelcome" />
-                  )}
-                </DropdownMenuItem>
+                <DropdownMenuCheckboxItem
+                  checked={showWelcomeGuide}
+                  onClick={() => handleSetupGuideToggle(!showWelcomeGuide)}
+                >
+                  <FormattedMessage defaultMessage="Display welcome guide" id="SetupGuide.DisplayWelcomeGuide" />
+                </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
           }
