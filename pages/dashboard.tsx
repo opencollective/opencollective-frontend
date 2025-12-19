@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -36,6 +37,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
 import ErrorPage from '@/components/ErrorPage';
 import Header from '@/components/Header';
+import I18nFormatters from '@/components/I18nFormatters';
 import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
 const messages = defineMessages({
@@ -86,6 +88,59 @@ const getNotification = (intl, account) => {
         description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
           type: account.type.toLowerCase(),
         }),
+      };
+    }
+  } else if (account?.type === CollectiveType.COLLECTIVE) {
+    if (!account?.host) {
+      return {
+        type: 'error',
+        inline: true,
+        title: (
+          <React.Fragment>
+            <FormattedMessage
+              defaultMessage="You have not applied to any fiscal host. You can not raise funds without a fiscal host."
+              id="Dashboard.NoHostNotification"
+            />
+            <Link
+              href={`/${account.slug}/accept-financial-contributions/host`}
+              className="ml-1 inline-flex items-center underline hover:no-underline"
+            >
+              <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />
+              <ArrowRight className="ml-1 inline h-4 w-4" />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    }
+    if (account?.hostApplication?.status === 'PENDING') {
+      return {
+        type: 'info',
+        inline: true,
+        title: (
+          <React.Fragment>
+            <span className="font-normal">
+              <FormattedMessage
+                defaultMessage="You applied to be hosted by <strong>{hostName}</strong> on <strong>{applicationData, date, medium}</strong>. Your application is being reviewed."
+                id="Dashboard.PendingHostApplicationNotification"
+                values={{
+                  ...I18nFormatters,
+                  hostName: account?.host.name,
+                  applicationData: new Date(account?.hostApplication.createdAt),
+                }}
+              />
+            </span>
+            <Link
+              href={getDashboardRoute(account, `/host?hostApplicationId=${account.hostApplication.id}`)}
+              className="ml-1 inline-flex items-center underline hover:no-underline"
+            >
+              <FormattedMessage
+                defaultMessage="See Application"
+                id="Dashboard.PendingHostApplicationNotificationLink"
+              />
+              <ArrowRight className="ml-1 inline h-4 w-4" />
+            </Link>
+          </React.Fragment>
+        ),
       };
     }
   }
