@@ -8,7 +8,7 @@ import type { WelcomeOrganizationQuery } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 import type { Category, Step } from '@/lib/welcome';
-import { INDIVIDUAL_CATEGORIES, ORG_CATEGORIES, sortSteps } from '@/lib/welcome';
+import { COLLECTIVE_CATEGORIES, INDIVIDUAL_CATEGORIES, ORGANIZATION_CATEGORIES, sortSteps } from '@/lib/welcome';
 
 import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { Drawer } from '@/components/Drawer';
@@ -29,6 +29,7 @@ const welcomeOrganizationQuery = gql`
       slug
       description
       currency
+      type
       legacyId
       longDescription
       isHost
@@ -58,6 +59,27 @@ const welcomeOrganizationQuery = gql`
         id
         type
       }
+      updates(limit: 1) {
+        nodes {
+          id
+        }
+      }
+      projects: childrenAccounts(accountType: [PROJECT], limit: 1) {
+        nodes {
+          id
+        }
+      }
+      approvedExpenses: expenses(status: APPROVED, direction: RECEIVED, limit: 1) {
+        nodes {
+          id
+        }
+      }
+      policies {
+        EXPENSE_POLICIES {
+          invoicePolicy
+          receiptPolicy
+        }
+      }
       ... on AccountWithPlatformSubscription {
         platformSubscription {
           isCurrent
@@ -71,6 +93,21 @@ const welcomeOrganizationQuery = gql`
       }
       ... on AccountWithContributions {
         contributionPolicy
+        tiers(limit: 1) {
+          nodes {
+            id
+          }
+        }
+      }
+      ... on AccountWithHost {
+        hostFeePercent
+        isApproved
+        approvedAt
+        hostApplication {
+          id
+          createdAt
+          status
+        }
       }
       ... on Organization {
         hasHosting
@@ -323,7 +360,7 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
             </CardAction>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(ORG_CATEGORIES).map(([key, category]) => (
+            {Object.entries(ORGANIZATION_CATEGORIES).map(([key, category]) => (
               <WelcomeCategoryButton
                 key={key}
                 {...category}
@@ -333,7 +370,76 @@ export const WelcomeOrganization = ({ account: _account, setOpen, open }) => {
             ))}
           </CardContent>
           <WelcomeDrawer
-            category={ORG_CATEGORIES[expandedCategory]}
+            category={ORGANIZATION_CATEGORIES[expandedCategory]}
+            account={data?.account}
+            onClose={() => setExpandedCategory(null)}
+            open={expandedCategory !== null}
+          />
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
+
+export const WelcomeCollective = ({ account: _account, setOpen, open }) => {
+  const intl = useIntl();
+  const { data } = useQuery<WelcomeOrganizationQuery>(welcomeOrganizationQuery, {
+    variables: { accountSlug: _account?.slug },
+    skip: !_account,
+
+    fetchPolicy: 'cache-and-network',
+  });
+  const { LoggedInUser } = useLoggedInUser();
+  // Undefined here means the initial state, after that we can set to null or a specific category ID
+  const [expandedCategory, setExpandedCategory] = useState<null | string>(null);
+
+  useEffect(() => {
+    if (LoggedInUser && open === undefined && data?.account) {
+      const showGuide = LoggedInUser?.shouldDisplaySetupGuide(data.account);
+      setOpen(showGuide !== false ? true : false);
+    }
+  }, [data?.account, open, setOpen, LoggedInUser]);
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">
+              <FormattedMessage
+                defaultMessage="What would like to do with the platform?"
+                id="Welcome.Organization.Title"
+              />
+            </CardTitle>
+            <CardDescription>
+              <FormattedMessage
+                defaultMessage="Get started with the basics or set up additional functionalities."
+                id="Welcome.Collective.Description"
+              />
+            </CardDescription>
+            <CardAction>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setOpen(false)}
+                aria-label={intl.formatMessage({ defaultMessage: 'Hide setup guide', id: 'SetupGuide.HideSetupGuide' })}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.entries(COLLECTIVE_CATEGORIES).map(([key, category]) => (
+              <WelcomeCategoryButton
+                key={key}
+                {...category}
+                account={data?.account}
+                onClick={() => setExpandedCategory(key)}
+              />
+            ))}
+          </CardContent>
+          <WelcomeDrawer
+            category={COLLECTIVE_CATEGORIES[expandedCategory]}
             account={data?.account}
             onClose={() => setExpandedCategory(null)}
             open={expandedCategory !== null}

@@ -72,17 +72,23 @@ const RedirectButton = ({
 export const sortSteps = (steps: Step[]) =>
   orderBy(compact(steps), step => (step.requiresUpgrade ? -1 : step.completed ? 1 : 0), ['desc', 'desc']);
 
-const ALL_STEPS: Record<string, MakeStep> = {
+const ALL_STEPS = {
   inviteAdmins: ({ account, router }) => ({
     id: 'invite-admins',
     title: <FormattedMessage defaultMessage="Invite additional admins" id="SetupGuide.InviteAdmins" />,
     completed: account.admins?.totalCount >= 2 || account.adminInvites?.length > 0,
-    description: (
-      <FormattedMessage
-        defaultMessage="We require there be at least two admins in the organizations. This guarantees that no one person holds exclusive access to the account. It also reduces the potential for fraudulent use of the account."
-        id="SetupGuide.InviteAdmins.Description"
-      />
-    ),
+    description:
+      account.type === 'COLLECTIVE' ? (
+        <FormattedMessage
+          defaultMessage="A collective works best with multiple administrators to help manage its activities. Invite at least one more admin to help you manage your Collective."
+          id="SetupGuide.InviteAdmins.CollectiveDescription"
+        />
+      ) : (
+        <FormattedMessage
+          defaultMessage="We require there be at least two admins in the organizations. This guarantees that no one person holds exclusive access to the account. It also reduces the potential for fraudulent use of the account."
+          id="SetupGuide.InviteAdmins.Description"
+        />
+      ),
     action: (
       <RedirectButton url={getDashboardRoute(account, 'team')} router={router}>
         <FormattedMessage defaultMessage="Invite Administrators" id="InviteAdministrators" />
@@ -202,6 +208,32 @@ const ALL_STEPS: Record<string, MakeStep> = {
       url: 'https://documentation.opencollective.com/fiscal-hosts/setting-up-a-fiscal-host/fiscal-host-policies',
     },
   }),
+  collectiveExpensePolicy: ({ account, router }) => ({
+    title: <FormattedMessage defaultMessage="Set your expense policies" id="SetupGuide.ExpensesPolicy" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Provide information and guidance to expense submitters about the types of expenses you are willing to pay, and what information you need to make the process easier."
+        id="SetupGuide.CollectiveExpensesPolicy.Description"
+      />
+    ),
+    id: 'collective-expenses-policy',
+    completed:
+      'policies' in account &&
+      !isEmpty(account.policies?.EXPENSE_POLICIES?.invoicePolicy) &&
+      !isEmpty(account.policies?.EXPENSE_POLICIES?.receiptPolicy),
+    action: (
+      <RedirectButton url={getDashboardRoute(account, 'policies#expenses')} router={router}>
+        <FormattedMessage defaultMessage="Set up expense policies" id="SetupGuide.Expenses" />
+      </RedirectButton>
+    ),
+
+    documentation: {
+      title: (
+        <FormattedMessage defaultMessage="Spending Money" id="SetupGuide.CollectiveExpensesPolicy.Documentation" />
+      ),
+      url: 'https://documentation.opencollective.com/collectives/spending-money',
+    },
+  }),
   chartOfAccounts: ({ account, router }) => ({
     title: <FormattedMessage defaultMessage="Set up your chart of accounts" id="SetupGuide.ChartOfAccounts" />,
     id: 'chart-of-accounts',
@@ -237,8 +269,11 @@ const ALL_STEPS: Record<string, MakeStep> = {
     title: <FormattedMessage defaultMessage="Create your public profile page" id="SetupGuide.PublicProfile" />,
     description: (
       <FormattedMessage
-        defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your Organization , your mission and what are your goals using the platform."
+        defaultMessage="Your public profile lets the world know you are active on the platform. It tells your story with a written description of your {type, select, ORGANIZATION {Organization} COLLECTIVE {Collective} other {Account}}, your mission and what are your goals using the platform."
         id="SetupGuide.PublicProfile.Description"
+        values={{
+          type: account.type,
+        }}
       />
     ),
     completed:
@@ -251,7 +286,6 @@ const ALL_STEPS: Record<string, MakeStep> = {
         <FormattedMessage defaultMessage="Edit your profile" id="SetupGuide.PublicProfile.Action" />
       </RedirectButton>
     ),
-
     documentation: {
       title: (
         <FormattedMessage defaultMessage="Editing your Profile Page" id="SetupGuide.PublicProfile.Documentation" />
@@ -385,7 +419,7 @@ const ALL_STEPS: Record<string, MakeStep> = {
       <RedirectButton
         url={getDashboardRoute(account, 'policies')}
         router={router}
-        disabled={!hasAccountMoneyManagement(account)}
+        disabled={account.type !== 'COLLECTIVE' && !hasAccountMoneyManagement(account)}
       >
         <FormattedMessage defaultMessage="Set up contribution policy" id="SetupGuide.ContributionPolicy.Action" />
       </RedirectButton>
@@ -457,9 +491,127 @@ const ALL_STEPS: Record<string, MakeStep> = {
       url: 'https://documentation.opencollective.com/fiscal-hosts/fiscal-hosts',
     },
   }),
-};
+  customizeProfileSections: ({ account, router }) => ({
+    id: 'customize-profile-sections',
+    title: <FormattedMessage defaultMessage="Customize profile sections" id="SetupGuide.CustomizeProfileSections" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Highlight important information on your public profile by customizing the sections displayed."
+        id="SetupGuide.CustomizeProfileSections.Description"
+      />
+    ),
+    completed: !isNil(account.settings?.collectivePage?.sections),
+    action: (
+      <RedirectButton url={getDashboardRoute(account, 'collective-page')} router={router}>
+        <FormattedMessage defaultMessage="Setup profile sections" id="SetupGuide.CustomizeProfileSections.Action" />
+      </RedirectButton>
+    ),
+  }),
+  findAndApplyHosting: ({ account, router }) => ({
+    id: 'find-and-apply-hosting',
+    title: <FormattedMessage defaultMessage="Apply to a Fiscal Host" id="collective.edit.host.findHost.title" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="If you don't have a fiscal host yet, you can find one that suits your needs on the platform and apply to them directly from your profile."
+        id="SetupGuide.FindAndApplyHosting.Description"
+      />
+    ),
+    completed: Boolean('hostApplication' in account && account.hostApplication),
+    action: (
+      <RedirectButton url={`/${account.slug}/accept-financial-contributions/host`} router={router}>
+        <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />
+      </RedirectButton>
+    ),
+    documentation: {
+      title: (
+        <FormattedMessage defaultMessage="Choosing a Fiscal Host" id="SetupGuide.FindAndApplyHosting.Documentation" />
+      ),
+      url: 'https://documentation.opencollective.com/collectives/choosing-a-fiscal-host',
+    },
+  }),
+  setupTiers: ({ account, router }) => ({
+    id: 'setup-tiers',
+    title: <FormattedMessage defaultMessage="Set up contribution tiers" id="SetupGuide.SetupTiers" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Contribution tiers allow you to define different levels of support for your contributors. Set up tiers to encourage more contributions and build a community around your organization."
+        id="SetupGuide.SetupTiers.Description"
+      />
+    ),
+    completed: 'tiers' in account && account.tiers.nodes?.length > 0,
+    action: (
+      <RedirectButton url={getDashboardRoute(account, 'tiers')} router={router}>
+        <FormattedMessage defaultMessage="Set up tiers" id="SetupGuide.SetupTiers.Action" />
+      </RedirectButton>
+    ),
+  }),
+  publishUpdate: ({ account, router }) => ({
+    id: 'publish-update',
+    title: <FormattedMessage defaultMessage="Publish your first update" id="SetupGuide.PublishUpdate" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Keep your community informed by publishing updates about your organization's activities, milestones, and news."
+        id="SetupGuide.PublishUpdate.Description"
+      />
+    ),
+    completed: 'updates' in account && account.updates.nodes?.length > 0,
+    action: (
+      <RedirectButton url={getDashboardRoute(account, 'updates')} router={router}>
+        <FormattedMessage defaultMessage="Publish update" id="SetupGuide.PublishUpdate.Action" />
+      </RedirectButton>
+    ),
+    documentation: {
+      title: <FormattedMessage defaultMessage="Updates and Contact" id="SetupGuide.PublishUpdate.Documentation" />,
+      url: 'https://documentation.opencollective.com/advanced/keeping-your-community-updated/updates-and-contact',
+    },
+  }),
+  createProject: ({ account, router }) => ({
+    id: 'create-project',
+    title: <FormattedMessage defaultMessage="Create your first project" id="SetupGuide.CreateProject" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Projects help you organize your work and showcase specific initiatives within your collective. Create a project to highlight your efforts and engage your community."
+        id="SetupGuide.CreateProject.Description"
+      />
+    ),
+    completed: 'projects' in account && account.projects.nodes?.length > 0,
+    action: (
+      <RedirectButton url={getDashboardRoute(account, 'accounts')} router={router}>
+        <FormattedMessage defaultMessage="Create project" id="SetupGuide.CreateProject.Action" />
+      </RedirectButton>
+    ),
+    documentation: {
+      title: (
+        <FormattedMessage defaultMessage="Creating and Managing Projects" id="SetupGuide.CreateProject.Documentation" />
+      ),
+      url: 'https://documentation.opencollective.com/collectives/managing-money/projects',
+    },
+  }),
+  approveExpense: ({ account, router }) => ({
+    id: 'approve-expense',
+    title: <FormattedMessage defaultMessage="Approve your first expense" id="SetupGuide.ApproveExpense" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Expenses are requests for payment submitted by contributors. Approving expenses is a key step in managing your organization's finances."
+        id="SetupGuide.ApproveExpense.Description"
+      />
+    ),
+    completed: 'approvedExpenses' in account && account.approvedExpenses.nodes?.length > 0,
+    action: (
+      <RedirectButton url={getDashboardRoute(account, 'expenses')} router={router}>
+        <FormattedMessage defaultMessage="Approve expense" id="SetupGuide.ApproveExpense.Action" />
+      </RedirectButton>
+    ),
+    documentation: {
+      title: (
+        <FormattedMessage defaultMessage="Receiving incoming expenses" id="SetupGuide.ApproveExpense.Documentation" />
+      ),
+      url: 'https://documentation.opencollective.com/collectives/spending-money#receiving-incoming-expenses',
+    },
+  }),
+} as const;
 
-export const ORG_CATEGORIES = {
+export const ORGANIZATION_CATEGORIES = {
   platformBasics: {
     image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
     title: <FormattedMessage defaultMessage="Platform Basics" id="Welcome.Organization.PlatformBasics" />,
@@ -555,6 +707,63 @@ export const ORG_CATEGORIES = {
       ALL_STEPS.hostApplications,
       ALL_STEPS.chartOfAccountsForCollectives,
     ],
+  },
+};
+
+export const COLLECTIVE_CATEGORIES = {
+  setupProfile: {
+    image: <Image src="/static/images/welcome/eye.png" alt="SetupProfile" width={40} height={40} />,
+    title: <FormattedMessage defaultMessage="Setup Public Profile" id="Welcome.Collective.SetupProfile" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Customise your public profile and increase discoverability"
+        id="Welcome.Collective.SetupProfile.Description"
+      />
+    ),
+    longDescription: (
+      <FormattedMessage
+        defaultMessage="You can start using some functionalities without setting anything up. Read about their documentation for the best practices."
+        id="Welcome.Organization.PlatformBasics.LongDescription"
+      />
+    ),
+    className: 'bg-blue-50',
+    steps: [ALL_STEPS.profilePage, ALL_STEPS.customizeProfileSections, ALL_STEPS.publishUpdate],
+  },
+  fundraise: {
+    className: 'bg-yellow-50',
+    image: <Image src="/static/images/welcome/jar.png" alt="FundRaise" width={42} height={40} />,
+    title: <FormattedMessage defaultMessage="Fundraise" id="Welcome.Collective.Fundraise" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Start crowdfunding and raise funds for your collective"
+        id="Welcome.Collective.Fundraise.Description"
+      />
+    ),
+    longDescription: (
+      <FormattedMessage
+        defaultMessage="Find a suitable Fiscal Host and collect contributions from individuals and organizations to fund your collective's activities."
+        id="Welcome.Collective.Fundraise.LongDescription"
+      />
+    ),
+    steps: [ALL_STEPS.findAndApplyHosting, ALL_STEPS.setupTiers, ALL_STEPS.contributionPolicy, ALL_STEPS.createProject],
+  },
+  spendMoney: {
+    className: 'bg-green-50',
+    image: <Image src="/static/images/welcome/stars.png" alt="SpendMoney" width={42} height={40} />,
+    title: <FormattedMessage defaultMessage="Spend Your Money" id="Welcome.Collective.SpendMoney" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Receive expenses and approve them for payment"
+        id="Welcome.Collective.SpendMoney.Description"
+      />
+    ),
+    longDescription: (
+      <FormattedMessage
+        defaultMessage="Manage expense submissions from your community, review them and approve them for payment to effectively utilize the funds raised."
+        id="Welcome.Collective.SpendMoney.LongDescription"
+      />
+    ),
+    steps: [ALL_STEPS.inviteAdmins, ALL_STEPS.collectiveExpensePolicy, ALL_STEPS.approveExpense],
   },
 };
 
