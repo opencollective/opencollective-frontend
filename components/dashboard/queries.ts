@@ -132,6 +132,12 @@ export const adminPanelQuery = gql`
       ... on AccountWithHost {
         hostFeePercent
         isApproved
+        approvedAt
+        hostApplication {
+          id
+          createdAt
+          status
+        }
         host {
           id
           requiredLegalDocuments

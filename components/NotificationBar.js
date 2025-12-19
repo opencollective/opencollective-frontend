@@ -69,7 +69,7 @@ const getBackgroundColor = type => {
 
 const NotificationBar = ({
   title,
-  description,
+  description = undefined,
   type,
   actions = undefined,
   inline = false,
