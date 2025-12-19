@@ -7,7 +7,12 @@ import { hasAccountMoneyManagement } from '@/lib/collective';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu';
 
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
@@ -87,13 +92,12 @@ export function OrgOverview() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
-                {showSetupGuide ? (
-                  <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-                ) : (
-                  <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-                )}
-              </DropdownMenuItem>
+              <DropdownMenuCheckboxItem
+                checked={showSetupGuide}
+                onClick={() => handleSetupGuideToggle(!showSetupGuide)}
+              >
+                <FormattedMessage defaultMessage="Display setup guide" id="SetupGuide.DisplaySetupGuide" />
+              </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
         }
