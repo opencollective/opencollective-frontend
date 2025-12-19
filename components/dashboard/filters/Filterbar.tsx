@@ -34,8 +34,12 @@ function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   return { displayedFilters, remainingFilters };
 }
 
-const renderFilter = ({ filters, values, key, activeViewId, intl, meta, setFilter }) => {
+const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilters, intl, meta, setFilter }) => {
   const filter = filters[key];
+  const view = views?.find(v => v.id === activeViewId);
+  const filterPartOfView = Boolean(view?.filter[key]);
+  const highlighted = !filterPartOfView;
+  const locked = lockViewFilters && filterPartOfView;
 
   if (!filter) {
     return null;
@@ -46,7 +50,7 @@ const renderFilter = ({ filters, values, key, activeViewId, intl, meta, setFilte
         value={values[key]}
         labelMsg={filter.labelMsg}
         onChange={val => setFilter(key, val)}
-        isViewActive={!!activeViewId}
+        highlighted={highlighted}
         intl={intl}
         meta={meta}
       />
@@ -59,8 +63,9 @@ const renderFilter = ({ filters, values, key, activeViewId, intl, meta, setFilte
         values={values}
         filters={filters}
         setFilter={setFilter}
-        isViewActive={!!activeViewId}
+        highlighted={highlighted}
         meta={meta}
+        locked={locked}
       />
     );
   }
@@ -80,6 +85,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   hideSeparator,
   primaryFilters,
   primaryFilterClassName,
+  lockViewFilters,
 }: {
   values: FV;
   filters: FilterComponentConfigs<FV, FM>;
@@ -94,6 +100,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   hideSeparator?: boolean;
   primaryFilters?: string[];
   primaryFilterClassName?: string;
+  lockViewFilters?: boolean;
 }) {
   const intl = useIntl();
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
@@ -127,7 +134,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
       {Boolean(filtersOnTop.length) && (
         <div className={cn('repeat(auto-fit, minmax(200px, 1fr)) grid gap-2 [&_input]:w-full', primaryFilterClassName)}>
           {filtersOnTop.map(key => {
-            return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter });
+            return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter, views, lockViewFilters });
           })}
           {primaryFilters.includes(sortFilterKey) && (
             <sortFilter.StandaloneComponent
@@ -141,7 +148,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
       <div className="flex flex-wrap justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           {regularFilters.map(key => {
-            return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter });
+            return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter, views, lockViewFilters });
           })}
 
           {remainingFilters.length > 0 && (

@@ -25,7 +25,8 @@ export type FilterComponentProps<FilterValue, Meta = Record<string, any>> = {
   intl: IntlShape;
   meta?: Meta;
   labelMsg?: MessageDescriptor;
-  isViewActive?: boolean;
+  highlighted?: boolean;
+  locked?: boolean;
   valueRenderer?: ValueRenderer<FilterValue, Meta>;
 };
 

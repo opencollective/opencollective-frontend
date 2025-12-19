@@ -103,7 +103,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
 
   return (
     <React.Fragment>
-      <Filterbar {...queryFilter} views={views} />
+      <Filterbar {...queryFilter} {...(views && { views })} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
