@@ -1,11 +1,14 @@
-import React from 'react';
 import type { TransformCallback } from 'interweave';
 import { Markup } from 'interweave';
+import { QRCodeSVG } from 'qrcode.react';
+import React from 'react';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
+import generateQrCode from 'sepa-payment-qr-code';
 
 import { formatCurrency } from '@/lib/currency-utils';
 import type { Amount } from '@/lib/graphql/types/v2/graphql';
+import { Currency } from '@/lib/graphql/types/v2/schema';
 import { cn } from '@/lib/utils';
 
 import type { TEMPLATE_VARIABLES } from './constants';
@@ -75,6 +78,21 @@ const replaceVariablesInHTML = (
   });
 };
 
+/** Creates an EPC QR-Code */
+export const formatQrCode = (bankAccount, amount, reference) => {
+  if (!bankAccount?.details?.IBAN || amount.currency !== Currency.EUR) {
+    return;
+  }
+  const data = {
+    name: bankAccount.accountHolderName,
+    iban: bankAccount.details.IBAN,
+    bic: bankAccount.details.BIC,
+    amount: amount.valueInCents / 100,
+    unstructuredReference: reference,
+  };
+  return generateQrCode(data);
+};
+
 /**
  * Component to render custom payment method instructions as HTML.
  * Supports variable replacement (e.g., {account}, {amount}, {reference}, {collective})
@@ -94,9 +112,18 @@ export const CustomPaymentMethodInstructions = ({
     return null;
   }
 
+  const qrCodeData = formatQrCode(values.accountDetails, values.amount, values.OrderId.toString());
+
   return (
     <div className={cn('whitespace-pre-wrap [&_a]:text-blue-600 [&_a:hover]:underline', className)}>
       <Markup content={rendered} transform={transform} />
+      {qrCodeData && (
+        <div>
+          <br />
+          <span>If your banking app supports QR codes, scan the code below:</span>
+          <QRCodeSVG value={qrCodeData} size={256} level="L" includeMargin data-cy="qr-code" />
+        </div>
+      )}
     </div>
   );
 };
