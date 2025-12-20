@@ -7,7 +7,9 @@ import { Edit, X } from 'lucide-react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
+import { formatCurrency } from '../../../lib/currency-utils';
 import { gql } from '../../../lib/graphql/helpers';
+import { Currency } from '../../../lib/graphql/types/v2/schema';
 import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
@@ -84,11 +86,16 @@ const editBankTransferMutation = gql`
 `;
 
 const renderBankInstructions = (instructions, bankAccountInfo) => {
+  const amountInCents = 3000;
+  const currency = bankAccountInfo?.currency || Currency.USD;
+  const formattedAmount = formatCurrency(amountInCents, currency, {
+    currencyDisplay: 'code',
+  });
   const formattedValues = {
     account: bankAccountInfo ? formatAccountDetails(bankAccountInfo) : '',
     reference: '76400',
     OrderId: '76400',
-    amount: '30,00 USD',
+    amount: formattedAmount,
     collective: 'acme',
   };
 
