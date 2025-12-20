@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import { formatCurrency } from '../../lib/currency-utils';
+import { Currency } from '../../lib/graphql/types/v2/schema';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
 
 import Container from '../Container';
@@ -83,11 +85,16 @@ class UpdateBankDetailsForm extends React.Component {
   }
 
   renderInstructions() {
+    const amountInCents = 3000;
+    const currency = this.props.bankAccount?.currency || Currency.USD;
+    const formattedAmount = formatCurrency(amountInCents, currency, {
+      currencyDisplay: 'code',
+    });
     const formattedValues = {
       account: this.props.bankAccount ? formatAccountDetails(this.props.bankAccount) : '',
       reference: '76400',
       OrderId: '76400',
-      amount: '30,00 USD',
+      amount: formattedAmount,
       collective: 'acme',
     };
 
