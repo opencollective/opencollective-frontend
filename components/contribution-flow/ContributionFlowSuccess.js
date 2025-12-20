@@ -4,6 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { themeGet } from '@styled-system/theme-get';
 import { get, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
+import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -14,7 +15,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
-import { formatManualInstructions } from '../../lib/payment-method-utils';
+import { formatManualInstructions, formatQrCode } from '../../lib/payment-method-utils';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {
@@ -311,6 +312,7 @@ class ContributionFlowSuccess extends React.Component {
   renderBankTransferInformation = () => {
     const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
+    const reference = get(this.props.data, 'order.legacyId', null);
 
     const amount = get(this.props.data, 'order.amount.valueInCents', 0);
     const platformTipAmount = get(this.props.data, 'order.platformTipAmount.valueInCents', 0);
@@ -321,9 +323,11 @@ class ContributionFlowSuccess extends React.Component {
       currencyDisplay: 'code',
     });
 
+    const qrCodeData = formatQrCode(bankAccount, totalAmount, currency, reference);
+
     const formattedValues = {
       account: bankAccount ? formatAccountDetails(bankAccount) : '',
-      reference: get(this.props.data, 'order.legacyId', null),
+      reference: reference,
       amount: formattedAmount,
       collective: get(this.props.data, 'order.toAccount.name', null),
       // Deprecated but still needed for compatibility
@@ -346,6 +350,9 @@ class ContributionFlowSuccess extends React.Component {
             </H3>
             <Flex mt={2}>
               <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formattedValues)}</Flex>
+              {qrCodeData && (
+                <QRCode value={qrCodeData} renderAs="svg" size={256} level="L" includeMargin data-cy="qr-code" />
+              )}
             </Flex>
           </BankTransferInfoContainer>
         )}
