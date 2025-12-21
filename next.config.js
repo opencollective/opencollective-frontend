@@ -8,6 +8,7 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
+const { default: supportedLanguages } = require('./lib/i18n/supported-languages');
 
 const isHeroku = process.env.IS_HEROKU === 'true';
 
@@ -38,55 +39,28 @@ const nextConfig = {
       'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
     ],
   },
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader', 'markdown-loader'],
+        as: '*.js',
+      },
+    },
+  },
   webpack: (config, { webpack, isServer, dev }) => {
-    config.resolve.alias['@sentry/replay'] = false;
-    config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
+    // NOTE: The following webpack configuration has been partially migrated to turbopack:
+    // - Resolve aliases: Moved to turbopack.resolveAlias
+    // - .md loader: Moved to turbopack.rules
+    //
+    // The following webpack-specific features cannot be migrated to turbopack:
+    // - Plugins: IgnorePlugin, ContextReplacementPlugin, EnvironmentPlugin, CircularDependencyPlugin,
+    //   DefinePlugin, CopyPlugin, WebpackManifestPlugin, codecovWebpackPlugin
+    // - Asset loaders: file-loader, url-loader, html-loader (Turbopack handles assets differently)
+    // - Custom module rules for images, HTML, and .mjs files
+    // - Optimization split chunks configuration
+    //
 
-    config.plugins.push(
-      // Ignore __tests__
-      new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
-      // Only include our supported locales
-      new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /en|fr|es|ja/),
-      // Set extra environment variables accessible through process.env.*
-      // Will be replaced by webpack by their values!
-      new webpack.EnvironmentPlugin({
-        OC_ENV: null,
-        API_KEY: null,
-        API_URL: null,
-        PDF_SERVICE_URL: null,
-        ML_SERVICE_URL: null,
-        DISABLE_MOCK_UPLOADS: false,
-        DYNAMIC_IMPORT: true,
-        WEBSITE_URL: null,
-        NEXT_IMAGES_URL: null,
-        REST_URL: null,
-        SENTRY_DSN: null,
-        WISE_PLATFORM_COLLECTIVE_SLUG: null,
-        WISE_ENVIRONMENT: 'sandbox',
-        HCAPTCHA_SITEKEY: false,
-        TURNSTILE_SITEKEY: false,
-        CAPTCHA_ENABLED: false,
-        CAPTCHA_PROVIDER: 'HCAPTCHA',
-        SENTRY_TRACES_SAMPLE_RATE: null,
-        OC_APPLICATION: null,
-        HEROKU_SLUG_COMMIT: null,
-        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
-        DISABLE_CONTACT_FORM: false,
-      }),
-    );
-
-    if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      const CircularDependencyPlugin = require('circular-dependency-plugin');
-      config.plugins.push(
-        new CircularDependencyPlugin({
-          include: /components|pages|server/,
-          failOnError: true,
-          cwd: process.cwd(),
-          exclude: /node_modules/,
-        }),
-      );
-    }
-
+    // TODO: Didn't find a way to migrate this to turbopack yet, there's a potential solution if we migrate to swc: https://www.apollographql.com/docs/react/development-testing/reducing-bundle-size
     if (!dev) {
       config.plugins.push(
         new webpack.DefinePlugin({
@@ -144,11 +118,6 @@ const nextConfig = {
         }),
       );
     }
-
-    config.module.rules.push({
-      test: /\.md$/,
-      use: ['raw-loader', 'markdown-loader'],
-    });
 
     // Configuration for images
     config.module.rules.unshift({
@@ -211,6 +180,42 @@ const nextConfig = {
     }
 
     return config;
+  },
+  // Transfer public environment variables
+  env: {
+    PORT: process.env.PORT ?? 3000,
+    HOSTNAME: process.env.HOSTNAME ?? 'localhost',
+    API_KEY: process.env.API_KEY ?? '09u624Pc9F47zoGLlkg1TBSbOl2ydSAq',
+    API_URL: process.env.API_URL ?? 'https://api-staging.opencollective.com',
+    IMAGES_URL: process.env.IMAGES_URL ?? 'https://images-staging.opencollective.com',
+    WEBSITE_URL: process.env.WEBSITE_URL ?? 'http://localhost:3000',
+    REST_URL: process.env.REST_URL ?? 'https://rest-staging.opencollective.com',
+    PDF_SERVICE_URL: process.env.PDF_SERVICE_URL ?? 'https://pdf-staging.opencollective.com',
+    ML_SERVICE_URL: process.env.ML_SERVICE_URL ?? 'https://ml.opencollective.com',
+    DISABLE_MOCK_UPLOADS: process.env.DISABLE_MOCK_UPLOADS ?? false,
+    PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT ?? 'sandbox',
+    STRIPE_KEY: process.env.STRIPE_KEY ?? 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',
+    GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY ?? 'AIzaSyAZJnIxtBw5bxnu2QoCUiLCjV1nk84Vnk0',
+    RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY ?? '6LcyeXoUAAAAAFtdHDZfsxncFUkD9NqydqbIFcCK',
+    HCAPTCHA_SITEKEY: process.env.HCAPTCHA_SITEKEY ?? '10000000-ffff-ffff-ffff-000000000001',
+    TURNSTILE_SITEKEY: process.env.TURNSTILE_SITEKEY ?? '0x4AAAAAAAS6okaJ_ThVJqYq',
+    CAPTCHA_ENABLED: process.env.CAPTCHA_ENABLED ?? false,
+    CAPTCHA_PROVIDER: process.env.CAPTCHA_PROVIDER ?? 'HCAPTCHA',
+    CLIENT_ANALYTICS_ENABLED: process.env.CLIENT_ANALYTICS_ENABLED ?? false,
+    CLIENT_ANALYTICS_DOMAIN: process.env.CLIENT_ANALYTICS_DOMAIN ?? 'localhost',
+    CLIENT_ANALYTICS_EXCLUSIONS:
+      process.env.CLIENT_ANALYTICS_EXCLUSIONS ?? '/**/banner.html, /**/contribute/button, /**/donate/button',
+    WISE_PLATFORM_COLLECTIVE_SLUG: process.env.WISE_PLATFORM_COLLECTIVE_SLUG ?? 'opencollective-host',
+    OC_APPLICATION: process.env.OC_APPLICATION ?? 'frontend',
+    OC_ENV: process.env.OC_ENV ?? 'development',
+    OC_SECRET: process.env.OC_SECRET ?? crypto.randomBytes(16).toString('hex'),
+    WISE_ENVIRONMENT: process.env.WISE_ENVIRONMENT ?? 'sandbox',
+    API_PROXY: process.env.API_PROXY ?? true,
+    SENTRY_TRACES_SAMPLE_RATE: process.env.SENTRY_TRACES_SAMPLE_RATE ?? null,
+    LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES:
+      process.env.LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES ?? false,
+    DISABLE_CONTACT_FORM: process.env.DISABLE_CONTACT_FORM ?? false,
+    NEW_PRICING: process.env.NEW_PRICING ?? false,
   },
   async rewrites() {
     return REWRITES;
