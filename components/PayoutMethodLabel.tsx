@@ -62,10 +62,11 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
   }
 
   return (
-    <div className={cn('flex min-h-8 min-w-0 items-center gap-2 whitespace-nowrap', props.className)}>
+    <div className={cn('flex min-h-8 min-w-0 items-center gap-2', props.className)}>
       {props.showIcon && <PayoutMethodIcon size={props.iconSize} payoutMethod={pm} />}
-      <span className="truncate">
-        {defaultLabel} {customLabel ? <span className="text-muted-foreground">{customLabel}</span> : null}
+      <span className="truncate whitespace-break-spaces sm:whitespace-nowrap">
+        {defaultLabel}{' '}
+        {customLabel ? <span className="whitespace-nowrap text-muted-foreground">{customLabel}</span> : null}
       </span>
     </div>
   );
