@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { addAuthTokenToHeader } from '../../../../lib/api';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { Host } from '../../../../lib/graphql/types/v2/schema';
-import { getWebsiteUrl } from '../../../../lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';
 import { I18nSupportLink } from '../../../I18nFormatters';
@@ -47,7 +46,7 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
   const handlePayBatch = async () => {
     const expenseIds = scheduledExpenses.data.expenses.nodes.map(e => e.id);
     try {
-      await request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
+      await request(`${process.env.API_URL}/services/transferwise/pay-batch`, {
         method: 'POST',
         body: JSON.stringify({ expenseIds, hostId: props.host.id }),
         headers: addAuthTokenToHeader(),

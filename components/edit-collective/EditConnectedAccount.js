@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
+import { isValidUrl, parseToBoolean } from '../../lib/utils';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { Box, Flex } from '../Grid';
@@ -105,7 +105,7 @@ class EditConnectedAccount extends React.Component {
 
     // Redirect to OAuth flow
     if (service === 'github') {
-      const redirectUrl = `${getWebsiteUrl()}/api/connected-accounts/${service}/oauthUrl`;
+      const redirectUrl = `${process.env.API_URL}/connected-accounts/${service}/oauthUrl`;
       const redirectUrlParams = new URLSearchParams({ CollectiveId: collective.id });
       const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
       if (accessToken) {
