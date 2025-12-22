@@ -39,10 +39,15 @@ function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     cell: ({ row }) => {
       const account = row.original.account;
+      let displayName = account.name;
+      if (account.legalName) {
+        displayName = `${displayName} (${account.legalName})`;
+      }
+
       return (
         <div className="flex items-center text-nowrap">
           <Avatar size={24} collective={account} mr={2} />
-          {account.name}
+          {displayName}
         </div>
       );
     },

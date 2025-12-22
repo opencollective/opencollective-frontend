@@ -33,6 +33,12 @@ export const kycVerificationFields = gql`
     requestedAt
     verifiedAt
     revokedAt
+    createdByUser {
+      id
+      name
+      slug
+      type
+    }
     verifiedData {
       legalName
       legalAddress
