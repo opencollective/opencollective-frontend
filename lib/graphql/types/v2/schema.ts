@@ -2811,6 +2811,7 @@ export type CommunityStats = {
   __typename?: 'CommunityStats';
   activities?: Maybe<ActivityCollection>;
   associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedCollective>>>;
+  associatedOrganizations?: Maybe<Array<Maybe<CommunityAssociatedCollective>>>;
   firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   relations: Array<Maybe<CommunityRelationType>>;
