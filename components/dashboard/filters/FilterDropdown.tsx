@@ -191,7 +191,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, highlight
         <TooltipContent align="start">
           <FormattedMessage
             defaultMessage="{filterLabel} can't be modified in this view"
-            id="LockedFilter"
+            id="rO7VnP"
             values={{ filterLabel }}
           />
         </TooltipContent>

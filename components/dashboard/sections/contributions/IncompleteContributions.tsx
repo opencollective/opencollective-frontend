@@ -15,12 +15,9 @@ import ContributionsTable from './ContributionsTable';
 import type { FilterMeta } from './filters';
 import { ContributionAccountingCategoryKinds, filters, schema as baseSchema, toVariables } from './filters';
 import { dashboardOrdersQuery } from './queries';
-import { isMulti } from '@/lib/filters/schemas';
-import z from 'zod';
 
 const schema = baseSchema.extend({
   hostContext: hostContextFilter.schema,
-  status: isMulti(z.nativeEnum(OrderStatus)).optional(),
 });
 
 enum IncompleteContributionsView {
