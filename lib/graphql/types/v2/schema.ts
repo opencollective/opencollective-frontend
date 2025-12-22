@@ -7829,6 +7829,8 @@ export type KycVerification = {
   __typename?: 'KYCVerification';
   /** The account that is verified */
   account: Account;
+  /** The user who added this account to the KYC verification list */
+  createdByUser?: Maybe<Account>;
   /** Unique identifier for this KYC verification */
   id: Scalars['String']['output'];
   permissions: KycVerificationPermissions;

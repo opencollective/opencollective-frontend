@@ -9,6 +9,7 @@ import type {
 } from '@/lib/graphql/types/v2/graphql';
 import type { KycProvider } from '@/lib/graphql/types/v2/schema';
 
+import { AccountHoverCard } from '@/components/AccountHoverCard';
 import Avatar from '@/components/Avatar';
 import DateTime from '@/components/DateTime';
 import { actionsColumn, DataTable } from '@/components/table/DataTable';
@@ -20,6 +21,7 @@ import { KYCVerificationStatusBadge } from '../KYCVerificationStatusBadge';
 
 export type KYCVerificationRow = KycVerificationCollectionFieldsFragment['nodes'][number] & {
   account: AccountHoverCardFieldsFragment;
+  createdByUser?: AccountHoverCardFieldsFragment;
 };
 
 function dateCell({ cell }) {
@@ -39,11 +41,24 @@ function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     cell: ({ row }) => {
       const account = row.original.account;
+      const mainName = account.legalName || account.name;
+      const hasSecondaryName = account.legalName && account.name && account.legalName !== account.name;
+      const secondaryName = hasSecondaryName && (account.name || account.legalName);
       return (
-        <div className="flex items-center text-nowrap">
-          <Avatar size={24} collective={account} mr={2} />
-          {account.name}
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center text-nowrap">
+              <Avatar size={24} collective={account} mr={2} />
+              <div className="flex flex-col">
+                <span className="max-w-[200px] truncate">{mainName}</span>
+                {secondaryName && (
+                  <span className="max-w-[200px] truncate text-xs text-slate-500 italic">{secondaryName}</span>
+                )}
+              </div>
+            </div>
+          }
+        />
       );
     },
   };
@@ -76,7 +91,30 @@ function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
     cell: ({ cell }) => <KYCVerificationProviderBadge provider={cell.getValue() as KycProvider} />,
   };
 
-  return [account, status, provider, requestedAt, verifiedAt, revokedAt, actionsColumn];
+  const createdByUser: ColumnDef<KYCVerificationRow> = {
+    accessorKey: 'createdByUser',
+    header: intl.formatMessage({ defaultMessage: 'Added by', id: 'KYC.AddedBy' }),
+    cell: ({ row }) => {
+      const createdByUser = row.original.createdByUser;
+      if (!createdByUser) {
+        return <span className="text-slate-500 italic">-</span>;
+      }
+
+      return (
+        <AccountHoverCard
+          account={createdByUser}
+          trigger={
+            <div className="flex items-center text-nowrap">
+              <Avatar size={24} collective={createdByUser} mr={2} />
+              <span className="max-w-[200px] truncate">{createdByUser.name}</span>
+            </div>
+          }
+        />
+      );
+    },
+  };
+
+  return [account, status, provider, createdByUser, requestedAt, verifiedAt, revokedAt, actionsColumn];
 }
 
 type KYCVerificationRequestsTableProps = {
