@@ -770,7 +770,7 @@ class ContributionFlow extends React.Component {
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean(
       (stepProfile && LoggedInUser) ||
-        (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier, collective)),
+      (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier, collective)),
     );
 
     const steps = [

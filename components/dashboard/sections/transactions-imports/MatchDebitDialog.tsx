@@ -715,14 +715,14 @@ export const MatchDebitDialog = ({
 
               {Boolean(
                 selectedExpense &&
-                  [
-                    ExpenseStatus.PENDING,
-                    ExpenseStatus.DRAFT,
-                    ExpenseStatus.INVITE_DECLINED,
-                    ExpenseStatus.REJECTED,
-                    ExpenseStatus.SPAM,
-                    ExpenseStatus.UNVERIFIED,
-                  ].includes(selectedExpense.status),
+                [
+                  ExpenseStatus.PENDING,
+                  ExpenseStatus.DRAFT,
+                  ExpenseStatus.INVITE_DECLINED,
+                  ExpenseStatus.REJECTED,
+                  ExpenseStatus.SPAM,
+                  ExpenseStatus.UNVERIFIED,
+                ].includes(selectedExpense.status),
               ) && (
                 <MessageBox type="warning" className="mt-4">
                   <strong>
