@@ -195,10 +195,10 @@ const getDefaultExchangeRate = (itemCurrency, expenseCurrency) => ({
 const isValidExchangeRate = (exchangeRate, itemCurrency, expenseCurrency) => {
   return Boolean(
     exchangeRate &&
-      exchangeRate.source === 'USER' &&
-      exchangeRate.fromCurrency === itemCurrency &&
-      exchangeRate.toCurrency === expenseCurrency &&
-      exchangeRate.value,
+    exchangeRate.source === 'USER' &&
+    exchangeRate.fromCurrency === itemCurrency &&
+    exchangeRate.toCurrency === expenseCurrency &&
+    exchangeRate.value,
   );
 };
 
@@ -230,11 +230,11 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
     const existingExchangeRate = get(item, 'amountV2.exchangeRate');
     return Boolean(
       existingExchangeRate &&
-        existingExchangeRate.source === 'OPENCOLLECTIVE' &&
-        existingExchangeRate.fromCurrency === itemCurrency &&
-        existingExchangeRate.toCurrency === expenseCurrency &&
-        existingExchangeRate.value &&
-        dayjs(existingExchangeRate?.date).isSame(dayjs(standardizeExpenseItemIncurredAt(get(item, 'incurredAt')))),
+      existingExchangeRate.source === 'OPENCOLLECTIVE' &&
+      existingExchangeRate.fromCurrency === itemCurrency &&
+      existingExchangeRate.toCurrency === expenseCurrency &&
+      existingExchangeRate.value &&
+      dayjs(existingExchangeRate?.date).isSame(dayjs(standardizeExpenseItemIncurredAt(get(item, 'incurredAt')))),
     );
   };
 

@@ -277,8 +277,8 @@ export const HostCreateExpenseModal = ({
           {({ isSubmitting, setFieldValue, setFieldTouched, values }) => {
             const hasChangedAmount = Boolean(
               transactionsImportRow?.amount?.valueInCents &&
-                (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
-                  transactionsImportRow.amount.currency !== values.amount.currency),
+              (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
+                transactionsImportRow.amount.currency !== values.amount.currency),
             );
 
             return (
