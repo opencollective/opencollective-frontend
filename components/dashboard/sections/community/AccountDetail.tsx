@@ -262,21 +262,21 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </div>
         )}
       </div>
-      <div className="@container mt-4 flex flex-grow flex-col gap-8">
+      <div className="mt-4 flex flex-grow flex-col gap-8">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
-              className="grid grid-cols-1 gap-12 aria-hidden:hidden @4xl:grid-cols-3"
+              className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-3"
               aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
-              <div className="space-y-4 @4xl:order-2">
+              <div className="space-y-4 xl:order-2">
                 <h2 className="tight text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Details" id="Details" />
                 </h2>
-                <InfoList variant="compact" className="grid-cols-1 @lg:grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-1">
+                <InfoList variant="compact" className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                     value={account?.legalName}
@@ -345,7 +345,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </InfoList>
               </div>
 
-              <div className="space-y-4 @4xl:order-1 @4xl:col-span-2">
+              <div className="space-y-4 xl:order-1 xl:col-span-2">
                 <h2 className="text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
                 </h2>
