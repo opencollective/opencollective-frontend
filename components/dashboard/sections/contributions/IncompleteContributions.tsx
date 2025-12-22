@@ -2,9 +2,8 @@ import React, { useContext } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { hasAccountHosting } from '@/lib/collective';
 import { ExpectedFundsFilter, OrderStatus } from '@/lib/graphql/types/v2/graphql';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -91,7 +90,6 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
     skipFiltersOnReset: ['hostContext'],
     lockViewFilters: true,
   });
-  const hasHosting = hasAccountHosting(account);
 
   const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
     variables: {
@@ -108,7 +106,7 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
   const { data: metadata, refetch: refetchMetadata } = useQuery(incompleteContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      hostContext: hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -131,7 +129,7 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage id="IncompleteContributions" defaultMessage="Incomplete Contributions" />
-            {hasHosting && (
+            {account.hasHosting && (
               <HostContextFilter
                 value={queryFilter.values.hostContext}
                 onChange={val => queryFilter.setFilter('hostContext', val)}
