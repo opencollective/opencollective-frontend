@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -23,6 +23,39 @@ const schema = baseSchema.extend({
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
 });
 
+enum IncompleteContributionsView {
+  PENDING = 'PENDING',
+  EXPIRED = 'EXPIRED',
+}
+
+const incompleteContributionsMetadataQuery = gql`
+  query IncompleteContributionsMetadata($slug: String!, $hostContext: HostContext) {
+    account(slug: $slug) {
+      id
+      slug
+
+      PENDING: orders(
+        filter: INCOMING
+        status: [PENDING]
+        includeIncognito: true
+        hostContext: $hostContext
+        expectedFundsFilter: ONLY_MANUAL
+      ) {
+        totalCount
+      }
+      EXPIRED: orders(
+        filter: INCOMING
+        status: [EXPIRED]
+        includeIncognito: true
+        hostContext: $hostContext
+        expectedFundsFilter: ONLY_MANUAL
+      ) {
+        totalCount
+      }
+    }
+  }
+`;
+
 export default function IncompleteContributions({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
@@ -37,14 +70,14 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
 
   const views = [
     {
-      id: 'PENDING',
+      id: IncompleteContributionsView.PENDING,
       label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: {
         status: [OrderStatus.PENDING],
       },
     },
     {
-      id: 'EXPIRED',
+      id: IncompleteContributionsView.EXPIRED,
       label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
       filter: {
         status: [OrderStatus.EXPIRED],
@@ -61,7 +94,6 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
     skipFiltersOnReset: ['hostContext'],
     lockViewFilters: true,
   });
-
   const hasHosting = hasAccountHosting(account);
 
   const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {
@@ -75,6 +107,25 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
+
+  const { data: metadata, refetch: refetchMetadata } = useQuery(incompleteContributionsMetadataQuery, {
+    variables: {
+      slug: accountSlug,
+      hostContext: hasHosting ? queryFilter.values.hostContext : undefined,
+    },
+
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+  });
+
+  const handleRefetch = React.useCallback(() => {
+    refetch();
+    refetchMetadata();
+  }, [refetch, refetchMetadata]);
+
+  const viewsWithCount = views.map(view => ({
+    ...view,
+    count: metadata?.account?.[view.id]?.totalCount,
+  }));
 
   const orders = data?.account?.orders ?? { nodes: [], totalCount: 0 };
   return (
@@ -103,11 +154,12 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
       <ContributionsTable
         accountSlug={accountSlug}
         queryFilter={queryFilter}
+        views={viewsWithCount}
         orders={orders}
         loading={loading}
         nbPlaceholders={queryFilter.values.limit}
         error={error}
-        refetch={refetch}
+        refetch={handleRefetch}
         columnVisibility={{ lastChargedAt: false, createdAt: true, expectedAt: false }}
       />
     </div>

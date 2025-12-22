@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { ArrowLeftRightIcon, LinkIcon, Pencil } from 'lucide-react';
+import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -74,8 +74,9 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     const transactionsUrl = getTransactionsUrl(LoggedInUser, order);
     transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
 
-    const actions: ReturnType<GetActions<any>> = {
-      primary: [
+    const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {
+      primary: [],
+      secondary: [
         {
           key: 'view-transactions',
           label: (
@@ -87,7 +88,6 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
           onClick: () => {},
         },
       ],
-      secondary: [],
     };
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
@@ -175,7 +175,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canMarkAsCompleted) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
+        label: intl.formatMessage({ defaultMessage: 'Add received funds', id: 'order.addReceivedFunds' }),
         onClick: () => {
           showModal(
             ContributionConfirmationModal,
@@ -187,6 +187,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             `confirm-contribution-${order.id}`,
           );
         },
+        Icon: CircleCheckBig,
         'data-cy': 'MARK_AS_PAID-button',
         key: 'mark-as-paid',
       });
@@ -194,7 +195,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canMarkAsExpired) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
+        label: intl.formatMessage({ defaultMessage: 'Expire', id: 'order.expire' }),
         onClick: () => {
           showConfirmationModal(
             {
@@ -228,6 +229,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             `mark-as-expired-${order.id}`,
           );
         },
+        Icon: AlarmClockOff,
         'data-cy': 'MARK_AS_EXPIRED-button',
         key: 'mark-as-expired',
       });
