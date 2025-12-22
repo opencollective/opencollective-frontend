@@ -31,7 +31,7 @@ const LocationAddress = ({ location, isLoading = false, showMessageIfEmpty = fal
     <React.Fragment>
       {location.address}
       {!singleLine ? location.address ? <br /> : null : ', '}
-      {getCountryDisplayName(intl, location.country)}
+      {location.country ? getCountryDisplayName(intl, location.country) : null}
     </React.Fragment>
   );
 };
