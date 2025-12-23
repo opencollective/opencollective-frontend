@@ -1800,8 +1800,6 @@
   "filter.NoMatchingResults": "No matching {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} UPDATES {updates} other {results}}",
   "filter.NoMatchingResults.subtitle": "We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters.",
   "filter.NoResults": "No {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} UPDATES {updates} other {results}}",
-  "Filter.OnlyConfirmed": "Only Confirmed",
-  "Filter.OnlyPending": "Only Pending",
   "FinancialContributions": "財政貢献",
   "financialContributions": "財政貢献",
   "FinancialContributors": "Financial Contributors",

@@ -1800,8 +1800,6 @@
   "filter.NoMatchingResults": "No hay {type, select, EXPENSES {gastos} CONTRIBUTIONS {colaboraciones} VIRTUAL_CARDS {tarjetas virtuales} VIRTUAL_CARD_REQUESTS {solicitudes de tarjeta virtual} TRANSACTIONS {transacciones} AGREEMENTS {acuerdos} COLLECTIVES {Colectivos} HOST_APPLICATIONS {solicitudes de Anfitrión} TAX_FORM {formularios fiscales} UPDATES {entradas} other {resultados}} equivalentes",
   "filter.NoMatchingResults.subtitle": "No encontramos {type, select, EXPENSES {ningún gasto} CONTRIBUTIONS {ninguna colaboración} VIRTUAL_CARDS {ninguna tarjeta virtual} VIRTUAL_CARD_REQUESTS {ninguna solicitud de tarjeta virtual} TRANSACTIONS {ninguna transacción} AGREEMENTS {ningún acuerdo} COLLECTIVES {ningún Colectivo} HOST_APPLICATIONS {ninguna solicitud de Anfitrión} UPDATES {ninguna entrada} other {ningún resultado}} que coincida con los filtros dados.",
   "filter.NoResults": "No hay {type, select, EXPENSES {gastos} CONTRIBUTIONS {colaboraciones} VIRTUAL_CARDS {tarjetas virtuales} VIRTUAL_CARD_REQUESTS {solicitudes de tarjeta virtual} TRANSACTIONS {transacciones} AGREEMENTS {acuerdos} COLLECTIVES {Colectivos} HOST_APPLICATIONS {solicitudes de Anfitrión} TAX_FORM {formularios fiscales} UPDATES {entradas} other {resultados}}",
-  "Filter.OnlyConfirmed": "Sólo confirmados",
-  "Filter.OnlyPending": "Sólo pendientes",
   "FinancialContributions": "Contribuciones financieras",
   "financialContributions": "Contribuciones financieras",
   "FinancialContributors": "Financial Contributors",
