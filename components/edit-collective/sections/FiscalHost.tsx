@@ -17,6 +17,7 @@ import { Separator } from '@/components/ui/Separator';
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 
+import FormBuilderEditor from '../../form-builder/FormBuilderEditor';
 import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 
@@ -51,6 +52,7 @@ const getInitialValues = account => {
     apply: get(account, 'settings.apply', false),
     applyMessage: get(account, 'settings.applyMessage', ''),
     tos: get(account, 'settings.tos', ''),
+    customApplyForm: get(account, 'settings.customApplyForm', { fields: [] }),
   };
 };
 
@@ -86,7 +88,7 @@ const FiscalHost = ({ account }) => {
                         ? parseInt(values.hostFeePercent, 10)
                         : null,
                   }),
-                  settings: pick(values, ['apply', 'applyMessage', 'tos']),
+                  settings: pick(values, ['apply', 'applyMessage', 'tos', 'customApplyForm']),
                 },
               },
             });
@@ -108,9 +110,9 @@ const FiscalHost = ({ account }) => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Card className="flex flex-row items-center justify-between p-4">
                 <div>
-                  <h1 className="font-bold">
+                  <h3 className="font-bold">
                     <FormattedMessage defaultMessage="Open to Applications" id="collective.application.label" />
-                  </h1>
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="Enable new collectives to apply to join your fiscal host."
@@ -129,9 +131,9 @@ const FiscalHost = ({ account }) => {
               <Card className="flex flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="font-bold">
+                    <h3 className="font-bold">
                       <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
-                    </h1>
+                    </h3>
                     <p className="text-sm text-muted-foreground">
                       <FormattedMessage
                         defaultMessage="Enable collecting a fee from contributions to the collectives you host."
@@ -175,12 +177,13 @@ const FiscalHost = ({ account }) => {
               </Card>
               <Card className="flex flex-col gap-4 p-4">
                 <div>
-                  <h1 className="font-bold">
+                  <label className="font-bold" htmlFor="input-tos">
                     <FormattedMessage defaultMessage="Terms of Fiscal Hosting" id="FiscalHost.TOS" />
-                  </h1>
+                  </label>
                 </div>
                 <FormField
                   name="tos"
+                  htmlFor="input-tos"
                   hint={
                     <FormattedMessage
                       defaultMessage="Link the terms and conditions under which your Host collects and holds funds. This appears on your public profile page and application form."
@@ -191,23 +194,37 @@ const FiscalHost = ({ account }) => {
               </Card>
 
               <div className="mt-4 flex w-full items-center">
-                <h1 className="grow-0 text-xl font-bold whitespace-nowrap">
-                  <FormattedMessage defaultMessage="Application Instructions" id="FiscalHost.Instructions" />
-                </h1>
+                <h3 className="grow-0 text-xl font-bold whitespace-nowrap">
+                  <FormattedMessage defaultMessage="Application Form" id="TeGcrX" />
+                </h3>
                 <Separator className="my-1 ml-2 w-fit grow" />
               </div>
 
-              <FormField
-                name="applyMessage"
-                hint={
-                  <FormattedMessage
-                    defaultMessage="These instructions appear on the application form (1000 character max)"
-                    id="FiscalHost.ApplyMessage.hint"
-                  />
-                }
-              >
-                {({ field }) => <Textarea className="min-h-32" {...field} />}
-              </FormField>
+              <Card className="flex flex-col gap-4 p-4">
+                <label className="font-bold" htmlFor="input-apply-message">
+                  <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />
+                </label>
+                <FormField
+                  name="applyMessage"
+                  htmlFor="input-apply-message"
+                  hint={
+                    <FormattedMessage
+                      defaultMessage="These instructions appear on the application form (1000 character max)"
+                      id="FiscalHost.ApplyMessage.hint"
+                    />
+                  }
+                >
+                  {({ field }) => <Textarea className="min-h-32" {...field} />}
+                </FormField>
+              </Card>
+
+              <Card className="flex flex-col gap-4 p-4">
+                <FormBuilderEditor
+                  value={values.customApplyForm}
+                  onChange={config => setFieldValue('customApplyForm', config)}
+                  disabled={!values.apply}
+                />
+              </Card>
 
               <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
                 <Button className="grow" type="submit" loading={submitting} disabled={!dirty}>
