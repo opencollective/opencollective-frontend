@@ -76,18 +76,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {
       primary: [],
-      secondary: [
-        {
-          key: 'view-transactions',
-          label: (
-            <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
-              <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
-              <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-            </Link>
-          ),
-          onClick: () => {},
-        },
-      ],
+      secondary: [],
     };
 
     const isAdminOfOrder = LoggedInUser.isAdminOfCollective(order.fromAccount);
@@ -126,6 +115,19 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         `edit-order-${order.id}-${action}`,
       );
     };
+
+    if (![OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status)) {
+      actions.secondary.push({
+        key: 'view-transactions',
+        label: (
+          <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
+            <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
+            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+          </Link>
+        ),
+        onClick: () => {},
+      });
+    }
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
