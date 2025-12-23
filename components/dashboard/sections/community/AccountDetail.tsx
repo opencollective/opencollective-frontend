@@ -334,7 +334,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                               className="font-normal text-muted-foreground hover:text-foreground hover:underline"
                               href={getDashboardRoute(props.host, `host-tax-forms?account=${account.slug}`)}
                             >
-                              <FormattedMessage defaultMessage="View all" id="pFK6bJ" />
+                              <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
                             </Link>
                           )}
                         </div>
