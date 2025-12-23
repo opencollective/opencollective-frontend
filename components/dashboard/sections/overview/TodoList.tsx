@@ -154,7 +154,7 @@ export const HostTodoList = () => {
         {
           id: 'contributions',
           title: intl.formatMessage({ defaultMessage: 'Contributions', id: 'Contributions' }),
-          href: getDashboardRoute(account, 'orders'),
+          href: getDashboardRoute(account, 'incoming-contributions'),
           icon: Coins,
           iconBgColor: 'bg-amber-50',
           iconColor: 'text-amber-700',
