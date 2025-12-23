@@ -3,8 +3,9 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Host } from '../../../../lib/graphql/types/v2/schema';
 import { getMessageForRejectedDropzoneFiles } from '../../../../lib/hooks/useImageUploader';
+import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import Dropzone, { DROPZONE_ACCEPT_PDF } from '../../../Dropzone';
 import type { BaseModalProps } from '../../../ModalContext';
@@ -33,8 +34,8 @@ export const UploadTaxFormModal = ({
   onSuccess,
   ...props
 }: {
-  legalDocument: LegalDocument;
-  host: Account | Host;
+  legalDocument: LegalDocumentFieldsFragment;
+  host: Pick<Account | Host, 'id'>;
   onSuccess?: () => void;
 } & BaseModalProps) => {
   const intl = useIntl();

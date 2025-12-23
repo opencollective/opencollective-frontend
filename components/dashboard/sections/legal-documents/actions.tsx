@@ -4,8 +4,8 @@ import { useIntl } from 'react-intl';
 import type { GetActions } from '../../../../lib/actions/types';
 import { downloadLegalDocument } from '../../../../lib/api';
 import { formatErrorMessage } from '../../../../lib/errors';
-import type { Host, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
 import { useTwoFactorAuthenticationPrompt } from '../../../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { Sentry } from '../../../../server/sentry';
 
 import { useModal } from '../../../ModalContext';
@@ -15,17 +15,17 @@ import { InvalidateTaxFormModal } from './InvalidateTaxFormModal';
 import { UploadTaxFormModal } from './UploadTaxFormModal';
 
 export function useLegalDocumentActions(
-  host: Host,
+  host: { id: string },
   refetch: () => void,
   isUpgradeRequired: boolean,
-): GetActions<LegalDocument> {
+): GetActions<LegalDocumentFieldsFragment> {
   const intl = useIntl();
   const { showModal } = useModal();
   const { toast } = useToast();
   const prompt2fa = useTwoFactorAuthenticationPrompt();
 
-  const getActions: GetActions<LegalDocument> = (legalDocument: LegalDocument) => {
-    const actions: ReturnType<GetActions<LegalDocument>> = { primary: [], secondary: [] };
+  const getActions: GetActions<LegalDocumentFieldsFragment> = (legalDocument: LegalDocumentFieldsFragment) => {
+    const actions: ReturnType<GetActions<LegalDocumentFieldsFragment>> = { primary: [], secondary: [] };
 
     if (legalDocument.documentLink) {
       actions.primary.push({

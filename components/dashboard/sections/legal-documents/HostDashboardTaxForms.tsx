@@ -33,6 +33,27 @@ import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
 
+export const legalDocumentFields = gql`
+  fragment LegalDocumentFields on LegalDocument {
+    id
+    year
+    type
+    status
+    service
+    requestedAt
+    updatedAt
+    documentLink
+    isExpired
+    account {
+      id
+      name
+      slug
+      type
+      imageUrl(height: 128)
+    }
+  }
+`;
+
 const hostDashboardTaxFormsQuery = gql`
   query HostTaxForms(
     $hostSlug: String!
@@ -62,26 +83,12 @@ const hostDashboardTaxFormsQuery = gql`
       ) {
         totalCount
         nodes {
-          id
-          year
-          type
-          status
-          service
-          requestedAt
-          updatedAt
-          documentLink
-          isExpired
-          account {
-            id
-            name
-            slug
-            type
-            imageUrl(height: 128)
-          }
+          ...LegalDocumentFields
         }
       }
     }
   }
+  ${legalDocumentFields}
 `;
 
 const NB_LEGAL_DOCUMENTS_DISPLAYED = 10;

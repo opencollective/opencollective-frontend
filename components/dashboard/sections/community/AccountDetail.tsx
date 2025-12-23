@@ -12,7 +12,7 @@ import { type AccountReferenceInput, KycProvider } from '@/lib/graphql/types/v2/
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { cn } from '@/lib/utils';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
@@ -23,6 +23,7 @@ import LocationAddress from '@/components/LocationAddress';
 import { DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
+import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 
 import Avatar from '../../../Avatar';
 import { CopyID } from '../../../CopyId';
@@ -37,6 +38,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { ContributionsTab } from './AccountDetailContributionsTab';
 import { ExpensesTab } from './AccountDetailExpensesTab';
+import { AccountTaxFormStatus } from './AccountTaxFormStatus';
 import { communityAccountDetailQuery } from './queries';
 
 const associatedCollectiveColumns = intl => [
@@ -84,31 +86,8 @@ const associatedCollectiveColumns = intl => [
   },
 ];
 
-const SummaryCard = ({
-  title,
-  isLoading,
-  children,
-  className,
-}: {
-  title: string | React.ReactNode;
-  isLoading?: boolean;
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn('group flex flex-col gap-1 rounded-xl border transition-all', className)}>
-      <div className="w-full space-y-1 p-3">
-        <div className="flex items-center gap-1">
-          <span className="block text-sm font-medium tracking-tight">{title}</span>
-        </div>
-        <div>{isLoading ? <Skeleton className="h-6 w-48" /> : children}</div>
-      </div>
-    </div>
-  );
-};
-
 enum AccountDetailView {
-  DETAILS = 'DETAILS',
+  OVERVIEW = 'OVERVIEW',
   EXPENSES = 'EXPENSES',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   ACTIVITIES = 'ACTIVITIES',
@@ -124,7 +103,7 @@ type ContributionDrawerProps = {
 export function ContributorDetails(props: ContributionDrawerProps) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
-  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.DETAILS);
+  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.OVERVIEW);
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
 
@@ -133,7 +112,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
       accountId: props.account.id,
-      host: props.host,
+      hostSlug: props.host.slug,
     },
     // Since tabs data is loaded on demand, we don't want to refetch when switching tabs
     nextFetchPolicy: 'standby',
@@ -143,8 +122,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const tabs = React.useMemo(
     () => [
       {
-        id: AccountDetailView.DETAILS,
-        label: <FormattedMessage defaultMessage="Details" id="Details" />,
+        id: AccountDetailView.OVERVIEW,
+        label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
       },
       {
         id: AccountDetailView.EXPENSES,
@@ -190,6 +169,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
         !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
     ) || [];
   const legalName = account?.legalName !== account?.name && account?.legalName;
+  const taxForms = query.data?.host?.hostedLegalDocuments;
 
   return (
     <div className="flex h-full flex-col">
@@ -208,7 +188,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             ) : (
               <React.Fragment>
                 <Avatar collective={account} size={36} />
-                {account.name}
+                {account.name || account.slug}
                 {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
                 <div className="flex flex-wrap gap-1 align-middle">
                   {relations.map(role => (
@@ -282,59 +262,99 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </div>
         )}
       </div>
-      <div className="mt-4 flex flex-grow flex-col gap-4">
+      <div className="mt-4 flex flex-grow flex-col gap-8">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
-              className="flex flex-col gap-4 aria-hidden:hidden"
-              aria-hidden={selectedTab !== AccountDetailView.DETAILS}
+              className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-4"
+              aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {(account?.location?.address || account?.location?.country) && (
-                  <SummaryCard
-                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
+              <div className="space-y-4 xl:order-2">
+                <h2 className="tight text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Details" id="Details" />
+                </h2>
+                <InfoList variant="compact" className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
+                    value={account?.legalName}
                     isLoading={isLoading}
-                    className={account.location.address && 'col-span-2'}
-                  >
-                    <LocationAddress location={account.location} />
-                  </SummaryCard>
-                )}
-                <SummaryCard
-                  title={<FormattedMessage defaultMessage="On the Platform Since" id="OnThePlatformSince" />}
-                  isLoading={isLoading}
-                >
-                  {account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
-                </SummaryCard>
-                <SummaryCard
-                  title={<FormattedMessage defaultMessage="Interactions with Host" id="InteractionsWithHost" />}
-                  isLoading={isLoading}
-                  className="text-sm"
-                >
-                  {account?.communityStats?.firstInteractionAt && (
-                    <div>
-                      <FormattedMessage defaultMessage="First" id="First" />:{' '}
-                      <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
-                    </div>
-                  )}
-                  {account?.communityStats?.lastInteractionAt && (
-                    <div>
-                      <FormattedMessage defaultMessage="Last" id="Last" />:{' '}
-                      <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
-                    </div>
-                  )}
-                </SummaryCard>
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
+                    value={account?.name || account?.slug}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
+                    value={
+                      (account?.location?.country || account?.location?.address) && (
+                        <LocationAddress location={account.location} />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Joined the platform on" id="Vf1x2A" />}
+                    value={account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
+                    value={
+                      account?.communityStats?.firstInteractionAt && (
+                        <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
+                    value={
+                      account?.communityStats?.lastInteractionAt && (
+                        <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
+                    value={
+                      taxForms?.nodes[0] && (
+                        <div className="flex flex-col items-start gap-1">
+                          <AccountTaxFormStatus
+                            taxForm={taxForms.nodes[0]}
+                            host={query.data?.host}
+                            onRefetch={() => query.refetch()}
+                          />
+                          {taxForms?.totalCount > 1 && (
+                            <Link
+                              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account?.slug}`)}
+                            >
+                              <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
+                            </Link>
+                          )}
+                        </div>
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                </InfoList>
               </div>
-              <h1 className="font-medium">
-                <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
-              </h1>
-              <DataTable
-                data={account?.communityStats?.associatedCollectives || []}
-                columns={associatedCollectiveColumns(intl)}
-                loading={isLoading}
-              />
+
+              <div className="space-y-4 xl:order-1 xl:col-span-3">
+                <h2 className="text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
+                </h2>
+                <DataTable
+                  data={account?.communityStats?.associatedCollectives || []}
+                  columns={associatedCollectiveColumns(intl)}
+                  loading={isLoading}
+                />
+              </div>
             </div>
             {selectedTab === AccountDetailView.CONTRIBUTIONS && (
               <ContributionsTab account={account} host={props.host} setOpenContributionId={setOpenContributionId} />

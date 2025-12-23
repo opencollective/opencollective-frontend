@@ -68,7 +68,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
       return (
         <div className="flex items-center text-nowrap">
           <Avatar size={24} collective={account} mr={2} />
-          {account.name}
+          {account.name || account.slug}
           {legalName && <span className="ml-1 text-muted-foreground">{`(${legalName})`}</span>}
         </div>
       );
@@ -337,7 +337,7 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
 
   if (!isEmpty(id)) {
     return (
-      <div className="h-full max-w-(--breakpoint-lg)">
+      <div className="h-full">
         <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
       </div>
     );

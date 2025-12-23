@@ -354,7 +354,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
               <React.Fragment>
                 <InfoList className="mb-6 sm:grid-cols-2">
                   <InfoListItem
-                    className="border-t-0 border-b"
+                    className="!border-t-0 !border-b"
                     title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                     value={
                       <LinkCollective
@@ -371,7 +371,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                   />
 
                   <InfoListItem
-                    className="border-t-0 border-b"
+                    className="!border-t-0 !border-b"
                     title={
                       transaction.type === 'CREDIT' ? (
                         <FormattedMessage defaultMessage="Sender" id="nbwXXN" />
