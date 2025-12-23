@@ -269,7 +269,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
-              className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-3"
+              className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-4"
               aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
               <div className="space-y-4 xl:order-2">
@@ -345,7 +345,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </InfoList>
               </div>
 
-              <div className="space-y-4 xl:order-1 xl:col-span-2">
+              <div className="space-y-4 xl:order-1 xl:col-span-3">
                 <h2 className="text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
                 </h2>
