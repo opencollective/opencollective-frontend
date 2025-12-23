@@ -128,7 +128,7 @@ const omitForViewMatching = (values, { filters, defaultSchemaValues }) => {
 
 export const getActiveViewId = (values, { filters, views, defaultSchemaValues, lockViewFilters }) => {
   let currentViewValues = omitForViewMatching(values, { filters, defaultSchemaValues });
-  if (lockViewFilters) {
+  if (lockViewFilters && views) {
     // remove all filters not part of the view filters
     const viewFilterKeys = views.reduce((acc, view) => {
       Object.keys(view.filter || {}).forEach(key => acc.add(key));
