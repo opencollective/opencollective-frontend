@@ -39,6 +39,7 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
 const defaultVisibility: VisibilityState = {
   legacyId: false,
   expectedAt: false,
+  createdAt: false,
 };
 
 export default function ContributionsTable<FilterValues extends Record<string, unknown>>({
@@ -102,7 +103,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
 
   return (
     <React.Fragment>
-      <Filterbar {...queryFilter} views={views} />
+      <Filterbar {...queryFilter} {...(views && { views })} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { ArrowLeftRightIcon, LinkIcon, Pencil } from 'lucide-react';
+import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -74,19 +74,8 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
     const transactionsUrl = getTransactionsUrl(LoggedInUser, order);
     transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
 
-    const actions: ReturnType<GetActions<any>> = {
-      primary: [
-        {
-          key: 'view-transactions',
-          label: (
-            <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
-              <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
-              <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-            </Link>
-          ),
-          onClick: () => {},
-        },
-      ],
+    const actions: ReturnType<GetActions<ManagedOrderFieldsFragment>> = {
+      primary: [],
       secondary: [],
     };
 
@@ -126,6 +115,19 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
         `edit-order-${order.id}-${action}`,
       );
     };
+
+    if (![OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status)) {
+      actions.secondary.push({
+        key: 'view-transactions',
+        label: (
+          <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
+            <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
+            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+          </Link>
+        ),
+        onClick: () => {},
+      });
+    }
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
@@ -175,7 +177,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canMarkAsCompleted) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
+        label: intl.formatMessage({ defaultMessage: 'Add received funds', id: 'order.addReceivedFunds' }),
         onClick: () => {
           showModal(
             ContributionConfirmationModal,
@@ -187,6 +189,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             `confirm-contribution-${order.id}`,
           );
         },
+        Icon: CircleCheckBig,
         'data-cy': 'MARK_AS_PAID-button',
         key: 'mark-as-paid',
       });
@@ -194,7 +197,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
 
     if (canMarkAsExpired) {
       actions.primary.push({
-        label: intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
+        label: intl.formatMessage({ defaultMessage: 'Expire', id: 'order.expire' }),
         onClick: () => {
           showConfirmationModal(
             {
@@ -228,6 +231,7 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
             `mark-as-expired-${order.id}`,
           );
         },
+        Icon: AlarmClockOff,
         'data-cy': 'MARK_AS_EXPIRED-button',
         key: 'mark-as-expired',
       });

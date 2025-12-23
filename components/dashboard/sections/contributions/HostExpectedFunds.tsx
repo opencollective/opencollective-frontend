@@ -17,7 +17,6 @@ import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { expectedDateFilter } from '../../filters/DateFilter';
-import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
@@ -98,7 +97,6 @@ const hostExpectedFundsMetadataQuery = gql`
 `;
 
 const schema = baseSchema.extend({
-  expectedFundsFilter: expectedFundsFilter.schema,
   expectedDate: expectedDateFilter.schema,
 });
 type FilterValues = z.infer<typeof schema>;
@@ -108,7 +106,6 @@ const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariable
 };
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...baseFilters,
-  expectedFundsFilter: expectedFundsFilter.filter,
   expectedDate: expectedDateFilter.filter,
 };
 
@@ -123,16 +120,13 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     {
       id: ContributionsTab.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {
-        expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
-      },
+      filter: {},
     },
     {
       id: ContributionsTab.PENDING,
       label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: {
         status: [OrderStatus.PENDING],
-        expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
       },
     },
     {
@@ -140,7 +134,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
       filter: {
         status: [OrderStatus.PAID],
-        expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
       },
     },
     {
@@ -148,7 +141,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
       filter: {
         status: [OrderStatus.EXPIRED],
-        expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
       },
     },
     {
@@ -156,7 +148,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
       filter: {
         status: [OrderStatus.CANCELLED],
-        expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
       },
     },
   ];
@@ -180,7 +171,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
     variables: {
       slug: accountSlug,
-      expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
+      expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -193,6 +184,7 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       filter: 'INCOMING',
       includeIncognito: true,
       hostContext: 'ALL',
+      expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
       ...queryFilter.variables,
     },
 

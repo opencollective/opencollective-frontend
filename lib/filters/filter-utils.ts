@@ -1,4 +1,4 @@
-import { forOwn, isEqual, isPlainObject, isUndefined, omitBy, setWith } from 'lodash';
+import { forOwn, isEqual, isPlainObject, isUndefined, omitBy, pick, setWith } from 'lodash';
 
 /* 
   Will take values in a flat object and if the key has structure of `key[subkey]` turn those into nested objects
@@ -126,9 +126,16 @@ const omitForViewMatching = (values, { filters, defaultSchemaValues }) => {
   );
 };
 
-export const getActiveViewId = (values, { filters, views, defaultSchemaValues }) => {
-  const currentViewValues = omitForViewMatching(values, { filters, defaultSchemaValues });
-
+export const getActiveViewId = (values, { filters, views, defaultSchemaValues, lockViewFilters }) => {
+  let currentViewValues = omitForViewMatching(values, { filters, defaultSchemaValues });
+  if (lockViewFilters && views) {
+    // remove all filters not part of the view filters
+    const viewFilterKeys = views.reduce((acc, view) => {
+      Object.keys(view.filter || {}).forEach(key => acc.add(key));
+      return acc;
+    }, new Set<string>());
+    currentViewValues = pick(currentViewValues, [...viewFilterKeys]);
+  }
   const matchingView = views?.find(v => {
     const viewFilters = omitForViewMatching(v.filter, { filters: filters, defaultSchemaValues });
     return isEqual(viewFilters, currentViewValues);

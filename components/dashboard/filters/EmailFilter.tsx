@@ -20,7 +20,7 @@ export const emailFilter: FilterConfig<z.infer<typeof emailFilterSchema>> = {
   },
 };
 
-function EmailFilter({ value, labelMsg, onChange, isViewActive }: FilterComponentProps<string>) {
+function EmailFilter({ value, labelMsg, onChange, highlighted }: FilterComponentProps<string>) {
   const intl = useIntl();
   const [input, setInput] = React.useState(value);
   const debouncedOnChange = React.useMemo(() => debounce(onChange, 500), [onChange]);
@@ -39,7 +39,7 @@ function EmailFilter({ value, labelMsg, onChange, isViewActive }: FilterComponen
         size={16}
         className={clsx(
           'pointer-events-none absolute top-0 bottom-0 left-3 h-full text-muted-foreground',
-          !isViewActive && value && 'text-primary',
+          highlighted && value && 'text-primary',
         )}
       />
       <Input

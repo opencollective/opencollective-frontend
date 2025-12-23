@@ -84,6 +84,7 @@ export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape>, GQLQu
   views?: readonly View<z.infer<S>>[];
   meta?: FilterMeta;
   defaultSchemaValues: Partial<z.infer<S>>;
+  lockViewFilters?: boolean;
 };
 
 type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta> = {
@@ -97,6 +98,7 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, F
   activeViewId?: string; // To use as a control for the active view
   shallow?: boolean; // If true, the router will not reload the page when updating the query
   skipFiltersOnReset?: string[];
+  lockViewFilters?: boolean; // If true, the view will lock the filters defined in the view, but you're able to add more filters without "leaving" the view
 };
 
 export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta = unknown>(
@@ -229,8 +231,14 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
 
   const activeViewId = React.useMemo(
     () =>
-      opts.activeViewId || getActiveViewId(values, { filters: opts.filters, views: opts.views, defaultSchemaValues }),
-    [values, opts.filters, opts.views, opts.activeViewId, defaultSchemaValues],
+      opts.activeViewId ||
+      getActiveViewId(values, {
+        filters: opts.filters,
+        views: opts.views,
+        defaultSchemaValues,
+        lockViewFilters: opts.lockViewFilters,
+      }),
+    [values, opts.filters, opts.views, opts.activeViewId, defaultSchemaValues, opts.lockViewFilters],
   );
 
   return {
@@ -245,6 +253,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
     filters: opts.filters,
     views: opts.views,
     meta: opts.meta,
+    lockViewFilters: opts.lockViewFilters,
   };
 }
 
