@@ -332,7 +332,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                           {taxForms?.totalCount > 1 && (
                             <Link
                               className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account.slug}`)}
+                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account?.slug}`)}
                             >
                               <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
                             </Link>
