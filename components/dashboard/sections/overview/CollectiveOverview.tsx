@@ -1,11 +1,12 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
-import { FlaskConical, X } from 'lucide-react';
+import { useMutation, useQuery } from '@apollo/client';
+import { FlaskConical, Settings, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
@@ -15,6 +16,12 @@ import Image from '../../../Image';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../../../ui/DropdownMenu';
 import { Popover, PopoverAnchor, PopoverContent } from '../../../ui/Popover';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -28,9 +35,10 @@ import AccountTable from './AccountTable';
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
-import { overviewMetricsQuery } from './queries';
+import { editAccountSettingMutation, overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
+import { WelcomeCollective } from './Welcome';
 
 export const schema = z.object({
   period: periodCompareFilter.schema,
@@ -41,8 +49,28 @@ export const schema = z.object({
 
 export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
+  const [showSetupGuide, setShowSetupGuide] = React.useState(undefined);
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
   const router = useRouter();
+
+  const handleSetupGuideToggle = React.useCallback(
+    async (open: boolean) => {
+      setShowSetupGuide(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showSetupGuide.id${account.legacyId}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
+
   const queryFilter = useQueryFilter({
     schema,
     toVariables: {
@@ -181,62 +209,80 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
           titleRoute={getDashboardRoute(account, 'overview')}
           actions={
-            <Popover open>
-              <PopoverAnchor>
-                <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowFeedbackModal(true)}>
-                  <FlaskConical size={16} />
-                  <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
-                </Button>
-              </PopoverAnchor>
-              <DismissibleMessage messageId={HELP_MESSAGE.COLLECTIVE_OVERVIEW_WELCOME}>
-                {({ dismiss }) => (
-                  <PopoverContent align="end" sideOffset={8} className="animate-in fade-in">
-                    <div>
-                      <div className="mb-2 flex items-start gap-3">
-                        <Image
-                          className="h-12 w-12 shrink-0"
-                          alt="Illustration of plant"
-                          width={48}
-                          height={48}
-                          src="/static/images/dashboard.png"
-                          aria-hidden="true"
-                        />
-                        <AlertTitle className="text-lg leading-tight text-balance">
-                          <FormattedMessage
-                            id="PreviewFeatures.CollectiveOverview.Welcome.Title"
-                            defaultMessage="Welcome to your new Collective Overview"
+            <div className="flex gap-2">
+              <Popover open>
+                <PopoverAnchor>
+                  <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowFeedbackModal(true)}>
+                    <FlaskConical size={16} />
+                    <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
+                  </Button>
+                </PopoverAnchor>
+                <DismissibleMessage messageId={HELP_MESSAGE.COLLECTIVE_OVERVIEW_WELCOME}>
+                  {({ dismiss }) => (
+                    <PopoverContent align="end" sideOffset={8} className="animate-in fade-in">
+                      <div>
+                        <div className="mb-2 flex items-start gap-3">
+                          <Image
+                            className="h-12 w-12 shrink-0"
+                            alt="Illustration of plant"
+                            width={48}
+                            height={48}
+                            src="/static/images/dashboard.png"
+                            aria-hidden="true"
                           />
-                        </AlertTitle>
+                          <AlertTitle className="text-lg leading-tight text-balance">
+                            <FormattedMessage
+                              id="PreviewFeatures.CollectiveOverview.Welcome.Title"
+                              defaultMessage="Welcome to your new Collective Overview"
+                            />
+                          </AlertTitle>
+                        </div>
+
+                        <AlertDescription className="mt-1 max-w-prose space-y-2">
+                          <p>
+                            <FormattedMessage
+                              id="PreviewFeatures.CollectiveOverview.Welcome.Description"
+                              defaultMessage="We’ve created this space for you to keep on top of everything happening in your Collective, please let us know how we can make it better!"
+                            />
+                          </p>
+                        </AlertDescription>
+                        <Button size="sm" variant="outline" className="mt-2 w-full" onClick={dismiss}>
+                          <FormattedMessage id="Close" defaultMessage="Close" />
+                        </Button>
                       </div>
 
-                      <AlertDescription className="mt-1 max-w-prose space-y-2">
-                        <p>
-                          <FormattedMessage
-                            id="PreviewFeatures.CollectiveOverview.Welcome.Description"
-                            defaultMessage="We’ve created this space for you to keep on top of everything happening in your Collective, please let us know how we can make it better!"
-                          />
-                        </p>
-                      </AlertDescription>
-                      <Button size="sm" variant="outline" className="mt-2 w-full" onClick={dismiss}>
-                        <FormattedMessage id="Close" defaultMessage="Close" />
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        className="absolute top-1 right-1 text-muted-foreground"
+                        onClick={dismiss}
+                      >
+                        <X size={16} />
                       </Button>
-                    </div>
-
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      className="absolute top-1 right-1 text-muted-foreground"
-                      onClick={dismiss}
-                    >
-                      <X size={16} />
-                    </Button>
-                  </PopoverContent>
-                )}
-              </DismissibleMessage>
-            </Popover>
+                    </PopoverContent>
+                  )}
+                </DismissibleMessage>
+              </Popover>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon-sm" variant="outline">
+                    <Settings size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuCheckboxItem
+                    checked={showSetupGuide}
+                    onClick={() => handleSetupGuideToggle(!showSetupGuide)}
+                  >
+                    <FormattedMessage defaultMessage="Display setup guide" id="SetupGuide.DisplaySetupGuide" />
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           }
         />
         <ConvertedAccountMessage account={account} />
+        <WelcomeCollective account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
         <Filterbar hideSeparator {...queryFilter} />
 
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">

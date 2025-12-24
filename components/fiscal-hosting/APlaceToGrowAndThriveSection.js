@@ -46,7 +46,7 @@ const APlaceToGrowAndThrive = () => {
             />
           </MainDescription>
         </Box>
-        <Link href="/create">
+        <Link href="/signup/collective">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="marketing" whiteSpace="nowrap">
             <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
           </StyledButton>
