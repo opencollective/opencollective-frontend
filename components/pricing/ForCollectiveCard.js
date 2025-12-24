@@ -235,7 +235,7 @@ const ForCollectiveCard = () => {
             </ListItem>
           </ListWrapper>
           <Container display="flex" flexDirection={['column', null, null, null, 'row']}>
-            <Link href="/create">
+            <Link href="/signup/collective">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', '226px', null, '237px', '160px']}

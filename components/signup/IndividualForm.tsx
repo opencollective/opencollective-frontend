@@ -12,7 +12,7 @@ import { formatErrorMessage, i18nGraphqlException } from '@/lib/errors';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { cn } from '@/lib/utils';
 
-import I18nFormatters from '@/components/I18nFormatters';
+import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
 import Image from '@/components/Image';
 import { Card, CardContent } from '@/components/ui/Card';
 
@@ -20,8 +20,6 @@ import { EditAvatar } from '../Avatar';
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
-import type { LinkProps } from '../Link';
-import Link from '../Link';
 import { PasswordInput } from '../PasswordInput';
 import { PasswordStrengthBar } from '../PasswordStrengthBar';
 import { Button } from '../ui/Button';
@@ -30,10 +28,6 @@ import { useToast } from '../ui/useToast';
 
 import type { SignupStepProps } from './common';
 import { SignupSteps } from './common';
-
-const makeLink = (props: Omit<LinkProps, 'children'>) => (children: React.ReactNode) => (
-  <Link {...props}>{children}</Link>
-);
 
 const emailVerificationFormSchema = z.union([
   z.object({
@@ -94,7 +88,7 @@ const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   );
 };
 
-export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow }: SignupStepProps) {
+export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: SignupStepProps) {
   const router = useRouter();
   const intl = useIntl();
   const { toast } = useToast();
@@ -188,18 +182,18 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
             ) : (
               <React.Fragment>
                 <h1 className="text-xl font-bold sm:text-3xl sm:leading-10">
-                  {includeOrganizationFlow ? (
+                  {nextActionFlow ? (
                     <FormattedMessage defaultMessage="Create your personal account" id="OkoBON" />
                   ) : (
                     <FormattedMessage defaultMessage="Create your account" id="signup.individual.title" />
                   )}
                 </h1>
                 <p className="text-sm break-words text-slate-700 sm:text-base">
-                  {includeOrganizationFlow ? (
+                  {nextActionFlow ? (
                     <FormattedMessage
-                      defaultMessage="You need a personal account to create an organization. {newLine}Sign in or create one to continue."
+                      defaultMessage="You need a personal account to create {type, select, organization {an organization} other {a collective}}. {newLine}Sign in or create one to continue."
                       id="signup.individual.orgFlow.description"
-                      values={I18nFormatters}
+                      values={{ ...I18nFormatters, type: nextActionFlow }}
                     />
                   ) : (
                     <FormattedMessage
@@ -297,7 +291,7 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                     defaultMessage="Already have an account? <SignInLink>Sign in</SignInLink>"
                     id="signup.alreadyHaveAccount"
                     values={{
-                      SignInLink: makeLink({
+                      SignInLink: getI18nLink({
                         href: '/signin',
                         className: 'text-primary hover:underline',
                       }),
@@ -311,12 +305,12 @@ export function EmailVerificationSteps({ step, nextStep, includeOrganizationFlow
                       id="signup.individual.tosAgreement"
                       values={{
                         ...I18nFormatters,
-                        TOSLink: makeLink({
+                        TOSLink: getI18nLink({
                           href: '/tos',
                           openInNewTab: true,
                           className: 'underline',
                         }),
-                        PrivacyPolicyLink: makeLink({
+                        PrivacyPolicyLink: getI18nLink({
                           href: '/privacypolicy',
                           openInNewTab: true,
                           className: 'underline',
