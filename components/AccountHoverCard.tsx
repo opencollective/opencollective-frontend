@@ -29,6 +29,7 @@ export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
     id
     name
+    legalName
     slug
     type
     description
