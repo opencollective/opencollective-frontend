@@ -263,8 +263,14 @@ export const communityAccountExpensesDetailQuery = gql`
   query CommunityAccountExpensesDetail(
     $accountId: String!
     $host: AccountReferenceInput!
-    $limit: Int!
-    $offset: Int!
+    $statsCurrency: Currency!
+    $skipSubmittedExpenses: Boolean!
+    $skipPaidExpenses: Boolean!
+    $skipApprovedExpenses: Boolean!
+    $submittedExpensesOffset: Int!
+    $paidExpensesOffset: Int!
+    $approvedExpensesOffset: Int!
+    $defaultLimit: Int!
   ) {
     account(id: $accountId) {
       id
@@ -284,8 +290,15 @@ export const communityAccountExpensesDetailQuery = gql`
           expenseCountAcc
         }
       }
-      expenses(direction: SUBMITTED, host: $host, limit: $limit, offset: $offset) {
+      submittedExpenses: expenses(
+        direction: SUBMITTED
+        host: $host
+        limit: $defaultLimit
+        offset: $submittedExpensesOffset
+      ) @skip(if: $skipSubmittedExpenses) {
         totalCount
+        limit
+        offset
         nodes {
           id
           legacyId
@@ -307,6 +320,82 @@ export const communityAccountExpensesDetailQuery = gql`
             id
             ...AccountHoverCardFields
           }
+        }
+      }
+    }
+    paidExpenses: expenses(
+      activity: { type: [COLLECTIVE_EXPENSE_PAID], individual: { id: $accountId } }
+      host: $host
+      limit: $defaultLimit
+      offset: $paidExpensesOffset
+      includeChildrenExpenses: true
+    ) @skip(if: $skipPaidExpenses) {
+      totalCount
+      limit
+      offset
+      totalAmount {
+        amount(currency: $statsCurrency) {
+          valueInCents
+          currency
+        }
+        amountsByCurrency {
+          valueInCents
+          currency
+        }
+      }
+      nodes {
+        id
+        legacyId
+        description
+        status
+        type
+        tags
+        accountingCategory {
+          id
+          name
+          code
+        }
+        amount: amountV2(currencySource: HOST) {
+          valueInCents
+          currency
+        }
+        createdAt
+        account {
+          id
+          ...AccountHoverCardFields
+        }
+      }
+    }
+    approvedExpenses: expenses(
+      activity: { type: [COLLECTIVE_EXPENSE_APPROVED], individual: { id: $accountId } }
+      host: $host
+      limit: $defaultLimit
+      offset: $approvedExpensesOffset
+      includeChildrenExpenses: true
+    ) @skip(if: $skipApprovedExpenses) {
+      totalCount
+      limit
+      offset
+      nodes {
+        id
+        legacyId
+        description
+        status
+        type
+        tags
+        accountingCategory {
+          id
+          name
+          code
+        }
+        amount: amountV2(currencySource: HOST) {
+          valueInCents
+          currency
+        }
+        createdAt
+        account {
+          id
+          ...AccountHoverCardFields
         }
       }
     }

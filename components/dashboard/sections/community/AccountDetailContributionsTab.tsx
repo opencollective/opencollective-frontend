@@ -6,16 +6,19 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { TransactionKind } from '@/lib/constants/transactions';
 import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '@/lib/i18n/expense';
+import { cn } from '@/lib/utils';
 
 import Avatar from '@/components/Avatar';
 import DateTime from '@/components/DateTime';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import Link from '@/components/Link';
 import LinkCollective from '@/components/LinkCollective';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { actionsColumn, DataTable } from '@/components/table/DataTable';
 import { Button } from '@/components/ui/Button';
@@ -114,13 +117,17 @@ export function ContributionsTab({ account, host, setOpenContributionId }) {
     skipRouter: true,
   });
 
-  const { data, previousData, loading } = useQuery(communityAccountContributionsDetailQuery, {
+  const { data, previousData, loading, error } = useQuery(communityAccountContributionsDetailQuery, {
     variables: {
       accountId: account.id,
-      host: host,
+      host: getAccountReferenceInput(host),
       ...pagination.variables,
     },
   });
+
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
 
   const getYearlySummaryActions = summary => ({
     primary: [
@@ -202,7 +209,7 @@ export function ContributionsTab({ account, host, setOpenContributionId }) {
               pagination.setFilter('limit', currentLimit + 5);
             }}
           >
-            <RefreshCcw size={14} className="shrink-0" />
+            <RefreshCcw size={14} className={cn('shrink-0', loading && 'animate-spin')} />
             <span className="capitalize">
               <FormattedMessage defaultMessage="load more" id="loadMore" />
             </span>

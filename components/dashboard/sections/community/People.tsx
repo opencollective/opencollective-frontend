@@ -334,11 +334,12 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   const router = useRouter();
   const pushSubpath = makePushSubpath(router);
   const id = subpath[0];
+  const { account } = useContext(DashboardContext);
 
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
+        <ContributorDetails account={{ id: subpath[0] }} host={account} onClose={() => pushSubpath('')} />
       </div>
     );
   }
