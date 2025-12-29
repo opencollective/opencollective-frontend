@@ -37,8 +37,9 @@ class UnsubscribeEmail extends React.Component {
 
   async componentDidMount() {
     let state, errorMessage, response;
+
     await fetch(
-      `/api/services/email/unsubscribe/${this.props.email}/${this.props.slug}/${this.props.type}/${this.props.token}`,
+      `${process.env.API_URL}/services/email/unsubscribe/${this.props.email}/${this.props.slug}/${this.props.type}/${this.props.token}`,
     ).then(res => {
       response = res.json();
     });
