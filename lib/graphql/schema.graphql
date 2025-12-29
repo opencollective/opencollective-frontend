@@ -9,6 +9,7 @@ interface CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean
+  hasMoneyManagement: Boolean
   name: String
   legalName: String
   company: String
@@ -2064,6 +2065,7 @@ type Collective implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2351,6 +2353,7 @@ type Event implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2638,6 +2641,7 @@ type Fund implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2925,6 +2929,7 @@ type Organization implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3212,6 +3217,7 @@ type Project implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3794,6 +3800,7 @@ type User implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -4083,6 +4090,7 @@ type Vendor implements CollectiveInterface {
   type: String
   isActive: Boolean
   hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String

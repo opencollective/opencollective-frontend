@@ -73,6 +73,24 @@ export function KYCVerificationDrawerContent(props: KYCVerificationDrawerContent
                 <DateTime dateStyle="medium" timeStyle="short" value={verification.requestedAt} />
               </DataListItemValue>
             </DataListItem>
+            {verification.createdByUser && (
+              <DataListItem>
+                <DataListItemLabel>
+                  <FormattedMessage defaultMessage="Added by" id="KYC.AddedBy" />
+                </DataListItemLabel>
+                <DataListItemValue>
+                  <AccountHoverCard
+                    account={verification.createdByUser}
+                    trigger={
+                      <div className="flex items-center gap-2 truncate">
+                        <Avatar collective={verification.createdByUser} radius={20} />
+                        <span className="max-w-[200px] truncate">{verification.createdByUser.name}</span>
+                      </div>
+                    }
+                  />
+                </DataListItemValue>
+              </DataListItem>
+            )}
             <DataListItem>
               <DataListItemLabel>
                 <FormattedMessage defaultMessage="Verified at" id="CJrQQ0" />
