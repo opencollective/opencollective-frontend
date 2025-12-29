@@ -126,6 +126,13 @@ export const communityAccountDetailQuery = gql`
           }
           relations
         }
+        associatedOrganizations {
+          account {
+            id
+            ...AccountHoverCardFields
+          }
+          relations
+        }
         relations
         transactionSummary {
           year

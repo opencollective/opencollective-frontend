@@ -354,6 +354,14 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   columns={associatedCollectiveColumns(intl)}
                   loading={isLoading}
                 />
+                <h2 className="mt-12 text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Associated Organizations" id="E9PjGp" />
+                </h2>
+                <DataTable
+                  data={account?.communityStats?.associatedOrganizations || []}
+                  columns={associatedCollectiveColumns(intl)}
+                  loading={isLoading}
+                />
               </div>
             </div>
             {selectedTab === AccountDetailView.CONTRIBUTIONS && (
