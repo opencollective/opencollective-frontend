@@ -3,10 +3,12 @@ import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import { Pagination } from '../../filters/Pagination';
 import TimelineItem from '../overview/TimelineItem';
@@ -20,13 +22,17 @@ export function ActivitiesTab({ account, host, setOpenExpenseId }) {
     skipRouter: true,
   });
 
-  const { data, loading } = useQuery(communityAccountActivitiesQuery, {
+  const { data, loading, error } = useQuery(communityAccountActivitiesQuery, {
     variables: {
       accountId: account.id,
-      host: host,
+      host: getAccountReferenceInput(host),
       ...pagination.variables,
     },
   });
+
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
 
   const activities = data?.account?.communityStats?.activities.nodes || [];
   const total = data?.account?.communityStats?.activities.totalCount;
