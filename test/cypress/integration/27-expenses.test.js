@@ -839,6 +839,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
+      cy.checkToast({ variant: 'success', message: 'Policies updated successfully' });
       cy.visit(`${expenseUrl}?forceLegacyFlow=true`);
       cy.get('[data-cy="submit-expense-dropdown"]:visible:first').click();
       cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
@@ -849,6 +850,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
+      cy.checkToast({ variant: 'success', message: 'Policies updated successfully' });
       cy.createProject({ userEmail: user.email, collective }).then(project => {
         cy.visit(`/${project.slug}/expenses/new?forceLegacyFlow=true`);
         cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
