@@ -691,6 +691,11 @@ interface Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -2084,6 +2089,11 @@ type OrderCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Order]
+
+  """
+  The accounts that created the orders in this collection, regardless of pagination
+  """
+  createdByUsers: [Account]
 }
 
 """
@@ -3411,6 +3421,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -6008,6 +6023,11 @@ type PaymentMethod {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection
 }
 
@@ -9562,6 +9582,11 @@ type Bot implements Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10562,6 +10587,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -12120,6 +12150,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -13394,6 +13429,11 @@ type Individual implements Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14684,6 +14724,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15814,6 +15859,11 @@ type Vendor implements Account & AccountWithContributions {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -17247,6 +17297,11 @@ type Query {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   organization(
     """
@@ -19772,6 +19827,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -20919,6 +20979,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
