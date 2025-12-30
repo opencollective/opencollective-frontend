@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { CardElement, Elements } from '@stripe/react-stripe-js';
 import { get, merge, pick } from 'lodash';

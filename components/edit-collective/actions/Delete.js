@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 

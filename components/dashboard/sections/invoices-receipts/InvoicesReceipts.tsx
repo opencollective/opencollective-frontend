@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { get } from 'lodash';

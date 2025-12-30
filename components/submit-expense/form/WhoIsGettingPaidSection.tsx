@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash';
 import { Lock } from 'lucide-react';

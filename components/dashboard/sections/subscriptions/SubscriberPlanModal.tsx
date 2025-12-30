@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Form } from 'formik';
 import { compact, flatten, get, isNil, isPlainObject, omitBy, set, startCase } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';

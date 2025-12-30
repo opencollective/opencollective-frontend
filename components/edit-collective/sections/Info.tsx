@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
 import { Form } from 'formik';

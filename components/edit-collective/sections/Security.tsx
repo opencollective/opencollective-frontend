@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
 import { get, pick } from 'lodash';

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';

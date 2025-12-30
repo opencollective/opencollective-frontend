@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { CheckCircle2, Shield } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

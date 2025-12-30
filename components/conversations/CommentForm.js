@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { truncate } from 'lodash';

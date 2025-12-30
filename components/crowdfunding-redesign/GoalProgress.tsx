@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 
 import dayjs from '../../lib/dayjs';
 import { cn } from '../../lib/utils';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import dayjs from 'dayjs';
 import { Info, Receipt, Shapes } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';

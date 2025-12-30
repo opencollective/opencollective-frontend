@@ -1,6 +1,6 @@
 import React from 'react';
-import type { MutationFunction } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
+import type { MutationFunction } from "@apollo/client/react";
+import { graphql } from "@apollo/client/v4-migration";
 import { Email } from '@styled-icons/material/Email';
 import { get } from 'lodash';
 import { ArrowLeft } from 'lucide-react';

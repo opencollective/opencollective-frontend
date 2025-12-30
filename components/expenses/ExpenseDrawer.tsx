@@ -1,5 +1,5 @@
 import React from 'react';
-import { useApolloClient, useQuery } from '@apollo/client';
+import { useApolloClient, useQuery } from "@apollo/client/react";
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';

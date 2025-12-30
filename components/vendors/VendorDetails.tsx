@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';

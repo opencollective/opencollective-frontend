@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { sum } from 'lodash';
 import { Info, TriangleAlert } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useFragment, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useFragment, useQuery } from "@apollo/client/react";
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 

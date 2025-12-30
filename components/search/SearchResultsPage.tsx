@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { SearchIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';

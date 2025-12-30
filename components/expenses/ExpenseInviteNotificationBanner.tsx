@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 

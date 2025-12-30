@@ -1,6 +1,7 @@
 import React from 'react';
-import type { ApolloClient, FetchResult } from '@apollo/client';
-import { gql, useApolloClient, useMutation } from '@apollo/client';
+import type { ApolloClient, ApolloLink } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
 import type { Account } from '@opencollective/taxes/dist/types/Accounts';
 import dayjs from 'dayjs';
@@ -635,7 +636,7 @@ const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
  * Only refetches when variables change or refresh is explicitly requested.
  */
 const memoizedExpenseFormSchema = memoizeOne(
-  async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
+  async (apolloClient: ApolloClient, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
 
@@ -1316,7 +1317,7 @@ function getPayeeSlug(values: ExpenseFormValues): string {
 
 async function buildFormOptions(
   intl: IntlShape,
-  apolloClient: ApolloClient<unknown>,
+  apolloClient: ApolloClient,
   loggedInUser: LoggedInUser,
   values: ExpenseFormValues,
   startOptions: ExpenseFormStartOptions,
@@ -1635,7 +1636,7 @@ export function useExpenseForm(opts: {
   startOptions: ExpenseFormStartOptions;
   handleOnSubmit?: boolean;
   onSuccess?: (
-    result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>,
+    result: ApolloLink.Result<CreateExpenseFromDashboardMutation> | ApolloLink.Result<EditExpenseFromDashboardMutation>,
     type: 'new' | 'invite' | 'edit',
   ) => void; // when handleOnSubmit === true
   onError?: (err) => void; // when handleOnSubmit === true
@@ -1729,7 +1730,7 @@ export function useExpenseForm(opts: {
   const onSubmitCallback = React.useCallback(
     async (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
       if (opts.handleOnSubmit) {
-        let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
+        let result: ApolloLink.Result<CreateExpenseFromDashboardMutation> | ApolloLink.Result<EditExpenseFromDashboardMutation>;
         try {
           track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
 

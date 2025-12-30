@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { clsx } from 'clsx';
 import { useFormik } from 'formik';
 import { omit } from 'lodash';

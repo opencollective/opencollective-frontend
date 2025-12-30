@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { truncate, uniqBy } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';

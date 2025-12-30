@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { compact, isEmpty, isString, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';

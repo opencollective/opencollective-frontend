@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { compact, isUndefined, omit } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';

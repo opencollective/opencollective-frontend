@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { useFormik } from 'formik';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { AlarmClockOff, ArrowLeftRightIcon, CircleCheckBig, LinkIcon, Pencil } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

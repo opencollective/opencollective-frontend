@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
-import { Mutation } from '@apollo/client/react/components';
+import { useMutation } from '@apollo/client/react';
+import { Mutation } from '@apollo/client/v4-migration';
 import { Camera } from '@styled-icons/feather/Camera';
 import { inRange } from 'lodash';
 import dynamic from 'next/dynamic';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
 import { capitalize, isNil, omit } from 'lodash';

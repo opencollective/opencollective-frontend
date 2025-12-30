@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import ReactAnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';

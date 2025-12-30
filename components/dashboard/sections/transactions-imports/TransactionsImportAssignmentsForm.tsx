@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { Form, Formik } from 'formik';
 import { uniqBy } from 'lodash';
 import { Building, ChartCandlestick, ChartLine, CreditCard, HandCoins, Landmark, Wallet } from 'lucide-react';

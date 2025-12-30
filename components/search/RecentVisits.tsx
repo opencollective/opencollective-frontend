@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 

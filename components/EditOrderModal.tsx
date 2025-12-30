@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useFormik } from 'formik';
 import { get, pick, startCase } from 'lodash';
 import { useRouter } from 'next/router';

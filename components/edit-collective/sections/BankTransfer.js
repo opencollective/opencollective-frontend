@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { findLast, get, omit } from 'lodash';

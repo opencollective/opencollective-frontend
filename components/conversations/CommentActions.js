@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
 import { X } from '@styled-icons/feather/X';

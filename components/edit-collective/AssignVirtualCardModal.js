@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';

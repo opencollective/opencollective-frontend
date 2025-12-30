@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { truncate } from 'lodash';
 import { ArrowRight, ArrowRightLeft, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/router';

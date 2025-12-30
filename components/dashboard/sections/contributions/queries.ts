@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client/core';
+import { gql } from "@apollo/client";
 
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 

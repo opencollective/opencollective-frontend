@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Command as CommandPrimitive } from 'cmdk';
 import { pick } from 'lodash';
 import { ChevronRight, SearchIcon } from 'lucide-react';

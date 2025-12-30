@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { themeGet } from '@styled-system/theme-get';

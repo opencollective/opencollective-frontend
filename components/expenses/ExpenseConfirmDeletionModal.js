@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mutation } from '@apollo/client/react/components';
+import { Mutation } from '@apollo/client/v4-migration';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';

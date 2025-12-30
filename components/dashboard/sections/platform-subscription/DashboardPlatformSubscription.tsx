@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { ChevronDown, Pencil, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';

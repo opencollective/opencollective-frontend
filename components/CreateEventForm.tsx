@@ -1,6 +1,5 @@
 import React from 'react';
-import type { MutationResult } from '@apollo/client';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { Form } from 'formik';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -132,7 +131,7 @@ export default function CreateEventForm({
 }: {
   parent: Pick<Account, 'id' | 'slug' | 'legacyId'>;
   loading: boolean;
-  onSuccess: (event: NonNullable<MutationResult<CreateEventMutation>['data']['createEvent']>) => Promise<void>;
+  onSuccess: (event: NonNullable<useMutation.Result<CreateEventMutation>['data']['createEvent']>) => Promise<void>;
 }) {
   const { toast } = useToast();
   const intl = useIntl();

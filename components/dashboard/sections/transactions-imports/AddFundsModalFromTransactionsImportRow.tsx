@@ -1,5 +1,5 @@
 import React from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from "@apollo/client/react";
 import { isEmpty, startCase } from 'lodash';
 
 import type {

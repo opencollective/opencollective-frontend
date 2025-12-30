@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';

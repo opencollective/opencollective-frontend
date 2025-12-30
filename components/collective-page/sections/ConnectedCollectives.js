@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';

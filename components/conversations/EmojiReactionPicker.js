@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 

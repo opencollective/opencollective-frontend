@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { orderBy, sumBy } from 'lodash';
 import { MoreVertical } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
