@@ -29,6 +29,7 @@ export const dashboardOrdersQuery = gql`
     $orderBy: ChronologicalOrderInput
     $tier: [TierReferenceInput!]
     $hostedAccounts: [AccountReferenceInput!]
+    $createdBy: [AccountReferenceInput]
   ) {
     account(slug: $slug) {
       id
@@ -57,6 +58,7 @@ export const dashboardOrdersQuery = gql`
         chargedDateTo: $chargedDateTo
         tier: $tier
         hostedAccounts: $hostedAccounts
+        createdBy: $createdBy
       ) {
         totalCount
         nodes {
