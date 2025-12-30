@@ -1,6 +1,6 @@
 import React from 'react';
 import type { InternalRefetchQueriesInclude } from '@apollo/client';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 

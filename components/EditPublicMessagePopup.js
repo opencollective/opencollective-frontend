@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mutation } from '@apollo/client/react/components';
+import { Mutation } from '@apollo/client/v4-migration';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage } from 'react-intl';

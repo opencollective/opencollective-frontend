@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from '@apollo/client/react/components';
+import { Query } from '@apollo/client/v4-migration';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { gql } from '../lib/graphql/helpers';

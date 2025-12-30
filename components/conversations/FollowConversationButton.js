@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Bell } from '@styled-icons/feather/Bell';
 import { BellOff } from '@styled-icons/feather/BellOff';
 import { get } from 'lodash';

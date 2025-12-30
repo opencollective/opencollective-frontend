@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { Email } from '@styled-icons/material/Email';
 import { useRouter } from 'next/router';

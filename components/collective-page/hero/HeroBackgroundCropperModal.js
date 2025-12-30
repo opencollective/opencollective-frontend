@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Image as ImageIcon } from '@styled-icons/boxicons-regular/Image';
 import { AngleDoubleDown } from '@styled-icons/fa-solid/AngleDoubleDown';
 import { cloneDeep, get, set } from 'lodash';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { FormattedMessage } from 'react-intl';
 
 import { gql } from '../lib/graphql/helpers';

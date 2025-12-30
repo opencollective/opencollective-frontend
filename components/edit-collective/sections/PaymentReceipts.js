@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { groupBy, uniq } from 'lodash';

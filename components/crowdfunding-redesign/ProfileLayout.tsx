@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 

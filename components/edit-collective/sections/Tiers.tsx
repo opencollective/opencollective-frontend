@@ -1,6 +1,6 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
-import { Mutation } from '@apollo/client/react/components';
+import { useMutation, useQuery } from "@apollo/client/react";
+import { Mutation } from "@apollo/client/v4-migration";
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';

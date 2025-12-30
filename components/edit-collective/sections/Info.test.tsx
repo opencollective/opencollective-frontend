@@ -1,6 +1,6 @@
 import React from 'react';
-import type { QueryResult } from '@apollo/client';
-import { MockedProvider } from '@apollo/client/testing';
+import type { useQuery } from "@apollo/client/react";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen } from '@testing-library/react';
 
 import { type AccountTaxInformationQuery, AccountType } from '@/lib/graphql/types/v2/graphql';
@@ -12,7 +12,7 @@ import Info, { infoSettingsDashboardQuery } from './Info';
 jest.mock('../../../components/RichTextEditor', () => () => <div data-testid="rich-text-editor-mock" />);
 jest.mock('../../../lib/hooks/useLoggedInUser', () => () => ({}));
 
-type AccountFromQuery = QueryResult<AccountTaxInformationQuery>['data']['account'];
+type AccountFromQuery = useQuery.Result<AccountTaxInformationQuery>['data']['account'];
 
 // Build a MockedProvider mocks entry that returns the given account for Info's query
 const buildQueryMock = (account: AccountFromQuery) => ({

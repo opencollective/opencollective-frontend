@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { debounce } from 'lodash';
 import { FormattedDate } from 'react-intl';
 

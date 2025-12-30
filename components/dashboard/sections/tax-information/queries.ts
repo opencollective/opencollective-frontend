@@ -1,4 +1,4 @@
-import type { QueryResult } from '@apollo/client';
+import type { useQuery } from "@apollo/client/react";
 import { gql } from '@apollo/client';
 
 import type { AccountTaxInformationQuery } from '../../../../lib/graphql/types/v2/graphql';
@@ -30,4 +30,4 @@ export const accountTaxInformationQuery = gql`
   }
 `;
 
-export type AccountFromTaxInformationQuery = QueryResult<AccountTaxInformationQuery>['data']['account'];
+export type AccountFromTaxInformationQuery = useQuery.Result<AccountTaxInformationQuery>['data']['account'];

@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { useIntl } from 'react-intl';
 
 import type { Views } from '../../../../lib/filters/filter-types';

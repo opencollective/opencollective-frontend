@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import type { NextRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 

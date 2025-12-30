@@ -1,6 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import dayjs from 'dayjs';
 import { omit, pick, round } from 'lodash';
 import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';

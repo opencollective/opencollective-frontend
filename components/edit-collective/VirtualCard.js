@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Copy } from '@styled-icons/feather/Copy';
 import { EllipsisVertical } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

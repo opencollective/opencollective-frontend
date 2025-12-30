@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { FormattedMessage } from 'react-intl';
 
 import { hasAccountMoneyManagement } from '@/lib/collective';

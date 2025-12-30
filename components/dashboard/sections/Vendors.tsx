@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { isEmpty, isString, pick } from 'lodash';
 import { Archive, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';

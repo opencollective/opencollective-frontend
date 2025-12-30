@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mutation } from '@apollo/client/react/components';
+import { Mutation } from '@apollo/client/v4-migration';
 import { Check } from '@styled-icons/fa-solid/Check';
 import { cloneDeep, set } from 'lodash';
 import { FormattedMessage } from 'react-intl';

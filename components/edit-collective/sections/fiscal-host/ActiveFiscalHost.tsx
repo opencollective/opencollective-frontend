@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../../lib/currency-utils';

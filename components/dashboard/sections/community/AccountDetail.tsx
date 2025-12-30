@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { pick } from 'lodash';
 import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

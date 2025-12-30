@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Info } from '@styled-icons/feather/Info';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

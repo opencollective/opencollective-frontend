@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
 import Router from 'next/router';
@@ -39,7 +39,7 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getDataFromTree } from '@apollo/client/react/ssr';
-import { mergeDeep } from '@apollo/client/utilities';
+import { mergeDeep } from '@apollo/client/utilities/internal';
 import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';

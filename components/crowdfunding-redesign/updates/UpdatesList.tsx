@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { Markup } from 'interweave';
 import { ChevronRight, MessageSquare, Smile } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports

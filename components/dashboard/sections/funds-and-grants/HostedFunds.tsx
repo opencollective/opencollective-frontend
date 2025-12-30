@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import type { ColumnDef } from '@tanstack/react-table';
 import { compact, isString, omit } from 'lodash';
 import { useRouter } from 'next/router';

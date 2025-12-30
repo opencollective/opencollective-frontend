@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { isEmpty, startCase } from 'lodash';
 import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';

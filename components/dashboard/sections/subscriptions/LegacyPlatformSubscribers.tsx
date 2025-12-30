@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { FormattedMessage } from 'react-intl';
 
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';

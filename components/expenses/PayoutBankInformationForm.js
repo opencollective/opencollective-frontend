@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { useFormikContext } from 'formik';
 import { compact, get, kebabCase, partition } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';

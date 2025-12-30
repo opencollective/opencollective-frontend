@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpectedFundsFilter, OrderStatus } from '@/lib/graphql/types/v2/graphql';

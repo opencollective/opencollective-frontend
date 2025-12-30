@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { RefreshCw } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 

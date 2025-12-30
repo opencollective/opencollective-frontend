@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { clsx } from 'clsx';
 import { clamp, cloneDeep, groupBy, isEmpty, isEqual, isNaN, round } from 'lodash';

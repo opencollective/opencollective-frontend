@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/v4-migration';
 import { clsx } from 'clsx';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { ChevronDown, FlaskConical, Megaphone } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
