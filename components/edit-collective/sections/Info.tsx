@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
@@ -206,7 +206,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
   const account = data?.account;
 
   // Load Google Maps for address autocomplete. Individuals use a simplified location input.
-  React.useEffect(() => {
+  useEffect(() => {
     if (account && account.type !== INDIVIDUAL) {
       loadGoogleMaps().finally(() => setIsLoadingGoogleMaps(false));
     }

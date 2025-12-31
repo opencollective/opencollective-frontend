@@ -181,7 +181,7 @@ const MENU_SECTIONS = {
     }),
     plusButton: {
       text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
-      href: '/create',
+      href: '/signup/collective',
     },
   },
   [CollectiveType.FUND]: {

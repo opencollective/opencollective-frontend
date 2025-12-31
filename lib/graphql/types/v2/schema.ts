@@ -8305,8 +8305,8 @@ export type Mutation = {
   importTransactions: TransactionsImport;
   /** Invite a new member to the Collective. Scope: "account". */
   inviteMember: MemberInvitation;
-  /** Creates and invites admins to an existing Organization. Scope: "account". */
-  inviteOrganizationAdmins?: Maybe<Organization>;
+  /** Creates and invites admins to an existing Account. Scope: "account". */
+  inviteMembers: Array<MemberInvitation>;
   /** [Root only] Merge two accounts, returns the result account */
   mergeAccounts: MergeAccountsResponse;
   /** Moves an expense from one account within a Collective to another */
@@ -9134,9 +9134,9 @@ export type MutationInviteMemberArgs = {
 
 
 /** This is the root mutation */
-export type MutationInviteOrganizationAdminsArgs = {
-  inviteMembers: Array<InviteMemberInput>;
-  organization: AccountReferenceInput;
+export type MutationInviteMembersArgs = {
+  account: AccountReferenceInput;
+  members: Array<InviteMemberInput>;
 };
 
 

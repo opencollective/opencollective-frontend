@@ -29,6 +29,7 @@ type EditTagsProps = {
   onChange: (value: { label: string; value: string }[]) => void;
   defaultValue?: string[];
   disabled?: boolean;
+  placeholder?: React.ReactNode;
 };
 
 type AutocompleteEditTagsProps = EditTagsProps & {
@@ -59,7 +60,16 @@ export const AutocompleteEditTags = ({ query, variables, ...props }: Autocomplet
   return <EditTags {...props} suggestedTags={suggestedTags} loading={loading} searchFunc={searchFunc} />;
 };
 
-const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, defaultValue, disabled }: EditTagsProps) => {
+const EditTags = ({
+  suggestedTags,
+  loading,
+  searchFunc,
+  value,
+  onChange,
+  defaultValue,
+  disabled,
+  placeholder,
+}: EditTagsProps) => {
   const intl = useIntl();
   const [tags, setTags] = React.useState(getOptions(value || defaultValue));
   const [inputValue, setInputValue] = React.useState('');
@@ -112,9 +122,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
             data-cy="edit-tags-open"
           >
             <Tags size={16} />
-            <span>
-              <FormattedMessage defaultMessage="Add tag" id="Un1mxZ" />
-            </span>
+            <span>{placeholder || <FormattedMessage defaultMessage="Add tag" id="Un1mxZ" />}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="max-w-48 p-0">
