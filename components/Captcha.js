@@ -63,6 +63,13 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
   );
 };
 
+export const resetCaptcha = () => {
+  if (typeof window !== 'undefined') {
+    window.grecaptcha?.reset(); // grecaptcha is compatible with both HCaptcha and ReCaptcha
+    window.turnstile?.reset();
+  }
+};
+
 /**
  * @type {React.ForwardRefExoticComponent<{ onVerify: (result) => void;}>}
  */
