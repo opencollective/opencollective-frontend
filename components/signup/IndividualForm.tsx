@@ -17,7 +17,7 @@ import Image from '@/components/Image';
 import { Card, CardContent } from '@/components/ui/Card';
 
 import { EditAvatar } from '../Avatar';
-import Captcha, { isCaptchaEnabled } from '../Captcha';
+import Captcha, { isCaptchaEnabled, resetCaptcha } from '../Captcha';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
 import { PasswordInput } from '../PasswordInput';
@@ -107,6 +107,7 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
             session: response.sessionId,
           });
         } else {
+          resetCaptcha();
           toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
         }
       } else if (step === SignupSteps.VERIFY_OTP) {
