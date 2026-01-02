@@ -6,21 +6,17 @@ import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
-import type {
-  AccountHoverCardFieldsFragment,
-  DashboardOrdersQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
-import { createdByFilter } from '../../filters/CreatedByFilter';
+import { createdByFilter, type CreatedByFilterMeta } from '../../filters/CreatedByFilter';
 import { expectedDateFilter } from '../../filters/DateFilter';
 import type { DashboardSectionProps } from '../../types';
 
@@ -87,15 +83,8 @@ const hostExpectedFundsMetadataQuery = gql`
       ) {
         totalCount
       }
-      orders(filter: INCOMING, expectedFundsFilter: ONLY_PENDING, hostContext: ALL) {
-        createdByUsers {
-          id
-          ...AccountHoverCardFields
-        }
-      }
     }
   }
-  ${accountHoverCardFields}
 `;
 
 const schema = baseSchema.extend({
@@ -103,9 +92,7 @@ const schema = baseSchema.extend({
   createdBy: createdByFilter.schema,
 });
 
-type FilterMeta = BaseFilterMeta & {
-  createdByUsers?: Partial<AccountHoverCardFieldsFragment>[];
-};
+type FilterMeta = BaseFilterMeta & CreatedByFilterMeta;
 
 type FilterValues = z.infer<typeof schema>;
 
@@ -176,7 +163,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     hostSlug: account.isHost ? account.slug : undefined,
     includeUncategorized: true,
     accountingCategoryKinds: ContributionAccountingCategoryKinds,
-    createdByUsers: metadata?.account?.orders?.createdByUsers,
   };
 
   const queryFilter = useQueryFilter({

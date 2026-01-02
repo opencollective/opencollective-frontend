@@ -9769,12 +9769,20 @@ export type OrderByInput = {
 /** A collection of "Orders" */
 export type OrderCollection = Collection & {
   __typename?: 'OrderCollection';
-  /** The accounts that created the orders in this collection, regardless of pagination */
-  createdByUsers?: Maybe<Array<Maybe<Account>>>;
+  /** The accounts that created the orders in this collection, regardless of pagination. Returns a paginated and searchable collection. */
+  createdByUsers: AccountCollection;
   limit?: Maybe<Scalars['Int']['output']>;
   nodes?: Maybe<Array<Maybe<Order>>>;
   offset?: Maybe<Scalars['Int']['output']>;
   totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+/** A collection of "Orders" */
+export type OrderCollectionCreatedByUsersArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Some context about how an order was created */

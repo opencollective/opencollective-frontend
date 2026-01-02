@@ -2091,9 +2091,24 @@ type OrderCollection implements Collection {
   nodes: [Order]
 
   """
-  The accounts that created the orders in this collection, regardless of pagination
+  The accounts that created the orders in this collection, regardless of pagination. Returns a paginated and searchable collection.
   """
-  createdByUsers: [Account]
+  createdByUsers(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term to filter by name, slug, or email
+    """
+    searchTerm: String
+  ): AccountCollection!
 }
 
 """
