@@ -232,6 +232,7 @@ export type AccountExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -1751,6 +1752,7 @@ export type BotExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -2327,6 +2329,7 @@ export type CollectiveExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -4447,6 +4450,7 @@ export type EventExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -4924,6 +4928,13 @@ export type ExpenseLegalDocumentsArgs = {
 /** This represents an Expense */
 export type ExpenseValidateTransferRequirementsArgs = {
   details?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type ExpenseActivityFilter = {
+  /** Activities triggered by this individual */
+  individual?: InputMaybe<AccountReferenceInput>;
+  /** The type(s) of activities to filter by */
+  type?: InputMaybe<Array<ActivityType>>;
 };
 
 /** Fields for an expense's attached file */
@@ -5732,6 +5743,7 @@ export type FundExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -6447,6 +6459,7 @@ export type HostExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -7473,6 +7486,7 @@ export type IndividualExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -10180,6 +10194,7 @@ export type OrganizationExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -11523,6 +11538,7 @@ export type ProjectExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -12037,6 +12053,7 @@ export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -13943,6 +13960,7 @@ export type VendorExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;

@@ -1,11 +1,12 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
-import { FlaskConical, X } from 'lucide-react';
+import { useMutation, useQuery } from '@apollo/client';
+import { FlaskConical, Settings, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
@@ -15,6 +16,12 @@ import Image from '../../../Image';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../../../ui/DropdownMenu';
 import { Popover, PopoverAnchor, PopoverContent } from '../../../ui/Popover';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -28,9 +35,10 @@ import AccountTable from './AccountTable';
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
-import { overviewMetricsQuery } from './queries';
+import { editAccountSettingMutation, overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { AccountTodoList } from './TodoList';
+import { WelcomeCollective } from './Welcome';
 
 export const schema = z.object({
   period: periodCompareFilter.schema,
@@ -41,8 +49,28 @@ export const schema = z.object({
 
 export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
+  const [showSetupGuide, setShowSetupGuide] = React.useState(undefined);
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
   const router = useRouter();
+
+  const handleSetupGuideToggle = React.useCallback(
+    async (open: boolean) => {
+      setShowSetupGuide(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showSetupGuide.id${account.legacyId}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
+
   const queryFilter = useQueryFilter({
     schema,
     toVariables: {
@@ -176,11 +204,11 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3">
-        <DashboardHeader
-          title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
-          titleRoute={getDashboardRoute(account, 'overview')}
-          actions={
+      <DashboardHeader
+        title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
+        titleRoute={getDashboardRoute(account, 'overview')}
+        actions={
+          <div className="flex gap-2">
             <Popover open>
               <PopoverAnchor>
                 <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowFeedbackModal(true)}>
@@ -234,11 +262,28 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
                 )}
               </DismissibleMessage>
             </Popover>
-          }
-        />
-        <ConvertedAccountMessage account={account} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon-sm" variant="outline">
+                  <Settings size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuCheckboxItem
+                  checked={showSetupGuide}
+                  onClick={() => handleSetupGuideToggle(!showSetupGuide)}
+                >
+                  <FormattedMessage defaultMessage="Display setup guide" id="SetupGuide.DisplaySetupGuide" />
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        }
+      />
+      <ConvertedAccountMessage account={account} />
+      <WelcomeCollective account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+      <div className="space-y-3">
         <Filterbar hideSeparator {...queryFilter} />
-
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
           {metrics
             .filter(metric => !metric.hide)
