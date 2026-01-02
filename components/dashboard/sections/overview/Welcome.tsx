@@ -400,6 +400,10 @@ export const WelcomeCollective = ({ account: _account, setOpen, open }) => {
     }
   }, [data?.account, open, setOpen, LoggedInUser]);
 
+  if (_account?.parent) {
+    return null;
+  }
+
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleContent>
