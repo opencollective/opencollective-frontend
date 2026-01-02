@@ -27,23 +27,21 @@ const hostedAccountFilterSearchQuery = gql`
   ${accountHoverCardFields}
 `;
 
-export const AccountRenderer = ({
-  account,
-  inOptionsList,
-}: {
+export const AccountRenderer = (props: {
   account: Partial<AccountHoverCardFieldsFragment> & {
     slug: Account['slug'];
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
   const { data } = useQuery<AccountFilterQuery>(accountFilterQuery, {
-    variables: { slug: account.slug },
+    variables: { slug: props.account.slug },
     fetchPolicy: 'cache-first',
 
     // skip query if there is already a field from the hover card data (such as description),
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
-    skip: !!account.description && !!account.type,
+    skip: !!props.account.description && !!props.account.type,
   });
+  const account = data?.account ?? props.account;
 
   const trigger = (
     <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
@@ -61,7 +59,7 @@ export const AccountRenderer = ({
   return (
     <AccountHoverCard
       account={data.account}
-      {...(inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
+      {...(props.inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
       trigger={trigger}
     />
   );

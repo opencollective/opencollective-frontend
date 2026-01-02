@@ -6,22 +6,23 @@ import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
+import type { DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
-import type { DashboardOrdersQueryVariables } from '@/lib/graphql/types/v2/graphql';
 
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
+import { createdByFilter, type CreatedByFilterMeta } from '../../filters/CreatedByFilter';
 import { expectedDateFilter } from '../../filters/DateFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
 import CreatePendingContributionModal from './CreatePendingOrderModal';
-import type { FilterMeta } from './filters';
+import type { FilterMeta as BaseFilterMeta } from './filters';
 import {
   ContributionAccountingCategoryKinds,
   filters as baseFilters,
@@ -39,7 +40,7 @@ enum ContributionsTab {
 }
 
 const hostExpectedFundsMetadataQuery = gql`
-  query HostExpectedFundsMetadata($slug: String!, $expectedFundsFilter: ExpectedFundsFilter) {
+  query HostExpectedFundsMetadata($slug: String!) {
     account(slug: $slug) {
       id
       slug
@@ -58,25 +59,15 @@ const hostExpectedFundsMetadataQuery = gql`
           hostFeePercent
         }
       }
-      PENDING: orders(
-        filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
-        status: [PENDING]
-        hostContext: ALL
-      ) {
+      PENDING: orders(filter: INCOMING, expectedFundsFilter: ONLY_PENDING, status: [PENDING], hostContext: ALL) {
         totalCount
       }
-      EXPIRED: orders(
-        filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
-        status: [EXPIRED]
-        hostContext: ALL
-      ) {
+      EXPIRED: orders(filter: INCOMING, expectedFundsFilter: ONLY_PENDING, status: [EXPIRED], hostContext: ALL) {
         totalCount
       }
       PAID: orders(
         filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
+        expectedFundsFilter: ONLY_PENDING
         status: [PAID]
         includeIncognito: true
         hostContext: ALL
@@ -85,7 +76,7 @@ const hostExpectedFundsMetadataQuery = gql`
       }
       CANCELED: orders(
         filter: INCOMING
-        expectedFundsFilter: $expectedFundsFilter
+        expectedFundsFilter: ONLY_PENDING
         status: [CANCELLED]
         includeIncognito: true
         hostContext: ALL
@@ -98,15 +89,23 @@ const hostExpectedFundsMetadataQuery = gql`
 
 const schema = baseSchema.extend({
   expectedDate: expectedDateFilter.schema,
+  createdBy: createdByFilter.schema,
 });
+
+type FilterMeta = BaseFilterMeta & CreatedByFilterMeta;
+
 type FilterValues = z.infer<typeof schema>;
+
 const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
-  ...baseToVariables,
+  ...(baseToVariables as FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta>),
   expectedDate: expectedDateFilter.toVariables,
+  createdBy: createdByFilter.toVariables,
 };
+
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...baseFilters,
   expectedDate: expectedDateFilter.filter,
+  createdBy: createdByFilter.filter,
 };
 
 function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
@@ -115,6 +114,12 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
 
   const isUpgradeRequired = requiresUpgrade(account, FEATURES.EXPECTED_FUNDS);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
+
+  const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
+    variables: { slug: accountSlug },
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+    skip: isUpgradeRequired,
+  });
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -166,16 +171,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     meta: filterMeta,
     views,
     filters,
-  });
-
-  const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
-    variables: {
-      slug: accountSlug,
-      expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
-    },
-
-    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
-    skip: isUpgradeRequired,
   });
 
   const { data, loading, error, refetch } = useQuery(dashboardOrdersQuery, {

@@ -353,6 +353,7 @@ export type AccountOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1880,6 +1881,7 @@ export type BotOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2471,6 +2473,7 @@ export type CollectiveOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4592,6 +4595,7 @@ export type EventOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5885,6 +5889,7 @@ export type FundOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6721,6 +6726,7 @@ export type HostOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -7641,6 +7647,7 @@ export type IndividualOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -9776,10 +9783,20 @@ export type OrderByInput = {
 /** A collection of "Orders" */
 export type OrderCollection = Collection & {
   __typename?: 'OrderCollection';
+  /** The accounts that created the orders in this collection, regardless of pagination. Returns a paginated and searchable collection. */
+  createdByUsers: AccountCollection;
   limit?: Maybe<Scalars['Int']['output']>;
   nodes?: Maybe<Array<Maybe<Order>>>;
   offset?: Maybe<Scalars['Int']['output']>;
   totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+/** A collection of "Orders" */
+export type OrderCollectionCreatedByUsersArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Some context about how an order was created */
@@ -10322,6 +10339,7 @@ export type OrganizationOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10574,6 +10592,7 @@ export type PaymentMethodOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11680,6 +11699,7 @@ export type ProjectOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -12160,6 +12180,7 @@ export type QueryOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -14088,6 +14109,7 @@ export type VendorOrdersArgs = {
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBy?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;

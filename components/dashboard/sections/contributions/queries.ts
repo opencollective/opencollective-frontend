@@ -28,6 +28,7 @@ export const dashboardOrdersQuery = gql`
     $expectedFundsFilter: ExpectedFundsFilter
     $orderBy: ChronologicalOrderInput
     $tier: [TierReferenceInput!]
+    $createdBy: [AccountReferenceInput]
   ) {
     account(slug: $slug) {
       id
@@ -55,6 +56,7 @@ export const dashboardOrdersQuery = gql`
         chargedDateFrom: $chargedDateFrom
         chargedDateTo: $chargedDateTo
         tier: $tier
+        createdBy: $createdBy
       ) {
         totalCount
         nodes {
