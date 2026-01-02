@@ -208,11 +208,7 @@ export function InviteAdminForm({ nextStep, createdAccount }: SignupStepProps) {
               onClick={() => nextStep()}
               data-cy="skip-button"
             >
-              {createdAccount?.type === 'COLLECTIVE' ? (
-                <FormattedMessage defaultMessage="Skip to my Profile" id="SkipToProfile" />
-              ) : (
-                <FormattedMessage defaultMessage="Skip to Dashboard" id="SkipToDashboard" />
-              )}
+              <FormattedMessage defaultMessage="Skip to Dashboard" id="SkipToDashboard" />
             </Button>
             <Button
               type="submit"

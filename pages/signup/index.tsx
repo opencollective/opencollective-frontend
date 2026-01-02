@@ -81,11 +81,7 @@ export default function SignupPage() {
         if (!requestedStep && !nextStep) {
           const pathname =
             getRedirectPathSafe(router) ||
-            (createdAccount
-              ? createdAccount.type === 'COLLECTIVE'
-                ? `/${createdAccount.slug}`
-                : getDashboardRoute(createdAccount, '/overview')
-              : '/dashboard');
+            (createdAccount ? getDashboardRoute(createdAccount, '/overview') : '/dashboard');
           router.push(pathname);
           return prev;
         } else {
@@ -131,11 +127,7 @@ export default function SignupPage() {
         nextStep(SignupSteps.CREATE_COLLECTIVE);
       } else {
         // If the user is already logged in and not creating an org, redirect to home page
-        router.push(
-          getRedirectPathSafe(router) || (nextActionFlow === NEXT_ACTION_FLOWS.COLLECTIVE && createdAccount)
-            ? `/${createdAccount.slug}`
-            : '/dashboard',
-        );
+        router.push(getRedirectPathSafe(router) || '/dashboard');
       }
     } else if (
       !me &&

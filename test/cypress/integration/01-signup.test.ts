@@ -249,7 +249,7 @@ describe('/signup', () => {
           expect(email.HTML).to.include('just invited you to the role of Administrator of');
         });
         cy.wait(500); // Wait for redirect
-        cy.url().should('include', `localhost:3000/${slug}`);
+        cy.url().should('include', `/dashboard/${slug}/overview`);
       });
 
       it('should create collective while logged-in', () => {
@@ -262,7 +262,7 @@ describe('/signup', () => {
         cy.get('@form').find('button[type="submit"]').click();
         cy.getByDataCy('skip-button').click();
         cy.wait(500); // Wait for redirect
-        cy.url().should('include', `localhost:3000/${slug}`);
+        cy.url().should('include', `/dashboard/${slug}/overview`);
       });
     },
   );
