@@ -59,8 +59,21 @@ export default async function handle(req, res) {
   } else {
     // For JSON requests, parse and re-stringify (existing behavior)
     const rawBody = await getRawBody(req);
-    const jsonBody = JSON.parse(rawBody.toString() || '{}');
-    body = JSON.stringify(jsonBody);
+    try {
+      const jsonBody = JSON.parse(rawBody.toString() || '{}');
+      body = JSON.stringify(jsonBody);
+    } catch (e) {
+      // Return 400 for malformed JSON instead of crashing with 500
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(400).json({
+        errors: [
+          {
+            message: `Invalid JSON in request body: ${e.message}`,
+            extensions: { code: 'BAD_REQUEST' },
+          },
+        ],
+      });
+    }
   }
 
   const result = await fetch(graphqlUrl, {

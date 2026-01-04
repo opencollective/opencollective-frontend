@@ -37,12 +37,19 @@ function createMockResponse() {
       this.headers[key] = value;
       return this;
     },
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
     json(data) {
       this.body = data;
       return this;
     },
     _getJSONData() {
       return this.body;
+    },
+    _getStatusCode() {
+      return this.statusCode;
     },
   };
   return res;
@@ -59,6 +66,34 @@ describe('pages/api/graphql/v2', () => {
   });
 
   describe('JSON requests', () => {
+    it('should return 400 for malformed JSON', async () => {
+      const req = createMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: 'Bearer test-token',
+        },
+        body: '{ invalid json }',
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      // Should return 400 Bad Request, not crash with 500
+      expect(res._getStatusCode()).toBe(400);
+      expect(res._getJSONData()).toEqual({
+        errors: [
+          {
+            message: expect.stringContaining('Invalid JSON'),
+            extensions: { code: 'BAD_REQUEST' },
+          },
+        ],
+      });
+      // Should not have called fetch
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
     it('should forward JSON requests with stringified body', async () => {
       const mockResponse = { data: { account: { id: '123' } } };
       global.fetch.mockResolvedValueOnce({
