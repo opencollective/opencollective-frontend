@@ -53,27 +53,40 @@ export default async function handle(req, res) {
 
   let body;
 
-  if (isMultipart(req)) {
-    // For multipart requests, forward the raw body without modification
-    body = await getRawBody(req);
-  } else {
-    // For JSON requests, parse and re-stringify (existing behavior)
-    const rawBody = await getRawBody(req);
-    try {
-      const jsonBody = JSON.parse(rawBody.toString() || '{}');
-      body = JSON.stringify(jsonBody);
-    } catch (e) {
-      // Return 400 for malformed JSON instead of crashing with 500
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(400).json({
-        errors: [
-          {
-            message: `Invalid JSON in request body: ${e.message}`,
-            extensions: { code: 'BAD_REQUEST' },
-          },
-        ],
-      });
+  try {
+    if (isMultipart(req)) {
+      // For multipart requests, forward the raw body without modification
+      body = await getRawBody(req);
+    } else {
+      // For JSON requests, parse and re-stringify (existing behavior)
+      const rawBody = await getRawBody(req);
+      try {
+        const jsonBody = JSON.parse(rawBody.toString() || '{}');
+        body = JSON.stringify(jsonBody);
+      } catch (e) {
+        // Return 400 for malformed JSON instead of crashing with 500
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(400).json({
+          errors: [
+            {
+              message: `Invalid JSON in request body: ${e.message}`,
+              extensions: { code: 'BAD_REQUEST' },
+            },
+          ],
+        });
+      }
     }
+  } catch (e) {
+    // Handle stream errors (e.g., client disconnect during upload)
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(500).json({
+      errors: [
+        {
+          message: `Error reading request body: ${e.message}`,
+          extensions: { code: 'INTERNAL_SERVER_ERROR' },
+        },
+      ],
+    });
   }
 
   const result = await fetch(graphqlUrl, {

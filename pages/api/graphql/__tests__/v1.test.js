@@ -26,6 +26,25 @@ function createMockRequest({ method, headers, body }) {
 }
 
 /**
+ * Create a mock request that emits a stream error (simulates client disconnect)
+ */
+function createErroringMockRequest({ method, headers, errorMessage }) {
+  const stream = new Readable({
+    read() {
+      // Emit error on next tick to simulate async stream error
+      process.nextTick(() => {
+        this.destroy(new Error(errorMessage || 'Client disconnected'));
+      });
+    },
+  });
+
+  return Object.assign(stream, {
+    method,
+    headers: headers || {},
+  });
+}
+
+/**
  * Create a mock response
  */
 function createMockResponse() {
@@ -87,6 +106,34 @@ describe('pages/api/graphql/v1', () => {
           {
             message: expect.stringContaining('Invalid JSON'),
             extensions: { code: 'BAD_REQUEST' },
+          },
+        ],
+      });
+      // Should not have called fetch
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('should return 500 for stream errors (client disconnect)', async () => {
+      const req = createErroringMockRequest({
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: 'Bearer test-token',
+        },
+        errorMessage: 'Client disconnected',
+      });
+
+      const res = createMockResponse();
+
+      await handler(req, res);
+
+      // Should return 500 Internal Server Error with proper message
+      expect(res._getStatusCode()).toBe(500);
+      expect(res._getJSONData()).toEqual({
+        errors: [
+          {
+            message: expect.stringContaining('Error reading request body'),
+            extensions: { code: 'INTERNAL_SERVER_ERROR' },
           },
         ],
       });
