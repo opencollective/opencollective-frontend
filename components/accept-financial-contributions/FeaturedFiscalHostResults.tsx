@@ -30,7 +30,11 @@ export default function FeaturedFiscalHostResults({
     <div className="rounded-3xl bg-[#F1F6FF] p-8">
       <div className="flex flex-wrap items-baseline gap-3">
         <h1 className="text-2xl font-bold">
-          <FormattedMessage defaultMessage="OFi Consortium Members" id="zJv9HH" />
+          <FormattedMessage
+            defaultMessage="{OrganizationName} Members"
+            values={{ OrganizationName: 'OFi Consortium' }}
+            id="OrganizationMembers"
+          />
         </h1>
         <p>
           <FormattedMessage
