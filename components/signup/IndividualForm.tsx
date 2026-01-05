@@ -407,7 +407,6 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
         nextStep();
       } catch (e) {
         setLoading(false);
-        toast({ variant: 'error', title: 'Error', message: e.message });
         toast({
           variant: 'error',
           title: <FormattedMessage id="signup.completeProfile.error" defaultMessage="Error completing profile" />,
