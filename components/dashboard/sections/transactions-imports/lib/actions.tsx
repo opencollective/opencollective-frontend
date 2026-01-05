@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { cloneDeep, pick, uniq, update } from 'lodash';
-import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon } from 'lucide-react';
+import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon, Unlink } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
@@ -17,6 +17,7 @@ import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchCreditDialog } from '../MatchCreditDialog';
 import { MatchDebitDialog } from '../MatchDebitDialog';
+import { UnlinkTransactionImportRowDialog } from '../UnlinkTransactionImportRowDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
@@ -140,6 +141,52 @@ export const useTransactionsImportActions = ({
     };
 
     if (isImported) {
+      const handleRevert = async () => {
+        hideModal('unlink-transaction-import-row-modal');
+        setUpdatingRows(uniq([...updatingRows, row.id]));
+        try {
+          const action = 'UNLINK';
+          await updateRows({
+            variables: {
+              action,
+              rows: [{ id: row.id }],
+            },
+            optimisticResponse: !skipOptimisticResponse
+              ? getOptimisticResponse(host, [row.id], TransactionsImportRowStatus.PENDING)
+              : undefined,
+          });
+
+          onUpdateSuccess?.();
+          toast({
+            variant: 'success',
+            message: intl.formatMessage({
+              defaultMessage: 'Transaction import row unlinked successfully',
+              id: 'UnlinkTransactionImportRowSuccess',
+            }),
+          });
+        } catch (error) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+        } finally {
+          setUpdatingRows(updatingRows.filter(rowId => rowId !== row.id));
+        }
+      };
+
+      actions.primary.push({
+        key: 'revert',
+        Icon: Unlink,
+        label: <FormattedMessage defaultMessage="Unlink" id="Transaction.Unlink" />,
+        disabled: isUpdatingRow,
+        onClick: () => {
+          showModal(
+            UnlinkTransactionImportRowDialog,
+            {
+              row,
+              onConfirm: handleRevert,
+            },
+            'unlink-transaction-import-row-modal',
+          );
+        },
+      });
       return actions;
     } else if (row.status !== TransactionsImportRowStatus.IGNORED) {
       if (row.amount.valueInCents > 0) {
