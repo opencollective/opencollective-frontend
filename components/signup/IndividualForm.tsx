@@ -31,13 +31,13 @@ import { SignupSteps } from './common';
 
 const emailVerificationFormSchema = z.union([
   z.object({
-    email: z.string().email().min(5).max(64),
+    email: z.string().email().min(5).max(128),
     captcha: isCaptchaEnabled()
       ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
       : z.undefined(),
   }),
   z.object({
-    email: z.string().email().min(5).max(64),
+    email: z.string().email().min(5).max(128),
     otp: z.string().min(6).max(6).toUpperCase(),
   }),
 ]);
