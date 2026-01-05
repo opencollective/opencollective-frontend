@@ -8,7 +8,8 @@ import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
 import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
-import { type AccountReferenceInput, KycProvider } from '@/lib/graphql/types/v2/schema';
+import type { Account, AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import { KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
@@ -97,7 +98,7 @@ enum AccountDetailView {
 type ContributionDrawerProps = {
   onClose: () => void;
   account?: AccountReferenceInput;
-  host?: AccountReferenceInput;
+  host?: Pick<Account, 'id' | 'currency' | 'slug'>;
 };
 
 export function ContributorDetails(props: ContributionDrawerProps) {
