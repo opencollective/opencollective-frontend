@@ -16,7 +16,7 @@ import StyledFilters from '../StyledFilters';
 import StyledInput from '../StyledInput';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
-import { H1, P } from '../Text';
+import { P } from '../Text';
 
 import FindAHostSearch from './FindAHostSearch';
 
@@ -34,7 +34,7 @@ const CommunityTypesToTags = {
   'Open Source': ['open source', 'opensource', 'open-source'],
   'Mutual Aid': ['mutual aid', 'covid', 'covid-19'],
   Education: ['education', 'meetup', 'tech meetup'],
-  'Civic Tech': [''],
+  'Civic Tech': ['civic tech', 'decentralization', 'governance', 'govtech'],
   'Arts & Culture': ['arts and culture', 'art', 'arts', 'visual art', 'visual arts', 'music'],
   Climate: ['climate', 'climate change', 'climate crisis', 'climate action', 'climate emergency'],
 };
@@ -87,51 +87,32 @@ export default function AcceptContributionsThroughAFiscalHost(props: StartAccept
 
   return (
     <Flex px={2} my={5} alignItems="center" flexDirection="column">
-      <Box
-        display="grid"
-        paddingX={[null, null, null, '100px']}
-        width={['100%', '100%', '90%', '927px', '1200px']}
-        gridTemplateColumns="auto auto"
-        gridTemplateRows="auto"
-        py={4}
-        px={2}
-      >
-        <Box gridColumn="1" justifySelf="center" gridRow={['1', '1', '1 / span 2']} mr={4} my={2}>
-          <Illustration
-            alt="A place to grow and thrive illustration"
-            src="/static/images/fiscal-hosting/what-is-a-fiscalhost-illustration.png"
-          />
-        </Box>
-        <Box gridColumn={['1', '1', '2']} gridRow={['2', '2', '1']}>
-          <H1
-            textAlign={['center', 'center', 'left']}
-            fontSize={['20px', '32px']}
-            lineHeight={['24px', '40px']}
-            fontWeight="700"
-            color="black.900"
-          >
+      <div className="mt-8 mb-10 flex flex-col items-center gap-8 sm:max-w-[90%] sm:flex-row sm:items-start lg:max-w-5xl">
+        <Illustration
+          alt="A place to grow and thrive illustration"
+          src="/static/images/fiscal-hosting/what-is-a-fiscalhost-illustration.png"
+        />
+        <div className="flex flex-col gap-4 text-center sm:text-left sm:text-3xl">
+          <h1 className="text-xl font-bold">
             <FormattedMessage defaultMessage="Accept contributions through a Fiscal Host" id="FEpInY" />
-          </H1>
-        </Box>
-        <Box gridColumn={['1', '1', '2']} gridRow={['3', '3', '2']} textAlign={['center', 'center', 'left']}>
-          <P my={3} fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
+          </h1>
+          <p className="text-lg">
             <FormattedMessage
               defaultMessage="A fiscal host is an organization that welcomes others to operate through their structure, so projects can use the host’s legal entity and bank account instead of setting up their own. The host provides administrative services, oversight, and support."
               id="1/t8Wm"
             />
-          </P>
-          <Box textAlign={['center', 'center', 'left']}>
-            <StyledLink
-              buttonSize="tiny"
-              buttonStyle="secondary"
-              href="https://opencollective.com/fiscal-hosting"
-              openInNewTab
-            >
-              <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
-            </StyledLink>
-          </Box>
-        </Box>
-      </Box>
+          </p>
+          <StyledLink
+            buttonSize="tiny"
+            buttonStyle="secondary"
+            href="https://opencollective.com/fiscal-hosting"
+            openInNewTab
+            className="self-center text-sm! tracking-normal! sm:self-start"
+          >
+            <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
+          </StyledLink>
+        </div>
+      </div>
       <StyledCard
         borderStyle={[null, null, 'solid', 'solid']}
         width={['100%', '100%', '90%', '927px']}

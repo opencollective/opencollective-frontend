@@ -4,9 +4,7 @@ import { styled } from 'styled-components';
 
 import type { Account, Host } from '../../lib/graphql/types/v2/schema';
 
-import { Flex, Grid } from '../Grid';
-import StyledCard from '../StyledCard';
-import { P } from '../Text';
+import { Grid } from '../Grid';
 
 import ApplyToHostCard from './ApplyToHostCard';
 
@@ -29,12 +27,16 @@ export default function FeaturedFiscalHostResults({
   collective: Pick<Account, 'slug'>;
 }) {
   return (
-    <StyledCard padding={4} bg="#F1F6FF" borderRadius="24px" borderStyle="none">
-      <Flex flexWrap="wrap">
-        <P mr={3} fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
-          <FormattedMessage defaultMessage="Recommended Hosts" id="NmfuHo" />
-        </P>
-        <P fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
+    <div className="rounded-3xl bg-[#F1F6FF] p-8">
+      <div className="flex flex-wrap items-baseline gap-3">
+        <h1 className="text-2xl font-bold">
+          <FormattedMessage
+            defaultMessage="{OrganizationName} Members"
+            values={{ OrganizationName: 'OFi Consortium' }}
+            id="OrganizationMembers"
+          />
+        </h1>
+        <p>
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
             id="PB3Bh9"
@@ -42,16 +44,19 @@ export default function FeaturedFiscalHostResults({
               hostCount: hosts.length,
             }}
           />
-        </P>
-      </Flex>
-      <P fontSize="14px" lineHeight="20px" fontWeight="500" color="black.900">
-        <FormattedMessage defaultMessage="Our most trusted hosts" id="w4F3He" />
-      </P>
+        </p>
+      </div>
+      <p>
+        <FormattedMessage
+          defaultMessage="They represent thousands of Collectives and guide our platform's strategic direction."
+          id="tDuKL5"
+        />
+      </p>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
           return <ApplyToHostCard key={host.slug} host={host} collective={collective} />;
         })}
       </HostCardContainer>
-    </StyledCard>
+    </div>
   );
 }
