@@ -108,7 +108,11 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
           });
         } else {
           resetCaptcha();
-          toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
+          const message =
+            formatErrorMessage(intl, response.error) ||
+            response.error?.message ||
+            'An error occurred while signing up, please try again.';
+          toast({ variant: 'error', message });
         }
       } else if (step === SignupSteps.VERIFY_OTP) {
         const sessionId = router.query?.session as string;
