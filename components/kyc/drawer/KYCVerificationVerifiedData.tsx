@@ -15,16 +15,20 @@ export function KYCVerificationVerifiedData(props: KYCVerificationVerifiedDataPr
     <React.Fragment>
       <DataList>
         <DataListItem>
-          <DataListItemLabel>
+          <DataListItemLabel className="min-w-auto sm:!basis-[180px]">
             <FormattedMessage defaultMessage="Legal Name" id="LegalName" />
           </DataListItemLabel>
-          <DataListItemValue>{verifiedData.legalName}</DataListItemValue>
+          <DataListItemValue className="grow overflow-hidden whitespace-pre-line">
+            {verifiedData.legalName}
+          </DataListItemValue>
         </DataListItem>
         <DataListItem>
-          <DataListItemLabel>
+          <DataListItemLabel className="min-w-auto sm:!basis-[180px]">
             <FormattedMessage defaultMessage="Legal Address" id="LegalAddress" />
           </DataListItemLabel>
-          <DataListItemValue>{verifiedData.legalAddress}</DataListItemValue>
+          <DataListItemValue className="grow overflow-hidden whitespace-pre-line">
+            {verifiedData.legalAddress}
+          </DataListItemValue>
         </DataListItem>
       </DataList>
     </React.Fragment>

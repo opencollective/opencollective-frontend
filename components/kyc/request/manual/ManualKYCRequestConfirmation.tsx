@@ -111,7 +111,9 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
                     <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
                   </div>
                 }
-                value={<span className="font-medium text-slate-900">{props.request.legalName}</span>}
+                labelClassName="min-w-auto sm:!basis-[180px]"
+                itemClassName="font-medium whitespace-pre-line text-slate-900 grow overflow-hidden"
+                value={props.request.legalName}
               />
 
               {props.request.legalAddress && (
@@ -122,9 +124,9 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
                       <FormattedMessage id="LegalAddress" defaultMessage="Legal Address" />
                     </div>
                   }
-                  value={
-                    <div className="font-medium whitespace-pre-line text-slate-900">{props.request.legalAddress}</div>
-                  }
+                  labelClassName="min-w-auto sm:!basis-[180px]"
+                  itemClassName="font-medium whitespace-pre-line text-slate-900 grow overflow-hidden"
+                  value={props.request.legalAddress}
                 />
               )}
 
@@ -136,7 +138,9 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
                       <FormattedMessage defaultMessage="Additional Notes" id="PzWdQF" />
                     </div>
                   }
-                  value={<div className="whitespace-pre-line text-slate-700">{props.request.notes}</div>}
+                  labelClassName="min-w-auto sm:!basis-[180px]"
+                  itemClassName="whitespace-pre-line text-slate-700 grow overflow-hidden"
+                  value={props.request.notes}
                 />
               )}
             </DataList>

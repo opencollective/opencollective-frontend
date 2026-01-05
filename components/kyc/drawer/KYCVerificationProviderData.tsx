@@ -16,10 +16,12 @@ export function KYCVerificationProviderData(props: KYCVerificationProviderDataPr
     <React.Fragment>
       <DataList>
         <DataListItem>
-          <DataListItemLabel>
+          <DataListItemLabel className="min-w-auto sm:!basis-[180px]">
             <FormattedMessage defaultMessage="Notes" id="expense.notes" />
           </DataListItemLabel>
-          <DataListItemValue>{providerData.notes ?? '-'}</DataListItemValue>
+          <DataListItemValue className="grow overflow-hidden whitespace-pre-line text-slate-700">
+            {providerData.notes ?? '-'}
+          </DataListItemValue>
         </DataListItem>
       </DataList>
     </React.Fragment>
