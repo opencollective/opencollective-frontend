@@ -167,6 +167,7 @@
     "dev": "node server",
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "git:clean": "cross-env ./scripts/git_clean.sh",
+    "graphql:audit": "node scripts/graphql-audit.js",
     "graphql:codegen": "graphql-codegen --config scripts/config/graphql-codegen.ts",
     "graphql:get-schema": "npm-run-all graphql:updateV1 graphql:updateV2",
     "graphql:update": "npm-run-all graphql:updateV1 graphql:updateV2 graphql:codegen",

@@ -510,7 +510,7 @@ class ConversationPage extends React.Component {
   }
 }
 
-const getData = graphql(conversationPageQuery, {
+const addConversationPageQuery = graphql(conversationPageQuery, {
   options: {
     pollInterval: 60000, // Will refresh the data every 60s to get new comments
   },
@@ -518,4 +518,4 @@ const getData = graphql(conversationPageQuery, {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default withUser(getData(withRouter(withApollo(ConversationPage))));
+export default withUser(addConversationPageQuery(withRouter(withApollo(ConversationPage))));

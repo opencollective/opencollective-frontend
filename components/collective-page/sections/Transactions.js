@@ -56,7 +56,7 @@ export const transactionsSectionQuery = gql`
       includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
   }
   ${transactionsQueryCollectionFragment}

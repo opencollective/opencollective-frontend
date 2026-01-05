@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/Dialog';
 
 import {
-  platformSubscriptionFeatures,
+  platformSubscriptionFeaturesFragment,
   platformSubscriptionFragment,
 } from '../dashboard/sections/platform-subscription/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -86,7 +86,7 @@ export function ManageSubscriptionModal(props: ManageSubscriptionModalProps) {
         }
       }
     }
-    ${platformSubscriptionFeatures}
+    ${platformSubscriptionFeaturesFragment}
   `);
 
   const [updatePlanMutation] = useMutation<

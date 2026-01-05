@@ -15,7 +15,7 @@ import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/schem
 
 import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
-import { kycStatusFields } from './kyc/graphql';
+import { kycStatusFieldsFragment } from './kyc/graphql';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import { AccountTrustBadge } from './AccountTrustBadge';
@@ -25,7 +25,7 @@ import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import Spinner from './Spinner';
 
-export const accountHoverCardFields = gql`
+export const accountHoverCardFieldsFragment = gql`
   fragment AccountHoverCardFields on Account {
     id
     name
@@ -133,7 +133,7 @@ const userContextualMembershipsQuery = gql`
       }
     }
   }
-  ${kycStatusFields}
+  ${kycStatusFieldsFragment}
 `;
 
 const getInfoItems = (account): InfoItemProps[] => {
