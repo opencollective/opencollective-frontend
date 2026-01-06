@@ -26,7 +26,9 @@ const sm = hidden('sm');
 const md = hidden('md');
 const lg = hidden('lg');
 
-const Hide = styled(Box)<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
+const Hide = styled(Box).withConfig({
+  shouldForwardProp: prop => !['xs', 'sm', 'md', 'lg'].includes(prop),
+})<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
   ${xs}
   ${sm}
   ${md}
