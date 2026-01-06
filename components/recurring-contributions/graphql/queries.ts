@@ -30,6 +30,11 @@ export const managedOrderFragment = gql`
     paymentMethod {
       ...UpdatePaymentMethodFragment
     }
+    customPaymentProvider {
+      id
+      type
+      name
+    }
     amount {
       value
       valueInCents

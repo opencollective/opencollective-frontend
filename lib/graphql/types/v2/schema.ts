@@ -243,6 +243,7 @@ export type AccountExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -1765,6 +1766,7 @@ export type BotExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -2344,6 +2346,7 @@ export type CollectiveExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -4056,6 +4059,21 @@ export enum CurrencyExchangeRateSourceType {
   WISE = 'WISE'
 }
 
+export type CustomPaymentProvider = {
+  __typename?: 'CustomPaymentProvider';
+  accountDetails?: Maybe<Scalars['JSON']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  instructions?: Maybe<Scalars['String']['output']>;
+  name: Scalars['NonEmptyString']['output'];
+  type: CustomPaymentProviderType;
+};
+
+export enum CustomPaymentProviderType {
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  OTHER = 'OTHER'
+}
+
 /** All possible DateTime fields for a resource */
 export enum DateTimeField {
   /** The creation time of a resource */
@@ -4063,7 +4081,9 @@ export enum DateTimeField {
   /** Transactions only: The date when a transaction was cleared by the payment processor */
   EFFECTIVE_DATE = 'EFFECTIVE_DATE',
   /** Orders only: The date when an order was last charged, defaults to createdAt if never charged */
-  LAST_CHARGED_AT = 'LAST_CHARGED_AT'
+  LAST_CHARGED_AT = 'LAST_CHARGED_AT',
+  /** Expenses only: The date when an expense was paid (based on the related transaction clearedAt) */
+  PAID_AT = 'PAID_AT'
 }
 
 /** This represents a Debit transaction */
@@ -4472,6 +4492,7 @@ export type EventExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -4871,6 +4892,8 @@ export type Expense = {
   merchantId?: Maybe<Scalars['String']['output']>;
   /** Whether this expense is on hold */
   onHold?: Maybe<Scalars['Boolean']['output']>;
+  /** The date on which the expense was paid */
+  paidAt?: Maybe<Scalars['DateTime']['output']>;
   /** The account who paid this expense */
   paidBy?: Maybe<Account>;
   /** The account being paid by this expense */
@@ -5778,6 +5801,7 @@ export type FundExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -6176,6 +6200,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** List of activities that the logged-in user is subscribed for this collective */
   activitySubscriptions?: Maybe<Array<Maybe<ActivitySubscription>>>;
   backgroundImageUrl?: Maybe<Scalars['String']['output']>;
+  /** @deprecated 2026-01-23: Deprecated in favour of custom payment providers */
   bankAccount?: Maybe<PayoutMethod>;
   /** Whether this account can have changelog updates */
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
@@ -6496,6 +6521,7 @@ export type HostExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -7525,6 +7551,7 @@ export type IndividualExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -9701,6 +9728,7 @@ export type Order = {
   createdByAccount?: Maybe<Account>;
   /** Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise) */
   customData?: Maybe<Scalars['JSON']['output']>;
+  customPaymentProvider?: Maybe<CustomPaymentProvider>;
   /** Data related to the order */
   data?: Maybe<Scalars['JSON']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -10237,6 +10265,7 @@ export type OrganizationExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -10643,6 +10672,7 @@ export type PaymentMethodOrdersArgs = {
 export type PaymentMethodInput = {
   /** When creating a credit card, use this field to set its info */
   creditCardInfo?: InputMaybe<CreditCardCreateInput>;
+  data?: InputMaybe<Scalars['JSON']['input']>;
   /** The id assigned to the payment method */
   id?: InputMaybe<Scalars['String']['input']>;
   /** Whether this payment method should be saved for future payments */
@@ -11584,6 +11614,7 @@ export type ProjectExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -12103,6 +12134,7 @@ export type QueryExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -13748,6 +13780,7 @@ export enum UploadedFileKind {
   ACCOUNT_LONG_DESCRIPTION = 'ACCOUNT_LONG_DESCRIPTION',
   AGREEMENT_ATTACHMENT = 'AGREEMENT_ATTACHMENT',
   COMMENT = 'COMMENT',
+  CUSTOM_PAYMENT_METHOD_TEMPLATE = 'CUSTOM_PAYMENT_METHOD_TEMPLATE',
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
   EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
@@ -14014,6 +14047,7 @@ export type VendorExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];

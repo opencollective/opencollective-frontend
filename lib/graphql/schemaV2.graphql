@@ -736,6 +736,11 @@ interface Account {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -1981,6 +1986,11 @@ enum DateTimeField {
   Orders only: The date when an order was last charged, defaults to createdAt if never charged
   """
   LAST_CHARGED_AT
+
+  """
+  Expenses only: The date when an expense was paid (based on the related transaction clearedAt)
+  """
+  PAID_AT
 }
 
 """
@@ -2169,6 +2179,7 @@ type Order {
   """
   totalContributed: Amount!
   paymentMethod: PaymentMethod
+  customPaymentProvider: CustomPaymentProvider
   paymentProcessorUrl: String
 
   """
@@ -2625,6 +2636,11 @@ type Expense {
   The account who paid this expense
   """
   paidBy: Account
+
+  """
+  The date on which the expense was paid
+  """
+  paidAt: DateTime
 
   """
   Whether this expense is on hold
@@ -3492,6 +3508,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -4062,7 +4083,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
   supportedPaymentMethods: [PaymentMethodLegacyType]
-  bankAccount: PayoutMethod
+  bankAccount: PayoutMethod @deprecated(reason: "2026-01-23: Deprecated in favour of custom payment providers")
 
   """
   Paypal preapproval info. Returns null if PayPal account is not connected.
@@ -8965,6 +8986,20 @@ type TransactionPermissions {
   canReject: Boolean!
 }
 
+type CustomPaymentProvider {
+  id: String!
+  type: CustomPaymentProviderType!
+  name: NonEmptyString!
+  instructions: String
+  icon: String
+  accountDetails: JSON
+}
+
+enum CustomPaymentProviderType {
+  BANK_TRANSFER
+  OTHER
+}
+
 type OrderTax {
   type: TaxType!
   percentage: Int! @deprecated(reason: "Please use `rate` instead")
@@ -9691,6 +9726,11 @@ type Bot implements Account {
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -10706,6 +10746,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -12283,6 +12328,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -13570,6 +13620,11 @@ type Individual implements Account {
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -14877,6 +14932,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -16022,6 +16082,11 @@ type Vendor implements Account & AccountWithContributions {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -17016,6 +17081,11 @@ type Query {
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -20020,6 +20090,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -21180,6 +21255,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -25819,6 +25899,7 @@ input PaymentMethodInput {
   """
   legacyType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
   newType: PaymentMethodType @deprecated(reason: "2021-08-20: Please use type instead")
+  data: JSON
 
   """
   Name of this payment method
@@ -26582,6 +26663,7 @@ enum UploadedFileKind {
   UPDATE
   COMMENT
   TIER_LONG_DESCRIPTION
+  CUSTOM_PAYMENT_METHOD_TEMPLATE
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE
