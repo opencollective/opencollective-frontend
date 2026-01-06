@@ -7,7 +7,7 @@ import Container from '../Container';
 import { Box, boxProps } from '../Grid';
 
 const StyledSvg = styled(Box).withConfig({
-  shouldForwardProp: prop => !boxProps.propNames.includes(prop) && defaultShouldForwardProp(prop),
+  shouldForwardProp: (prop, target) => !boxProps.propNames.includes(prop) && defaultShouldForwardProp(prop, target),
 })`
   #logoContainer {
     transform-origin: 50% 50%;
