@@ -2,10 +2,9 @@ import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { flexbox } from 'styled-system';
 
-import { defaultShouldForwardProp } from '../lib/styled_components_utils';
-
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 
 export const DropdownContent = styled.div`
   display: none;
