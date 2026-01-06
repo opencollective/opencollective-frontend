@@ -173,6 +173,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           }}
           expenseId={duplicateExpenseId}
           duplicateExpense={!!duplicateExpenseId}
+          payeeSlug={accountSlug}
         />
       )}
     </React.Fragment>

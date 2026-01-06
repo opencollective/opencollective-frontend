@@ -24,6 +24,7 @@ type SubmitExpenseFlowProps = {
   draftKey?: string;
   duplicateExpense?: boolean;
   submitExpenseTo?: string;
+  payeeSlug?: string;
   endFlowButtonLabel?: React.ReactNode;
 };
 
@@ -234,6 +235,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <div className="relative flex w-full flex-row justify-center overflow-y-scroll pt-4 sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
+                  payeeSlug={props.payeeSlug}
                   draftKey={props.draftKey}
                   duplicateExpense={props.duplicateExpense}
                   expenseId={props.expenseId}
@@ -258,6 +260,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
  */
 function ExpenseFormikContainer(props: {
   submitExpenseTo?: string;
+  payeeSlug?: string;
   draftKey?: string;
   duplicateExpense?: boolean;
   expenseId?: number;
@@ -280,6 +283,7 @@ function ExpenseFormikContainer(props: {
     formRef,
     initialValues: {
       accountSlug: props.submitExpenseTo,
+      payeeSlug: props.payeeSlug,
       title: '',
       expenseTypeOption: ExpenseType.INVOICE,
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
