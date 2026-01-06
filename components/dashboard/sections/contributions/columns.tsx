@@ -205,7 +205,7 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
                 </div>
                 <div className="overflow-hidden">
                   <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
-                    {account.name || account.slug}
+                    {account?.name || account?.slug}
                   </div>
                 </div>
               </div>
