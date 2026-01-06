@@ -71,7 +71,7 @@
   "0b9yMU": "Prywatne notatki są widoczne tylko dla Ciebie i innych administratorów Gospodarza.",
   "0bkmNx": "Wstrzymaj {count} powtarzające się składki",
   "0Eavm2": "Wskazuje \"REFUNDED\", jeśli ta transakcja została zwrócona (inaczej pusta).",
-  "0eCOkC": "",
+  "0eCOkC": "Organization's Detail",
   "0frjVr": "Utwórz fundusz",
   "0FWFFg": "Wymagane przez {isSelfHosted, select, true {{collectiveName}} other {{hostName} podmiotu prawnego świadczącego usługi finansowe dla {collectiveName}}}, ponieważ łączna kwota wkładów w bieżącym roku podatkowym przekracza {amount}.",
   "0HT+Ib": "Archiwum",
