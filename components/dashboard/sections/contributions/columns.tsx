@@ -184,6 +184,37 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
       );
     },
   }),
+  columnHelper.accessor('createdByAccount', {
+    meta: { labelMsg: defineMessage({ defaultMessage: 'Created by', id: 'Agreement.createdBy' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ cell, row }) => {
+      const order = row.original;
+      const account = cell.getValue();
+      return (
+        <AccountHoverCard
+          account={account}
+          includeAdminMembership={{
+            hostSlug: order.toAccount && 'host' in order.toAccount ? order.toAccount.host.slug : undefined,
+            accountSlug: order.toAccount?.slug,
+          }}
+          trigger={
+            <div>
+              <div className="flex items-center gap-1">
+                <div>
+                  <Avatar size={24} collective={account} displayTitle={false} />
+                </div>
+                <div className="overflow-hidden">
+                  <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
+                    {account.name || account.slug}
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        />
+      );
+    },
+  }),
   columnHelper.accessor('paymentMethod', {
     meta: {
       className: 'whitespace-nowrap max-w-[140px]',
@@ -209,13 +240,22 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
     meta: { labelMsg: defineMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }) },
     header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ row }) => {
-      const dateValue = row.original.pendingContributionData?.expectedAt;
+      const order = row.original;
+      const expectedAt = order.pendingContributionData?.expectedAt;
+      const createdAt = order.createdAt;
       return (
-        dateValue && (
-          <div className="flex items-center gap-2 truncate">
-            <DateTime value={dateValue} dateStyle="medium" timeStyle={undefined} />
-          </div>
-        )
+        <React.Fragment>
+          {expectedAt && <DateTime value={expectedAt} dateStyle="medium" timeStyle={undefined} />}
+          {createdAt && (
+            <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
+              <FormattedMessage
+                defaultMessage="Created on {date}"
+                id="contribution.createdAt"
+                values={{ date: <DateTime value={createdAt} dateStyle="medium" timeStyle={undefined} /> }}
+              />
+            </div>
+          )}
+        </React.Fragment>
       );
     },
   }),
