@@ -38,6 +38,7 @@ import StyledLink from '../../components/StyledLink';
 import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
+import { CustomPayoutMethodInstructions } from '../edit-collective/sections/receive-money/CustomPayoutMethodInstructions';
 import { formatAccountDetails } from '../edit-collective/utils';
 import Link from '../Link';
 import { Survey, SURVEY_KEY } from '../Survey';
@@ -309,8 +310,23 @@ class ContributionFlowSuccess extends React.Component {
   };
 
   renderBankTransferInformation = () => {
-    const instructions = get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
+    const customPaymentProviderId = get(this.props.data, 'order.data.customPaymentProviderId');
+    const customPaymentProviders = get(this.props.data, 'order.toAccount.host.settings.customPaymentProviders', []);
+    const customProvider = customPaymentProviderId
+      ? customPaymentProviders.find(p => p.id === customPaymentProviderId)
+      : null;
+
+    const instructions = customProvider
+      ? customProvider.instructions
+      : get(this.props.data, 'order.toAccount.host.settings.paymentMethods.manual.instructions', null);
     const bankAccount = get(this.props.data, 'order.toAccount.host.bankAccount.data', null);
+    console.log({
+      customProvider,
+      instructions,
+      bankAccount,
+      customPaymentProviders,
+      data: this.props.data,
+    });
 
     const amount = get(this.props.data, 'order.amount.valueInCents', 0);
     const platformTipAmount = get(this.props.data, 'order.platformTipAmount.valueInCents', 0);
@@ -321,8 +337,14 @@ class ContributionFlowSuccess extends React.Component {
       currencyDisplay: 'code',
     });
 
+    const accountDetails = customProvider
+      ? customProvider.accountDetails
+      : bankAccount
+        ? formatAccountDetails(bankAccount)
+        : '';
+
     const formattedValues = {
-      account: bankAccount ? formatAccountDetails(bankAccount) : '',
+      account: accountDetails,
       reference: get(this.props.data, 'order.legacyId', null),
       amount: formattedAmount,
       collective: get(this.props.data, 'order.toAccount.name', null),
@@ -345,7 +367,7 @@ class ContributionFlowSuccess extends React.Component {
               <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
             </H3>
             <Flex mt={2}>
-              <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formattedValues)}</Flex>
+              <CustomPayoutMethodInstructions instructions={instructions} formattedValues={formattedValues} />
             </Flex>
           </BankTransferInfoContainer>
         )}

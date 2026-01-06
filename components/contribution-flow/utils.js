@@ -23,6 +23,7 @@ import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
+import { CUSTOM_PAYMEMENT_ICON_MAP } from '../edit-collective/sections/receive-money/constants';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
@@ -222,30 +223,68 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
+    // if (
+    //   hostHasManual &&
+    //   stepDetails.interval === INTERVALS.oneTime &&
+    //   !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
+    // ) {
+    //   uniquePMs.push({
+    //     key: 'manual',
+    //     title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
+    //       <FormattedMessage defaultMessage="Bank transfer (manual)" id="ycoJnS" />
+    //     ),
+    //     paymentMethod: {
+    //       service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+    //       type: PAYMENT_METHOD_TYPE.MANUAL,
+    //     },
+    //     icon: getPaymentMethodIcon({
+    //       service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+    //       type: PAYMENT_METHOD_TYPE.MANUAL,
+    //     }),
+    //     instructions: (
+    //       <FormattedMessage
+    //         id="NewContributionFlow.bankInstructions"
+    //         defaultMessage="Instructions to make a transfer will be given on the next page."
+    //       />
+    //     ),
+    //   });
+    // }
+
+    // Custom payment providers
+    const customPaymentProviders = get(collective, 'host.settings.customPaymentProviders', []);
     if (
-      hostHasManual &&
+      Array.isArray(customPaymentProviders) &&
+      customPaymentProviders.length > 0 &&
       stepDetails.interval === INTERVALS.oneTime &&
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
     ) {
-      uniquePMs.push({
-        key: 'manual',
-        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
-          <FormattedMessage defaultMessage="Bank transfer (manual)" id="ycoJnS" />
-        ),
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
-          type: PAYMENT_METHOD_TYPE.MANUAL,
-        },
-        icon: getPaymentMethodIcon({
-          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
-          type: PAYMENT_METHOD_TYPE.MANUAL,
-        }),
-        instructions: (
-          <FormattedMessage
-            id="NewContributionFlow.bankInstructions"
-            defaultMessage="Instructions to make a transfer will be given on the next page."
-          />
-        ),
+      customPaymentProviders.forEach(provider => {
+        const IconComponent = CUSTOM_PAYMEMENT_ICON_MAP[provider.icon];
+        uniquePMs.push({
+          key: `custom-${provider.id}`,
+          title: provider.name,
+          paymentMethod: {
+            service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+            type: PAYMENT_METHOD_TYPE.MANUAL,
+            data: {
+              customPaymentProviderId: provider.id,
+            },
+          },
+          icon: IconComponent ? (
+            <IconComponent className="h-5 w-5" />
+          ) : (
+            getPaymentMethodIcon({
+              service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+              type: PAYMENT_METHOD_TYPE.MANUAL,
+            })
+          ),
+          subtitle: (
+            <FormattedMessage
+              id="NewContributionFlow.customPaymentInstructions"
+              defaultMessage="Instructions to complete payment will be given on the next page."
+            />
+          ),
+        });
       });
     }
   }
