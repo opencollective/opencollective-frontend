@@ -1,3 +1,4 @@
+import { isUndefined } from 'lodash';
 import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
@@ -571,7 +572,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_GOALS,
-          if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) && !isAccountantOnly,
+          if:
+            !isAccountantOnly &&
+            (!isUndefined(account.settings?.collectivePage?.showGoals) ||
+              isOneOfTypes(account, [COLLECTIVE, PROJECT]) ||
+              (isOrganization && hasMoneyManagement && !hasHosting)),
         },
         {
           // POLICIES also available for Fiscal hosts further up in this list
