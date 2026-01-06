@@ -8,7 +8,6 @@ import { usePlaidLink } from 'react-plaid-link';
 
 import { confettiFireworks } from '@/lib/confettis';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   ConnectPlaidAccountMutation,
   ConnectPlaidAccountMutationVariables,
@@ -53,10 +52,9 @@ const PlaidOAuthCallbackPage = () => {
   const [connectPlaidAccount, { data }] = useMutation<
     ConnectPlaidAccountMutation,
     ConnectPlaidAccountMutationVariables
-  >(connectPlaidAccountMutation, { context: API_V2_CONTEXT });
+  >(connectPlaidAccountMutation);
   const [refreshPlaidAccount] = useMutation<RefreshPlaidAccountMutation, RefreshPlaidAccountMutationVariables>(
     refreshPlaidAccountMutation,
-    { context: API_V2_CONTEXT },
   );
   const { open, ready } = usePlaidLink({
     receivedRedirectUri: windowData.receivedRedirectUri,

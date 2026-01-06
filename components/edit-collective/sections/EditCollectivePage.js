@@ -12,7 +12,7 @@ import styled, { css } from 'styled-components';
 import { getCollectiveSections, getSectionPath } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
@@ -382,13 +382,11 @@ const EditCollectivePage = ({ collective }) => {
 
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
 
   const [submitSetting, { loading: isSubmitting, error }] = useMutation(editAccountSettingsMutation, {
-    context: API_V2_CONTEXT,
     // Refresh the settings for GQLV1 cache, to refresh the navbar
-    refetchQueries: [{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }],
+    refetchQueries: [{ query: collectiveSettingsQuery, variables: { slug: collective.slug }, context: API_V1_CONTEXT }],
   });
 
   // Load sections from fetched collective

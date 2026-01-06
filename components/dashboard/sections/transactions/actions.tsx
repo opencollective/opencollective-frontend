@@ -5,7 +5,6 @@ import type React from 'react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { saveInvoice } from '../../../../lib/transactions';
@@ -53,9 +52,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
 
   const { LoggedInUser } = useLoggedInUser();
 
-  const [refundTransaction] = useMutation(refundTransactionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [refundTransaction] = useMutation(refundTransactionMutation);
 
   const { callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
 

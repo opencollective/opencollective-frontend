@@ -5,7 +5,6 @@ import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link'; // eslint-disable-line no-restricted-imports
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -68,7 +67,7 @@ function CollapsibleAccountsList({ accounts, label }) {
 export function Accounts({ accountSlug }) {
   const { data, loading, error } = useQuery(collectiveBalanceQuery, {
     variables: { slug: accountSlug },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
   });
 

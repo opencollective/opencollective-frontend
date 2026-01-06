@@ -1,5 +1,7 @@
 import { gql } from '../../../lib/graphql/helpers';
 
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+
 import { accountHoverCardFields } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
@@ -108,19 +110,6 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
-export const accountingCategoryFields = gql`
-  fragment AccountingCategoryFields on AccountingCategory {
-    id
-    name
-    kind
-    instructions
-    friendlyName
-    code
-    expensesTypes
-    appliesTo
-  }
-`;
-
 export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
@@ -165,7 +154,7 @@ export const expenseHostFields = gql`
     expenseAccountingCategories: accountingCategories(kind: EXPENSE) {
       nodes {
         id
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
     policies {
@@ -183,7 +172,7 @@ export const expenseHostFields = gql`
       }
     }
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 export const expenseValuesByRoleFragment = gql`
@@ -191,21 +180,21 @@ export const expenseValuesByRoleFragment = gql`
     id
     submitter {
       accountingCategory {
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
     accountAdmin {
       accountingCategory {
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
     hostAdmin {
       accountingCategory {
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 export const expensePayeeFieldsFragment = gql`
@@ -276,7 +265,7 @@ export const expensePageExpenseFieldsFragment = gql`
     amount
     accountingCategory {
       id
-      ...AccountingCategoryFields
+      ...AccountingCategorySelectFields
     }
     valuesByRole {
       id
@@ -553,6 +542,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canReject
       canMarkAsSpam
       canPay
+      canMarkAsPaid
       canMarkAsUnpaid
       canMarkAsIncomplete
       canComment
@@ -679,7 +669,7 @@ export const expensePageExpenseFieldsFragment = gql`
 
   ${expenseHostFields}
   ${accountNavbarFieldsFragment}
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
   ${accountHoverCardFields}
   ${expenseValuesByRoleFragment}
   ${expensePayeeFieldsFragment}
@@ -700,7 +690,7 @@ export const expensesListFieldsFragment = gql`
     }
     accountingCategory {
       id
-      ...AccountingCategoryFields
+      ...AccountingCategorySelectFields
     }
     valuesByRole {
       id
@@ -771,6 +761,7 @@ export const expensesListFieldsFragment = gql`
       canReject
       canMarkAsSpam
       canPay
+      canMarkAsPaid
       canMarkAsUnpaid
       canMarkAsIncomplete
       canSeeInvoiceInfo
@@ -824,7 +815,7 @@ export const expensesListFieldsFragment = gql`
       ...AccountHoverCardFields
     }
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
   ${expenseValuesByRoleFragment}
   ${accountHoverCardFields}
 `;

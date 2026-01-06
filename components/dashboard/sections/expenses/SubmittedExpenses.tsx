@@ -4,7 +4,6 @@ import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
@@ -26,7 +25,7 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta as CommonFilterMeta, FilterValues } from './filters';
-import { filters as commonFilters, schema, toVariables } from './filters';
+import { ExpenseAccountingCategoryKinds, filters as commonFilters, schema, toVariables } from './filters';
 import { accountExpensesQuery } from './queries';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
@@ -85,12 +84,12 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     refetch: refetchExpenses,
   } = useQuery(accountExpensesQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const filterMeta: FilterMeta = {
     currency: (LoggedInUser?.collective?.currency || 'USD') as Currency,
     omitExpenseTypesInFilter,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const hasNewSubmitExpenseFlow =
@@ -98,17 +97,13 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
 
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
-  if (error) {
-    return <MessageBoxGraphqlError error={error} />;
-  }
-
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
           description={
-            <FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." id="aKfm6V" />
+            <FormattedMessage defaultMessage="Expenses that you have submitted to other accounts." id="aKfm6V" />
           }
           actions={
             hasNewSubmitExpenseFlow ? (
@@ -127,7 +122,9 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         />
         <Filterbar {...queryFilter} meta={filterMeta} />
 
-        {!loading && !data.expenses?.nodes.length ? (
+        {!loading && error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : !loading && !data.expenses?.nodes.length ? (
           <EmptyResults
             entityType="EXPENSES"
             onResetFilters={() => queryFilter.resetFilters({})}
@@ -176,6 +173,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           }}
           expenseId={duplicateExpenseId}
           duplicateExpense={!!duplicateExpenseId}
+          payeeSlug={accountSlug}
         />
       )}
     </React.Fragment>

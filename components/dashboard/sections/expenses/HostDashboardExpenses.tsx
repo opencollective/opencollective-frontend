@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
@@ -39,7 +38,12 @@ import type { DashboardSectionProps } from '../../types';
 
 import ExpensePipelineOverview from './ExpensePipelineOverview';
 import type { FilterMeta as CommonFilterMeta } from './filters';
-import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
+import {
+  ExpenseAccountingCategoryKinds,
+  filters as commonFilters,
+  schema as commonSchema,
+  toVariables as commonToVariables,
+} from './filters';
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
@@ -121,7 +125,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     refetch: refetchMetaData,
   } = useQuery(hostDashboardMetadataQuery, {
     variables: { hostSlug, withHoverCard: true },
-    context: API_V2_CONTEXT,
   });
 
   const views: Views<FilterValues> = [
@@ -190,6 +193,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     hostedAccounts: metaData?.hostedAccounts.nodes,
     expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
     includeUncategorized: true,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({
@@ -209,7 +213,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
@@ -227,7 +230,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   };
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>

@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import { getPortabilitySummary, leaveHostQuery } from '@/components/edit-collective/LeaveHostModal';
 
@@ -59,13 +59,11 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
     data: accountData,
   } = useQuery(leaveHostQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
 
   const portabilitySummary = getPortabilitySummary(accountData?.account);
 
   const [unhostAccount, { loading }] = useMutation(unhostAccountMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: collective.id,

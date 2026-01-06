@@ -5,7 +5,7 @@ import { Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { ConfirmOrderMutation, ManagePaymentMethodsQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../../../lib/payment_method_label';
 import { getPaymentMethodIcon } from '../../../../lib/payment-method-utils';
@@ -118,7 +118,6 @@ export default function PaymentMethodsTable({ paymentMethods, account, loading }
       }
     `,
     {
-      context: API_V2_CONTEXT,
       refetchQueries: ['ManagePaymentMethods'],
     },
   );
@@ -147,7 +146,6 @@ export default function PaymentMethodsTable({ paymentMethods, account, loading }
       }
     `,
     {
-      context: API_V2_CONTEXT,
       refetchQueries: ['ManagePaymentMethods'],
     },
   );

@@ -12,7 +12,7 @@ import CommentActions from './CommentActions';
 import { CommentMetadata } from './CommentMetadata';
 import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
-import { editCommentMutation, mutationOptions } from './graphql';
+import { editCommentMutation } from './graphql';
 import SmallComment from './SmallComment';
 
 /**
@@ -60,7 +60,6 @@ const Comment = ({
       <Box position="relative" maxHeight={maxCommentHeight} css={{ overflowY: 'auto' }}>
         <InlineEditField
           mutation={editCommentMutation}
-          mutationOptions={mutationOptions}
           values={comment}
           field="html"
           canEdit={canEdit}

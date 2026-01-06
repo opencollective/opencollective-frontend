@@ -5,9 +5,12 @@ import { get, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
+import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import { FormField } from '@/components/FormField';
+import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 import { Card } from '@/components/ui/Card';
 import { InputGroup } from '@/components/ui/Input';
 import { Separator } from '@/components/ui/Separator';
@@ -54,9 +57,10 @@ const getInitialValues = account => {
 const FiscalHost = ({ account }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation);
+
+  const { account: accountFromDashboardQuery } = React.useContext(DashboardContext);
+  const isUpgradeRequiredForSettingHostFee = requiresUpgrade(accountFromDashboardQuery, FEATURES.CHARGE_HOSTING_FEES);
 
   return (
     <React.Fragment>
@@ -75,11 +79,13 @@ const FiscalHost = ({ account }) => {
               variables: {
                 account: {
                   id: account.id,
-                  hostFeePercent: !values.hostFees
-                    ? 0
-                    : values.hostFeePercent
-                      ? parseInt(values.hostFeePercent, 10)
-                      : null,
+                  ...(!isUpgradeRequiredForSettingHostFee && {
+                    hostFeePercent: !values.hostFees
+                      ? 0
+                      : values.hostFeePercent
+                        ? parseInt(values.hostFeePercent, 10)
+                        : null,
+                  }),
                   settings: pick(values, ['apply', 'applyMessage', 'tos']),
                 },
               },
@@ -139,6 +145,7 @@ const FiscalHost = ({ account }) => {
                     onCheckedChange={checked => {
                       setFieldValue('hostFees', checked);
                     }}
+                    disabled={isUpgradeRequiredForSettingHostFee}
                   />
                 </div>
                 {values.hostFees && (
@@ -151,8 +158,19 @@ const FiscalHost = ({ account }) => {
                       />
                     }
                   >
-                    {({ field }) => <InputGroup {...field} maxLength={2} className="max-w-32" append="%" />}
+                    {({ field }) => (
+                      <InputGroup
+                        {...field}
+                        disabled={isUpgradeRequiredForSettingHostFee}
+                        maxLength={2}
+                        className="max-w-32"
+                        append="%"
+                      />
+                    )}
                   </FormField>
+                )}
+                {isUpgradeRequiredForSettingHostFee && (
+                  <UpgradePlanCTA compact featureKey={FEATURES.CHARGE_HOSTING_FEES} />
                 )}
               </Card>
               <Card className="flex flex-col gap-4 p-4">

@@ -6,7 +6,6 @@ import type { z } from 'zod';
 
 import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
 import { isIndividualAccount, loggedInUserCanAccessFinancialData } from '../lib/collective';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import type { TransactionsPageQuery } from '@/lib/graphql/types/v2/graphql';
@@ -52,7 +51,7 @@ const transactionsPageQueryHelper = getSSRQueryHelpers<
     ...getSSRVariablesFromQuery({ query: ctx.query, schema, toVariables, defaultFilterValues }),
     slug: ctx.query.collectiveSlug,
   }),
-  context: API_V2_CONTEXT,
+
   skipClientIfSSRThrows404: true,
 });
 

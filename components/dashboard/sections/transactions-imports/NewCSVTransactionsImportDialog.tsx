@@ -7,7 +7,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
@@ -38,7 +37,6 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: { accountSlug },
     },
   );
@@ -71,7 +69,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
       }
       ${TransactionImportListFieldsFragment}
     `,
-    { context: API_V2_CONTEXT },
+    {},
   );
 
   const existingSources = data?.host?.transactionsImportsSources || [];

@@ -11,7 +11,6 @@ export const SECTIONS = {
   CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
-  HOST_FINANCIAL_CONTRIBUTIONS: 'orders',
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
@@ -19,9 +18,11 @@ export const SECTIONS = {
   HOST_TAX_FORMS: 'host-tax-forms',
   CONTRIBUTORS: 'contributors',
   PEOPLE: 'people',
+  KYC: 'kyc',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
   HOST_EXPECTED_FUNDS: 'expected-funds',
+  INCOMPLETE_CONTRIBUTIONS: 'incomplete-contributions',
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
@@ -40,6 +41,7 @@ export const SECTIONS = {
   SUBMITTED_GRANTS: 'submitted-grants',
   APPROVE_GRANT_REQUESTS: 'approve-grant-requests',
   PLATFORM_SUBSCRIPTION: 'platform-subscription',
+  SEARCH: 'search',
 };
 
 export const ROOT_SECTIONS = {
@@ -112,7 +114,6 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.EXPENSE_REPORTS,
   ALL_SECTIONS.PAYMENT_RECEIPTS,
   ALL_SECTIONS.HOST_EXPENSES,
-  ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
   ALL_SECTIONS.TRANSACTIONS,
   ALL_SECTIONS.EXPENSES,
   ALL_SECTIONS.HOST_AGREEMENTS,
@@ -122,6 +123,7 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.HOST_TRANSACTIONS,
   ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
   ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+  ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
   ALL_SECTIONS.CONTRIBUTORS,
   ALL_SECTIONS.GRANTS,
   ALL_SECTIONS.HOSTED_GRANTS,
@@ -142,10 +144,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.ACTIVITY_LOG]: {
     id: 't0lUqz',
     defaultMessage: 'Activity log',
-  },
-  [ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: {
-    id: 'FinancialContributions',
-    defaultMessage: 'Financial Contributions',
   },
   [ALL_SECTIONS.HOST_APPLICATIONS]: {
     id: 'Menu.HostApplications',
@@ -276,8 +274,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Virtual Cards',
   },
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
-    id: 'HostedCollectives',
-    defaultMessage: 'Hosted Collectives',
+    id: 'Collectives',
+    defaultMessage: 'Collectives',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',

@@ -1,14 +1,13 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
-import { isHostAccount } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -26,17 +25,20 @@ import {
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
-import { getMenuItems } from '../components/dashboard/Menu';
 import { adminPanelQuery } from '../components/dashboard/queries';
-import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
 import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
+import ErrorPage from '@/components/ErrorPage';
+import Header from '@/components/Header';
+import I18nFormatters from '@/components/I18nFormatters';
+import { SidebarInset, SidebarProvider } from '@/components/ui/Sidebar';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -62,7 +64,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (loggedInUser?.isAccountantOnly(account) && isHostAccount(account)) {
+  } else if (loggedInUser?.isAccountantOnly(account) && account.hasHosting) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else if (loggedInUser?.isAccountantOnly(account)) {
     return ALL_SECTIONS.PAYMENT_RECEIPTS;
@@ -88,6 +90,59 @@ const getNotification = (intl, account) => {
         }),
       };
     }
+  } else if (account?.type === CollectiveType.COLLECTIVE) {
+    if (!account?.host) {
+      return {
+        type: 'error',
+        inline: true,
+        title: (
+          <React.Fragment>
+            <FormattedMessage
+              defaultMessage="You have not applied to any fiscal host. You can not raise funds without a fiscal host."
+              id="Dashboard.NoHostNotification"
+            />
+            <Link
+              href={`/${account.slug}/accept-financial-contributions/host`}
+              className="ml-1 inline-flex items-center underline hover:no-underline"
+            >
+              <FormattedMessage defaultMessage="Find a Fiscal Host" id="join.findAFiscalHost" />
+              <ArrowRight className="ml-1 inline h-4 w-4" />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    }
+    if (account?.hostApplication?.status === 'PENDING') {
+      return {
+        type: 'info',
+        inline: true,
+        title: (
+          <React.Fragment>
+            <span className="font-normal">
+              <FormattedMessage
+                defaultMessage="You applied to be hosted by <strong>{hostName}</strong> on <strong>{applicationData, date, medium}</strong>. Your application is being reviewed."
+                id="Dashboard.PendingHostApplicationNotification"
+                values={{
+                  ...I18nFormatters,
+                  hostName: account?.host.name,
+                  applicationData: new Date(account?.hostApplication.createdAt),
+                }}
+              />
+            </span>
+            <Link
+              href={getDashboardRoute(account, `/host?hostApplicationId=${account.hostApplication.id}`)}
+              className="ml-1 inline-flex items-center underline hover:no-underline"
+            >
+              <FormattedMessage
+                defaultMessage="See Application"
+                id="Dashboard.PendingHostApplicationNotificationLink"
+              />
+              <ArrowRight className="ml-1 inline h-4 w-4" />
+            </Link>
+          </React.Fragment>
+        ),
+      };
+    }
   }
 };
 
@@ -100,6 +155,9 @@ const getProfileUrl = (
   contextAccount: DashboardQuery['account'],
   account: { id: string; slug: string; type: string },
 ) => {
+  if (!contextAccount) {
+    return null;
+  }
   const context =
     'host' in contextAccount && loggedInUser?.isAdminOfCollective(contextAccount.host)
       ? contextAccount.host
@@ -141,8 +199,8 @@ function getBlocker(LoggedInUser, account, section) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.COMMUNITY_MANAGER, account)) {
       return (
         <FormattedMessage
-          defaultMessage="You need to be logged in as a community manager to view this page"
-          id="dnkxQ8"
+          defaultMessage="You need to be logged in as an admin or a community manager to view this page"
+          id="BduqMQ"
         />
       );
     }
@@ -194,8 +252,7 @@ const DashboardPage = () => {
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
-  const { data, loading } = useQuery(adminPanelQuery, {
-    context: API_V2_CONTEXT,
+  const { data, loading, error } = useQuery(adminPanelQuery, {
     variables: { slug: activeSlug },
     skip: !activeSlug || !LoggedInUser || isRootProfile,
   });
@@ -204,9 +261,10 @@ const DashboardPage = () => {
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (activeSlug && activeSlug !== workspace.slug) {
+    if (activeSlug) {
       if (LoggedInUser) {
-        setWorkspace({ slug: activeSlug });
+        const membership = LoggedInUser.memberOf.find(val => val.collective.slug === activeSlug);
+        setWorkspace({ slug: activeSlug, isHost: membership?.collective.isHost });
       }
     }
     // If there is no slug set (that means /dashboard)
@@ -215,6 +273,13 @@ const DashboardPage = () => {
     // And if activeSlug is different than LoggedInUser slug
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
+    }
+    if (router.route !== '/signup' && LoggedInUser?.requiresProfileCompletion) {
+      router.replace('/signup/profile');
+    }
+    // If slug is `me` and there is a LoggedInUser, redirect to the user's dashboard
+    if (slug === 'me' && LoggedInUser) {
+      router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
     }
   }, [activeSlug, LoggedInUser]);
 
@@ -230,8 +295,11 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
+
+  if (!loading && !account && error) {
+    return <ErrorPage error={error} />;
+  }
 
   return (
     <DashboardContext.Provider
@@ -247,53 +315,57 @@ const DashboardPage = () => {
         getProfileUrl: targetAccount => getProfileUrl(LoggedInUser, account, targetAccount),
       }}
     >
-      <div className="flex min-h-screen flex-col justify-between">
-        <Page
-          noRobots
-          collective={account}
-          title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
-          pageTitle={titleBase}
-          showFooter={false}
-        >
-          {Boolean(notification) && <NotificationBar {...notification} />}
-          {blocker ? (
-            <div className="my-32 flex flex-col items-center">
-              <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-                <p>{blocker}</p>
-                {LoggedInUser && (
-                  <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                    <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
-                  </Link>
+      <Header
+        title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
+        noRobots
+        collective={account}
+        withTopBar={Boolean(blocker)}
+        showMenuItems={false}
+      />
+      {blocker ? (
+        <div className="my-32 flex flex-col items-center">
+          <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+            <p>{blocker}</p>
+            {LoggedInUser && (
+              <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+              </Link>
+            )}
+          </MessageBox>
+          {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+        </div>
+      ) : (
+        <SidebarProvider>
+          <DashboardSidebar isLoading={isLoading} />
+          <SidebarInset className="min-w-0">
+            <DashboardTopbar />
+            {Boolean(notification) && <NotificationBar {...notification} />}
+            <div className="flex-1 px-3 md:px-6">
+              <div
+                className="flex min-h-[600px] flex-1 flex-col justify-center gap-6 pt-6 pb-12 md:flex-row lg:gap-12 lg:pt-8"
+                data-cy="admin-panel-container"
+              >
+                {LoggedInUser &&
+                require2FAForAdmins(account) &&
+                !LoggedInUser.hasTwoFactorAuth &&
+                selectedSection !== 'user-security' ? (
+                  <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+                ) : (
+                  <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
+                    <DashboardSection
+                      section={selectedSection}
+                      isLoading={isLoading}
+                      account={account}
+                      subpath={subpath}
+                    />
+                  </div>
                 )}
-              </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
+              </div>
             </div>
-          ) : (
-            <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
-              data-cy="admin-panel-container"
-            >
-              <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-              {LoggedInUser &&
-              require2FAForAdmins(account) &&
-              !LoggedInUser.hasTwoFactorAuth &&
-              selectedSection !== 'user-security' ? (
-                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-              ) : (
-                <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </Page>
-        <Footer />
-      </div>
+            <Footer isDashboard />
+          </SidebarInset>
+        </SidebarProvider>
+      )}
     </DashboardContext.Provider>
   );
 };

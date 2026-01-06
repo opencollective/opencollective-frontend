@@ -4,7 +4,7 @@ import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../../../lib/api';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { Host } from '../../../../lib/graphql/types/v2/schema';
 import { getWebsiteUrl } from '../../../../lib/utils';
 
@@ -37,7 +37,6 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       hostSlug: props.host.slug,
     },

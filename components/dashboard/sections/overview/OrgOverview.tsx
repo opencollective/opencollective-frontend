@@ -1,39 +1,36 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
+import { Settings } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { isHostAccount } from '@/lib/collective';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu';
 
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import { HostOverviewContent } from './HostOverviewContent';
 import { OrgOverviewContent } from './OrgOverviewContent';
 import { PlatformBillingOverviewCard } from './PlatformBillingOverviewCard';
-import { SetupGuideCard } from './SetupGuide';
-
-const editAccountSettingMutation = gql`
-  mutation UpdateSetupGuideState($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      settings
-    }
-  }
-`;
+import { editAccountSettingMutation } from './queries';
+import { WelcomeOrganization } from './Welcome';
 
 export function OrgOverview() {
   const { account } = useContext(DashboardContext);
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [showSetupGuide, setShowSetupGuide] = useState(undefined);
   const [showSubscriptionCard, setShowSubscriptionCard] = useState(undefined);
-  const [editAccountSetting] = useMutation(editAccountSettingMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
 
   useEffect(() => {
     if (!LoggedInUser || !account) {
@@ -81,25 +78,33 @@ export function OrgOverview() {
     [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
   );
 
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
+
   return (
-    <div className="max-w-(--breakpoint-lg) space-y-6">
+    <div className="space-y-6">
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         actions={
-          isHostAccount(account) && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => handleSetupGuideToggle(!showSetupGuide)}>
-                {showSetupGuide ? (
-                  <FormattedMessage defaultMessage="Hide setup guide" id="SetupGuide.HideSetupGuide" />
-                ) : (
-                  <FormattedMessage defaultMessage="Show setup guide" id="SetupGuide.ShowSetupGuide" />
-                )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon-sm" variant="outline">
+                <Settings size={16} />
               </Button>
-            </div>
-          )
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuCheckboxItem
+                checked={showSetupGuide}
+                onClick={() => handleSetupGuideToggle(!showSetupGuide)}
+              >
+                <FormattedMessage defaultMessage="Display setup guide" id="SetupGuide.DisplaySetupGuide" />
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
-      {isHostAccount(account) ? (
+      <ConvertedAccountMessage account={account} />
+      <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+      {hasMoneyManagement ? (
         <React.Fragment>
           {account.platformSubscription && (
             <Collapsible open={showSubscriptionCard}>
@@ -111,11 +116,12 @@ export function OrgOverview() {
               </CollapsibleContent>
             </Collapsible>
           )}
-          <SetupGuideCard account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
           <HostOverviewContent accountSlug={account.slug} />
         </React.Fragment>
       ) : (
-        <OrgOverviewContent accountSlug={account.slug} />
+        <React.Fragment>
+          <OrgOverviewContent accountSlug={account.slug} />
+        </React.Fragment>
       )}
     </div>
   );

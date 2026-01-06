@@ -3,13 +3,13 @@ import { useMutation } from '@apollo/client';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { hasAccountMoneyManagement } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { getErrorFromGraphqlException } from '@/lib/errors';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import MessageBox from '@/components/MessageBox';
 
-import { getI18nLink } from '../../I18nFormatters';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import { Button } from '../../ui/Button';
@@ -32,11 +32,13 @@ const deleteUserCollectiveMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
+const { PROJECT, EVENT } = CollectiveType;
+
 const DeleteCollective = ({ collective, ...props }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
-  const [deleteCollective] = useMutation(deleteCollectiveMutation);
-  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
+  const [deleteCollective] = useMutation(deleteCollectiveMutation, { context: API_V1_CONTEXT });
+  const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation, { context: API_V1_CONTEXT });
 
   const handleDelete = async () => {
     try {
@@ -55,7 +57,7 @@ const DeleteCollective = ({ collective, ...props }) => {
   };
 
   const { deleting, error } = deleteStatus;
-  const hasBalance = collective.stats.balance > 0 && (collective.type === 'COLLECTIVE' || collective.type === 'FUND');
+  const hasMoneyManagement = hasAccountMoneyManagement(collective);
 
   const closeModal = () => setShowModal(false);
 
@@ -76,9 +78,7 @@ const DeleteCollective = ({ collective, ...props }) => {
         />
       </p>
       {error && <MessageBox type="error">{error}</MessageBox>}
-      {!collective.isDeletable &&
-      collective.type !== CollectiveType.EVENT &&
-      collective.type !== CollectiveType.PROJECT ? (
+      {!collective.isDeletable && ![EVENT, PROJECT].includes(collective.type) ? (
         <MessageBox type="warning">
           <FormattedMessage
             id="collective.delete.isNotDeletable-message"
@@ -86,25 +86,15 @@ const DeleteCollective = ({ collective, ...props }) => {
             values={{ type: collective.type }}
           />
         </MessageBox>
-      ) : collective.isHost ? (
+      ) : hasMoneyManagement ? (
         <MessageBox type="warning">
-          {collective.type === CollectiveType.COLLECTIVE ? (
-            <FormattedMessage
-              id="collective.delete.selfHost"
-              defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}/host` }) }}
-            />
-          ) : (
-            <FormattedMessage
-              id="collective.delete.balance.warning"
-              defaultMessage="You can't delete {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
-              values={{ type: collective.type }}
-            />
-          )}
+          <FormattedMessage
+            id="collective.delete.balance.warning"
+            defaultMessage="You can't delete {type, select, ORGANIZATION {your organization} other {your account}} while managing money on the platform. Please disable Money Management (and Fiscal Hosting if enabled) before archiving this account."
+            values={{ type: collective.type }}
+          />
         </MessageBox>
-      ) : hasBalance &&
-        !collective.isDeletable &&
-        (collective.type === CollectiveType.EVENT || collective.type === CollectiveType.PROJECT) ? (
+      ) : !collective.isDeletable && [EVENT, PROJECT].includes(collective.type) ? (
         <MessageBox type="warning">
           <FormattedMessage
             id="collective.event.delete.isNotDeletable-message"
@@ -116,7 +106,7 @@ const DeleteCollective = ({ collective, ...props }) => {
       <Button
         onClick={() => setShowModal(true)}
         loading={deleting}
-        disabled={collective.isHost || !collective.isDeletable}
+        disabled={hasMoneyManagement || !collective.isDeletable}
         variant="outline"
       >
         <FormattedMessage

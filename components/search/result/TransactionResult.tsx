@@ -1,23 +1,22 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import { Markup } from 'interweave';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
+import type { SearchTransactionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Badge } from '../../ui/Badge';
+import { Highlight } from '../Highlight';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
-import type { TransactionResultData } from '../useRecentlyVisited';
 
-// TODO: i18n
 export function TransactionResult({
   transaction,
   highlights,
 }: {
-  transaction: TransactionResultData;
+  transaction: SearchTransactionFieldsFragment;
   highlights?: SearchHighlights;
 }) {
   const intl = useIntl();
@@ -37,11 +36,7 @@ export function TransactionResult({
         <div className="flex justify-between gap-2">
           <div className="flex gap-1">
             <Badge type="outline" size="xs">
-              {highlightFields.top.id ? (
-                <Markup allowList={['mark']} content={`#${highlightFields.top.id[0]}`} />
-              ) : (
-                `#${transaction.legacyId}`
-              )}
+              <Highlight content={`#${highlightFields.top.id?.[0] ?? transaction.legacyId}`} />
             </Badge>
             <div>{i18nTransactionKind(intl, transaction.kind)}</div>
           </div>
@@ -55,21 +50,21 @@ export function TransactionResult({
         </div>
 
         <div className="overflow-hidden">
-          <div className="truncate text-muted-foreground">
-            <span className="text-foreground">{transaction.account.name}</span>{' '}
-            {transaction.type === 'DEBIT' ? 'sent' : 'received'} transaction{' '}
-            {transaction.type === 'DEBIT' ? 'to' : 'from'}{' '}
+          <div className="flex items-center gap-2 truncate text-muted-foreground">
+            <span className="text-foreground">{transaction.account.name}</span>
+            {transaction.type === 'DEBIT' ? (
+              <ArrowRight className="!size-4" />
+            ) : (
+              <ArrowLeft className="!size-4 text-green-600" />
+            )}
             <span className="text-foreground">{transaction.oppositeAccount.name}</span>
           </div>
-        </div>
-
-        {otherHighlight && (
-          <div className="overflow-hidden">
+          {otherHighlight && (
             <div className="truncate">
-              <Markup className="text-muted-foreground italic" allowList={['mark']} content={otherHighlight} />
+              <Highlight className="text-muted-foreground italic" content={otherHighlight} />
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

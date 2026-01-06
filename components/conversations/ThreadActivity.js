@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
@@ -83,12 +83,7 @@ const ThreadActivity = ({ activity }) => {
               movedFromCollective: activity.data?.movedFromCollective?.name || 'collective',
             })}
           </ActivityMessage>
-          {details && (
-            <Fragment>
-              <br />
-              {details}
-            </Fragment>
-          )}
+          {details && <div className="mt-2 text-xs">{details}</div>}
           {DataRenderer && <DataRenderer activity={activity} />}
         </ActivityParagraph>
       )}

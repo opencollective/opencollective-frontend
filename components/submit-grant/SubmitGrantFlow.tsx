@@ -302,7 +302,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
           {
             name: Step.GRANT_PROVIDER,
             hidden: true,
-            formValues: ['accountSlug'],
+            formValues: ['accountSlug', 'expenseTypeOption'],
           },
           {
             name: Step.INSTRUCTIONS,

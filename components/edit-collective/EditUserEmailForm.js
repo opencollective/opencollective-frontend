@@ -5,7 +5,7 @@ import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { gqlV1 } from '../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -174,6 +174,7 @@ const loggedInUserEmailQuery = gqlV1 /* GraphQL */ `
 const addLoggedInUserEmailData = graphql(loggedInUserEmailQuery, {
   options: {
     fetchPolicy: 'network-only',
+    context: API_V1_CONTEXT,
   },
 });
 
@@ -189,6 +190,9 @@ const updateUserEmailMutation = gqlV1 /* GraphQL */ `
 
 const addUpdateUserEmailMutation = graphql(updateUserEmailMutation, {
   name: 'updateUserEmail',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 export default addUpdateUserEmailMutation(addLoggedInUserEmailData(EditUserEmailForm));

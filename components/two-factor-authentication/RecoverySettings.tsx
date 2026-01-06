@@ -4,7 +4,7 @@ import { RefreshCcw } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import MessageBox from '../MessageBox';
@@ -30,9 +30,6 @@ export function RecoverySettings(props: RecoverySettingsProps) {
 
   const [regenerateRecoveryCodes, { loading }] = useMutation<{ regenerateRecoveryCodes: string[] }>(
     regenerateRecoveryCodesMutation,
-    {
-      context: API_V2_CONTEXT,
-    },
   );
 
   const onRegenerateConfirmation = React.useCallback(async () => {

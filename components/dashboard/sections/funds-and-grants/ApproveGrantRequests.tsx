@@ -6,7 +6,6 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import type { Account, Expense } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
@@ -94,7 +93,6 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
 
   const { data: metadata, refetch } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
-    context: API_V2_CONTEXT,
   });
 
   const hostSlug = get(metadata, 'account.host.slug');
@@ -127,7 +125,6 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
       type: ExpenseType.GRANT,
       status: [ExpenseStatusFilter.PENDING],
     },
-    context: API_V2_CONTEXT,
   });
 
   const pageRoute = `/dashboard/${accountSlug}/approve-grant-requests`;
@@ -165,7 +162,7 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Approve Grants Requests" id="nsfRjl" />}
           description={<FormattedMessage defaultMessage="Review received Grant Requests" id="su6SvX" />}

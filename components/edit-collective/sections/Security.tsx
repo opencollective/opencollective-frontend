@@ -8,7 +8,7 @@ import { styled } from 'styled-components';
 import { margin } from 'styled-system';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
@@ -90,11 +90,8 @@ const Security = ({ collective }) => {
   const { toast } = useToast();
   const { data, loading } = useQuery(securityAccountQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
-  const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation);
 
   if (loading) {
     return <LoadingPlaceholder height={300} />;

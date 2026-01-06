@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Box, Flex } from '../Grid';
@@ -122,7 +122,6 @@ const createProjectMutation = gql`
 
 const addCreateProjectMutation = graphql(createProjectMutation, {
   name: 'createProject',
-  options: { context: API_V2_CONTEXT },
 });
 
 export default withRouter(withUser(addCreateProjectMutation(CreateProject)));

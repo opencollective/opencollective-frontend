@@ -11,6 +11,7 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import dayjs from '../../../lib/dayjs';
 import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
 import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
 import { getIntlDisplayNames } from '../../../lib/i18n';
@@ -181,6 +182,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
           variant="outline"
           className="shrink-0"
           disabled={props.initialLoading || isAmountLocked || props.isSubmitting}
+          data-cy="expense-add-item-btn"
           onClick={() =>
             setFieldValue('expenseItems', [
               ...expenseItems,
@@ -440,7 +442,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 name={`expenseItems.${props.index}.incurredAt`}
               >
                 {({ field }) => {
-                  return <Input type="date" {...field} />;
+                  return <Input type="date" max={dayjs().format('YYYY-MM-DD')} {...field} />;
                 }}
               </FormField>
             )}

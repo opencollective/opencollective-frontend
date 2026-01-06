@@ -11,6 +11,7 @@ export function EmptyResults({
   entityType,
   otherActions,
   imageSize = 160,
+  isEmptySearch,
 }: {
   onResetFilters?: (e) => void;
   hasFilters: boolean;
@@ -31,6 +32,7 @@ export function EmptyResults({
     | 'GRANTS'
     | 'PAYMENT_METHODS';
   imageSize?: number;
+  isEmptySearch?: boolean;
 }) {
   return (
     <div className="flex flex-col items-center gap-6 py-6 sm:py-12" data-cy="zero-results-message">
@@ -52,6 +54,8 @@ export function EmptyResults({
             defaultMessage="No matching {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} UPDATES {updates} other {results}}"
             values={{ type: entityType }}
           />
+        ) : isEmptySearch ? (
+          <FormattedMessage id="filter.EmptySearch" defaultMessage="Search for something" />
         ) : (
           <FormattedMessage
             id="filter.NoResults"
@@ -62,11 +66,18 @@ export function EmptyResults({
       </h3>
 
       <p className="text-center text-balance text-muted-foreground">
-        <FormattedMessage
-          id="filter.NoMatchingResults.subtitle"
-          defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."
-          values={{ type: entityType }}
-        />
+        {isEmptySearch ? (
+          <FormattedMessage
+            id="filter.EmptySearch.subtitle"
+            defaultMessage="Search for accounts, expenses, contributions, transactions and more"
+          />
+        ) : (
+          <FormattedMessage
+            id="filter.NoMatchingResults.subtitle"
+            defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."
+            values={{ type: entityType }}
+          />
+        )}
       </p>
 
       {hasFilters && (

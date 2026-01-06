@@ -7,7 +7,6 @@ import { defineMessages, useIntl } from 'react-intl';
 import { APOLLO_STATE_PROP_NAME, initClient } from '@/lib/apollo-client';
 import { getCollectivePageMetadata, isHiddenAccount } from '@/lib/collective';
 import { generateNotFoundError } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
@@ -134,7 +133,6 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
 
       ${CollectivePageMetadataFieldsFragment}
     `,
-    context: API_V2_CONTEXT,
     variables: {
       collectiveSlug,
     },

@@ -6,9 +6,8 @@ import { Pencil, Trash2, Undo2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
+import { AccountTypesWithHost, CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import {
   type EditPayoutMethodMutation,
   type EditPayoutMethodMutationVariables,
@@ -17,6 +16,7 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
 import { objectKeys } from '@/lib/utils';
 
@@ -39,6 +39,7 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
+import { updateAccountLegalNameMutation } from './mutations';
 import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 type PayoutMethodSectionProps = {
@@ -85,6 +86,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
     React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const { LoggedInUser } = useLoggedInUser();
 
   const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
   const isPickingProfileAdministered = props.payeeSlug === '__findAccountIAdminister';
@@ -139,6 +141,11 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
   const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
+  const payeeIsCollectiveFamilyType =
+    props.payee && (AccountTypesWithHost as readonly string[]).includes(props.payee.type);
+  const payeeIsSameHost = props.payee && props.host && 'host' in props.payee && props.payee.host?.id === props.host.id;
+  const hasSuitablePayoutMethodOption = payoutMethods?.length > 0;
+  const payeeHostIsTrusted = props.payee && 'host' in props.payee && props.payee.host?.isTrustedHost;
 
   const onPaymentMethodDeleted = React.useCallback(
     async deletedPayoutMethodId => {
@@ -182,6 +189,47 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   return (
     <div>
+      {/* Cross-host scenario messages */}
+      {payeeIsCollectiveFamilyType && !payeeIsSameHost && (
+        <React.Fragment>
+          {!payeeHostIsTrusted ? (
+            <MessageBox type="error" mt={2} mb={3} fontSize="12px">
+              <FormattedMessage
+                defaultMessage="This Expense is between different Hosts but the Payer Host is not allowed for this yet."
+                id="GiJCGt"
+              />
+              &nbsp;
+              <FormattedMessage
+                defaultMessage="If it's an issue, contact the Host or Open Collective support."
+                id="ZbcLMU"
+              />
+            </MessageBox>
+          ) : !hasSuitablePayoutMethodOption ? (
+            <MessageBox type="error" mt={2} mb={3} fontSize="12px">
+              <FormattedMessage
+                defaultMessage="This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes})."
+                id="eKwDAi"
+                values={{
+                  payoutMethodTypes: props.newPayoutMethodTypes?.join(', ') || '',
+                }}
+              />
+              &nbsp;
+              <FormattedMessage
+                defaultMessage="If it's an issue, contact the Host or Open Collective support."
+                id="ZbcLMU"
+              />
+            </MessageBox>
+          ) : (
+            <MessageBox type="warning" mt={2} mb={3} fontSize="12px">
+              <FormattedMessage
+                defaultMessage="This Expense is between different Hosts. Pick a Payout Method from the recipient Host."
+                id="EgEmmA"
+              />
+            </MessageBox>
+          )}
+        </React.Fragment>
+      )}
+
       {!isLoading &&
       !isLoadingPayee &&
       !isPickingProfileAdministered &&
@@ -230,6 +278,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
                 refresh={props.refresh}
                 account={props.account}
+                disableWarningMessages={
+                  payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
+                }
               />
             ))}
 
@@ -241,7 +292,8 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
           {!(isLoading || isLoadingPayee) &&
             props.newPayoutMethodTypes?.length > 0 &&
-            !(isVendor && payoutMethods.length > 0) && (
+            !(isVendor && payoutMethods.length > 0) &&
+            !payeeIsCollectiveFamilyType && (
               <RadioGroupCard
                 value="__newPayoutMethod"
                 data-cy="add-new-payout-method"
@@ -316,7 +368,6 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         payoutMethod: { ...props.newPayoutMethod },
         payeeSlug: props.payeeSlug,
@@ -551,39 +602,17 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const [keepNameDifferent, setKeepNameDifferent] = React.useState(false);
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
 
-  const [submitLegalNameMutation, { loading }] = useMutation(
-    gqlV1`
-    mutation UpdatePayoutProfileLegalName($input: CollectiveInputType!) {
-      editCollective(collective: $input) {
-        id
-        legalName
-      }
-    }
-  `,
-    {
-      variables: {
-        input: {
-          id: props.payee?.legacyId,
-          legalName: props.payoutMethod.data?.accountHolderName,
-        },
-      },
-      update(cache, result) {
-        cache.writeFragment({
-          id: `Individual:${props.payee?.id}`,
-          fragment: gql`
-            fragment PayoutProfile on Account {
-              legalName
-            }
-          `,
-          data: {
-            legalName: result.data.editCollective.legalName,
-          },
-        });
-
-        props.refresh?.();
+  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
+    variables: {
+      account: {
+        id: props.payee?.id,
+        legalName: props.payoutMethod.data?.accountHolderName,
       },
     },
-  );
+    onCompleted: () => {
+      props.refresh?.();
+    },
+  });
 
   const onUpdateLegalNameToMatch = React.useCallback(async () => {
     try {
@@ -598,31 +627,25 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     }
   }, [submitLegalNameMutation, toast, intl]);
 
-  const [deletePayoutMethod] = useMutation(
-    gql`
-      mutation DeletePayoutMethod($payoutMethodId: String!) {
-        removePayoutMethod(payoutMethodId: $payoutMethodId) {
-          id
-        }
+  const [deletePayoutMethod] = useMutation(gql`
+    mutation DeletePayoutMethod($payoutMethodId: String!) {
+      removePayoutMethod(payoutMethodId: $payoutMethodId) {
+        id
       }
-    `,
-    { context: API_V2_CONTEXT },
-  );
+    }
+  `);
 
-  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(
-    gql`
-      mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
-        editPayoutMethod(payoutMethod: $payoutMethod) {
-          id
-          name
-          data
-          isSaved
-          type
-        }
+  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(gql`
+    mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
+      editPayoutMethod(payoutMethod: $payoutMethod) {
+        id
+        name
+        data
+        isSaved
+        type
       }
-    `,
-    { context: API_V2_CONTEXT },
-  );
+    }
+  `);
 
   const { showConfirmationModal } = useModal();
 

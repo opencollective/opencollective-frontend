@@ -72,12 +72,12 @@ const itemHasValidAmount = (expenseCurrency: string, item: ExpenseItemFormValues
   return Boolean(
     // Either the item has an amount set with the same currency as the expense
     item.amountV2?.valueInCents &&
-      (item.amountV2.currency === expenseCurrency ||
-        // Or a valid exchange rate was provided
-        (item.amountV2.exchangeRate &&
-          item.amountV2.exchangeRate.fromCurrency === item.amountV2.currency &&
-          item.amountV2.exchangeRate.toCurrency === expenseCurrency &&
-          item.amountV2.exchangeRate.value)),
+    (item.amountV2.currency === expenseCurrency ||
+      // Or a valid exchange rate was provided
+      (item.amountV2.exchangeRate &&
+        item.amountV2.exchangeRate.fromCurrency === item.amountV2.currency &&
+        item.amountV2.exchangeRate.toCurrency === expenseCurrency &&
+        item.amountV2.exchangeRate.value)),
   );
 };
 

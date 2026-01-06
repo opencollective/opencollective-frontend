@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import { Box, Flex } from '../../../Grid';
 import Link from '../../../Link';
@@ -28,7 +28,7 @@ const disputesQuery = gql`
 `;
 
 export const DisputedContributionsWarning = ({ hostSlug }: DisputedContributionsWarningProps) => {
-  const { data, loading } = useQuery(disputesQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading } = useQuery(disputesQuery, { variables: { hostSlug } });
   const { host } = data || {};
   if (!host || (!host.hasDisputedOrders && !host.hasInReviewOrders)) {
     return null;
@@ -54,7 +54,7 @@ export const DisputedContributionsWarning = ({ hostSlug }: DisputedContributions
                   id="host.disputes.warning"
                   defaultMessage="There are disputed charges that need review."
                 />{' '}
-                <Link href={`/dashboard/${hostSlug}/orders?status=DISPUTED`}>
+                <Link href={`/dashboard/${hostSlug}/incoming-contributions?status=DISPUTED`}>
                   <FormattedMessage defaultMessage="Disputed Contributions" id="3fVeCs" />
                 </Link>
               </P>
@@ -65,7 +65,7 @@ export const DisputedContributionsWarning = ({ hostSlug }: DisputedContributions
                   id="host.in_review.warning"
                   defaultMessage="There are charges under review that need attention."
                 />{' '}
-                <Link href={`/dashboard/${hostSlug}/orders?status=IN_REVIEW`}>
+                <Link href={`/dashboard/${hostSlug}/incoming-contributions?status=IN_REVIEW`}>
                   <FormattedMessage defaultMessage="In Review Contributions" id="K0EEJy" />
                 </Link>
               </P>

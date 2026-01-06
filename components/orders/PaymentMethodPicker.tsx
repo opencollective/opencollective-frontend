@@ -11,7 +11,7 @@ import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { clsx } from 'clsx';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { PaymentMethodPickerQuery } from '../../lib/graphql/types/v2/graphql';
 import type { Account, Host, Order, PaymentMethod, PaymentMethodType } from '../../lib/graphql/types/v2/schema';
 import { PaymentMethodLegacyType, PaymentMethodService } from '../../lib/graphql/types/v2/schema';
@@ -100,7 +100,6 @@ export type PaymentMethodOption =
 export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
   const [error, setError] = React.useState();
   const query = useQuery<PaymentMethodPickerQuery>(paymentMethodPickerQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       hostSlug: props.host?.slug,
       accountSlug: props.account?.slug,

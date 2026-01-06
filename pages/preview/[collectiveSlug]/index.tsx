@@ -3,8 +3,6 @@ import { useQuery } from '@apollo/client';
 import { Markup } from 'interweave';
 import { useRouter } from 'next/router';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-
 import { ContentOverview } from '../../../components/crowdfunding-redesign/ContentOverview';
 import { GoalProgress } from '../../../components/crowdfunding-redesign/GoalProgress';
 import {
@@ -61,7 +59,6 @@ export default function ContributePage() {
   const router = useRouter();
   const { data } = useQuery(contributePageQuery, {
     variables: { slug: router.query.collectiveSlug },
-    context: API_V2_CONTEXT,
   });
   const profile = getDefaultProfileValues(data?.account);
   const mainfundraising = true;

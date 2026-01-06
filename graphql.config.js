@@ -17,36 +17,33 @@ module.exports = {
       schema: 'lib/graphql/schema.graphql',
       documents: [
         // The following documents only use gqlV1
-        // grep -rl " gqlV1/" ./components ./lib ./pages | xargs grep -rL "gql\`" | sort
-        'components/CollectivePickerAsync.js',
-        'components/CreateCollectiveMiniForm.tsx',
-        'components/CreateGiftCardsForm.js',
-        'components/EditPublicMessagePopup.js',
-        'components/MembersWithData.js',
-        'components/MembershipsWithData.js',
-        'components/SignInOrJoinFree.js',
+        // grep -rl " = gqlV1" ./components ./lib ./pages | xargs grep -rL "gql\`" | sort
         'components/collective-page/graphql/fragments.js',
         'components/collective-page/graphql/queries.js',
         'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.js',
-        'components/edit-collective/CreateHostFormWithData.js',
-        'components/edit-collective/EditUserEmailForm.js',
+        'components/CollectivePickerAsync.js',
+        'components/CreateCollectiveMiniForm.tsx',
+        'components/CreateGiftCardsForm.js',
         'components/edit-collective/actions/Archive.js',
         'components/edit-collective/actions/Delete.js',
-        'components/edit-collective/sections/FiscalHosting.js',
-        'components/edit-collective/sections/GiftCards.ts',
+        'components/edit-collective/EditUserEmailForm.js',
+        'components/edit-collective/sections/GiftCards.tsx',
         'components/edit-collective/sections/PaymentReceipts.js',
-        'components/edit-collective/sections/Webhooks.js',
+        'components/edit-collective/sections/Webhooks.tsx',
+        'components/EditPublicMessagePopup.js',
+        'components/MembershipsWithData.js',
+        'components/MembersWithData.js',
+        'components/SignInOrJoinFree.js',
         'components/tier-page/graphql/queries.js',
         'lib/graphql/v1/fragments.js',
         'lib/graphql/v1/mutations.js',
         'lib/graphql/v1/queries.js',
-        'pages/confirmEmail.js',
         'pages/contribute.js',
         'pages/redeem.js',
-        'pages/redeemed.js',
+        'pages/redeemed.tsx',
         'pages/updatePaymentMethod.js',
         // The following documents use gql and gqlV1 at the same time, gqlV1 will not be linted
-        // grep -rl " gqlV1/" ./components ./lib ./pages | xargs grep -rl "gql\`" | sort
+        // grep -rl " = gqlV1" ./components ./lib ./pages | xargs grep -rl "gql\`" | sort
         // No file anymore and it should stay like that!
       ],
       extensions: {

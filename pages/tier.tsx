@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import { CollectiveType } from '../lib/constants/collectives';
+import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
@@ -54,6 +55,7 @@ const getPageMetaData = (pageProps: TierPageProps, data) => {
 
 const tierPageQueryHelpers = getSSRQueryHelpers<{ tierId: number }, TierPageProps>({
   query: tierPageQuery,
+  context: API_V1_CONTEXT,
   getVariablesFromContext: ({ query: { tierId } }) => ({ tierId: Number(tierId) }),
   getPropsFromContext: ({
     query: { parentCollectiveSlug, collectiveSlug, tierId, tierSlug, redirect, collectiveType },

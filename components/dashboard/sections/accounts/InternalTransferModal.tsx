@@ -5,15 +5,12 @@ import { Form } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { getAccountReferenceInput } from '../../../../lib/collective';
-import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../../lib/graphql/helpers';
-import type {
-  AccountsDashboardQuery,
-  DashboardAccountsQueryFieldsFragment,
-} from '../../../../lib/graphql/types/v2/graphql';
-import type { Account } from '../../../../lib/graphql/types/v2/schema';
-import { Currency } from '../../../../lib/graphql/types/v2/schema';
+import { getAccountReferenceInput } from '@/lib/collective';
+import { i18nGraphqlException } from '@/lib/errors';
+import type { AccountsDashboardQuery, DashboardAccountsQueryFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { Account } from '@/lib/graphql/types/v2/schema';
+import { Currency } from '@/lib/graphql/types/v2/schema';
+import { fromCollectiveSearchQuery } from '@/lib/graphql/v1/queries';
 
 import CollectivePickerAsync from '@/components/CollectivePickerAsync';
 
@@ -53,55 +50,6 @@ const internalTransferMutation = gql`
   }
 `;
 
-const fromCollectiveSearchQuery = gqlV1 /* GraphQL */ `
-  query CollectivePickerSearch(
-    $term: String!
-    $types: [TypeOfCollective]
-    $limit: Int
-    $hostCollectiveIds: [Int]
-    $parentCollectiveIds: [Int]
-    $skipGuests: Boolean
-    $includeArchived: Boolean
-    $includeVendorsForHostId: Int
-  ) {
-    search(
-      term: $term
-      types: $types
-      limit: $limit
-      hostCollectiveIds: $hostCollectiveIds
-      parentCollectiveIds: $parentCollectiveIds
-      skipGuests: $skipGuests
-      includeArchived: $includeArchived
-      includeVendorsForHostId: $includeVendorsForHostId
-    ) {
-      id
-      collectives {
-        id
-        type
-        slug
-        name
-        currency
-        location {
-          id
-          address
-          country
-        }
-        imageUrl(height: 64)
-        hostFeePercent
-        isActive
-        isArchived
-        isHost
-        stats {
-          balanceWithBlockedFunds
-        }
-        ... on Organization {
-          isTrustedHost
-        }
-      }
-    }
-  }
-`;
-
 interface InternalTransferModalProps extends BaseModalProps {
   defaultFromAccount?: DashboardAccountsQueryFieldsFragment;
   parentAccount: Pick<Account, 'legacyId' | 'id' | 'slug' | 'name'>;
@@ -122,7 +70,6 @@ export default function InternalTransferModal({
       accountSlug: parentAccount.slug,
       limit: 10,
     },
-    context: API_V2_CONTEXT,
   });
 
   const activeAccounts = React.useMemo(
@@ -138,9 +85,7 @@ export default function InternalTransferModal({
     }
   }, [data?.accout]);
 
-  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation);
 
   const isLoading = loadingMutation || loading;
 

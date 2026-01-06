@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import Avatar from '../components/Avatar';
@@ -51,7 +51,7 @@ const resetPasswordAccountQuery = gql`
 const ResetPasswordPage = ({ token }: { token: string }) => {
   const router = useRouter();
   const intl = useIntl();
-  const graphqlContext = { ...API_V2_CONTEXT, headers: { Authorization: `Bearer ${token}` } };
+  const graphqlContext = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
   const { login, refetchLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(resetPasswordAccountQuery, { context: graphqlContext, skip: !token });
   const [resetPassword] = useMutation(resetPasswordMutation, { context: graphqlContext });

@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
@@ -176,7 +176,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
-  const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
+  const queryParams = { variables: queryVariables };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
 
   const { LoggedInUser } = useLoggedInUser();

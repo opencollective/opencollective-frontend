@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { P } from '../Text';
@@ -24,7 +24,6 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
   const { toast } = useToast();
   const intl = useIntl();
   const [deleteToken] = useMutation(deletePersonalTokenMutation, {
-    context: API_V2_CONTEXT,
     update: (cache, { data }) => {
       cache.evict({ id: cache.identify(personalToken) });
       cache.gc();

@@ -4,7 +4,8 @@ import { max } from 'lodash';
 import { FilePenLine } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import type { AccountTaxInformationQuery, AccountTaxInformationQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import { LegalDocumentRequestStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { getI18nLink, I18nSupportLink } from '../../../I18nFormatters';
 import Image from '../../../Image';
@@ -31,8 +32,6 @@ const PendingTaxFormView = ({
   refetch: () => void;
 }) => {
   const [hasTaxInformationForm, setHasTaxInformationForm] = React.useState(false);
-  const requestService = account.usTaxForms[0]?.service;
-
   return (
     <div>
       <MessageBox type="warning" withIcon>
@@ -43,8 +42,8 @@ const PendingTaxFormView = ({
           <p className="my-2">
             <FormattedMessage
               values={{ maxExpiredYear: max(expiredForms.map(form => form.year)) }}
-              defaultMessage="The tax information you provided for {maxExpiredYear} has expired. Please fill out the form again."
-              id="WEDTW5"
+              defaultMessage="The tax information requested for{maxExpiredYear} has expired. Please fill out the form again."
+              id="aicNDf"
             />
           </p>
         )}
@@ -69,16 +68,10 @@ const PendingTaxFormView = ({
         </p>
       </MessageBox>
       <hr className="my-8" />
-      {requestService === 'DROPBOX_FORMS' ? (
-        <p>
-          <FormattedMessage defaultMessage="You will receive an email with a link to fill out a form." id="V2vf/v" />
-        </p>
-      ) : (
-        <Button onClick={() => setHasTaxInformationForm(true)}>
-          <FilePenLine className="mr-1" size={16} />
-          <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
-        </Button>
-      )}
+      <Button onClick={() => setHasTaxInformationForm(true)}>
+        <FilePenLine className="mr-1" size={16} />
+        <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
+      </Button>
       <TaxInformationFormDialog
         account={account}
         open={hasTaxInformationForm}
@@ -129,9 +122,17 @@ const TaxFormSuccessView = () => {
  * A page for users to fill their info for W9/W8 tax forms.
  */
 export const TaxInformationSettingsSection = ({ account }) => {
-  const queryParams = { variables: { id: account.id }, context: API_V2_CONTEXT };
-  const { data, error, loading, refetch } = useQuery(accountTaxInformationQuery, queryParams);
+  const queryParams = { variables: { id: account.id } };
+  const { data, error, loading, refetch } = useQuery<AccountTaxInformationQuery, AccountTaxInformationQueryVariables>(
+    accountTaxInformationQuery,
+    queryParams,
+  );
   const taxForms = data?.account?.usTaxForms || [];
+  const validTaxForm = taxForms.find(form => [LegalDocumentRequestStatus.RECEIVED].includes(form.status));
+  const activeRequests = taxForms.filter(form =>
+    [LegalDocumentRequestStatus.REQUESTED, LegalDocumentRequestStatus.EXPIRED].includes(form.status),
+  );
+
   return (
     <div>
       <h2 className="mb-8 text-3xl font-bold">
@@ -142,7 +143,15 @@ export const TaxInformationSettingsSection = ({ account }) => {
         <Loading />
       ) : error ? (
         <MessageBoxGraphqlError error={error} />
-      ) : !taxForms.length ? (
+      ) : validTaxForm ? (
+        <TaxFormSuccessView />
+      ) : activeRequests.length > 0 ? (
+        <PendingTaxFormView
+          account={data.account}
+          expiredForms={taxForms.filter(form => form.status === LegalDocumentRequestStatus.EXPIRED)}
+          refetch={refetch}
+        />
+      ) : (
         <div className="flex items-center justify-between gap-5 text-xl">
           <Image src="/static/images/illustrations/plant.png" alt="" width={164} height={164} />
           <FormattedMessage
@@ -150,14 +159,6 @@ export const TaxInformationSettingsSection = ({ account }) => {
             id="Mdn+cL"
           />
         </div>
-      ) : taxForms.find(form => form.status === 'RECEIVED' && !form.isExpired) ? (
-        <TaxFormSuccessView />
-      ) : (
-        <PendingTaxFormView
-          account={data.account}
-          expiredForms={taxForms.filter(form => form.isExpired)}
-          refetch={refetch}
-        />
       )}
     </div>
   );

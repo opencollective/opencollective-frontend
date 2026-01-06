@@ -27,7 +27,7 @@ type AccountingCategoryDrawerProps = {
   onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onDelete: (category: Pick<AccountingCategory, 'id'>) => void;
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
-  isIndependentCollective: boolean;
+  hasHosting: boolean;
   isInitiallyEditing?: boolean;
 };
 
@@ -50,7 +50,7 @@ export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
 
       {!isEditing && (
         <AccountingCategoryDrawerView
-          isIndependentCollective={props.isIndependentCollective}
+          hasHosting={props.hasHosting}
           onEditClick={() => setIsEditing(true)}
           onDeleteClick={() => props.onDelete(props.accountingCategory)}
           accountingCategory={props.accountingCategory}
@@ -58,7 +58,7 @@ export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
       )}
       {isEditing && (
         <AccountingCategoryEditingDrawerView
-          isIndependentCollective={props.isIndependentCollective}
+          hasHosting={props.hasHosting}
           accountingCategory={props.accountingCategory}
           onEdit={props.onEdit}
           onExitEdit={() => setIsEditing(false)}
@@ -72,7 +72,7 @@ type AccountingCategoryDrawerViewProps = {
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
   onEditClick: () => void;
   onDeleteClick: () => void;
-  isIndependentCollective: boolean;
+  hasHosting: boolean;
 };
 
 function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) {
@@ -108,7 +108,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           </DataListItem>
         )}
 
-        {!props.isIndependentCollective && (
+        {props.hasHosting && (
           <DataListItem>
             <DataListItemLabel>
               <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
@@ -134,7 +134,11 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
 
         <DataListItem>
           <DataListItemLabel>
-            <FormattedMessage defaultMessage="Visible only to host admins" id="NvBPFR" />
+            {props.hasHosting ? (
+              <FormattedMessage defaultMessage="Visible only to Host admins" id="JM47p6" />
+            ) : (
+              <FormattedMessage defaultMessage="Visible only to Organization admins" id="pWKR0F" />
+            )}
           </DataListItemLabel>
           <DataListItemValue>
             {props.accountingCategory?.hostOnly ? (
@@ -203,7 +207,7 @@ type AccountingCategoryEditingDrawerViewProps = {
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
   onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onExitEdit: () => void;
-  isIndependentCollective: boolean;
+  hasHosting: boolean;
 };
 
 function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDrawerViewProps) {
@@ -250,7 +254,7 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
             values.expensesTypes && values.expensesTypes.length > 0 ? values.expensesTypes.map(t => t.value) : null,
           appliesTo: values.appliesTo
             ? values.appliesTo.value
-            : props.isIndependentCollective
+            : !props.hasHosting
               ? AccountingCategoryAppliesTo.HOST
               : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
         });
@@ -262,7 +266,7 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
   });
   return (
     <React.Fragment>
-      <AccountingCategoryForm isIndependentCollective={props.isIndependentCollective} formik={formik} />
+      <AccountingCategoryForm hasHosting={props.hasHosting} formik={formik} />
       <DrawerActions>
         <StyledButton onClick={props.onExitEdit}>
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

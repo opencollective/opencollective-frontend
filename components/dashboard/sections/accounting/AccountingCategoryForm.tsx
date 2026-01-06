@@ -123,7 +123,7 @@ export const AccountingCategoryAppliesToI18n = defineMessages({
 
 type AccountingCategoryFormProps = {
   formik: ReturnType<typeof useFormik<FormValues>>;
-  isIndependentCollective: boolean;
+  hasHosting: boolean;
 };
 
 export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
@@ -231,7 +231,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           onChange={e => props.formik.setFieldValue('friendlyName', e.target.value)}
         />
       </StyledInputField>
-      {!props.isIndependentCollective && (
+      {props.hasHosting && (
         <StyledInputField
           name="appliesTo"
           required

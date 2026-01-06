@@ -16,7 +16,9 @@ class LoggedInUser {
   public CollectiveId: number;
   public collective: GraphQLV1Collective;
   public isRoot: boolean;
+  public requiresProfileCompletion: boolean;
   public id: number;
+  public image: string;
   public hasTwoFactorAuth: boolean;
   public email: string;
   public memberOf: Array<{ id: number; role: ReverseCompatibleMemberRole; collective: GraphQLV1Collective }>;
@@ -239,8 +241,10 @@ class LoggedInUser {
       return feature.isEnabled();
     }
 
-    const enabledByDefault = feature.enabledByDefaultFor?.some(
-      slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+    const enabledByDefault = Boolean(
+      feature.enabledByDefaultFor?.some(
+        slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
+      ),
     );
     const isTurnedOn = earlyAccess[featureKey] === true;
     const isTurnedOff = earlyAccess[featureKey] === false;
@@ -290,6 +294,14 @@ class LoggedInUser {
     });
 
     return availablePreviewFeatures;
+  }
+
+  shouldDisplaySetupGuide(account: { legacyId: number } | { id: number }) {
+    if (!account || !this.collective) {
+      return false;
+    }
+
+    return this.collective.settings?.showSetupGuide?.[`id${'legacyId' in account ? account.legacyId : account.id}`];
   }
 }
 

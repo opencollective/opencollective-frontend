@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { updateTransactionsImportRows } from './lib/graphql';
@@ -310,6 +309,7 @@ const useMatchCreditDialogQueryFilter = (
       hostSlug: host.slug,
       hostedAccounts: accounts,
       disableHostedAccountsSearch: Boolean(accounts?.length),
+      accountingCategoryKinds: ExpenseFilters.ExpenseAccountingCategoryKinds,
     };
 
     return meta;
@@ -401,7 +401,7 @@ export const MatchCreditDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPECTED_FUNDS);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [updateRows] = useMutation(updateTransactionsImportRows);
   const queryFilter = useMatchCreditDialogQueryFilter(activeViewId, row, host, accounts);
   const [isConfirming, setIsConfirming] = React.useState(false);
 
@@ -411,7 +411,6 @@ export const MatchCreditDialog = ({
     loading: expensesLoading,
     error: expensesError,
   } = useQuery(findExpenseMatchForOffPlatformCreditQuery, {
-    context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.id },
     fetchPolicy: 'cache-and-network',
     skip: queryFilter.activeViewId !== TabType.EXPENSES,
@@ -424,7 +423,6 @@ export const MatchCreditDialog = ({
     error: contributionsError,
     client,
   } = useQuery(findOrderMatchForOffPlatformCreditQuery, {
-    context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.slug },
     fetchPolicy: 'cache-and-network',
     skip: queryFilter.activeViewId === TabType.EXPENSES,
@@ -635,7 +633,7 @@ export const MatchCreditDialog = ({
                         </Link>
                       ) : (
                         <Link
-                          href={`/${selectedContribution.toAccount.slug}/orders/${selectedContribution.legacyId}`}
+                          href={`/${selectedContribution.toAccount.slug}/incoming-contributions/${selectedContribution.legacyId}`}
                           className="text-sm underline"
                           openInNewTab
                         >

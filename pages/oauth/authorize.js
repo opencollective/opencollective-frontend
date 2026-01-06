@@ -4,7 +4,7 @@ import { difference } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import EmbeddedPage from '../../components/EmbeddedPage';
@@ -56,7 +56,7 @@ const OAuthAuthorizePage = () => {
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
   const skipQuery = missingParams.length;
   const queryVariables = { clientId: query['client_id'] };
-  const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
+  const queryParams = { skip: skipQuery, variables: queryVariables };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
   // Accept whitespace (OAuth 2.0 compliance) or comma (retro-compatibility)

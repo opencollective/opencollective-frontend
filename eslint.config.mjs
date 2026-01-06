@@ -184,7 +184,13 @@ export default defineConfig([
   },
 
   // Scripts config
-  { files: ['scripts/*.js'], rules: { 'no-console': 'off' } },
+  {
+    files: ['scripts/**/*.+(js|ts)'],
+    rules: {
+      'no-console': 'off',
+      'n/no-process-exit': 'off',
+    },
+  },
 
   // Server/config files
   {

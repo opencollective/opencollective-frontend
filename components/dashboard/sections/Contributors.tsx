@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { MemberRole } from '../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
@@ -244,7 +243,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     variables: {
       slug: accountSlug,
     },
-    context: API_V2_CONTEXT,
   });
 
   const views = [
@@ -329,7 +327,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
       role: [MemberRole.FOLLOWER, MemberRole.BACKER],
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
   });
 
   const contributors = data?.account?.members.nodes || [];
@@ -348,7 +345,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const [isDownloadingCsv, setDownloadingCsv] = React.useState(false);
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />}
         actions={

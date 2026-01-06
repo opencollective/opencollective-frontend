@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   DashboardAccountsQueryFieldsFragment,
   HostedCollectivesQueryVariables,
@@ -61,7 +60,6 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const { data: metadata } = useQuery(accountsMetadataQuery, {
     variables: { accountSlug },
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
   const { account } = useContext(DashboardContext);
   const openAccountId = subpath[0];
@@ -111,7 +109,6 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
 
   const { data, error, loading } = useQuery(accountsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
-    context: API_V2_CONTEXT,
   });
 
   const { openDrawer, drawerProps } = useDrawer({
@@ -135,7 +132,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   });
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Accounts" id="FvanT6" />}
         description={

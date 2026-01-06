@@ -5,7 +5,6 @@ import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
@@ -40,7 +39,6 @@ function ExpenseTagsFilter({
   const [options, setOptions] = React.useState<{ label: string; value: string }[]>(defaultOptions);
 
   const [search, { loading, data }] = useLazyQuery(expenseTagsQuery, {
-    context: API_V2_CONTEXT,
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
     variables: {

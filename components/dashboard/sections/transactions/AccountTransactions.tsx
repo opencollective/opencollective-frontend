@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import type { TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
@@ -85,7 +84,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const { data: metaData } = useQuery(accountTransactionsMetaDataQuery, {
     variables: { slug: accountSlug },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-first',
   });
 
@@ -110,7 +109,6 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
       ...queryFilter.variables,
     },
     notifyOnNetworkStatusChange: true,
-    context: API_V2_CONTEXT,
   });
 
   const { transactions } = data || {};

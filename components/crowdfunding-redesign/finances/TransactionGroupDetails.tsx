@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
 import DateTime from '../../DateTime';
@@ -85,7 +84,6 @@ export function TransactionGroupDetails() {
     },
     // skip: !router.query.groupId || !router.query.accountSlug,
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
   const intl = useIntl();
   return (

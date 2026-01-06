@@ -1,31 +1,40 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
-import { css } from '@styled-system/css';
-import { isEmpty } from 'lodash';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { get, isEmpty } from 'lodash';
+import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { styled } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { PROJECTS_ORDER_KEY } from '../../../lib/constants/collectives';
+import { getErrorFromGraphqlException } from '../../../lib/errors';
 import type {
   ProjectsSectionSearchQuery,
   ProjectsSectionSearchQueryVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import useDebounced from '../../../lib/hooks/useDebounced';
+import { sortProjects, updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
+import { EMPTY_ARRAY } from '@/lib/constants/utils';
 
+import Container from '../../Container';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeProject from '../../contribute-cards/ContributeProject';
-import CreateNew from '../../contribute-cards/CreateNew';
 import { EmptyResults } from '../../dashboard/EmptyResults';
 import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
 import LoadingGrid from '../../LoadingGrid';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { Input } from '../../ui/Input';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
+import { editAccountSettingMutation } from '../graphql/mutations';
 import SectionTitle from '../SectionTitle';
+
+// Dynamic imports
+const AdminContributeCardsContainer = dynamic(() => import('../../contribute-cards/AdminContributeCardsContainer'), {
+  ssr: false,
+});
 
 const ProjectSectionCardFields = gql`
   fragment ProjectSectionCardFields on Account {
@@ -43,18 +52,16 @@ const ProjectSectionCardFields = gql`
 
 const CONTRIBUTE_CARD_PADDING_X = [15, 18];
 
-const ContributeCardContainer = styled(Box).attrs({ px: CONTRIBUTE_CARD_PADDING_X })(
-  css({
-    scrollSnapAlign: ['center', null, 'start'],
-  }),
-);
-
 type ProjectsProps = {
   collective: {
+    id: number;
     slug: string;
     name: string;
     currency: string;
     isActive: string;
+    settings?: {
+      [PROJECTS_ORDER_KEY]?: number[];
+    };
   };
   projects: { id: number; isArchived?: boolean; isActive?: boolean; contributors?: object[] }[];
   isAdmin: boolean;
@@ -78,8 +85,14 @@ export default function Projects(props: ProjectsProps) {
   const hasProjectsSection = (props.projects.length >= 0 && collective.isActive) || isAdmin;
 
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [draggingId, setDraggingId] = React.useState<number | null>(null);
+  const [showProjectsAdmin, setShowProjectsAdmin] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+
   const deboucedSearchTerm = useDebounced(searchTerm, 1000);
   const isSearching = !isEmpty(deboucedSearchTerm);
+
+  const [editAccountSettings, { loading: isSaving }] = useMutation(editAccountSettingMutation);
   const query = useQuery<ProjectsSectionSearchQuery, ProjectsSectionSearchQueryVariables>(
     gql`
       query ProjectsSectionSearch($slug: String, $searchTerm: String) {
@@ -96,7 +109,6 @@ export default function Projects(props: ProjectsProps) {
       ${ProjectSectionCardFields}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.collective.slug,
         searchTerm: deboucedSearchTerm,
@@ -114,9 +126,58 @@ export default function Projects(props: ProjectsProps) {
     [isAdmin, props.projects],
   );
 
+  // Get project order keys and sort projects
+  const projectOrderKeys = get(collective.settings, PROJECTS_ORDER_KEY, EMPTY_ARRAY) as number[];
+  const sortedCollectiveProjects = React.useMemo(() => {
+    return sortProjects(collectiveProjects, projectOrderKeys);
+  }, [collectiveProjects, projectOrderKeys]);
+
+  const getProjectCards = React.useMemo(() => {
+    return sortedCollectiveProjects.map(project => ({
+      key: project.id,
+      Component: ContributeProject,
+      componentProps: {
+        collective,
+        project,
+        disableCTA: !project.isActive,
+        hideContributors: !sortedCollectiveProjects.some(p => p.contributors?.length),
+      },
+    }));
+  }, [sortedCollectiveProjects, collective]);
+
+  const onProjectsReorder = React.useCallback(
+    async (cards: Array<{ key: number }>) => {
+      const cardKeys = cards.map(c => c.key);
+
+      setError(null);
+      try {
+        await editAccountSettings({
+          variables: {
+            collectiveId: collective.id,
+            key: PROJECTS_ORDER_KEY,
+            value: cardKeys,
+          },
+          update: (store, response) => {
+            // We need to update the store manually because the response comes from API V2
+            updateCollectiveInGraphQLV1Cache(store, collective.id, {
+              settings: response.data.editAccountSetting.settings,
+            });
+          },
+        });
+      } catch (e) {
+        setError(getErrorFromGraphqlException(e));
+      }
+    },
+    [collective, editAccountSettings],
+  );
+
+  const onProjectsAdminReady = React.useCallback(() => {
+    setShowProjectsAdmin(true);
+  }, []);
+
   const hasMore = isSearching && !query.loading && query.data?.account?.projects?.totalCount > searchProjects.length;
   const isLoadingSearch = isSearching && query.loading;
-  const displayedProjects = !isSearching ? collectiveProjects : searchProjects;
+  const displayedProjects = !isSearching ? sortedCollectiveProjects : searchProjects;
   if (!hasProjectsSection) {
     return null;
   }
@@ -152,7 +213,12 @@ export default function Projects(props: ProjectsProps) {
       </ContainerSectionContent>
 
       <Box mb={4}>
-        <HorizontalScroller container={ContributeCardsContainer} getScrollDistance={getContributeCardsScrollDistance}>
+        <HorizontalScroller
+          container={ContributeCardsContainer}
+          getScrollDistance={getContributeCardsScrollDistance}
+          containerProps={{ disableScrollSnapping: !!draggingId }}
+        >
+          {error && <MessageBoxGraphqlError mb={5} error={error} />}
           {isLoadingSearch && (
             <div className="ml-8 self-center">
               <LoadingGrid />
@@ -165,16 +231,32 @@ export default function Projects(props: ProjectsProps) {
               </div>
             </div>
           )}
-          {displayedProjects.map(project => (
-            <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
-              <ContributeProject
+          {!(isAdmin && showProjectsAdmin && !isSearching) &&
+            displayedProjects.map(project => (
+              <Box key={project.id} px={CONTRIBUTE_CARD_PADDING_X}>
+                <ContributeProject
+                  collective={collective}
+                  project={project}
+                  disableCTA={!project.isActive}
+                  hideContributors={!displayedProjects.some(project => project.contributors?.length)}
+                />
+              </Box>
+            ))}
+          {isAdmin && !isSearching && (
+            <Container display={showProjectsAdmin ? 'block' : 'none'} data-cy="admin-projects-cards">
+              <AdminContributeCardsContainer
+                createNewType="PROJECT"
                 collective={collective}
-                project={project}
-                disableCTA={!project.isActive}
-                hideContributors={!displayedProjects.some(project => project.contributors?.length)}
+                cards={getProjectCards}
+                onReorder={onProjectsReorder}
+                isSaving={isSaving}
+                setDraggingId={setDraggingId}
+                draggingId={draggingId}
+                onMount={onProjectsAdminReady}
+                enableReordering={true}
               />
-            </Box>
-          ))}
+            </Container>
+          )}
           {hasMore && (
             <div className="self-center">
               <div className="w-60 text-center">
@@ -183,13 +265,6 @@ export default function Projects(props: ProjectsProps) {
                 </Link>
               </div>
             </div>
-          )}
-          {isAdmin && (
-            <ContributeCardContainer minHeight={150}>
-              <CreateNew route={`/${collective.slug}/projects/create`}>
-                <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
-              </CreateNew>
-            </ContributeCardContainer>
           )}
         </HorizontalScroller>
         <ContainerSectionContent>

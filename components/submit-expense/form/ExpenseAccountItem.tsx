@@ -2,7 +2,6 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { type AccountItemQuery } from '../../../lib/graphql/types/v2/graphql';
 import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../lib/i18n/collective-type';
@@ -68,7 +67,6 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
       ${accountHoverCardFields}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         slug: 'slug' in props ? props.slug : null,
         showAdmins: !!props.showAdmins,

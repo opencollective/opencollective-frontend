@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import ConversationsList from '../../conversations/ConversationsList';
 import { conversationListFragment } from '../../conversations/graphql';
@@ -104,7 +104,6 @@ class SectionConversations extends React.PureComponent {
 const addConversationsSectionData = graphql(conversationsSectionQuery, {
   options: props => ({
     variables: getConversationsSectionQueryVariables(props.collective.slug),
-    context: API_V2_CONTEXT,
   }),
 });
 

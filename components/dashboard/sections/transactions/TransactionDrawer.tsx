@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
@@ -249,7 +248,6 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const id = transactionId || prevTransactionId;
   const { data, refetch, loading, error } = useQuery(transactionQuery, {
     variables: { transaction: { legacyId: Number(id) } },
-    context: API_V2_CONTEXT,
   });
   const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };
@@ -356,7 +354,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
               <React.Fragment>
                 <InfoList className="mb-6 sm:grid-cols-2">
                   <InfoListItem
-                    className="border-t-0 border-b"
+                    className="!border-t-0 !border-b"
                     title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                     value={
                       <LinkCollective
@@ -373,7 +371,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                   />
 
                   <InfoListItem
-                    className="border-t-0 border-b"
+                    className="!border-t-0 !border-b"
                     title={
                       transaction.type === 'CREDIT' ? (
                         <FormattedMessage defaultMessage="Sender" id="nbwXXN" />

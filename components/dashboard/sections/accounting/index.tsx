@@ -5,9 +5,7 @@ import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { CollectiveType } from '../../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
@@ -17,6 +15,8 @@ import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema'
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
+
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -45,20 +45,12 @@ const accountingCategoriesQuery = gql`
       accountingCategories {
         totalCount
         nodes {
-          id
-          kind
-          code
-          hostOnly
-          instructions
-          name
-          friendlyName
-          expensesTypes
-          createdAt
-          appliesTo
+          ...AccountingCategorySelectFields
         }
       }
     }
   }
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 // TODO adapt for host types other than organization
@@ -73,22 +65,14 @@ const editAccountingCategoryMutation = gql`
           accountingCategories {
             totalCount
             nodes {
-              id
-              kind
-              code
-              name
-              hostOnly
-              instructions
-              friendlyName
-              expensesTypes
-              createdAt
-              appliesTo
+              ...AccountingCategorySelectFields
             }
           }
         }
       }
     }
   }
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {
@@ -147,6 +131,8 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
   const [deleteCategoryConfirmation, setDeleteCategoryConfirmation] = React.useState(null);
 
+  const hasHosting = account.hasHosting;
+
   const queryFilter = useQueryFilter({
     schema: React.useMemo(
       () =>
@@ -154,7 +140,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           searchTerm: searchFilter.schema,
           orderBy: orderByCodeFilter.schema,
           kind: kindFilter.schema,
-          hostOnly: hostOnlyFilter.schema,
+          ...(hasHosting ? { hostOnly: hostOnlyFilter.schema } : {}),
         }),
       [],
     ),
@@ -162,27 +148,24 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       searchTerm: searchFilter.filter,
       orderBy: orderByCodeFilter.filter,
       kind: kindFilter.filter,
-      hostOnly: hostOnlyFilter.filter,
+      ...(hasHosting ? { hostOnly: hostOnlyFilter.filter } : {}),
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
       kind: kindFilter.toVariables,
-      hostOnly: v => v === 'yes',
+      ...(hasHosting ? { hostOnly: v => v === 'yes' } : {}),
     },
   });
 
   const query = useQuery<AdminAccountingCategoriesQuery, AdminAccountingCategoriesQueryVariables>(
     accountingCategoriesQuery,
     {
-      context: API_V2_CONTEXT,
       variables: {
         hostSlug: accountSlug,
       },
     },
   );
-
-  const isIndependentCollective = query.data?.host?.type === CollectiveType.COLLECTIVE;
 
   const categories = React.useMemo(
     () => query.data?.host?.accountingCategories?.nodes || [],
@@ -233,7 +216,6 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(query.data?.host)); // Accountants can't edit accounting categories
 
   const [editAccountingCategories] = useMutation(editAccountingCategoryMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       hostSlug: accountSlug,
     },
@@ -283,13 +265,13 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />}
           description={
             <FormattedMessage
-              defaultMessage="Manage your accounting categories, and use these categories to keep your Collectives’ expenses organized."
-              id="5j8RQd"
+              defaultMessage="Manage your accounting categories, and use these categories to keep transactions organized."
+              id="rPyk8i"
             />
           }
           actions={
@@ -324,13 +306,14 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
               isFiltered={!!queryFilter.values.searchTerm}
               onDelete={onDelete}
               onEdit={onEdit}
+              hasHosting={hasHosting}
             />
           </React.Fragment>
         )}
       </div>
       {isCreateCategoryModalOpen && (
         <CreateAccountingCategoryModal
-          isIndependentCollective={isIndependentCollective}
+          hasHosting={hasHosting}
           onClose={() => setIsCreateCategoryModalOpen(false)}
           onCreate={onCreate}
         />

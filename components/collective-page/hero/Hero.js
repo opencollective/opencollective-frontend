@@ -1,11 +1,9 @@
 import React, { Fragment, useEffect } from 'react';
-import { Palette } from '@styled-icons/boxicons-regular/Palette';
-import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first } from 'lodash';
-import { Tags } from 'lucide-react';
+import { Image, Palette, Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -115,6 +113,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
   const isFund = collective.type === CollectiveType.FUND;
+  const isOrganization = collective.type === CollectiveType.ORGANIZATION;
   const parentIsHost = host && collective.parentCollective?.id === host.id;
   const firstConnectedAccount = first(collective.connectedTo);
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
@@ -125,7 +124,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
   const numberOfHiddenTags = hiddenTags?.length;
-  const canHostAccounts = collective.isHost && collective.settings?.canHostAccounts !== false;
+  const hasHosting = collective.hasHosting;
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -144,18 +143,28 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
         <HeroBackground collective={collective} />
         {isAdmin && !isEditing && (
           <Container data-cy="edit-collective-display-features" position="absolute" right={25} top={25} zIndex={222}>
-            <StyledButton data-cy="edit-cover-btn" buttonSize="tiny" onClick={() => editCover(true)}>
-              <Camera size="1.2em" />
-              <Span ml={2} css={{ verticalAlign: 'middle' }}>
+            <div className="flex gap-2">
+              <Button
+                data-cy="edit-cover-btn"
+                className="text-xs"
+                size="xs"
+                variant="outline"
+                onClick={() => editCover(true)}
+              >
+                <Image size={14} />
                 <FormattedMessage id="Hero.EditCover" defaultMessage="Edit cover" />
-              </Span>
-            </StyledButton>
-            <StyledButton data-cy="edit-main-color-btn" buttonSize="tiny" ml={3} onClick={() => showColorPicker(true)}>
-              <Palette size="1.2em" />
-              <Span ml={2} css={{ verticalAlign: 'middle' }}>
+              </Button>
+              <Button
+                data-cy="edit-main-color-btn"
+                className="text-xs"
+                size="xs"
+                variant="outline"
+                onClick={() => showColorPicker(true)}
+              >
+                <Palette size={14} />
                 <FormattedMessage id="Hero.EditColor" defaultMessage="Edit main color" />
-              </Span>
-            </StyledButton>
+              </Button>
+            </div>
           </Container>
         )}
         {hasColorPicker && (
@@ -197,7 +206,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
 
           {!isEvent && (
             <Fragment>
-              {(isCollective || isFund || isProject) && (
+              {(isCollective || isOrganization || isFund || isProject) && (
                 <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
                   <StyledTag
                     textTransform="uppercase"
@@ -379,7 +388,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     )}
                   </Fragment>
                 )}
-                {canHostAccounts && (
+                {hasHosting && (
                   <Fragment>
                     {collective.type !== CollectiveType.COLLECTIVE && (
                       <Fragment>

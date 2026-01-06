@@ -3,8 +3,6 @@ import { useQuery } from '@apollo/client';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-
 import Page from '../Page';
 
 import { Banner } from './Banner';
@@ -22,7 +20,6 @@ export default function ProfileLayout({ activeTab = 'home', children, collapsed 
       accountSlug: router.query.accountSlug,
       includeAccount: Boolean(router.query.accountSlug),
     },
-    context: API_V2_CONTEXT,
   });
   const breadcrumbs = getBreadcrumbs
     ? getBreadcrumbs({ account: data?.account, collective: data?.collective })

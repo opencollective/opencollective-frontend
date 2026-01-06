@@ -12,7 +12,6 @@ import { formatCurrency, formatValueAsCurrency, getDefaultCurrencyPrecision } fr
 import { createError, ERROR } from '../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { cn, isValidUrl } from '../../lib/utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
@@ -196,10 +195,10 @@ const getDefaultExchangeRate = (itemCurrency, expenseCurrency) => ({
 const isValidExchangeRate = (exchangeRate, itemCurrency, expenseCurrency) => {
   return Boolean(
     exchangeRate &&
-      exchangeRate.source === 'USER' &&
-      exchangeRate.fromCurrency === itemCurrency &&
-      exchangeRate.toCurrency === expenseCurrency &&
-      exchangeRate.value,
+    exchangeRate.source === 'USER' &&
+    exchangeRate.fromCurrency === itemCurrency &&
+    exchangeRate.toCurrency === expenseCurrency &&
+    exchangeRate.value,
   );
 };
 
@@ -231,11 +230,11 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
     const existingExchangeRate = get(item, 'amountV2.exchangeRate');
     return Boolean(
       existingExchangeRate &&
-        existingExchangeRate.source === 'OPENCOLLECTIVE' &&
-        existingExchangeRate.fromCurrency === itemCurrency &&
-        existingExchangeRate.toCurrency === expenseCurrency &&
-        existingExchangeRate.value &&
-        dayjs(existingExchangeRate?.date).isSame(dayjs(standardizeExpenseItemIncurredAt(get(item, 'incurredAt')))),
+      existingExchangeRate.source === 'OPENCOLLECTIVE' &&
+      existingExchangeRate.fromCurrency === itemCurrency &&
+      existingExchangeRate.toCurrency === expenseCurrency &&
+      existingExchangeRate.value &&
+      dayjs(existingExchangeRate?.date).isSame(dayjs(standardizeExpenseItemIncurredAt(get(item, 'incurredAt')))),
     );
   };
 
@@ -258,7 +257,7 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
 
   const { loading } = useQuery(currencyExchangeRateQuery, {
     skip: shouldSkipExchangeRateQuery(),
-    context: API_V2_CONTEXT,
+
     variables: {
       requests: [
         {

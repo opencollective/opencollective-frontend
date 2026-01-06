@@ -18,10 +18,10 @@ export function PasswordInput(inputProps: Omit<React.ComponentProps<typeof Input
   return (
     <div className="relative">
       <Input
-        type={showPassword ? 'text' : 'password'}
         placeholder={intl.formatMessage({ defaultMessage: 'Enter password', id: '2LbrkB' })}
         className={cn('pr-10', inputProps.className)}
         {...inputProps}
+        type={showPassword ? 'text' : 'password'}
       />
       <Button
         type="button"

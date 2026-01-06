@@ -21,7 +21,7 @@ export const searchFilter: FilterConfig<z.infer<typeof searchFilterSchema>> = {
   },
 };
 
-function SearchFilter({ value, labelMsg, onChange, isViewActive }: FilterComponentProps<string>) {
+function SearchFilter({ value, labelMsg, onChange, highlighted }: FilterComponentProps<string>) {
   const intl = useIntl();
   const [input, setInput] = React.useState(value);
   const debouncedOnChange = React.useMemo(() => debounce(onChange, 500), [onChange]);
@@ -40,7 +40,7 @@ function SearchFilter({ value, labelMsg, onChange, isViewActive }: FilterCompone
         size={16}
         className={clsx(
           'pointer-events-none absolute top-0 bottom-0 left-3 h-full text-muted-foreground',
-          !isViewActive && value && 'text-primary',
+          highlighted && value && 'text-primary',
         )}
       />
       <Input

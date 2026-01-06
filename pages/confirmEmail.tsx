@@ -6,7 +6,7 @@ import { get } from 'lodash';
 import { ArrowLeft } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/schema';
 import type { UserContextProps } from '../lib/hooks/useLoggedInUser';
 
@@ -140,9 +140,6 @@ const confirmUserEmailMutation = gql`
 
 const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
   name: 'confirmEmail',
-  options: {
-    context: API_V2_CONTEXT,
-  },
 });
 
 // next.js export

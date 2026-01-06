@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from '@apollo/client';
-import { MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
+import { HandCoinsIcon, MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { JoinCTAButtons } from '../home/solutions/JoinCTAButtons';
+import I18nFormatters from '../I18nFormatters';
 import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
@@ -67,6 +68,28 @@ function TierPricePlansDisplay({ tier, packages }) {
 
       <div className="mt-6 mb-6 rounded-lg border bg-slate-50 p-4 text-sm">
         <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <HandCoinsIcon size={24} className="text-slate-800" />
+            <div className="space-y-1">
+              <p className="font-medium text-slate-900">
+                <FormattedMessage defaultMessage="Crowdfunding contributions" id="Pricing-Crowdfunding" />
+              </p>
+              <p className="flex items-center gap-1 text-xs text-slate-600">
+                <FormattedMessage
+                  id="Pricing-Crowdfunding-Price"
+                  defaultMessage="Free with <PlatformTipsLink>Platform Tips</PlatformTipsLink> activated"
+                  values={{
+                    PlatformTipsLink: parts => (
+                      <Link href="#platform-tips" className="underline">
+                        {parts}
+                      </Link>
+                    ),
+                  }}
+                />
+              </p>
+            </div>
+          </div>
+
           <div className="flex items-center gap-3">
             <ShapesIcon size={24} className="text-slate-800" />
             <div className="space-y-1">
@@ -284,7 +307,7 @@ export default function Pricing({ data }) {
               </h3>
               <p className="text-muted-foreground">
                 <FormattedMessage
-                  defaultMessage="Since October 2024, the platform is managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives. "
+                  defaultMessage="Since October 2024, the platform is managed by {oficoLink} (OFiCo), a non-profit members-based organization. Pricing is set by OFiCo's <MembersLink>members</MembersLink>, who are also its main users, and is aimed at ensuring the platform's long-term sustainability. It is structured to scale with your needs, whether you're serving a single organization or an entire network of collectives."
                   id="8/YzW7"
                   values={{
                     oficoLink: (
@@ -298,6 +321,19 @@ export default function Pricing({ data }) {
                       </a>
                     ),
                   }}
+                />
+              </p>
+            </div>
+
+            <div className="p-6" id="platform-tips">
+              <h3 className="mb-2 text-xl font-medium text-foreground">
+                <FormattedMessage defaultMessage="What are Platform Tips?" id="pricing.new.faq.tips.question" />
+              </h3>
+              <p className="text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>"
+                  id="pricing.new.faq.tips.answer"
+                  values={I18nFormatters}
                 />
               </p>
             </div>

@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { checkUserExistence, signin } from '../../lib/api';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { getWebsiteUrl } from '../../lib/utils';
 
@@ -28,9 +28,7 @@ const resendDraftExpenseInviteMutation = gql`
 const ResendDraftInviteButton = ({ expense }) => {
   const { toast } = useToast();
   const intl = useIntl();
-  const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation);
   const success = !error && data?.resendDraftExpenseInvite?.id;
 
   return (

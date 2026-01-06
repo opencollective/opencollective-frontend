@@ -59,16 +59,17 @@ const SocialLinks = ({ className, iconSize = 16 }: { className?: string; iconSiz
   );
 };
 
-const Footer = ({ className }: { className?: string }) => {
+const Footer = ({ className, isDashboard }: { className?: string; isDashboard?: boolean }) => {
   const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   const usingNewPricing = parseToBoolean(getEnvVar('NEW_PRICING'));
 
   const footerItems = usingNewPricing ? newFooterItems : legacyFooterItems;
+
   return (
-    <footer className={cn('border-t bg-background antialiased', className)}>
-      <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 lg:px-8">
+    <footer className={cn('border-t bg-background pt-16 antialiased', className)}>
+      <div className="mx-auto max-w-(--breakpoint-xl) px-3 md:px-6">
         <div className="xl:flex xl:gap-12">
           <div className="max-w-xs space-y-6">
             <div className="space-y-4">
@@ -112,8 +113,7 @@ const Footer = ({ className }: { className?: string }) => {
                     <p className="mb-4 text-sm/6 font-medium text-slate-900">{intl.formatMessage(label)}</p>
                     <ul className="space-y-4">
                       {items.map(item =>
-                        !LoggedInUser ||
-                        (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
+                        !LoggedInUser || (LoggedInUser && !(item.href === '/signup' || item.href === '/signin')) ? (
                           <li className="text-slate-600 hover:text-foreground" key={item.label.id}>
                             {item.href[0] === '/' ? (
                               <Link href={item.href}>{intl.formatMessage(item.label)}</Link>
@@ -141,12 +141,14 @@ const Footer = ({ className }: { className?: string }) => {
         </div>
       </div>
 
-      <div className="bg-muted">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
-          <p className="text-sm text-muted-foreground">&nbsp;</p>
-          <SocialLinks className="gap-2" iconSize={18} />
+      {!isDashboard && (
+        <div className="mt-16 bg-muted">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row lg:px-8">
+            <p className="text-sm text-muted-foreground">&nbsp;</p>
+            <SocialLinks className="gap-2" iconSize={18} />
+          </div>
         </div>
-      </div>
+      )}
     </footer>
   );
 };

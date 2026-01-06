@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
@@ -160,11 +160,8 @@ const GroupSettings = ({ accounts, group, title, ...boxProps }) => {
 const NotificationsSettings = ({ accountSlug, subpath }) => {
   const { data, loading, error } = useQuery(userActivitySubscriptionsQuery, {
     variables: { slug: accountSlug },
-    context: API_V2_CONTEXT,
   });
-  const [setNewsletterOptIn, { loading: setNewsletterOptInLoading }] = useMutation(setNewsletterOptInMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [setNewsletterOptIn, { loading: setNewsletterOptInLoading }] = useMutation(setNewsletterOptInMutation);
 
   const accounts = data?.account.memberOf.nodes.map(member => member.account) || [];
   const hosts = accounts.filter(a => !!a.host);

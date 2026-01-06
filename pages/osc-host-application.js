@@ -5,7 +5,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import ApplicationForm from '../components/osc-host-application/ApplicationForm';
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
@@ -114,12 +114,9 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
 
-  const { data: hostData } = useQuery(oscHostApplicationPageQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const { data: hostData } = useQuery(oscHostApplicationPageQuery);
 
   const { data, loading: loadingCollective } = useQuery(oscCollectiveApplicationQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: collectiveSlug },
     skip: !(LoggedInUser && collectiveSlug && step === 'form'),
     onError: error => {

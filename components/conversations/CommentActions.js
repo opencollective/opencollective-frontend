@@ -10,7 +10,7 @@ import { usePopper } from 'react-popper';
 import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
@@ -140,8 +140,6 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 const CommentActions = ({
   comment,
   anchorHash,
@@ -160,7 +158,7 @@ const CommentActions = ({
   const [showAdminActions, setShowAdminActions] = React.useState(false);
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
-  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation, mutationOptions);
+  const [deleteComment, { error: deleteError }] = useMutation(deleteCommentMutation);
   const { styles, attributes, state } = usePopper(refElement, popperElement, {
     placement: 'bottom-end',
     modifiers: REACT_POPPER_MODIFIERS,

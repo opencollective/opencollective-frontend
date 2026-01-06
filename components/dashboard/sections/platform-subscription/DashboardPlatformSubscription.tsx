@@ -4,7 +4,6 @@ import { ChevronDown, Pencil, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   DashboardPlatformSubscriptionQuery,
   DashboardPlatformSubscriptionQueryVariables,
@@ -37,13 +36,20 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const query = useQuery<DashboardPlatformSubscriptionQuery, DashboardPlatformSubscriptionQueryVariables>(
     gql`
       query DashboardPlatformSubscription($slug: String!) {
-        host(slug: $slug) {
-          platformSubscription {
-            ...PlatformSubscriptionFields
+        account(slug: $slug) {
+          type
+          isHost
+          settings
+          ... on Organization {
+            hasHosting
           }
-
-          platformBilling {
-            ...PlatformBillingFields
+          ... on AccountWithPlatformSubscription {
+            platformSubscription {
+              ...PlatformSubscriptionFields
+            }
+            platformBilling {
+              ...PlatformBillingFields
+            }
           }
         }
       }
@@ -51,7 +57,6 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
       ${platformBillingFragment}
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.accountSlug,
       },
@@ -62,11 +67,17 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
   const desiredFeature = router.query?.feature as unknown as (typeof PlatformSubscriptionFeatures)[number];
 
   const queryError = query.error;
-  const activeSubscription = query.data?.host?.platformSubscription;
-  const billing = query.data?.host?.platformBilling;
+  const activeSubscription =
+    query.data?.account && 'platformSubscription' in query.data.account
+      ? query.data.account.platformSubscription
+      : null;
+  const billing =
+    query.data?.account && 'platformBilling' in query.data.account ? query.data.account.platformBilling : null;
   const isLoading = query.loading;
 
-  const isFreeDiscoverTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+  const isFreeTier = activeSubscription?.plan?.pricing?.pricePerMonth?.valueInCents === 0;
+
+  const hasHosting = Boolean(query.data?.account?.['hasHosting']);
 
   React.useEffect(() => {
     if (!desiredFeature || !activeSubscription?.plan || !billing) {
@@ -129,7 +140,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
                     <FormattedMessage defaultMessage="Modify Subscription" id="VICsET" />
                   </Button>
                 </DropdownMenuItem>
-                {!isFreeDiscoverTier && (
+                {!isFreeTier && (
                   <DropdownMenuItem asChild>
                     <Button
                       disabled={isLoading}
@@ -186,7 +197,7 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
             </div>
             <Separator className="w-auto grow border-b bg-border" />
             <div className="font-bold">
-              {activeSubscription.plan.pricing.pricePerMonth.valueInCents !== 0 && (
+              {!isFreeTier && (
                 <FormattedMessage
                   defaultMessage="{perMonth} / Month"
                   id="+2hntI"
@@ -203,15 +214,17 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
               )}
             </div>
           </div>
-          <div className="mb-4 text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="Base subscription will renew on the {dueDate}"
-              id="28oT0p"
-              values={{
-                dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
-              }}
-            />
-          </div>
+          {!isFreeTier && (
+            <div className="mb-4 text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Subscription will renew on {dueDate}"
+                id="28oT0p"
+                values={{
+                  dueDate: <FormattedDate dateStyle="medium" timeZone="UTC" value={billing.dueDate} />,
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -221,7 +234,11 @@ export function DashboardPlatformSubscription(props: DashboardSectionProps) {
         <div className="flex flex-col gap-4">
           {billing?.subscriptions?.length > 0 &&
             billing?.subscriptions.map(subscription => (
-              <PlatformSubscriptionCard key={subscription.startDate} subscription={subscription} />
+              <PlatformSubscriptionCard
+                key={subscription.startDate}
+                subscription={subscription}
+                hasHosting={hasHosting}
+              />
             ))}
         </div>
       )}

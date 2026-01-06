@@ -33,13 +33,18 @@ describe('Recurring contributions', () => {
   });
 
   it('Has contributions in the right categories', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contributions-interval').click();
-      cy.getByDataCy('recurring-contributions-interval').get('[data-cy="select-option"]:nth-child(2)').click();
-      cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
-      cy.getByDataCy('recurring-contributions-interval').click();
-      cy.getByDataCy('recurring-contributions-interval').get('[data-cy="select-option"]:nth-child(3)').click();
-      cy.getByDataCy('recurring-contribution-card').should('have.length', 0);
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      // Filter by Yearly frequency
+      cy.getByDataCy('add-filter').click();
+      cy.contains('Frequency').click();
+      cy.get('[data-cy="combo-select-option"][data-value=YEARLY]').click();
+      cy.getByDataCy('apply-filter').click();
+      cy.get('[data-cy^="datatable-row"]').should('have.length', 0);
+      // Filter by Monthly frequency
+      cy.getByDataCy('filter-frequency').click();
+      cy.get('[data-cy="combo-select-option"][data-value=MONTHLY]').click();
+      cy.getByDataCy('apply-filter').click();
+      cy.get('[data-cy^="datatable-row"]').should('have.length', 1);
     });
   });
 
@@ -52,75 +57,70 @@ describe('Recurring contributions', () => {
       },
     },
     () => {
-      cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-        cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-        cy.getByDataCy('recurring-contribution-menu-payment-option').click();
-        cy.getByDataCy('recurring-contribution-payment-menu').should('exist');
-        cy.getByDataCy('recurring-contribution-add-pm-button').click();
-        cy.wait(3000);
-        cy.fillStripeInput();
-        cy.getByDataCy('recurring-contribution-submit-pm-button').click();
-        cy.contains('[data-cy="recurring-contribution-pm-box"]', 'VISA **** 4242').within(() => {
-          cy.getByDataCy('radio-select').check();
-        });
-        cy.getByDataCy('recurring-contribution-update-pm-button').click();
-        cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-      });
+      cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(
+        () => {
+          cy.getByDataCy('actions-menu-trigger').first().click();
+          cy.contains('Update payment method').click();
+          cy.get('input[type=radio][value="stripe-payment-element"]').check();
+          cy.wait(500);
+          cy.fillStripePaymentElementInput();
+          cy.getByDataCy('recurring-contribution-submit-pm-button').click();
+          cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+        },
+      );
     },
   );
 
   it('Can change the tier and amount of the order', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
-      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.getByDataCy('actions-menu-trigger').first().click();
+      cy.contains('Update amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Backer').within(() => {
-        cy.getByDataCy('radio-select').check();
+        cy.get('input[type="radio"]').check();
       });
       cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$5.00 USD / month');
+      cy.contains('[data-cy^="datatable-row"]', '$5.00').should('exist');
     });
   });
 
   it('Can select a fixed recurring contribution tier', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
-      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.getByDataCy('actions-menu-trigger').first().click();
+      cy.contains('Update amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Recurring Fixed Donation Tier').within(() => {
-        cy.getByDataCy('radio-select').check();
+        cy.get('input[type="radio"]').check();
       });
       cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$10.00 USD / month');
+      cy.contains('[data-cy^="datatable-row"]', '$10.00').should('exist');
     });
   });
 
   it('Can change the amount in a flexible contribution tier', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
-      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.getByDataCy('actions-menu-trigger').first().click();
+      cy.contains('Update amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
-        cy.getByDataCy('radio-select').check();
+        cy.get('input[type="radio"]').check();
       });
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', '$250').click();
       cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$250.00 USD / month');
+      cy.contains('[data-cy^="datatable-row"]', '$250.00').should('exist');
     });
   });
 
   it('Can contribute a custom contribution amount', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
-      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.getByDataCy('actions-menu-trigger').first().click();
+      cy.contains('Update amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
-        cy.getByDataCy('radio-select').check();
+        cy.get('input[type="radio"]').check();
       });
+
+      cy.wait(250);
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', 'Other').click();
       cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');
@@ -128,19 +128,19 @@ describe('Recurring contributions', () => {
 
       cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
-      cy.getByDataCy('recurring-contribution-amount-contributed').contains('$150.00 USD / month');
+      cy.contains('[data-cy^="datatable-row"]', '$150.00').should('exist');
     });
   });
 
   it('Cannot contribute a contribution amount less than the minimum allowable amount', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
-      cy.getByDataCy('recurring-contribution-menu-tier-option').click();
-      cy.getByDataCy('recurring-contribution-order-menu').should('exist');
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.getByDataCy('actions-menu-trigger').first().click();
+      cy.contains('Update amount').click();
       cy.contains('[data-cy="recurring-contribution-tier-box"]', 'Sponsor').within(() => {
-        cy.getByDataCy('radio-select').check();
+        cy.get('input[type="radio"]').check();
       });
 
+      cy.wait(250);
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', 'Other').click();
       cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');

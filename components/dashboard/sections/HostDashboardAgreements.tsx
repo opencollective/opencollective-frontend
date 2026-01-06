@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '../../../lib/errors';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import type { Agreement } from '../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
@@ -86,7 +86,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
   const [isEditingAgreement, setIsEditingAgreement] = React.useState(false);
   const [agreementToDelete, setAgreementToDelete] = React.useState<Agreement | null>(null);
-  const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION, { context: API_V2_CONTEXT });
+  const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION);
   const { toast } = useToast();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
@@ -101,7 +101,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
 
   const { data, error, variables, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-    context: API_V2_CONTEXT,
+
     skip: isUpgradeRequired,
   });
 
@@ -126,7 +126,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   const getActions = useAgreementActions(handleEdit, handleDelete);
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
         actions={

@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
 
 import Container from '../../Container';
@@ -299,11 +299,9 @@ const setPasswordMutation = gql`
 const addGraphql = compose(
   graphql(setPasswordMutation, {
     name: 'setPassword',
-    options: { context: API_V2_CONTEXT },
   }),
   graphql(accountHasTwoFactorAuthQuery, {
     options: props => ({
-      context: API_V2_CONTEXT,
       variables: {
         slug: props.slug,
       },

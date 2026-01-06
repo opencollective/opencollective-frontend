@@ -6,7 +6,6 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -106,7 +105,6 @@ const UpdatesList = () => {
     variables: {
       slug: account.slug,
     },
-    context: API_V2_CONTEXT,
   });
 
   const views: Views<z.infer<typeof schema>> = [
@@ -144,7 +142,6 @@ const UpdatesList = () => {
       slug: account.slug,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
   });
 
   const loading = metadataLoading || queryLoading;
@@ -152,14 +149,14 @@ const UpdatesList = () => {
   const updates = data?.account?.updates;
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
+    <div className="flex flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-6">
         <DashboardHeader
           title={<FormattedMessage id="updates" defaultMessage="Updates" />}
           description={
             <FormattedMessage
               id="Dashboard.Updates.Subtitle"
-              defaultMessage="Updates from your account that are visible to people following your account"
+              defaultMessage="Updates from your account that are visible to people following you"
             />
           }
           actions={

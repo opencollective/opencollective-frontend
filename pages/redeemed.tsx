@@ -4,7 +4,7 @@ import { Rocket } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import HappyBackground from '../components/gift-cards/HappyBackground';
@@ -56,6 +56,7 @@ const RedeemedPage = () => {
   const router = useRouter();
   const { collectiveSlug, code } = router.query;
   const { data, loading, error } = useQuery(redeemedPageQuery, {
+    context: API_V1_CONTEXT,
     skip: !code || !collectiveSlug,
     variables: { code, collectiveSlug },
   });

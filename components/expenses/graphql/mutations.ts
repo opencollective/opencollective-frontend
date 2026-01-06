@@ -1,6 +1,8 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { accountingCategoryFields, expensePageExpenseFieldsFragment, expenseValuesByRoleFragment } from './fragments';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+
+import { expensePageExpenseFieldsFragment, expenseValuesByRoleFragment } from './fragments';
 
 export const editExpenseMutation = gql`
   mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String, $isDraftEdit: Boolean) {
@@ -23,11 +25,11 @@ export const editExpenseCategoryMutation = gql`
       }
       accountingCategory {
         id
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
   ${expenseValuesByRoleFragment}
 `;
 

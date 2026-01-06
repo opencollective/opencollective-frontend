@@ -6,7 +6,7 @@ import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import CollectiveRoles from '../../../lib/constants/roles';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -216,6 +216,7 @@ const contributionsSectionQuery = gql`
         orderByRoles: true
         isApproved: true
         isArchived: false
+        isFrozen: false
         orderBy: $orderBy
       ) {
         offset
@@ -282,12 +283,11 @@ const SectionContributions = ({ collective }) => {
       skipTotalDonations: [FILTERS.HOSTED_COLLECTIVES, FILTERS.HOSTED_EVENTS, FILTERS.HOSTED_FUNDS].includes(filter),
       ...selectedFilter.args,
     },
-    context: API_V2_CONTEXT,
+
     notifyOnNetworkStatusChange: true,
   });
   const { data: staticData } = useQuery(contributionsSectionStaticQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
 
   const handleLoadMore = async () => {

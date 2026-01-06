@@ -5,7 +5,6 @@ import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -13,6 +12,7 @@ import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyID } from '../CopyId';
 import DateTime from '../DateTime';
@@ -175,16 +175,23 @@ const contributionDrawerQuery = gql`
         type
         accountingCategories {
           nodes {
-            id
-            code
-            name
-            friendlyName
-            kind
-            appliesTo
+            ...AccountingCategorySelectFields
           }
         }
       }
       approvedAt
+    }
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            ...AccountingCategorySelectFields
+          }
+        }
+      }
     }
 
     ... on AccountWithParent {
@@ -234,6 +241,7 @@ const contributionDrawerQuery = gql`
     paymentProcessorUrl
   }
   ${accountHoverCardFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 type ContributionDrawerProps = {
@@ -248,7 +256,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
   const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       orderId: props.orderId,
     },
@@ -310,7 +317,8 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 ) : (
                   query.data?.order?.permissions?.canUpdateAccountingCategory &&
                   query.data.order.toAccount &&
-                  'host' in query.data.order.toAccount && (
+                  'host' in query.data.order.toAccount &&
+                  query.data.order.toAccount['host'] && (
                     <OrderAdminAccountingCategoryPill
                       order={query.data?.order}
                       account={query.data?.order.toAccount}
@@ -327,7 +335,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 </div>
               </div>
               <div className="text-sm">
-                <InfoList className="mb-6 sm:grid-cols-2">
+                <InfoList className="mt-4 mb-6 sm:grid-cols-2">
                   <InfoListItem
                     className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}

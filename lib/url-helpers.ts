@@ -216,16 +216,51 @@ export const getCollectivePageRoute = (account: {
   }
 };
 
+const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'oscollective.org'];
 const TRUSTED_DOMAINS = [
   'octobox.io',
   'dotnetfoundation.org',
   'hopin.com',
   'app.papertree.earth',
   'sharedground.co',
-  'gatherfor.org',
   'funds.ecosyste.ms',
+  // Trusted organizations
+  'kiakotahi.org',
+  'raft.foundation',
+  'oceurope.org',
+  'oscollective.org',
+  'xwiki.com',
+  'platform6.coop',
+  'ferrous-systems.com',
+  'compassionate-revolution.net',
+  'e-nable.org',
+  'womenwhocode.com',
+  'codeforscience.org',
+  'allforclimate.earth',
+  'permaculture.org.uk',
+  'fission.codes',
+  'schumacherinstitute.org.uk',
+  'numfocus.org',
+  'piratpartiet.se',
+  'reparations.org',
+  'fya.org.au',
+  'huddlecraft.com',
+  'muslimbenefits.org',
+  'themuseumofhumanachievement.com',
+  'oceurope.org',
+  'gatherfor.org',
+  'massvis.se',
+  'coopcloud.tech',
+  'opencollective.com',
+  'pactcollective.xyz',
+  'citizenspring.earth',
+  'thesocialchangenest.org',
+  'thesocialchangenest.org',
+  'protozoa.nz',
+  'oficonsortium.org',
+  'giftcollective.nz',
+  'metagov.org',
 ];
-const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'oscollective.org'];
 
 export const isTrustedRedirectURL = (url: URL) => {
   if (url.protocol !== 'https:') {
@@ -234,7 +269,7 @@ export const isTrustedRedirectURL = (url: URL) => {
     return false;
   }
 
-  const host = url.host;
+  const host = url.host.replace(/^www\./, '');
   if (TRUSTED_DOMAINS.includes(host)) {
     return true;
   }
@@ -384,9 +419,9 @@ const getConversationPageUrl = (conversation: Conversation) => {
   return `${getCollectivePageRoute(conversation.account)}/conversations/${conversation.slug}-${conversation.id}`;
 };
 
-const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
+export const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
   if (loggedInUser.isAdminOfCollective(application.host) || loggedInUser.isHostAdmin(application.account)) {
-    return `${getDashboardRoute(application.account, 'host-applications')}?hostApplicationId=${application.id}`;
+    return `${getDashboardRoute(application.host, 'host-applications')}?hostApplicationId=${application.id}`;
   } else {
     return `${getDashboardRoute(application.account, 'host')}`;
   }

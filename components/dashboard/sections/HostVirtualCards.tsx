@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
 import { boolean, isMulti, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { Currency, HostedVirtualCardsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import { VirtualCardStatus } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
@@ -200,7 +200,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
     Component: ({ meta, ...props }) => {
       const { data, loading } = useQuery(hostedVirtualCardAccountsQuery, {
         variables: { slug: meta.hostSlug },
-        context: API_V2_CONTEXT,
       });
       const accounts = data?.host?.hostedVirtualCardCollectives?.nodes ?? [];
 
@@ -247,7 +246,6 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { toast } = useToast();
   const intl = useIntl();
   const { data: metadata } = useQuery(hostVirtualCardsMetadataQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: hostSlug },
   });
 
@@ -281,7 +279,6 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   });
 
   const { error, loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       slug: hostSlug,
       ...queryFilter.variables,
@@ -312,7 +309,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   };
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />}
         description={

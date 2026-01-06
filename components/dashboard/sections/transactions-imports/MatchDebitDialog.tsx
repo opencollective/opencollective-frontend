@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { updateTransactionsImportRows } from './lib/graphql';
@@ -293,6 +292,7 @@ const useMatchDebitDialogQueryFilter = (
       hostSlug: host.slug,
       hostedAccounts: accounts,
       disableHostedAccountsSearch: Boolean(accounts?.length),
+      accountingCategoryKinds: ExpenseFilters.ExpenseAccountingCategoryKinds,
     };
 
     if (activeViewId === TabType.EXPENSES_UNPAID || activeViewId === TabType.EXPENSES_PAID) {
@@ -384,7 +384,7 @@ export const MatchDebitDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPENSES_UNPAID);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-  const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [updateRows] = useMutation(updateTransactionsImportRows);
   const queryFilter = useMatchDebitDialogQueryFilter(activeViewId, row, host, accounts);
 
   // Query for expenses
@@ -393,7 +393,6 @@ export const MatchDebitDialog = ({
     loading: expensesLoading,
     error: expensesError,
   } = useQuery(findExpenseMatchForOffPlatformDebitQuery, {
-    context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.id },
     fetchPolicy: 'cache-and-network',
     skip: queryFilter.activeViewId === TabType.CONTRIBUTIONS,
@@ -405,7 +404,6 @@ export const MatchDebitDialog = ({
     loading: contributionsLoading,
     error: contributionsError,
   } = useQuery(findContributionsMatchForOffPlatformDebitQuery, {
-    context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.slug },
     fetchPolicy: 'cache-and-network',
     skip: queryFilter.activeViewId !== TabType.CONTRIBUTIONS,
@@ -572,7 +570,7 @@ export const MatchDebitDialog = ({
                     </Link>
                   ) : (
                     <Link
-                      href={`/${selectedContribution.toAccount.slug}/orders/${selectedContribution.legacyId}`}
+                      href={`/${selectedContribution.toAccount.slug}/outgoing-contributions/${selectedContribution.legacyId}`}
                       className="text-sm underline"
                       openInNewTab
                     >
@@ -717,14 +715,14 @@ export const MatchDebitDialog = ({
 
               {Boolean(
                 selectedExpense &&
-                  [
-                    ExpenseStatus.PENDING,
-                    ExpenseStatus.DRAFT,
-                    ExpenseStatus.INVITE_DECLINED,
-                    ExpenseStatus.REJECTED,
-                    ExpenseStatus.SPAM,
-                    ExpenseStatus.UNVERIFIED,
-                  ].includes(selectedExpense.status),
+                [
+                  ExpenseStatus.PENDING,
+                  ExpenseStatus.DRAFT,
+                  ExpenseStatus.INVITE_DECLINED,
+                  ExpenseStatus.REJECTED,
+                  ExpenseStatus.SPAM,
+                  ExpenseStatus.UNVERIFIED,
+                ].includes(selectedExpense.status),
               ) && (
                 <MessageBox type="warning" className="mt-4">
                   <strong>
@@ -732,7 +730,7 @@ export const MatchDebitDialog = ({
                   </strong>
                   <p className="mt-2">
                     <FormattedMessage
-                      defaultMessage="You are matching a bank transaction with an expense that has not been approved by the collective admin. If you match this expense it will override the approval process and mark the expense as paid. The collective admins will be informed. "
+                      defaultMessage="You are matching a bank transaction with an expense that has not been approved by the collective admin. If you match this expense it will override the approval process and mark the expense as paid. The collective admins will be informed."
                       id="6ymIia"
                     />
                   </p>

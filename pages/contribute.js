@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 
-import { getCollectivePageMetadata } from '../lib/collective';
+import { getCollectivePageMetadata, sortConnectedCollectives, sortProjects } from '../lib/collective';
+import { CONNECTED_COLLECTIVES_ORDER_KEY, PROJECTS_ORDER_KEY } from '../lib/constants/collectives';
 import { TierTypes } from '../lib/constants/tiers-types';
+import { EMPTY_ARRAY } from '../lib/constants/utils';
 import { sortEvents } from '../lib/events';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
-import { sortTiersForCollective } from '../lib/tier-utils';
+import { getCollectiveTicketsOrder, sortTickets, sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
 
@@ -127,34 +130,43 @@ class ContributePage extends React.Component {
 
       // Tickets
       const tickets = collective.tiers?.filter(t => t.type === TierTypes.TICKET);
-      tickets?.forEach(ticket => {
-        waysToContribute.push({
-          ContributeCardComponent: ContributeTier,
-          key: `ticket-${ticket.id}`,
-          props: {
-            collective: collective,
-            tier: ticket,
-            hideContributors: !hasContributors,
-            'data-cy': 'contribute-ticket',
-          },
+      if (tickets?.length > 0) {
+        const ticketOrderKeys = getCollectiveTicketsOrder(collective);
+        const sortedTickets = sortTickets(tickets, ticketOrderKeys);
+        sortedTickets.forEach(ticket => {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeTier,
+            key: `ticket-${ticket.id}`,
+            props: {
+              collective: collective,
+              tier: ticket,
+              hideContributors: !hasContributors,
+              'data-cy': 'contribute-ticket',
+            },
+          });
         });
-      });
+      }
     }
 
     // Projects
     if (showAll || verb === 'projects') {
-      collective.projects?.forEach(project => {
-        waysToContribute.push({
-          ContributeCardComponent: ContributeProject,
-          key: `project-${project.id}`,
-          props: {
-            collective: collective,
-            project: project,
-            disableCTA: !project.isActive,
-            hideContributors: !hasContributors,
-          },
+      const projects = collective.projects || [];
+      if (projects.length > 0) {
+        const projectOrderKeys = get(collective.settings, PROJECTS_ORDER_KEY, EMPTY_ARRAY);
+        const sortedProjects = sortProjects(projects, projectOrderKeys);
+        sortedProjects.forEach(project => {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeProject,
+            key: `project-${project.id}`,
+            props: {
+              collective: collective,
+              project: project,
+              disableCTA: !project.isActive,
+              hideContributors: !hasContributors,
+            },
+          });
         });
-      });
+      }
     }
 
     // Events
@@ -174,15 +186,23 @@ class ContributePage extends React.Component {
 
     // Connected collectives
     if (showAll || verb === 'connected-collectives') {
-      collective.connectedCollectives?.forEach(connectedCollectiveMember => {
-        waysToContribute.push({
-          ContributeCardComponent: ContributeCollective,
-          key: `connected-collective-${connectedCollectiveMember.id}`,
-          props: {
-            collective: connectedCollectiveMember.collective,
-          },
+      const connectedCollectives = collective.connectedCollectives || [];
+      if (connectedCollectives.length > 0) {
+        const connectedCollectivesOrderKeys = get(collective.settings, CONNECTED_COLLECTIVES_ORDER_KEY, EMPTY_ARRAY);
+        const sortedConnectedCollectives = sortConnectedCollectives(
+          connectedCollectives,
+          connectedCollectivesOrderKeys,
+        );
+        sortedConnectedCollectives.forEach(connectedCollectiveMember => {
+          waysToContribute.push({
+            ContributeCardComponent: ContributeCollective,
+            key: `connected-collective-${connectedCollectiveMember.id}`,
+            props: {
+              collective: connectedCollectiveMember.collective,
+            },
+          });
         });
-      });
+      }
     }
 
     return waysToContribute;
@@ -226,7 +246,7 @@ class ContributePage extends React.Component {
           subtitle: (
             <FormattedMessage
               id="ContributePage.Description"
-              defaultMessage="These are all the ways you can help make our community sustainable. "
+              defaultMessage="These are all the ways you can help make our community sustainable."
             />
           ),
         };
@@ -442,6 +462,7 @@ const contributePageQuery = gqlV1 /* GraphQL */ `
 
 const addContributePageData = ssrGraphQLQuery({
   query: contributePageQuery,
+  context: API_V1_CONTEXT,
   getVariablesFromProps: props => ({
     slug: props.slug,
     nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,

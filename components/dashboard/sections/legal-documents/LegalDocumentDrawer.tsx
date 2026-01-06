@@ -4,11 +4,11 @@ import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
+import type { Account } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
+import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -30,9 +30,9 @@ import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
 type LegalDocumentDrawerProps = {
   open: boolean;
   onClose: () => void;
-  document?: LegalDocument;
-  host: Account;
-  getActions: GetActions<LegalDocument>;
+  document?: LegalDocumentFieldsFragment;
+  host: Pick<Account, 'id' | 'slug'>;
+  getActions: GetActions<LegalDocumentFieldsFragment>;
 };
 
 const legalDocumentDrawerQuery = gql`
@@ -74,7 +74,6 @@ export default function LegalDocumentDrawer({
   const intl = useIntl();
   const dropdownTriggerRef = React.useRef(undefined);
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
-    context: API_V2_CONTEXT,
     variables: { hostId: host.id, accountId: get(document, 'account.id') },
     skip: !document,
   });

@@ -13,10 +13,12 @@ import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import { useNavigationWarning } from '../../../lib/hooks/useNavigationWarning';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
+
+import InputAmount from '@/components/InputAmount';
 
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
@@ -24,7 +26,6 @@ import InputFieldPresets from '../../InputFieldPresets';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledInput from '../../StyledInput';
-import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputFormikField from '../../StyledInputFormikField';
 import StyledLink from '../../StyledLink';
 import StyledSelect from '../../StyledSelect';
@@ -258,7 +259,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           mt="3"
         >
           {({ field, form }) => (
-            <StyledInputAmount
+            <InputAmount
               id={field.id}
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
@@ -292,6 +293,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           {({ field, form }) => (
             <InputFieldPresets
               {...field}
+              currency={collective.currency}
               min={values.minimumAmount?.valueInCents || 0}
               defaultValue={field.value}
               onChange={value => form.setFieldValue(field.name, value)}
@@ -307,7 +309,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           mt="3"
         >
           {({ field, form }) => (
-            <StyledInputAmount
+            <InputAmount
               id={field.id}
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
@@ -337,7 +339,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           required
         >
           {({ field, form }) => (
-            <StyledInputAmount
+            <InputAmount
               id={field.id}
               data-cy={field.name}
               currency={field.value?.currency ?? collective.currency}
@@ -406,7 +408,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         required={false}
       >
         {({ field, form }) => (
-          <StyledInputAmount
+          <InputAmount
             id={field.id}
             data-cy={field.name}
             currency={field.value?.currency ?? collective.currency}
@@ -613,20 +615,23 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
   const [formDirty, setFormDirty] = React.useState(false);
   const intl = useIntl();
 
-  const handleClose = React.useCallback(() => {
-    if (formDirty) {
-      const confirmed = confirm(
-        intl.formatMessage({
-          id: 'WarningUnsavedChanges',
-          defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
-        }),
-      );
-      if (!confirmed) {
-        return; // Don't close if user cancels
+  const handleClose = React.useCallback(
+    ({ ignoreCloseWarning = false } = {}) => {
+      if (formDirty && !ignoreCloseWarning) {
+        const confirmed = confirm(
+          intl.formatMessage({
+            id: 'WarningUnsavedChanges',
+            defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
+          }),
+        );
+        if (!confirmed) {
+          return; // Don't close if user cancels
+        }
       }
-    }
-    onClose();
-  }, [formDirty, intl, onClose]);
+      onClose();
+    },
+    [formDirty, intl, onClose],
+  );
 
   return (
     <Dialog open={true} onOpenChange={open => !open && handleClose()}>
@@ -654,7 +659,7 @@ export default function EditTierModal({ tier, collective, onClose, onUpdate, for
           onClose={handleClose}
           forcedType={forcedType}
           onUpdate={onUpdate}
-          onFormDirtyChange={setFormDirty}
+          setFormDirty={setFormDirty}
         />
       </DialogContent>
     </Dialog>
@@ -794,7 +799,7 @@ function EditTierFormInner({
   onDeleteTierClick,
   isDeleting,
   isConfirmingDelete,
-  onFormDirtyChange,
+  setFormDirty,
 }) {
   const intl = useIntl();
   const { values, isSubmitting, dirty } = formik;
@@ -810,8 +815,8 @@ function EditTierFormInner({
 
   // Notify parent component when dirty state changes
   React.useEffect(() => {
-    onFormDirtyChange?.(dirty);
-  }, [dirty, onFormDirtyChange]);
+    setFormDirty?.(dirty);
+  }, [dirty, setFormDirty]);
 
   return (
     <Form data-cy="edit-tier-modal-form">
@@ -870,7 +875,7 @@ function EditTierFormInner({
   );
 }
 
-function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormDirtyChange }) {
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, setFormDirty }) {
   const intl = useIntl();
   const isEditing = Boolean(tier?.id);
   const initialValues = React.useMemo(() => {
@@ -904,7 +909,6 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
   const formMutation = isEditing ? editTierMutation : createTierMutation;
 
   const [submitFormMutation] = useMutation(formMutation, {
-    context: API_V2_CONTEXT,
     update: cache => {
       // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
       const __typename = collective.type === CollectiveType.EVENT ? 'Event' : 'Collective';
@@ -920,7 +924,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
     },
   });
 
-  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation);
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
   const { toast } = useToast();
@@ -943,7 +947,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
             cache.gc();
           },
         });
-        onClose();
+        onClose({ ignoreCloseWarning: true });
         toast({
           variant: 'success',
           message: intl.formatMessage(
@@ -991,7 +995,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
                     { type: values.type },
                   ),
             });
-            onClose();
+            onClose({ ignoreCloseWarning: true });
           } catch (e) {
             toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
@@ -1008,7 +1012,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType, onFormD
               onDeleteTierClick={onDeleteTierClick}
               isDeleting={isDeleting}
               isConfirmingDelete={isConfirmingDelete}
-              onFormDirtyChange={onFormDirtyChange}
+              setFormDirty={setFormDirty}
             />
           );
         }}

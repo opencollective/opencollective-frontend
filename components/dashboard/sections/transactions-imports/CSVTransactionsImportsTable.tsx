@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
@@ -15,6 +14,7 @@ import { TransactionImportListFieldsFragment } from './lib/graphql';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
+import DateTime from '@/components/DateTime';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -61,7 +61,6 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
   const router = useRouter();
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const { data, loading, refetch, error } = useQuery(ledgerCSVImportsQuery, {
-    context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     skip: isUpgradeRequired,
   });
@@ -116,6 +115,22 @@ export const CSVTransactionsImportsTable = ({ accountSlug }) => {
                       {i18nTransactionsImportType(intl, type)}
                     </Badge>
                   );
+                },
+              },
+              {
+                header: intl.formatMessage({ defaultMessage: 'Created on', id: 'transactions.import.createdOn' }),
+                accessorKey: 'createdAt',
+                cell: ({ cell }) => {
+                  const createdAt = cell.getValue() as string;
+                  return <DateTime value={new Date(createdAt)} timeStyle="short" dateStyle="short" />;
+                },
+              },
+              {
+                header: intl.formatMessage({ defaultMessage: 'Last update', id: 'transactions.import.lastUpdate' }),
+                accessorKey: 'updatedAt',
+                cell: ({ cell }) => {
+                  const updatedAt = cell.getValue() as string;
+                  return <DateTime value={new Date(updatedAt)} timeStyle="short" dateStyle="short" />;
                 },
               },
               {

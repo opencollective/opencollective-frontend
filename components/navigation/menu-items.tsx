@@ -157,7 +157,7 @@ export const legacyFooterItems: MenuGroupItem[] = [
       },
       {
         label: defineMessage({ id: 'platform.signup', defaultMessage: 'Sign up' }),
-        href: '/create-account',
+        href: '/signup',
       },
       {
         label: defineMessage({ id: 'platform.login', defaultMessage: 'Log in' }),
@@ -170,7 +170,7 @@ export const legacyFooterItems: MenuGroupItem[] = [
     items: [
       {
         label: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
-        href: '/create',
+        href: '/signup/collective',
       },
       {
         label: defineMessage({ id: 'join.aboutFiscalHosting', defaultMessage: 'About Fiscal Hosting' }),

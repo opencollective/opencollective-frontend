@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, get, orderBy, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
 import { FormattedMessage } from 'react-intl';
@@ -10,27 +9,31 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { getCollectiveContributionCardsOrder, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
-import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
+import {
+  getCollectiveTicketsOrder,
+  sortTickets,
+  sortTiersForCollective,
+  TICKETS_ORDER_KEY,
+  TIERS_ORDER_KEY,
+} from '../../../lib/tier-utils';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
+import { updateCollectiveInGraphQLV1Cache } from '@/lib/collective';
+
+import { ContributionCategoryPicker } from '@/components/accept-financial-contributions/ContributionCategoryPicker';
 
 import Container from '../../Container';
-import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
-import CreateNew from '../../contribute-cards/CreateNew';
 import { Box, Flex } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
-import Spinner from '../../Spinner';
 import StyledButton from '../../StyledButton';
-import { H3, P } from '../../Text';
+import { H3 } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 import { editAccountSettingMutation } from '../graphql/mutations';
-import { collectivePageQuery, getCollectivePageQueryVariables } from '../graphql/queries';
 import SectionTitle from '../SectionTitle';
 
 // Dynamic imports
@@ -87,12 +90,19 @@ class SectionContribute extends React.PureComponent {
 
   state = {
     showTiersAdmin: false,
+    showTicketsAdmin: false,
     isSaving: false,
+    isSavingTickets: false,
     draggingId: null,
+    draggingTicketId: null,
   };
 
   onTiersAdminReady = () => {
     this.setState({ showTiersAdmin: true });
+  };
+
+  onTicketsAdminReady = () => {
+    this.setState({ showTicketsAdmin: true });
   };
 
   getFinancialContributorsWithoutTier = memoizeOne(contributors => {
@@ -115,15 +125,37 @@ class SectionContribute extends React.PureComponent {
         variables: mutationVariables,
         update: (store, response) => {
           // We need to update the store manually because the response comes from API V2
-          const collectivePageQueryVariables = getCollectivePageQueryVariables(collective.slug);
-          const data = store.readQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables });
-          const newData = set(cloneDeep(data), 'Collective.settings', response.data.editAccountSetting.settings);
-          store.writeQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables, data: newData });
+          updateCollectiveInGraphQLV1Cache(store, collective.id, {
+            settings: response.data.editAccountSetting.settings,
+          });
         },
       });
       this.setState({ isSaving: false });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSaving: false });
+    }
+  };
+
+  onTicketsReorder = async cards => {
+    const { collective, editAccountSettings } = this.props;
+    const cardKeys = cards.map(c => c.key);
+
+    // Save the new positions
+    this.setState({ isSavingTickets: true });
+    try {
+      const mutationVariables = { collectiveId: collective.id, key: TICKETS_ORDER_KEY, value: cardKeys };
+      await editAccountSettings({
+        variables: mutationVariables,
+        update: (store, response) => {
+          // We need to update the store manually because the response comes from API V2
+          updateCollectiveInGraphQLV1Cache(store, collective.id, {
+            settings: response.data.editAccountSetting.settings,
+          });
+        },
+      });
+      this.setState({ isSavingTickets: false });
+    } catch (e) {
+      this.setState({ error: getErrorFromGraphqlException(e), isSavingTickets: false });
     }
   };
 
@@ -138,58 +170,61 @@ class SectionContribute extends React.PureComponent {
     }
   }
 
-  sortContributeCards = memoizeOne((cards, orderKeys) => {
-    return orderBy(cards, card => {
-      const index = orderKeys.findIndex(key => key === card.key);
-      return index === -1 ? Infinity : index; // put unsorted cards at the end
+  getContributeCards = memoizeOne((collective, tiers) => {
+    const { contributors, contributorsStats, isAdmin } = this.props;
+    const hasNoContributor = !this.hasContributors(contributors);
+    const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
+    const sortedTiers = sortTiersForCollective(collective, tiers);
+    return sortedTiers.map(tier => {
+      if (tier === 'custom') {
+        return {
+          key: 'custom',
+          Component: ContributeCustom,
+          componentProps: {
+            collective,
+            contributors: this.getFinancialContributorsWithoutTier(contributors),
+            stats: contributorsStats,
+            hideContributors: hasNoContributor,
+            disableCTA: !canContribute,
+          },
+        };
+      } else {
+        return {
+          key: tier.id,
+          Component: ContributeTier,
+          componentProps: { collective, tier, hideContributors: hasNoContributor },
+        };
+      }
     });
   });
 
-  getContributeCards = memoizeOne(tiers => {
-    const { collective, contributors, contributorsStats, isAdmin } = this.props;
-    const hasNoContributor = !this.hasContributors(contributors);
-    const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
-    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
-
-    // Remove tickets
-    const baseTiers = tiers.filter(tier => tier.type !== TierTypes.TICKET);
-
-    const contributeCards = [
-      ...baseTiers.map(tier => ({
-        key: tier.id,
-        Component: ContributeTier,
-        componentProps: { collective, tier, hideContributors: hasNoContributor },
-      })),
-    ];
-
-    if (hasCustomContribution) {
-      contributeCards.push({
-        key: 'custom',
-        Component: ContributeCustom,
-        componentProps: {
-          collective,
-          contributors: this.getFinancialContributorsWithoutTier(contributors),
-          stats: contributorsStats,
-          hideContributors: hasNoContributor,
-          disableCTA: !canContribute,
-        },
-      });
-    }
-
-    return contributeCards;
-  });
-
-  sortTicketTiers = memoizeOne(tiers => {
-    return orderBy([...tiers], ['endsAt'], ['desc']);
+  sortTicketTiers = memoizeOne((tiers, orderKeys) => {
+    return sortTickets(tiers, orderKeys);
   });
 
   filterTickets = memoizeOne(tiers => {
     return tiers.filter(tier => tier.type === TierTypes.TICKET);
   });
 
+  getTicketCards = memoizeOne(tickets => {
+    const { collective, contributors } = this.props;
+    const hasNoContributor = !this.hasContributors(contributors);
+
+    return tickets.map(tier => ({
+      key: tier.id,
+      Component: ContributeTier,
+      componentProps: {
+        collective,
+        tier,
+        hideContributors: hasNoContributor,
+        disableCTA: !collective.isActive,
+      },
+    }));
+  });
+
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
-    const { isSaving, showTiersAdmin } = this.state;
+    const { showTiersAdmin, showTicketsAdmin } = this.state;
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
@@ -198,12 +233,12 @@ class SectionContribute extends React.PureComponent {
     const isActive = collective.isActive;
     const hasHost = collective.host;
     const isHost = collective.isHost;
-    const orderKeys = getCollectiveContributionCardsOrder(collective);
-    const contributeCards = this.getContributeCards(tiers);
-    const sortedContributeCards = this.sortContributeCards(contributeCards, orderKeys);
+    const contributeCards = this.getContributeCards(collective, tiers);
     const hasContribute = Boolean(isAdmin || (collective.isActive && contributeCards.length));
     const hasNoContributor = !this.hasContributors(contributors);
-    const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
+    const ticketTiers = this.filterTickets(tiers);
+    const ticketOrderKeys = getCollectiveTicketsOrder(collective);
+    const sortedTicketTiers = this.sortTicketTiers(ticketTiers, ticketOrderKeys);
     const hasTickets = isEvent && Boolean(isAdmin || (collective.isActive && sortedTicketTiers.length));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
     const cannotOrderTickets = (!hasTickets && !isAdmin) || isPastEvent(collective);
@@ -225,22 +260,8 @@ class SectionContribute extends React.PureComponent {
       <Fragment>
         {/* "Start accepting financial contributions" for admins */}
         {isAdmin && !hasHost && !isHost && (
-          <ContainerSectionContent py={4}>
-            <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
-              <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
-                <FormattedMessage
-                  id="contributions.subtitle"
-                  defaultMessage="To accept financial contributions, you need to complete your setup and decide where your funds will be held."
-                />
-              </P>
-            </Flex>
-            <Box my={5}>
-              <Link href={`/${collective.parentCollective?.slug || collective.slug}/accept-financial-contributions`}>
-                <StyledButton buttonStyle="primary" buttonSize="large">
-                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-                </StyledButton>
-              </Link>
-            </Box>
+          <ContainerSectionContent pb={6}>
+            <ContributionCategoryPicker collective={collective} />
           </ContainerSectionContent>
         )}
 
@@ -261,16 +282,8 @@ class SectionContribute extends React.PureComponent {
                     containerProps={{ disableScrollSnapping: !!this.state.draggingId }}
                   >
                     <React.Fragment>
-                      {isSaving && (
-                        <ContainerOverlay position="fixed" top={0} alignItems="center">
-                          <Spinner size={64} />
-                          <P mt={3} fontSize="15px">
-                            <FormattedMessage id="Saving" defaultMessage="Saving..." />
-                          </P>
-                        </ContainerOverlay>
-                      )}
                       {!(isAdmin && showTiersAdmin) &&
-                        sortedContributeCards.map(({ key, Component, componentProps }) => (
+                        contributeCards.map(({ key, Component, componentProps }) => (
                           <ContributeCardContainer key={key}>
                             <Component {...componentProps} />
                           </ContributeCardContainer>
@@ -279,12 +292,13 @@ class SectionContribute extends React.PureComponent {
                         <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
                           <AdminContributeCardsContainer
                             collective={collective}
-                            cards={sortedContributeCards}
+                            cards={contributeCards}
                             onReorder={this.onContributeCardsReorder}
                             isSaving={this.state.isSaving}
                             setDraggingId={draggingId => this.setState({ draggingId })}
                             draggingId={this.state.draggingId}
                             onMount={this.onTiersAdminReady}
+                            useTierModals={false}
                           />
                         </Container>
                       )}
@@ -307,24 +321,36 @@ class SectionContribute extends React.PureComponent {
                 <HorizontalScroller
                   container={ContributeCardsContainer}
                   getScrollDistance={this.getContributeCardsScrollDistance}
+                  containerProps={{ disableScrollSnapping: !!this.state.draggingTicketId }}
                 >
-                  {sortedTicketTiers.map(tier => (
-                    <ContributeCardContainer key={tier.id}>
-                      <ContributeTier
-                        collective={collective}
-                        tier={tier}
-                        hideContributors={hasNoContributor}
-                        disableCTA={!collective.isActive}
-                      />
-                    </ContributeCardContainer>
-                  ))}
-                  {isAdmin && (
-                    <ContributeCardContainer minHeight={150}>
-                      <CreateNew route={getDashboardRoute(collective, 'tickets')}>
-                        <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
-                      </CreateNew>
-                    </ContributeCardContainer>
-                  )}
+                  <React.Fragment>
+                    {!(isAdmin && showTicketsAdmin) &&
+                      sortedTicketTiers.map(tier => (
+                        <ContributeCardContainer key={tier.id}>
+                          <ContributeTier
+                            collective={collective}
+                            tier={tier}
+                            hideContributors={hasNoContributor}
+                            disableCTA={!collective.isActive}
+                          />
+                        </ContributeCardContainer>
+                      ))}
+                    {isAdmin && (
+                      <Container display={showTicketsAdmin ? 'block' : 'none'} data-cy="admin-tickets-cards">
+                        <AdminContributeCardsContainer
+                          collective={collective}
+                          cards={this.getTicketCards(sortedTicketTiers)}
+                          onReorder={this.onTicketsReorder}
+                          isSaving={this.state.isSavingTickets}
+                          setDraggingId={draggingTicketId => this.setState({ draggingTicketId })}
+                          draggingId={this.state.draggingTicketId}
+                          onMount={this.onTicketsAdminReady}
+                          createNewType="TICKET"
+                          useTierModals={false}
+                        />
+                      </Container>
+                    )}
+                  </React.Fragment>
                 </HorizontalScroller>
               </Box>
             )}
@@ -348,7 +374,6 @@ class SectionContribute extends React.PureComponent {
 
 const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
   name: 'editAccountSettings',
-  options: { context: API_V2_CONTEXT },
 });
 
 export default addEditAccountSettingMutation(SectionContribute);

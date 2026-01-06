@@ -1,11 +1,14 @@
 import React from 'react';
 
-import type { DashboardSectionProps } from '../../types';
+import IncomingContributionsForHosted from './IncomingContributionsForHosted';
+import IncomingContributionsForOrganizations from './IncomingContributionsForOrganizations';
 
-import Contributions from './Contributions';
-
-const IncomingContributions = (props: DashboardSectionProps) => {
-  return <Contributions {...props} direction="INCOMING" includeChildrenAccounts={true} />;
+const IncomingContributions = ({ account }) => {
+  if (account.type === 'ORGANIZATION') {
+    return <IncomingContributionsForOrganizations accountSlug={account.slug} />;
+  } else {
+    return <IncomingContributionsForHosted accountSlug={account.slug} />;
+  }
 };
 
 export default IncomingContributions;

@@ -4,7 +4,6 @@ import { RefreshCw } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 
 import type { ButtonProps } from '../../../ui/Button';
@@ -33,7 +32,7 @@ export const TransactionsImportForceSyncButton = ({
 } & ButtonProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation, { context: API_V2_CONTEXT });
+  const [syncTransactionsImport] = useMutation(syncTransactionsImportMutation);
   const setHasRequestedSyncTimeout = useRef(null);
   const prevIsSyncing = usePrevious(isSyncing);
 

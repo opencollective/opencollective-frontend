@@ -3,7 +3,7 @@ import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { FormattedDate } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -110,7 +110,7 @@ const formatOptionLabel = option => {
 const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito, ...props }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
   const variables = { includeIncognito, filter, account: getAccountInput(account) };
-  const queryParameters = { fetchPolicy, variables, context: API_V2_CONTEXT };
+  const queryParameters = { fetchPolicy, variables };
   const [searchOrders, { loading, data }] = useLazyQuery(ordersSearchQuery, queryParameters);
   const [searchTerm, setSearchTerm] = React.useState('');
   const options = React.useMemo(() => getOptionsFromOrders(data?.orders?.nodes), [data?.orders?.nodes]);

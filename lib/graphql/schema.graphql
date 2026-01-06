@@ -8,6 +8,8 @@ interface CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean
+  hasMoneyManagement: Boolean
   name: String
   legalName: String
   company: String
@@ -273,6 +275,7 @@ type UserDetails {
   Has the account a password set?
   """
   hasPassword: Boolean
+  requiresProfileCompletion: Boolean
   isRoot: Boolean!
 }
 
@@ -1106,12 +1109,12 @@ type CollectiveFeatures {
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
-  RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
+  KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -2061,6 +2064,8 @@ type Collective implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2229,6 +2234,7 @@ type Collective implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -2346,6 +2352,8 @@ type Event implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2514,6 +2522,7 @@ type Event implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -2631,6 +2640,8 @@ type Fund implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -2799,6 +2810,7 @@ type Fund implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -2916,6 +2928,8 @@ type Organization implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3084,6 +3098,7 @@ type Organization implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -3201,6 +3216,8 @@ type Project implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3369,6 +3386,7 @@ type Project implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -3781,6 +3799,8 @@ type User implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -3949,6 +3969,7 @@ type User implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -4068,6 +4089,8 @@ type Vendor implements CollectiveInterface {
   children: [CollectiveInterface]!
   type: String
   isActive: Boolean
+  hasHosting: Boolean!
+  hasMoneyManagement: Boolean!
   name: String
   legalName: String
   company: String
@@ -4236,6 +4259,7 @@ type Vendor implements CollectiveInterface {
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
+    @deprecated(reason: "2025-12-05: Will be deleted soon. Use GraphQL v2")
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
   transactions(
@@ -4627,7 +4651,6 @@ type Mutation {
     """
     email: String!
   ): UserDetails
-  editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
 
   """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
@@ -4640,12 +4663,6 @@ type Mutation {
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
     @deprecated(reason: "2021-01-27: Please use editPublicMessage from GraphQLV2")
-
-  """
-  Update a payment method
-  """
-  updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
-    @deprecated(reason: "2024-07-16: Please use updateOrder from GraphQLV2")
 
   """
   Replace a payment method
@@ -4716,16 +4733,6 @@ type Mutation {
   claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType!
 
   """
-  Removes the payment method
-  """
-  removePaymentMethod(
-    """
-    ID of the payment method to remove
-    """
-    id: Int!
-  ): PaymentMethodType!
-
-  """
   Edits (by replacing) the admin-level webhooks for a collective.
   """
   editWebhooks(
@@ -4739,31 +4746,6 @@ type Mutation {
     """
     notifications: [NotificationInputType]
   ): [NotificationType]
-
-  """
-  Register user-level webhooks for a collective.
-  """
-  createWebhook(
-    """
-    Slug of the collective the webhook is created for.
-    """
-    collectiveSlug: String!
-
-    """
-    The notification object.
-    """
-    notification: NotificationInputType
-  ): NotificationType
-
-  """
-  Deletes a notification by ID.
-  """
-  deleteNotification(
-    """
-    ID of the notification to delete.
-    """
-    id: Int!
-  ): NotificationType
 
   """
   Activate a collective as Host.
@@ -4781,26 +4763,6 @@ type Mutation {
   deactivateCollectiveAsHost(
     """
     ID of the collective (Organization or User)
-    """
-    id: Int!
-  ): CollectiveInterface
-
-  """
-  Activate budget (For Host Organizations only)
-  """
-  activateBudget(
-    """
-    ID of the "collective" (Host Organization)
-    """
-    id: Int!
-  ): CollectiveInterface
-
-  """
-  Deactivate budget (For Host Organizations only)
-  """
-  deactivateBudget(
-    """
-    ID of the "collective" (Host Organization)
     """
     id: Int!
   ): CollectiveInterface
@@ -4979,14 +4941,6 @@ input CaptchaInputType {
   The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
   """
   provider: String!
-}
-
-"""
-Input type for ConnectedAccountInputType
-"""
-input ConnectedAccountInputType {
-  id: Int
-  settings: JSON
 }
 
 """

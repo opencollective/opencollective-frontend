@@ -14,7 +14,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { expenseFormPayeeStepCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
@@ -255,7 +255,6 @@ const ExpenseFormPayeeStep = ({
   const { formatMessage } = intl;
   const { values, errors } = formik;
   const { data, loading } = useQuery(hostVendorsQuery, {
-    context: API_V2_CONTEXT,
     variables: { hostId: collective.host?.id, collectiveSlug: collective.slug },
     skip: !collective.host?.id,
   });

@@ -3,7 +3,7 @@ import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import Loading from '../components/Loading';
 
@@ -21,7 +21,6 @@ const getVariablesFromContext = context => ({ hostCollectiveSlug: context.query.
 
 const tosQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVariablesFromContext>>({
   query: hostTermsQuery,
-  context: API_V2_CONTEXT,
   skipClientIfSSRThrows404: true,
   getVariablesFromContext,
 });

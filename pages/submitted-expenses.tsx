@@ -9,7 +9,6 @@ import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collectiv
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { ExpenseStatus } from '../lib/graphql/types/v2/schema';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import type { ExpensesPageQuery } from '@/lib/graphql/types/v2/graphql';
@@ -71,7 +70,7 @@ type ExpensesPageProps = {
 
 const expensePageQueryHelpers = getSSRQueryHelpers<z.infer<typeof schema>, ExpensesPageProps, ExpensesPageQuery>({
   query: expensesPageQuery,
-  context: API_V2_CONTEXT,
+
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
   getVariablesFromContext: ctx => ({
     account: { slug: ctx.query.collectiveSlug },

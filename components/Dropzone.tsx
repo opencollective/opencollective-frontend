@@ -36,7 +36,6 @@ import { cn } from '@/lib/utils';
 
 import { Button } from './ui/Button';
 import { useToast } from './ui/useToast';
-import { getI18nLink } from './I18nFormatters';
 import LocalFilePreview from './LocalFilePreview';
 import Spinner from './Spinner';
 import UploadedFilePreview from './UploadedFilePreview';
@@ -92,6 +91,7 @@ export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
 export const DROPZONE_ACCEPT_CSV = { 'text/csv': ['.csv'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
+const PrimaryText = (chunks: React.ReactNode) => <span className="text-primary">{chunks}</span>;
 
 /**
  * A dropzone to upload one or multiple files
@@ -291,15 +291,15 @@ const Dropzone = ({
                         {collectFilesOnly ? (
                           <FormattedMessage
                             id="DragAndDropOrClickToSelect"
-                            defaultMessage="Drag & drop or <i18n-link>click to select</i18n-link>"
-                            values={{ 'i18n-link': getI18nLink() }}
+                            defaultMessage="Drag & drop or <PrimaryText>click to select</PrimaryText>"
+                            values={{ PrimaryText }}
                             tagName="span"
                           />
                         ) : (
                           <FormattedMessage
                             id="DragAndDropOrClickToUpload"
-                            defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
-                            values={{ 'i18n-link': getI18nLink() }}
+                            defaultMessage="Drag & drop or <PrimaryText>click to upload</PrimaryText>"
+                            values={{ PrimaryText }}
                             tagName="span"
                           />
                         )}
@@ -345,15 +345,15 @@ const Dropzone = ({
                         {collectFilesOnly ? (
                           <FormattedMessage
                             id="DragAndDropOrClickToSelect"
-                            defaultMessage="Drag & drop or <i18n-link>click to select</i18n-link>"
-                            values={{ 'i18n-link': getI18nLink() }}
+                            defaultMessage="Drag & drop or <PrimaryText>click to select</PrimaryText>"
+                            values={{ PrimaryText }}
                             tagName="span"
                           />
                         ) : (
                           <FormattedMessage
                             id="DragAndDropOrClickToUpload"
-                            defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
-                            values={{ 'i18n-link': getI18nLink() }}
+                            defaultMessage="Drag & drop or <PrimaryText>click to upload</PrimaryText>"
+                            values={{ PrimaryText }}
                             tagName="span"
                           />
                         )}

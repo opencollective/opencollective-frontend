@@ -63,6 +63,13 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
   );
 };
 
+export const resetCaptcha = () => {
+  if (typeof window !== 'undefined') {
+    window.grecaptcha?.reset(); // grecaptcha is compatible with both HCaptcha and ReCaptcha
+    window.turnstile?.reset();
+  }
+};
+
 /**
  * @type {React.ForwardRefExoticComponent<{ onVerify: (result) => void;}>}
  */
@@ -104,6 +111,8 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
         sitekey={TURNSTILE_SITE_KEY}
         onVerify={token => handleVerify({ provider, token })}
         onError={handleError}
+        appearance="execute"
+        refreshExpired="auto"
         theme="light"
         {...props}
       />

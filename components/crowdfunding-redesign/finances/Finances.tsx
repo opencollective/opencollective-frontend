@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { TimeUnit } from '../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
@@ -96,7 +95,6 @@ export function Finances({ inFundraiserLayout }: { inFundraiserLayout?: boolean 
       includeChildren: !router.query.accountSlug,
     },
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   });
 
   if (error) {

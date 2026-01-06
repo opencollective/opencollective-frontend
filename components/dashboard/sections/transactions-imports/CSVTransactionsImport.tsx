@@ -24,7 +24,6 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
@@ -42,7 +41,7 @@ import {
 } from './lib/graphql';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
-import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
 import Avatar from '../../../Avatar';
@@ -113,11 +112,23 @@ const transactionsImportHostFieldsFragment = gql`
       totalCount
       nodes {
         id
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
+`;
+
+const transactionsImportStatsQuery = gql`
+  query TransactionsImportStats($importId: NonEmptyString!) {
+    transactionsImport(id: $importId) {
+      id
+      stats {
+        ...TransactionsImportStats
+      }
+    }
+  }
+  ${TransactionsImportStatsFragment}
 `;
 
 const transactionsImportQuery = gql`
@@ -305,11 +316,10 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
     filters,
   });
 
-  const { data, previousData, loading, error, refetch, variables } = useQuery<
+  const { data, previousData, loading, error, refetch, variables, client } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
   >(transactionsImportQuery, {
-    context: API_V2_CONTEXT,
     variables: { importId, ...queryFilter.variables, fetchOnlyRowIds: false },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
@@ -323,10 +333,17 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host: importData?.account?.['host'],
+    onUpdateSuccess: () =>
+      client.query({
+        query: transactionsImportStatsQuery,
+        variables: { importId },
+        fetchPolicy: 'network-only',
+      }),
+    skipOptimisticResponse: true,
     getAllRowsIds: async () => {
       const { data, error } = await apolloClient.query<TransactionsImportQuery, TransactionsImportQueryVariables>({
         query: transactionsImportQuery,
-        context: API_V2_CONTEXT,
+
         variables: { ...variables, limit: 100_000, fetchOnlyRowIds: true },
       });
 
@@ -393,30 +410,30 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                   hasNewData ? 'rounded-tl-lg rounded-tr-lg border-b-0' : 'rounded-lg',
                 )}
               >
-                <div className="flex justify-between">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                <div className="flex flex-wrap items-start justify-between gap-6">
+                  <div className="flex min-w-56 flex-1 flex-col gap-2 sm:min-w-56">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <div className="flex items-center gap-2">
-                        <CalendarClock size={16} />
-                        <div className="text-sm font-bold sm:text-base">
+                        <CalendarClock size={16} className="shrink-0" />
+                        <div className="text-sm font-bold">
                           <FormattedMessage defaultMessage="Last update" id="transactions.import.lastUpdate" />
                         </div>
                       </div>
                       <DateTime value={new Date(importData.updatedAt)} timeStyle="short" />
                     </div>
 
-                    <div className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
-                        <Calendar size={16} />
+                        <Calendar size={16} className="shrink-0" />
                         <div className="font-bold">
                           <FormattedMessage defaultMessage="Created on" id="transactions.import.createdOn" />
                         </div>
                       </div>
                       <DateTime value={new Date(importData.createdAt)} timeStyle="short" />
                     </div>
-                    <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
-                        <Target size={16} />
+                        <Target size={16} className="shrink-0" />
                         <div className="font-bold">
                           <FormattedMessage defaultMessage="Processed" id="TransactionsImport.processed" />
                         </div>
@@ -426,29 +443,25 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-2">
-                      {importData.file && (
-                        <Link
-                          className="flex gap-1 align-middle hover:underline"
-                          openInNewTab
-                          href={importData.file.url}
-                          title={importData.file.name}
-                        >
-                          <Button size="xs" variant="outline">
-                            <Download size={16} />
-                            <span className="inline-block max-w-52 truncate">{importData.file.name}</span> (
-                            {formatFileSize(importData.file.size)})
-                          </Button>
-                        </Link>
-                      )}
-                      <Button size="xs" variant="outline" onClick={() => setHasSettingsModal(true)}>
-                        <Settings size={16} />
-                        <span className="hidden sm:inline">
-                          <FormattedMessage defaultMessage="Settings" id="Settings" />
-                        </span>
-                      </Button>
-                    </div>
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    {importData.file && (
+                      <Link
+                        className="flex max-w-full min-w-0 gap-1 align-middle hover:underline"
+                        openInNewTab
+                        href={importData.file.url}
+                        title={importData.file.name}
+                      >
+                        <Button size="xs" variant="outline" className="max-w-56 min-w-0 overflow-hidden">
+                          <Download size={16} className="shrink-0" />
+                          <span className="min-w-0 flex-1 truncate">{importData.file.name}</span>
+                          <span className="shrink-0 whitespace-nowrap"> ({formatFileSize(importData.file.size)})</span>
+                        </Button>
+                      </Link>
+                    )}
+                    <Button size="xs" variant="outline" onClick={() => setHasSettingsModal(true)}>
+                      <Settings size={16} className="shrink-0" />
+                      <FormattedMessage defaultMessage="Settings" id="Settings" />
+                    </Button>
                   </div>
                 </div>
               </div>

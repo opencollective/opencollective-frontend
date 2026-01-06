@@ -17,7 +17,7 @@ import {
   verifyFieldLength,
   verifyURLPattern,
 } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { i18nLabels } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -100,9 +100,7 @@ const applyToHostMutation = gql`
 `;
 
 const useApplicationMutation = canApplyWithCollective =>
-  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
-    context: API_V2_CONTEXT,
-  });
+  useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation);
 
 const ApplicationForm = ({
   LoggedInUser,

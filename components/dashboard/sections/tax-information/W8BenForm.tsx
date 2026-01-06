@@ -23,6 +23,7 @@ import { Checkbox } from '../../../ui/Checkbox';
 import { BaseFormSchema, TaxFormLocationFields, TaxFormNameFields } from './common';
 import { HintText } from './HintText';
 import type { AccountFromTaxInformationQuery } from './queries';
+import { TaxFormSubQuestion } from './TaxFormSubQuestion';
 
 export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
   z.object({
@@ -183,32 +184,36 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         )}
       </StyledInputFormikField>
       {values.taxpayerIdentificationNumberTypeUS && (
-        <StyledInputFormikField
-          name="taxpayerIdentificationNumberUS"
-          label={`${values.taxpayerIdentificationNumberTypeUS} ID number`}
-        >
-          {({ field }) => (
-            <StyledInput
-              placeholder={values.taxpayerIdentificationNumberTypeUS === 'SSN' ? '123-45-6789' : '12-3456789'}
-              disabled={!values.taxpayerIdentificationNumberTypeUS}
-              {...field}
-              maxLength={values.taxpayerIdentificationNumberTypeUS === 'SSN' ? 11 : 10}
-              pattern={
-                values.taxpayerIdentificationNumberTypeUS === 'SSN' ? '[0-9]{3}-[0-9]{2}-[0-9]{4}' : '[0-9]{2}-[0-9]{7}'
-              }
-              onChange={e => {
-                const { value } = e.target;
-                if (values.taxpayerIdentificationNumberTypeUS === 'SSN') {
-                  const formattedValue = value.replace(/[^0-9]/g, '').replace(/(\d{3})(\d{2})(\d{4})/, '$1-$2-$3');
-                  setFieldValue(field.name, formattedValue);
-                } else {
-                  const formattedValue = value.replace(/[^0-9]/g, '').replace(/(\d{2})(\d{7})/, '$1-$2');
-                  setFieldValue(field.name, formattedValue);
+        <TaxFormSubQuestion>
+          <StyledInputFormikField
+            name="taxpayerIdentificationNumberUS"
+            label={`${values.taxpayerIdentificationNumberTypeUS} ID number`}
+          >
+            {({ field }) => (
+              <StyledInput
+                placeholder={values.taxpayerIdentificationNumberTypeUS === 'SSN' ? '123-45-6789' : '12-3456789'}
+                disabled={!values.taxpayerIdentificationNumberTypeUS}
+                {...field}
+                maxLength={values.taxpayerIdentificationNumberTypeUS === 'SSN' ? 11 : 10}
+                pattern={
+                  values.taxpayerIdentificationNumberTypeUS === 'SSN'
+                    ? '[0-9]{3}-[0-9]{2}-[0-9]{4}'
+                    : '[0-9]{2}-[0-9]{7}'
                 }
-              }}
-            />
-          )}
-        </StyledInputFormikField>
+                onChange={e => {
+                  const { value } = e.target;
+                  if (values.taxpayerIdentificationNumberTypeUS === 'SSN') {
+                    const formattedValue = value.replace(/[^0-9]/g, '').replace(/(\d{3})(\d{2})(\d{4})/, '$1-$2-$3');
+                    setFieldValue(field.name, formattedValue);
+                  } else {
+                    const formattedValue = value.replace(/[^0-9]/g, '').replace(/(\d{2})(\d{7})/, '$1-$2');
+                    setFieldValue(field.name, formattedValue);
+                  }
+                }}
+              />
+            )}
+          </StyledInputFormikField>
+        </TaxFormSubQuestion>
       )}
       <div className="mt-2">
         <p className="text-lg font-bold">Tax treaty benefits</p>
@@ -235,7 +240,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         )}
       </StyledInputFormikField>
       {Boolean(values.claimsSpecialRatesAndConditions) && (
-        <React.Fragment>
+        <TaxFormSubQuestion>
           <StyledInputFormikField name="certifiesResidentCountry">
             {({ field }) => (
               <label className="cursor-pointer text-sm leading-normal font-normal">
@@ -277,7 +282,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
             )}
           </StyledInputFormikField>
           {values.hasTaxTreatySpecialRatesAndConditions && (
-            <React.Fragment>
+            <TaxFormSubQuestion>
               <StyledInputFormikField name="claimsArticleAndParagraph" label="Article and paragraph" />
               <StyledInputFormikField
                 required={values.hasTaxTreatySpecialRatesAndConditions}
@@ -295,9 +300,9 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
               </StyledInputFormikField>
               <StyledInputFormikField name="claimsIncomeType" label="Type of income" />
               <StyledInputFormikField name="claimsExplanation" label="Explanation" />
-            </React.Fragment>
+            </TaxFormSubQuestion>
           )}
-        </React.Fragment>
+        </TaxFormSubQuestion>
       )}
 
       <div className="mt-2">
@@ -324,7 +329,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         )}
       </StyledInputFormikField>
       {values.isSignerTheBeneficialOwner === false && (
-        <React.Fragment>
+        <TaxFormSubQuestion>
           <StyledInputFormikField
             name="signerCapacity"
             label="If the signer is not the beneficial owner, in what capacity are they acting?"
@@ -332,7 +337,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           <StyledInputFormikField name="signer.firstName" label="First Name" />
           <StyledInputFormikField name="signer.middleName" label="Middle Name" />
           <StyledInputFormikField name="signer.lastName" label="Last Name" />
-        </React.Fragment>
+        </TaxFormSubQuestion>
       )}
 
       <StyledInputFormikField name="hasConfirmedTOS">

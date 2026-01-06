@@ -79,11 +79,6 @@ class SectionEvents extends React.PureComponent {
           container={ContributeCardsContainer}
           getScrollDistance={this.getContributeCardsScrollDistance}
         >
-          {this.sortEvents(events).map(event => (
-            <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-              <ContributeEvent collective={collective} event={event} hideContributors={hasNoContributorForEvents} />
-            </Box>
-          ))}
           {isAdmin && (
             <Box px={CONTRIBUTE_CARD_PADDING_X} minHeight={150}>
               <CreateNew route={`/${collective.slug}/events/create`} data-cy="create-event">
@@ -91,6 +86,11 @@ class SectionEvents extends React.PureComponent {
               </CreateNew>
             </Box>
           )}
+          {this.sortEvents(events).map(event => (
+            <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
+              <ContributeEvent collective={collective} event={event} hideContributors={hasNoContributorForEvents} />
+            </Box>
+          ))}
         </HorizontalScroller>
         {Boolean(events.length > 6) && (
           <ContainerSectionContent>

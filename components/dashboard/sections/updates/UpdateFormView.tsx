@@ -12,7 +12,6 @@ import { toIsoDateStr } from '../../../../lib/date-utils';
 import { i18nGraphqlException, isOCError } from '../../../../lib/errors';
 import FormPersister from '../../../../lib/form-persister';
 import { formatFormErrorMessage, requireFields } from '../../../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { LOCAL_STORAGE_KEYS } from '../../../../lib/local-storage';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { cn, formatDate } from '../../../../lib/utils';
@@ -132,17 +131,11 @@ const FormBody = ({ update, accountSlug }) => {
   const { account } = React.useContext(DashboardContext);
   const [uploading, setUploading] = React.useState(false);
 
-  const [createUpdate] = useMutation(createUpdateMutation, { context: API_V2_CONTEXT });
-  const [editUpdate] = useMutation(editUpdateMutation, { context: API_V2_CONTEXT, variables: { id: update?.id } });
-  const [unpublishUpdate] = useMutation(unpublishUpdateMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [publishUpdate] = useMutation(publishUpdateMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [getAudienceData, { loading: audienceLoading }] = useLazyQuery(updateAudienceQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const [createUpdate] = useMutation(createUpdateMutation);
+  const [editUpdate] = useMutation(editUpdateMutation, { variables: { id: update?.id } });
+  const [unpublishUpdate] = useMutation(unpublishUpdateMutation);
+  const [publishUpdate] = useMutation(publishUpdateMutation);
+  const [getAudienceData, { loading: audienceLoading }] = useLazyQuery(updateAudienceQuery);
 
   const refetchQueries = React.useMemo(
     () =>
@@ -151,7 +144,6 @@ const FormBody = ({ update, accountSlug }) => {
         update && {
           query: updatesViewQuery,
           variables: { id: update.id },
-          context: API_V2_CONTEXT,
         },
       ]),
     [account, update],
@@ -502,7 +494,7 @@ const UpdateFormView = ({ updateId, accountSlug }) => {
     variables: {
       id: updateId,
     },
-    context: API_V2_CONTEXT,
+
     skip: !isEditing,
   });
 

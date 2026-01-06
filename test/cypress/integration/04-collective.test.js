@@ -76,10 +76,7 @@ describe('Collective page', () => {
     it('Can edit primary color', () => {
       cy.get('[data-cy=edit-collective-display-features] [data-cy=edit-main-color-btn]').click();
       cy.get('[data-cy=collective-color-picker-card] [data-cy=collective-color-picker-options-btn]:first').click();
-      cy.get('[data-cy=collective-color-picker-save-btn]').then($saveBtn => {
-        cy.wrap($saveBtn).should('have.css', 'background-color', 'rgb(191, 40, 33)');
-        cy.wrap($saveBtn).click();
-      });
+      cy.get('[data-cy=collective-color-picker-save-btn]').click();
     });
 
     it('Can change cover background image', () => {

@@ -3,6 +3,15 @@ import { gql } from '../../../../lib/graphql/helpers';
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { transactionsTableQueryCollectionFragment } from '../transactions/queries';
 
+export const editAccountSettingMutation = gql`
+  mutation UpdateSetupGuideState($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+    editAccountSetting(account: $account, key: $key, value: $value) {
+      id
+      settings
+    }
+  }
+`;
+
 export const timelineQuery = gql`
   query Timeline($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
     account(slug: $slug) {

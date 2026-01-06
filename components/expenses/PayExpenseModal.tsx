@@ -14,7 +14,7 @@ import { EXPENSE_PAYMENT_METHOD_SERVICES, PAYMENT_METHOD_SERVICE } from '../../l
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
@@ -137,7 +137,6 @@ const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFie
   const generateReference = host.settings?.transferwise?.generateReference !== false;
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
-    context: API_V2_CONTEXT,
   });
 
   useEffect(() => {
@@ -392,6 +391,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
 };
 
 type PayExpenseModalProps = {
+  canPayWithAutomaticPayment: boolean;
   expense: Expense & { amountInHostCurrency?: { valueInCents: number; currency?: string } };
   collective: Pick<Account, 'currency'>;
   host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings' | 'features' | 'platformSubscription'>;
@@ -404,27 +404,33 @@ type PayExpenseModalProps = {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }: PayExpenseModalProps) => {
+const PayExpenseModal = ({
+  onClose,
+  onSubmit,
+  expense,
+  collective,
+  host,
+  error,
+  canPayWithAutomaticPayment,
+}: PayExpenseModalProps) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const blockAutomaticPayment = requiresUpgrade(host, FEATURES.TRANSFERWISE);
+  const blockAutomaticPayment = !canPayWithAutomaticPayment || requiresUpgrade(host, FEATURES.TRANSFERWISE);
   const initialValues = getInitialValues(expense, host, blockAutomaticPayment);
   const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
   const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
-  const hasAutomaticManualPicker = ![
-    PayoutMethodType.OTHER,
-    PayoutMethodType.ACCOUNT_BALANCE,
-    PayoutMethodType.STRIPE,
-  ].includes(payoutMethodType);
+  const hasAutomaticManualPicker =
+    canPayWithAutomaticPayment &&
+    ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(payoutMethodType);
   const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
 
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !blockAutomaticPayment;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
-    context: API_V2_CONTEXT,
+
     skip: !canQuote,
   });
 
@@ -807,8 +813,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 <P mt={2} fontSize="12px" lineHeight="18px">
                   <FormattedMessage
                     id="PayExpenseModal.NotEnoughFundsOnWise"
-                    defaultMessage="Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}.
-Please add funds to your Wise {currency} account."
+                    defaultMessage="Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}. Please add funds to your Wise {currency} account."
                     values={{
                       currency: amountInBalance.currency,
                       totalNeeded: formatCurrency(

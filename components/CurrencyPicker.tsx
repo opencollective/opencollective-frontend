@@ -54,7 +54,7 @@ const CurrencyPicker = React.memo(
     return (
       <ComboSelect
         id={props.inputId || 'currency-picker'}
-        data-cy="currency-picker"
+        data-cy={props['data-cy'] || 'currency-picker'}
         error={!value}
         isSearchable={availableCurrencies.length > 10}
         options={currencyOptions}

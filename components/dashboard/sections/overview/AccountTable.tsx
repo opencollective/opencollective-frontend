@@ -6,7 +6,6 @@ import { isNil, omit } from 'lodash';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { AccountMetricsFragment, OverviewMetricsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import type { Currency } from '../../../../lib/graphql/types/v2/schema';
 import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
@@ -242,7 +241,7 @@ export default function AccountTable({ accountSlug, queryFilter, metric }) {
       ...queryFilter.variables,
       slug: accountSlug,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
   });
   const { account } = React.useContext(DashboardContext);

@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -254,7 +254,6 @@ const addConversationsPageData = graphql(conversationsPageQuery, {
     // Because this list is updated often, using this option ensures that the list gets
     // properly updated when doing things like redirecting after a conversation delete.
     fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
   },
 });
 

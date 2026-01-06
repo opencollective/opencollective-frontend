@@ -11,7 +11,6 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQuery } from '../../../../lib/graphql/types/v2/graphql';
 import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -20,6 +19,7 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { elementFromClass } from '../../../../lib/react-utils';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -91,7 +91,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
     hostFeesStructure: collective.hostFeesStructure,
     hostFeePercent: collective.hostFeePercent || host.hostFeePercent,
   });
-  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee, { context: API_V2_CONTEXT });
+  const [submitEditSettings, { loading }] = useMutation(editAccountHostFee);
   const handleFeeStructureChange = async ({ hostFeesStructure, hostFeePercent }) => {
     const previousState = cloneDeep(feeStructure);
     const isCustomFee = hostFeesStructure === HOST_FEE_STRUCTURE.CUSTOM_FEE;
@@ -194,7 +194,7 @@ const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetai
         }
       }
     `,
-    { context: API_V2_CONTEXT },
+    {},
   );
   const handleUpdate = async value => {
     try {
@@ -235,7 +235,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
   const [expenseTypes, setExpenseTypes] = React.useState(() => collective.settings?.expenseTypes || {});
   const isUsingGlobalSetttings = isEmpty(expenseTypes);
 
-  const [submitEditSettings, { loading, data }] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
+  const [submitEditSettings, { loading, data }] = useMutation(editAccountSettingsMutation);
   const handleUpdate = async value => {
     const previousState = cloneDeep(expenseTypes);
     const variables = {
@@ -489,7 +489,7 @@ const CollectiveDetails = ({
   const drawerActionsContainer = useDrawerActionsContainer();
   const { data, loading: loadingCollectiveInfo } = useQuery(hostedCollectiveDetailQuery, {
     variables: { id: collectiveId || c?.id },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
   });
   const collective = data?.account || c;
@@ -497,6 +497,8 @@ const CollectiveDetails = ({
   const isHostedCollective = host && collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
   const isChild = !!collective?.parent?.id;
+
+  const isUpgradeRequiredForSettingHostFee = requiresUpgrade(account, FEATURES.CHARGE_HOSTING_FEES);
 
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
   const balance = collective?.stats?.balance;
@@ -575,7 +577,7 @@ const CollectiveDetails = ({
                 </Badge>
                 {collective.parent && (
                   <FormattedMessage
-                    defaultMessage=" by {parentAccount}"
+                    defaultMessage="by {parentAccount}"
                     id="LGPYM7"
                     values={{
                       parentAccount: (
@@ -604,10 +606,13 @@ const CollectiveDetails = ({
             <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
             {isHostedCollective && (
               <React.Fragment>
-                <InfoListItem
-                  title={<FormattedMessage defaultMessage="Fee Structure" id="CS88Lr" />}
-                  value={<HostFeeStructurePicker host={host} collective={collective} />}
-                />
+                {!isUpgradeRequiredForSettingHostFee && (
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Fee Structure" id="CS88Lr" />}
+                    value={<HostFeeStructurePicker host={host} collective={collective} />}
+                  />
+                )}
+
                 <InfoListItem
                   title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
                   value={<ExpenseTypesPicker host={host} collective={collective} />}

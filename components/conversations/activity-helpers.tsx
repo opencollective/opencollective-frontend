@@ -15,7 +15,7 @@ import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
-import type { Transaction } from '@/lib/graphql/types/v2/schema';
+import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/schema';
 
 import { Box as Container } from '../Grid';
 /**
@@ -70,6 +70,18 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Updated',
       defaultMessage: 'Expense updated',
     }),
+    renderDetails: ({ previousData, expense }) => {
+      if (previousData?.status !== ExpenseStatus.PENDING && expense?.status === ExpenseStatus.PENDING) {
+        return (
+          <FormattedMessage
+            defaultMessage="The expense has been modified and re-submitted for approval by the collective."
+            id="JORJ1B"
+          />
+        );
+      }
+
+      return null;
+    },
   },
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
     type: 'info',

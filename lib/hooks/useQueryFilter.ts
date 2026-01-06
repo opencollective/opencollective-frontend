@@ -1,5 +1,5 @@
 import React from 'react';
-import { forEach, isEmpty, isNil, isUndefined, omit, omitBy } from 'lodash';
+import { forEach, isEmpty, isNil, isUndefined, omit, omitBy, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import type { z } from 'zod';
@@ -60,7 +60,7 @@ export function getSSRVariablesFromQuery<S extends z.ZodObject<z.ZodRawShape>, G
     if (toVariables?.[key]) {
       apiVariables = {
         ...apiVariables,
-        ...toVariables[key](value, key, meta),
+        ...toVariables[key](value, key, meta, values),
       };
     } else {
       apiVariables = {
@@ -84,6 +84,7 @@ export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape>, GQLQu
   views?: readonly View<z.infer<S>>[];
   meta?: FilterMeta;
   defaultSchemaValues: Partial<z.infer<S>>;
+  lockViewFilters?: boolean;
 };
 
 type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta> = {
@@ -96,6 +97,8 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, F
   skipRouter?: boolean; // Used when not updating the URL query is desired, this will instead use internal state.
   activeViewId?: string; // To use as a control for the active view
   shallow?: boolean; // If true, the router will not reload the page when updating the query
+  skipFiltersOnReset?: string[];
+  lockViewFilters?: boolean; // If true, the view will lock the filters defined in the view, but you're able to add more filters without "leaving" the view
 };
 
 export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQLQueryVars, FilterMeta = unknown>(
@@ -149,7 +152,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
       if (opts.toVariables?.[key]) {
         apiVariables = {
           ...apiVariables,
-          ...opts.toVariables[key](value, key, opts.meta),
+          ...opts.toVariables[key](value, key, opts.meta, values),
         };
       } else {
         apiVariables = {
@@ -164,7 +167,8 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
 
   const resetFilters = React.useCallback(
     (newFilters, newPath?: string) => {
-      const result = opts.schema.safeParse(newFilters);
+      const filtersToKeep = pick(values, opts.skipFiltersOnReset);
+      const result = opts.schema.safeParse({ ...filtersToKeep, ...newFilters });
 
       if (result.success) {
         const filterValues = result.data;
@@ -227,8 +231,14 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
 
   const activeViewId = React.useMemo(
     () =>
-      opts.activeViewId || getActiveViewId(values, { filters: opts.filters, views: opts.views, defaultSchemaValues }),
-    [values, opts.filters, opts.views, opts.activeViewId, defaultSchemaValues],
+      opts.activeViewId ||
+      getActiveViewId(values, {
+        filters: opts.filters,
+        views: opts.views,
+        defaultSchemaValues,
+        lockViewFilters: opts.lockViewFilters,
+      }),
+    [values, opts.filters, opts.views, opts.activeViewId, defaultSchemaValues, opts.lockViewFilters],
   );
 
   return {
@@ -243,6 +253,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
     filters: opts.filters,
     views: opts.views,
     meta: opts.meta,
+    lockViewFilters: opts.lockViewFilters,
   };
 }
 
@@ -253,13 +264,13 @@ function addFilterValidationErrorToast(error, intl) {
     errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
   });
 
-  if (typeof setImmediate !== 'undefined') {
-    setImmediate(() => {
-      toast({
-        variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
-        message: errorMessage,
-      });
+  // Use setTimeout instead of setImmediate to avoid hydration mismatch
+  // setImmediate is Node.js only and causes client/server differences
+  setTimeout(() => {
+    toast({
+      variant: 'error',
+      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
+      message: errorMessage,
     });
-  }
+  }, 0);
 }

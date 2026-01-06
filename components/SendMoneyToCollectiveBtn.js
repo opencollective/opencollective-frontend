@@ -5,7 +5,7 @@ import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
 import { compose } from '../lib/utils';
 
@@ -160,7 +160,6 @@ const paymentMethodsQuery = gql`
 
 const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   options: props => ({
-    context: API_V2_CONTEXT,
     variables: {
       slug: get(props, 'fromCollective.slug'),
     },
@@ -191,7 +190,6 @@ const sendMoneyToCollectiveMutation = gql`
 
 const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, {
   name: 'sendMoneyToCollective',
-  options: { context: API_V2_CONTEXT },
 });
 
 const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);

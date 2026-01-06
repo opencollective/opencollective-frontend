@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApolloClient, useQuery } from '@apollo/client';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
@@ -41,7 +40,7 @@ export default function ExpenseDrawer({
   const { data, loading, error, refetch, fetchMore, startPolling, stopPolling } = useQuery(expensePageQuery, {
     variables: id ? getVariablesFromQuery({ ExpenseId: id }) : undefined,
     skip: !id,
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-and-network',
   });
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);

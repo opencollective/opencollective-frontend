@@ -11,7 +11,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { ExpenseLockableFields } from '../../lib/graphql/types/v2/schema';
 import { flattenObjectDeep } from '../../lib/utils';
 
@@ -138,9 +138,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expe
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [payeeType, setPayeeType] = React.useState(values.payee?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER);
-  const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery);
 
   const changePayeeType = e => {
     e.stopPropagation();

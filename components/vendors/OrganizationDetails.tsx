@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { elementFromClass } from '../../lib/react-utils';
 
 import Avatar from '../Avatar';
@@ -75,12 +75,9 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
   const intl = useIntl();
   const { data } = useQuery(organizationDetailsQuery, {
     variables: { organizationSlug: organization.slug },
-    context: API_V2_CONTEXT,
   });
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
-  const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation);
 
   const handleConvert = async () => {
     try {
@@ -141,7 +138,10 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
             <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${organization.slug}`} className="text-sm">
               {activity.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
             </Link>
-            <Link href={`${dashboardLink}/orders?searchTerm=%40${organization.slug}`} className="text-sm">
+            <Link
+              href={`${dashboardLink}/incoming-contributions?searchTerm=%40${organization.slug}`}
+              className="text-sm"
+            >
               {activity.orders.totalCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
             </Link>
           </div>

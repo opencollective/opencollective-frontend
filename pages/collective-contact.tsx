@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCollectivePageMetadata, isHiddenAccount } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { Account } from '../lib/graphql/types/v2/schema';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -51,7 +51,6 @@ const CollectiveContact = () => {
   // We query here rather than SSR cause the query is authenticated
   const { loading, data, error } = useQuery(collectiveContactPageQuery, {
     variables: { collectiveSlug },
-    context: API_V2_CONTEXT,
   });
 
   if (!loading) {

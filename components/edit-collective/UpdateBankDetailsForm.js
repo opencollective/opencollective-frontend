@@ -21,7 +21,7 @@ const validateInstructions = instructions => {
   const errors = [];
   const usedVariables = instructions.match(/{[^}]+}/g) || [];
   const allowedVariables = ['account', 'amount', 'collective', 'reference'];
-  const requiredVariables = ['account', 'reference'];
+  const requiredVariables = ['reference'];
   const addError = message => errors.push({ key: uuid(), message });
 
   usedVariables.forEach(variable => {

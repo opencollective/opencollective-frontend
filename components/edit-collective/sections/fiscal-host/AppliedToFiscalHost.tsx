@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AppliedToFiscalHostQuery,
   AppliedToFiscalHostQueryVariables,
@@ -49,7 +48,6 @@ export default function AppliedToFiscalHost(props: AppliedToFiscalHostProps) {
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         collectiveSlug: props.collectiveSlug,
       },

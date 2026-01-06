@@ -15,10 +15,6 @@ exports.REWRITES = [
     destination: '/tax-form',
   },
   {
-    source: '/welcome',
-    destination: '/welcome',
-  },
-  {
     source: '/organizations',
     destination: '/solutions',
   },
@@ -57,6 +53,10 @@ exports.REWRITES = [
   {
     source: '/create-account/guest',
     destination: '/guest-join',
+  },
+  {
+    source: '/signup/:step(verify|profile|organization|collective)?',
+    destination: '/signup',
   },
   {
     source: '/organizations/new',
@@ -356,30 +356,8 @@ exports.REWRITES = [
   },
   // New accept financial contributions flow
   {
-    source:
-      '/:slug/accept-financial-contributions/:path(ourselves|myself|organization|host)?/:method(stripe|bank)?/:state(success)?',
+    source: '/:slug/accept-financial-contributions/host/:state(success)?',
     destination: '/accept-financial-contributions',
-  },
-  // New recurring contributions page
-  {
-    source: '/:slug/manage-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/manage-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/recurring-contributions/:tab(recurring|processing)?',
-    destination: '/manage-contributions',
-  },
-  {
-    source: '/:slug/subscriptions',
-    destination: '/manage-contributions',
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
@@ -398,6 +376,10 @@ exports.REWRITES = [
   {
     source: '/search',
     destination: '/search',
+  },
+  {
+    source: '/search-results',
+    destination: '/search-results',
   },
   {
     source: '/pricing',

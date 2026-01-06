@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
 import { formatCurrency, formatValueAsCurrency } from '../../../../lib/currency-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { Box, Flex } from '../../../Grid';
@@ -86,7 +86,6 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
   const [graphType, setGraphType] = React.useState(GRAPH_TYPES.LIST);
   const { data, loading } = useQuery(budgetSectionExpenseQuery, {
     variables: { slug: collective.slug, ...tmpDateInterval },
-    context: API_V2_CONTEXT,
   });
   const intl = useIntl();
 

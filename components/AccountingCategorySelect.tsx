@@ -1,4 +1,5 @@
 import React from 'react';
+import { gql } from '@apollo/client';
 import { get, isNull, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
@@ -16,6 +17,21 @@ import { isSameAccount } from '@/lib/collective';
 import { Button } from './ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
+
+export const AccountingCategorySelectFieldsFragment = gql`
+  fragment AccountingCategorySelectFields on AccountingCategory {
+    id
+    kind
+    code
+    hostOnly
+    instructions
+    name
+    friendlyName
+    expensesTypes
+    createdAt
+    appliesTo
+  }
+`;
 
 type RequiredHostFields = Pick<Host, 'id' | 'slug' | 'type'> & {
   [K in (typeof ACCOUNTING_CATEGORY_HOST_FIELDS)[number]]?: { nodes: RequiredAccountingCategoryFields[] };
@@ -42,7 +58,8 @@ type AccountingCategorySelectProps = {
   onChange: (category: AccountingCategory | null) => void;
   onBlur?: () => void;
   allowNone?: boolean;
-  showCode?: boolean;
+  /** Usually true for host/organization admins, false for other users */
+  showCode: boolean;
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
@@ -330,7 +347,7 @@ const AccountingCategorySelect = ({
   id,
   error,
   allowNone = false,
-  showCode = false,
+  showCode,
   expenseValues = undefined,
   buttonClassName = '',
   children = null,

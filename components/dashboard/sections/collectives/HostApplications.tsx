@@ -7,7 +7,6 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -86,7 +85,6 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostApplicationsMetadataQuery, {
     variables: { hostSlug },
     fetchPolicy: 'network-only',
-    context: API_V2_CONTEXT,
   });
 
   const views: Views<z.infer<typeof schema>> = [
@@ -131,7 +129,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     {
       variables: { hostSlug, ...omit(queryFilter.variables, 'hostApplicationId') },
       fetchPolicy: 'cache-and-network',
-      context: API_V2_CONTEXT,
+
       onCompleted() {
         refetchMetadata();
       },
@@ -152,7 +150,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />} />
 
       <Filterbar {...queryFilter} />

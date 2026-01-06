@@ -17,7 +17,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
@@ -37,7 +37,6 @@ import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
 import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
-  accountingCategoryFields,
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
@@ -55,6 +54,7 @@ import { SubmitExpenseFlow } from '../components/submit-expense/SubmitExpenseFlo
 import { Survey, SURVEY_KEY } from '../components/Survey';
 import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
+import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
@@ -539,7 +539,7 @@ const hostFieldsFragment = gql`
     accountingCategories {
       nodes {
         id
-        ...AccountingCategoryFields
+        ...AccountingCategorySelectFields
       }
     }
     policies {
@@ -552,7 +552,7 @@ const hostFieldsFragment = gql`
     supportedPayoutMethods
     isTrustedHost
   }
-  ${accountingCategoryFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 const createExpensePageQuery = gql`
@@ -640,7 +640,6 @@ const createExpensePageQuery = gql`
 
 const addCreateExpensePageData = graphql(createExpensePageQuery, {
   options: {
-    context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
   },
 });
@@ -661,7 +660,6 @@ const createExpenseMutation = gql`
 
 const addCreateExpenseMutation = graphql(createExpenseMutation, {
   name: 'createExpense',
-  options: { context: API_V2_CONTEXT },
 });
 
 const draftExpenseAndInviteUserMutation = gql`
@@ -676,7 +674,6 @@ const draftExpenseAndInviteUserMutation = gql`
 
 const addDraftExpenseAndInviteUserMutation = graphql(draftExpenseAndInviteUserMutation, {
   name: 'draftExpenseAndInviteUser',
-  options: { context: API_V2_CONTEXT },
 });
 
 const addHoc = compose(

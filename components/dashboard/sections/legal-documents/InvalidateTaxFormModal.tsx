@@ -3,8 +3,8 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Host } from '../../../../lib/graphql/types/v2/schema';
+import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import LinkCollective from '../../../LinkCollective';
 import type { BaseModalProps } from '../../../ModalContext';
@@ -34,16 +34,14 @@ export const InvalidateTaxFormModal = ({
   onSuccess,
   ...props
 }: {
-  legalDocument: LegalDocument;
-  host: Account | Host;
+  legalDocument: LegalDocumentFieldsFragment;
+  host: Pick<Account | Host, 'id'>;
   onSuccess?: () => void;
 } & BaseModalProps) => {
   const intl = useIntl();
   const [message, setMessage] = React.useState('');
   const { toast } = useToast();
-  const [editLegalDocumentStatus, { loading }] = useMutation(editLegalDocumentStatusMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editLegalDocumentStatus, { loading }] = useMutation(editLegalDocumentStatusMutation);
   const onTextChange = React.useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value),
     [setMessage],

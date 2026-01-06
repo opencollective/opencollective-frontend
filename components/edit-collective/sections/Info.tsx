@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
@@ -8,24 +8,27 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import timezones from '@/lib/constants/timezones';
+import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { Currency as CurrencyOptions } from '@/lib/constants/currency';
 import { VAT_OPTIONS } from '@/lib/constants/vat';
 import dayjs from '@/lib/dayjs';
 import { loadGoogleMaps } from '@/lib/google-maps';
-import type { Account, AccountUpdateInput } from '@/lib/graphql/types/v2/schema';
-import { AccountType, Currency } from '@/lib/graphql/types/v2/schema';
+import type { Account, AccountUpdateInput, Currency } from '@/lib/graphql/types/v2/schema';
+import { AccountType } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { cn, omitDeepBy } from '@/lib/utils';
 
+import { EditAvatar } from '@/components/Avatar';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '@/components/collective-page/graphql/queries';
+import CurrencyPicker from '@/components/CurrencyPicker';
 import EditTags from '@/components/EditTags';
 import { FormField } from '@/components/FormField';
 import { FormikZod } from '@/components/FormikZod';
 import { I18nSupportLink } from '@/components/I18nFormatters';
 import { useModal } from '@/components/ModalContext';
 import RichTextEditor from '@/components/RichTextEditor';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/Command';
+import { TimezonePicker } from '@/components/TimezonePicker';
 import { InputGroup } from '@/components/ui/Input';
 import LocationInput, { UserLocationInput } from '@/components/ui/LocationInput';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/Select';
@@ -45,6 +48,7 @@ const editAccountFragment = gql`
     name
     slug
     legalName
+    image: imageUrl
     description
     longDescription
     isActive
@@ -114,6 +118,7 @@ const baseInfo = z.object({
   longDescription: z.string().max(30000).nullable(),
   currency: z.string().max(3).nullable(),
   tags: z.array(z.string()).nullable(),
+  image: z.string().url().nullable().optional(),
   location: z
     .object({
       name: z.string().optional().nullable(),
@@ -181,28 +186,27 @@ type FormValuesSchema = z.infer<typeof formSchema>;
 const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 'slug'> }) => {
   const intl = useIntl();
   const { showConfirmationModal } = useModal();
+  const { refetchLoggedInUser } = useLoggedInUser();
   const formikRef = useRef<FormikProps<FormValuesSchema>>(undefined);
-  const currencyInputRef = useRef<HTMLInputElement>(null);
-  const timezoneInputRef = useRef<HTMLInputElement>(null);
-  const [showTimezoneSelect, setShowTimezoneSelect] = useState(false);
-  const [showCurrencySelect, setShowCurrencySelect] = useState(false);
   const [isLoadingGoogleMaps, setIsLoadingGoogleMaps] = useState(true);
   const { toast } = useToast();
   const { data, loading } = useQuery(infoSettingsDashboardQuery, {
-    context: API_V2_CONTEXT,
     variables: { id: accountFromParent.id },
   });
   const [updateAccount, { loading: submitting }] = useMutation(editAccountMutation, {
-    context: API_V2_CONTEXT,
     refetchQueries: [
-      { query: collectivePageQuery, variables: getCollectivePageQueryVariables(accountFromParent.slug) },
+      {
+        query: collectivePageQuery,
+        context: API_V1_CONTEXT,
+        variables: getCollectivePageQueryVariables(accountFromParent.slug),
+      },
     ],
   });
 
   const account = data?.account;
 
   // Load Google Maps for address autocomplete. Individuals use a simplified location input.
-  React.useEffect(() => {
+  useEffect(() => {
     if (account && account.type !== INDIVIDUAL) {
       loadGoogleMaps().finally(() => setIsLoadingGoogleMaps(false));
     }
@@ -215,6 +219,7 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         : {
             ...pick(account, [
               'type',
+              'image',
               ...Object.keys(baseInfo.shape),
               ...Object.keys(eventShape.shape),
               ...Object.keys(individualShape.shape),
@@ -224,47 +229,6 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
             startsAt: account.startsAt && dayjs(account.startsAt).format('YYYY-MM-DDTHH:mm:ss'),
           },
     [account],
-  );
-
-  const currencyOptions = useMemo(
-    () =>
-      Object.keys(Currency).map(code => ({
-        value: code,
-        label: code,
-      })),
-    [],
-  );
-  const timezoneOptions = useMemo(
-    () =>
-      timezones.map(tz => ({
-        label: tz.replace('_', ' '),
-        value: tz,
-      })),
-    [],
-  );
-
-  const openCurrencySelect = useCallback(
-    open => {
-      setShowCurrencySelect(open);
-      if (open) {
-        setTimeout(() => {
-          currencyInputRef.current?.focus();
-        }, 100);
-      }
-    },
-    [currencyInputRef],
-  );
-
-  const openTimezoneSelect = useCallback(
-    open => {
-      setShowTimezoneSelect(open);
-      if (open) {
-        setTimeout(() => {
-          timezoneInputRef.current?.focus();
-        }, 100);
-      }
-    },
-    [timezoneInputRef],
   );
 
   const onSubmit = async (values: FormValuesSchema) => {
@@ -297,8 +261,8 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
       const update = async () => {
         await updateAccount({
           variables,
-          context: API_V2_CONTEXT,
         });
+        await refetchLoggedInUser();
         toast({
           variant: 'success',
           message: <FormattedMessage id="Account.Updated" defaultMessage="Account updated." />,
@@ -360,6 +324,27 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
         );
         return (
           <Form className="flex flex-col gap-4">
+            <FormField
+              name="image"
+              label={
+                account.type === INDIVIDUAL ? (
+                  <FormattedMessage defaultMessage="Avatar" id="Avatar" />
+                ) : (
+                  <FormattedMessage defaultMessage="Logo" id="Logo" />
+                )
+              }
+            >
+              {({ field, form }) => (
+                <EditAvatar
+                  size={120}
+                  name={values.name}
+                  type={account.type}
+                  value={field.value}
+                  onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                  maxSize={5e3 * 1024}
+                />
+              )}
+            </FormField>
             <FormField
               name="name"
               label={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
@@ -478,51 +463,12 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                   }
                 >
                   {({ field }) => (
-                    <Select
+                    <TimezonePicker
+                      data-cy="organization-timezone-trigger"
                       value={field.value}
-                      open={showTimezoneSelect}
-                      onOpenChange={openTimezoneSelect}
                       disabled={field.disabled}
-                    >
-                      <SelectTrigger
-                        className={cn(!field.value && 'text-muted-foreground')}
-                        data-cy="organization-timezone-trigger"
-                      >
-                        {field.value ? (
-                          timezoneOptions.find(option => option.value === field.value)?.label || field.value
-                        ) : (
-                          <FormattedMessage defaultMessage="Select timezone" id="collective.timezone.placeholder" />
-                        )}
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[50vh]">
-                        <Command>
-                          <CommandInput
-                            placeholder={intl.formatMessage({ defaultMessage: 'Search timezones...', id: 'VzPJtr' })}
-                            data-cy="organization-timezone-search"
-                            ref={timezoneInputRef}
-                          />
-                          <CommandList data-cy="organization-timezone-list">
-                            <CommandEmpty>
-                              <FormattedMessage defaultMessage="No timezone found." id="GTBZLL" />
-                            </CommandEmpty>
-                            <CommandGroup>
-                              {timezoneOptions.map(({ value, label }) => (
-                                <CommandItem
-                                  key={value}
-                                  data-cy={`organization-country-${value}`}
-                                  onSelect={() => {
-                                    setFieldValue(field.name, value as Currency);
-                                    setShowTimezoneSelect(false);
-                                  }}
-                                >
-                                  <span>{label}</span>
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </SelectContent>
-                    </Select>
+                      onChange={value => setFieldValue(field.name, value)}
+                    />
                   )}
                 </FormField>
                 <FormField
@@ -592,51 +538,16 @@ const Info = ({ account: accountFromParent }: { account: Pick<Account, 'id' | 's
                 }
               >
                 {({ field }) => (
-                  <Select
-                    value={field.value}
-                    open={showCurrencySelect}
-                    onOpenChange={openCurrencySelect}
+                  <CurrencyPicker
+                    data-cy="organization-currency-trigger"
                     disabled={field.disabled}
-                  >
-                    <SelectTrigger
-                      className={cn(!field.value && 'text-muted-foreground')}
-                      data-testid="organization-currency-trigger"
-                    >
-                      {field.value ? (
-                        field.value
-                      ) : (
-                        <FormattedMessage defaultMessage="Select currency" id="collective.curency.placeholder" />
-                      )}
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[50vh]">
-                      <Command>
-                        <CommandInput
-                          placeholder={intl.formatMessage({ defaultMessage: 'Search currencies...', id: 'fDMc8k' })}
-                          data-cy="organization-currency-search"
-                          ref={currencyInputRef}
-                        />
-                        <CommandList data-cy="organization-currency-list">
-                          <CommandEmpty>
-                            <FormattedMessage defaultMessage="No currency found." id="moOGSq" />
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {currencyOptions.map(({ value, label }) => (
-                              <CommandItem
-                                key={value}
-                                data-cy={`organization-country-${value}`}
-                                onSelect={() => {
-                                  setFieldValue(field.name, value as Currency);
-                                  setShowCurrencySelect(false);
-                                }}
-                              >
-                                <span>{label}</span>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </SelectContent>
-                  </Select>
+                    availableCurrencies={CurrencyOptions}
+                    value={field.value}
+                    // deepscan-disable-next-line
+                    onChange={value => {
+                      setFieldValue(field.name, value as Currency);
+                    }}
+                  />
                 )}
               </FormField>
             )}

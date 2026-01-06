@@ -59,9 +59,9 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
             }
             onClose={onClose}
           />
-
           <InfoList className="sm:grid-cols-2">
             <InfoListItem
+              className="sm:col-span-2"
               title={<FormattedMessage id="Tags.USER" defaultMessage="User" />}
               value={<ActivityUser activity={activity} />}
             />

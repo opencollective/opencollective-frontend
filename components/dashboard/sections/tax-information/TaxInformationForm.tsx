@@ -9,7 +9,6 @@ import type { z } from 'zod';
 
 import { mergeName } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 
@@ -101,9 +100,9 @@ export const TaxInformationForm = ({
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const queryParams = { variables: { id: accountId }, context: API_V2_CONTEXT };
+  const queryParams = { variables: { id: accountId } };
   const { data, error, loading } = useQuery(accountTaxInformationQuery, queryParams);
-  const [submitLegalDocument] = useMutation(submitLegalDocumentMutation, { context: API_V2_CONTEXT });
+  const [submitLegalDocument] = useMutation(submitLegalDocumentMutation);
   const { LoggedInUser } = useLoggedInUser();
   const [hasPreviewModal, setHasPreviewModal] = React.useState(false);
   const [schema, setSchema] = React.useState(BaseFormSchema);

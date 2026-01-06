@@ -8,7 +8,7 @@ import { styled } from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose, isValidEmail } from '../lib/utils';
 
 import Body from '../components/Body';
@@ -278,6 +278,9 @@ const redeemPageQuery = gqlV1 /* GraphQL */ `
 
 const addRedeemPageData = graphql(redeemPageQuery, {
   skip: props => !props.collectiveSlug,
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const redeemPaymentMethodMutation = gqlV1 /* GraphQL */ `
@@ -291,6 +294,9 @@ const redeemPaymentMethodMutation = gqlV1 /* GraphQL */ `
 
 const addRedeemPaymentMethodMutation = graphql(redeemPaymentMethodMutation, {
   name: 'redeemPaymentMethod',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addGraphql = compose(addRedeemPageData, addRedeemPaymentMethodMutation);

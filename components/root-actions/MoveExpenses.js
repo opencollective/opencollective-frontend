@@ -5,7 +5,7 @@ import { FormattedDate, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -33,7 +33,7 @@ const moveExpensesMutation = gql`
 export default function MoveExpenses() {
   const intl = useIntl();
   const { toast } = useToast();
-  const [submitMoveExpenses] = useMutation(moveExpensesMutation, { context: API_V2_CONTEXT });
+  const [submitMoveExpenses] = useMutation(moveExpensesMutation);
 
   const [sourceAccount, setSourceAccount] = React.useState(null);
   const [destinationAccount, setDestinationAccount] = React.useState(null);

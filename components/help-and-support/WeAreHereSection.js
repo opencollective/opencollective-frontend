@@ -12,11 +12,7 @@ const WeAreHereIfYouWantToTalk = () => (
   <Flex flexDirection="column" px={3} alignItems="center" my="58px">
     <Box textAlign="center" mb="40px" width={['256px', '660px', '768px']}>
       <SectionTitle mb={3}>
-        <FormattedMessage
-          id="helpAndSupport.weAreHere"
-          defaultMessage="We’re here if you
-want to talk!"
-        />
+        <FormattedMessage id="helpAndSupport.weAreHere" defaultMessage="We’re here if you want to talk!" />
       </SectionTitle>
     </Box>
     <Flex flexDirection={['column', 'row']} alignItems="center">

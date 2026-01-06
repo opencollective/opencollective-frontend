@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { stripHTML } from '../lib/html';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -120,7 +120,6 @@ const updatePageSSRQueryHelpers = getSSRQueryHelpers({
   query: updatePageQuery,
   getPropsFromContext: ctx => pick(ctx.query, ['collectiveSlug', 'updateSlug']) as UpdatePageArgs,
   getVariablesFromContext: (ctx, props) => props,
-  context: API_V2_CONTEXT,
 });
 
 // next.js export

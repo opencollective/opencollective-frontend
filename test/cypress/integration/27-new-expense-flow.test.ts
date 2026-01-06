@@ -1,6 +1,8 @@
 /* eslint-disable prefer-arrow-callback */
 import * as cheerio from 'cheerio';
 
+import { Currency } from '../../../lib/graphql/types/v2/schema';
+
 import { randomSlug } from '../support/faker';
 
 describe('New expense flow', () => {
@@ -9,37 +11,44 @@ describe('New expense flow', () => {
   });
 
   describe('Invoices', () => {
-    commonScenarios('invoice');
+    describe('Create', () => {
+      commonScenarios('invoice');
 
-    describe('Taxes', function () {
-      it(`User can submit invoice expense with taxes`, function () {
-        const colSlug = randomSlug();
-        cy.createCollectiveV2({
-          skipApproval: true,
-          host: { slug: 'e2e-host' },
-          collective: {
-            slug: colSlug,
-            name: `${colSlug} - e2eHostedCollectiveWithVAT`,
-            location: { country: 'BE' },
-            settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
-          },
-        });
+      describe('Taxes', function () {
+        it(`User can submit invoice expense with taxes`, function () {
+          const colSlug = randomSlug();
+          cy.createCollectiveV2({
+            skipApproval: true,
+            host: { slug: 'e2e-host' },
+            collective: {
+              slug: colSlug,
+              name: `${colSlug} - e2eHostedCollectiveWithVAT`,
+              location: { country: 'BE' },
+              settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
+            },
+          });
 
-        cy.contains('New expense').click();
-        submitExpense({
-          expenseType: 'invoice',
-          accountSlug: colSlug,
-          payeeSlug: this.userSlug,
-          taxes: {
-            hasTax: true,
-          },
+          cy.contains('New expense').click();
+          submitExpense({
+            expenseType: 'invoice',
+            accountSlug: colSlug,
+            payeeSlug: this.userSlug,
+            taxes: {
+              hasTax: true,
+            },
+          });
         });
       });
+    });
+
+    describe('Edit', () => {
+      commonEditScenario('invoice');
     });
   });
 
   describe('Reimbursements', () => {
     commonScenarios('reimbursement');
+    commonEditScenario('reimbursement');
   });
 });
 
@@ -223,7 +232,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
         cy.contains('You have been invited to submit an expense').should('exist');
         cy.contains('Decline invitation').should('exist');
         cy.contains('Continue submission').click();
-        cy.contains('Sign In').click({ force: true });
+        cy.contains('Log In').click({ force: true });
         cy.location().its('pathname').should('eql', `/signin`);
         cy.location()
           .its('search')
@@ -255,7 +264,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       cy.contains('Continue submission').click();
       cy.contains(newUser).should('exist');
       cy.contains(`oc-test-${newUser}@opencollective.com`).should('exist');
-      cy.contains('Sign In').should('exist');
+      cy.contains('Log In').should('exist');
       fillNewPayoutMethod({
         type: 'OTHER',
         slug: randomSlug(),
@@ -599,6 +608,94 @@ function submitExpense(options: {
   cy.get('form').contains('button', 'Submit Expense').scrollIntoView().click();
   cy.contains('has been submitted successfully!').should('exist');
   cy.contains('button', 'View all expenses').click();
+}
+
+function commonEditScenario(expenseType: 'invoice' | 'reimbursement') {
+  describe(`Edit ${expenseType} expense`, function () {
+    let expense;
+
+    beforeEach(function () {
+      const payoutMethodSlug = randomSlug();
+      const userSlug = randomSlug();
+      cy.signup({
+        user: { name: userSlug, email: `oc-test-${userSlug}@opencollective.com` },
+        redirect: `/dashboard/${userSlug}/submitted-expenses?newExpenseFlowEnabled=true`,
+      });
+
+      cy.location('pathname').should('eq', `/dashboard/${userSlug}/submitted-expenses`, {
+        timeout: 30_000,
+      });
+
+      cy.createExpense({
+        userEmail: `oc-test-${userSlug}@opencollective.com`,
+        account: { slug: 'apex' },
+        payee: { slug: userSlug },
+        items: [{ description: 'Some stuff', amountV2: { valueInCents: 1000, currency: Currency.USD } }],
+        payoutMethod: {
+          type: 'OTHER',
+          name: payoutMethodSlug,
+          data: {
+            content: `My payout method ${payoutMethodSlug}`,
+            currency: 'USD',
+          },
+        },
+      }).then(createdExpense => {
+        expense = createdExpense;
+        cy.visit(`/apex/expenses/${expense.legacyId}?newExpenseFlowEnabled=true`);
+      });
+    });
+
+    it('Edits title', () => {
+      cy.getByDataCy('edit-expense-title-btn').click();
+      cy.get('input[name="description"]').type('{selectall}New title');
+      cy.get('form').contains('button', 'Save').click();
+      cy.getByDataCy('expense-description').should('have.text', 'New title');
+    });
+
+    it('Edits items', () => {
+      cy.getByDataCy('edit-expense-expenseDetails-btn').click();
+      cy.get('input[name="expenseItems.0.description"]').type('{selectall}New item description');
+
+      // Add an item for 100 EUR (on top of the existing $10)
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.get('input[name="expenseItems.1.description"]').type('{selectall}Item 2 description');
+      cy.get('input[name="expenseItems.1.incurredAt"]').type('2025-09-29');
+      cy.getByDataCy('input-expenseItems.1.amount.valueInCents-currency-picker').click();
+      cy.focused().should('have.attr', 'placeholder', 'Search...').type('EUR{enter}');
+      cy.get('input[name="expenseItems.1.amount.valueInCents"]').type('{selectall}100');
+
+      // USD should be selected by default
+      cy.get('[data-cy=reference-currency-option-USD] span[data-state="checked"]').should('exist');
+      cy.get('[data-cy=reference-currency-option-EUR]').click(); // Switch to EUR
+      cy.wait(50);
+
+      cy.get('form').contains('button', 'Save').click();
+      cy.checkToast({ variant: 'success', message: 'Expense edited' });
+
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(1) [data-cy=expense-summary-item-amount]').should(
+        'contain',
+        '€11.00 EUR',
+      );
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(1) [data-cy=expense-summary-item-amount]').should(
+        'contain',
+        '$10.00 USD',
+      );
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(2) [data-cy=expense-summary-item-amount]').should(
+        'contain',
+        '€100.00 EUR',
+      );
+
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(1) [data-cy=expense-summary-item-description]').should(
+        'have.text',
+        'New item description',
+      );
+      cy.get('[data-cy=expense-summary-item]:nth-of-type(2) [data-cy=expense-summary-item-description]').should(
+        'have.text',
+        'Item 2 description',
+      );
+      cy.getByDataCy('expense-items-total-amount').should('have.text', '€111.00 EUR');
+    });
+  });
 }
 
 function fillNewPayoutMethod(payoutMethod: {

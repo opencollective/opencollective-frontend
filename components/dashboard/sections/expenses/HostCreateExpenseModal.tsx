@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../../../lib/expenses';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   Account,
   Host,
@@ -75,7 +74,6 @@ const PayeeSelect = ({
 } & React.ComponentProps<typeof CollectivePickerAsync>) => {
   const intl = useIntl();
   const { data, loading } = useQuery(hostCreateExpenseModalPayeeSelectQuery, {
-    context: API_V2_CONTEXT,
     variables: { hostId: host.id, forAccount: getAccountReferenceInput(forAccount) },
   });
   const recommendedVendors = data?.host?.vendors?.nodes || [];
@@ -190,7 +188,7 @@ export const HostCreateExpenseModal = ({
 } & BaseModalProps) => {
   const intl = useIntl();
   const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(transactionsImportRow?.amount?.valueInCents));
-  const [createExpense, { client }] = useMutation(hostCreateExpenseMutation, { context: API_V2_CONTEXT });
+  const [createExpense, { client }] = useMutation(hostCreateExpenseMutation);
   const { toast } = useToast();
   const expenseTypeOptions = React.useMemo(
     () => SUPPORTED_EXPENSE_TYPES.map(value => getExpenseTypeOption(intl, value)),
@@ -279,8 +277,8 @@ export const HostCreateExpenseModal = ({
           {({ isSubmitting, setFieldValue, setFieldTouched, values }) => {
             const hasChangedAmount = Boolean(
               transactionsImportRow?.amount?.valueInCents &&
-                (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
-                  transactionsImportRow.amount.currency !== values.amount.currency),
+              (Math.abs(transactionsImportRow.amount.valueInCents) !== values.amount.valueInCents ||
+                transactionsImportRow.amount.currency !== values.amount.currency),
             );
 
             return (

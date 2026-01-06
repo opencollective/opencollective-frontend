@@ -8,7 +8,7 @@ import { useToast } from '../../components/ui/useToast';
 
 import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
-import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import { gql } from '../graphql/helpers';
 import type { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/schema';
 
 import { getMessageForRejectedDropzoneFiles } from './useImageUploader';
@@ -77,7 +77,7 @@ export const useGraphQLFileUploader = ({
   maxSize = undefined,
 }: useGraphQLFileUploaderProps) => {
   const [isUploading, setIsUploading] = React.useState(false);
-  const [callUploadFile] = useMutation(uploadFileMutation, { context: API_V2_CONTEXT });
+  const [callUploadFile] = useMutation(uploadFileMutation);
   const { toast } = useToast();
   const intl = useIntl();
 

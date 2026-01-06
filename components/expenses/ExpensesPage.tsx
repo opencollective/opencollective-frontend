@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { ExpensesPageQuery, HostDashboardExpensesQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
@@ -233,7 +232,6 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
 
   const { data, loading, refetch } = useQuery(expensesPageQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   React.useEffect(() => {

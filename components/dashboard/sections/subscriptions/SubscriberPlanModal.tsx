@@ -1,12 +1,11 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { compact, flatten, get, isNil, isPlainObject, omitBy, set } from 'lodash';
-import { useIntl } from 'react-intl';
+import { compact, flatten, get, isNil, isPlainObject, omitBy, set, startCase } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { SubscriberFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { omitDeep } from '@/lib/utils';
 
@@ -15,6 +14,7 @@ import { FormField } from '@/components/FormField';
 import { FormikZod } from '@/components/FormikZod';
 import InputAmount from '@/components/InputAmount';
 import MessageBox from '@/components/MessageBox';
+import { PlatformSubscriptionFeatureTitles } from '@/components/platform-subscriptions/constants';
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -23,7 +23,7 @@ import { Label } from '@/components/ui/Label';
 import { DefaultSelect } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/useToast';
 
-import { AVAILABLE_FEATURES, AVAILABLE_FEATURES_LABELS } from './common';
+import { AVAILABLE_FEATURES } from './common';
 import { availablePlansQuery, updateAccountPlatformSubscriptionMutation } from './queries';
 
 type SubscriberFormProps = {
@@ -72,10 +72,8 @@ const keysDeep = (obj: object, prefix?: string, omit?: string[]) =>
 const SubscriberForm = (props: SubscriberFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { data, loading } = useQuery(availablePlansQuery, { context: API_V2_CONTEXT });
-  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const { data, loading } = useQuery(availablePlansQuery);
+  const [updateSubscription, { loading: updating }] = useMutation(updateAccountPlatformSubscriptionMutation);
   const [disclaimerChecked, setDisclaimerChecked] = React.useState(false);
   const planOptions = data?.platformSubscriptionTiers.map(plan => ({
     value: plan.id,
@@ -216,7 +214,13 @@ const SubscriberForm = (props: SubscriberFormProps) => {
                     {({ field }) => (
                       <div className="flex items-center gap-2">
                         <Checkbox checked={field.value} onCheckedChange={value => setFieldValue(field.name, value)} />
-                        <Label className="text-sm font-normal">{AVAILABLE_FEATURES_LABELS[feature]}</Label>
+                        <Label className="text-sm font-normal">
+                          {PlatformSubscriptionFeatureTitles[feature] ? (
+                            <FormattedMessage {...PlatformSubscriptionFeatureTitles[feature]} />
+                          ) : (
+                            startCase(feature)
+                          )}
+                        </Label>
                       </div>
                     )}
                   </FormField>

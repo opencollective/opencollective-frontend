@@ -4,7 +4,7 @@ import { CheckCircle2Icon, Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 import theme from '../../lib/theme';
 
@@ -66,7 +66,6 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
   const { toast } = useToast();
 
   const [removeTwoFactorMethod, removing] = useMutation(RemoveTwoFactorAuthFromIndividualMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: props.individual.id,
@@ -78,7 +77,6 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
   });
 
   const [editTwoFactorMethod, editing] = useMutation(EditTwoFactorAuthenticationMethodMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       userTwoFactorMethod: {
         id: props.userTwoFactorMethod.id,

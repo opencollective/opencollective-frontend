@@ -24,6 +24,8 @@ export type Scalars = {
   JSON: { input: any; output: any; }
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { input: any; output: any; }
+  /** A reference to a KYC Verification */
+  KYCVerificationReferenceInput: { input: any; output: any; }
   /** The locale in the format of a BCP 47 (RFC 5646) standard string */
   Locale: { input: any; output: any; }
   /** A string that cannot be passed as an empty value */
@@ -87,7 +89,10 @@ export type Account = {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -95,6 +100,8 @@ export type Account = {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   /**
    * The internal database identifier of the collective (ie: 580)
    * @deprecated 2020-01-01: should only be used during the transition to GraphQL API v2.
@@ -225,6 +232,7 @@ export type AccountExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -285,6 +293,14 @@ export type AccountImageUrlArgs = {
 
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -302,6 +318,7 @@ export type AccountMemberOfArgs = {
   accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
@@ -332,6 +349,7 @@ export type AccountOAuthApplicationsArgs = {
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -343,6 +361,7 @@ export type AccountOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -783,6 +802,7 @@ export type AccountUpdateInput = {
   hostFeePercent?: InputMaybe<Scalars['Int']['input']>;
   /** The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['URL']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<LocationInput>;
   longDescription?: InputMaybe<Scalars['String']['input']>;
@@ -914,7 +934,7 @@ export type AccountWithParent = {
   parent?: Maybe<Account>;
 };
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscription = {
   legacyPlan: HostPlan;
   platformBilling: PlatformBilling;
@@ -923,7 +943,7 @@ export type AccountWithPlatformSubscription = {
 };
 
 
-/** An account that can be hosted by a Host */
+/** An account that can have a Platform Subscription */
 export type AccountWithPlatformSubscriptionPlatformBillingArgs = {
   billingPeriod?: InputMaybe<PlatformBillingPeriodInput>;
 };
@@ -1038,6 +1058,8 @@ export enum ActivityAndClassesType {
   ACCOUNTING_CATEGORIES_EDITED = 'ACCOUNTING_CATEGORIES_EDITED',
   ACTIVATED_COLLECTIVE_AS_HOST = 'ACTIVATED_COLLECTIVE_AS_HOST',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT = 'ACTIVATED_COLLECTIVE_AS_INDEPENDENT',
+  ACTIVATED_HOSTING = 'ACTIVATED_HOSTING',
+  ACTIVATED_MONEY_MANAGEMENT = 'ACTIVATED_MONEY_MANAGEMENT',
   ACTIVITIES_UPDATES = 'ACTIVITIES_UPDATES',
   ACTIVITY_ALL = 'ACTIVITY_ALL',
   ADDED_FUNDS_EDITED = 'ADDED_FUNDS_EDITED',
@@ -1052,6 +1074,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION = 'COLLECTIVE_CONVERTED_TO_ORGANIZATION',
   COLLECTIVE_CORE_MEMBER_ADDED = 'COLLECTIVE_CORE_MEMBER_ADDED',
   COLLECTIVE_CORE_MEMBER_EDITED = 'COLLECTIVE_CORE_MEMBER_EDITED',
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED = 'COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED',
@@ -1112,11 +1135,16 @@ export enum ActivityAndClassesType {
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
+  DEACTIVATED_HOSTING = 'DEACTIVATED_HOSTING',
+  DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSES = 'EXPENSES',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
   FUND_EVENTS = 'FUND_EVENTS',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
+  KYC_REQUESTED = 'KYC_REQUESTED',
+  KYC_REVOKED = 'KYC_REVOKED',
+  KYC_VERIFIED = 'KYC_VERIFIED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1138,6 +1166,7 @@ export enum ActivityAndClassesType {
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE = 'ORGANIZATION_CONVERTED_TO_COLLECTIVE',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
@@ -1166,6 +1195,7 @@ export enum ActivityAndClassesType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_OTP_REQUESTED = 'USER_OTP_REQUESTED',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   USER_RESET_PASSWORD = 'USER_RESET_PASSWORD',
@@ -1231,6 +1261,8 @@ export enum ActivityType {
   ACCOUNTING_CATEGORIES_EDITED = 'ACCOUNTING_CATEGORIES_EDITED',
   ACTIVATED_COLLECTIVE_AS_HOST = 'ACTIVATED_COLLECTIVE_AS_HOST',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT = 'ACTIVATED_COLLECTIVE_AS_INDEPENDENT',
+  ACTIVATED_HOSTING = 'ACTIVATED_HOSTING',
+  ACTIVATED_MONEY_MANAGEMENT = 'ACTIVATED_MONEY_MANAGEMENT',
   ACTIVITY_ALL = 'ACTIVITY_ALL',
   ADDED_FUNDS_EDITED = 'ADDED_FUNDS_EDITED',
   ADDED_FUND_TO_ORG = 'ADDED_FUND_TO_ORG',
@@ -1243,6 +1275,7 @@ export enum ActivityType {
   COLLECTIVE_COMMENT_CREATED = 'COLLECTIVE_COMMENT_CREATED',
   COLLECTIVE_CONTACT = 'COLLECTIVE_CONTACT',
   COLLECTIVE_CONVERSATION_CREATED = 'COLLECTIVE_CONVERSATION_CREATED',
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION = 'COLLECTIVE_CONVERTED_TO_ORGANIZATION',
   COLLECTIVE_CORE_MEMBER_ADDED = 'COLLECTIVE_CORE_MEMBER_ADDED',
   COLLECTIVE_CORE_MEMBER_EDITED = 'COLLECTIVE_CORE_MEMBER_EDITED',
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED = 'COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED',
@@ -1302,9 +1335,14 @@ export enum ActivityType {
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
+  DEACTIVATED_HOSTING = 'DEACTIVATED_HOSTING',
+  DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
+  KYC_REQUESTED = 'KYC_REQUESTED',
+  KYC_REVOKED = 'KYC_REVOKED',
+  KYC_VERIFIED = 'KYC_VERIFIED',
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
@@ -1326,6 +1364,7 @@ export enum ActivityType {
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE = 'ORGANIZATION_CONVERTED_TO_COLLECTIVE',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
   PAYMENT_CREDITCARD_EXPIRING = 'PAYMENT_CREDITCARD_EXPIRING',
   PAYMENT_FAILED = 'PAYMENT_FAILED',
@@ -1353,6 +1392,7 @@ export enum ActivityType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_OTP_REQUESTED = 'USER_OTP_REQUESTED',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   USER_RESET_PASSWORD = 'USER_RESET_PASSWORD',
@@ -1573,7 +1613,10 @@ export type Bot = Account & {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -1581,6 +1624,8 @@ export type Bot = Account & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -1707,6 +1752,7 @@ export type BotExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -1767,6 +1813,14 @@ export type BotImageUrlArgs = {
 
 
 /** This represents a Bot account */
+export type BotKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents a Bot account */
 export type BotLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -1788,6 +1842,7 @@ export type BotMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -1821,6 +1876,7 @@ export type BotOAuthApplicationsArgs = {
 
 /** This represents a Bot account */
 export type BotOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1832,6 +1888,7 @@ export type BotOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2101,7 +2158,10 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -2109,6 +2169,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   legacyPlan: HostPlan;
   /** The legal documents associated with this account */
@@ -2267,6 +2329,7 @@ export type CollectiveExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -2341,6 +2404,14 @@ export type CollectiveImageUrlArgs = {
 
 
 /** This represents a Collective account */
+export type CollectiveKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents a Collective account */
 export type CollectiveLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -2362,6 +2433,7 @@ export type CollectiveMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -2395,6 +2467,7 @@ export type CollectiveOAuthApplicationsArgs = {
 
 /** This represents a Collective account */
 export type CollectiveOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2406,6 +2479,7 @@ export type CollectiveOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2628,6 +2702,7 @@ export type CollectiveFeatures = {
   EXPENSE_SECURITY_CHECKS?: Maybe<CollectiveFeatureStatus>;
   FUNDS_GRANTS_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
   HOST_DASHBOARD?: Maybe<CollectiveFeatureStatus>;
+  KYC?: Maybe<CollectiveFeatureStatus>;
   MULTI_CURRENCY_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   OFF_PLATFORM_TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
   ORDER?: Maybe<CollectiveFeatureStatus>;
@@ -2639,7 +2714,6 @@ export type CollectiveFeatures = {
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
-  RESTRICTED_FUNDS?: Maybe<CollectiveFeatureStatus>;
   STRIPE_PAYMENT_INTENT?: Maybe<CollectiveFeatureStatus>;
   TAX_FORMS?: Maybe<CollectiveFeatureStatus>;
   TEAM?: Maybe<CollectiveFeatureStatus>;
@@ -2720,8 +2794,8 @@ export type CommentUpdateInput = {
   id: Scalars['String']['input'];
 };
 
-export type CommunityAssociatedCollective = {
-  __typename?: 'CommunityAssociatedCollective';
+export type CommunityAssociatedAccount = {
+  __typename?: 'CommunityAssociatedAccount';
   account?: Maybe<Account>;
   relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
 };
@@ -2739,7 +2813,8 @@ export enum CommunityRelationType {
 export type CommunityStats = {
   __typename?: 'CommunityStats';
   activities?: Maybe<ActivityCollection>;
-  associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedCollective>>>;
+  associatedCollectives?: Maybe<Array<Maybe<CommunityAssociatedAccount>>>;
+  associatedOrganizations?: Maybe<Array<Maybe<CommunityAssociatedAccount>>>;
   firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   relations: Array<Maybe<CommunityRelationType>>;
@@ -2755,9 +2830,15 @@ export type CommunityStatsActivitiesArgs = {
 export type CommunityTransactionSummary = {
   __typename?: 'CommunityTransactionSummary';
   contributionCount: Scalars['Int']['output'];
+  contributionCountAcc: Scalars['Int']['output'];
   contributionTotal: Amount;
+  contributionTotalAcc: Amount;
   expenseCount: Scalars['Int']['output'];
+  expenseCountAcc: Scalars['Int']['output'];
   expenseTotal: Amount;
+  expenseTotalAcc: Amount;
+  orderCount: Scalars['Int']['output'];
+  orderCountAcc: Scalars['Int']['output'];
   year: Scalars['Int']['output'];
 };
 
@@ -4194,7 +4275,10 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -4202,6 +4286,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -4364,6 +4450,7 @@ export type EventExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -4438,6 +4525,14 @@ export type EventImageUrlArgs = {
 
 
 /** This represents an Event account */
+export type EventKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Event account */
 export type EventLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -4459,6 +4554,7 @@ export type EventMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -4492,6 +4588,7 @@ export type EventOAuthApplicationsArgs = {
 
 /** This represents an Event account */
 export type EventOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4503,6 +4600,7 @@ export type EventOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -4832,6 +4930,13 @@ export type ExpenseValidateTransferRequirementsArgs = {
   details?: InputMaybe<Scalars['JSON']['input']>;
 };
 
+export type ExpenseActivityFilter = {
+  /** Activities triggered by this individual */
+  individual?: InputMaybe<AccountReferenceInput>;
+  /** The type(s) of activities to filter by */
+  type?: InputMaybe<Array<ActivityType>>;
+};
+
 /** Fields for an expense's attached file */
 export type ExpenseAttachedFile = {
   __typename?: 'ExpenseAttachedFile';
@@ -5123,6 +5228,8 @@ export type ExpensePermissions = {
   canHold: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as incomplete */
   canMarkAsIncomplete: Scalars['Boolean']['output'];
+  /** Whether the current user can mark this expense as paid */
+  canMarkAsPaid: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as spam */
   canMarkAsSpam: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as unpaid */
@@ -5159,6 +5266,7 @@ export type ExpensePermissions = {
   editType: Permission;
   hold: Permission;
   id: Scalars['String']['output'];
+  markAsPaid: Permission;
   markAsSpam: Permission;
   markAsUnpaid: Permission;
   pay: Permission;
@@ -5468,7 +5576,10 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -5476,6 +5587,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -5630,6 +5743,7 @@ export type FundExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -5704,6 +5818,14 @@ export type FundImageUrlArgs = {
 
 
 /** This represents an Project account */
+export type FundKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Project account */
 export type FundLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -5725,6 +5847,7 @@ export type FundMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -5758,6 +5881,7 @@ export type FundOAuthApplicationsArgs = {
 
 /** This represents an Project account */
 export type FundOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5769,6 +5893,7 @@ export type FundOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6105,7 +6230,10 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   isFirstPartyHost: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -6116,6 +6244,8 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   isTrustedHost: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   legacyPlan: HostPlan;
   /** The legal documents associated with this account */
@@ -6329,6 +6459,7 @@ export type HostExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -6510,6 +6641,14 @@ export type HostImageUrlArgs = {
 
 
 /** This represents an Host account */
+export type HostKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Host account */
 export type HostLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -6531,6 +6670,7 @@ export type HostMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -6577,6 +6717,7 @@ export type HostOffPlatformTransactionsArgs = {
 
 /** This represents an Host account */
 export type HostOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6588,6 +6729,7 @@ export type HostOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7182,7 +7324,10 @@ export type Individual = Account & {
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   isGuest: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -7190,6 +7335,12 @@ export type Individual = Account & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** Verified KYC status, if any */
+  kycStatus: KycStatus;
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
+  /** KYC Verification requests to this account */
+  kycVerifications: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -7232,6 +7383,7 @@ export type Individual = Account & {
   policies: Policies;
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']['output']>;
+  requiresProfileCompletion?: Maybe<Scalars['Boolean']['output']>;
   settings: Scalars['JSON']['output'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String']['output'];
@@ -7334,6 +7486,7 @@ export type IndividualExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -7400,6 +7553,28 @@ export type IndividualIsFollowingConversationArgs = {
 
 
 /** This represents an Individual account */
+export type IndividualKycStatusArgs = {
+  requestedByAccount: AccountReferenceInput;
+};
+
+
+/** This represents an Individual account */
+export type IndividualKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Individual account */
+export type IndividualKycVerificationsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  requestedByAccounts?: InputMaybe<Array<AccountReferenceInput>>;
+};
+
+
+/** This represents an Individual account */
 export type IndividualLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -7421,6 +7596,7 @@ export type IndividualMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -7461,6 +7637,7 @@ export type IndividualOAuthAuthorizationsArgs = {
 
 /** This represents an Individual account */
 export type IndividualOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -7472,6 +7649,7 @@ export type IndividualOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7649,6 +7827,74 @@ export type InviteMemberInput = {
   since?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export enum KycProvider {
+  MANUAL = 'MANUAL'
+}
+
+export type KycProviderData = ManualKycProviderData;
+
+/** A individual KYC verified status */
+export type KycStatus = {
+  __typename?: 'KYCStatus';
+  manual?: Maybe<KycVerification>;
+};
+
+/** A KYC Verification */
+export type KycVerification = {
+  __typename?: 'KYCVerification';
+  /** The account that is verified */
+  account: Account;
+  /** The user who added this account to the KYC verification list */
+  createdByUser?: Maybe<Account>;
+  /** Unique identifier for this KYC verification */
+  id: Scalars['String']['output'];
+  permissions: KycVerificationPermissions;
+  /** Provider used to make this KYC verification */
+  provider: KycProvider;
+  /** Provider specific data */
+  providerData: KycProviderData;
+  requestedAt: Scalars['DateTime']['output'];
+  /** The account that requested the KYC verification */
+  requestedByAccount: Account;
+  revokedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: KycVerificationStatus;
+  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Verified KYC data */
+  verifiedData: KycVerifiedData;
+};
+
+export type KycVerificationCollection = Collection & {
+  __typename?: 'KYCVerificationCollection';
+  limit?: Maybe<Scalars['Int']['output']>;
+  nodes?: Maybe<Array<KycVerification>>;
+  offset?: Maybe<Scalars['Int']['output']>;
+  totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+/** KYC Verification permissions */
+export type KycVerificationPermissions = {
+  __typename?: 'KYCVerificationPermissions';
+  /** Whether this KYC Verification can be revoked by the logged in user */
+  canRevokeKYCVerification: Scalars['Boolean']['output'];
+};
+
+export enum KycVerificationStatus {
+  EXPIRED = 'EXPIRED',
+  FAILED = 'FAILED',
+  PENDING = 'PENDING',
+  REVOKED = 'REVOKED',
+  VERIFIED = 'VERIFIED'
+}
+
+/** Verified KYC data */
+export type KycVerifiedData = {
+  __typename?: 'KYCVerifiedData';
+  /** Account legal address as verified by KYC */
+  legalAddress?: Maybe<Scalars['String']['output']>;
+  /** Account legal name as verified by KYC */
+  legalName?: Maybe<Scalars['String']['output']>;
+};
+
 /** Defines role of the last comment author */
 export enum LastCommentBy {
   /** Collective Admin */
@@ -7763,6 +8009,13 @@ export type Maximum_Virtual_Card_Limit_Amount_For_Interval = {
   PER_AUTHORIZATION?: Maybe<Amount>;
   WEEKLY?: Maybe<Amount>;
   YEARLY?: Maybe<Amount>;
+};
+
+/** Manual KYC data */
+export type ManualKycProviderData = {
+  __typename?: 'ManualKYCProviderData';
+  /** Notes added during manual verification */
+  notes: Scalars['String']['output'];
 };
 
 export enum MarkAsUnPaidExpenseStatus {
@@ -7924,6 +8177,10 @@ export type Mutation = {
   connectGoCardlessAccount: GoCardlessConnectAccountResponse;
   /** Connect a Plaid account */
   connectPlaidAccount: PlaidConnectAccountResponse;
+  /** Convert an account to an Organization. Scope: "account". */
+  convertAccountToOrganization: Account;
+  /** Convert an Organization to a Collective. Scope: "account". */
+  convertOrganizationToCollective: Collective;
   /** Convert an organization to a vendor */
   convertOrganizationToVendor: Vendor;
   createApplication?: Maybe<Application>;
@@ -8031,6 +8288,8 @@ export type Mutation = {
   editMember: Member;
   /** Edit an existing member invitation of the Collective. Scope: "account". */
   editMemberInvitation?: Maybe<MemberInvitation>;
+  /** Convert an account to an Organization. Scope: "account". */
+  editOrganizationMoneyManagementAndHosting: Organization;
   editPayoutMethod: PayoutMethod;
   /** To edit a pending order. Scope: "orders". */
   editPendingOrder: Order;
@@ -8060,6 +8319,8 @@ export type Mutation = {
   importTransactions: TransactionsImport;
   /** Invite a new member to the Collective. Scope: "account". */
   inviteMember: MemberInvitation;
+  /** Creates and invites admins to an existing Account. Scope: "account". */
+  inviteMembers: Array<MemberInvitation>;
   /** [Root only] Merge two accounts, returns the result account */
   mergeAccounts: MergeAccountsResponse;
   /** Moves an expense from one account within a Collective to another */
@@ -8102,6 +8363,8 @@ export type Mutation = {
   removeTwoFactorAuthTokenFromIndividual: Individual;
   /** Endpoint to accept or reject an invitation to become a member. Scope: "account". */
   replyToMemberInvitation: Scalars['Boolean']['output'];
+  /** Requests an account to be verified using a KYC provider */
+  requestKYCVerification: KycVerification;
   /** Request Virtual Card to host. Scope: "virtualCards". */
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
@@ -8110,6 +8373,8 @@ export type Mutation = {
   restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
+  /** Revoke the KYC Verification */
+  revokeKYCVerification: KycVerification;
   /** Revoke an OAuth authorization. Scope: "account". */
   revokeOAuthAuthorization: OAuthAuthorization;
   /** [Root only] Anonymizes an account */
@@ -8311,6 +8576,20 @@ export type MutationConnectPlaidAccountArgs = {
 
 
 /** This is the root mutation */
+export type MutationConvertAccountToOrganizationArgs = {
+  account: AccountReferenceInput;
+  hasMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
+  legalName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationConvertOrganizationToCollectiveArgs = {
+  organization: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationConvertOrganizationToVendorArgs = {
   host: AccountReferenceInput;
   organization: AccountReferenceInput;
@@ -8409,7 +8688,8 @@ export type MutationCreateOrderArgs = {
 /** This is the root mutation */
 export type MutationCreateOrganizationArgs = {
   captcha?: InputMaybe<CaptchaInputType>;
-  financiallyActive?: InputMaybe<Scalars['Boolean']['input']>;
+  hasHosting?: InputMaybe<Scalars['Boolean']['input']>;
+  hasMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
   individual?: InputMaybe<IndividualCreateInput>;
   inviteMembers?: InputMaybe<Array<InputMaybe<InviteMemberInput>>>;
   organization: OrganizationCreateInput;
@@ -8746,6 +9026,14 @@ export type MutationEditMemberInvitationArgs = {
 
 
 /** This is the root mutation */
+export type MutationEditOrganizationMoneyManagementAndHostingArgs = {
+  hasHosting?: InputMaybe<Scalars['Boolean']['input']>;
+  hasMoneyManagement?: InputMaybe<Scalars['Boolean']['input']>;
+  organization: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationEditPayoutMethodArgs = {
   payoutMethod: PayoutMethodInput;
 };
@@ -8856,6 +9144,13 @@ export type MutationInviteMemberArgs = {
   memberAccount: AccountReferenceInput;
   role: MemberRole;
   since?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationInviteMembersArgs = {
+  account: AccountReferenceInput;
+  members: Array<InviteMemberInput>;
 };
 
 
@@ -9013,6 +9308,15 @@ export type MutationReplyToMemberInvitationArgs = {
 
 
 /** This is the root mutation */
+export type MutationRequestKycVerificationArgs = {
+  provider: KycProvider;
+  request: RequestKycVerificationInput;
+  requestedByAccount: AccountReferenceInput;
+  verifyAccount: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationRequestVirtualCardArgs = {
   account: AccountReferenceInput;
   budget?: InputMaybe<Scalars['Int']['input']>;
@@ -9038,6 +9342,12 @@ export type MutationRestorePayoutMethodArgs = {
 /** This is the root mutation */
 export type MutationResumeVirtualCardArgs = {
   virtualCard: VirtualCardReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationRevokeKycVerificationArgs = {
+  kycVerification: Scalars['KYCVerificationReferenceInput']['input'];
 };
 
 
@@ -9690,6 +10000,10 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   feed?: Maybe<Array<Maybe<Activity>>>;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']['output']>;
+  /** Returns whether the account has hosting activated. */
+  hasHosting: Scalars['Boolean']['output'];
+  /** Returns whether the account has money management activated. */
+  hasMoneyManagement: Scalars['Boolean']['output'];
   /** Returns true if the account has started the process to resume contributions */
   hasResumeContributionsProcessStarted: Scalars['Boolean']['output'];
   /** If the organization is a host account, this will return the matching Host object */
@@ -9706,7 +10020,10 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -9714,6 +10031,8 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   legacyPlan: HostPlan;
   /** The legal documents associated with this account */
@@ -9875,6 +10194,7 @@ export type OrganizationExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -9935,6 +10255,14 @@ export type OrganizationImageUrlArgs = {
 
 
 /** This represents an Organization account */
+export type OrganizationKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Organization account */
 export type OrganizationLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -9956,6 +10284,7 @@ export type OrganizationMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -9989,6 +10318,7 @@ export type OrganizationOAuthApplicationsArgs = {
 
 /** This represents an Organization account */
 export type OrganizationOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10000,6 +10330,7 @@ export type OrganizationOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10170,7 +10501,7 @@ export type OrganizationCreateInput = {
   /** Two-letters country code following ISO31661 */
   countryISO?: InputMaybe<Scalars['String']['input']>;
   currency?: InputMaybe<Currency>;
-  description: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
   /** The profile avatar image */
   image?: InputMaybe<Scalars['Upload']['input']>;
   legalName?: InputMaybe<Scalars['String']['input']>;
@@ -10239,6 +10570,7 @@ export type PaymentMethod = {
 
 /** PaymentMethod model */
 export type PaymentMethodOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10250,6 +10582,7 @@ export type PaymentMethodOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10400,6 +10733,8 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
+  /** Whether this payout method can be archived */
+  canBeArchived?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be deleted or only archived */
   canBeDeleted?: Maybe<Scalars['Boolean']['output']>;
   /** Whether this payout method can be edited */
@@ -10746,7 +11081,6 @@ export type PlatformSubscriptionFeatures = {
   RECEIVE_EXPENSES: Scalars['Boolean']['output'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['output'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['output'];
-  RESTRICTED_FUNDS: Scalars['Boolean']['output'];
   TAX_FORMS: Scalars['Boolean']['output'];
   TRANSFERWISE: Scalars['Boolean']['output'];
   UPDATES: Scalars['Boolean']['output'];
@@ -10767,7 +11101,6 @@ export type PlatformSubscriptionFeaturesFeatures = {
   RECEIVE_EXPENSES: Scalars['Boolean']['input'];
   RECEIVE_FINANCIAL_CONTRIBUTIONS: Scalars['Boolean']['input'];
   RECEIVE_HOST_APPLICATIONS: Scalars['Boolean']['input'];
-  RESTRICTED_FUNDS: Scalars['Boolean']['input'];
   TAX_FORMS: Scalars['Boolean']['input'];
   TRANSFERWISE: Scalars['Boolean']['input'];
   UPDATES: Scalars['Boolean']['input'];
@@ -11036,7 +11369,10 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -11044,6 +11380,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -11200,6 +11538,7 @@ export type ProjectExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -11274,6 +11613,14 @@ export type ProjectImageUrlArgs = {
 
 
 /** This represents an Project account */
+export type ProjectKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents an Project account */
 export type ProjectLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -11295,6 +11642,7 @@ export type ProjectMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -11328,6 +11676,7 @@ export type ProjectOAuthApplicationsArgs = {
 
 /** This represents an Project account */
 export type ProjectOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11339,6 +11688,7 @@ export type ProjectOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -11650,7 +12000,6 @@ export type QueryCollectiveArgs = {
 /** This is the root query */
 export type QueryCommunityArgs = {
   account?: InputMaybe<AccountReferenceInput>;
-  email?: InputMaybe<Scalars['EmailAddress']['input']>;
   host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -11704,6 +12053,7 @@ export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -11806,6 +12156,7 @@ export type QueryOrderArgs = {
 /** This is the root query */
 export type QueryOrdersArgs = {
   account?: InputMaybe<AccountReferenceInput>;
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11817,6 +12168,7 @@ export type QueryOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
@@ -12067,6 +12419,16 @@ export enum RefundKind {
   /** Rejection issued by the host or collective admin */
   REJECT = 'REJECT'
 }
+
+export type RequestKycVerificationInput = {
+  manual?: InputMaybe<RequestManualKycVerificationInput>;
+};
+
+export type RequestManualKycVerificationInput = {
+  legalAddress: Scalars['String']['input'];
+  legalName: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type SearchResponse = {
   __typename?: 'SearchResponse';
@@ -12889,10 +13251,7 @@ export type TransactionsImport = {
    * @deprecated 2025-07-02: Please use the generic accounts field instead.
    */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
-  /**
-   * List of rows in the import
-   * @deprecated 2025-04-29: Please use `host.offPlatformTransactions` instead.
-   */
+  /** List of rows in the import */
   rows: TransactionsImportRowCollection;
   /** Source of the import (e.g. "Bank of America", "Eventbrite", etc...) */
   source: Scalars['NonEmptyString']['output'];
@@ -13434,7 +13793,10 @@ export type Vendor = Account & AccountWithContributions & {
   isArchived: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
-  /** Returns whether the account is setup to Host collectives. */
+  /**
+   * Returns whether the account has money management activated.
+   * @deprecated 2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.
+   */
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
@@ -13442,6 +13804,8 @@ export type Vendor = Account & AccountWithContributions & {
   isSuspended: Scalars['Boolean']['output'];
   /** Whether the account is verified */
   isVerified: Scalars['Boolean']['output'];
+  /** KYC Verification requests made by this account */
+  kycVerificationRequests: KycVerificationCollection;
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -13596,6 +13960,7 @@ export type VendorExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  activity?: InputMaybe<ExpenseActivityFilter>;
   amount?: InputMaybe<AmountRangeInput>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
@@ -13656,6 +14021,14 @@ export type VendorImageUrlArgs = {
 
 
 /** This represents a Vendor account */
+export type VendorKycVerificationRequestsArgs = {
+  accounts?: InputMaybe<Array<AccountReferenceInput>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
+/** This represents a Vendor account */
 export type VendorLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
 };
@@ -13677,6 +14050,7 @@ export type VendorMemberOfArgs = {
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
   isApproved?: InputMaybe<Scalars['Boolean']['input']>;
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  isFrozen?: InputMaybe<Scalars['Boolean']['input']>;
   isHostAccount?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -13710,6 +14084,7 @@ export type VendorOAuthApplicationsArgs = {
 
 /** This represents a Vendor account */
 export type VendorOrdersArgs = {
+  accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   amount?: InputMaybe<AmountRangeInput>;
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -13721,6 +14096,7 @@ export type VendorOrdersArgs = {
   filter?: InputMaybe<AccountOrdersFilter>;
   frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   hostedAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;

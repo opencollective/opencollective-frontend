@@ -6,7 +6,8 @@ import { Plus, Trash } from 'lucide-react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
+import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -317,6 +318,9 @@ class CollectiveGoals extends React.Component {
 
 const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
   name: 'editCollectiveSettings',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 export default injectIntl(addEditCollectiveSettingsMutation(CollectiveGoals));

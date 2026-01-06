@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -159,7 +159,6 @@ const confirmOrderMutation = gql`
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   name: 'confirmOrder',
-  options: { context: API_V2_CONTEXT },
 });
 
 // next.js export

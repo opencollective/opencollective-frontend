@@ -2,8 +2,9 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { editCollectiveLongDescriptionMutation } from '../../../lib/graphql/v1/mutations';
+import { CollectiveType } from '@/lib/constants/collectives';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
+import { editCollectiveLongDescriptionMutation } from '@/lib/graphql/v1/mutations';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -29,6 +30,8 @@ const messages = defineMessages({
   },
 });
 
+const editCollectiveLongDescriptionMutationOptions = { context: API_V1_CONTEXT };
+
 /**
  * About section category with editable description
  */
@@ -43,6 +46,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
       <Container width="100%" maxWidth={700} margin="0 auto" mt={4}>
         <InlineEditField
           mutation={editCollectiveLongDescriptionMutation}
+          mutationOptions={editCollectiveLongDescriptionMutationOptions}
           values={collective}
           field="longDescription"
           canEdit={canEdit}

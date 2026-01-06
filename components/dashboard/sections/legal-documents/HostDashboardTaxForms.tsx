@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { HostTaxFormsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -32,6 +32,27 @@ import type { DashboardSectionProps } from '../../types';
 import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
+
+export const legalDocumentFields = gql`
+  fragment LegalDocumentFields on LegalDocument {
+    id
+    year
+    type
+    status
+    service
+    requestedAt
+    updatedAt
+    documentLink
+    isExpired
+    account {
+      id
+      name
+      slug
+      type
+      imageUrl(height: 128)
+    }
+  }
+`;
 
 const hostDashboardTaxFormsQuery = gql`
   query HostTaxForms(
@@ -62,26 +83,12 @@ const hostDashboardTaxFormsQuery = gql`
       ) {
         totalCount
         nodes {
-          id
-          year
-          type
-          status
-          service
-          requestedAt
-          updatedAt
-          documentLink
-          isExpired
-          account {
-            id
-            name
-            slug
-            type
-            imageUrl(height: 128)
-          }
+          ...LegalDocumentFields
         }
       }
     }
   }
+  ${legalDocumentFields}
 `;
 
 const NB_LEGAL_DOCUMENTS_DISPLAYED = 10;
@@ -145,12 +152,11 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
   });
   const { data, error, loading, refetch } = useQuery(hostDashboardTaxFormsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-    context: API_V2_CONTEXT,
   });
   const getActions = useLegalDocumentActions(data?.host, refetch, isUpgradeRequired);
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
       {isUpgradeRequired && <UpgradePlanCTA featureKey="TAX_FORMS" />}
       <Filterbar {...queryFilter} />

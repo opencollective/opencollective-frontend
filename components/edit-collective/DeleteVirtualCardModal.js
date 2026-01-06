@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
@@ -27,7 +27,6 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
     : {};
 
   const [deleteVirtualCard, { loading: isBusy }] = useMutation(deleteVirtualCardMutation, {
-    context: API_V2_CONTEXT,
     ...refetchOptions,
   });
 

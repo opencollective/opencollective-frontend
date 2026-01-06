@@ -12,7 +12,7 @@ import { track } from '../../lib/analytics/plausible';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { iconForSocialLinkType } from '../../lib/social-links';
@@ -558,7 +558,6 @@ const orderSuccessQuery = gql`
 
 const addOrderSuccessQuery = graphql(orderSuccessQuery, {
   options: props => ({
-    context: API_V2_CONTEXT,
     variables: { order: { id: props.router.query.OrderId } },
   }),
 });

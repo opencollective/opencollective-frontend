@@ -30,8 +30,7 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
-      cy.get('[data-cy="menu-item-Hosting"]').click();
-      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').should('be.visible').click();
       cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
@@ -55,8 +54,7 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
-      cy.get('[data-cy="menu-item-Hosting"]').click();
-      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').should('be.visible').click();
       cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
@@ -87,8 +85,7 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
-      cy.get('[data-cy="menu-item-Hosting"]').click();
-      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').should('be.visible').click();
       cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
@@ -100,7 +97,8 @@ describe('host dashboard', () => {
         cy.getByDataCy('more-actions-btn').click();
       });
       cy.getByDataCy('actions-add-funds').click();
-      cy.get('[data-cy="add-funds-amount"]').type('20');
+      cy.wait(300);
+      cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
       cy.contains(`@brusselstogetherasbl`).click();

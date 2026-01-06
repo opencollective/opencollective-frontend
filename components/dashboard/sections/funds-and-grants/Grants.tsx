@@ -6,7 +6,6 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import type { Account, Expense } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseType } from '../../../../lib/graphql/types/v2/schema';
@@ -106,7 +105,6 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
 
   const { data: metadata, refetch: refechMetadata } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
-    context: API_V2_CONTEXT,
   });
 
   const hostSlug = get(metadata, 'account.host.slug');
@@ -138,7 +136,6 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
       ...queryFilter.variables,
       type: ExpenseType.GRANT,
     },
-    context: API_V2_CONTEXT,
   });
 
   const pageRoute = `/dashboard/${accountSlug}/grants`;
@@ -186,7 +183,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
           }}
         />
       )}
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Grant requests" id="71LMx7" />}
           description={<FormattedMessage defaultMessage="Grant requests submitted to your account." id="qSe73a" />}

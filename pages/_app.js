@@ -9,6 +9,7 @@ import { StyleSheetManager, ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
+import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
@@ -117,7 +118,11 @@ class OpenCollectiveFrontendApp extends App {
     if (typeof window === 'undefined' && ctx.req.cookies.enableAuthSsr) {
       if (getTokenFromCookie(ctx.req)) {
         try {
-          const result = await apolloClient.query({ query: loggedInUserQuery, fetchPolicy: 'network-only' });
+          const result = await apolloClient.query({
+            query: loggedInUserQuery,
+            context: API_V1_CONTEXT,
+            fetchPolicy: 'network-only',
+          });
           props.LoggedInUserData = result.data.LoggedInUser;
         } catch (err) {
           Sentry.captureException(err);

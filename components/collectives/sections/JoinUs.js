@@ -144,7 +144,7 @@ const JoinUs = ({ page = undefined }) => (
 
       <Container ml={[null, null, null, 3, 6]}>
         <JoinUsActionContainer
-          link={page === 'becomeAHost' ? '/signup/organization' : '/create'}
+          link={page === 'becomeAHost' ? '/signup/organization?host=true' : '/signup/collective'}
           title={
             page === 'becomeAHost' ? (
               <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />

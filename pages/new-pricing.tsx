@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 
 import { getSSRQueryHelpers } from '@/lib/apollo-client';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type {
   PlatformSubscriptionTiersQuery,
   PlatformSubscriptionTiersQueryVariables,
@@ -13,7 +12,6 @@ import Page from '../components/Page';
 
 const pricingPageQueryHelpers = getSSRQueryHelpers({
   query: pricingPageQuery,
-  context: API_V2_CONTEXT,
   skipClientIfSSRThrows404: true,
 });
 
@@ -24,9 +22,7 @@ export const getServerSideProps = pricingPageQueryHelpers.getServerSideProps;
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function PricingPage() {
-  const { data } = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(pricingPageQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const { data } = useQuery<PlatformSubscriptionTiersQuery, PlatformSubscriptionTiersQueryVariables>(pricingPageQuery);
   return (
     <Page>
       <NewPricing data={data} />

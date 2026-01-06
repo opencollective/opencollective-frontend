@@ -16,7 +16,6 @@ import { z } from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
@@ -49,9 +48,12 @@ import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
+
+import { supportsBaseExpenseTypes } from './form/helper';
 
 export enum InviteeAccountType {
   INDIVIDUAL = 'INDIVIDUAL',
@@ -435,14 +437,7 @@ const formSchemaQuery = gql`
 
     accountingCategories(kind: EXPENSE) {
       nodes {
-        id
-        name
-        kind
-        expensesTypes
-        friendlyName
-        code
-        instructions
-        appliesTo
+        ...AccountingCategorySelectFields
       }
     }
   }
@@ -588,6 +583,7 @@ const formSchemaQuery = gql`
   }
 
   ${accountHoverCardFields}
+  ${AccountingCategorySelectFieldsFragment}
 `;
 
 type ExpenseFormOptions = {
@@ -627,6 +623,7 @@ type ExpenseFormOptions = {
   canSetupRecurrence?: boolean;
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
+  hasInvalidAccount?: boolean;
 };
 
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
@@ -641,7 +638,7 @@ const memoizedExpenseFormSchema = memoizeOne(
   async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
-      context: API_V2_CONTEXT,
+
       variables: variables,
       errorPolicy: 'all',
       fetchPolicy: refresh ? 'network-only' : 'cache-first',
@@ -690,7 +687,39 @@ function buildFormSchema(
       .nullish()
       .refine(slug => {
         return slug && !slug.startsWith('__');
-      }, requiredMessage),
+      }, requiredMessage)
+      .refine(
+        accountSlug => {
+          if (!accountSlug) {
+            return false;
+          }
+          if (!options.supportedExpenseTypes) {
+            return true;
+          }
+
+          if (
+            values.expenseTypeOption === ExpenseType.GRANT &&
+            !options.supportedExpenseTypes.includes(ExpenseType.GRANT)
+          ) {
+            return false;
+          }
+
+          if (
+            values.expenseTypeOption !== ExpenseType.GRANT &&
+            !supportsBaseExpenseTypes(options.supportedExpenseTypes)
+          ) {
+            return false;
+          }
+
+          return true;
+        },
+        () => ({
+          message: intl.formatMessage({
+            defaultMessage: 'The selected account does not support expense submissions.',
+            id: '6dZw2w',
+          }),
+        }),
+      ),
     payeeSlug: z
       .string()
       .nullish()
@@ -955,7 +984,7 @@ function buildFormSchema(
                 return true;
               }
 
-              return v > 0 && v < 1;
+              return v >= 0 && v < 1;
             },
             () => ({
               message: intl.formatMessage(
@@ -1244,16 +1273,7 @@ function buildFormSchema(
 
               return true;
             }, requiredMessage),
-          website: z
-            .string()
-            .nullish()
-            .refine(website => {
-              if (values.payeeSlug === '__invite' && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-                return !isEmpty(website);
-              }
-
-              return true;
-            }, requiredMessage),
+          website: z.string().nullish(),
           description: z
             .string()
             .nullish()
@@ -1409,8 +1429,11 @@ async function buildFormOptions(
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
 
-    if ((account?.supportedExpenseTypes ?? []).length > 0) {
+    if (account?.supportedExpenseTypes) {
       options.supportedExpenseTypes = account.supportedExpenseTypes;
+      if (!supportsBaseExpenseTypes(options.supportedExpenseTypes) && !query.loading) {
+        options.hasInvalidAccount = true;
+      }
     }
 
     if (query.data?.loggedInAccount) {
@@ -1653,7 +1676,6 @@ export function useExpenseForm(opts: {
     `,
     {
       context: {
-        ...API_V2_CONTEXT,
         headers: {
           'x-is-new-expense-flow': 'true',
         },
@@ -1678,7 +1700,6 @@ export function useExpenseForm(opts: {
     `,
     {
       context: {
-        ...API_V2_CONTEXT,
         headers: {
           'x-is-new-expense-flow': 'true',
         },
@@ -1697,7 +1718,6 @@ export function useExpenseForm(opts: {
     `,
     {
       context: {
-        ...API_V2_CONTEXT,
         headers: {
           'x-is-new-expense-flow': 'true',
         },
@@ -2154,6 +2174,19 @@ export function useExpenseForm(opts: {
     setFieldValue,
   ]);
 
+  // Reset expense type if the account does not support it (unless we're editing an existing one)
+  React.useEffect(() => {
+    if (
+      !initialLoading.current &&
+      expenseForm.values.expenseTypeOption &&
+      !formOptions.expense?.id &&
+      formOptions.supportedExpenseTypes &&
+      !formOptions.supportedExpenseTypes.includes(expenseForm.values.expenseTypeOption)
+    ) {
+      setFieldValue('expenseTypeOption', null);
+    }
+  }, [formOptions.supportedExpenseTypes, expenseForm.values.expenseTypeOption, formOptions.expense?.id, setFieldValue]);
+
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
       setFieldValue('accountingCategoryId', null);
@@ -2163,6 +2196,7 @@ export function useExpenseForm(opts: {
   // Reset reference currency if it's no longer in the available currencies
   React.useEffect(() => {
     if (
+      !initialLoading.current &&
       formOptions.availableReferenceCurrencies &&
       expenseForm.values.referenceCurrency &&
       !formOptions.availableReferenceCurrencies.includes(expenseForm.values.referenceCurrency as Currency)
@@ -2174,6 +2208,7 @@ export function useExpenseForm(opts: {
   // Set item currency if we're done loading and there's a single available reference currency
   React.useEffect(() => {
     if (
+      !initialLoading.current &&
       formOptions.availableReferenceCurrencies &&
       formOptions.availableReferenceCurrencies.length === 1 &&
       expenseForm.values.expenseItems.length === 1 &&
@@ -2246,9 +2281,7 @@ export function useExpenseForm(opts: {
               }
             }
           `,
-          context: {
-            ...API_V2_CONTEXT,
-          },
+          context: {},
           variables: {
             exchangeRateRequests,
           },

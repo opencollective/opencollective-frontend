@@ -2,7 +2,7 @@ import React from 'react';
 import { Query } from '@apollo/client/react/components';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { Separator } from './ui/Separator';
@@ -137,7 +137,7 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
         </DialogHeader>
         <Separator className="my-3" />
         <div className="px-0 pb-6">
-          <Query query={newsAndUpdatesQuery} context={API_V2_CONTEXT}>
+          <Query query={newsAndUpdatesQuery}>
             {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
           </Query>
         </div>

@@ -6,7 +6,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import SignInOrJoinFree from '../SignInOrJoinFree';
@@ -138,7 +138,6 @@ const createFundMutation = gql`
 
 const addCreateFundMutation = graphql(createFundMutation, {
   name: 'createFund',
-  options: { context: API_V2_CONTEXT },
 });
 
 export default withRouter(withUser(addCreateFundMutation(injectIntl(CreateFund))));

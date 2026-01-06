@@ -13,6 +13,7 @@ const dashboardAccountsQueryFields = gql`
     imageUrl(height: 96)
     isFrozen
     isActive
+    isArchived
     isHost
     tags
     settings

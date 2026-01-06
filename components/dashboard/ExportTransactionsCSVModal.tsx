@@ -23,7 +23,6 @@ import {
   HOST_OMITTED_FIELDS,
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
@@ -41,14 +40,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
-
-const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
-
-const TABS = Object.keys(GROUP_FIELDS).map(group => ({
-  id: group,
-  label: GROUPS[group] || group,
-  count: GROUP_FIELDS[group].length,
-}));
 
 const makeUrl = ({
   account,
@@ -257,10 +248,22 @@ const ExportTransactionsCSVModal = ({
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
 
-  const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] = useMutation(
-    editAccountSettingsMutation,
-    { context: API_V2_CONTEXT },
+  const totalAvailableFields = React.useMemo(
+    () => FIELDS.filter(({ id: fieldId }) => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))).length,
+    [isHostReport],
   );
+  const tabs = React.useMemo(
+    () =>
+      Object.keys(GROUP_FIELDS).map(group => ({
+        id: group,
+        label: GROUPS[group] || group,
+        count: GROUP_FIELDS[group].filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))).length,
+      })),
+    [isHostReport],
+  );
+
+  const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
+    useMutation(editAccountSettingsMutation);
 
   const customFields = React.useMemo(
     () =>
@@ -391,7 +394,12 @@ const ExportTransactionsCSVModal = ({
 
   const handleGroupSwitch = ({ name, checked }) => {
     if (checked) {
-      setFields(uniq([...fields, ...GROUP_FIELDS[name]]));
+      setFields(
+        uniq([
+          ...fields,
+          ...GROUP_FIELDS[name].filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId))),
+        ]),
+      );
     } else {
       setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
     }
@@ -463,7 +471,9 @@ const ExportTransactionsCSVModal = ({
   const isAboveRowLimit = exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
-  const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
+  const isWholeTabSelected = GROUP_FIELDS[tab]
+    ?.filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
+    .every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 
   return (
@@ -534,10 +544,10 @@ const ExportTransactionsCSVModal = ({
               <CollapsibleContent>
                 <h1 className="font-bold">
                   <FormattedMessage defaultMessage="Available fields" id="+Ct+Nd" />
-                  <small className="ml-1 text-base font-medium text-gray-700">({TOTAL_AVAILABLE_FIELDS})</small>
+                  <small className="ml-1 text-base font-medium text-gray-700">({totalAvailableFields})</small>
                 </h1>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-6">
-                  <Tabs variant="vertical" tabs={TABS} selectedId={tab} onChange={setTab} />
+                  <Tabs variant="vertical" tabs={tabs} selectedId={tab} onChange={setTab} />
                   <div className="flex flex-1 flex-col gap-3 rounded-lg border border-solid border-slate-100 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="font-bold">{GROUPS[tab] || tab}</div>
@@ -597,7 +607,7 @@ const ExportTransactionsCSVModal = ({
                       <FormattedMessage
                         defaultMessage="{n} out of {m}"
                         id="3uinDX"
-                        values={{ n: fields.length, m: TOTAL_AVAILABLE_FIELDS }}
+                        values={{ n: fields.length, m: totalAvailableFields }}
                       />
                       )
                     </small>

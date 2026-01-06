@@ -5,7 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import type { Account } from '../lib/graphql/types/v2/schema';
 import { MemberRole } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -45,7 +44,6 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: account.slug,
       },
@@ -63,7 +61,6 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: account.slug,
       },

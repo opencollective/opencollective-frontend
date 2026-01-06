@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
 import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
@@ -126,7 +125,6 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
     variables: { hostSlug, accountTypes },
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
-    context: API_V2_CONTEXT,
   });
 
   const pushSubpath = makePushSubpath(router);
@@ -182,7 +180,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
@@ -209,9 +207,13 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const hostedAccounts = data?.host?.hostedAccounts;
   const onClickRow = row => handleDrawer(row.original);
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+        title={<FormattedMessage id="Collectives" defaultMessage="Collectives" />}
+        className="mb-6"
+        description={
+          <FormattedMessage defaultMessage="Collectives you currently host or have hosted in the past." id="nTMHB4" />
+        }
         actions={
           <ExportHostedCollectivesCSVModal
             open={displayExportCSVModal}

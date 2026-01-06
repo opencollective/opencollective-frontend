@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 import { TwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 
@@ -139,7 +139,6 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
       recoveryCodes: string[];
     };
   }>(AddAuthenticatorAppToIndividualMutation, {
-    context: API_V2_CONTEXT,
     variables: {
       account: {
         id: props.individual.id,

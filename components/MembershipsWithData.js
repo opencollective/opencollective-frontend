@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Error from './Error';
@@ -163,6 +163,7 @@ const membershipsQuery = gqlV1 /* GraphQL */ `
 
 const addMembershipsData = graphql(membershipsQuery, {
   options: props => ({
+    context: API_V1_CONTEXT,
     variables: {
       memberCollectiveSlug: props.memberCollectiveSlug,
       offset: 0,

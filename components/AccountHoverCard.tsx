@@ -4,17 +4,18 @@ import type { Content } from '@radix-ui/react-hover-card';
 import { clsx } from 'clsx';
 import { get } from 'lodash';
 import type { LucideIcon } from 'lucide-react';
-import { Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
+import { BadgeCheck, Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
-import type { Amount } from '@/lib/graphql/types/v2/schema';
+import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
 
 import { DashboardContext } from './dashboard/DashboardContext';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
+import { kycStatusFields } from './kyc/graphql';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import { AccountTrustBadge } from './AccountTrustBadge';
@@ -28,6 +29,7 @@ export const accountHoverCardFields = gql`
   fragment AccountHoverCardFields on Account {
     id
     name
+    legalName
     slug
     type
     description
@@ -95,6 +97,8 @@ const userContextualMembershipsQuery = gql`
     $hostSlug: String
     $getHostAdmin: Boolean!
     $getAccountAdmin: Boolean!
+    $dashboardAccountSlug: String
+    $hasDashboardAccountSlug: Boolean!
   ) {
     account(slug: $userSlug) {
       id
@@ -122,8 +126,14 @@ const userContextualMembershipsQuery = gql`
           }
         }
       }
+      ... on Individual {
+        kycStatus(requestedByAccount: { slug: $dashboardAccountSlug }) @include(if: $hasDashboardAccountSlug) {
+          ...KYCStatusFields
+        }
+      }
     }
   }
+  ${kycStatusFields}
 `;
 
 const getInfoItems = (account): InfoItemProps[] => {
@@ -251,7 +261,11 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
         />
       ),
     })) || []),
-  ];
+    data?.account?.['kycStatus']?.manual?.status === KycVerificationStatus.VERIFIED && {
+      Icon: BadgeCheck,
+      info: 'KYC Verified',
+    },
+  ].filter(Boolean);
 };
 
 type InfoItemProps = {
@@ -275,6 +289,7 @@ export const AccountHoverCard = ({
 }: AccountHoverCardProps) => {
   const [open, setOpen] = React.useState(false);
   const context = React.useContext(DashboardContext);
+  const dashboardAccount = context?.account;
 
   const isIndividual = account ? isIndividualAccount(account) : false;
   const isVendor = account?.type === 'VENDOR';
@@ -293,11 +308,12 @@ export const AccountHoverCard = ({
       hostSlug,
       getHostAdmin: !!hostSlug,
       getAccountAdmin: !!accountSlug && accountSlug !== hostSlug, // Don't fetch account admin membership if the account is also the host
+      dashboardAccountSlug: dashboardAccount?.slug,
+      hasDashboardAccountSlug: !!dashboardAccount?.slug,
     },
     // Skip query if account is not an individual, if there no accountSlug or hostSlug in `includeAdminMembership`, or if the hover card is not open or hovered
     skip: !isIndividual || !account?.slug || !(accountSlug || hostSlug) || !(open || hasBeenHovered),
     fetchPolicy: 'cache-first',
-    context: API_V2_CONTEXT,
   });
 
   const handleMouseEnter = () => {

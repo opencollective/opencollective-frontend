@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -118,13 +118,13 @@ const BanAccountsWithSearch = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const { data, loading, error, refetch } = useQuery(searchQuery, {
     variables: { term: searchTerm },
-    context: API_V2_CONTEXT,
+
     skip: !searchTerm,
   });
   const [selectedAccounts, setSelectedAccounts] = React.useState([]);
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
-  const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation, { context: API_V2_CONTEXT });
+  const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccounts?.length);

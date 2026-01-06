@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 
 type PlatformSubscriptionCardProps = {
   subscription: PlatformSubscriptionFieldsFragment;
+  hasHosting: boolean;
 };
 
 export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
@@ -67,7 +68,11 @@ export function PlatformSubscriptionCard(props: PlatformSubscriptionCardProps) {
         </div>
 
         {(props.subscription.isCurrent || isExpanded) && (
-          <PlatformSubscriptionDetails className="p-4" subscription={props.subscription} />
+          <PlatformSubscriptionDetails
+            className="p-4"
+            subscription={props.subscription}
+            hasHosting={props.hasHosting}
+          />
         )}
       </div>
     </div>
@@ -79,50 +84,52 @@ export function PlatformSubscriptionDetails(props: PlatformSubscriptionCardProps
 
   return (
     <div className={clsx('flex flex-wrap gap-16', props.className)}>
-      <div className="flex gap-3">
-        <div>
-          <Shapes />
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center text-sm">
-            <b>
+      {props.hasHosting && (
+        <div className="flex gap-3">
+          <div>
+            <Shapes />
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center text-sm">
+              <b>
+                <FormattedMessage
+                  defaultMessage="{includedCount} Active Collectives"
+                  id="PQL55g"
+                  values={{
+                    includedCount: props.subscription.plan.pricing.includedCollectives,
+                  }}
+                />
+              </b>
+              &nbsp;
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info size={14} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <FormattedMessage
+                    defaultMessage="Active collectives have at least one ledger transaction in the billing period."
+                    id="j0U5jT"
+                  />
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="text-xs text-muted-foreground">
               <FormattedMessage
-                defaultMessage="{includedCount} Active Collectives"
-                id="PQL55g"
+                defaultMessage="{amount} / Collective after that"
+                id="vNN8Hw"
                 values={{
-                  includedCount: props.subscription.plan.pricing.includedCollectives,
+                  amount: (
+                    <FormattedMoneyAmount
+                      amount={props.subscription.plan.pricing.pricePerAdditionalCollective.valueInCents}
+                      currency={props.subscription.plan.pricing.pricePerAdditionalCollective.currency}
+                    />
+                  ),
                 }}
               />
-            </b>
-            &nbsp;
-            <Tooltip>
-              <TooltipTrigger>
-                <Info size={14} />
-              </TooltipTrigger>
-              <TooltipContent>
-                <FormattedMessage
-                  defaultMessage="Active collectives have at least one ledger transaction in the billing period."
-                  id="j0U5jT"
-                />
-              </TooltipContent>
-            </Tooltip>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="{amount} / Collective after that"
-              id="vNN8Hw"
-              values={{
-                amount: (
-                  <FormattedMoneyAmount
-                    amount={props.subscription.plan.pricing.pricePerAdditionalCollective.valueInCents}
-                    currency={props.subscription.plan.pricing.pricePerAdditionalCollective.currency}
-                  />
-                ),
-              }}
-            />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="flex gap-3">
         <div>

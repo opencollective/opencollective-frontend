@@ -231,9 +231,9 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
    * v1 or the api v2.
    */
   const httpLink = ApolloLink.split(
-    operation => operation.getContext().apiVersion === '2', // Routes the query to the proper client
-    apiV2Link,
+    operation => operation.getContext().apiVersion === '1', // Routes the query to the proper client
     apiV1Link,
+    apiV2Link,
   );
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);
@@ -253,6 +253,7 @@ function createInMemoryCache() {
       AccountWithParent: ['Event', 'Project'],
       AccountWithContributions: ['Collective', 'Organization', 'Event', 'Fund', 'Project', 'Host'],
       AccountWithPlatformSubscription: ['Organization', 'Collective'],
+      KYCProviderData: ['ManualKYCProviderData'],
     },
     // Documentation:
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#merging-non-normalized-objects
@@ -265,6 +266,180 @@ function createInMemoryCache() {
             },
           },
         },
+      },
+      // Add this for search results pagination
+      SearchResults: {
+        fields: {
+          accounts: {
+            keyArgs: false, // Don't separate cache by any args, we handle it manually
+            merge(existing, incoming, { args, variables }) {
+              // If no existing data or offset is 0, replace with incoming
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              // Check if the component explicitly requested infinite scroll behavior
+              // This is set via a special variable: __infiniteScroll: true
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                // Infinite scroll mode: append new results to existing ones
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              // Regular pagination mode: replace results
+              return incoming;
+            },
+          },
+          expenses: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          orders: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          transactions: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          updates: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          comments: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+          hostApplications: {
+            keyArgs: false,
+            merge(existing, incoming, { args, variables }) {
+              if (!existing || args?.offset === 0) {
+                return incoming;
+              }
+
+              const isInfiniteScroll = (variables as { __infiniteScroll?: boolean })?.__infiniteScroll === true;
+
+              if (isInfiniteScroll) {
+                return {
+                  ...incoming,
+                  highlights: { ...existing.highlights, ...incoming.highlights },
+                  collection: {
+                    ...incoming.collection,
+                    nodes: [...existing.collection.nodes, ...incoming.collection.nodes],
+                  },
+                };
+              }
+
+              return incoming;
+            },
+          },
+        },
+      },
+      Tier: {
+        keyFields: ['id'],
       },
     },
   });

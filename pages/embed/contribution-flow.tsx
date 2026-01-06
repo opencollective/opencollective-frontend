@@ -7,7 +7,6 @@ import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/schema';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -187,7 +186,6 @@ class EmbedContributionFlowPage extends React.Component<{
 const addContributionFlowData = graphql(contributionFlowAccountQuery, {
   options: (props: { collectiveSlug: string; tierId: number }) => ({
     variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
-    context: API_V2_CONTEXT,
   }),
 });
 

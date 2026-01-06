@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
@@ -7,29 +7,36 @@ import { z } from 'zod';
 
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Contributor } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 
+import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
+
 import Avatar from '../../../Avatar';
+import { CopyID } from '../../../CopyId';
+import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { emailFilter } from '../../filters/EmailFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
+import { searchFilter } from '../../filters/SearchFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
 import { ContributorDetails } from './AccountDetail';
 import { peopleHostDashboardQuery } from './queries';
+import { usePersonActions } from './usePersonActions';
 
 const RelationTypeSchema = isMulti(z.nativeEnum(CommunityRelationType)).optional();
 const relationTypeFilter: FilterConfig<z.infer<typeof RelationTypeSchema>> = {
@@ -51,7 +58,7 @@ const relationTypeFilter: FilterConfig<z.infer<typeof RelationTypeSchema>> = {
   },
 };
 
-const getColumns = ({ intl }) => {
+const getColumns = ({ intl, hasKYCFeature }) => {
   const account = {
     accessorKey: 'account',
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
@@ -61,7 +68,7 @@ const getColumns = ({ intl }) => {
       return (
         <div className="flex items-center text-nowrap">
           <Avatar size={24} collective={account} mr={2} />
-          {account.name}
+          {account.name || account.slug}
           {legalName && <span className="ml-1 text-muted-foreground">{`(${legalName})`}</span>}
         </div>
       );
@@ -73,7 +80,27 @@ const getColumns = ({ intl }) => {
     header: intl.formatMessage({ defaultMessage: 'Email', id: 'Email' }),
     cell: ({ cell }) => {
       const email = cell.getValue();
-      return email ? email : <span className="text-muted-foreground">—</span>;
+      return email ? (
+        <div className="flex items-center gap-1">
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <div className="max-w-[250px] truncate text-xs">{email}</div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="max-w-sm break-all">{email}</div>
+            </TooltipContent>
+          </Tooltip>
+          <CopyID
+            value={email}
+            tooltipLabel={intl.formatMessage({ defaultMessage: 'Copy to clipboard', id: 'Clipboard.Copy' })}
+            className="shrink-0"
+            stopEventPropagation
+            toastOnCopy
+          />
+        </div>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      );
     },
   };
 
@@ -98,7 +125,7 @@ const getColumns = ({ intl }) => {
 
   const relations = {
     accessorKey: 'relations',
-    header: intl.formatMessage({ defaultMessage: 'Relations', id: 'mn5pjI' }),
+    header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
     cell: ({ row }) => {
       const account = row.original;
       const relations =
@@ -106,7 +133,7 @@ const getColumns = ({ intl }) => {
           (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
         ) || [];
       return (
-        <div className="flex gap-1 align-middle">
+        <div className="flex flex-wrap gap-1 align-middle">
           {relations.map(role => (
             <div
               key={role}
@@ -120,7 +147,62 @@ const getColumns = ({ intl }) => {
     },
   };
 
-  return [account, email, country, relations];
+  const expenses = {
+    accessorKey: 'expenses',
+    header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
+    cell: ({ row }) => {
+      const account = row.original;
+      const summary = account?.communityStats?.transactionSummary?.[0];
+      const total = summary?.expenseTotalAcc;
+      const count = summary?.expenseCountAcc || 0;
+
+      if (!total || count === 0) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+
+      return (
+        <div className="text-sm">
+          <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+          <span className="ml-1 text-muted-foreground">({count})</span>
+        </div>
+      );
+    },
+  };
+
+  const contributions = {
+    accessorKey: 'contributions',
+    header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
+    cell: ({ row }) => {
+      const account = row.original;
+      const summary = account?.communityStats?.transactionSummary?.[0];
+      const total = summary?.contributionTotalAcc;
+      const count = summary?.contributionCountAcc || 0;
+
+      if (!total || count === 0) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+
+      return (
+        <div className="text-xs">
+          <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+          <span className="ml-1 text-muted-foreground">({count})</span>
+        </div>
+      );
+    },
+  };
+
+  let kycColumn = null;
+  if (hasKYCFeature) {
+    kycColumn = {
+      accessorKey: 'kycStatus',
+      header: 'KYC',
+      cell: ({ row }) => {
+        return <IndividualKYCStatus kycStatus={row.original.kycStatus} />;
+      },
+    };
+  }
+
+  return [account, email, kycColumn, country, relations, expenses, contributions, actionsColumn].filter(Boolean);
 };
 
 enum ContributorsTab {
@@ -175,16 +257,15 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       limit: integer.default(PAGE_SIZE),
       offset: integer.default(0),
       relation: relationTypeFilter.schema,
-      email: emailFilter.schema,
+      searchTerm: searchFilter.schema,
       account: z.string().optional(),
     }),
     toVariables: {
-      email: emailFilter.toVariables,
       account: hostedAccountFilter.toVariables,
     },
     filters: {
       relation: relationTypeFilter.filter,
-      email: emailFilter.filter,
+      searchTerm: searchFilter.filter,
       account: hostedAccountFilter.filter,
     },
     meta: { hostSlug: accountSlug },
@@ -199,21 +280,29 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
       slug: accountSlug,
       ...queryFilter.variables,
     },
-    context: API_V2_CONTEXT,
   });
 
   const contributors = data?.community?.nodes || [];
   const loading = queryLoading;
   const error = queryError;
 
-  const columns = React.useMemo(() => getColumns({ intl }), [intl, queryFilter.activeViewId]);
+  const { account: dashboardAccount } = useContext(DashboardContext);
+
+  const hasKYCFeature = isFeatureEnabled(dashboardAccount, FEATURES.KYC);
+
+  const getActions = usePersonActions({ accountSlug, hasKYCFeature });
+
+  const columns = React.useMemo(
+    () => getColumns({ intl, hasKYCFeature }),
+    [intl, queryFilter.activeViewId, hasKYCFeature],
+  );
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="People" defaultMessage="People" />}
         description={
-          <FormattedMessage id="People.Description" defaultMessage="People that interacted with your Fiscal Host" />
+          <FormattedMessage id="People.Description" defaultMessage="People that interacted with your organization." />
         }
       />
       <Filterbar {...queryFilter} />
@@ -232,6 +321,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
               pushSubpath(row.original.id as string);
             }}
             mobileTableView
+            getActions={getActions}
           />
           <Pagination queryFilter={queryFilter} total={data?.community?.totalCount} />
         </div>
@@ -244,10 +334,13 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   const router = useRouter();
   const pushSubpath = makePushSubpath(router);
   const id = subpath[0];
+  const { account } = useContext(DashboardContext);
 
   if (!isEmpty(id)) {
     return (
-      <ContributorDetails account={{ id: subpath[0] }} host={{ slug: accountSlug }} onClose={() => pushSubpath('')} />
+      <div className="h-full">
+        <ContributorDetails account={{ id: subpath[0] }} host={account} onClose={() => pushSubpath('')} />
+      </div>
     );
   }
 

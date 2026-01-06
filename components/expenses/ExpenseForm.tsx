@@ -30,7 +30,7 @@ import {
   validateExpenseTaxes,
 } from './lib/utils';
 import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
-import { FIRST_PARTY_HOSTS } from '@/lib/preview-features';
+import { OFICO_MEMBER_ORGANIZATIONS } from '@/lib/preview-features';
 
 import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
@@ -289,7 +289,7 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
 
 const checkOCREnabled = (router, host) => {
   const urlFlag = router.query.ocr && parseToBoolean(router.query.ocr);
-  return urlFlag !== false && FIRST_PARTY_HOSTS.includes(host?.slug);
+  return urlFlag !== false && OFICO_MEMBER_ORGANIZATIONS.includes(host?.slug);
 };
 
 const STYLED_CURRENCY_PICKER_STYLE = { menu: { width: '280px' } };
@@ -873,8 +873,8 @@ const ExpenseFormBody = ({
                       </div>
                       <p className="text-xs text-gray-500">
                         <FormattedMessage
-                          id="InvoiceReferenceDescription"
-                          defaultMessage="If the invoice being submitted has a reference number, add it here"
+                          defaultMessage="The unique identifier mentioned on your invoice"
+                          id="lct/39"
                         />
                       </p>
                       <Field

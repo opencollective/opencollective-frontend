@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDateFromValue, toIsoDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { RecurringExpenseIntervals, RecurringIntervalOptions } from '../../lib/i18n/expense';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -31,7 +31,7 @@ const deleteExpenseMutation = gql`
 
 const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   const { recurringExpense } = expense;
-  const [deleteExpense, { loading }] = useMutation(deleteExpenseMutation, { context: API_V2_CONTEXT });
+  const [deleteExpense, { loading }] = useMutation(deleteExpenseMutation);
   const { toast } = useToast();
   const intl = useIntl();
   const router = useRouter();

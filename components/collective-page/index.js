@@ -24,7 +24,6 @@ import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionOurTeam from './sections/OurTeam';
 import SectionProjects from './sections/Projects';
-import SectionRecurringContributions from './sections/RecurringContributions';
 import SectionParticipants from './sections/SponsorsAndParticipants';
 import SectionTopFinancialContributors from './sections/TopFinancialContributors';
 import SectionTransactions from './sections/Transactions';
@@ -146,10 +145,6 @@ class CollectivePage extends Component {
       case Sections.CONVERSATIONS:
         return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
 
-      case Sections.RECURRING_CONTRIBUTIONS:
-        return (
-          <SectionRecurringContributions slug={this.props.collective.slug} LoggedInUser={this.props.LoggedInUser} />
-        );
       case Sections.LOCATION:
         return <SectionLocation collective={this.props.collective} refetch={this.props.refetch} />;
 
@@ -235,6 +230,7 @@ class CollectivePage extends Component {
           <SectionConnectedCollectives
             collective={this.props.collective}
             connectedCollectives={this.props.connectedCollectives}
+            isAdmin={this.props.isAdmin}
           />
         );
       case Sections.TOP_FINANCIAL_CONTRIBUTORS:

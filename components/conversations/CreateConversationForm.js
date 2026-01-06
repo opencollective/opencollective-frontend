@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import EditTags from '../EditTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
@@ -31,8 +31,6 @@ const createConversationMutation = gql`
     }
   }
 `;
-
-const mutationOptions = { context: API_V2_CONTEXT };
 
 const messages = defineMessages({
   titlePlaceholder: {
@@ -73,7 +71,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const intl = useIntl();
   const { slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
-  const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
+  const [createConversation, { error: submitError }] = useMutation(createConversationMutation);
   const [formPersister] = React.useState(new FormPersister());
   const [uploading, setUploading] = React.useState(false);
 

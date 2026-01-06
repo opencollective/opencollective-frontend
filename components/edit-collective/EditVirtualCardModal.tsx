@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { Account, VirtualCard, VirtualCardRequest } from '../../lib/graphql/types/v2/schema';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -187,7 +187,6 @@ export default function EditVirtualCardModal({
   const { toast } = useToast();
 
   const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       slug: host.slug,
     },
@@ -199,12 +198,8 @@ export default function EditVirtualCardModal({
   const isEditing = virtualCard?.id ? true : false;
   const formMutation = isEditing ? editVirtualCardMutation : createVirtualCardMutation;
 
-  const [submitForm, { loading: isBusy }] = useMutation(formMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitForm, { loading: isBusy }] = useMutation(formMutation);
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
 
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);
@@ -307,7 +302,6 @@ export default function EditVirtualCardModal({
       };
     };
   }>(virtualCardsAssignedToCollectiveQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       collectiveSlug: formik.values?.collective?.slug,
       hostSlug: host.slug,

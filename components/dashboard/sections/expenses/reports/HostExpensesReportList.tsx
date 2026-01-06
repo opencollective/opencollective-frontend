@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import type {
   HostExpensesReportListQuery,
   HostExpensesReportListQueryVariables,
@@ -127,7 +126,6 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
       }
     `,
     {
-      context: API_V2_CONTEXT,
       variables: {
         accountSlug: props.accountSlug,
         ...queryFilter.variables,
@@ -213,7 +211,7 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Expense Reports" id="qC0ZXX" />}
           titleRoute={`/dashboard/${props.accountSlug}/reports/expenses`}

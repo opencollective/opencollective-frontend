@@ -259,9 +259,10 @@ interface Account {
   isActive: Boolean
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -323,6 +324,11 @@ interface Account {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
@@ -544,12 +550,22 @@ interface Account {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -814,6 +830,11 @@ interface Account {
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -1101,6 +1122,26 @@ interface Account {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
 }
 
 """
@@ -2906,9 +2947,10 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   isActive: Boolean
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -2982,6 +3024,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -2992,6 +3035,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -3227,12 +3275,22 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -3497,6 +3555,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -3769,6 +3832,26 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4587,7 +4670,7 @@ type AccountCollection implements Collection {
 }
 
 """
-An account that can be hosted by a Host
+An account that can have a Platform Subscription
 """
 interface AccountWithPlatformSubscription {
   """
@@ -4674,7 +4757,6 @@ type PlatformSubscriptionFeatures {
   EXPENSE_SECURITY_CHECKS: Boolean!
   EXPECTED_FUNDS: Boolean!
   CHARGE_HOSTING_FEES: Boolean!
-  RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
@@ -5271,6 +5353,23 @@ input PayoutMethodReferenceInput {
   id: String
 }
 
+enum HostContext {
+  """
+  Both the Host Organizations internal accounts and Hosted Collectives
+  """
+  ALL
+
+  """
+  Only the Host Organization (including its projects/events)
+  """
+  INTERNAL
+
+  """
+  Only Hosted Collectives (including their projects/events)
+  """
+  HOSTED
+}
+
 """
 The user or system that paused the order
 """
@@ -5410,6 +5509,168 @@ enum LastCommentBy {
   Collective Admin
   """
   COLLECTIVE_ADMIN
+}
+
+input ExpenseActivityFilter {
+  """
+  Activities triggered by this individual
+  """
+  individual: AccountReferenceInput
+
+  """
+  The type(s) of activities to filter by
+  """
+  type: [ActivityType!]
+}
+
+enum ActivityType {
+  ACTIVITY_ALL
+  ACCOUNTING_CATEGORIES_EDITED
+  CONNECTED_ACCOUNT_CREATED
+  CONNECTED_ACCOUNT_ERROR
+  CONNECTED_ACCOUNT_REMOVED
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  COLLECTIVE_EDITED
+  COLLECTIVE_DELETED
+  COLLECTIVE_UNHOSTED
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION
+  ORGANIZATION_COLLECTIVE_CREATED
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
+  COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
+  ORDER_COMMENT_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_INVITE_DECLINED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
+  COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
+  COLLECTIVE_VIRTUAL_CARD_ADDED
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_RESUMED
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
+  COLLECTIVE_VIRTUAL_CARD_DELETED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
+  COLLECTIVE_MEMBER_INVITED
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
+  COLLECTIVE_TRANSACTION_CREATED
+  TRANSACTIONS_IMPORT_CREATED
+  TRANSACTIONS_IMPORT_ROW_UPDATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_CONTACT
+  HOST_APPLICATION_CONTACT
+  HOST_APPLICATION_COMMENT_CREATED
+  CONTRIBUTION_REJECTED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
+  TICKET_CONFIRMED
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  ORDER_PENDING
+  ORDER_PENDING_CONTRIBUTION_NEW
+  ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_PROCESSING
+  ORDER_PROCESSED
+  ORDER_PAYMENT_FAILED
+  ORDER_REVIEW_OPENED
+  ORDER_REVIEW_CLOSED
+  ORDER_DISPUTE_CREATED
+  ORDER_DISPUTE_CLOSED
+  ORDER_UPDATED
+  ADDED_FUNDS_EDITED
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
+  ORDER_PENDING_EXPIRED
+  ORDERS_SUSPICIOUS
+  PAYMENT_FAILED
+  PAYMENT_CREDITCARD_CONFIRMATION
+  PAYMENT_CREDITCARD_EXPIRING
+  USER_CREATED
+  USER_NEW_TOKEN
+  USER_SIGNIN
+  USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
+  OAUTH_APPLICATION_AUTHORIZED
+  TWO_FACTOR_METHOD_ADDED
+  TWO_FACTOR_METHOD_DELETED
+  TWO_FACTOR_CODE_REQUESTED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY_REPORT
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_MONEY_MANAGEMENT
+  DEACTIVATED_MONEY_MANAGEMENT
+  ACTIVATED_HOSTING
+  DEACTIVATED_HOSTING
+  AGREEMENT_CREATED
+  AGREEMENT_EDITED
+  AGREEMENT_DELETED
+  PLATFORM_SUBSCRIPTION_UPDATED
+  PLATFORM_BILLING_OVERDUE_REMINDER
+  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION
+  ADDED_FUND_TO_ORG
+  COLLECTIVE_TRANSACTION_PAID
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
+  SUBSCRIPTION_CONFIRMED
+  COLLECTIVE_COMMENT_CREATED
+  ORDER_PENDING_CRYPTO
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  KYC_REQUESTED
+  KYC_REVOKED
+  KYC_VERIFIED
 }
 
 """
@@ -5726,6 +5987,11 @@ type PayoutMethod {
   Whether this payout method can be deleted or only archived
   """
   canBeDeleted: Boolean
+
+  """
+  Whether this payout method can be archived
+  """
+  canBeArchived: Boolean
 }
 
 """
@@ -5778,12 +6044,22 @@ type PaymentMethod {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -6709,12 +6985,12 @@ type CollectiveFeatures {
   EXPENSE_SECURITY_CHECKS: CollectiveFeatureStatus
   EXPECTED_FUNDS: CollectiveFeatureStatus
   CHARGE_HOSTING_FEES: CollectiveFeatureStatus
-  RESTRICTED_FUNDS: CollectiveFeatureStatus
   AGREEMENTS: CollectiveFeatureStatus
   TAX_FORMS: CollectiveFeatureStatus
   FUNDS_GRANTS_MANAGEMENT: CollectiveFeatureStatus
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
+  KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -6984,146 +7260,6 @@ type Activity {
   isSystem: Boolean!
 }
 
-enum ActivityType {
-  ACTIVITY_ALL
-  ACCOUNTING_CATEGORIES_EDITED
-  CONNECTED_ACCOUNT_CREATED
-  CONNECTED_ACCOUNT_ERROR
-  CONNECTED_ACCOUNT_REMOVED
-  COLLECTIVE_CREATED_GITHUB
-  COLLECTIVE_APPLY
-  COLLECTIVE_APPROVED
-  COLLECTIVE_REJECTED
-  COLLECTIVE_CREATED
-  COLLECTIVE_EDITED
-  COLLECTIVE_DELETED
-  COLLECTIVE_UNHOSTED
-  ORGANIZATION_COLLECTIVE_CREATED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
-  COLLECTIVE_CONVERSATION_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
-  CONVERSATION_COMMENT_CREATED
-  ORDER_COMMENT_CREATED
-  COLLECTIVE_EXPENSE_CREATED
-  COLLECTIVE_EXPENSE_DELETED
-  COLLECTIVE_EXPENSE_UPDATED
-  COLLECTIVE_EXPENSE_REJECTED
-  COLLECTIVE_EXPENSE_APPROVED
-  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
-  COLLECTIVE_EXPENSE_UNAPPROVED
-  COLLECTIVE_EXPENSE_MOVED
-  COLLECTIVE_EXPENSE_PAID
-  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
-  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
-  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
-  COLLECTIVE_EXPENSE_PROCESSING
-  COLLECTIVE_EXPENSE_PUT_ON_HOLD
-  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
-  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
-  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
-  COLLECTIVE_EXPENSE_ERROR
-  COLLECTIVE_EXPENSE_INVITE_DRAFTED
-  COLLECTIVE_EXPENSE_INVITE_DECLINED
-  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
-  COLLECTIVE_EXPENSE_MISSING_RECEIPT
-  TAXFORM_REQUEST
-  TAXFORM_RECEIVED
-  TAXFORM_INVALIDATED
-  COLLECTIVE_VIRTUAL_CARD_ADDED
-  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
-  COLLECTIVE_VIRTUAL_CARD_RESUMED
-  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
-  COLLECTIVE_VIRTUAL_CARD_DELETED
-  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED
-  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
-  VIRTUAL_CARD_PURCHASE
-  COLLECTIVE_MEMBER_INVITED
-  COLLECTIVE_MEMBER_CREATED
-  COLLECTIVE_CORE_MEMBER_ADDED
-  COLLECTIVE_CORE_MEMBER_INVITED
-  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
-  COLLECTIVE_CORE_MEMBER_REMOVED
-  COLLECTIVE_CORE_MEMBER_EDITED
-  COLLECTIVE_TRANSACTION_CREATED
-  TRANSACTIONS_IMPORT_CREATED
-  TRANSACTIONS_IMPORT_ROW_UPDATED
-  COLLECTIVE_UPDATE_CREATED
-  COLLECTIVE_UPDATE_PUBLISHED
-  COLLECTIVE_CONTACT
-  HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
-  CONTRIBUTION_REJECTED
-  SUBSCRIPTION_ACTIVATED
-  SUBSCRIPTION_CANCELED
-  SUBSCRIPTION_PAUSED
-  SUBSCRIPTION_RESUMED
-  SUBSCRIPTION_READY_TO_BE_RESUMED
-  TICKET_CONFIRMED
-  ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  ORDER_PENDING
-  ORDER_PENDING_CONTRIBUTION_NEW
-  ORDER_PENDING_CONTRIBUTION_REMINDER
-  ORDER_PROCESSING
-  ORDER_PROCESSED
-  ORDER_PAYMENT_FAILED
-  ORDER_REVIEW_OPENED
-  ORDER_REVIEW_CLOSED
-  ORDER_DISPUTE_CREATED
-  ORDER_DISPUTE_CLOSED
-  ORDER_UPDATED
-  ADDED_FUNDS_EDITED
-  VENDOR_CREATED
-  VENDOR_EDITED
-  VENDOR_DELETED
-  ORDER_PENDING_CREATED
-  ORDER_PENDING_FOLLOWUP
-  ORDER_PENDING_RECEIVED
-  ORDER_PENDING_EXPIRED
-  ORDERS_SUSPICIOUS
-  PAYMENT_FAILED
-  PAYMENT_CREDITCARD_CONFIRMATION
-  PAYMENT_CREDITCARD_EXPIRING
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_SIGNIN
-  USER_RESET_PASSWORD
-  OAUTH_APPLICATION_AUTHORIZED
-  TWO_FACTOR_METHOD_ADDED
-  TWO_FACTOR_METHOD_DELETED
-  TWO_FACTOR_CODE_REQUESTED
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_PASSWORD_SET
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY_REPORT
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  AGREEMENT_CREATED
-  AGREEMENT_EDITED
-  AGREEMENT_DELETED
-  PLATFORM_SUBSCRIPTION_UPDATED
-  PLATFORM_BILLING_OVERDUE_REMINDER
-  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION
-  ADDED_FUND_TO_ORG
-  COLLECTIVE_TRANSACTION_PAID
-  COLLECTIVE_USER_ADDED
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
-  SUBSCRIPTION_CONFIRMED
-  COLLECTIVE_COMMENT_CREATED
-  ORDER_PENDING_CRYPTO
-  BACKYOURSTACK_DISPATCH_CONFIRMED
-}
-
 enum ActivityClassType {
   COLLECTIVE
   EXPENSES
@@ -7219,7 +7355,8 @@ type TransactionsAmountGroup {
 }
 
 type CommunityStats {
-  associatedCollectives: [CommunityAssociatedCollective]
+  associatedCollectives: [CommunityAssociatedAccount]
+  associatedOrganizations: [CommunityAssociatedAccount]
   relations: [CommunityRelationType]!
   transactionSummary: [CommunityTransactionSummary!]!
   lastInteractionAt: DateTime
@@ -7237,7 +7374,7 @@ type CommunityStats {
   ): ActivityCollection
 }
 
-type CommunityAssociatedCollective {
+type CommunityAssociatedAccount {
   account: Account
   relations: [CommunityRelationType]
 }
@@ -7258,6 +7395,12 @@ type CommunityTransactionSummary {
   expenseCount: Int!
   contributionTotal: Amount!
   contributionCount: Int!
+  expenseTotalAcc: Amount!
+  expenseCountAcc: Int!
+  contributionTotalAcc: Amount!
+  contributionCountAcc: Int!
+  orderCount: Int!
+  orderCountAcc: Int!
 }
 
 """
@@ -7268,6 +7411,107 @@ type ActivityCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Activity!]
+}
+
+type KYCVerificationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [KYCVerification!]
+}
+
+"""
+A KYC Verification
+"""
+type KYCVerification {
+  """
+  Unique identifier for this KYC verification
+  """
+  id: String!
+
+  """
+  Provider used to make this KYC verification
+  """
+  provider: KYCProvider!
+
+  """
+  The account that requested the KYC verification
+  """
+  requestedByAccount: Account!
+
+  """
+  The account that is verified
+  """
+  account: Account!
+
+  """
+  The user who added this account to the KYC verification list
+  """
+  createdByUser: Account
+
+  """
+  Provider specific data
+  """
+  providerData: KYCProviderData!
+
+  """
+  Verified KYC data
+  """
+  verifiedData: KYCVerifiedData!
+  status: KYCVerificationStatus!
+  requestedAt: DateTime!
+  revokedAt: DateTime
+  verifiedAt: DateTime
+  permissions: KYCVerificationPermissions!
+}
+
+enum KYCProvider {
+  MANUAL
+}
+
+union KYCProviderData = ManualKYCProviderData
+
+"""
+Manual KYC data
+"""
+type ManualKYCProviderData {
+  """
+  Notes added during manual verification
+  """
+  notes: String!
+}
+
+"""
+Verified KYC data
+"""
+type KYCVerifiedData {
+  """
+  Account legal name as verified by KYC
+  """
+  legalName: String
+
+  """
+  Account legal address as verified by KYC
+  """
+  legalAddress: String
+}
+
+enum KYCVerificationStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  REVOKED
+  EXPIRED
+}
+
+"""
+KYC Verification permissions
+"""
+type KYCVerificationPermissions {
+  """
+  Whether this KYC Verification can be revoked by the logged in user
+  """
+  canRevokeKYCVerification: Boolean!
 }
 
 """
@@ -7382,23 +7626,6 @@ type HostStats {
     """
     net: Boolean = false
   ): Amount
-}
-
-enum HostContext {
-  """
-  Both the Host Organizations internal accounts and Hosted Collectives
-  """
-  ALL
-
-  """
-  Only the Host Organization (including its projects/events)
-  """
-  INTERNAL
-
-  """
-  Only Hosted Collectives (including their projects/events)
-  """
-  HOSTED
 }
 
 """
@@ -7855,7 +8082,6 @@ type TransactionsImport {
     """
     accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
-    @deprecated(reason: "2025-04-29: Please use `host.offPlatformTransactions` instead.")
   stats: TransactionsImportStats!
 }
 
@@ -8391,6 +8617,11 @@ type ExpensePermissions {
   canPay: Boolean!
 
   """
+  Whether the current user can mark this expense as paid
+  """
+  canMarkAsPaid: Boolean!
+
+  """
   Whether the current user can approve this expense
   """
   canApprove: Boolean!
@@ -8471,6 +8702,7 @@ type ExpensePermissions {
   delete: Permission!
   seeInvoiceInfo: Permission!
   pay: Permission!
+  markAsPaid: Permission!
   approve: Permission!
   unapprove: Permission!
   reject: Permission!
@@ -8883,9 +9115,10 @@ type Bot implements Account {
   isActive: Boolean
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -8959,6 +9192,7 @@ type Bot implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -8969,6 +9203,11 @@ type Bot implements Account {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -9204,12 +9443,22 @@ type Bot implements Account {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -9474,6 +9723,11 @@ type Bot implements Account {
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -9746,6 +10000,26 @@ type Bot implements Account {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9846,9 +10120,10 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   isActive: Boolean!
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -9922,6 +10197,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -9932,6 +10208,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -10167,12 +10448,22 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -10437,6 +10728,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -10709,6 +11005,26 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11367,9 +11683,10 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isActive: Boolean!
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -11443,6 +11760,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -11453,6 +11771,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -11688,12 +12011,22 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -11958,6 +12291,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -12230,6 +12568,26 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12604,9 +12962,10 @@ type Individual implements Account {
   isActive: Boolean
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -12680,6 +13039,7 @@ type Individual implements Account {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -12690,6 +13050,11 @@ type Individual implements Account {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -12925,12 +13290,22 @@ type Individual implements Account {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -13195,6 +13570,11 @@ type Individual implements Account {
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -13465,6 +13845,26 @@ type Individual implements Account {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13488,6 +13888,7 @@ type Individual implements Account {
   """
   email: String
   isGuest: Boolean!
+  requiresProfileCompletion: Boolean
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
   newsletterOptIn: Boolean
@@ -13534,6 +13935,36 @@ type Individual implements Account {
   """
   twoFactorMethods: [UserTwoFactorMethod]
   contributorProfiles(forAccount: AccountReferenceInput!): [ContributorProfile]!
+
+  """
+  KYC Verification requests to this account
+  """
+  kycVerifications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only KYC requests made by these accounts
+    """
+    requestedByAccounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
+
+  """
+  Verified KYC status, if any
+  """
+  kycStatus(
+    """
+    If set, returns only KYC requests made by these accounts
+    """
+    requestedByAccount: AccountReferenceInput!
+  ): KYCStatus!
 }
 
 """
@@ -13655,6 +14086,13 @@ type ContributorProfile {
     """
     since: DateTime
   ): Amount
+}
+
+"""
+A individual KYC verified status
+"""
+type KYCStatus {
+  manual: KYCVerification
 }
 
 """
@@ -13819,9 +14257,10 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   isActive: Boolean
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -13895,6 +14334,7 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -13905,6 +14345,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -14140,12 +14585,22 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -14410,6 +14865,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -14680,6 +15140,26 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14781,6 +15261,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   If the organization is a host account, this will return the matching Host object
   """
   host: Host
+
+  """
+  Returns whether the account has money management activated.
+  """
+  hasMoneyManagement: Boolean!
+
+  """
+  Returns whether the account has hosting activated.
+  """
+  hasHosting: Boolean!
 }
 
 """
@@ -14902,9 +15392,10 @@ type Vendor implements Account & AccountWithContributions {
   isActive: Boolean
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -14978,6 +15469,7 @@ type Vendor implements Account & AccountWithContributions {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -14988,6 +15480,11 @@ type Vendor implements Account & AccountWithContributions {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -15223,12 +15720,22 @@ type Vendor implements Account & AccountWithContributions {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -15493,6 +16000,11 @@ type Vendor implements Account & AccountWithContributions {
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -15765,6 +16277,26 @@ type Vendor implements Account & AccountWithContributions {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -16254,9 +16786,8 @@ type Query {
     type: [AccountType]
 
     """
-    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    Admin only. Search by email address or name of a member.
     """
-    email: EmailAddress
     searchTerm: String
     relation: [CommunityRelationType!]
     limit: Int! = 100
@@ -16445,6 +16976,11 @@ type Query {
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   expenseTagStats(
     """
@@ -16627,12 +17163,22 @@ type Query {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -18555,7 +19101,9 @@ enum ActivityAndClassesType {
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
   COLLECTIVE_UNHOSTED
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION
   ORGANIZATION_COLLECTIVE_CREATED
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_CONVERSATION_CREATED
@@ -18649,6 +19197,7 @@ enum ActivityAndClassesType {
   USER_NEW_TOKEN
   USER_SIGNIN
   USER_RESET_PASSWORD
+  USER_OTP_REQUESTED
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_METHOD_ADDED
   TWO_FACTOR_METHOD_DELETED
@@ -18664,6 +19213,10 @@ enum ActivityAndClassesType {
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_MONEY_MANAGEMENT
+  DEACTIVATED_MONEY_MANAGEMENT
+  ACTIVATED_HOSTING
+  DEACTIVATED_HOSTING
   AGREEMENT_CREATED
   AGREEMENT_EDITED
   AGREEMENT_DELETED
@@ -18679,6 +19232,9 @@ enum ActivityAndClassesType {
   COLLECTIVE_COMMENT_CREATED
   ORDER_PENDING_CRYPTO
   BACKYOURSTACK_DISPATCH_CONFIRMED
+  KYC_REQUESTED
+  KYC_REVOKED
+  KYC_VERIFIED
   COLLECTIVE
   EXPENSES
   CONTRIBUTIONS
@@ -18804,9 +19360,10 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isActive: Boolean!
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -18880,6 +19437,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -18890,6 +19448,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -19125,12 +19688,22 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -19395,6 +19968,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -19667,6 +20245,26 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -19914,9 +20512,10 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   isActive: Boolean!
 
   """
-  Returns whether the account is setup to Host collectives.
+  Returns whether the account has money management activated.
   """
   isHost: Boolean!
+    @deprecated(reason: "2025-11-21: use hasMoneyManagement or hasHosting on the Organization object instead.")
 
   """
   Returns true if the remote user is an admin of this account
@@ -19990,6 +20589,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter on whether the account is a host or not
     """
     isHostAccount: Boolean
+      @deprecated(reason: "2025-12-20: Deprecated. Will be eventually replaced by hasMoneyManagement or hasHosting.")
 
     """
     Filter on (un)approved collectives
@@ -20000,6 +20600,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter on archived collectives
     """
     isArchived: Boolean
+
+    """
+    Filter on (not) frozen collectives
+    """
+    isFrozen: Boolean
 
     """
     Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
@@ -20235,12 +20840,22 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
 
     """
-    If account is a host, also include hosted accounts orders
+    Only return orders that match these accounting categories
     """
-    includeHostedAccounts: Boolean
+    accountingCategory: [String]
 
     """
-    Include orders from children events/projects
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean @deprecated(reason: "2025-11-20: Please use hostContext instead")
+
+    """
+    If account is a host, select whether to include ALL, INTERNAL or HOSTED accounts. When set (and `hostedAccounts` is not provided), this will automatically include children accounts (events/projects) of the selected accounts. If `hostedAccounts` is also provided, use `includeChildrenAccounts` to control children account inclusion.
+    """
+    hostContext: HostContext
+
+    """
+    Include orders from children events/projects. Only relevant when `hostedAccounts` is provided. When `hostContext` is set without `hostedAccounts`, children accounts are automatically included regardless of this parameter.
     """
     includeChildrenAccounts: Boolean! = false
 
@@ -20505,6 +21120,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return transactions that are associated with this payout method
     """
     payoutMethod: PayoutMethodReferenceInput
+
+    """
+    Filter expenses by activities
+    """
+    activity: ExpenseActivityFilter
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -20777,6 +21397,26 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Various stats about how this account is connected to the rest of the community
   """
   communityStats(host: AccountReferenceInput!): CommunityStats
+
+  """
+  KYC Verification requests made by this account
+  """
+  kycVerificationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If set, returns only verification requests made to these accounts
+    """
+    accounts: [AccountReferenceInput!]
+  ): KYCVerificationCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -20951,7 +21591,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -20981,7 +21621,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -20996,7 +21636,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21011,7 +21651,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21026,7 +21666,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21041,7 +21681,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21056,7 +21696,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21071,7 +21711,7 @@ type SearchResults {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 0
 
     """
     The offset to use to fetch
@@ -21559,6 +22199,26 @@ type Mutation {
   regenerateRecoveryCodes: [String!]
 
   """
+  Convert an account to an Organization. Scope: "account".
+  """
+  convertAccountToOrganization(
+    """
+    Account to convert.
+    """
+    account: AccountReferenceInput!
+
+    """
+    Should the Organization have money management capabilities
+    """
+    hasMoneyManagement: Boolean = false
+
+    """
+    Legal name of the Organization.
+    """
+    legalName: String
+  ): Account!
+
+  """
   Edit an accounting category. Returns the account with the updated categories.
   """
   editAccountingCategories(
@@ -21873,7 +22533,7 @@ type Mutation {
     """
     A optional private comment to add to the created expense
     """
-    privateComment: String
+    privateComment: String @deprecated(reason: "2025-11-03: This field is no longer used")
   ): Expense!
 
   """
@@ -22214,6 +22874,21 @@ type Mutation {
   ): MemberInvitation!
 
   """
+  Creates and invites admins to an existing Account. Scope: "account".
+  """
+  inviteMembers(
+    """
+    Reference to the account to invite admins to, must be an Organization, Collective, Fund, Event or Project.
+    """
+    account: AccountReferenceInput!
+
+    """
+    List of members to invite as admins.
+    """
+    members: [InviteMemberInput!]!
+  ): [MemberInvitation!]!
+
+  """
   Edit an existing member invitation of the Collective. Scope: "account".
   """
   editMemberInvitation(
@@ -22543,10 +23218,45 @@ type Mutation {
     captcha: CaptchaInputType
 
     """
-    If true, the organization will be created as financially active, allowing the organization to receive contributions and pay for expenses. Defaults to false.
+    If true, the organization will be created with Money Management activated, allowing the organization to receive contributions and pay for expenses. Defaults to false.
     """
-    financiallyActive: Boolean = false
+    hasMoneyManagement: Boolean = false
+
+    """
+    If true, the organization will be created with Hosting activated, allowing the organization to host Collectives and Funds. Defaults to false.
+    """
+    hasHosting: Boolean = false
   ): Organization
+
+  """
+  Convert an account to an Organization. Scope: "account".
+  """
+  editOrganizationMoneyManagementAndHosting(
+    """
+    Organization to edit money management capability.
+    """
+    organization: AccountReferenceInput!
+
+    """
+    Should the Organization have money management capabilities
+    """
+    hasMoneyManagement: Boolean
+
+    """
+    Should the Organization have hosting capabilities
+    """
+    hasHosting: Boolean
+  ): Organization!
+
+  """
+  Convert an Organization to a Collective. Scope: "account".
+  """
+  convertOrganizationToCollective(
+    """
+    Account to convert.
+    """
+    organization: AccountReferenceInput!
+  ): Collective!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".
@@ -23429,6 +24139,32 @@ type Mutation {
   Send In-App Survey response
   """
   sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
+
+  """
+  Requests an account to be verified using a KYC provider
+  """
+  requestKYCVerification(
+    """
+    Account request KYC Verification
+    """
+    requestedByAccount: AccountReferenceInput!
+
+    """
+    Account that will be verified
+    """
+    verifyAccount: AccountReferenceInput!
+    provider: KYCProvider!
+
+    """
+    Provider specific request data
+    """
+    request: RequestKYCVerificationInput!
+  ): KYCVerification!
+
+  """
+  Revoke the KYC Verification
+  """
+  revokeKYCVerification(kycVerification: KYCVerificationReferenceInput!): KYCVerification!
 }
 
 input CollectiveCreateInput {
@@ -23647,6 +24383,7 @@ input AccountUpdateInput {
   legalName: String
   slug: String
   description: String
+  image: URL
   longDescription: String
   company: String
   tags: [String]
@@ -25230,7 +25967,7 @@ input OrganizationCreateInput {
   name: String!
   legalName: String
   slug: String!
-  description: String!
+  description: String
   website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 
@@ -25691,6 +26428,7 @@ enum UploadedFileKind {
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE
+  RECEIPT_EMBEDDED_IMAGE
 }
 
 """
@@ -25992,7 +26730,6 @@ input PlatformSubscriptionFeaturesFeatures {
   EXPENSE_SECURITY_CHECKS: Boolean!
   EXPECTED_FUNDS: Boolean!
   CHARGE_HOSTING_FEES: Boolean!
-  RESTRICTED_FUNDS: Boolean!
   AGREEMENTS: Boolean!
   TAX_FORMS: Boolean!
   FUNDS_GRANTS_MANAGEMENT: Boolean!
@@ -26031,3 +26768,18 @@ input PlatformSubscriptionPlanPricing {
   """
   includedExpensesPerMonth: Int!
 }
+
+input RequestKYCVerificationInput {
+  manual: RequestManualKYCVerificationInput
+}
+
+input RequestManualKYCVerificationInput {
+  legalName: String!
+  legalAddress: String!
+  notes: String
+}
+
+"""
+A reference to a KYC Verification
+"""
+scalar KYCVerificationReferenceInput

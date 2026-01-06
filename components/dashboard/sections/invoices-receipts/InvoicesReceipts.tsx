@@ -8,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { editCollectiveSettingsMutation } from '../../../../lib/graphql/v1/mutations';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';
@@ -35,12 +36,18 @@ const BILL_TO_OPTIONS = [
   { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
 ] as const;
 
-const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'settings'> }) => {
+const InvoicesReceipts = ({
+  account,
+}: {
+  account: Pick<Account, 'legacyId' | 'settings'> & { hasHosting?: boolean };
+}) => {
   const intl = useIntl();
   const { toast } = useToast();
   const defaultReceipt = useReceipt({ template: ReceiptTemplate.Default, settings: account.settings });
   const alternativeReceipt = useReceipt({ template: ReceiptTemplate.Alternative, settings: account.settings });
-  const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
+  const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation, {
+    context: API_V1_CONTEXT,
+  });
   const [hasAlternativeReceipt, setHasAlternativeReceipt] = React.useState(
     alternativeReceipt.values.title !== undefined,
   );
@@ -126,27 +133,29 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </SettingsSectionTitle>
 
-        <div className="mt-4">
-          <Label htmlFor="expense-bill-to-select" className="text-black-800 text-base leading-6 font-bold">
-            {intl.formatMessage({ defaultMessage: 'Bill To', id: 'izhuHE' })}
-          </Label>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {intl.formatMessage({
-              defaultMessage:
-                'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
-              id: 'yMFA0e',
-            })}
-          </p>
-          <div className="mt-2">
-            <DefaultSelect
-              name="expense-bill-to-select"
-              placeholder={intl.formatMessage({ defaultMessage: 'No selection', id: 'Select.Placeholder' })}
-              value={billTo || ''}
-              setValue={value => onChange(value, setBillTo)}
-              options={BILL_TO_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
-            />
+        {account.hasHosting && (
+          <div className="mt-4">
+            <Label htmlFor="expense-bill-to-select" className="text-black-800 text-base leading-6 font-bold">
+              {intl.formatMessage({ defaultMessage: 'Bill To', id: 'izhuHE' })}
+            </Label>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {intl.formatMessage({
+                defaultMessage:
+                  'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
+                id: 'yMFA0e',
+              })}
+            </p>
+            <div className="mt-2">
+              <DefaultSelect
+                name="expense-bill-to-select"
+                placeholder={intl.formatMessage({ defaultMessage: 'No selection', id: 'Select.Placeholder' })}
+                value={billTo || ''}
+                setValue={value => onChange(value, setBillTo)}
+                options={BILL_TO_OPTIONS.map(opt => ({ value: opt.value, label: opt.label }))}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <SettingsSectionTitle
         actions={
@@ -161,7 +170,7 @@ const InvoicesReceipts = ({ account }: { account: Pick<Account, 'legacyId' | 'se
       <p className="mb-6 text-sm">
         <FormattedMessage
           id="EditHostInvoice.Receipt.Instructions"
-          defaultMessage="You can customize the title (and add custom text) on automatically generated receipts for financial contributions to your Collective(s), e.g., 'donation receipt' or 'tax receipt' or a phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
+          defaultMessage="You can customize the title (and add custom text) on automatically generated receipts for financial contributions, e.g., 'donation receipt' or 'tax receipt' or a phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
         />
         {/** Un-localized on purpose, because it's not localized in the actual invoice */}
         &nbsp;<i>{defaultReceipt.placeholders.title}</i>.

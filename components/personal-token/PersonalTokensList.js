@@ -2,7 +2,7 @@ import React from 'react';
 import { NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { getPersonalTokenSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -44,7 +44,6 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
   const [showCreatePersonalToken, setShowCreatePersonalTokenModal] = React.useState(false);
   const { data, loading, error, networkStatus } = useQuery(personalTokenQuery, {
     variables,
-    context: API_V2_CONTEXT,
   });
 
   const showLoadingState = loading || networkStatus === NetworkStatus.refetch;

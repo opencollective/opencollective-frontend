@@ -12,7 +12,7 @@ import { getLegacyIdForCollective } from '../../../../lib/collective';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -258,6 +258,7 @@ const addFundsAccountQueryHostFieldsFragment = gql`
         id
         code
         name
+        friendlyName
         kind
         appliesTo
       }
@@ -430,7 +431,7 @@ const checkCanAddHostFee = account => {
     return account.host.id !== account.parent.id;
   }
 
-  // No host fees for Host Organizations or Independent Collectives
+  // No host fees for Host Organizations
   return account.host.id !== account.id;
 };
 
@@ -460,7 +461,6 @@ const AddFundsModalContentWithCollective = ({
     loading,
     error: fetchAccountError,
   } = useQuery(addFundsAccountQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
   });
   const account = data?.account;
@@ -472,14 +472,16 @@ const AddFundsModalContentWithCollective = ({
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
     isEdit ? editAddedFundsMutation : addFundsMutation,
     {
-      context: API_V2_CONTEXT,
       refetchQueries: [
         {
-          context: API_V2_CONTEXT,
           query: getBudgetSectionQuery(true, false),
           variables: getBudgetSectionQueryVariables(collective.slug, false, host),
         },
-        { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
+        {
+          query: collectivePageQuery,
+          context: API_V1_CONTEXT,
+          variables: getCollectivePageQueryVariables(collective.slug),
+        },
       ],
       awaitRefetchQueries: true,
     },
@@ -744,6 +746,7 @@ const AddFundsModalContentWithCollective = ({
                         account={account}
                         selectedCategory={field.value}
                         allowNone={true}
+                        showCode={true}
                       />
                     )}
                   </Field>

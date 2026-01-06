@@ -9,7 +9,7 @@ import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
 
 import { toast } from './ui/useToast';
@@ -131,7 +131,7 @@ class SignInOrJoinFree extends React.Component {
     }
     let redirectUrl = this.props.redirect;
     if (currentPath.includes('/create-account') && redirectUrl === '/') {
-      redirectUrl = '/welcome';
+      redirectUrl = '/dashboard';
     }
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
@@ -182,12 +182,25 @@ class SignInOrJoinFree extends React.Component {
         this.setState({ unknownEmailError: true, submitting: false });
       } else if (e.json?.errorCode === 'PASSWORD_REQUIRED') {
         this.setState({ passwordRequired: true, submitting: false });
+      } else if (e.json?.errorCode === 'EMAIL_AWAITING_VERIFICATION') {
+        toast({
+          variant: 'error',
+          message: (
+            <FormattedMessage
+              defaultMessage="Email not verified, please finish signing up."
+              id="signup.requiresVerificationError"
+            />
+          ),
+        });
+        setTimeout(() => {
+          this.props.router.push({ pathname: '/signup', query: { email } });
+        }, 1000);
       } else if (e.message?.includes('Two-factor authentication is enabled')) {
         this.setState({ submitting: false });
       } else {
         toast({
           variant: 'error',
-          message: e.message || 'Server error',
+          message: e.json?.message || e.message || 'Server error',
         });
         this.setState({ submitting: false });
       }
@@ -361,6 +374,6 @@ const signupMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
+const addSignupMutation = graphql(signupMutation, { name: 'createUser', options: { context: API_V1_CONTEXT } });
 
 export default withUser(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));

@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import type { FormikProps } from 'formik';
-import { Field } from 'formik';
+import { FastField, Field } from 'formik';
 import { pickBy } from 'lodash';
+import type { InputHTMLAttributes } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
@@ -25,6 +26,7 @@ export function FormField({
   privateMessage,
   validate,
   className,
+  isFastField = false,
   ...props
 }: {
   label?: string | React.ReactNode;
@@ -45,15 +47,20 @@ export function FormField({
   privateMessage?: React.ReactNode;
   validate?: any;
   className?: string;
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
+  autoFocus?: boolean;
+  ref?: React.ForwardedRef<HTMLInputElement>;
   onFocus?: () => void;
   onChange?: (e) => void;
+  isFastField?: boolean;
 }) {
   const intl = useIntl();
   const htmlFor = props.htmlFor || `input-${name}`;
   const { schema } = useContext(FormikZodContext);
+  const FieldComponent = isFastField ? FastField : Field;
 
   return (
-    <Field name={name} validate={validate}>
+    <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => {
         const hasError = Boolean(meta.error && (meta.touched || form.submitCount)) || Boolean(customError);
         const error = customError || meta.error;
@@ -72,6 +79,9 @@ export function FormField({
               required: props.required,
               error: hasError,
               placeholder,
+              autoFocus: props.autoFocus,
+              autoComplete: props.autoComplete,
+              ref: props.ref,
               onFocus: props.onFocus,
               onChange: props.onChange || field.onChange,
             },
@@ -119,6 +129,6 @@ export function FormField({
           </div>
         );
       }}
-    </Field>
+    </FieldComponent>
   );
 }

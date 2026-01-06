@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import DashboardHeader from '../dashboard/DashboardHeader';
@@ -31,7 +31,7 @@ const CONNECTED_ACCOUNT_ACCEPTED_TYPES = [
 ];
 
 const ConnectAccountsForm = () => {
-  const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation, { context: API_V2_CONTEXT });
+  const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation);
   const [memberAccount, setMemberAccount] = React.useState(null);
   const [account, setAccount] = React.useState(null);
   const { toast } = useToast();

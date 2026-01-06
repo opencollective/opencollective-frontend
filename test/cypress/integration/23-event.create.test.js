@@ -31,7 +31,7 @@ describe('event.create.test.js', () => {
     cy.get('#location .address').contains('75007');
 
     // Go to "Edit Tickets"
-    cy.get('[data-cy=edit-collective-btn]:first').click();
+    cy.get('[data-cy="go-to-dashboard-btn"]').click();
     cy.getByDataCy('menu-item-tickets').click();
     cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Free ticket');
@@ -53,8 +53,9 @@ describe('event.create.test.js', () => {
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier] [data-cy=amount]').contains(15);
     cy.get('#top').scrollIntoView();
-    cy.get('[data-cy="edit-collective-btn"]:visible').click();
+    cy.get('[data-cy="go-to-dashboard-btn"]').click();
     cy.get('[data-cy="menu-item-Settings"]:visible').click();
+    cy.get('[data-cy="menu-item-info"]:visible').click();
 
     // edit event info
     cy.get('input[name="name"]').type(`{selectall}${updatedTitle}`);
@@ -82,9 +83,9 @@ describe('event.create.test.js', () => {
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.get('h1[data-cy=collective-title]').contains(updatedTitle);
     // delete event tiers
-    cy.get('[data-cy="edit-collective-btn"]:visible').click();
+    cy.get('[data-cy="go-to-dashboard-btn"]').click();
     cy.getByDataCy('menu-item-Settings').click();
-    cy.getByDataCy('menu-item-advanced').click();
+    cy.getByDataCy('menu-item-advanced').should('be.visible').click();
     cy.contains('button', 'Delete this Event').click();
     cy.get('[data-cy=delete]').click();
     cy.wait(1000);

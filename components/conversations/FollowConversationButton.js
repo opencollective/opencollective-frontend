@@ -7,7 +7,7 @@ import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -34,12 +34,9 @@ const ButtonLabel = styled(Span).attrs({
  * Because it fires a request, this button should **not** be used in lists.
  */
 const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedInUser, loadingLoggedInUser }) => {
-  const [followConversation, { loading: submitting }] = useMutation(followConversationMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [followConversation, { loading: submitting }] = useMutation(followConversationMutation);
 
   const { data, loading } = useQuery(isUserFollowingConversationQuery, {
-    context: API_V2_CONTEXT,
     variables: { id: conversationId },
     skip: !LoggedInUser,
   });

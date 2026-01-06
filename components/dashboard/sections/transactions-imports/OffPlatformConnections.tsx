@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -72,7 +71,6 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const [selectedImport, setSelectedImport] = React.useState(null);
   const [showNewConnectionDialog, setShowNewConnectionDialog] = React.useState(false);
   const { data, loading, refetch, error } = useQuery(offPlatformConnectionsQuery, {
-    context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     pollInterval: importsWithSyncRequest.size ? 5_000 : 0,
     skip: isUpgradeRequired,

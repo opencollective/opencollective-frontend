@@ -5,7 +5,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 @theme inline {
   --color-border: var(--border);
   --color-input: var(--input);
@@ -34,6 +33,15 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--primary);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
   --color-oc-primary-100: hsla(208, 100%, 95%, 1);
   --color-oc-blue: hsla(218, 92%, 53%, 1);
   --color-oc-blue-tints-050: hsla(208, 100%, 97%, 1);
@@ -61,6 +69,7 @@
   --animate-collapsible-down: collapsible-down 0.2s ease-out;
   --animate-collapsible-up: collapsible-up 0.2s ease-out;
   --animate-arrow-right: arrow-right 0.2s ease-out forwards;
+  --animate-caret-blink: caret-blink 0.2s linear infinite;
 
   --transition-duration-1500: 1500ms;
   --transition-duration-2000: 2000ms;
@@ -105,6 +114,11 @@
       transform: translateX(25%);
     }
   }
+@keyframes caret-blink {
+  50% {
+    opacity: 0.0;
+  }
+}
 }
 
 :root {
@@ -352,6 +366,14 @@
   --color-stone-950: oklch(0.147 0.004 49.25);
   --color-black: #000;
   --color-white: #fff;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 @utility container {
@@ -563,7 +585,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border antialiased;
   }
   body {
     @apply h-full overflow-y-scroll bg-background text-foreground;

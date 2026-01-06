@@ -9,7 +9,7 @@ import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 
@@ -361,10 +361,16 @@ class OnboardingModal extends React.Component {
 
 const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   name: 'editCollectiveMembers',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
   name: 'editCollectiveContact',
+  options: {
+    context: API_V1_CONTEXT,
+  },
 });
 
 const addMemberInvitationQuery = graphql(
@@ -385,7 +391,6 @@ const addMemberInvitationQuery = graphql(
   {
     options: props => ({
       variables: { slug: props.collective.slug },
-      context: API_V2_CONTEXT,
     }),
   },
 );

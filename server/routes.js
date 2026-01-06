@@ -42,9 +42,8 @@ module.exports = expressApp => {
     app.use(
       '/api',
       proxy(baseApiUrl, {
-        parseReqBody: false,
         proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-          for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+          for (const key of ['oc-env', 'oc-secret', 'oc-application', 'Content-Type']) {
             if (srcReq.headers[key]) {
               proxyReqOpts.headers[key] = srcReq.headers[key];
             }
@@ -60,6 +59,8 @@ module.exports = expressApp => {
           searchParams.set('api_key', process.env.API_KEY);
           return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
         },
+        // Be consistent to the actual API limit
+        limit: '10mb',
       }),
     );
   }

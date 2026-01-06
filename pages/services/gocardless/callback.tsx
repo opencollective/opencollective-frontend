@@ -7,7 +7,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { confettiFireworks } from '@/lib/confettis';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '@/lib/local-storage';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
@@ -67,9 +66,7 @@ const GoCardlessOAuthCallbackPage = () => {
   const ref = router.query['ref'] as string;
   const windowData = getWindowData();
 
-  const [connectGoCardlessAccount, { data }] = useMutation(connectGoCardlessAccountMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [connectGoCardlessAccount, { data }] = useMutation(connectGoCardlessAccountMutation);
 
   React.useEffect(() => {
     const handleCallback = async () => {

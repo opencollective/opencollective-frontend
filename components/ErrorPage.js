@@ -1,28 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Support } from '@styled-icons/boxicons-regular/Support';
-import { Redo } from '@styled-icons/fa-solid/Redo';
 import copy from 'copy-to-clipboard';
 import { get } from 'lodash';
+import { CircleHelp, RefreshCw } from 'lucide-react';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
 
 import Footer from './navigation/Footer';
+import { Button } from './ui/Button';
 import Body from './Body';
-import Container from './Container';
-import { ErrorFallbackLinks } from './ErrorFallbackLinks';
-import { Box, Flex } from './Grid';
 import Header from './Header';
 import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import NotFound from './NotFound';
-import StyledButton from './StyledButton';
-import StyledLink from './StyledLink';
-import { H1, P } from './Text';
 import { withUser } from './UserProvider';
 
 /**
@@ -48,7 +42,7 @@ class ErrorPage extends React.Component {
     router: PropTypes.object,
   };
 
-  state = { copied: false };
+  state = { copiedErrorMessage: false };
 
   getErrorComponent() {
     const { error, data, loading, log = true } = this.props;
@@ -98,39 +92,49 @@ class ErrorPage extends React.Component {
 
   renderErrorMessage(message) {
     return (
-      <Flex flexDirection="column" alignItems="center" px={2} py={6}>
-        <MessageBox type="error" withIcon mb={5}>
-          {message}
-        </MessageBox>
-        <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => this.props.router.back()}>
+      <div className="flex w-full flex-col items-center justify-center px-4 py-8">
+        <div className="mb-8">
+          <MessageBox type="error" withIcon>
+            {message}
+          </MessageBox>
+        </div>
+        <Button size="lg" onClick={() => this.props.router.back()}>
           &larr; <FormattedMessage id="error.goBack" defaultMessage="Go back to the previous page" />
-        </StyledButton>
-      </Flex>
+        </Button>
+      </div>
     );
   }
 
   networkError() {
     return (
-      <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
-        <Image src="/static/images/unexpected-error.png" alt="" width={624} height={403} />
-        <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
-          <FormattedMessage defaultMessage="Network error" id="BrdgZE" />
-        </H1>
-        <Box maxWidth={550}>
-          <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
-            <FormattedMessage
-              id="Error.Network"
-              defaultMessage="A network error occurred, please check your connectivity or try again later"
-            />
-          </P>
-        </Box>
-        <Box>
-          <P fontSize="16px" fontWeight="500" color="black.800" mb="16px" textAlign="center">
-            <FormattedMessage defaultMessage="Here are some helpful links instead:" id="UTSapC" />
-          </P>
-          <ErrorFallbackLinks />
-        </Box>
-      </Flex>
+      <div className="flex w-full flex-col items-center justify-center px-4 py-8" data-cy="not-found">
+        <div className="flex w-full max-w-md flex-col items-center gap-6">
+          <Image src="/static/images/unexpected-error.png" alt="" width={312} height={202} className="h-auto w-auto" />
+          <div className="space-y-2 text-center">
+            <h2 className="text-xl font-semibold">
+              <FormattedMessage defaultMessage="Network error" id="BrdgZE" />
+            </h2>
+            <p className="text-muted-foreground">
+              <FormattedMessage
+                id="Error.Network"
+                defaultMessage="A network error occurred, please check your connectivity or try again later"
+              />
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button size="sm" onClick={() => location.reload()}>
+              <RefreshCw className="mr-1 h-4 w-4" />
+              <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
+            </Button>
+            <Link href="/help">
+              <Button size="sm" variant="outline">
+                <CircleHelp className="mr-1 h-4 w-4" />
+                <FormattedMessage defaultMessage="Check Help & Support" id="DashboardErrorBoundary.HelpSupport" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -142,53 +146,64 @@ class ErrorPage extends React.Component {
     const toBase64 = str => Buffer.from(str).toString('base64');
     const formatStacktrace = () => (process.env.OC_ENV === 'production' ? toBase64(stackTrace) : stackTrace);
     return (
-      <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
-        <Image src="/static/images/unexpected-error.png" alt="" width={624} height={403} />
-        <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
-          <FormattedMessage defaultMessage="Unexpected error" id="1rlBUx" />
-        </H1>
-        <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
-          <FormattedMessage defaultMessage="Something went wrong, please refresh or try something else" id="VEUYB7" />
-        </P>
-        <Box>
-          <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
-            <StyledLink my={2} as={Link} href="/contact" mx={2} buttonStyle="standard" buttonSize="large">
-              <Support size="1em" /> <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
-            </StyledLink>
-            <StyledButton my={2} mx={2} buttonSize="large" onClick={() => location.reload()}>
-              <Redo size="0.8em" /> <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
-            </StyledButton>
-          </Flex>
+      <div className="flex w-full flex-col items-center justify-center px-4 py-8" data-cy="not-found">
+        <div className="flex w-full max-w-md flex-col items-center gap-6">
+          <Image src="/static/images/unexpected-error.png" alt="" width={312} height={202} className="h-auto w-auto" />
+          <div className="space-y-2 text-center">
+            <h2 className="text-xl font-semibold">
+              <FormattedMessage defaultMessage="Something went wrong" id="SectionError.Title" />
+            </h2>
+            <p className="text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="We encountered an issue loading this {type,select,section{section}other{page}}. Please reload the page or contact support if the problem persists."
+                id="+SSp9V"
+                values={{ type: 'page' }}
+              />
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button size="sm" onClick={() => location.reload()}>
+              <RefreshCw className="mr-1 h-4 w-4" />
+              <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
+            </Button>
+            <Link href="/help">
+              <Button size="sm" variant="outline">
+                <CircleHelp className="mr-1 h-4 w-4" />
+                <FormattedMessage defaultMessage="Check Help & Support" id="DashboardErrorBoundary.HelpSupport" />
+              </Button>
+            </Link>
+          </div>
           {(stackTrace || message) && (
-            <Container mt={5} maxWidth={800}>
+            <div className="mt-4 w-full max-w-2xl">
               <details open={expandError}>
-                <summary style={{ textAlign: 'center', marginBottom: 12 }}>
+                <summary className="mb-3 cursor-pointer text-center text-sm font-medium">
                   <FormattedMessage id="error.details" defaultMessage="Error details" />
                 </summary>
-                <Container p={3}>
+                <div>
                   {message && (
-                    <React.Fragment>
-                      <P fontWeight="bold" mb={1}>
+                    <div className="mb-4">
+                      <p className="mb-1 font-semibold">
                         <FormattedMessage id="Contact.Message" defaultMessage="Message" />
-                      </P>
-                      <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{message}</pre>
-                      <br />
-                    </React.Fragment>
+                      </p>
+                      <pre className="font-mono break-words whitespace-pre-wrap" style={{ fontSize }}>
+                        {message}
+                      </pre>
+                    </div>
                   )}
                   {stackTrace && (
-                    <React.Fragment>
-                      <P fontWeight="bold" mb={1}>
-                        <FormattedMessage id="Details" defaultMessage="Details" />
-                      </P>
-                      <Flex justifyContent="space-between" alignItems="center" mb={2}>
-                        <FormattedMessage
-                          defaultMessage="Please share these details when contacting support"
-                          id="UFh1Me"
-                        />
-                        <StyledButton
-                          buttonSize="tiny"
+                    <div>
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="text-sm">
+                          <FormattedMessage
+                            defaultMessage="Please share these details when contacting support"
+                            id="UFh1Me"
+                          />
+                        </p>
+                        <Button
+                          size="xs"
+                          variant="outline"
                           onClick={() => {
-                            const formattedMessage = `Error: ${message}`;
+                            const formattedMessage = `Error: ${message || ''}`;
                             const formattedDetails = `Details: ${formatStacktrace()}`;
                             copy(`${formattedMessage}\n${formattedDetails}`);
                             this.setState({ copiedErrorMessage: true });
@@ -200,28 +215,25 @@ class ErrorPage extends React.Component {
                           ) : (
                             <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
                           )}
-                        </StyledButton>
-                      </Flex>
-                      <P
-                        as="pre"
-                        whiteSpace="pre-wrap"
-                        fontSize={fontSize}
-                        css={{
-                          userSelect: 'all',
-                          maxHeight: 400,
-                          overflowY: 'auto',
-                        }}
+                        </Button>
+                      </div>
+                      <p className="mb-1 font-semibold">
+                        <FormattedMessage id="Details" defaultMessage="Details" />
+                      </p>
+                      <pre
+                        className="max-h-[400px] overflow-y-auto font-mono break-words whitespace-pre-wrap select-all"
+                        style={{ fontSize }}
                       >
                         {formatStacktrace()}
-                      </P>
-                    </React.Fragment>
+                      </pre>
+                    </div>
                   )}
-                </Container>
+                </div>
               </details>
-            </Container>
+            </div>
           )}
-        </Box>
-      </Flex>
+        </div>
+      </div>
     );
   }
 
@@ -234,7 +246,7 @@ class ErrorPage extends React.Component {
       <div className="ErrorPage" data-cy="error-page">
         <Header LoggedInUser={LoggedInUser} noRobots />
         <Body>
-          <Container py={[5, 6]}>{component}</Container>
+          <div className="py-12 md:py-16">{component}</div>
         </Body>
         <Footer />
       </div>

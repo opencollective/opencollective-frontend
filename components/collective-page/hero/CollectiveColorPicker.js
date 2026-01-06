@@ -6,16 +6,17 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';
 
-import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
-import defaultTheme from '../../../lib/theme';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
+import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
+import defaultTheme from '@/lib/theme';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledInput from '../../StyledInput';
 import StyledInputGroup from '../../StyledInputGroup';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 
 const colorPath = 'collectivePage.primaryColor';
 
@@ -54,7 +55,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   };
 
   return (
-    <Mutation mutation={editCollectiveSettingsMutation}>
+    <Mutation mutation={editCollectiveSettingsMutation} context={API_V1_CONTEXT}>
       {(editSettings, { loading }) => (
         <StyledCard
           data-cy="collective-color-picker-card"
@@ -132,35 +133,34 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
             </Flex>
           </Box>
           <Container borderTop="1px solid #D7DBE0" px={2}>
-            <Flex justifyContent="space-between" flexWrap="wrap">
-              <StyledButton
-                m={2}
-                flex="1 1"
-                textTransform="capitalize"
+            <Flex justifyContent="space-between" flexWrap="wrap" gap="8px" p="8px">
+              <Button
+                className="flex-1 capitalize"
+                size="sm"
+                variant="outline"
                 onClick={() => {
                   dispatchValue(defaultTheme.colors.primary[500]);
                 }}
               >
                 <FormattedMessage id="Reset" defaultMessage="Reset" />
-              </StyledButton>
-              <Flex flex="1 1 50%">
-                <StyledButton
-                  m={2}
-                  flex="1 1 50%"
-                  textTransform="capitalize"
+              </Button>
+              <Flex flex="1 1 50%" justifyContent="flex-end" gap="8px">
+                <Button
+                  className="flex-1 capitalize"
+                  size="sm"
+                  variant="outline"
                   onClick={() => {
                     onChange(null);
                     onClose();
                   }}
                 >
                   <FormattedMessage id="form.cancel" defaultMessage="cancel" />
-                </StyledButton>
-                <StyledButton
+                </Button>
+                <Button
                   data-cy="collective-color-picker-save-btn"
-                  m={2}
-                  buttonStyle="primary"
-                  textTransform="capitalize"
-                  flex="1 1 50%"
+                  className="flex-1 capitalize"
+                  size="sm"
+                  variant="default"
                   loading={loading}
                   disabled={hasError}
                   onClick={() => {
@@ -175,7 +175,7 @@ const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
                   }}
                 >
                   <FormattedMessage id="save" defaultMessage="Save" />
-                </StyledButton>
+                </Button>
               </Flex>
             </Flex>
           </Container>

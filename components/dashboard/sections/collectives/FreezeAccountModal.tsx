@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { Account } from '../../../../lib/graphql/types/v2/schema';
 
 import { collectivePageQuery } from '../../../collective-page/graphql/queries';
@@ -135,11 +135,8 @@ const FreezeAccountModal = ({
   const [submitAction, setSubmitAction] = useState<ModalState | null>(null);
   const { data, loading, error } = useQuery(freezeAccountModalQuery, {
     variables: { accountId: collective.id },
-    context: API_V2_CONTEXT,
   });
-  const [editAccountFreezeStatus, { loading: submitting }] = useMutation(editAccountFreezeStatusMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editAccountFreezeStatus, { loading: submitting }] = useMutation(editAccountFreezeStatusMutation);
   const setMessageForAccountAdminsFromInputEvent = React.useCallback(
     e => _setMessageForAccountAdmins(e.target.value),
     [],
@@ -372,7 +369,9 @@ const FreezeAccountModal = ({
                 };
                 await editAccountFreezeStatus({
                   variables,
-                  refetchQueries: [{ query: collectivePageQuery, variables: { slug: data.account.slug } }],
+                  refetchQueries: [
+                    { query: collectivePageQuery, context: API_V1_CONTEXT, variables: { slug: data.account.slug } },
+                  ],
                   awaitRefetchQueries: true,
                 });
                 const successMsgArgs = { accountName: data.account.name, accountSlug: data.account.slug };

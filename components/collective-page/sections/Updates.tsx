@@ -5,7 +5,7 @@ import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { Account, Update } from '../../../lib/graphql/types/v2/schema';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
@@ -76,7 +76,6 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
  */
 const SectionUpdates = ({ collective, isAdmin }) => {
   const { data } = useQuery<{ account: Account }>(updatesSectionQuery, {
-    context: API_V2_CONTEXT,
     variables: getUpdatesSectionQueryVariables(collective.slug, isAdmin),
   });
 

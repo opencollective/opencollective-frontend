@@ -3,7 +3,7 @@ import { Query } from '@apollo/client/react/components';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
@@ -69,7 +69,6 @@ class MemberInvitationsPage extends React.Component {
             query={memberInvitationsPageQuery}
             variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
             fetchPolicy="network-only"
-            context={API_V2_CONTEXT}
           >
             {({ data, error, loading }) => (
               <Container background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" py={[4, 5, 6]} px={[2, 3, 4]}>

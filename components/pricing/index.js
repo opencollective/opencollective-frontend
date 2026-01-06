@@ -197,7 +197,7 @@ const Pricing = () => {
           borderRadius="8px"
           mb={['20px', 0]}
           mr={[null, '10px']}
-          minHeight="500px"
+          minHeight="525px"
           background="white"
         >
           <Flex flexDirection={['column', 'row']} alignItems="center">
@@ -233,13 +233,9 @@ const Pricing = () => {
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                   <FormattedMessage
                     id="pricing.collectiveCard.description"
-                    defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account as an <IndependentCollectiveLink>Independent Collective</IndependentCollectiveLink>, or apply to a <FiscalHostLink>Fiscal Host</FiscalHostLink>."
+                    defaultMessage="<strong>Collect, spend, and manage money transparently for a group, project, or initiative.</strong> Collectives do not have a legal entity of their own and must apply to a <FiscalHostLink>Fiscal Host</FiscalHostLink> to operate under their legal entity."
                     values={{
                       ...I18nFormatters,
-                      IndependentCollectiveLink: getI18nLink({
-                        href: 'https://documentation.opencollective.com/independent-collectives/independent-collectives',
-                        openInNewTab: true,
-                      }),
                       FiscalHostLink: getI18nLink({
                         href: 'https://opencollective.com/fiscal-hosting',
                         openInNewTab: true,
@@ -252,7 +248,7 @@ const Pricing = () => {
           </Flex>
           <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '24px', '40px']}>
             <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" fontWeight="500">
-              <FormattedMessage id="pricing.collectiveCard.free" defaultMessage="Free – forever" />
+              <FormattedMessage id="Amount.Free" defaultMessage="Free" />
             </H4>
             <ListWrapper as="ul">
               <ListItem
@@ -275,15 +271,12 @@ const Pricing = () => {
                 />
               </ListItem>
               <ListItem>
-                <FormattedMessage
-                  id="pricing.collectiveCard.hostFees"
-                  defaultMessage="Fiscal Host fees may apply, if you opt to join one"
-                />
+                <FormattedMessage id="pricing.collectiveCard.hostFees" defaultMessage="Fiscal Host fees may apply" />
               </ListItem>
             </ListWrapper>
           </Box>
           <Container display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
-            <Link href="/create">
+            <Link href="/signup/collective">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', null, '160px']}
@@ -303,7 +296,7 @@ const Pricing = () => {
             </Link>
           </Container>
         </Card>
-        <Card border="1px solid #DCDEE0" borderRadius="8px" ml={[null, '10px']} minHeight="500px" background="white">
+        <Card border="1px solid #DCDEE0" borderRadius="8px" ml={[null, '10px']} minHeight="525px" background="white">
           <Flex flexDirection={['column', null, 'row']}>
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
               <NextIllustration
@@ -323,7 +316,7 @@ const Pricing = () => {
                 color="primary.900"
                 mb="8px"
               >
-                <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
+                <FormattedMessage defaultMessage="For Organizations" id="X7kjxh" />
               </P>
               <StyledHR />
               <Box width="144px" height="144px" my="8px" display={[null, null, 'none']}>
@@ -338,7 +331,7 @@ const Pricing = () => {
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                   <FormattedMessage
                     id="pricing.fiscalHostCard.description"
-                    defaultMessage="As a <FiscalHostLink>Fiscal Host</FiscalHostLink>, you hold funds on behalf of Collectives. <strong>You decide what fees to charge</strong> (if any), and share revenue with the platform."
+                    defaultMessage="Hold funds for your own legal entity and/or act as a <FiscalHostLink>Fiscal Host</FiscalHostLink> by holding funds on behalf of Collectives. When hosting, you decide what fees to charge, if any, and share revenue with the platform."
                     values={{
                       strong: I18nBold,
                       FiscalHostLink: getI18nLink({
@@ -376,13 +369,13 @@ const Pricing = () => {
               <ListItem>
                 <FormattedMessage
                   id="pricing.fiscalHost.hostFees"
-                  defaultMessage="15% revenue share with the platform if you charge Host Fees"
+                  defaultMessage="15% share with the platform if you charge Host Fees"
                 />
               </ListItem>
             </ListWrapper>
           </Box>
           <Container display="flex" flexDirection={['column', null, 'row']} alignItems={['center', null, 'flex-start']}>
-            <Link href="/signup/organization">
+            <Link href="/signup/organization?active=true">
               <StyledButton
                 buttonStyle="primary"
                 width={['224px', null, '160px']}
@@ -392,7 +385,7 @@ const Pricing = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, 3]}
               >
-                <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
+                <FormattedMessage id="host.organization.create" defaultMessage="Create an Organization" />
               </StyledButton>
             </Link>
             <Link href="#fiscalHost">

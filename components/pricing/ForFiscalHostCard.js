@@ -183,7 +183,7 @@ const ForFiscalHosts = () => {
             letterSpacing={[null, '-0.00em']}
             color="primary.900"
           >
-            <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
+            <FormattedMessage defaultMessage="For Organizations" id="X7kjxh" />
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">
@@ -298,9 +298,9 @@ const ForFiscalHosts = () => {
       </Flex>
 
       <Flex justifyContent={['center', 'left']} alignItems={['flex-start', 'center']} mt={10}>
-        <Link href="/signup/organization">
+        <Link href="/signup/organization?active=true">
           <StyledButton px={3} py={2} buttonStyle="primary" width="160px" whiteSpace="nowrap" mb={4}>
-            <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
+            <FormattedMessage id="host.organization.create" defaultMessage="Create an Organization" />
           </StyledButton>
         </Link>
       </Flex>

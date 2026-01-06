@@ -3,8 +3,6 @@ import { gql, useMutation } from '@apollo/client';
 import { MinusCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-
 import type { BaseModalProps } from '../../../ModalContext';
 import TransactionRejectMessageForm from '../../../transactions/TransactionRejectMessageForm';
 import {
@@ -55,9 +53,7 @@ const TransactionRejectModal = ({
   setOpen,
   onCloseFocusRef,
 }: TransactionRejectModalProps) => {
-  const [rejectTransaction, { loading }] = useMutation(rejectTransactionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [rejectTransaction, { loading }] = useMutation(rejectTransactionMutation);
   const [message, setMessage] = React.useState('');
 
   const handleRejectTransaction = async () => {

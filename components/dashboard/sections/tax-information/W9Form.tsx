@@ -42,7 +42,8 @@ export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) =>
       ...(submitterType === SubmitterType.Individual
         ? {}
         : {
-            businessName: z.string().min(1).max(255),
+            organizationName: z.string().min(1).max(255),
+            businessName: z.string().max(255).or(z.literal('')).optional(),
             federalTaxClassificationDetails: z.string().max(255).or(z.literal('')).optional(),
             exemptPayeeCode: z.string().max(5).or(z.literal('')).optional(),
             fatcaExemptionCode: z.string().max(14).or(z.literal('')).optional(),
@@ -65,7 +66,10 @@ export const getInitialValuesForW9 = (
     location: { country: 'US', ...pick(account.location, ['country', 'structured']) },
     ...(baseValues.submitterType === SubmitterType.Individual
       ? { federalTaxClassification: FederalTaxClassification.Individual }
-      : { federalTaxClassification: null }),
+      : {
+          organizationName: account.legalName || account.name || '',
+          federalTaxClassification: null,
+        }),
   });
 };
 
@@ -105,7 +109,16 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
       {formik.values.submitterType === SubmitterType.Business && (
         <React.Fragment>
           <p className="mt-2 text-lg font-bold">Business information</p>
-          <StyledInputFormikField name="businessName" label="Business name" />
+          <StyledInputFormikField
+            name="organizationName"
+            label="Name of entity/individual"
+            hint="This name should match the name on your tax return."
+          />
+          <StyledInputFormikField
+            name="businessName"
+            label="Business name/disregarded entity name, if different from above"
+            hint="Only fill this if the business name is different from the name above."
+          />
           <StyledInputFormikField name="federalTaxClassification" label="Federal tax classification">
             {({ field }) => (
               <Select value={values.federalTaxClassification} onValueChange={value => setFieldValue(field.name, value)}>

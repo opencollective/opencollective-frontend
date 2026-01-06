@@ -7,7 +7,6 @@ import { useToast } from '../../components/ui/useToast';
 
 import { getAccountReferenceInput } from '../collective';
 import { i18nGraphqlException } from '../errors';
-import { API_V2_CONTEXT } from '../graphql/helpers';
 import type {
   ConnectPlaidAccountMutation,
   ConnectPlaidAccountMutationVariables,
@@ -108,14 +107,12 @@ export const usePlaidConnectDialog = ({
   const [generatePlaidToken, { data: plaidTokenData, reset: resetPlaidToken }] = useMutation<
     GeneratePlaidLinkTokenMutation,
     GeneratePlaidLinkTokenMutationVariables
-  >(generatePlaidLinkTokenMutation, { context: API_V2_CONTEXT });
+  >(generatePlaidLinkTokenMutation);
   const [connectPlaidAccount] = useMutation<ConnectPlaidAccountMutation, ConnectPlaidAccountMutationVariables>(
     connectPlaidAccountMutation,
-    { context: API_V2_CONTEXT },
   );
   const [refreshPlaidAccount] = useMutation<RefreshPlaidAccountMutation, RefreshPlaidAccountMutationVariables>(
     refreshPlaidAccountMutation,
-    { context: API_V2_CONTEXT },
   );
   const linkToken = plaidTokenData?.generatePlaidLinkToken?.linkToken;
   const { open, ready } = usePlaidLink({

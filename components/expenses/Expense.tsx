@@ -16,7 +16,6 @@ import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { Account } from '../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
@@ -311,9 +310,7 @@ function Expense(props: ExpenseProps) {
     },
   });
 
-  const [editExpense] = useMutation(editExpenseMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [editExpense] = useMutation(editExpenseMutation);
 
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;
@@ -848,6 +845,7 @@ function Expense(props: ExpenseProps) {
       )}
 
       {state.showFilesViewerModal &&
+        expense &&
         createPortal(
           <FilesViewerModal
             allowOutsideInteraction={isDrawer}

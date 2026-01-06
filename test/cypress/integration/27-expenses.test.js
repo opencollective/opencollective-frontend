@@ -833,15 +833,15 @@ describe('Expense flow', () => {
 
     it('Displays expense policy', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
-      cy.get('[data-cy="edit-collective-btn"]:visible').click();
+      cy.get('[data-cy="go-to-dashboard-btn"]').click();
       cy.getByDataCy('menu-item-Settings').click();
-      cy.getByDataCy('menu-item-policies').click();
+      cy.getByDataCy('menu-item-policies').should('be.visible').click();
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
+      cy.checkToast({ variant: 'success', message: 'Policies updated successfully' });
       cy.visit(`${expenseUrl}?forceLegacyFlow=true`);
-      cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
-      cy.getByDataCy('submit-expense-dropdown').click();
+      cy.get('[data-cy="submit-expense-dropdown"]:visible:first').click();
       cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
     });
 
@@ -850,6 +850,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
+      cy.checkToast({ variant: 'success', message: 'Policies updated successfully' });
       cy.createProject({ userEmail: user.email, collective }).then(project => {
         cy.visit(`/${project.slug}/expenses/new?forceLegacyFlow=true`);
         cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');

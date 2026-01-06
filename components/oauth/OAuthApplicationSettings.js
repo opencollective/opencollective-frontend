@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -90,8 +90,8 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
   const router = useRouter();
   const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
-  const { data, loading, error } = useQuery(applicationQuery, { variables: { id }, context: API_V2_CONTEXT });
-  const [updateApplication] = useMutation(updateApplicationMutation, { context: API_V2_CONTEXT });
+  const { data, loading, error } = useQuery(applicationQuery, { variables: { id } });
+  const [updateApplication] = useMutation(updateApplicationMutation);
   return (
     <div data-cy="oauth-app-settings">
       <P mt={3} mb={4}>

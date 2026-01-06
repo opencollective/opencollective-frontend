@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
@@ -62,8 +62,6 @@ const isAutoFocused = id => {
   return id && typeof window !== 'undefined' && get(window, 'location.hash') === `#${id}`;
 };
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 /** A small helper to make the form work with params from both API V1 & V2 */
 const prepareCommentParams = (html, conversationId, expenseId, updateId, hostApplicationId) => {
   const comment = { html };
@@ -111,7 +109,7 @@ const CommentForm = ({
   submitButtonJustify,
   submitButtonVariant,
 }) => {
-  const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
+  const [createComment, { loading, error }] = useMutation(createCommentMutation);
   const intl = useIntl();
   const [html, setHtml] = useState('');
   const [resetValue, setResetValue] = useState();

@@ -11,7 +11,7 @@ import { AmountTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -102,7 +102,7 @@ const OTHER_LABEL = 'Other';
 
 export const useUpdateOrder = ({ contribution, onSuccess }) => {
   const { toast } = useToast();
-  const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation, { context: API_V2_CONTEXT });
+  const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation);
   return {
     isSubmittingOrder: loading,
     updateOrder: async (selectedTier, selectedAmountOption, inputAmountValue, paypalSubscriptionId = null) => {
@@ -286,7 +286,7 @@ export const ContributionInterval = ({ tier, contribution }) => {
 const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // GraphQL mutations and queries
   const queryVariables = { slug: contribution.toAccount.slug };
-  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+  const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables });
 
   // state management
   const { locale } = useIntl();

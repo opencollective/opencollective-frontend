@@ -3,6 +3,7 @@ import { useMutation } from '@apollo/client';
 import { Image as ImageIcon } from '@styled-icons/boxicons-regular/Image';
 import { AngleDoubleDown } from '@styled-icons/fa-solid/AngleDoubleDown';
 import { cloneDeep, get, set } from 'lodash';
+import { RotateCcw, Save, Upload } from 'lucide-react';
 import ReactDropzone from 'react-dropzone';
 import Cropper from 'react-easy-crop';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -10,6 +11,7 @@ import { styled } from 'styled-components';
 
 import { upload } from '../../../lib/api';
 import { formatErrorMessage, getErrorFromXhrUpload, i18nGraphqlException } from '../../../lib/errors';
+import { API_V1_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveBackgroundMutation } from '../../../lib/graphql/v1/mutations';
 import { useElementSize } from '../../../lib/hooks/useElementSize';
 import { mergeRefs } from '../../../lib/react-utils';
@@ -18,10 +20,10 @@ import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { DROPZONE_ACCEPT_IMAGES } from '../../Dropzone';
 import { Box, Flex } from '../../Grid';
-import StyledButton from '../../StyledButton';
 import StyledInputSlider from '../../StyledInputSlider';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { Span } from '../../Text';
+import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 
 import {
@@ -35,7 +37,6 @@ import {
 } from './HeroBackground';
 
 const KEY_IMG_REMOVE = '__REMOVE__';
-const BUTTONS_PROPS = { buttonSize: 'small', py: 1, my: 1, mx: 2, width: ['100%', 'auto'] };
 
 const EmptyDropzoneContainer = styled.div`
   border: 2px dashed #c3c6cb;
@@ -64,7 +65,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const [isSubmitting, setSubmitting] = React.useState(false); // Not using Apollo to have a common flag with file upload
   const intl = useIntl();
   const { toast } = useToast();
-  const [editBackground] = useMutation(editCollectiveBackgroundMutation);
+  const [editBackground] = useMutation(editCollectiveBackgroundMutation, { context: API_V1_CONTEXT });
   const containerSize = useElementSize({ defaultWidth: 600 });
   const [mediaSize, setMediaSize] = React.useState();
   const [crop, onCropChange] = React.useState(getCrop(collective));
@@ -192,13 +193,15 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
               </ModalBody>
               <ModalFooter>
                 <Flex justifyContent="space-between" flexWrap="wrap" my={1}>
-                  <Flex flexWrap="wrap" width={['100%', 'auto']}>
-                    <StyledButton
-                      {...BUTTONS_PROPS}
-                      buttonStyle="primary"
+                  <Button variant="outline" size="sm" onClick={open} disabled={isSubmitting}>
+                    <Upload size={16} className="mr-2" />
+                    <FormattedMessage defaultMessage="Upload new image" id="v4BgXt" />
+                  </Button>
+                  <Flex flexWrap="wrap" flexDirection="row-reverse" width={['100%', 'auto']} gap="8px">
+                    <Button
+                      size="sm"
                       data-cy="heroBackgroundDropzoneSave"
-                      py={1}
-                      minWidth={75}
+                      className="min-w-[75px]"
                       loading={isSubmitting}
                       onClick={async () => {
                         setSubmitting(true);
@@ -263,10 +266,12 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                         }
                       }}
                     >
+                      <Save size={16} className="mr-2" />
                       <FormattedMessage id="save" defaultMessage="Save" />
-                    </StyledButton>
-                    <StyledButton
-                      {...BUTTONS_PROPS}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       disabled={!hasImage || isSubmitting}
                       onClick={() => {
                         onCropChange(DEFAULT_BACKGROUND_CROP);
@@ -274,12 +279,10 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                         setUploadedImage(KEY_IMG_REMOVE);
                       }}
                     >
+                      <RotateCcw size={16} className="mr-2" />
                       <FormattedMessage id="Reset" defaultMessage="Reset" />
-                    </StyledButton>
+                    </Button>
                   </Flex>
-                  <StyledButton {...BUTTONS_PROPS} onClick={open} disabled={isSubmitting}>
-                    <FormattedMessage defaultMessage="Upload new image" id="v4BgXt" />
-                  </StyledButton>
                 </Flex>
               </ModalFooter>
             </React.Fragment>

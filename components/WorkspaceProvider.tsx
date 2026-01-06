@@ -5,8 +5,8 @@ import useLocalStorage from '../lib/hooks/useLocalStorage';
 import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
 type WorkspaceContextType = {
-  workspace: { slug?: string };
-  setWorkspace: React.Dispatch<React.SetStateAction<{ slug?: string }>>;
+  workspace: { slug?: string; isHost?: boolean };
+  setWorkspace: React.Dispatch<React.SetStateAction<{ slug?: string; isHost?: boolean }>>;
 };
 
 const WorkspaceContext = createContext<WorkspaceContextType | null>(null);

@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
 import { UploadedFileKind } from '../../lib/graphql/types/v2/schema';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
@@ -204,8 +204,8 @@ const validateVendorForm = values => {
 const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxForm, ...props }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
-  const [editVendor, { loading: isEditing }] = useMutation(editVendorMutation, { context: API_V2_CONTEXT });
+  const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation);
+  const [editVendor, { loading: isEditing }] = useMutation(editVendorMutation);
   const drawerActionsContainer = useDrawerActionsContainer();
 
   const handleSubmit = async values => {

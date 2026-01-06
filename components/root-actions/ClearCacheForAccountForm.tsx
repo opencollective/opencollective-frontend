@@ -4,7 +4,7 @@ import { startCase, uniq } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import type { ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
 import { AccountCacheType } from '../../lib/graphql/types/v2/schema';
 
@@ -32,9 +32,7 @@ const clearCacheMutation = gql`
 const ClearCacheForAccountForm = () => {
   const [account, setAccount] = React.useState(null);
   const [cacheTypes, setCacheTypes] = React.useState<AccountCacheType[]>(() => [...CACHE_TYPES]);
-  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation);
   const { toast } = useToast();
   const isValid = account && cacheTypes.length > 0;
   const intl = useIntl();

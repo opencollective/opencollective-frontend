@@ -64,7 +64,7 @@ const Page = ({
 
   const childProps = { LoggedInUser, loadingLoggedInUser };
   return (
-    <div>
+    <div className="flex min-h-screen flex-col">
       <Header
         showSearch={showSearch}
         title={title}
@@ -82,7 +82,7 @@ const Page = ({
         withTopBar={withTopBar}
         updatesRss={updatesRss}
       />
-      <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
+      <Body className="flex-1">{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
     </div>
   );

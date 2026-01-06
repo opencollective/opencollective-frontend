@@ -5,7 +5,6 @@ import { Check, Copy, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import useProcessExpense from '@/lib/expenses/useProcessExpense';
 import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
@@ -140,11 +139,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
   const [isGrantFlowOpen, setIsGrantFlowOpen] = React.useState(false);
-
-  const isHost = isHostAccount(account);
-
   const permissions = props.grant?.permissions;
-
   const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
   const processExpense = useProcessExpense({
     expense: props.grant,
@@ -173,7 +168,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
                   router.push(
                     getDashboardRoute(
                       account,
-                      `${isHost ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${isHost ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
+                      `${account.hasHosting ? 'hosted-grants' : 'grants'}?fromAccount=${props.grant.payee.slug}${account.hasHosting ? '&sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL' : ''}`,
                     ),
                   )
                 }
@@ -231,7 +226,6 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
 
 function BeneficiaryCell({ grant }) {
   const { account: dashboardAccount } = React.useContext(DashboardContext);
-  const isHostDashboardAccount = isHostAccount(dashboardAccount);
 
   const intl = useIntl();
 
@@ -242,7 +236,7 @@ function BeneficiaryCell({ grant }) {
 
   const previousGrantsLink = getDashboardRoute(
     dashboardAccount,
-    `${isHostDashboardAccount ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${isHostDashboardAccount ? `&status=ALL` : ''}`,
+    `${dashboardAccount.hasHosting ? 'hosted-grants' : 'grants'}?sort[field]=CREATED_AT&sort[direction]=DESC&fromAccount=${beneficiary.slug}${dashboardAccount.hasHosting ? `&status=ALL` : ''}`,
   );
 
   return (

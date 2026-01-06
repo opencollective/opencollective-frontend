@@ -6,6 +6,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
+import { KYCRequests } from '../kyc/dashboard/KYCRequests';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import AccountSettingsForm from '../root-actions/AccountSettings';
@@ -31,8 +32,8 @@ import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
 import PeopleRouter from './sections/community/People';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
-import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
+import IncompleteContributions from './sections/contributions/IncompleteContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
@@ -52,6 +53,7 @@ import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import { DashboardPlatformSubscription } from './sections/platform-subscription/DashboardPlatformSubscription';
 import Reports from './sections/reports/Reports';
+import Search from './sections/search/Search';
 import LegacyPlatformSubscribers from './sections/subscriptions/LegacyPlatformSubscribers';
 import PlatformSubscribers from './sections/subscriptions/PlatformSubscribers';
 import { TaxInformationSettingsSection } from './sections/tax-information';
@@ -76,6 +78,7 @@ import {
   SETTINGS_SECTIONS,
 } from './constants';
 import { DashboardContext } from './DashboardContext';
+import DashboardErrorBoundary from './DashboardErrorBoundary';
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
@@ -84,7 +87,6 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
   [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
-  [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
@@ -102,9 +104,11 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.PEOPLE]: PeopleRouter,
+  [SECTIONS.KYC]: KYCRequests,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
+  [SECTIONS.INCOMPLETE_CONTRIBUTIONS]: IncompleteContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.UPDATES]: Updates,
@@ -112,13 +116,14 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
   [SECTIONS.ACCOUNTS]: Accounts,
-  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
+  [SECTIONS.SEARCH]: Search,
 };
 
 const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
+  [SECTIONS.PLATFORM_SUBSCRIPTION]: DashboardPlatformSubscription,
 };
 
 const ROOT_COMPONENTS = {
@@ -168,8 +173,10 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const RootComponent = ROOT_COMPONENTS[section];
   if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
-      <div className="w-full pb-6">
-        <RootComponent subpath={subpath} isDashboard />
+      <div className="w-full">
+        <DashboardErrorBoundary>
+          <RootComponent subpath={subpath} isDashboard />
+        </DashboardErrorBoundary>
       </div>
     );
   }
@@ -177,20 +184,24 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
     return (
-      <div className="w-full pb-6">
-        <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
+      <div className="h-full w-full">
+        <DashboardErrorBoundary>
+          <DashboardComponent accountSlug={account.slug} account={account} subpath={subpath} isDashboard />
+        </DashboardErrorBoundary>
       </div>
     );
   }
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-(--breakpoint-lg) pb-6">
+      <div className="w-full">
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
 
-        <AccountSettings account={account} section={section} />
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
+        </DashboardErrorBoundary>
       </div>
     );
   }
@@ -199,24 +210,24 @@ const DashboardSection = ({ account, isLoading, section, subpath }: DashboardSec
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      // <div className="flex max-w-(--breakpoint-lg) justify-center">
-      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
-        <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+      <div className="mx-auto w-full max-w-(--breakpoint-md)">
+        <DashboardErrorBoundary>
+          <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        </DashboardErrorBoundary>
       </div>
     );
   }
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      // <div className="flex max-w-(--breakpoint-lg) justify-center">
-      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
+      <div className="mx-auto w-full max-w-(--breakpoint-md)">
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
-
-        <AccountSettings account={account} section={section} />
+        <DashboardErrorBoundary>
+          <AccountSettings account={account} section={section} />
+        </DashboardErrorBoundary>
       </div>
-      // </div>
     );
   }
 

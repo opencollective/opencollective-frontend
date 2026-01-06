@@ -1,9 +1,13 @@
 import React from 'react';
+import type { FieldMetaProps } from 'formik';
+import { Field } from 'formik';
 import { pick, uniqBy } from 'lodash';
+import { AlertCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 
+import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -134,6 +138,23 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
           </RadioGroupCard>
         )}
       </RadioGroup>
+      {/** Show errors for account field (usually unsupported expense types) */}
+      {Boolean(props.accountSlug && !props.accountSlug.startsWith('__')) && (
+        <Field name="accountSlug">
+          {({ meta }: { meta: FieldMetaProps<string> }) => {
+            if (!meta.error) {
+              return null;
+            }
+            return (
+              <Alert variant="destructive" className="mt-4">
+                <AlertDescription>
+                  <AlertCircle className="inline-block align-text-bottom" size={16} /> {meta.error}
+                </AlertDescription>
+              </Alert>
+            );
+          }}
+        </Field>
+      )}
     </FormSectionContainer>
   );
 }, getFormProps);

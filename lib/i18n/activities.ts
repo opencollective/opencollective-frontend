@@ -179,6 +179,30 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     id: 'HTHBXN',
     avatar: 'fromAccount',
   },
+  ACTIVATED_HOSTING: {
+    defaultMessage: '<Individual></Individual> activated "Fiscal Hosting"',
+    id: '10zzEB',
+  },
+  ACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: '<Individual></Individual> activated "Money Management"',
+    id: 'H7Z/m9',
+  },
+  DEACTIVATED_HOSTING: {
+    defaultMessage: '<Individual></Individual> deactivated "Fiscal Hosting"',
+    id: '0meZND',
+  },
+  DEACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: '<Individual></Individual> deactivated "Money Management"',
+    id: '3uQNWr',
+  },
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE: {
+    defaultMessage: '<Individual></Individual> converted to Collective',
+    id: 'KrCkBc',
+  },
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION: {
+    defaultMessage: '<Individual></Individual> converted to Organization',
+    id: 'St4vQ3',
+  },
 });
 
 export const ActivityDescriptionI18n = defineMessages({
@@ -195,6 +219,14 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_EDITED: {
     defaultMessage: '<Account></Account> edited',
     id: 'A4+n4H',
+  },
+  COLLECTIVE_CONVERTED_TO_ORGANIZATION: {
+    defaultMessage: '<Account></Account> converted to Organization',
+    id: 'Gj4ZS9',
+  },
+  ORGANIZATION_CONVERTED_TO_COLLECTIVE: {
+    defaultMessage: '<Account></Account> converted to Collective',
+    id: 'fwgTtu',
   },
   COLLECTIVE_REJECTED: {
     defaultMessage: '<Account></Account> application rejected',
@@ -581,6 +613,22 @@ export const ActivityDescriptionI18n = defineMessages({
   ADDED_FUNDS_EDITED: {
     defaultMessage: '<Individual></Individual> edited added funds',
     id: 'nxtsKq',
+  },
+  ACTIVATED_HOSTING: {
+    defaultMessage: 'Activated "Fiscal Hosting" on <Account></Account>',
+    id: 'jBr7+k',
+  },
+  ACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: 'Activated "Money Management" on <Account></Account>',
+    id: 'v+IOuX',
+  },
+  DEACTIVATED_HOSTING: {
+    defaultMessage: 'Deactivated "Fiscal Hosting" on <Account></Account>',
+    id: 'dHKP5Y',
+  },
+  DEACTIVATED_MONEY_MANAGEMENT: {
+    defaultMessage: 'Deactivated "Money Management" on <Account></Account>',
+    id: 'Cqq301',
   },
 });
 

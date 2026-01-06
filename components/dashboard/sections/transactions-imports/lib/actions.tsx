@@ -1,12 +1,11 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { cloneDeep, pick, uniq, update } from 'lodash';
-import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon } from 'lucide-react';
+import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon, Unlink } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
@@ -18,6 +17,7 @@ import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchCreditDialog } from '../MatchCreditDialog';
 import { MatchDebitDialog } from '../MatchDebitDialog';
+import { UnlinkTransactionImportRowDialog } from '../UnlinkTransactionImportRowDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
@@ -56,12 +56,16 @@ const getOptimisticResponse = (
 export const useTransactionsImportActions = ({
   host,
   getAllRowsIds,
+  onUpdateSuccess,
+  skipOptimisticResponse,
 }: {
   host: React.ComponentProps<typeof MatchCreditDialog>['host'] &
     React.ComponentProps<typeof MatchDebitDialog>['host'] &
     React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
   /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
   getAllRowsIds: () => Promise<string[]>;
+  onUpdateSuccess?: () => void;
+  skipOptimisticResponse?: boolean;
 }): {
   getActions: GetActions<TransactionsImportRow>;
   setRowsStatus: (
@@ -73,7 +77,7 @@ export const useTransactionsImportActions = ({
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
-  const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [updateRows] = useMutation(updateTransactionsImportRows);
   const { showModal, hideModal } = useModal();
 
   const setRowsStatus = async (
@@ -105,8 +109,10 @@ export const useTransactionsImportActions = ({
           action,
           rows: allRowsIds.map(id => ({ id, status: newStatus })),
         },
-        optimisticResponse: getOptimisticResponse(host, rowIds, newStatus),
+        optimisticResponse: !skipOptimisticResponse ? getOptimisticResponse(host, rowIds, newStatus) : undefined,
       });
+
+      onUpdateSuccess?.();
 
       return true;
     } catch (error) {
@@ -135,6 +141,52 @@ export const useTransactionsImportActions = ({
     };
 
     if (isImported) {
+      const handleRevert = async () => {
+        hideModal('unlink-transaction-import-row-modal');
+        setUpdatingRows(uniq([...updatingRows, row.id]));
+        try {
+          const action = 'UNLINK';
+          await updateRows({
+            variables: {
+              action,
+              rows: [{ id: row.id }],
+            },
+            optimisticResponse: !skipOptimisticResponse
+              ? getOptimisticResponse(host, [row.id], TransactionsImportRowStatus.PENDING)
+              : undefined,
+          });
+
+          onUpdateSuccess?.();
+          toast({
+            variant: 'success',
+            message: intl.formatMessage({
+              defaultMessage: 'Transaction import row unlinked successfully',
+              id: 'UnlinkTransactionImportRowSuccess',
+            }),
+          });
+        } catch (error) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+        } finally {
+          setUpdatingRows(updatingRows.filter(rowId => rowId !== row.id));
+        }
+      };
+
+      actions.primary.push({
+        key: 'revert',
+        Icon: Unlink,
+        label: <FormattedMessage defaultMessage="Unlink" id="Transaction.Unlink" />,
+        disabled: isUpdatingRow,
+        onClick: () => {
+          showModal(
+            UnlinkTransactionImportRowDialog,
+            {
+              row,
+              onConfirm: handleRevert,
+            },
+            'unlink-transaction-import-row-modal',
+          );
+        },
+      });
       return actions;
     } else if (row.status !== TransactionsImportRowStatus.IGNORED) {
       if (row.amount.valueInCents > 0) {

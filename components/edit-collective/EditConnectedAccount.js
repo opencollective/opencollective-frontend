@@ -201,9 +201,9 @@ class EditConnectedAccount extends React.Component {
               />
             ) : (
               <Box>
-                <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>
+                <p className="mb-3 text-sm text-gray-700">
                   {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
-                </P>
+                </p>
                 <Button
                   data-cy={`connect-${service}-button`}
                   size="sm"

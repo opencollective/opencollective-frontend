@@ -5,7 +5,6 @@ import { z } from 'zod';
 
 import dayjs from '../../../../lib/dayjs';
 import { integer } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -85,7 +84,7 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
       ...queryFilter.variables,
       includeGroups: false,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-first',
   });
   const columns = getColumns(intl);
@@ -108,7 +107,7 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
   );
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
         actions={<div className="flex items-center gap-2"></div>}

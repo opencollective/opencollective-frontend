@@ -151,7 +151,7 @@ const WhatAreTheBenefits = () => {
         </Box>
         <Box width={[null, '264px', '344px', null, '408px']} textAlign={['center', 'left']} ml={[null, 4, 0, 5]}>
           <Title>
-            <FormattedMessage id="fiscalHosting.whatAreTheBenefits.moneyManagement" defaultMessage="Money management" />
+            <FormattedMessage id="Welcome.Organization.MoneyManagement" defaultMessage="Money Management" />
           </Title>
           <Description>
             <FormattedMessage

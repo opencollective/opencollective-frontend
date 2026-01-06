@@ -6,7 +6,6 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import {
   type Account,
@@ -19,6 +18,8 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { sortSelectOptions } from '@/lib/utils';
+
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import StyledButton from '../../../StyledButton';
@@ -34,7 +35,12 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import type { FilterMeta as CommonFilterMeta } from './filters';
-import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
+import {
+  ExpenseAccountingCategoryKinds,
+  filters as commonFilters,
+  schema as commonSchema,
+  toVariables as commonToVariables,
+} from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
@@ -114,7 +120,6 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     refetch: refetchMetadata,
   } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
-    context: API_V2_CONTEXT,
   });
 
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
@@ -132,6 +137,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     hostSlug: hostSlug,
     includeUncategorized: true,
     omitExpenseTypesInFilter,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter<typeof schema | typeof schemaWithoutHost, { type: ExpenseType }>({
@@ -141,7 +147,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     filters: hostSlug ? filters : filtersWithoutHost,
   });
 
-  const { data, loading, refetch } = useQuery(accountExpensesQuery, {
+  const { data, loading, refetch, error } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
@@ -152,7 +158,6 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
         : {}),
     },
-    context: API_V2_CONTEXT,
   });
 
   const hasNewSubmitExpenseFlow =
@@ -162,7 +167,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
           description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
@@ -204,7 +209,9 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         )}
         <Filterbar {...queryFilter} />
 
-        {!loading && !data.expenses?.nodes.length ? (
+        {!loading && error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : !loading && !data.expenses?.nodes.length ? (
           <EmptyResults
             entityType="EXPENSES"
             onResetFilters={() => queryFilter.resetFilters({})}

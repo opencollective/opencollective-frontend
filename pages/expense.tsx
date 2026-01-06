@@ -8,7 +8,6 @@ import { defineMessages, useIntl } from 'react-intl';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -56,7 +55,6 @@ const expensePageQueryHelper = getSSRQueryHelpers<
   ReturnType<typeof getPropsFromQuery>
 >({
   query: expensePageQuery,
-  context: API_V2_CONTEXT,
   getVariablesFromContext: context => getVariablesFromQuery(context.query),
   getPropsFromContext: context => getPropsFromQuery(context.query),
 });

@@ -1,13 +1,20 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
-import { Calendar, TestTube2, UserCog } from 'lucide-react';
+import { isEmpty } from 'lodash';
+import { ArrowUp, Calendar, LoaderCircle, Pencil, TestTube2, UserCog } from 'lucide-react';
+import type { FileRejection } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import { styled } from 'styled-components';
 import type { BorderProps, ColorProps, LayoutProps, SpaceProps } from 'styled-system';
 import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
+import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
+import { useImageUploader } from '@/lib/hooks/useImageUploader';
+import { cn } from '@/lib/utils';
 
+import { DROPZONE_ACCEPT_IMAGES } from './Dropzone';
 import type { FlexProps } from './Grid';
 import { Flex } from './Grid';
 
@@ -108,6 +115,8 @@ const Avatar = ({
   style?: React.CSSProperties;
 } & React.ComponentProps<typeof StyledAvatar>) => {
   let child = children;
+  const isIndividual = type === 'INDIVIDUAL' || type === 'USER';
+
   if (collective?.type === 'ROOT') {
     useIcon = true;
   }
@@ -127,13 +136,13 @@ const Avatar = ({
     } else {
       src = getCollectiveImage(collective, { height: getImageHeightFromRadius(radius) });
     }
-
-    if (!src && !child) {
-      if ((type === 'USER' || type === 'INDIVIDUAL') && name) {
-        child = <span>{getInitials(name)}</span>;
-      }
+  }
+  if (!src && !child) {
+    if (isIndividual && !isEmpty(name)) {
+      child = <span>{getInitials(name)}</span>;
     }
   }
+
   return (
     <StyledAvatar size={radius} type={type} src={src} title={displayTitle ? name : undefined} {...styleProps}>
       {child}
@@ -187,3 +196,84 @@ export const GuestAvatar = avatarProps => {
 
 /** @component */
 export default Avatar;
+
+/**
+ * Editable Avatar Field following new UI patterns
+ */
+export const EditAvatar = ({
+  value,
+  name,
+  type,
+  size,
+  minSize,
+  maxSize,
+  onSuccess,
+  onReject,
+}: {
+  value?: string;
+  name?: string;
+  type?: string;
+  size: string | number;
+  minSize?: number;
+  maxSize?: number;
+  onSuccess: ({ url }: { url: string }) => void;
+  onReject?: ({ message }: { message: string }) => void;
+}) => {
+  const { uploadFiles, isUploading } = useImageUploader({
+    isMulti: false,
+    mockImageGenerator: () => `https://loremflickr.com/120/120/logo`,
+    onSuccess,
+    onReject,
+    kind: UploadedFileKind.ACCOUNT_AVATAR,
+    accept: DROPZONE_ACCEPT_IMAGES,
+  });
+  const onDropCallback = React.useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      uploadFiles(acceptedFiles, fileRejections);
+    },
+    [uploadFiles],
+  );
+  const isIndividual = type === 'INDIVIDUAL' || type === 'USER';
+  const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
+  const dropProps = getRootProps();
+  return (
+    <div
+      data-cy={`avatar-dropzone`}
+      className="group relative cursor-pointer outline-none"
+      style={{ height: size, width: size }}
+      {...dropProps}
+      role="button"
+      tabIndex={0}
+    >
+      <input name={name} {...getInputProps()} />
+      <Avatar
+        size={size}
+        className={cn(
+          'relative ring-ring ring-offset-background transition-[color,box-shadow] duration-300 group-hover:ring-2 group-focus:ring-2 after:absolute after:size-[100%] after:bg-white/0 after:transition-colors after:duration-300 group-hover:after:bg-white/30',
+          isUploading && 'opacity-30 ring-0!',
+          isDragActive && 'ring-2 ring-primary after:bg-white/30',
+        )}
+        src={isIndividual ? value || '/static/images/sample-avatar.png' : value}
+        backgroundSize={value ? undefined : '80%'}
+        type={type || 'INDIVIDUAL'}
+        name={name}
+        displayTitle
+      />
+      <div
+        className={cn(
+          'absolute right-0 bottom-0 flex size-8 items-center justify-center rounded-full bg-white shadow-md transition-colors duration-300 group-hover:bg-primary group-focus:bg-primary',
+          (isUploading || isDragActive) && 'bg-primary',
+        )}
+      >
+        {isUploading ? (
+          <LoaderCircle size={16} className="text-white motion-safe:animate-spin" />
+        ) : isDragActive ? (
+          <ArrowUp size={14} className="text-white" />
+        ) : (
+          <Pencil size={14} className="text-muted-foreground group-hover:text-white group-focus:text-white" />
+        )}
+      </div>
+    </div>
+  );
+};

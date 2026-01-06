@@ -1,8 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box } from '../Grid';
@@ -16,7 +14,6 @@ const RecurringContributions = () => {
   const { data, loading } = useQuery(manageContributionsQuery, {
     skip: !account,
     variables: { slug: account?.slug },
-    context: API_V2_CONTEXT,
   });
   return (
     <Box>

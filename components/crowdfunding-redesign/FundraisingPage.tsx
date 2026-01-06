@@ -4,8 +4,6 @@ import { Markup } from 'interweave';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 
 import { ContentOverview } from './ContentOverview';
@@ -17,7 +15,6 @@ export function FundraisingPage() {
   const router = useRouter();
   const { data, error, loading } = useQuery(profilePageQuery, {
     variables: { slug: router.query.accountSlug },
-    context: API_V2_CONTEXT,
   });
   const account = data?.account;
   const fundraiser = getDefaultFundraiserValues(account);

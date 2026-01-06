@@ -11,6 +11,7 @@ import type {
 } from '../../../../lib/graphql/types/v2/graphql';
 import type { Currency } from '../../../../lib/graphql/types/v2/schema';
 import {
+  AccountingCategoryKind,
   ExpenseStatusFilter,
   ExpenseType,
   LastCommentBy,
@@ -60,9 +61,12 @@ export const schema = z.object({
 
 export type FilterValues = z.infer<typeof schema>;
 
+export const ExpenseAccountingCategoryKinds = [AccountingCategoryKind.EXPENSE] as const;
+
 export type FilterMeta = {
   currency?: Currency;
   hideExpensesMetaStatuses?: boolean;
+  accountingCategoryKinds?: readonly AccountingCategoryKind[];
 };
 
 // Only needed when either the key or the expected query variables are different

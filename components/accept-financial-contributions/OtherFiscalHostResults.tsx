@@ -4,8 +4,7 @@ import { styled } from 'styled-components';
 
 import type { Account, Host } from '../../lib/graphql/types/v2/schema';
 
-import { Box, Flex, Grid } from '../Grid';
-import { P } from '../Text';
+import { Grid } from '../Grid';
 
 import ApplyToHostCard from './ApplyToHostCard';
 
@@ -24,20 +23,18 @@ export default function OtherFiscalHostResults({
   hosts,
   totalCount,
   collective,
-  onHostApplyClick,
 }: {
   hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
   totalCount: number;
   collective: Pick<Account, 'slug'>;
-  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   return (
-    <Box>
-      <Flex>
-        <P mr={3} fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
+    <div>
+      <div className="flex flex-wrap items-baseline gap-3">
+        <h1 className="text-2xl font-bold">
           <FormattedMessage defaultMessage="Other Hosts" id="8DxsHx" />
-        </P>
-        <P fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
+        </h1>
+        <p>
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
             id="PB3Bh9"
@@ -45,15 +42,13 @@ export default function OtherFiscalHostResults({
               hostCount: totalCount,
             }}
           />
-        </P>
-      </Flex>
+        </p>
+      </div>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
-          return (
-            <ApplyToHostCard key={host.slug} host={host} collective={collective} onHostApplyClick={onHostApplyClick} />
-          );
+          return <ApplyToHostCard key={host.slug} host={host} collective={collective} />;
         })}
       </HostCardContainer>
-    </Box>
+    </div>
   );
 }

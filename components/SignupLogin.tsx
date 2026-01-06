@@ -91,7 +91,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
             <div className="relative">
               <div className="space-y-3">
                 <Link
-                  href="/signup/organization?active=true"
+                  href="/signup/organization"
                   className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <div>
@@ -106,7 +106,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
                 </Link>
 
                 <Link
-                  href="/create"
+                  href="/signup/collective"
                   className="group flex w-full items-center justify-between rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   <div>
@@ -123,7 +123,7 @@ const SignupLogin: React.FC<SignupLoginProps> = ({
 
               <div className="mt-4">
                 <span className="text-sm text-muted-foreground">Or </span>
-                <Link href="/create-account" className="text-sm text-blue-800 underline hover:text-blue-700">
+                <Link href="/signup" className="text-sm text-blue-800 underline hover:text-blue-700">
                   <FormattedMessage defaultMessage="Join as an individual" id="s+BE7Y" />
                 </Link>
               </div>

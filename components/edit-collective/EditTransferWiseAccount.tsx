@@ -3,12 +3,12 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { connectAccount } from '../../lib/api';
-import { editCollectiveSettingsMutation } from '../../lib/graphql/v1/mutations';
+import { connectAccount } from '@/lib/api';
 import { i18nGraphqlException } from '@/lib/errors';
-import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import { API_V1_CONTEXT } from '@/lib/graphql/helpers';
 import type { EditTransferWiseAccountQuery } from '@/lib/graphql/types/v2/graphql';
 import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
+import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
@@ -64,12 +64,9 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
   const { LoggedInUser } = useLoggedInUser();
   const { data, loading, refetch } = useQuery<EditTransferWiseAccountQuery>(editTransferWiseAccountQuery, {
     variables: { slug: collective.slug },
-    context: API_V2_CONTEXT,
   });
-  const [deleteTransferWiseAccount, { loading: deleting }] = useMutation(deleteTransferWiseAccountMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [setSettings, { loading: mutating }] = useMutation(editCollectiveSettingsMutation);
+  const [deleteTransferWiseAccount, { loading: deleting }] = useMutation(deleteTransferWiseAccountMutation);
+  const [setSettings, { loading: mutating }] = useMutation(editCollectiveSettingsMutation, { context: API_V1_CONTEXT });
   const connectedAccounts = data?.account?.connectedAccounts;
   const userIsConnected = connectedAccounts?.some(
     account => account.createdByAccount?.legacyId === LoggedInUser?.CollectiveId,
@@ -201,7 +198,7 @@ const EditTransferWiseAccount = ({ collective }: { collective: Account }) => {
           </MessageBox>
         )}
 
-        <Button size="sm" className="mt-2 w-fit" variant="outline" type="submit" onClick={handleConnect}>
+        <Button size="sm" className="w-fit" type="submit" onClick={handleConnect}>
           <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
         </Button>
       </React.Fragment>

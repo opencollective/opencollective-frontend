@@ -5,7 +5,7 @@ import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
@@ -45,8 +45,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const mutationOptions = { context: API_V2_CONTEXT };
-  const [processOrder, { loading }] = useMutation(processPendingOrderMutation, mutationOptions);
+  const [processOrder, { loading }] = useMutation(processPendingOrderMutation);
   const [hasConfirm, setConfirm] = React.useState(false);
   const [showContributionConfirmationModal, setShowContributionConfirmationModal] = React.useState(false);
 
@@ -149,13 +148,12 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
           )}
         </ConfirmationModal>
       )}
-      {showContributionConfirmationModal && (
-        <ContributionConfirmationModal
-          order={order}
-          onClose={() => setShowContributionConfirmationModal(false)}
-          onSuccess={onSuccess}
-        />
-      )}
+      <ContributionConfirmationModal
+        order={order}
+        open={showContributionConfirmationModal}
+        setOpen={setShowContributionConfirmationModal}
+        onSuccess={onSuccess}
+      />
     </React.Fragment>
   );
 };

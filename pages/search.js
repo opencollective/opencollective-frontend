@@ -10,7 +10,7 @@ import styled, { css } from 'styled-components';
 import { padding } from 'styled-system';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 import { textTransform } from '@/lib/styled-system-custom-properties';
@@ -689,7 +689,6 @@ const searchPageQuery = gql`
 
 const addSearchPageData = graphql(searchPageQuery, {
   options: props => ({
-    context: API_V2_CONTEXT,
     variables: {
       term: props.term,
       type: props.type,

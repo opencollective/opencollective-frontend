@@ -1,74 +1,46 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { pick } from 'lodash';
 import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { integer } from '@/lib/filters/schemas';
-import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
-import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
+import { CollectiveType } from '@/lib/constants/collectives';
+import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
+import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
+import type { Account, AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import { KycProvider } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
-import { i18nExpenseType } from '@/lib/i18n/expense';
-import { cn } from '@/lib/utils';
+import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
-import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
-import { InfoTooltipIcon } from '@/components/InfoTooltipIcon';
+import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
-import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
+import { InfoList, InfoListItem } from '@/components/ui/InfoList';
 
 import Avatar from '../../../Avatar';
 import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
-import { Pagination } from '../../filters/Pagination';
-import { Metric } from '../overview/Metric';
-import TimelineItem from '../overview/TimelineItem';
 
-import {
-  communityAccountActivitiesQuery,
-  communityAccountContributionsDetailQuery,
-  communityAccountDetailQuery,
-  communityAccountExpensesDetailQuery,
-} from './queries';
-
-const expenseSummaryColumns = [
-  {
-    accessorKey: 'year',
-    header: () => <FormattedMessage defaultMessage="Year" id="IFo1oo" />,
-    cell: ({ cell }) => {
-      return cell.getValue();
-    },
-  },
-  {
-    accessorKey: 'expenseCount',
-    header: () => <FormattedMessage defaultMessage="Expenses Submitted" id="ExpensesSubmitted" />,
-    cell: ({ cell }) => {
-      return cell.getValue();
-    },
-  },
-  {
-    accessorKey: 'expenseTotal',
-    header: () => <FormattedMessage defaultMessage="Total Expended" id="TotalExpended" />,
-    cell: ({ cell }) => {
-      const amount = cell.getValue();
-      return <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />;
-    },
-  },
-];
+import { ActivitiesTab } from './AccountDetailActivitiesTab';
+import { ContributionsTab } from './AccountDetailContributionsTab';
+import { ExpensesTab } from './AccountDetailExpensesTab';
+import { AccountTaxFormStatus } from './AccountTaxFormStatus';
+import { communityAccountDetailQuery } from './queries';
 
 const associatedCollectiveColumns = intl => [
   {
@@ -93,7 +65,7 @@ const associatedCollectiveColumns = intl => [
   },
   {
     accessorKey: 'relations',
-    header: intl.formatMessage({ defaultMessage: 'Relations', id: 'mn5pjI' }),
+    header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
     cell: ({ row }) => {
       const relations =
         row.original.relations?.filter(
@@ -115,296 +87,93 @@ const associatedCollectiveColumns = intl => [
   },
 ];
 
-const contributionColumns = intl => [
-  {
-    accessorKey: 'createdAt',
-    header: () => <FormattedMessage defaultMessage="Date" id="expense.incurredAt" />,
-    cell: ({ cell }) => {
-      return <DateTime value={cell.getValue()} />;
-    },
-  },
-  {
-    accessorKey: 'toAccount',
-    header: () => <FormattedMessage defaultMessage="Collective" id="Collective" />,
-    cell: ({ row }) => {
-      const order = row.original;
-      return (
-        <LinkCollective collective={order.toAccount} withHoverCard>
-          <Avatar size={24} collective={order.toAccount} mr={2} />
-        </LinkCollective>
-      );
-    },
-  },
-  {
-    accessorKey: 'description',
-    header: () => <FormattedMessage defaultMessage="Description" id="Fields.description" />,
-    cell: ({ cell }) => {
-      const expense = cell.row.original;
-      return (
-        <div className="flex flex-col">
-          <span>{expense.description}</span>
-          <span className="text-xs text-muted-foreground">
-            {i18nExpenseType(intl, expense.type)}
-            {expense.accountingCategory && <span>: {expense.accountingCategory.name}</span>}
-            {!expense.accountingCategory && expense.tags?.length > 0 && <span>: {expense.tags.join(', ')}</span>}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: () => <FormattedMessage defaultMessage="Status" id="Status" />,
-    cell: ({ cell }) => {
-      const status = cell.getValue();
-      return <OrderStatusTag status={status} />;
-    },
-  },
-  {
-    accessorKey: 'totalContributed',
-    header: () => <FormattedMessage id="TotalContributed" defaultMessage="Total Contributed" />,
-    cell: ({ cell }) => {
-      const amount = cell.getValue();
-      return <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />;
-    },
-    meta: { className: 'text-right' },
-  },
-];
-
-const expenseColumns = intl => [
-  {
-    accessorKey: 'createdAt',
-    header: () => <FormattedMessage defaultMessage="Date" id="expense.incurredAt" />,
-    cell: ({ cell }) => {
-      return <DateTime value={cell.getValue()} />;
-    },
-  },
-  {
-    accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Collective" id="Collective" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      return (
-        <LinkCollective collective={expense.account} withHoverCard>
-          <Avatar size={24} collective={expense.account} mr={2} />
-        </LinkCollective>
-      );
-    },
-  },
-  {
-    accessorKey: 'description',
-    header: () => <FormattedMessage defaultMessage="Description" id="Fields.description" />,
-    cell: ({ cell }) => {
-      const expense = cell.row.original;
-      return (
-        <div className="flex flex-col">
-          <span>{expense.description}</span>
-          <span className="text-xs text-muted-foreground">
-            {i18nExpenseType(intl, expense.type)}
-            {expense.accountingCategory && <span>: {expense.accountingCategory.name}</span>}
-            {!expense.accountingCategory && expense.tags?.length > 0 && <span>: {expense.tags.join(', ')}</span>}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: () => <FormattedMessage defaultMessage="Status" id="Status" />,
-    cell: ({ cell }) => {
-      const status = cell.getValue();
-      return <ExpenseStatusTag status={status} />;
-    },
-  },
-  {
-    accessorKey: 'amount',
-    header: () => <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />,
-    cell: ({ cell }) => {
-      const amount = cell.getValue();
-      return <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />;
-    },
-    meta: { className: 'text-right' },
-  },
-];
-
-const contributionSummaryColumns = [
-  {
-    accessorKey: 'year',
-    header: () => <FormattedMessage defaultMessage="Year" id="IFo1oo" />,
-    cell: ({ cell }) => {
-      return cell.getValue();
-    },
-  },
-  {
-    accessorKey: 'contributionCount',
-    header: () => <FormattedMessage defaultMessage="Charged Processed" id="ChargesProcessed" />,
-    cell: ({ cell }) => {
-      return cell.getValue();
-    },
-  },
-  {
-    accessorKey: 'contributionTotal',
-    header: () => <FormattedMessage defaultMessage="Total Contributed" id="TotalContributed" />,
-    cell: ({ cell }) => {
-      const amount = cell.getValue();
-      return <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />;
-    },
-  },
-];
-
-const SummaryCard = ({
-  title,
-  isLoading,
-  children,
-  className,
-}: {
-  title: string | React.ReactNode;
-  isLoading?: boolean;
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn('group flex flex-col gap-1 rounded-xl border transition-all', className)}>
-      <div className="w-full space-y-1 p-3">
-        <div className="flex items-center gap-1">
-          <span className="block text-sm font-medium tracking-tight">{title}</span>
-        </div>
-        <div>{isLoading ? <Skeleton className="h-6 w-48" /> : children}</div>
-      </div>
-    </div>
-  );
-};
-
 enum AccountDetailView {
-  DETAILS = 'DETAILS',
+  OVERVIEW = 'OVERVIEW',
   EXPENSES = 'EXPENSES',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   ACTIVITIES = 'ACTIVITIES',
+  KYC = 'KYC',
 }
 
 type ContributionDrawerProps = {
   onClose: () => void;
   account?: AccountReferenceInput;
-  host?: AccountReferenceInput;
+  host?: Pick<Account, 'id' | 'currency' | 'slug'>;
 };
 
 export function ContributorDetails(props: ContributionDrawerProps) {
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
   const intl = useIntl();
-  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.DETAILS);
+  const [selectedTab, setSelectedTab] = React.useState<AccountDetailView>(AccountDetailView.OVERVIEW);
   const [openExpenseId, setOpenExpenseId] = React.useState(null);
   const [openContributionId, setOpenContributionId] = React.useState(null);
 
-  const query = useQuery(communityAccountDetailQuery, {
-    context: API_V2_CONTEXT,
+  const { LoggedInUser } = useLoggedInUser();
+
+  const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
       accountId: props.account.id,
-      host: props.host,
       hostSlug: props.host.slug,
     },
+    // Since tabs data is loaded on demand, we don't want to refetch when switching tabs
+    nextFetchPolicy: 'standby',
   });
 
-  const pagination = useQueryFilter({
-    schema: z.object({ limit: integer.default(5), offset: integer.default(0) }),
-    filters: {},
-    skipRouter: true,
-  });
-  const activityPagination = useQueryFilter({
-    schema: z.object({ limit: integer.default(10), offset: integer.default(0) }),
-    filters: {},
-    skipRouter: true,
-  });
-  const { data: expensesData } = useQuery(communityAccountExpensesDetailQuery, {
-    context: API_V2_CONTEXT,
-    variables: {
-      accountId: props.account.id,
-      host: props.host,
-      ...pagination.variables,
-    },
-  });
-
-  const { data: contributionsData } = useQuery(communityAccountContributionsDetailQuery, {
-    context: API_V2_CONTEXT,
-    variables: {
-      accountId: props.account.id,
-      host: props.host,
-      ...pagination.variables,
-    },
-  });
-  const { data: activitiesData } = useQuery(communityAccountActivitiesQuery, {
-    context: API_V2_CONTEXT,
-    variables: {
-      accountId: props.account.id,
-      host: props.host,
-      ...activityPagination.variables,
-    },
-  });
-
-  const handleTabChange = React.useCallback(
-    (tab: AccountDetailView) => {
-      pagination.setFilter('offset', null);
-      activityPagination.setFilter('offset', null);
-      setSelectedTab(tab);
-    },
-    [pagination, activityPagination, setSelectedTab],
-  );
-
-  const isLoading = !query.called || query.loading || !query.data;
-  const account = query.data?.account;
-
-  const relations =
-    account?.communityStats?.relations?.filter(
-      (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
-    ) || [];
-  const totalExpended = account?.communityStats?.transactionSummary?.reduce(
-    (acc, curr) => ({
-      valueInCents: acc.valueInCents + (curr.expenseTotal.valueInCents || 0),
-      currency: curr.expenseTotal.currency,
-    }),
-    { valueInCents: 0, currency: 'USD' },
-  ) || { valueInCents: 0, currency: 'USD' };
-  const expenseCount =
-    account?.communityStats?.transactionSummary?.reduce((acc, curr) => acc + (curr.expenseCount || 0), 0) || 0;
-  const totalContributed = account?.communityStats?.transactionSummary?.reduce(
-    (acc, curr) => ({
-      valueInCents: acc.valueInCents + (curr.contributionTotal.valueInCents || 0),
-      currency: curr.contributionTotal.currency,
-    }),
-    { valueInCents: 0, currency: 'USD' },
-  ) || { valueInCents: 0, currency: 'USD' };
-  const chargeCount =
-    account?.communityStats?.transactionSummary?.reduce((acc, curr) => acc + (curr.contributionCount || 0), 0) || 0;
-  const contributionCount = contributionsData?.account?.orders.totalCount || 0;
-  const activities = activitiesData?.account?.communityStats?.activities.nodes || [];
-  const activitiesCount = activitiesData?.account?.communityStats?.activities.totalCount || 0;
-  const legalName = account?.legalName !== account?.name && account?.legalName;
-
+  const kycStatus = query.data?.account && 'kycStatus' in query.data.account ? query.data.account['kycStatus'] : {};
   const tabs = React.useMemo(
     () => [
       {
-        id: AccountDetailView.DETAILS,
-        label: <FormattedMessage defaultMessage="Details" id="Details" />,
+        id: AccountDetailView.OVERVIEW,
+        label: <FormattedMessage defaultMessage="Overview" id="AdminPanel.Menu.Overview" />,
       },
       {
         id: AccountDetailView.EXPENSES,
         label: <FormattedMessage defaultMessage="Expenses" id="Expenses" />,
-        count: expenseCount,
+        count: query.data?.account?.communityStats?.transactionSummary[0]?.expenseCountAcc || 0,
       },
       {
         id: AccountDetailView.CONTRIBUTIONS,
         label: <FormattedMessage defaultMessage="Contributions" id="Contributions" />,
-        count: contributionCount,
+        count: query.data?.account?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0,
       },
       {
         id: AccountDetailView.ACTIVITIES,
         label: <FormattedMessage defaultMessage="Activities" id="Activities" />,
-        count: activitiesCount,
       },
+      ...(query.data?.account?.type === CollectiveType.INDIVIDUAL && isFeatureEnabled(dashboardAccount, FEATURES.KYC)
+        ? [
+            {
+              id: AccountDetailView.KYC,
+              label: 'KYC',
+              count: Object.values(pick(kycStatus, [KycProvider.MANUAL.toLowerCase()])).filter(
+                status => status !== null,
+              ).length,
+            },
+          ]
+        : []),
     ],
-    [expenseCount, contributionCount, activitiesCount],
+    [query.data, query.data?.account?.type, LoggedInUser, kycStatus],
   );
 
+  const handleTabChange = React.useCallback(
+    (tab: AccountDetailView) => {
+      setSelectedTab(tab);
+    },
+    [setSelectedTab],
+  );
+
+  const isLoading = query.loading || !query.data;
+  const account = query.data?.account;
+  const relations =
+    account?.communityStats?.relations?.filter(
+      (relation, _, relations) =>
+        !(relation === CommunityRelationType.EXPENSE_SUBMITTER && relations.includes(CommunityRelationType.PAYEE)),
+    ) || [];
+  const legalName = account?.legalName !== account?.name && account?.legalName;
+  const taxForms = query.data?.host?.hostedLegalDocuments;
+
   return (
-    <div className="flex max-w-screen-lg flex-col">
+    <div className="flex h-full flex-col">
       <button className="mb-4 flex w-fit items-center text-xs text-gray-500" onClick={() => history.back()}>
         <ArrowLeft size="14px" className="mr-1" />
         <FormattedMessage defaultMessage="Go Back" id="GoBack" />
@@ -420,7 +189,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             ) : (
               <React.Fragment>
                 <Avatar collective={account} size={36} />
-                {account.name}
+                {account.name || account.slug}
                 {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
                 <div className="flex flex-wrap gap-1 align-middle">
                   {relations.map(role => (
@@ -460,18 +229,18 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 {props.account.id.split('-')[0]}...
               </CopyID>
             </div>
-            {account.email && (
+            {account['email'] && (
               <React.Fragment>
                 <Dot size={14} />
                 <div className="flex items-center gap-1">
                   <Mail size={14} />
                   <CopyID
-                    value={account.email}
+                    value={account['email']}
                     tooltipLabel={<FormattedMessage defaultMessage="Copy Email" id="8NlxGY" />}
                     className="inline-flex items-center gap-1"
                     Icon={null}
                   >
-                    {account.email}
+                    {account['email']}
                   </CopyID>
                 </div>
               </React.Fragment>
@@ -494,150 +263,120 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           </div>
         )}
       </div>
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="mt-4 flex flex-grow flex-col gap-8">
         {query.error ? (
           <MessageBoxGraphqlError error={query.error} />
         ) : (
           <React.Fragment>
             <Tabs tabs={tabs} selectedId={selectedTab as string} onChange={handleTabChange} />
             <div
-              className="flex flex-col gap-4 aria-hidden:hidden"
-              aria-hidden={selectedTab !== AccountDetailView.DETAILS}
+              className="grid grid-cols-1 gap-12 aria-hidden:hidden xl:grid-cols-4"
+              aria-hidden={selectedTab !== AccountDetailView.OVERVIEW}
             >
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {(account?.location?.address || account?.location?.country) && (
-                  <SummaryCard
-                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
+              <div className="space-y-4 xl:order-2">
+                <h2 className="tight text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Details" id="Details" />
+                </h2>
+                <InfoList variant="compact" className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
+                    value={account?.legalName}
                     isLoading={isLoading}
-                    className={account.location.address && 'col-span-2'}
-                  >
-                    <LocationAddress location={account.location} />
-                  </SummaryCard>
-                )}
-                <SummaryCard
-                  title={<FormattedMessage defaultMessage="On the Platform Since" id="OnThePlatformSince" />}
-                  isLoading={isLoading}
-                >
-                  {account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
-                </SummaryCard>
-                <SummaryCard
-                  title={<FormattedMessage defaultMessage="Interactions with Host" id="InteractionsWithHost" />}
-                  isLoading={isLoading}
-                  className="text-sm"
-                >
-                  {account?.communityStats?.firstInteractionAt && (
-                    <div>
-                      <FormattedMessage defaultMessage="First" id="First" />:{' '}
-                      <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
-                    </div>
-                  )}
-                  {account?.communityStats?.lastInteractionAt && (
-                    <div>
-                      <FormattedMessage defaultMessage="Last" id="Last" />:{' '}
-                      <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
-                    </div>
-                  )}
-                </SummaryCard>
-              </div>
-              <h1 className="font-medium">
-                <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
-              </h1>
-              <DataTable
-                data={account?.communityStats?.associatedCollectives || []}
-                columns={associatedCollectiveColumns(intl)}
-              />
-            </div>
-            <div
-              className="flex flex-col gap-4 aria-hidden:hidden"
-              aria-hidden={selectedTab !== AccountDetailView.ACTIVITIES}
-            >
-              <h1 className="flex items-center font-medium">
-                <FormattedMessage defaultMessage="Recent activities" id="RecentActivities" />
-                <InfoTooltipIcon className="ml-2">
-                  <FormattedMessage
-                    defaultMessage="The activities listed here are contextual to your fiscal-host and do not necessarily represent all activities performed by this user on the platform."
-                    id="mTzyCH"
                   />
-                </InfoTooltipIcon>
-              </h1>
-              <div className="group flex flex-col gap-1 space-y-3 divide-y rounded-xl border p-4">
-                {activities.length === 0 ? (
-                  <div className="text-center text-sm text-muted-foreground">
-                    <FormattedMessage defaultMessage="No recent activities" id="NoRecentActivities" />
-                  </div>
-                ) : (
-                  activities.map(activity => (
-                    <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseId(id)} />
-                  ))
-                )}
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Display name" id="Fields.displayName" />}
+                    value={account?.name || account?.slug}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Location" id="SectionLocation.Title" />}
+                    value={
+                      (account?.location?.country || account?.location?.address) && (
+                        <LocationAddress location={account.location} />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Joined the platform on" id="Vf1x2A" />}
+                    value={account?.createdAt && <DateTime value={account.createdAt} dateStyle="long" />}
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
+                    value={
+                      account?.communityStats?.firstInteractionAt && (
+                        <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
+                    value={
+                      account?.communityStats?.lastInteractionAt && (
+                        <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                  <InfoListItem
+                    title={<FormattedMessage defaultMessage="Tax form" id="TaxForm" />}
+                    value={
+                      taxForms?.nodes[0] && (
+                        <div className="flex flex-col items-start gap-1">
+                          <AccountTaxFormStatus
+                            taxForm={taxForms.nodes[0]}
+                            host={query.data?.host}
+                            onRefetch={() => query.refetch()}
+                          />
+                          {taxForms?.totalCount > 1 && (
+                            <Link
+                              className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account?.slug}`)}
+                            >
+                              <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
+                            </Link>
+                          )}
+                        </div>
+                      )
+                    }
+                    isLoading={isLoading}
+                  />
+                </InfoList>
               </div>
-              <Pagination
-                queryFilter={activityPagination}
-                total={activitiesData?.account?.communityStats?.activities.totalCount}
-              />
-            </div>
-            <div
-              className="flex flex-col gap-4 aria-hidden:hidden"
-              aria-hidden={selectedTab !== AccountDetailView.EXPENSES}
-            >
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Metric
-                  label={<FormattedMessage defaultMessage="Total Received" id="TotalReceived" />}
-                  amount={{ current: totalExpended }}
+
+              <div className="space-y-4 xl:order-1 xl:col-span-3">
+                <h2 className="text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
+                </h2>
+                <DataTable
+                  data={account?.communityStats?.associatedCollectives || []}
+                  columns={associatedCollectiveColumns(intl)}
+                  loading={isLoading}
                 />
-                <Metric
-                  label={
-                    <FormattedMessage defaultMessage="Number of Submitted Paid Expenses" id="NumberPaidExpenses" />
-                  }
-                  count={{ current: expenseCount }}
+                <h2 className="mt-12 text-xl font-bold text-slate-800">
+                  <FormattedMessage defaultMessage="Associated Organizations" id="E9PjGp" />
+                </h2>
+                <DataTable
+                  data={account?.communityStats?.associatedOrganizations || []}
+                  columns={associatedCollectiveColumns(intl)}
+                  loading={isLoading}
                 />
               </div>
-              <DataTable
-                columns={expenseSummaryColumns}
-                data={account?.communityStats?.transactionSummary.filter(curr => curr.expenseCount > 0) || []}
-              />
-              <h1 className="font-medium">
-                <FormattedMessage defaultMessage="Expenses" id="Expenses" />
-              </h1>
-              <DataTable
-                data={expensesData?.account?.expenses.nodes || []}
-                columns={expenseColumns(intl)}
-                onClickRow={row => setOpenExpenseId(row.original.legacyId)}
-              />
-              <Pagination queryFilter={pagination} total={expensesData?.account?.expenses.totalCount} />
             </div>
-            <div
-              className="flex flex-col gap-4 aria-hidden:hidden"
-              aria-hidden={selectedTab !== AccountDetailView.CONTRIBUTIONS}
-            >
-              <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Metric
-                  label={<FormattedMessage defaultMessage="Total Contributed" id="TotalContributed" />}
-                  amount={{ current: totalContributed }}
-                />
-                <Metric
-                  label={<FormattedMessage defaultMessage="Number of Contributions" id="NumberContributions" />}
-                  count={{ current: contributionCount }}
-                />
-                <Metric
-                  label={<FormattedMessage defaultMessage="Number of Processed Charges" id="NumberProcessedCharges" />}
-                  count={{ current: chargeCount }}
-                />
-              </div>
-              <DataTable
-                columns={contributionSummaryColumns}
-                data={account?.communityStats?.transactionSummary?.filter(curr => curr.contributionCount > 0) || []}
-              />
-              <h1 className="font-medium">
-                <FormattedMessage defaultMessage="Contributions" id="Contributions" />
-              </h1>
-              <DataTable
-                data={contributionsData?.account?.orders.nodes || []}
-                columns={contributionColumns(intl)}
-                onClickRow={row => setOpenContributionId(row.original.legacyId)}
-              />
-              <Pagination queryFilter={pagination} total={contributionsData?.account?.orders.totalCount} />
-            </div>
+            {selectedTab === AccountDetailView.CONTRIBUTIONS && (
+              <ContributionsTab account={account} host={props.host} setOpenContributionId={setOpenContributionId} />
+            )}
+            {selectedTab === AccountDetailView.EXPENSES && (
+              <ExpensesTab account={account} host={props.host} setOpenExpenseId={setOpenExpenseId} />
+            )}
+            {selectedTab === AccountDetailView.ACTIVITIES && (
+              <ActivitiesTab account={account} host={props.host} setOpenExpenseId={setOpenExpenseId} />
+            )}
+            {selectedTab === AccountDetailView.KYC && (
+              <KYCTabPeopleDashboard requestedByAccount={props.host} verifyAccount={props.account} />
+            )}
           </React.Fragment>
         )}
       </div>

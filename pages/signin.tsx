@@ -57,11 +57,13 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
     const isValidRelative = isValidRelativeUrl(next);
     const requestedByWhitelabelProvider = getWhitelabelProviderFromRedirectionUrl(next as string);
     email = typeof email === 'string' && decodeURIComponent(email);
+    const userAgent =
+      req && typeof req['get'] === 'function' ? (req as any).get('User-Agent') : req?.headers?.['user-agent'];
     return {
       token,
       next: next && (isValidRelative || isTrustedRedirection) ? next : null,
       form: form || 'signin',
-      isSuspiciousUserAgent: isSuspiciousUserAgent((req as any)?.get('User-Agent')),
+      isSuspiciousUserAgent: isSuspiciousUserAgent(userAgent),
       email: email && isEmail(email) ? email : null,
       untrustedDomainRedirection: !isValidRelative && !isTrustedRedirection ? next : null,
       requestedByWhitelabelProvider,
@@ -156,7 +158,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
   getRoutes() {
     const { next } = this.props;
-    const routes = { signin: '/signin', join: '/create-account' };
+    const routes = { signin: '/signin', join: '/signup' };
     if (!next) {
       return routes;
     } else {

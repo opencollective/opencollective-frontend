@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import { Flex } from '../Grid';
@@ -116,8 +116,6 @@ const getOptimisticResponse = (entity, emoji, isAdding) => {
   }
 };
 
-const mutationOptions = { context: API_V2_CONTEXT };
-
 /**
  * A component to render the reaction picker on comments.
  */
@@ -126,8 +124,8 @@ const EmojiReactionPicker = ({ comment = null, update = null }) => {
   const emojiSecondRow = ['😕', '❤️', '🚀', '👀'];
   const [open, setOpen] = React.useState(false);
   const wrapperRef = React.useRef(undefined);
-  const [addReaction] = useMutation(addReactionMutation, mutationOptions);
-  const [removeReaction] = useMutation(removeReactionMutation, mutationOptions);
+  const [addReaction] = useMutation(addReactionMutation);
+  const [removeReaction] = useMutation(removeReactionMutation);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {

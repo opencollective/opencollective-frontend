@@ -40,7 +40,7 @@ export const getActivityVariables = (
       collective={activity.individual}
       withHoverCard
       className="font-medium hover:underline"
-      truncateNameLength={15}
+      truncateNameLength={30}
       hoverCardProps={{
         includeAdminMembership: {
           hostSlug: activity.host?.slug,
@@ -53,7 +53,7 @@ export const getActivityVariables = (
     <LinkCollective
       collective={activity.individual || activity.account}
       withHoverCard
-      truncateNameLength={15}
+      truncateNameLength={30}
       className="font-medium hover:underline"
       {...(activity.individual && {
         hoverCardProps: {
@@ -68,7 +68,7 @@ export const getActivityVariables = (
   FromAccount: () => (
     <LinkCollective
       collective={activity.fromAccount}
-      truncateNameLength={15}
+      truncateNameLength={30}
       withHoverCard
       className="font-medium hover:underline"
     />
@@ -85,7 +85,7 @@ export const getActivityVariables = (
   AccountParent: () => (
     <LinkCollective
       collective={activity.account?.parent}
-      truncateNameLength={15}
+      truncateNameLength={30}
       withHoverCard
       className="font-medium hover:underline"
     />
@@ -109,7 +109,7 @@ export const getActivityVariables = (
     ) : (
       <LinkCollective
         collective={activity.expense.payee}
-        truncateNameLength={15}
+        truncateNameLength={30}
         withHoverCard
         className="font-medium hover:underline"
       />
@@ -134,7 +134,7 @@ export const getActivityVariables = (
   Host: () => (
     <LinkCollective
       collective={activity.host}
-      truncateNameLength={15}
+      truncateNameLength={30}
       withHoverCard
       className="font-medium hover:underline"
     />
@@ -142,7 +142,7 @@ export const getActivityVariables = (
   Vendor: () => (
     <LinkCollective
       collective={activity.data?.vendor}
-      truncateNameLength={15}
+      truncateNameLength={30}
       withHoverCard
       className="font-medium hover:underline"
     />
@@ -166,7 +166,7 @@ export const getActivityVariables = (
       return (
         <LinkCollective
           collective={activity.account}
-          truncateNameLength={15}
+          truncateNameLength={30}
           withHoverCard
           className="font-medium hover:underline"
         />

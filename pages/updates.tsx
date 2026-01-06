@@ -8,7 +8,7 @@ import { FEATURES, getFeatureStatus, isFeatureSupported } from '../lib/allowed-f
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getDashboardRoute } from '../lib/url-helpers';
 import type { NextParsedUrlQuery } from 'next/dist/server/request-meta';
@@ -122,7 +122,6 @@ const updatesPageQueryHelper = getSSRQueryHelpers<
   ReturnType<typeof getPropsFromQuery>
 >({
   query: updatesPageQuery,
-  context: API_V2_CONTEXT,
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
   getVariablesFromContext: (ctx, props) => getUpdatesVariables(props),
   skipClientIfSSRThrows404: true,

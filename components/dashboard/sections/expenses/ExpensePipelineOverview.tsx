@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../../../../lib/api';
 import { createError, ERROR } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { Amount, ExpenseCollection, Host } from '../../../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../../lib/stripe/dashboard';
@@ -113,7 +113,6 @@ export default function ExpensePipelineOverview(props: ExpensePipelineOverviewPr
     paypalReadyToPay: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
     paypalScheduledForPayment: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
   }>(ExpensePipelineOverviewQuery, {
-    context: API_V2_CONTEXT,
     variables: {
       hostSlug: props.host.slug,
       currency: props.host.currency,

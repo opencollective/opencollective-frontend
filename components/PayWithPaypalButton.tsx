@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
-import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -231,7 +231,6 @@ const addPaypalPlan = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
   skip: props => !props.interval || props.interval === INTERVALS.oneTime,
   options: (props: any) => ({
-    context: API_V2_CONTEXT,
     variables: {
       account: { id: props.collective.id },
       tier: props.tier ? { id: props.tier.id } : null,

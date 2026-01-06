@@ -5,12 +5,14 @@ import { Plus, X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { FilterComponentConfigs, SetFilter as SetFilterType } from '../../../lib/filters/filter-types';
+import { cn } from '@/lib/utils';
 
 import { Badge } from '../../ui/Badge';
 import { Button } from '../../ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../../ui/Popover';
 import { Separator } from '../../ui/Separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 
 function ChooseFilterType<FV>({
   remainingFilters,
@@ -91,7 +93,7 @@ export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter
   );
 }
 
-const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewActive, meta }) => {
+const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, highlighted, meta, locked }) => {
   const intl = useIntl();
   const value = tmpValue;
   const arrayValue = isNil(value) ? null : Array.isArray(value) ? value : [value];
@@ -99,8 +101,11 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
   const valueRenderer = filterConfig?.valueRenderer;
   const hasValue = !isNil(value);
   const isFilterWithoutComponent = filterConfig && !filterConfig.Component;
-  const disallowEmpty = Boolean(filterConfig?.getDisallowEmpty?.({ meta }));
-  return (
+  const disallowEmpty = Boolean(filterConfig?.getDisallowEmpty?.({ meta })) || locked;
+
+  const filterLabel = filterConfig?.labelMsg ? intl.formatMessage(filterConfig.labelMsg) : filterKey;
+
+  const button = (
     <Button
       asChild
       variant="outline"
@@ -109,10 +114,11 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
         'group rounded-full p-0 [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring [&:has(:focus-visible)]:ring-offset-2',
         (!filterKey || !open) && 'text-muted-foreground',
         isFilterWithoutComponent && 'hover:bg-default hover:text-default-foreground',
+        locked && 'hover:bg-background',
       )}
       disabled={isFilterWithoutComponent}
     >
-      <div className="cursor-pointer">
+      <div>
         {hasValue &&
           (!disallowEmpty ? (
             <button
@@ -131,7 +137,11 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
             <div />
           ))}
         <PopoverTrigger
-          className={clsx('flex h-full items-center px-3 focus:outline-hidden', hasValue && 'pl-2 text-foreground')}
+          className={cn(
+            'flex h-full items-center px-3 focus:outline-hidden',
+            hasValue && 'pl-2 text-foreground',
+            locked && 'cursor-default text-muted-foreground',
+          )}
           disabled={isFilterWithoutComponent}
           data-cy={filterKey ? `filter-${filterKey}` : `add-filter`}
         >
@@ -140,21 +150,13 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
               <Plus size={12} strokeWidth={1.5} absoluteStrokeWidth />
             </div>
           )}
-          {filterConfig ? (
-            filterConfig.labelMsg ? (
-              intl.formatMessage(filterConfig.labelMsg)
-            ) : (
-              filterKey
-            )
-          ) : (
-            <FormattedMessage defaultMessage="Add Filter" id="Rqzsq/" />
-          )}
+          {filterLabel ?? <FormattedMessage defaultMessage="Add Filter" id="Rqzsq/" />}
           {arrayValue?.length > 0 && (
             <React.Fragment>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <div className="space-x-1">
                 {arrayValue.length > 2 ? (
-                  <Badge className={clsx('rounded-sm px-1 font-normal', !isViewActive && 'bg-blue-50 text-blue-700')}>
+                  <Badge className={clsx('rounded-sm px-1 font-normal', highlighted && 'bg-blue-50 text-blue-700')}>
                     <FormattedMessage
                       id="filter.noFiltersSelected"
                       defaultMessage="{number} selected"
@@ -166,7 +168,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
                     <Badge
                       className={clsx(
                         'max-w-[256px] truncate rounded-sm px-1 font-normal',
-                        !isViewActive && 'bg-blue-50 text-blue-700',
+                        highlighted && 'bg-blue-50 text-blue-700',
                       )}
                       key={JSON.stringify(value)}
                     >
@@ -181,6 +183,23 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
       </div>
     </Button>
   );
+
+  if (locked) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent align="start">
+          <FormattedMessage
+            defaultMessage="{filterLabel} can't be modified in this view"
+            id="rO7VnP"
+            values={{ filterLabel }}
+          />
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return button;
 };
 
 function FilterDropdown<FV, FM>({
@@ -188,17 +207,19 @@ function FilterDropdown<FV, FM>({
   remainingFilters,
   filters,
   setFilter,
-  isViewActive,
+  highlighted,
   meta,
   values,
+  locked,
 }: {
   filterKey?: keyof FV;
   remainingFilters?: (keyof FV)[];
   filters: FilterComponentConfigs<FV, FM>;
   setFilter: SetFilterType<FV>;
-  isViewActive?: boolean;
+  highlighted?: boolean;
   meta?: FM;
   values: FV;
+  locked?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const [filterKey, setFilterKey] = React.useState(currentFilterKey);
@@ -213,9 +234,11 @@ function FilterDropdown<FV, FM>({
     <Popover
       open={open}
       onOpenChange={open => {
-        setFilterKey(currentFilterKey);
-        setTmpValue(values[currentFilterKey]);
-        setOpen(open);
+        if (!locked) {
+          setFilterKey(currentFilterKey);
+          setTmpValue(values[currentFilterKey]);
+          setOpen(open);
+        }
       }}
     >
       <PopoverAnchor>
@@ -224,9 +247,10 @@ function FilterDropdown<FV, FM>({
           filters={filters}
           tmpValue={tmpValue}
           setFilter={setFilter}
-          isViewActive={isViewActive}
+          highlighted={highlighted}
           open={open}
           meta={meta}
+          locked={locked}
         />
       </PopoverAnchor>
       <PopoverContent className="w-[260px] p-0" align="start">

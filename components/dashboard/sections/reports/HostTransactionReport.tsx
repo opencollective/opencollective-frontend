@@ -5,7 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { boolean } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
@@ -67,7 +66,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
       ...variables,
       includeGroups: true,
     },
-    context: API_V2_CONTEXT,
+
     fetchPolicy: 'cache-first',
   });
 
@@ -115,7 +114,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
   };
   return (
     <Fragment>
-      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
           titleRoute={`/dashboard/${hostSlug}/reports/transactions`}

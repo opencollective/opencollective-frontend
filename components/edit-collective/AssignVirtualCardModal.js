@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -77,12 +77,8 @@ const throttledCall = debounce((searchFunc, variables) => {
 
 const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClose, ...modalProps }) => {
   const { toast } = useToast();
-  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
-    context: API_V2_CONTEXT,
-  });
+  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation);
+  const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery);
 
   const formik = useFormik({
     initialValues: {
@@ -161,7 +157,6 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
   const { data: virtualCardsAssignedToCollectiveData, loading: isLoadingVirtualCardsAssignedToCollective } = useQuery(
     virtualCardsAssignedToCollectiveQuery,
     {
-      context: API_V2_CONTEXT,
       variables: {
         collectiveSlug: formik.values?.collective?.slug,
         hostSlug: host.slug,

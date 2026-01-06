@@ -7,8 +7,8 @@ import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { gqlV1 } from '../../../lib/graphql/helpers';
 import type { GraphQLV1PaymentMethod } from '@/lib/custom_typings/GraphQLV1';
+import { API_V1_CONTEXT, gqlV1 } from '@/lib/graphql/helpers';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 
@@ -245,6 +245,7 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
   );
 
   const { data, loading } = useQuery<QueryResult>(giftCardsQuery, {
+    context: API_V1_CONTEXT,
     variables: {
       collectiveId,
       isConfirmed: getIsConfirmedFromFilter(filter as string | undefined),

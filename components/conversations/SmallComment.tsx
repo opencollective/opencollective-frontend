@@ -14,7 +14,7 @@ import RichTextEditor from '../RichTextEditor';
 
 import CommentActions from './CommentActions';
 import { CommentMetadata } from './CommentMetadata';
-import { editCommentMutation, mutationOptions } from './graphql';
+import { editCommentMutation } from './graphql';
 import type { CommentProps } from './types';
 
 export default function SmallComment(props: CommentProps) {
@@ -57,7 +57,6 @@ export default function SmallComment(props: CommentProps) {
             <div className="mt-4">
               <InlineEditField
                 mutation={editCommentMutation}
-                mutationOptions={mutationOptions}
                 values={comment}
                 field="html"
                 canEdit={props.canEdit}

@@ -7,7 +7,7 @@ import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { isIndividualAccount } from '../../lib/collective';
 import dayjs from '../../lib/dayjs';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -33,7 +33,6 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation, {
-    context: API_V2_CONTEXT,
     onCompleted: onRevoke,
   });
 

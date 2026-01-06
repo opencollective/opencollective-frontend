@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V1_CONTEXT } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -98,8 +98,8 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
   const variables = { slug: account.slug };
   const { toast } = useToast();
   const intl = useIntl();
-  const { loading, error, data } = useQuery(leaveHostQuery, { variables, context: API_V2_CONTEXT });
-  const [removeHost, { loading: submitting }] = useMutation(leaveHostMutation, { context: API_V2_CONTEXT });
+  const { loading, error, data } = useQuery(leaveHostQuery, { variables });
+  const [removeHost, { loading: submitting }] = useMutation(leaveHostMutation);
   const portabilitySummary = getPortabilitySummary(data?.account);
   return (
     <StyledModal onClose={onClose}>
@@ -131,6 +131,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                 refetchQueries: [
                   {
                     query: editCollectivePageQuery,
+                    context: API_V1_CONTEXT,
                     variables: { slug: account.slug },
                   },
                 ],

@@ -4,7 +4,7 @@ import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { gql } from '../../../lib/graphql/helpers';
 import type { AccountFilterQuery, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../../lib/graphql/types/v2/schema';
 import { isMulti } from '@/lib/filters/schemas';
@@ -39,7 +39,7 @@ export const AccountRenderer = ({
   const { data } = useQuery<AccountFilterQuery>(accountFilterQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
-    context: API_V2_CONTEXT,
+
     // skip query if there is already a field from the hover card data (such as description),
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
     skip: !!account.description && !!account.type,
@@ -119,7 +119,6 @@ function HostedAccountFilter({
     variables: { hostSlug },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
-    context: API_V2_CONTEXT,
   });
 
   const searchFunc = React.useCallback(

@@ -45,6 +45,7 @@ type ComboSelectProps = {
   placeholder?: string;
   inputPlaceholder?: string;
   isSearchable?: boolean;
+  noOptions?: React.ReactNode;
   'data-cy'?: string;
   name?: string;
 };
@@ -85,6 +86,8 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           )}
           id={props.id}
           data-cy={props['data-cy']}
+          data-testid={props['data-testid']}
+          data-disabled={props.disabled ? true : undefined}
           name={props.name}
         >
           <SelectValue placeholder={placeholder} />
@@ -106,6 +109,8 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           id={props.id}
           disabled={props.disabled}
           data-cy={props['data-cy']}
+          data-testid={props['data-cy']}
+          data-disabled={props.disabled ? true : undefined}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -124,7 +129,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
         <Command>
           <CommandInput placeholder={props.inputPlaceholder || intl.formatMessage(Messages.inputPlaceholder)} />
           <CommandList>
-            <CommandEmpty>{intl.formatMessage(Messages.noOptions)}</CommandEmpty>
+            <CommandEmpty>{props.noOptions || intl.formatMessage(Messages.noOptions)}</CommandEmpty>
             <CommandGroup>
               {props.options.map(option => (
                 <CommandItem

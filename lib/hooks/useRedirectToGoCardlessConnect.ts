@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 
-import { API_V2_CONTEXT } from '../graphql/helpers';
 import { LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';
 
 const generateGoCardlessLinkMutation = gql`
@@ -17,9 +16,7 @@ const generateGoCardlessLinkMutation = gql`
 
 export const useRedirectToGoCardlessConnect = () => {
   const [isRedirecting, setIsRedirecting] = React.useState(false);
-  const [generateGoCardlessLink] = useMutation(generateGoCardlessLinkMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [generateGoCardlessLink] = useMutation(generateGoCardlessLinkMutation);
 
   const redirectToGoCardlessConnect = async (
     hostId: string,

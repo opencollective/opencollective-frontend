@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { trim } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 import { formatErrorMessage } from '@/lib/errors';
 import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
@@ -63,11 +63,11 @@ const EditPayPalAccount = props => {
   const intl = useIntl();
   const { data, loading, refetch } = useQuery(editPayPalAccountQuery, {
     variables: { slug: props.collective.slug },
-    context: API_V2_CONTEXT,
   });
   const mutationOptions = {
-    context: API_V2_CONTEXT,
-    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
+    refetchQueries: [
+      { query: editCollectivePageQuery, variables: { slug: props.collective.slug }, context: API_V1_CONTEXT },
+    ],
     awaitRefetchQueries: true,
   };
   const connectedAccount = data?.account?.connectedAccounts?.[0];
@@ -75,7 +75,9 @@ const EditPayPalAccount = props => {
     createConnectedAccountMutation,
     mutationOptions,
   );
-  const [setSettings, { loading: mutating, error: settingUpdateError }] = useMutation(editCollectiveSettingsMutation);
+  const [setSettings, { loading: mutating, error: settingUpdateError }] = useMutation(editCollectiveSettingsMutation, {
+    context: API_V1_CONTEXT,
+  });
 
   const formik = useFormik({
     initialValues: {

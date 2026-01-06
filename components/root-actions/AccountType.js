@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -27,7 +27,7 @@ const AccountType = () => {
   const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
-  const [editAccountType, { loading }] = useMutation(editAccountTypeMutation, { context: API_V2_CONTEXT });
+  const [editAccountType, { loading }] = useMutation(editAccountTypeMutation);
   const [isConfirmationModelOpen, setIsConfirmationModelOpen] = React.useState(false);
 
   const callToAction = selectedAccountOption?.value

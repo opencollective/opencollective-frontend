@@ -6,12 +6,11 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Expense } from '../../../../lib/graphql/types/v2/schema';
+import type { AccountingCategoryKind, Expense } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
@@ -34,6 +33,7 @@ import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta } from '../expenses/filters';
 import {
+  ExpenseAccountingCategoryKinds,
   filters as commonFilters,
   schema as commonSchema,
   toVariables as commonToVariables,
@@ -64,6 +64,7 @@ type FilterMeta = CommonFilterMeta & {
   hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
   expenseTags?: string[];
   includeUncategorized?: boolean;
+  accountingCategoryKinds: readonly AccountingCategoryKind[];
 };
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
@@ -133,7 +134,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     `,
     {
       variables: { hostSlug, withHoverCard: true },
-      context: API_V2_CONTEXT,
+
       skip: isUpgradeRequired,
     },
   );
@@ -173,6 +174,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     hostedAccounts: metaData?.hostedAccounts.nodes,
     expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
     includeUncategorized: true,
+    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
   const queryFilter = useQueryFilter({
@@ -193,7 +195,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables,
-    context: API_V2_CONTEXT,
+
     skip: isUpgradeRequired,
   });
 
@@ -231,7 +233,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   );
 
   return (
-    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Grants" id="Csh2rX" />}
         description={<FormattedMessage defaultMessage="Grant requests submitted to your hosted funds" id="TPbcKk" />}

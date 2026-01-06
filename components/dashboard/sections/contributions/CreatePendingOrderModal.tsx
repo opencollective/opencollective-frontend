@@ -10,7 +10,7 @@ import { styled } from 'styled-components';
 
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { gql } from '../../../../lib/graphql/helpers';
 import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -28,12 +28,12 @@ import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import type { BaseModalProps } from '../../../ModalContext';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
 import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
-import StyledModal, { ModalHeader } from '../../../StyledModal';
 import StyledSelect from '../../../StyledSelect';
 import StyledTextarea from '../../../StyledTextarea';
 import StyledTooltip from '../../../StyledTooltip';
@@ -41,6 +41,7 @@ import { TaxesFormikFields } from '../../../taxes/TaxesFormikFields';
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
 import { Button } from '../../../ui/Button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
 import { vendorFieldFragment } from '../../../vendors/queries';
 
@@ -62,12 +63,6 @@ const EDITABLE_FIELDS = [
 const debouncedLazyQuery = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
-
-const CreatePendingContributionModalContainer = styled(StyledModal)`
-  width: 100%;
-  max-width: 576px;
-  padding: 24px 30px;
-`;
 
 interface AmountDetailsLineProps {
   label?: React.ReactNode;
@@ -295,7 +290,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
     createPendingContributionModalCollectiveQuery,
     {
-      context: API_V2_CONTEXT,
       variables: { slug: host.slug },
     },
   );
@@ -840,29 +834,30 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   );
 };
 
-type CreatePendingContributionModalProps = {
+type CreatePendingContributionModalProps = BaseModalProps & {
   hostSlug: string;
   edit?: Partial<OrderPageQuery['order']>;
-  onClose: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 };
 
-const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePendingContributionModalProps) => {
+const CreatePendingContributionModal = ({
+  hostSlug,
+  edit,
+  open,
+  setOpen,
+  onCloseFocusRef,
+  onSuccess,
+}: CreatePendingContributionModalProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const { toast } = useToast();
 
   const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
-    context: API_V2_CONTEXT,
     variables: { slug: hostSlug },
   });
 
   const host = data?.host;
-  const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation);
+  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation);
 
   // No modal if logged-out
   if (!LoggedInUser) {
@@ -870,7 +865,12 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
   }
 
   const handleClose = () => {
-    props.onClose();
+    setOpen(false);
+  };
+
+  const handleSuccess = () => {
+    setOpen(false);
+    onSuccess?.();
   };
 
   const error = createOrderError || editOrderError;
@@ -887,105 +887,112 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     : { hostFeePercent: host?.hostFeePercent || 0 };
 
   return (
-    <CreatePendingContributionModalContainer
-      className="overflow-y-hidden sm:max-h-[90vh]"
-      {...props}
-      onClose={handleClose}
-    >
-      <ModalHeader>
-        {edit ? (
-          <FormattedMessage defaultMessage="Edit Expected Funds #{id}" id="/QMYYS" values={{ id: edit.legacyId }} />
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent
+        className="w-full max-w-[576px] overflow-y-hidden p-6 sm:max-h-[90vh]"
+        onCloseAutoFocus={e => {
+          if (onCloseFocusRef?.current) {
+            e.preventDefault();
+            onCloseFocusRef.current.focus();
+          }
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            {edit ? (
+              <FormattedMessage defaultMessage="Edit Expected Funds #{id}" id="/QMYYS" values={{ id: edit.legacyId }} />
+            ) : (
+              <FormattedMessage defaultMessage="Create Expected Funds" id="8zsN7i" />
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        {loading ? (
+          <LoadingPlaceholder mt={2} height={200} />
+        ) : require2FAForAdmins(host) && !LoggedInUser.hasTwoFactorAuth ? (
+          <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />
         ) : (
-          <FormattedMessage defaultMessage="Create Expected Funds" id="8zsN7i" />
-        )}
-      </ModalHeader>
-      {loading ? (
-        <LoadingPlaceholder mt={2} height={200} />
-      ) : require2FAForAdmins(host) && !LoggedInUser.hasTwoFactorAuth ? (
-        <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />
-      ) : (
-        <Formik
-          initialValues={initialValues}
-          enableReinitialize={true}
-          validate={validate}
-          onSubmit={async values => {
-            const amounts = getAmountsFromValues(values);
-            const tax = !values.tax ? null : cloneDeep(values.tax);
-            if (tax) {
-              // Populate amount so that API can double-check there's no rounding error
-              tax.amount = { valueInCents: amounts.tax, currency: values.amount.currency };
-            }
+          <Formik
+            initialValues={initialValues}
+            enableReinitialize={true}
+            validate={validate}
+            onSubmit={async values => {
+              const amounts = getAmountsFromValues(values);
+              const tax = !values.tax ? null : cloneDeep(values.tax);
+              if (tax) {
+                // Populate amount so that API can double-check there's no rounding error
+                tax.amount = { valueInCents: amounts.tax, currency: values.amount.currency };
+              }
 
-            if (edit) {
-              const order = omitDeep(
-                {
-                  id: edit.id,
-                  ...pick(values, EDITABLE_FIELDS),
+              if (edit) {
+                const order = omitDeep(
+                  {
+                    id: edit.id,
+                    ...pick(values, EDITABLE_FIELDS),
+                    fromAccount: buildAccountReference(values.fromAccount),
+                    tier: !values.tier ? null : { id: values.tier.id },
+                    expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
+                    amount: { ...values.amount, valueInCents: amounts.gross },
+                    platformTipAmount: values.platformTipAmount?.valueInCents ? values.platformTipAmount : null,
+                    tax,
+                  },
+                  ['__typename'],
+                );
+
+                const result = await editPendingOrder({ variables: { order } });
+
+                toast({
+                  variant: 'success',
+                  message: (
+                    <FormattedMessage
+                      defaultMessage="Expected Funds #{orderId} updated"
+                      id="6mXKXi"
+                      values={{ orderId: result.data.editPendingOrder.legacyId }}
+                    />
+                  ),
+                });
+              } else {
+                const order = {
+                  ...omit(values, ['totalAmount']), // Total amount is transformed to amount when passed to the API
+                  amount: { ...values.amount, valueInCents: amounts.gross },
                   fromAccount: buildAccountReference(values.fromAccount),
+                  toAccount: values.childAccount
+                    ? buildAccountReference(values.childAccount)
+                    : buildAccountReference(values.toAccount),
+                  childAccount: undefined,
                   tier: !values.tier ? null : { id: values.tier.id },
                   expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
-                  amount: { ...values.amount, valueInCents: amounts.gross },
-                  platformTipAmount: values.platformTipAmount?.valueInCents ? values.platformTipAmount : null,
                   tax,
-                },
-                ['__typename'],
-              );
+                  accountingCategory: values.accountingCategory && { id: values.accountingCategory.id },
+                };
 
-              const result = await editPendingOrder({ variables: { order } });
+                const result = await createPendingOrder({ variables: { order } });
 
-              toast({
-                variant: 'success',
-                message: (
-                  <FormattedMessage
-                    defaultMessage="Expected Funds #{orderId} updated"
-                    id="6mXKXi"
-                    values={{ orderId: result.data.editPendingOrder.legacyId }}
-                  />
-                ),
-              });
-            } else {
-              const order = {
-                ...omit(values, ['totalAmount']), // Total amount is transformed to amount when passed to the API
-                amount: { ...values.amount, valueInCents: amounts.gross },
-                fromAccount: buildAccountReference(values.fromAccount),
-                toAccount: values.childAccount
-                  ? buildAccountReference(values.childAccount)
-                  : buildAccountReference(values.toAccount),
-                childAccount: undefined,
-                tier: !values.tier ? null : { id: values.tier.id },
-                expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
-                tax,
-                accountingCategory: values.accountingCategory && { id: values.accountingCategory.id },
-              };
+                toast({
+                  variant: 'success',
+                  message: (
+                    <FormattedMessage
+                      defaultMessage="Expected Funds created with reference #{orderId}"
+                      id="k8izBg"
+                      values={{ orderId: result.data.createPendingOrder.legacyId }}
+                    />
+                  ),
+                });
+              }
 
-              const result = await createPendingOrder({ variables: { order } });
-
-              toast({
-                variant: 'success',
-                message: (
-                  <FormattedMessage
-                    defaultMessage="Expected Funds created with reference #{orderId}"
-                    id="k8izBg"
-                    values={{ orderId: result.data.createPendingOrder.legacyId }}
-                  />
-                ),
-              });
-            }
-
-            props.onSuccess();
-            handleClose();
-          }}
-        >
-          <CreatePendingContributionForm
-            host={host}
-            onClose={handleClose}
-            loading={loading}
-            error={error}
-            edit={edit}
-          />
-        </Formik>
-      )}
-    </CreatePendingContributionModalContainer>
+              handleSuccess();
+            }}
+          >
+            <CreatePendingContributionForm
+              host={host}
+              onClose={handleClose}
+              loading={loading}
+              error={error}
+              edit={edit}
+            />
+          </Formik>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };
 

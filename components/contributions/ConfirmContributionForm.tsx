@@ -7,7 +7,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { TaxInput } from '../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import type { ConfirmContributionFieldsFragment } from '@/lib/graphql/types/v2/graphql';
@@ -155,7 +154,7 @@ export const ConfirmContributionForm = ({
   const [processedAt, setProcessedAt] = useState(initialValues['processedAt'] ?? getCurrentLocalDateStr());
   const intl = useIntl();
   const { toast } = useToast();
-  const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
+  const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation);
   const contributionAmount = amountReceived - platformTip;
   const grossContributionAmount = Math.round(contributionAmount / (1 + taxPercent / 100));
   const taxAmount = taxPercent ? Math.round(contributionAmount - grossContributionAmount) : null;
