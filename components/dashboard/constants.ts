@@ -274,8 +274,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Virtual Cards',
   },
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
-    id: 'HostedCollectives',
-    defaultMessage: 'Hosted Collectives',
+    id: 'Collectives',
+    defaultMessage: 'Collectives',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',

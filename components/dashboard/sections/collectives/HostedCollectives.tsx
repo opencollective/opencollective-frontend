@@ -209,7 +209,11 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+        title={<FormattedMessage id="Collectives" defaultMessage="Collectives" />}
+        className="mb-6"
+        description={
+          <FormattedMessage defaultMessage="Collectives you currently host or have hosted in the past." id="nTMHB4" />
+        }
         actions={
           <ExportHostedCollectivesCSVModal
             open={displayExportCSVModal}
