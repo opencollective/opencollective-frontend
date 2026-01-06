@@ -507,24 +507,7 @@ class ContributionFlow extends React.Component {
       return null;
     }
 
-    const paymentMethod = {
-      // TODO: cleanup after this version is deployed in production
-
-      // Migration Step 1
-      // type: stepPayment.paymentMethod.providerType,
-      // legacyType: stepPayment.paymentMethod.providerType,
-      // service: stepPayment.paymentMethod.service,
-      // newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 2
-      legacyType: stepPayment.paymentMethod.providerType,
-      service: stepPayment.paymentMethod.service,
-      newType: stepPayment.paymentMethod.type,
-
-      // Migration Step 3
-      // service: stepPayment.paymentMethod.service,
-      // type: stepPayment.paymentMethod.type,
-    };
+    const paymentMethod = pick(stepPayment.paymentMethod, ['service', 'type', 'data']);
 
     // Payment Method already registered
     if (stepPayment.paymentMethod.id) {
@@ -559,7 +542,7 @@ class ContributionFlow extends React.Component {
       paymentMethod.paymentIntentId = stepPayment.paymentMethod.paymentIntentId;
       paymentMethod.isSavedForLater = stepPayment.paymentMethod.isSavedForLater;
     }
-
+    console.log({ paymentMethod, stepPayment });
     return paymentMethod;
   };
 

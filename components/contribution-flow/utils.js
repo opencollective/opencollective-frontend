@@ -22,6 +22,7 @@ import {
 import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
+import { getCustomPaymentProviderIconComponent } from '../custom-payment-provider/CustomPaymentProviderIcon';
 import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
@@ -47,7 +48,7 @@ export const generatePaymentMethodOptions = (
   paymentIntent,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
-  const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
+  const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER); // TODO: Replace by "Manual" type
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
@@ -221,31 +222,34 @@ export const generatePaymentMethodOptions = (
       });
     }
 
-    // Manual (bank transfer)
+    // Custom payment providers
+    const customPaymentProviders = get(collective, 'host.settings.customPaymentProviders', []);
     if (
       hostHasManual &&
+      Array.isArray(customPaymentProviders) &&
+      customPaymentProviders.length > 0 &&
       stepDetails.interval === INTERVALS.oneTime &&
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
     ) {
-      uniquePMs.push({
-        key: 'manual',
-        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
-          <FormattedMessage defaultMessage="Bank transfer (manual)" id="ycoJnS" />
-        ),
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
-          type: PAYMENT_METHOD_TYPE.MANUAL,
-        },
-        icon: getPaymentMethodIcon({
-          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
-          type: PAYMENT_METHOD_TYPE.MANUAL,
-        }),
-        instructions: (
-          <FormattedMessage
-            id="NewContributionFlow.bankInstructions"
-            defaultMessage="Instructions to make a transfer will be given on the next page."
-          />
-        ),
+      customPaymentProviders.forEach(provider => {
+        uniquePMs.push({
+          key: `custom-${provider.id}`,
+          title: provider.name,
+          paymentMethod: {
+            service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+            type: PAYMENT_METHOD_TYPE.MANUAL,
+            data: {
+              customPaymentProviderId: provider.id,
+            },
+          },
+          icon: getCustomPaymentProviderIconComponent(provider),
+          subtitle: (
+            <FormattedMessage
+              id="NewContributionFlow.customPaymentInstructions"
+              defaultMessage="Instructions to complete payment will be given on the next page."
+            />
+          ),
+        });
       });
     }
   }

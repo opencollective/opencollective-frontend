@@ -18,6 +18,7 @@ import MessageBox from '../MessageBox';
 import Spinner from '../Spinner';
 import { Input } from '../ui/Input';
 import { Separator } from '../ui/Separator';
+import { Skeleton } from '../ui/Skeleton';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ value: key, label: name }));
@@ -108,7 +109,6 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
   const required = disabled ? false : input.required;
   const label = i18nFieldLabels[input.name] ? intl.formatMessage(i18nFieldLabels[input.name]) : input.name;
-
   const comboOptions = React.useMemo(
     () =>
       input.type === 'radio' || input.type === 'select'
@@ -247,7 +247,7 @@ const i18nTransactionTypeLabels = defineMessages({
   // TODO: Figure out the "Wire" option
 });
 
-const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSave }) => {
+const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, currency, alwaysSave }) => {
   const intl = useIntl();
   const needsRefetchRef = React.useRef(false);
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
@@ -305,7 +305,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
   );
 
   if (loading && !data) {
-    return <Spinner />;
+    return <Skeleton className="mt-2 h-10 w-full" />;
   }
   if (error) {
     return (
@@ -426,7 +426,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
           ))}
         </React.Fragment>
       )}
-      {transactionMethod && alwaysSave && (
+      {transactionMethod && alwaysSave && !onlyDataFields && (
         <React.Fragment>
           <Separator className="my-6" />
           <FormField
@@ -481,12 +481,13 @@ const availableCurrenciesQuery = gql`
 const PayoutBankInformationForm = ({
   isNew,
   getFieldName,
-  host,
-  fixedCurrency,
-  ignoreBlockedCurrencies,
+  host = null,
+  fixedCurrency = false,
+  ignoreBlockedCurrencies = false,
   optional,
-  disabled,
-  alwaysSave,
+  disabled = false,
+  alwaysSave = false,
+  onlyDataFields = false,
 }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     variables: { slug: WISE_PLATFORM_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
@@ -495,7 +496,6 @@ const PayoutBankInformationForm = ({
     skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),
   });
   const wiseHost = data?.host || host;
-
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
 
@@ -566,7 +566,7 @@ const PayoutBankInformationForm = ({
 
   // Display spinner if loading
   if (loading) {
-    return <Spinner />;
+    return <Skeleton className="mt-2 h-10 w-full" />;
   }
 
   if (!currencies) {
@@ -611,10 +611,11 @@ const PayoutBankInformationForm = ({
           getFieldName={getFieldName}
           host={wiseHost}
           alwaysSave={alwaysSave}
+          onlyDataFields={onlyDataFields}
         />
       )}
       {!selectedCurrency && !currencies?.length && (
-        <MessageBox fontSize="12px" type="error">
+        <MessageBox fontSize="12px" type="error" mt={2}>
           <FormattedMessage
             id="PayoutBankInformationForm.Error.AvailableCurrencies"
             defaultMessage="There was an error loading available currencies for this host"

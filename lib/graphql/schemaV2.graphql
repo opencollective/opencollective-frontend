@@ -2179,6 +2179,7 @@ type Order {
   """
   totalContributed: Amount!
   paymentMethod: PaymentMethod
+  customPaymentProvider: CustomPaymentProvider
   paymentProcessorUrl: String
 
   """
@@ -4082,7 +4083,7 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
   """
   supportedPaymentMethods: [PaymentMethodLegacyType]
-  bankAccount: PayoutMethod
+  bankAccount: PayoutMethod @deprecated(reason: "2026-01-23: Deprecated in favour of custom payment providers")
 
   """
   Paypal preapproval info. Returns null if PayPal account is not connected.
@@ -8983,6 +8984,20 @@ type TransactionPermissions {
   Whether the current user can reject the transaction
   """
   canReject: Boolean!
+}
+
+type CustomPaymentProvider {
+  id: String!
+  type: CustomPaymentProviderType!
+  name: NonEmptyString!
+  instructions: String
+  icon: String
+  accountDetails: JSON
+}
+
+enum CustomPaymentProviderType {
+  BANK_TRANSFER
+  OTHER
 }
 
 type OrderTax {
@@ -25894,6 +25909,7 @@ input PaymentMethodInput {
   """
   legacyType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
   newType: PaymentMethodType @deprecated(reason: "2021-08-20: Please use type instead")
+  data: JSON
 
   """
   Name of this payment method
@@ -26657,6 +26673,7 @@ enum UploadedFileKind {
   UPDATE
   COMMENT
   TIER_LONG_DESCRIPTION
+  CUSTOM_PAYMENT_METHOD_TEMPLATE
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
   EXPENSE_INVOICE

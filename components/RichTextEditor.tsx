@@ -28,6 +28,8 @@ type RichTextEditorContainerProps = {
   withStickyToolbar?: boolean;
   /** Version of the editor */
   version: 'default' | 'simplified';
+  /** If true, the image upload button will be displayed - even in simplified mode */
+  imageUploadEnabled?: boolean;
   /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
   toolbarTop?: number | string | number[] | string[];
   /** Useful to compensate the height of the toolbar when editing inline */
@@ -75,6 +77,7 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   disabled?: boolean;
 
   videoEmbedEnabled?: boolean;
+  imageUploadEnabled?: boolean;
   'data-cy': string;
   /** Called when an image is being uploaded to set a boolean */
   setUploading?: (uploading: boolean) => void;
@@ -179,9 +182,11 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     ${props =>
       props.version === 'simplified' &&
       css({
-        '.trix-button-group--file-tools': {
-          display: 'none',
-        },
+        ...(!props.imageUploadEnabled && {
+          '.trix-button-group--file-tools': {
+            display: 'none',
+          },
+        }),
         '.trix-button-group--block-tools .trix-button:not(.trix-button--icon-number-list):not(.trix-button--icon-bullet-list)':
           {
             display: 'none',
@@ -548,7 +553,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       }
 
       return;
-    } else if (this.props.version === 'simplified') {
+    } else if (this.props.version === 'simplified' && !this.props.imageUploadEnabled) {
       // Don't upload files in simplified mode
       attachment.remove();
       return;
@@ -698,6 +703,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       showCount,
       maxLength,
       editorMaxHeight,
+      imageUploadEnabled,
     } = this.props;
 
     return !this.state.id ? (
@@ -715,6 +721,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         editorMaxHeight={editorMaxHeight}
         withBorders={withBorders}
         version={version}
+        imageUploadEnabled={imageUploadEnabled}
         isDisabled={disabled}
         error={error}
         data-cy={this.props['data-cy']}
