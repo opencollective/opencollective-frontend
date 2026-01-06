@@ -97,7 +97,8 @@ describe('host dashboard', () => {
         cy.getByDataCy('more-actions-btn').click();
       });
       cy.getByDataCy('actions-add-funds').click();
-      cy.get('[data-cy="add-funds-amount"]').type('20');
+      cy.wait(300);
+      cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
       cy.contains(`@brusselstogetherasbl`).click();
