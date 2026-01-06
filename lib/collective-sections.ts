@@ -229,10 +229,6 @@ const getSectionsToRemoveForUser = (collective, isAdmin) => {
   if (!hasAccessToFeature(FEATURES.CONVERSATIONS)) {
     toRemove.add(Sections.CONVERSATIONS);
   }
-  if (features[FEATURES.CONNECTED_ACCOUNTS] !== 'ACTIVE') {
-    // If there's no connected accounts, there's no benefit in enabling the section as it will return null anyway
-    toRemove.add(Sections.CONNECTED_COLLECTIVES);
-  }
   if (!hasAccessToFeature(FEATURES.ABOUT)) {
     toRemove.add(Sections.ABOUT);
   }
