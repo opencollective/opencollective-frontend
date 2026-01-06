@@ -31,13 +31,13 @@ import { SignupSteps } from './common';
 
 const emailVerificationFormSchema = z.union([
   z.object({
-    email: z.string().email().min(5).max(64),
+    email: z.string().email().min(5).max(128),
     captcha: isCaptchaEnabled()
       ? z.object({ token: z.string().nonempty(), provider: z.string().nonempty() })
       : z.undefined(),
   }),
   z.object({
-    email: z.string().email().min(5).max(64),
+    email: z.string().email().min(5).max(128),
     otp: z.string().min(6).max(6).toUpperCase(),
   }),
 ]);
@@ -108,7 +108,11 @@ export function EmailVerificationSteps({ step, nextStep, nextActionFlow }: Signu
           });
         } else {
           resetCaptcha();
-          toast({ variant: 'error', message: formatErrorMessage(intl, response.error) });
+          const message =
+            formatErrorMessage(intl, response.error) ||
+            response.error?.message ||
+            'An error occurred while signing up, please try again.';
+          toast({ variant: 'error', message });
         }
       } else if (step === SignupSteps.VERIFY_OTP) {
         const sessionId = router.query?.session as string;
@@ -403,7 +407,6 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
         nextStep();
       } catch (e) {
         setLoading(false);
-        toast({ variant: 'error', title: 'Error', message: e.message });
         toast({
           variant: 'error',
           title: <FormattedMessage id="signup.completeProfile.error" defaultMessage="Error completing profile" />,
