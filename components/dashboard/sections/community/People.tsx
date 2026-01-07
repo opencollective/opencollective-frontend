@@ -35,8 +35,8 @@ import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
 import { ContributorDetails } from './AccountDetail';
+import { usePersonActions } from './common';
 import { peopleHostDashboardQuery } from './queries';
-import { usePersonActions } from './usePersonActions';
 
 const RelationTypeSchema = isMulti(z.nativeEnum(CommunityRelationType)).optional();
 const relationTypeFilter: FilterConfig<z.infer<typeof RelationTypeSchema>> = {
@@ -183,7 +183,7 @@ const getColumns = ({ intl, hasKYCFeature }) => {
       }
 
       return (
-        <div className="text-xs">
+        <div className="text-sm">
           <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
           <span className="ml-1 text-muted-foreground">({count})</span>
         </div>

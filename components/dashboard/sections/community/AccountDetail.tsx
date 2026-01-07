@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { pick } from 'lodash';
+import { compact, pick } from 'lodash';
 import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -18,10 +18,11 @@ import { getDashboardRoute } from '@/lib/url-helpers';
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import HeroSocialLinks from '@/components/crowdfunding-redesign/SocialLinks';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import { KYCTabPeopleDashboard } from '@/components/kyc/dashboard/KYCTabPeopleDashboard';
 import LinkCollective from '@/components/LinkCollective';
 import LocationAddress from '@/components/LocationAddress';
-import { DataTable } from '@/components/table/DataTable';
+import { actionsColumn, DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
 import { InfoList, InfoListItem } from '@/components/ui/InfoList';
@@ -40,52 +41,104 @@ import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { ContributionsTab } from './AccountDetailContributionsTab';
 import { ExpensesTab } from './AccountDetailExpensesTab';
 import { AccountTaxFormStatus } from './AccountTaxFormStatus';
+import { useAssociatedCollectiveActions } from './common';
 import { communityAccountDetailQuery } from './queries';
 
-const associatedCollectiveColumns = intl => [
-  {
-    accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-    cell: ({ row }) => {
-      const { account } = row.original;
-      return (
-        <div className="flex items-center text-nowrap">
-          {account.isFrozen && (
-            <Badge type="info" size="xs" className="mr-2">
-              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
-            </Badge>
-          )}
-          <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
-            <Avatar size={24} collective={account} mr={2} />
-            {account.name}
-          </LinkCollective>
-        </div>
-      );
+const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false) =>
+  compact([
+    {
+      accessorKey: 'account',
+      header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+      cell: ({ row }) => {
+        const { account } = row.original;
+        return (
+          <div className="flex items-center text-nowrap">
+            {account.isFrozen && (
+              <Badge type="info" size="xs" className="mr-2">
+                <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+              </Badge>
+            )}
+            <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
+              <Avatar size={24} collective={account} mr={2} />
+              {account.name}
+            </LinkCollective>
+          </div>
+        );
+      },
     },
-  },
-  {
-    accessorKey: 'relations',
-    header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
-    cell: ({ row }) => {
-      const relations =
-        row.original.relations?.filter(
-          (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
-        ) || [];
-      return (
-        <div className="flex gap-1 align-middle">
-          {relations.map(role => (
-            <div
-              key={role}
-              className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-            >
-              {formatCommunityRelation(intl, role)}
-            </div>
-          ))}
-        </div>
-      );
+    {
+      accessorKey: 'relations',
+      header: intl.formatMessage({ defaultMessage: 'Roles', id: 'c35gM5' }),
+      cell: ({ row }) => {
+        const relations =
+          row.original.relations?.filter(
+            (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')),
+          ) || [];
+        return (
+          <div className="flex gap-1 align-middle">
+            {relations.map(role => (
+              <div
+                key={role}
+                className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
+              >
+                {formatCommunityRelation(intl, role)}
+              </div>
+            ))}
+          </div>
+        );
+      },
     },
-  },
-];
+    includeAssociatedCollectiveColumns && {
+      accessorKey: 'expenses',
+      header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
+      cell: ({ row }) => {
+        const summary = row.original.transactionSummary;
+        const total = summary?.expenseTotal;
+        const count = summary?.expenseCount || 0;
+
+        if (!total || count === 0) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        return (
+          <div className="text-sm">
+            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <span className="ml-1 text-muted-foreground">({count})</span>
+          </div>
+        );
+      },
+    },
+
+    includeAssociatedCollectiveColumns && {
+      accessorKey: 'contributions',
+      header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
+      cell: ({ row }) => {
+        const summary = row.original.transactionSummary;
+        const total = summary?.contributionTotal;
+        const count = summary?.contributionCount || 0;
+
+        if (!total || count === 0) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        return (
+          <div className="text-sm">
+            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <span className="ml-1 text-muted-foreground">({count})</span>
+          </div>
+        );
+      },
+    },
+    includeAssociatedCollectiveColumns && {
+      accessorKey: 'firstInteraction',
+      header: intl.formatMessage({ defaultMessage: 'First Interaction', id: 'FirstInteraction' }),
+      cell: ({ row }) => {
+        const date = row.original.firstInteractionAt;
+        return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
+      },
+    },
+    includeAssociatedCollectiveColumns && actionsColumn,
+  ]);
 
 enum AccountDetailView {
   OVERVIEW = 'OVERVIEW',
@@ -164,6 +217,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
 
   const isLoading = query.loading || !query.data;
   const account = query.data?.account;
+  const getActions = useAssociatedCollectiveActions({ accountSlug: account?.slug });
   const relations =
     account?.communityStats?.relations?.filter(
       (relation, _, relations) =>
@@ -352,15 +406,16 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </h2>
                 <DataTable
                   data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedCollectiveColumns(intl)}
+                  columns={associatedTableColumns(intl, true)}
                   loading={isLoading}
+                  getActions={getActions}
                 />
                 <h2 className="mt-12 text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Associated Organizations" id="E9PjGp" />
                 </h2>
                 <DataTable
                   data={account?.communityStats?.associatedOrganizations || []}
-                  columns={associatedCollectiveColumns(intl)}
+                  columns={associatedTableColumns(intl)}
                   loading={isLoading}
                 />
               </div>

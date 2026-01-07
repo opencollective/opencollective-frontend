@@ -164,6 +164,13 @@ export function ContributionsTab({ account, host, setOpenContributionId }) {
   const chargeCount = accountData?.communityStats?.transactionSummary[0]?.contributionCountAcc || 0;
   return (
     <div className="flex flex-col gap-4">
+      <h2 className="tight text-xl font-bold text-slate-800">
+        <FormattedMessage
+          defaultMessage="Contributions made by {name}"
+          id="ContributionsMadeByName"
+          values={{ name: account.legalName || account.name || `@${account.slug}` }}
+        />
+      </h2>
       <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Metric
           label={<FormattedMessage defaultMessage="Total Contributed" id="TotalContributed" />}

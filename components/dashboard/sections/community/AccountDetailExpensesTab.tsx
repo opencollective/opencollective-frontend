@@ -267,24 +267,24 @@ export function ExpensesTab({ account, host, setOpenExpenseId }) {
     <div className="flex flex-col gap-4">
       {/* First Section: Expenses submitted by this user */}
       <div className="flex flex-col gap-6">
-        <h1 className="text-lg font-semibold">
+        <h2 className="tight text-xl font-bold text-slate-800">
           <FormattedMessage
             defaultMessage="Expenses submitted by {name}"
             id="ExpensesSubmittedByName"
             values={{ name: account.legalName || account.name || `@${account.slug}` }}
           />
-        </h1>
+        </h2>
 
         {/* Stats */}
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Metric
-            label={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
-            count={{ current: submittedExpensesCount }}
+            label={<FormattedMessage defaultMessage="Total Paid" id="TotalPaid" />}
+            amount={{ current: totalPaid }}
             loading={loading}
           />
           <Metric
-            label={<FormattedMessage defaultMessage="Total Received" id="TotalReceived" />}
-            amount={{ current: totalPaid }}
+            label={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
+            count={{ current: submittedExpensesCount }}
             loading={loading}
           />
         </div>

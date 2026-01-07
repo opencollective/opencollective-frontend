@@ -7387,6 +7387,9 @@ type CommunityStats {
 type CommunityAssociatedAccount {
   account: Account
   relations: [CommunityRelationType]
+  lastInteractionAt: DateTime
+  firstInteractionAt: DateTime
+  transactionSummary: CommunityTransactionSummary!
 }
 
 enum CommunityRelationType {
@@ -7400,7 +7403,7 @@ enum CommunityRelationType {
 }
 
 type CommunityTransactionSummary {
-  year: Int!
+  year: Int
   expenseTotal: Amount!
   expenseCount: Int!
   contributionTotal: Amount!
@@ -26362,6 +26365,7 @@ enum TransactionsImportRowAction {
   RESTORE_ALL
   PUT_ON_HOLD_ALL
   UPDATE_ROWS
+  UNLINK
 }
 
 """

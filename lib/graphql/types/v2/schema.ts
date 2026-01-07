@@ -2800,7 +2800,10 @@ export type CommentUpdateInput = {
 export type CommunityAssociatedAccount = {
   __typename?: 'CommunityAssociatedAccount';
   account?: Maybe<Account>;
+  firstInteractionAt?: Maybe<Scalars['DateTime']['output']>;
+  lastInteractionAt?: Maybe<Scalars['DateTime']['output']>;
   relations?: Maybe<Array<Maybe<CommunityRelationType>>>;
+  transactionSummary: CommunityTransactionSummary;
 };
 
 export enum CommunityRelationType {
@@ -2842,7 +2845,7 @@ export type CommunityTransactionSummary = {
   expenseTotalAcc: Amount;
   orderCount: Scalars['Int']['output'];
   orderCountAcc: Scalars['Int']['output'];
-  year: Scalars['Int']['output'];
+  year?: Maybe<Scalars['Int']['output']>;
 };
 
 /** Response for the confirmGuestAccount mutation */
@@ -13364,6 +13367,7 @@ export enum TransactionsImportRowAction {
   DISMISS_ALL = 'DISMISS_ALL',
   PUT_ON_HOLD_ALL = 'PUT_ON_HOLD_ALL',
   RESTORE_ALL = 'RESTORE_ALL',
+  UNLINK = 'UNLINK',
   UPDATE_ROWS = 'UPDATE_ROWS'
 }
 
