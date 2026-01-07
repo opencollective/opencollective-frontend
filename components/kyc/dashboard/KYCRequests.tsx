@@ -1,15 +1,18 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { integer } from '@/lib/filters/schemas';
+import type { FilterComponentConfigs } from '@/lib/filters/filter-types';
+import { integer, isMulti } from '@/lib/filters/schemas';
 import type { KycRequestsDashboardQuery } from '@/lib/graphql/types/v2/graphql';
+import { KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { EmptyResults } from '@/components/dashboard/EmptyResults';
+import ComboSelectFilter from '@/components/dashboard/filters/ComboSelectFilter';
 import { Filterbar } from '@/components/dashboard/filters/Filterbar';
 import { Pagination } from '@/components/dashboard/filters/Pagination';
 import type { DashboardSectionProps } from '@/components/dashboard/types';
@@ -19,20 +22,44 @@ import { useModal } from '@/components/ModalContext';
 import { Button } from '@/components/ui/Button';
 
 import { kycVerificationCollectionFields } from '../graphql';
+import { i18nKYCVerificationStatus } from '../intl';
 import { KYCRequestModal } from '../request/KYCRequestModal';
 
 import { KYCVerificationRequestsTable } from './KYCVerificationRequestsTable';
 
 const PAGE_SIZE = 20;
 
+const schema = z.object({
+  limit: integer.default(PAGE_SIZE),
+  offset: integer.default(0),
+  status: isMulti(z.nativeEnum(KycVerificationStatus)).optional(),
+});
+
+type FilterValues = z.infer<typeof schema>;
+
+const filters: FilterComponentConfigs<FilterValues> = {
+  status: {
+    labelMsg: defineMessage({ id: 'Status', defaultMessage: 'Status' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(
+        () =>
+          Object.values(KycVerificationStatus).map(value => ({
+            label: i18nKYCVerificationStatus(intl, value),
+            value,
+          })),
+        [intl],
+      );
+      return <ComboSelectFilter options={options} isMulti {...props} />;
+    },
+    valueRenderer: ({ value, intl }) => i18nKYCVerificationStatus(intl, value),
+  },
+};
+
 export function KYCRequests(props: DashboardSectionProps) {
   const { showModal } = useModal();
   const queryFilter = useQueryFilter({
-    schema: z.object({
-      limit: integer.default(PAGE_SIZE),
-      offset: integer.default(0),
-    }),
-    filters: {},
+    schema,
+    filters,
   });
 
   const {
@@ -41,9 +68,9 @@ export function KYCRequests(props: DashboardSectionProps) {
     error: queryError,
   } = useQuery<KycRequestsDashboardQuery>(
     gql`
-      query KYCRequestsDashboard($slug: String!) {
+      query KYCRequestsDashboard($slug: String!, $limit: Int!, $offset: Int!, $status: [KYCVerificationStatus!]) {
         account(slug: $slug) {
-          kycVerificationRequests {
+          kycVerificationRequests(limit: $limit, offset: $offset, status: $status) {
             ...KYCVerificationCollectionFields
             nodes {
               ... on KYCVerification {
@@ -66,7 +93,12 @@ export function KYCRequests(props: DashboardSectionProps) {
     },
   );
 
-  const kycVerifications = data?.account?.kycVerificationRequests || { nodes: [], limit: 0, offset: 0, totalCount: 0 };
+  const kycVerifications = data?.account?.kycVerificationRequests || {
+    nodes: [],
+    limit: 0,
+    offset: 0,
+    totalCount: 0,
+  };
   const loading = queryLoading;
   const error = queryError;
 
@@ -93,7 +125,7 @@ export function KYCRequests(props: DashboardSectionProps) {
               });
             }}
           >
-            <FormattedMessage defaultMessage="Request KYC Verification" id="Kio9p/" />
+            <FormattedMessage defaultMessage="Submit KYC Verification" id="fS9N/M" />
           </Button>
         }
       />
@@ -108,6 +140,7 @@ export function KYCRequests(props: DashboardSectionProps) {
             data={kycVerifications.nodes}
             loading={loading}
             nbPlaceholders={queryFilter.values?.limit || 10}
+            refetchQueries={['KYCRequestsDashboard']}
           />
           <Pagination queryFilter={queryFilter} total={kycVerifications.totalCount} />
         </div>

@@ -1138,6 +1138,11 @@ interface Account {
     offset: Int! = 0
 
     """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
+
+    """
     If set, returns only verification requests made to these accounts
     """
     accounts: [AccountReferenceInput!]
@@ -3846,6 +3851,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
 
     """
     If set, returns only verification requests made to these accounts
@@ -10016,6 +10026,11 @@ type Bot implements Account {
     offset: Int! = 0
 
     """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
+
+    """
     If set, returns only verification requests made to these accounts
     """
     accounts: [AccountReferenceInput!]
@@ -11019,6 +11034,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
 
     """
     If set, returns only verification requests made to these accounts
@@ -12584,6 +12604,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
 
     """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
+
+    """
     If set, returns only verification requests made to these accounts
     """
     accounts: [AccountReferenceInput!]
@@ -13859,6 +13884,11 @@ type Individual implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
 
     """
     If set, returns only verification requests made to these accounts
@@ -15156,6 +15186,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     offset: Int! = 0
 
     """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
+
+    """
     If set, returns only verification requests made to these accounts
     """
     accounts: [AccountReferenceInput!]
@@ -16291,6 +16326,11 @@ type Vendor implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
 
     """
     If set, returns only verification requests made to these accounts
@@ -20261,6 +20301,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
 
     """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
+
+    """
     If set, returns only verification requests made to these accounts
     """
     accounts: [AccountReferenceInput!]
@@ -21411,6 +21456,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The offset to use to fetch
     """
     offset: Int! = 0
+
+    """
+    If set, returns only verification requests with this status
+    """
+    status: [KYCVerificationStatus!]
 
     """
     If set, returns only verification requests made to these accounts
@@ -26775,7 +26825,7 @@ input RequestKYCVerificationInput {
 
 input RequestManualKYCVerificationInput {
   legalName: String!
-  legalAddress: String!
+  legalAddress: String
   notes: String
 }
 

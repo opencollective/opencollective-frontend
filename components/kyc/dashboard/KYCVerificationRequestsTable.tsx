@@ -5,8 +5,8 @@ import { useIntl } from 'react-intl';
 import type {
   AccountHoverCardFieldsFragment,
   KycVerificationCollectionFieldsFragment,
-  KycVerificationStatus,
 } from '@/lib/graphql/types/v2/graphql';
+import { KycVerificationStatus } from '@/lib/graphql/types/v2/graphql';
 import type { KycProvider } from '@/lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
@@ -38,7 +38,7 @@ function dateCell({ cell }) {
 function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
   const account: ColumnDef<KYCVerificationRow> = {
     accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+    header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
     cell: ({ row }) => {
       const account = row.original.account;
       const mainName = account.legalName || account.name;
@@ -60,6 +60,23 @@ function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
           }
         />
       );
+    },
+  };
+
+  const verifiedName: ColumnDef<KYCVerificationRow> = {
+    accessorKey: 'verifiedData.legalName',
+    header: intl.formatMessage({ defaultMessage: 'Verified Name', id: 'EFK89S' }),
+    meta: { className: 'max-w-40' },
+    cell: ({ cell, row }) => {
+      if (row.original.status === KycVerificationStatus.VERIFIED) {
+        return (
+          <div title={cell.getValue() as string} className="truncate overflow-hidden">
+            {cell.getValue() as string}
+          </div>
+        );
+      }
+
+      return <span className="text-slate-500 italic">-</span>;
     },
   };
 
@@ -114,7 +131,7 @@ function getKYCVerificationColumns({ intl }): ColumnDef<KYCVerificationRow>[] {
     },
   };
 
-  return [account, status, provider, createdByUser, requestedAt, verifiedAt, revokedAt, actionsColumn];
+  return [account, verifiedName, status, provider, createdByUser, requestedAt, verifiedAt, revokedAt, actionsColumn];
 }
 
 type KYCVerificationRequestsTableProps = {
