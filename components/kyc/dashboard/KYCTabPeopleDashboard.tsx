@@ -3,6 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { integer } from '@/lib/filters/schemas';
 import type { KycTabPeopleDashboardQuery, KycVerificationCollection } from '@/lib/graphql/types/v2/graphql';
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
@@ -67,7 +68,7 @@ export function KYCTabPeopleDashboard(props: KYCTabPeopleDashboardProps) {
     {
       variables: {
         verifyAccountId: props.verifyAccount.id,
-        requestedByAccount: props.requestedByAccount,
+        requestedByAccount: getAccountReferenceInput(props.requestedByAccount),
         ...queryFilter.variables,
       },
     },
