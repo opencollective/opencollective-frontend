@@ -30,7 +30,7 @@ const lg = hidden('lg');
 const FILTERED_PROPS = new Set(['xs', 'sm', 'md', 'lg']);
 
 const Hide = styled(Box).withConfig({
-  shouldForwardProp: prop => defaultShouldForwardProp(prop) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
 })<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
   ${xs}
   ${sm}
