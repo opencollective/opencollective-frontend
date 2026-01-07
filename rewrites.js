@@ -51,10 +51,6 @@ exports.REWRITES = [
     destination: '/confirmCollectiveDeletion',
   },
   {
-    source: '/create-account/guest',
-    destination: '/guest-join',
-  },
-  {
     source: '/signup/:step(verify|profile|organization|collective)?',
     destination: '/signup',
   },

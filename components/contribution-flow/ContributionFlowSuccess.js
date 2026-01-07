@@ -298,7 +298,6 @@ class ContributionFlowSuccess extends React.Component {
           <SuccessCTA
             key={type}
             type={type}
-            orderId={get(data, 'order.id')}
             email={email}
             account={get(data, 'order.toAccount')}
             isPrimary={idx === 0}
