@@ -430,8 +430,8 @@ const PayExpenseModal = ({
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !blockAutomaticPayment;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
-
     skip: !canQuote,
+    fetchPolicy: 'no-cache',
   });
 
   const amounts = calculateAmounts({
