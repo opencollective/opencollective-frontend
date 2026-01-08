@@ -83,6 +83,10 @@ const quoteExpenseQuery = gql`
           currency
         }
         estimatedDeliveryAt
+        notices {
+          type
+          text
+        }
       }
     }
   }
@@ -433,11 +437,12 @@ const PayExpenseModal = ({
     skip: !canQuote,
     fetchPolicy: 'no-cache',
   });
+  const quote = quoteQuery.data?.expense?.quote;
 
   const amounts = calculateAmounts({
     values: formik.values,
     expense,
-    quote: quoteQuery.data?.expense?.quote,
+    quote,
     host,
     feesPayer: formik.values.feesPayer,
   });
@@ -804,6 +809,11 @@ const PayExpenseModal = ({
                 </P>
               </MessageBox>
             )}
+            {quote?.notices?.map(notice => (
+              <MessageBox key={notice.text} type={notice.type === 'INFO' ? 'info' : 'warning'} my={3}>
+                <p>{notice.text}</p>
+              </MessageBox>
+            ))}
             {canQuote && hasFunds === false && (
               <MessageBox type="error" withIcon my={3} fontSize="12px">
                 <strong>
