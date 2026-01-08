@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
-import type { Contributor } from '@/lib/graphql/types/v2/schema';
+import { type Contributor, KycProvider } from '@/lib/graphql/types/v2/schema';
 
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import { useModal } from '@/components/ModalContext';
@@ -14,6 +14,7 @@ import { useModal } from '@/components/ModalContext';
 type UsePersonActionsOptions = {
   accountSlug: string;
   hasKYCFeature: boolean;
+  hasPersonaKYCFeature: boolean;
 };
 
 export function usePersonActions(opts: UsePersonActionsOptions) {
@@ -86,21 +87,46 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
         actions.secondary.push({
           key: 'request-kyc',
           label: intl.formatMessage({
-            defaultMessage: 'Request KYC Verification',
-            id: 'Kio9p/',
+            defaultMessage: 'Submit Manual KYC Verification',
+            id: 'y47Tc8',
           }),
           Icon: BookKey,
           onClick: () =>
             showModal(KYCRequestModal, {
               requestedByAccount: { slug: opts.accountSlug },
               verifyAccount: { id: contributor.id },
+              provider: KycProvider.MANUAL,
+              refetchQueries: ['PeopleHostDashboard'],
+            }),
+        });
+      }
+
+      if (opts.hasPersonaKYCFeature && account.type === CollectiveType.INDIVIDUAL) {
+        actions.secondary.push({
+          key: 'request-persona-kyc',
+          label: intl.formatMessage({
+            defaultMessage: 'Import Persona Inquiry',
+            id: '7I2m2l',
+          }),
+          Icon: BookKey,
+          onClick: () =>
+            showModal(KYCRequestModal, {
+              requestedByAccount: { slug: opts.accountSlug },
+              verifyAccount: { id: contributor.id },
+              provider: KycProvider.PERSONA,
+              providerOptions: {
+                persona: {
+                  isImport: true,
+                },
+              },
+              refetchQueries: ['PeopleHostDashboard'],
             }),
         });
       }
 
       return actions;
     },
-    [intl, showModal, router, opts.accountSlug, opts.hasKYCFeature],
+    [intl, showModal, router, opts.accountSlug, opts.hasKYCFeature, opts.hasPersonaKYCFeature],
   );
 }
 
