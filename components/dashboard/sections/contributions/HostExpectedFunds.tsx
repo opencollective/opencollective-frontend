@@ -252,8 +252,12 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
           hostSlug={accountSlug}
           columnVisibility={{
             legacyId: true,
-            fromAccount: false,
             expectedAt: true,
+            createdByAccount: true,
+            paymentMethod: false,
+            fromAccount: false,
+            createdAt: false,
+            lastChargedAt: false,
           }}
         />
       )}

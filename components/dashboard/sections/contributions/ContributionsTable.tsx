@@ -40,6 +40,7 @@ const defaultVisibility: VisibilityState = {
   legacyId: false,
   expectedAt: false,
   createdAt: false,
+  createdByAccount: false,
 };
 
 export default function ContributionsTable<FilterValues extends Record<string, unknown>>({
