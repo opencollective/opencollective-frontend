@@ -289,6 +289,7 @@ const ExpenseSummary = ({
                   values={{
                     name: (
                       <AccountHoverCard
+                        key="name"
                         account={createdByAccount}
                         includeAdminMembership={{
                           accountSlug: expense.account?.slug,
@@ -310,6 +311,7 @@ const ExpenseSummary = ({
                   values={{
                     name: (
                       <AccountHoverCard
+                        key="name"
                         account={createdByAccount}
                         includeAdminMembership={{
                           accountSlug: expense.account?.slug,
@@ -334,6 +336,7 @@ const ExpenseSummary = ({
                     values={{
                       name: (
                         <AccountHoverCard
+                          key="name"
                           account={expense.approvedBy.find(Boolean)}
                           includeAdminMembership={{
                             accountSlug: expense.account.slug,
@@ -378,7 +381,12 @@ const ExpenseSummary = ({
                   defaultMessage="Ref: {reference}"
                   values={{
                     reference: (
-                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                      <TruncatedTextWithTooltip
+                        key="reference"
+                        value={expense.reference}
+                        length={10}
+                        truncatePosition="middle"
+                      />
                     ),
                   }}
                 />
