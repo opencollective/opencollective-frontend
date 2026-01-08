@@ -35,5 +35,7 @@ export function kycVerificationProviderName(provider: KycProvider) {
   switch (provider) {
     case KycProvider.MANUAL:
       return 'Manual';
+    case KycProvider.PERSONA:
+      return 'Persona';
   }
 }

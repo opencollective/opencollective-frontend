@@ -6,14 +6,27 @@ const kycVerificationManualProviderDataFields = gql`
   }
 `;
 
+const kycVerificationPersonaProviderDataFields = gql`
+  fragment PersonaKYCProviderDataFields on PersonaKYCProviderData {
+    id
+    status
+    imported
+    fields
+  }
+`;
+
 const kycVerificationProviderDataFields = gql`
   fragment KYCProviderDataFields on KYCProviderData {
     ... on ManualKYCProviderData {
       ...ManualKYCProviderDataFields
     }
+    ... on PersonaKYCProviderData {
+      ...PersonaKYCProviderDataFields
+    }
   }
 
   ${kycVerificationManualProviderDataFields}
+  ${kycVerificationPersonaProviderDataFields}
 `;
 
 const kycVerificationActionsFields = gql`

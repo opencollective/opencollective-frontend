@@ -18,12 +18,10 @@ import { Pagination } from '@/components/dashboard/filters/Pagination';
 import type { DashboardSectionProps } from '@/components/dashboard/types';
 import { DocumentationCardList } from '@/components/documentation/DocumentationCardList';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
-import { useModal } from '@/components/ModalContext';
-import { Button } from '@/components/ui/Button';
 
 import { kycVerificationCollectionFields } from '../graphql';
 import { i18nKYCVerificationStatus } from '../intl';
-import { KYCRequestModal } from '../request/KYCRequestModal';
+import { SubmitKYCVerificationButton } from '../request/SubmitKYCVerificationButton';
 
 import { KYCVerificationRequestsTable } from './KYCVerificationRequestsTable';
 
@@ -56,7 +54,6 @@ const filters: FilterComponentConfigs<FilterValues> = {
 };
 
 export function KYCRequests(props: DashboardSectionProps) {
-  const { showModal } = useModal();
   const queryFilter = useQueryFilter({
     schema,
     filters,
@@ -113,20 +110,11 @@ export function KYCRequests(props: DashboardSectionProps) {
           />
         }
         actions={
-          <Button
-            size="sm"
-            onClick={() => {
-              showModal(KYCRequestModal, {
-                requestedByAccount: {
-                  slug: props.accountSlug,
-                },
-                verifyAccount: null,
-                refetchQueries: ['KYCRequestsDashboard'],
-              });
-            }}
-          >
-            <FormattedMessage defaultMessage="Submit KYC Verification" id="fS9N/M" />
-          </Button>
+          <SubmitKYCVerificationButton
+            requestedByAccount={{ slug: props.accountSlug }}
+            verifyAccount={null}
+            refetchQueries={['KYCRequestsDashboard']}
+          />
         }
       />
       <Filterbar {...queryFilter} />
