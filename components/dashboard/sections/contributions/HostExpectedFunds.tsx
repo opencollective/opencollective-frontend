@@ -229,7 +229,12 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
             )}
           </div>
         }
-        description={<FormattedMessage defaultMessage="Expected funds for Collectives you host." id="tNEw2N" />}
+        description={
+          <FormattedMessage
+            defaultMessage="Expected funds for your Organization and Collectives you host."
+            id="dNG8Qp"
+          />
+        }
         actions={
           <React.Fragment>
             <Button
