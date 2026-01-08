@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const formatPrivateNoteLabel = msg => {
   return (
-    <Tooltip key="tooltip">
+    <Tooltip key="private-note">
       <TooltipTrigger className="cursor-help underline decoration-slate-400 decoration-dashed">{msg}</TooltipTrigger>
       <TooltipContent>
         <FormattedMessage defaultMessage="Private notes are only visible to you and other Host admins." id="0b9yMU" />

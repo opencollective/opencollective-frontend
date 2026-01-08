@@ -50,7 +50,7 @@ const ThreadActivity = ({ activity }) => {
                 values={{
                   userName: (
                     <StyledLink
-                      key="link"
+                      key="user-name"
                       as={LinkCollective}
                       color="black.800"
                       collective={activity.individual}

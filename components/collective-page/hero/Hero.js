@@ -333,7 +333,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       defaultMessage="Part of: {parentName}"
                       values={{
                         parentName: (
-                          <StyledLink key="link" as={LinkCollective} collective={collective.parentCollective} noTitle>
+                          <StyledLink
+                            key="parent-name"
+                            as={LinkCollective}
+                            collective={collective.parentCollective}
+                            noTitle
+                          >
                             <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
                           </StyledLink>
                         ),
@@ -348,10 +353,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         id="Collective.Hero.Host"
                         defaultMessage="{FiscalHost}: {hostName}"
                         values={{
-                          FiscalHost: <DefinedTerm key="term" term={Terms.FISCAL_HOST} color="black.700" />,
+                          FiscalHost: <DefinedTerm key="fiscal-host" term={Terms.FISCAL_HOST} color="black.700" />,
                           hostName: (
                             <StyledLink
-                              key="link"
+                              key="host-name"
                               as={LinkCollective}
                               collective={host}
                               data-cy="fiscalHostName"
@@ -372,7 +377,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           values={{
                             parentName: (
                               <StyledLink
-                                key="link"
+                                key="parent-name"
                                 as={LinkCollective}
                                 collective={displayedConnectedAccount.collective}
                                 noTitle
@@ -412,7 +417,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                             defaultMessage="Host fee: {fee}"
                             values={{
                               fee: (
-                                <DefinedTerm key="term" term={Terms.HOST_FEE} color="black.700">
+                                <DefinedTerm key="host-fee" term={Terms.HOST_FEE} color="black.700">
                                   {collective.hostFeePercent || 0}%
                                 </DefinedTerm>
                               ),
@@ -428,7 +433,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           defaultMessage="Platform fee: {fee}"
                           values={{
                             fee: (
-                              <DefinedTerm key="term" term={Terms.PLATFORM_FEE} color="black.700">
+                              <DefinedTerm key="platform-fee" term={Terms.PLATFORM_FEE} color="black.700">
                                 {collective.platformFeePercent}%
                               </DefinedTerm>
                             ),

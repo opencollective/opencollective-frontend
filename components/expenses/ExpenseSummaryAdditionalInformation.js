@@ -60,7 +60,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
           values={{
             totalPaidInvoices: (
               <FormattedMoneyAmount
-                key="invoices"
+                key="total-paid-invoices"
                 amount={stats.totalPaidInvoices.valueInCents}
                 currency={stats.totalPaidInvoices.currency}
                 precision={2}
@@ -68,7 +68,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
             ),
             totalPaidReceipts: (
               <FormattedMoneyAmount
-                key="receipts"
+                key="total-paid-receipts"
                 amount={stats.totalPaidReceipts.valueInCents}
                 currency={stats.totalPaidReceipts.currency}
                 precision={2}
@@ -76,7 +76,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
             ),
             totalPaidGrants: (
               <FormattedMoneyAmount
-                key="grants"
+                key="total-paid-grants"
                 amount={stats.totalPaidGrants.valueInCents}
                 currency={stats.totalPaidGrants.currency}
                 precision={2}

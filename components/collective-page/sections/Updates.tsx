@@ -221,7 +221,7 @@ const SectionUpdates = ({ collective, isAdmin }) => {
                           defaultMessage="Created on {date} (draft) by {author}"
                           values={{
                             date: formatDate(update.createdAt),
-                            author: <LinkCollective collective={update.fromAccount} />,
+                            author: <LinkCollective key="author" collective={update.fromAccount} />,
                           }}
                         />
                       )}

@@ -56,7 +56,7 @@ const FormattedMoneyAmount = ({
 }: FormattedMoneyAmountProps) => {
   if (!currency) {
     return (
-      <span key="placeholder" className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>
+      <span key="amount" className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>
         {EMPTY_AMOUNT_PLACEHOLDER}
       </span>
     );
@@ -64,7 +64,7 @@ const FormattedMoneyAmount = ({
 
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <span key="placeholder" className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>
+      <span key="amount" className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>
         {EMPTY_AMOUNT_PLACEHOLDER}
       </span>
     ) : (
@@ -84,7 +84,7 @@ const FormattedMoneyAmount = ({
   }
 
   const currencyCode = showCurrencyCode ? (
-    <span key="currency" className={currencyCodeClassName}>
+    <span key="currency-code" className={currencyCodeClassName}>
       {currency}
     </span>
   ) : (

@@ -243,7 +243,7 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
                       id="Transaction.from"
                       defaultMessage="from {name}"
                       values={{
-                        name: <StyledLink key="link" as={LinkCollective} withHoverCard collective={fromAccount} />,
+                        name: <StyledLink key="name" as={LinkCollective} withHoverCard collective={fromAccount} />,
                       }}
                     />
                     &nbsp;
@@ -254,7 +254,7 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
                     id="Transaction.to"
                     defaultMessage="to {name}"
                     values={{
-                      name: <StyledLink key="link" as={LinkCollective} withHoverCard collective={toAccount} />,
+                      name: <StyledLink key="name" as={LinkCollective} withHoverCard collective={toAccount} />,
                     }}
                   />
                 }
@@ -265,10 +265,10 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
                       id="transaction.usingGiftCardFrom"
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
-                        giftCard: <DefinedTerm key="term" term={Terms.GIFT_CARD} textTransform="lowercase" />,
+                        giftCard: <DefinedTerm key="gift-card" term={Terms.GIFT_CARD} textTransform="lowercase" />,
                         collective: (
                           <StyledLink
-                            key="link"
+                            key="collective"
                             as={LinkCollective}
                             withHoverCard
                             collective={giftCardEmitterAccount}
