@@ -8783,6 +8783,21 @@ type ExpenseQuote {
   The date on which the item was created
   """
   estimatedDeliveryAt: DateTime
+
+  """
+  Notices related to this quote
+  """
+  notices: [ExpenseQuoteNotice]
+}
+
+"""
+Fields for an expense quote notice
+"""
+type ExpenseQuoteNotice {
+  type: String!
+  text: String!
+  code: String!
+  link: String!
 }
 
 type TransferWiseRequiredField {
