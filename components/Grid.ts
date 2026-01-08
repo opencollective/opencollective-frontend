@@ -24,7 +24,7 @@ type BoxProps = SpaceProps &
 const FILTERED_PROPS = new Set(['display', 'width', 'height']);
 
 export const Box = styled.div.withConfig({
-  shouldForwardProp: prop => defaultShouldForwardProp(prop) && !FILTERED_PROPS.has(prop),
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
 })<BoxProps>(
   {
     boxSizing: 'border-box',
