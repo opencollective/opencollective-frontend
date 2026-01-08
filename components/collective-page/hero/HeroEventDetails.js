@@ -156,7 +156,11 @@ class HeroEventDetails extends React.Component {
                 id="Event.CreatedBy"
                 defaultMessage="Created by: {CollectiveLink}"
                 values={{
-                  CollectiveLink: <Link href={`/${parentCollective.slug}`}>{parentCollective.name}</Link>,
+                  CollectiveLink: (
+                    <Link key="link" href={`/${parentCollective.slug}`}>
+                      {parentCollective.name}
+                    </Link>
+                  ),
                 }}
               />
             </span>
@@ -169,9 +173,10 @@ class HeroEventDetails extends React.Component {
                 id="Collective.Hero.Host"
                 defaultMessage="{FiscalHost}: {hostName}"
                 values={{
-                  FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
+                  FiscalHost: <DefinedTerm key="term" term={Terms.FISCAL_HOST} color="black.700" />,
                   hostName: (
                     <StyledLink
+                      key="link"
                       as={LinkCollective}
                       collective={host}
                       data-cy="fiscalHostName"
@@ -193,6 +198,7 @@ class HeroEventDetails extends React.Component {
                 values={{
                   parentName: (
                     <StyledLink
+                      key="link"
                       as={LinkCollective}
                       collective={displayedConnectedAccount.collective}
                       noTitle

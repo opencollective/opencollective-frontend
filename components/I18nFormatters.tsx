@@ -19,9 +19,9 @@ export const I18nItalic = chunks => <i>{chunks}</i>;
 // ts-unused-exports:disable-next-line
 export const I18nCode = chunks => <code>{chunks}</code>;
 // ts-unused-exports:disable-next-line
-export const I18nOrderedList = chunks => <ol className="list-inside list-decimal">{chunks}</ol>;
+export const I18nOrderedList = chunks => <ol className="list-inside list-decimal">{React.Children.toArray(chunks)}</ol>;
 // ts-unused-exports:disable-next-line
-export const I18nUnorderedList = chunks => <ul className="list-inside list-disc">{chunks}</ul>;
+export const I18nUnorderedList = chunks => <ul className="list-inside list-disc">{React.Children.toArray(chunks)}</ul>;
 // ts-unused-exports:disable-next-line
 export const I18nListItem = chunks => <li>{chunks}</li>;
 

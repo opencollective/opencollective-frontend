@@ -487,7 +487,7 @@ const ExpenseSummary = ({
                             id="withColon"
                             defaultMessage="{item}:"
                             values={{
-                              item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+                              item: <FormattedMessage key="item" id="expense.incurredAt" defaultMessage="Date" />,
                             }}
                           />{' '}
                           {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}

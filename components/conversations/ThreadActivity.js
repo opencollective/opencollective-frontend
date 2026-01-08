@@ -50,6 +50,7 @@ const ThreadActivity = ({ activity }) => {
                 values={{
                   userName: (
                     <StyledLink
+                      key="link"
                       as={LinkCollective}
                       color="black.800"
                       collective={activity.individual}
@@ -70,7 +71,7 @@ const ThreadActivity = ({ activity }) => {
               <FormattedMessage
                 defaultMessage="on {date}"
                 id="mzGohi"
-                values={{ date: <DateTime value={activity.createdAt} /> }}
+                values={{ date: <DateTime key="date" value={activity.createdAt} /> }}
               />
             </Span>
           </Flex>
