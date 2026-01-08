@@ -3186,6 +3186,7 @@
   "Payout.Automatic": "אוטומטית",
   "Payout.Manual": "ידנית",
   "PayoutBankInformationForm.AccountInfo": "פרטי חשבון",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "היתה בעיה בהעלאת פרטי מטבע לארגון זה",
   "PayoutBankInformationForm.Error.RequiredFields": "היתה בעיה בהעלאת שדות נדרשים",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

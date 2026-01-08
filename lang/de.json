@@ -3186,6 +3186,7 @@
   "Payout.Automatic": "Automatisch",
   "Payout.Manual": "Manuell",
   "PayoutBankInformationForm.AccountInfo": "Kontoinformationen",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "Beim Laden der verfügbaren Währungen ist ein Fehler aufgetreten",
   "PayoutBankInformationForm.Error.RequiredFields": "Beim Abrufen der erforderlichen Felder ist ein Fehler aufgetreten",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

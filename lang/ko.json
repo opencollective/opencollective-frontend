@@ -3186,6 +3186,7 @@
   "Payout.Automatic": "자동",
   "Payout.Manual": "수동",
   "PayoutBankInformationForm.AccountInfo": "Account Information",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
   "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

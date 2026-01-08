@@ -3186,6 +3186,7 @@
   "Payout.Automatic": "Automatisch",
   "Payout.Manual": "Handmatig",
   "PayoutBankInformationForm.AccountInfo": "Account Information",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
   "PayoutBankInformationForm.Error.RequiredFields": "Er is een fout opgetreden bij het ophalen van de vereiste velden",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",
