@@ -1115,6 +1115,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {

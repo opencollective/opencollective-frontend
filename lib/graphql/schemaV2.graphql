@@ -6308,6 +6308,7 @@ type ConnectedAccount {
 All supported services a user can connect with
 """
 enum ConnectedAccountService {
+  persona
   paypal
   stripe
   stripe_customer
@@ -7057,6 +7058,7 @@ type CollectiveFeatures {
   VENDORS: CollectiveFeatureStatus
   ACCOUNT_MANAGEMENT: CollectiveFeatureStatus
   KYC: CollectiveFeatureStatus
+  PERSONA_KYC: CollectiveFeatureStatus
 }
 
 enum CollectiveFeatureStatus {
@@ -7536,9 +7538,10 @@ type KYCVerification {
 
 enum KYCProvider {
   MANUAL
+  PERSONA
 }
 
-union KYCProviderData = ManualKYCProviderData
+union KYCProviderData = ManualKYCProviderData | PersonaKYCProviderData
 
 """
 Manual KYC data
@@ -7548,6 +7551,31 @@ type ManualKYCProviderData {
   Notes added during manual verification
   """
   notes: String!
+}
+
+"""
+Persona KYC data
+"""
+type PersonaKYCProviderData {
+  """
+  Whether this persona inquiry was imported
+  """
+  imported: Boolean!
+
+  """
+  ID of the Persona inquiry
+  """
+  id: String!
+
+  """
+  Status of the Persona inquiry
+  """
+  status: String!
+
+  """
+  Contains KYC data verified by this inquiry
+  """
+  fields: JSON!
 }
 
 """
@@ -14239,6 +14267,7 @@ A individual KYC verified status
 """
 type KYCStatus {
   manual: KYCVerification
+  persona: KYCVerification
 }
 
 """
@@ -26993,12 +27022,17 @@ input PlatformSubscriptionPlanPricing {
 
 input RequestKYCVerificationInput {
   manual: RequestManualKYCVerificationInput
+  persona: RequestPersonaKYCVerificationInput
 }
 
 input RequestManualKYCVerificationInput {
   legalName: String!
   legalAddress: String
   notes: String
+}
+
+input RequestPersonaKYCVerificationInput {
+  importInquiryId: String
 }
 
 """
