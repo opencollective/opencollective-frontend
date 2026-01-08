@@ -110,7 +110,7 @@ const OficoMembers = () => {
         <h2 className="mb-8 text-center text-[2rem] font-bold text-slate-800">
           {formatMessage(messages.title, {
             OficoLink: () => (
-              <Link href="https://openfinanceconsortium.org" className="underline">
+              <Link key="ofico-link" href="https://openfinanceconsortium.org" className="underline">
                 <Avatar
                   radius={42}
                   src={'/static/images/ofico/ofico-logo.png'}
