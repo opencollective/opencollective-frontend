@@ -17,6 +17,7 @@ import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { expectedDateFilter } from '../../filters/DateFilter';
+import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
@@ -39,7 +40,11 @@ enum ContributionsTab {
 }
 
 const hostExpectedFundsMetadataQuery = gql`
-  query HostExpectedFundsMetadata($slug: String!, $expectedFundsFilter: ExpectedFundsFilter) {
+  query HostExpectedFundsMetadata(
+    $slug: String!
+    $expectedFundsFilter: ExpectedFundsFilter
+    $hostContext: HostContext
+  ) {
     account(slug: $slug) {
       id
       slug
@@ -62,7 +67,7 @@ const hostExpectedFundsMetadataQuery = gql`
         filter: INCOMING
         expectedFundsFilter: $expectedFundsFilter
         status: [PENDING]
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
@@ -70,7 +75,7 @@ const hostExpectedFundsMetadataQuery = gql`
         filter: INCOMING
         expectedFundsFilter: $expectedFundsFilter
         status: [EXPIRED]
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
@@ -79,7 +84,7 @@ const hostExpectedFundsMetadataQuery = gql`
         expectedFundsFilter: $expectedFundsFilter
         status: [PAID]
         includeIncognito: true
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
@@ -88,7 +93,7 @@ const hostExpectedFundsMetadataQuery = gql`
         expectedFundsFilter: $expectedFundsFilter
         status: [CANCELLED]
         includeIncognito: true
-        hostContext: ALL
+        hostContext: $hostContext
       ) {
         totalCount
       }
@@ -98,6 +103,7 @@ const hostExpectedFundsMetadataQuery = gql`
 
 const schema = baseSchema.extend({
   expectedDate: expectedDateFilter.schema,
+  hostContext: hostContextFilter.schema,
 });
 type FilterValues = z.infer<typeof schema>;
 const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
@@ -166,12 +172,14 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     meta: filterMeta,
     views,
     filters,
+    skipFiltersOnReset: ['hostContext'],
   });
 
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostExpectedFundsMetadataQuery, {
     variables: {
       slug: accountSlug,
       expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -183,7 +191,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       slug: accountSlug,
       filter: 'INCOMING',
       includeIncognito: true,
-      hostContext: 'ALL',
       expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
       ...queryFilter.variables,
     },
@@ -210,8 +217,24 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />}
-        description={<FormattedMessage defaultMessage="Expected funds for Collectives you host." id="tNEw2N" />}
+        title={
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
+            <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
+          </div>
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Expected funds for your Organization and Collectives you host."
+            id="dNG8Qp"
+          />
+        }
         actions={
           <React.Fragment>
             <Button

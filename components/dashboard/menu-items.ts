@@ -7,7 +7,6 @@ import {
   BookOpenCheck,
   BookUserIcon,
   Building,
-  Coins,
   CreditCard,
   FileText,
   HandCoins,
@@ -268,6 +267,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
+          label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
+          section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
+        },
+        {
+          if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
           label: intl.formatMessage({ defaultMessage: 'Incomplete Contributions', id: 'IncompleteContributions' }),
           section: ALL_SECTIONS.INCOMPLETE_CONTRIBUTIONS,
         },
@@ -282,12 +286,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
         },
       ],
-    },
-    {
-      if: !isIndividual && hasMoneyManagement && !isCommunityManagerOnly,
-      label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
-      Icon: Coins,
-      section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },
     {
       if: hasHosting && !isAccountantOnly && !isCommunityManagerOnly,
