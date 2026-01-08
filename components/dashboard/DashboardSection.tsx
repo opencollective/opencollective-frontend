@@ -7,6 +7,7 @@ import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import { KYCRequests } from '../kyc/dashboard/KYCRequests';
+import { KYCSettings } from '../kyc/dashboard/settings/KYCSettings';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import AccountSettingsForm from '../root-actions/AccountSettings';
@@ -105,6 +106,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.PEOPLE]: PeopleRouter,
   [SECTIONS.KYC]: KYCRequests,
+  [SECTIONS.KYC_SETTINGS]: KYCSettings,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,

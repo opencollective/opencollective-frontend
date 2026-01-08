@@ -329,6 +329,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.KYC,
           label: intl.formatMessage({ defaultMessage: 'Requests', id: 'VirtualCards.Requests' }),
         },
+        {
+          if: isFeatureEnabled(account, FEATURES.PERSONA_KYC),
+          section: ALL_SECTIONS.KYC_SETTINGS,
+          label: intl.formatMessage({ defaultMessage: 'Settings', id: 'Settings' }),
+        },
       ],
     },
     {
