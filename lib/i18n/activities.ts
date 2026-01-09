@@ -2,13 +2,69 @@ import type { MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
 import type { ActivityTypes } from '../constants/activities';
+import type { ActivityType } from '../graphql/types/v2/schema';
 
 interface TimelineMessageDescriptor extends MessageDescriptor {
   avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)
   content?: 'update' | 'conversation'; // Used to determine which content card to display
 }
 
-export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessageDescriptor>({
+type ActivityWithMandatoryMessageDescriptor = Exclude<
+  ActivityType,
+  | ActivityType.ACTIVITY_ALL
+  | ActivityType.BACKYOURSTACK_DISPATCH_CONFIRMED
+  | ActivityType.ORDER_PENDING_CRYPTO
+  | ActivityType.PAYMENT_CREDITCARD_CONFIRMATION
+  | ActivityType.PAYMENT_CREDITCARD_EXPIRING
+  | ActivityType.PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION
+  | ActivityType.PLATFORM_BILLING_OVERDUE_REMINDER
+  | ActivityType.TWO_FACTOR_CODE_REQUESTED
+  | ActivityType.SUBSCRIPTION_READY_TO_BE_RESUMED
+  | ActivityType.ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  | ActivityType.VIRTUAL_CARD_CHARGE_DECLINED
+  | ActivityType.WEBHOOK_PAYPAL_RECEIVED
+  | ActivityType.WEBHOOK_STRIPE_RECEIVED
+  | ActivityType.USER_RESET_PASSWORD
+  | ActivityType.USER_OTP_REQUESTED
+  | ActivityType.USER_NEW_TOKEN
+>;
+
+export const ActivityTimelineMessageI18n = defineMessages<
+  ActivityWithMandatoryMessageDescriptor,
+  TimelineMessageDescriptor
+>({
+  ACCOUNTING_CATEGORIES_EDITED: {
+    defaultMessage: '<Individual></Individual> edited chart of accounts for <Account></Account>',
+    id: 'vXqXJu',
+  },
+  ACTIVATED_COLLECTIVE_AS_HOST: {
+    defaultMessage: '<Individual></Individual> activated <Account></Account> as a host',
+    id: 'ZAcGq3',
+  },
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT: {
+    defaultMessage: '<Individual></Individual> activated <Account></Account> as an independent collective',
+    id: '8qE+vL',
+  },
+  ADDED_FUNDS_EDITED: {
+    defaultMessage: '<Individual></Individual> edited added funds for <Account></Account>',
+    id: 'UFBGcv',
+  },
+  ADDED_FUND_TO_ORG: {
+    defaultMessage: '<Individual></Individual> added fund to <Account></Account>',
+    id: 'NCvxh0',
+  },
+  AGREEMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> created agreement for <Account></Account>',
+    id: '0AVbic',
+  },
+  AGREEMENT_DELETED: {
+    defaultMessage: '<Individual></Individual> deleted agreement for <Account></Account>',
+    id: 'lpd5ac',
+  },
+  AGREEMENT_EDITED: {
+    defaultMessage: '<Individual></Individual> edited agreement for <Account></Account>',
+    id: '8gvcEv',
+  },
   COLLECTIVE_APPROVED: {
     defaultMessage: "<Individual></Individual> approved <Account></Account>'s application to be hosted",
     id: 'tMbYww',
@@ -22,6 +78,84 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     defaultMessage:
       '<Individual></Individual> removed <FromAccount></FromAccount> as an <MemberRole></MemberRole> for <Account></Account>',
     id: '6J42kW',
+  },
+  COLLECTIVE_CORE_MEMBER_EDITED: {
+    defaultMessage: '<Individual></Individual> edited <FromAccount></FromAccount> membership to <Account></Account>',
+    id: 'VVHub9',
+  },
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: {
+    defaultMessage: '<FromAccount></FromAccount> declined invitation to join <Account></Account>',
+    id: 'VIpCLM',
+    avatar: 'fromAccount',
+  },
+  COLLECTIVE_CORE_MEMBER_INVITED: {
+    defaultMessage:
+      '<Individual></Individual> invited <FromAccount></FromAccount> to join <Account></Account> as <MemberRole></MemberRole>',
+    id: 'CAcrDA',
+  },
+  COLLECTIVE_COMMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> commented on <CommentEntity></CommentEntity>',
+    id: '/KsYzO',
+  },
+  COLLECTIVE_CONTACT: {
+    defaultMessage: '<FromAccount></FromAccount> contacted <Account></Account>',
+    id: 'PjKtqv',
+    avatar: 'fromAccount',
+  },
+  COLLECTIVE_CREATED: {
+    defaultMessage: '<Individual></Individual> created <Account></Account>',
+    id: 'DOhe/o',
+  },
+  COLLECTIVE_CREATED_GITHUB: {
+    defaultMessage: '<Individual></Individual> created <Account></Account> through GitHub',
+    id: '7Baxl1',
+  },
+  COLLECTIVE_DELETED: {
+    defaultMessage: '<Individual></Individual> deleted <Account></Account>',
+    id: 'QJQk3+',
+  },
+  COLLECTIVE_EDITED: {
+    defaultMessage: '<Individual></Individual> edited <Account></Account>',
+    id: 'Ib5AtK',
+  },
+  COLLECTIVE_EXPENSE_DELETED: {
+    defaultMessage: '<Individual></Individual> deleted expense',
+    id: 'tET5c6',
+  },
+  COLLECTIVE_EXPENSE_INVITE_DECLINED: {
+    defaultMessage: '<FromAccount></FromAccount> declined expense invite',
+    id: 'vOMwSM',
+    avatar: 'fromAccount',
+  },
+  COLLECTIVE_EXPENSE_MISSING_RECEIPT: {
+    defaultMessage:
+      '<Individual></Individual> notified admins about missing receipt for expense <Expense>{expenseDescription}</Expense>',
+    id: 'ZqUuF1',
+  },
+  COLLECTIVE_EXPENSE_MOVED: {
+    defaultMessage: '<Individual></Individual> moved expense <Expense>{expenseDescription}</Expense>',
+    id: '2kd9Bh',
+  },
+  COLLECTIVE_EXPENSE_PROCESSING: {
+    defaultMessage: '<Individual></Individual> is processing expense <Expense>{expenseDescription}</Expense>',
+    id: '/lEDfS',
+  },
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD: {
+    defaultMessage: '<Individual></Individual> put expense <Expense>{expenseDescription}</Expense> on hold',
+    id: 'jHZV57',
+  },
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD: {
+    defaultMessage: '<Individual></Individual> released hold on expense <Expense>{expenseDescription}</Expense>',
+    id: 'viWayq',
+  },
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
+    defaultMessage: '<Individual></Individual> scheduled expense <Expense>{expenseDescription}</Expense> for payment',
+    id: 'ZWB99K',
+  },
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT: {
+    defaultMessage:
+      '<Individual></Individual> unscheduled expense <Expense>{expenseDescription}</Expense> from payment',
+    id: 'xq619k',
   },
   COLLECTIVE_FROZEN: { defaultMessage: '<Individual></Individual> froze <Account></Account>', id: 'CU72pt' },
   COLLECTIVE_UNFROZEN: { defaultMessage: '<Individual></Individual> unfreezed <Account></Account>', id: '468Qmg' },
@@ -118,6 +252,74 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     id: 'blBwBm',
     avatar: 'fromAccount',
   },
+  COLLECTIVE_MEMBER_INVITED: {
+    defaultMessage:
+      '<Individual></Individual> invited <FromAccount></FromAccount> to join <Account></Account> as <MemberRole></MemberRole>',
+    id: 'CAcrDA',
+  },
+  COLLECTIVE_MONTHLY_REPORT: {
+    defaultMessage: '<Individual></Individual> generated monthly report for <Account></Account>',
+    id: 'Ite1ta',
+  },
+  COLLECTIVE_REJECTED: {
+    defaultMessage: '<Individual></Individual> rejected <Account></Account> application',
+    id: '46Ln84',
+  },
+  COLLECTIVE_TRANSACTION_CREATED: {
+    defaultMessage:
+      '<Individual></Individual> created transaction from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'Fif2Ft',
+  },
+  COLLECTIVE_TRANSACTION_PAID: {
+    defaultMessage:
+      '<Individual></Individual> paid transaction from <FromAccount></FromAccount> to <Account></Account>',
+    id: '3sRNXH',
+  },
+  COLLECTIVE_UPDATE_CREATED: {
+    defaultMessage: '<Individual></Individual> drafted update on <Account></Account>',
+    id: 'BHspz7',
+  },
+  COLLECTIVE_USER_ADDED: {
+    defaultMessage: '<Individual></Individual> added user to <Account></Account>',
+    id: 'i4XG7q',
+  },
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED: {
+    defaultMessage: '<Individual></Individual> assigned virtual card to <Account></Account>',
+    id: '8jdI/Z',
+  },
+  COLLECTIVE_VIRTUAL_CARD_CREATED: {
+    defaultMessage: '<Individual></Individual> created virtual card on <Account></Account>',
+    id: 't6H0HI',
+  },
+  COLLECTIVE_VIRTUAL_CARD_DELETED: {
+    defaultMessage: '<Individual></Individual> deleted virtual card on <Account></Account>',
+    id: 'RFY8Jn',
+  },
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS: {
+    defaultMessage:
+      '<Individual></Individual> notified admins about missing receipts for virtual card on <Account></Account>',
+    id: '7MKNQH',
+  },
+  COLLECTIVE_VIRTUAL_CARD_RESUMED: {
+    defaultMessage: '<Individual></Individual> resumed virtual card on <Account></Account>',
+    id: 'RZVniG',
+  },
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY: {
+    defaultMessage: '<Individual></Individual> suspended virtual card on <Account></Account> due to inactivity',
+    id: 'ulMcxk',
+  },
+  CONNECTED_ACCOUNT_CREATED: {
+    defaultMessage: '<Individual></Individual> added connected account',
+    id: 'L5rs8v',
+  },
+  CONNECTED_ACCOUNT_ERROR: {
+    defaultMessage: '<Individual></Individual> encountered error with connected account',
+    id: 'RgD20A',
+  },
+  CONNECTED_ACCOUNT_REMOVED: {
+    defaultMessage: '<Individual></Individual> removed connected account',
+    id: 'lbJ/Vn',
+  },
   CONTRIBUTION_REJECTED: {
     defaultMessage:
       // Individual not always available here (added to activity 2024-02-22), using Account as fallback
@@ -195,6 +397,88 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     defaultMessage: '<Individual></Individual> deactivated "Money Management"',
     id: '3uQNWr',
   },
+  DEACTIVATED_COLLECTIVE_AS_HOST: {
+    defaultMessage: '<Individual></Individual> deactivated <Account></Account> as a host',
+    id: '51tM0i',
+  },
+  HOST_APPLICATION_COMMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> commented on host application',
+    id: 'MOP2FK',
+  },
+  HOST_APPLICATION_CONTACT: {
+    defaultMessage: '<FromAccount></FromAccount> contacted about host application',
+    id: '1Lh2F+',
+    avatar: 'fromAccount',
+  },
+  KYC_REQUESTED: {
+    defaultMessage: '<Individual></Individual> requested KYC verification',
+    id: '5ZPEgN',
+  },
+  KYC_REVOKED: {
+    defaultMessage: '<Individual></Individual> revoked KYC verification',
+    id: '5j9aSe',
+  },
+  KYC_VERIFIED: {
+    defaultMessage: '<Individual></Individual> verified KYC',
+    id: '7U+Y6h',
+  },
+  OAUTH_APPLICATION_AUTHORIZED: {
+    defaultMessage: '<Individual></Individual> authorized OAuth application',
+    id: 'Z+VOcX',
+  },
+  ORDER_COMMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> commented on <Order>contribution</Order>',
+    id: 'XNXJm3',
+  },
+  ORDER_DISPUTE_CLOSED: {
+    defaultMessage: '<Individual></Individual> closed dispute for <Order>contribution</Order>',
+    id: 'MXxyX/',
+  },
+  ORDER_DISPUTE_CREATED: {
+    defaultMessage: '<Individual></Individual> created dispute for <Order>contribution</Order>',
+    id: 'JHvzBW',
+  },
+  ORDER_PENDING: {
+    defaultMessage: '<FromAccount></FromAccount> has pending <Order>contribution</Order> to <Account></Account>',
+    id: 'Ot+fCA',
+    avatar: 'fromAccount',
+  },
+  ORDER_PENDING_CONTRIBUTION_REMINDER: {
+    defaultMessage:
+      '<Individual></Individual> sent reminder about pending contribution from <FromAccount></FromAccount>',
+    id: 't3WOba',
+  },
+  ORDER_PENDING_CREATED: {
+    defaultMessage: '<FromAccount></FromAccount> created pending order to <Account></Account>',
+    id: 'gjF3aT',
+    avatar: 'fromAccount',
+  },
+  ORDER_PENDING_EXPIRED: {
+    defaultMessage: '<FromAccount></FromAccount> pending order expired to <Account></Account>',
+    id: 'atbi3J',
+    avatar: 'fromAccount',
+  },
+  ORDER_PENDING_FOLLOWUP: {
+    defaultMessage: '<Individual></Individual> followed up on pending order',
+    id: '2VeZJd',
+  },
+  ORDER_PENDING_RECEIVED: {
+    defaultMessage: '<FromAccount></FromAccount> received pending order to <Account></Account>',
+    id: 'LqFESe',
+    avatar: 'fromAccount',
+  },
+  ORDER_REVIEW_CLOSED: {
+    defaultMessage: '<Individual></Individual> closed order review',
+    id: 'x3q3HE',
+  },
+  ORDER_REVIEW_OPENED: {
+    defaultMessage: '<Individual></Individual> opened order review',
+    id: 'QkCC/V',
+  },
+  ORDER_UPDATED: {
+    defaultMessage: '<Individual></Individual> updated <Order>contribution</Order>',
+    id: '6X1Kk9',
+  },
   ORGANIZATION_CONVERTED_TO_COLLECTIVE: {
     defaultMessage: '<Individual></Individual> converted to Collective',
     id: 'KrCkBc',
@@ -203,12 +487,140 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     defaultMessage: '<Individual></Individual> converted to Organization',
     id: 'St4vQ3',
   },
+  PLATFORM_SUBSCRIPTION_UPDATED: {
+    defaultMessage: '<Individual></Individual> updated platform subscription',
+    id: 'oDeSxJ',
+  },
+  SUBSCRIPTION_ACTIVATED: {
+    defaultMessage: "<FromAccount></FromAccount>'s recurring contribution activated",
+    id: '0auWgg',
+    avatar: 'fromAccount',
+  },
+  SUBSCRIPTION_CONFIRMED: {
+    defaultMessage: "<FromAccount></FromAccount>'s recurring contribution confirmed",
+    id: 'p2d9Zt',
+    avatar: 'fromAccount',
+  },
+  SUBSCRIPTION_RESUMED: {
+    defaultMessage: "<FromAccount></FromAccount>'s recurring contribution resumed",
+    id: '5EscZU',
+    avatar: 'fromAccount',
+  },
+  TAXFORM_INVALIDATED: {
+    defaultMessage: '<Individual></Individual> invalidated tax form for <Account></Account>',
+    id: '0qAPqd',
+  },
+  TAXFORM_RECEIVED: {
+    defaultMessage: '<Individual></Individual> received tax form for <Account></Account>',
+    id: 'xpucu/',
+  },
+  TAXFORM_REQUEST: {
+    defaultMessage: '<Individual></Individual> requested tax form for <Account></Account>',
+    id: '8Vld2o',
+  },
+  TRANSACTIONS_IMPORT_CREATED: {
+    defaultMessage: '<Individual></Individual> added a new transactions import',
+    id: 'PevwYy',
+  },
+  TRANSACTIONS_IMPORT_ROW_UPDATED: {
+    defaultMessage: '<Individual></Individual> updated transactions import row',
+    id: 'FFTher',
+  },
+  TWO_FACTOR_METHOD_ADDED: {
+    defaultMessage: '<Individual></Individual> added two factor method',
+    id: '0ctC5l',
+  },
+  TWO_FACTOR_METHOD_DELETED: {
+    defaultMessage: '<Individual></Individual> deleted two factor method',
+    id: 'muBlOw',
+  },
+  USER_CARD_CLAIMED: {
+    defaultMessage: '<FromAccount></FromAccount> claimed gift card',
+    id: 't3lE6O',
+    avatar: 'fromAccount',
+  },
+  USER_CARD_INVITED: {
+    defaultMessage: '<Individual></Individual> generated gift card for <Account></Account>',
+    id: 'sdFiPq',
+  },
+  USER_CHANGE_EMAIL: {
+    defaultMessage: '<Individual></Individual> changed email address',
+    id: 'JDrWzR',
+  },
+  USER_CREATED: {
+    defaultMessage: '<Individual></Individual> created user profile',
+    id: 'ZU7BO8',
+  },
+  USER_PASSWORD_SET: {
+    defaultMessage: '<Individual></Individual> changed password',
+    id: 'zDTt4/',
+  },
+  USER_PAYMENT_METHOD_CREATED: {
+    defaultMessage: '<Individual></Individual> created payment method for <Account></Account>',
+    id: '+232S9',
+  },
+  USER_SIGNIN: {
+    defaultMessage: '<Individual></Individual> signed in',
+    id: '3kzK7/',
+  },
+  VENDOR_CREATED: {
+    defaultMessage: '<Individual></Individual> created vendor <Vendor></Vendor>',
+    id: 'oNyYv0',
+  },
+  VENDOR_DELETED: {
+    defaultMessage: '<Individual></Individual> deleted vendor <Vendor></Vendor>',
+    id: 'EDz+8Q',
+  },
+  VENDOR_EDITED: {
+    defaultMessage: '<Individual></Individual> edited vendor <Vendor></Vendor>',
+    id: 'raGFNM',
+  },
+  ORDERS_SUSPICIOUS: {
+    defaultMessage: '<Individual></Individual> flagged suspicious orders',
+    id: 'H7mpEM',
+  },
+  ORDER_PROCESSING: {
+    defaultMessage:
+      '<Individual></Individual> set contribution from <FromAccount></FromAccount> to <Account></Account> as processing',
+    id: '3ts87+',
+  },
+  ORGANIZATION_COLLECTIVE_CREATED: {
+    defaultMessage: '<Individual></Individual> created organization <Account></Account>',
+    id: '7RCVgj',
+  },
+  TICKET_CONFIRMED: {
+    defaultMessage: '<Individual></Individual> confirmed ticket',
+    id: 'lcMp08',
+  },
 });
 
-export const ActivityDescriptionI18n = defineMessages({
+export const ActivityDescriptionI18n = defineMessages<
+  ActivityWithMandatoryMessageDescriptor & Extract<ActivityType, ActivityType.ACTIVITY_ALL>,
+  MessageDescriptor
+>({
+  ACTIVITY_ALL: {
+    defaultMessage: 'All activities',
+    id: '1KfRoB',
+  },
   ACCOUNTING_CATEGORIES_EDITED: {
     defaultMessage: 'Chart of account edited',
     id: 'F3FkEv',
+  },
+  ADDED_FUND_TO_ORG: {
+    defaultMessage: 'Added fund to organization',
+    id: 'wS5KDg',
+  },
+  AGREEMENT_CREATED: {
+    defaultMessage: 'Agreement created',
+    id: 'Q/kLys',
+  },
+  AGREEMENT_DELETED: {
+    defaultMessage: 'Agreement deleted',
+    id: 'Nx1bbk',
+  },
+  AGREEMENT_EDITED: {
+    defaultMessage: 'Agreement edited',
+    id: 'c9Ziym',
   },
   // Collective creation & applications
   COLLECTIVE_CREATED: {
@@ -239,6 +651,10 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_CREATED_GITHUB: {
     defaultMessage: '<Account></Account> created through GitHub',
     id: '+UdXIM',
+  },
+  COLLECTIVE_DELETED: {
+    defaultMessage: '<Account></Account> deleted',
+    id: 'Zq6/5U',
   },
   COLLECTIVE_APPLY: {
     defaultMessage: '<Account></Account> applied to be hosted by <Host></Host>',
@@ -358,6 +774,10 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'New draft created for <Expense>recurring expense</Expense> on <Account></Account>',
     id: 'ecapW0',
   },
+  COLLECTIVE_EXPENSE_INVITE_DECLINED: {
+    defaultMessage: 'Expense invite declined',
+    id: 'FhNjpq',
+  },
   COLLECTIVE_EXPENSE_MISSING_RECEIPT: {
     defaultMessage:
       'Notified admins about a missing receipt for expense <Expense>{expenseDescription}</Expense> on <Account></Account>',
@@ -370,6 +790,10 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD: {
     defaultMessage: 'Released hold on expense <Expense>{expenseDescription}</Expense>',
     id: 'o60jEo',
+  },
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT: {
+    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> unscheduled from payment',
+    id: 'T/r4vq',
   },
   TAXFORM_REQUEST: {
     defaultMessage: 'Tax form request sent to <Account></Account>',
@@ -392,9 +816,17 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
     id: 'MAL7pS',
   },
-  COLLECTIVE_CORE_MEMBER_INVITED: {
-    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
-    id: 'MAL7pS',
+  COLLECTIVE_MONTHLY_REPORT: {
+    defaultMessage: 'Monthly report generated for <Account></Account>',
+    id: 'FmLmM1',
+  },
+  COLLECTIVE_TRANSACTION_PAID: {
+    defaultMessage: 'Transaction paid from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'iC1LaR',
+  },
+  COLLECTIVE_USER_ADDED: {
+    defaultMessage: 'User added to <Account></Account>',
+    id: 'eIHBye',
   },
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: {
     defaultMessage:
@@ -409,6 +841,10 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_CORE_MEMBER_EDITED: {
     defaultMessage: 'Edited <FromAccount></FromAccount> membership to <Account></Account>',
     id: 'qpaFgk',
+  },
+  COLLECTIVE_CORE_MEMBER_INVITED: {
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
+    id: 'MAL7pS',
   },
   COLLECTIVE_CORE_MEMBER_REMOVED: {
     defaultMessage: '<FromAccount></FromAccount> removed as <MemberRole></MemberRole> of <Account></Account>',
@@ -439,17 +875,41 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'New virtual card added to <Account></Account>',
     id: 'BqfMx5',
   },
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED: {
+    defaultMessage: 'Virtual card assigned to <Account></Account>',
+    id: 'YTBNCK',
+  },
   COLLECTIVE_VIRTUAL_CARD_CREATED: {
     defaultMessage: 'New virtual card created on <Account></Account>',
     id: 'WjU8+x',
+  },
+  COLLECTIVE_VIRTUAL_CARD_DELETED: {
+    defaultMessage: 'Virtual card deleted on <Account></Account>',
+    id: 'aLLG+G',
   },
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS: {
     defaultMessage: 'Notified admins about a missing receipt for <Expense>expense</Expense> on <Account></Account>',
     id: '2E8GCk',
   },
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED: {
+    defaultMessage: 'Virtual card request approved for <Account></Account>',
+    id: 'cXXlmA',
+  },
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED: {
+    defaultMessage: 'Virtual card request rejected for <Account></Account>',
+    id: 'JJWfpF',
+  },
+  COLLECTIVE_VIRTUAL_CARD_RESUMED: {
+    defaultMessage: 'Virtual card resumed on <Account></Account>',
+    id: '8SrIqJ',
+  },
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED: {
     defaultMessage: 'Virtual card suspended on <Account></Account>',
     id: 'a1lJXS',
+  },
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY: {
+    defaultMessage: 'Virtual card suspended on <Account></Account> due to inactivity',
+    id: 'qR5kZF',
   },
   VIRTUAL_CARD_REQUESTED: {
     defaultMessage: 'Requested a virtual card for <Account></Account>',
@@ -468,14 +928,30 @@ export const ActivityDescriptionI18n = defineMessages({
     id: 'WebhookEvents.CONNECTED_ACCOUNT_CREATED',
     defaultMessage: 'Connected account added',
   },
+  CONNECTED_ACCOUNT_ERROR: {
+    defaultMessage: 'Connected account error',
+    id: 'wkF2z6',
+  },
+  CONNECTED_ACCOUNT_REMOVED: {
+    defaultMessage: 'Connected account removed',
+    id: 'PCbj+q',
+  },
   // Contributions
   SUBSCRIPTION_CANCELED: {
     defaultMessage: "<FromAccount></FromAccount>'s <Order>recurring contribution</Order> cancelled",
     id: 'gXMGr2',
   },
+  SUBSCRIPTION_ACTIVATED: {
+    defaultMessage: "<FromAccount></FromAccount>'s <Order>recurring contribution</Order> activated",
+    id: 'o7b+E/',
+  },
   SUBSCRIPTION_PAUSED: {
     defaultMessage: "<FromAccount></FromAccount>'s <Order>recurring contribution</Order> paused",
     id: 'XEZlSZ',
+  },
+  SUBSCRIPTION_CONFIRMED: {
+    defaultMessage: "<FromAccount></FromAccount>'s <Order>recurring contribution</Order> confirmed",
+    id: 'oN6HNf',
   },
   SUBSCRIPTION_READY_TO_BE_RESUMED: {
     defaultMessage: '<Order>Recurring contribution</Order> ready to be resumed',
@@ -502,15 +978,14 @@ export const ActivityDescriptionI18n = defineMessages({
       '<Order>Contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing',
     id: 'LZTaeF',
   },
-  ORDER_PROCESSING_CRYPTO: {
-    defaultMessage:
-      'Crypto <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing',
-    id: '6QW6MJ',
-  },
   ORDER_PROCESSED: {
     defaultMessage:
       '<Order>Contribution</Order> from <FromAccount></FromAccount> to <Account></Account> processed successfully',
     id: 'wWPkPb',
+  },
+  ORDERS_SUSPICIOUS: {
+    defaultMessage: 'Suspicious orders flagged',
+    id: '6haK6E',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
     defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
@@ -520,6 +995,49 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage:
       'Sent reminder to <FromAccount></FromAccount> about <Order>expected funds</Order> to <Account></Account>',
     id: '76qdIc',
+  },
+  ORDER_PENDING: {
+    defaultMessage: 'Pending <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'XlNLRh',
+  },
+  ORDER_PENDING_CREATED: {
+    defaultMessage:
+      'Pending <Order>contribution</Order> created from <FromAccount></FromAccount> to <Account></Account>',
+    id: '7I2yPR',
+  },
+  ORDER_PENDING_EXPIRED: {
+    defaultMessage:
+      'Pending <Order>contribution</Order> expired from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'N1hg0P',
+  },
+  ORDER_PENDING_RECEIVED: {
+    defaultMessage:
+      'Pending <Order>contribution</Order> received from <FromAccount></FromAccount> to <Account></Account>',
+    id: '7e4Bm7',
+  },
+  ORDER_COMMENT_CREATED: {
+    defaultMessage: 'Comment created on <Order>contribution</Order>',
+    id: 'Pae6pC',
+  },
+  ORDER_DISPUTE_CLOSED: {
+    defaultMessage: '<Order>Contribution</Order> dispute closed',
+    id: '8mKlkK',
+  },
+  ORDER_DISPUTE_CREATED: {
+    defaultMessage: '<Order>Contribution</Order> dispute created',
+    id: '46Kjm7',
+  },
+  ORDER_REVIEW_CLOSED: {
+    defaultMessage: '<Order>Contribution</Order> review closed',
+    id: 'oAsx8U',
+  },
+  ORDER_REVIEW_OPENED: {
+    defaultMessage: '<Order>Contribution</Order> review opened',
+    id: 'PjDV0k',
+  },
+  ORDER_UPDATED: {
+    defaultMessage: '<Order>Contribution</Order> updated',
+    id: 'tDQ8iW',
   },
   BACKYOURSTACK_DISPATCH_CONFIRMED: {
     defaultMessage: 'BackYourStack dispatch confirmed for <Account></Account>',
@@ -548,6 +1066,10 @@ export const ActivityDescriptionI18n = defineMessages({
     id: 'afrSHa',
   },
   // Sign in
+  USER_CREATED: {
+    defaultMessage: 'User profile created',
+    id: 'RUJAuW',
+  },
   USER_NEW_TOKEN: {
     defaultMessage: 'Requested a new sign in token',
     id: 'd//GCi', // Deprecated and replaced by USER_SIGNIN
@@ -559,6 +1081,46 @@ export const ActivityDescriptionI18n = defineMessages({
   OAUTH_APPLICATION_AUTHORIZED: {
     defaultMessage: 'Authorized a new OAuth application',
     id: 'X0h+Qz',
+  },
+  HOST_APPLICATION_COMMENT_CREATED: {
+    defaultMessage: 'Comment created on host application',
+    id: '181VV9',
+  },
+  HOST_APPLICATION_CONTACT: {
+    defaultMessage: 'Contact about host application',
+    id: '7XUDSX',
+  },
+  KYC_REQUESTED: {
+    defaultMessage: 'KYC verification requested',
+    id: 'azK1bU',
+  },
+  KYC_REVOKED: {
+    defaultMessage: 'KYC verification revoked',
+    id: 'zH3syr',
+  },
+  KYC_VERIFIED: {
+    defaultMessage: 'KYC verification verified',
+    id: '/tQumq',
+  },
+  PLATFORM_BILLING_ADDITIONAL_CHARGES_NOTIFICATION: {
+    defaultMessage: 'Platform billing additional charges notification',
+    id: '0UJt8J',
+  },
+  PLATFORM_BILLING_OVERDUE_REMINDER: {
+    defaultMessage: 'Platform billing overdue reminder',
+    id: 'CMLrMP',
+  },
+  PLATFORM_SUBSCRIPTION_UPDATED: {
+    defaultMessage: 'Platform subscription updated',
+    id: '8oLWFR',
+  },
+  TRANSACTIONS_IMPORT_CREATED: {
+    defaultMessage: 'Transactions import created',
+    id: 'QkJwIH',
+  },
+  TRANSACTIONS_IMPORT_ROW_UPDATED: {
+    defaultMessage: 'Transactions import row updated',
+    id: 'aXNtjO',
   },
   USER_CHANGE_EMAIL: {
     defaultMessage: 'Changed email address',
@@ -609,6 +1171,10 @@ export const ActivityDescriptionI18n = defineMessages({
   VENDOR_CREATED: {
     defaultMessage: 'Vendor <Vendor></Vendor> created',
     id: 'IUlgDG',
+  },
+  VENDOR_DELETED: {
+    defaultMessage: 'Vendor <Vendor></Vendor> deleted',
+    id: 'L3EHT/',
   },
   ADDED_FUNDS_EDITED: {
     defaultMessage: '<Individual></Individual> edited added funds',
@@ -866,10 +1432,6 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   ORDER_PROCESSING: {
     defaultMessage: 'Contribution processing',
     id: 'EEO+n7',
-  },
-  ORDER_PROCESSING_CRYPTO: {
-    defaultMessage: 'Contribution processing (crypto)',
-    id: 'oisSUu',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
     defaultMessage: 'New expected funds',

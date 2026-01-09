@@ -70,7 +70,6 @@ export const ActivityTypes = {
   ORDER_CANCELED_ARCHIVED_COLLECTIVE: 'order.canceled.archived.collective',
   ORDER_PENDING_CONTRIBUTION_NEW: 'order.new.pendingFinancialContribution',
   ORDER_PENDING_CONTRIBUTION_REMINDER: 'order.reminder.pendingFinancialContribution',
-  ORDER_PROCESSING_CRYPTO: 'order.processing.crypto',
   ORDER_PROCESSING: 'order.processing',
   ORDER_PROCESSED: 'order.processed',
   ORDERS_SUSPICIOUS: 'orders.suspicious',
