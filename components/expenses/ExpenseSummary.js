@@ -128,11 +128,8 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote } = LoggedInUser?.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
-  )
-    ? expense?.permissions || {}
-    : {};
+  const { canEditTitle, canEditType, canEditItems, canUsePrivateNote, canAttachReceipts } =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? expense?.permissions || {} : {};
   const invoiceFile = React.useMemo(
     () => expense?.invoiceFile || expense?.draft?.invoiceFile,
     [expense?.invoiceFile, expense?.draft?.invoiceFile],
@@ -412,14 +409,21 @@ const ExpenseSummary = ({
           <h3 className="text-lg font-semibold">
             <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
           </h3>
-          {canEditItems && (
+          {canEditItems ? (
             <EditExpenseDialog
               expense={expense}
               dialogContentClassName="sm:max-w-2xl"
               field="expenseDetails"
               title={intl.formatMessage({ defaultMessage: 'Edit expense details', id: 'expense.editDetails' })}
             />
-          )}
+          ) : canAttachReceipts ? (
+            <EditExpenseDialog
+              expense={expense}
+              dialogContentClassName="sm:max-w-2xl"
+              field="attachReceipts"
+              title={intl.formatMessage({ defaultMessage: 'Edit expense details', id: 'expense.editDetails' })}
+            />
+          ) : null}
         </div>
         <Flex mt={4} mb={2} alignItems="center" gridGap={2}>
           {!expense && isLoading ? (
