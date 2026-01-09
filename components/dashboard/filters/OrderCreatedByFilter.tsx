@@ -6,10 +6,11 @@ import { z } from 'zod';
 import type { FilterComponentProps, FilterConfig } from '@/lib/filters/filter-types';
 import { isMulti } from '@/lib/filters/schemas';
 import { gql } from '@/lib/graphql/helpers';
-import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { AccountHoverCardFieldsFragment, HostContext } from '@/lib/graphql/types/v2/graphql';
 import type { ExpectedFundsFilter } from '@/lib/graphql/types/v2/schema';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
+import type { FilterValues as OrderFilterValues } from '../sections/contributions/filters';
 
 import ComboSelectFilter from './ComboSelectFilter';
 import { AccountRenderer } from './HostedAccountFilter';
@@ -20,8 +21,15 @@ const createdByFilterSearchQuery = gql`
     $searchTerm: String
     $expectedFundsFilter: ExpectedFundsFilter
     $hostContext: HostContext
+    $status: [OrderStatus]
   ) {
-    orders(account: $account, filter: INCOMING, expectedFundsFilter: $expectedFundsFilter, hostContext: $hostContext) {
+    orders(
+      account: $account
+      filter: INCOMING
+      expectedFundsFilter: $expectedFundsFilter
+      hostContext: $hostContext
+      status: $status
+    ) {
       createdByUsers(searchTerm: $searchTerm, limit: 20) {
         nodes {
           id
@@ -33,7 +41,7 @@ const createdByFilterSearchQuery = gql`
   ${accountHoverCardFields}
 `;
 
-export type CreatedByFilterMeta = {
+export type OrderCreatedByFilterMeta = {
   accountSlug: string;
   expectedFundsFilter?: ExpectedFundsFilter;
 };
@@ -46,13 +54,19 @@ const resultNodeToOption = (account: Partial<AccountHoverCardFieldsFragment>) =>
   value: account.slug,
 });
 
-// This filter is currently only for Host Expected Funds,
-// if generalized to other tools we should provide the correct filters through the metadata
-function CreatedByFilter({ meta, ...props }: FilterComponentProps<z.infer<typeof schema>, CreatedByFilterMeta>) {
-  const [options, setOptions] = React.useState<{ label: React.ReactNode; keywords: string[]; value: string }[]>([]);
+type RequiredFilterValueTypes = {
+  hostContext?: HostContext;
+  expectedFundsFilter?: ExpectedFundsFilter;
+  status?: OrderFilterValues['status'];
+};
 
+function OrderCreatedByFilter({
+  meta,
+  values,
+  ...props
+}: FilterComponentProps<z.infer<typeof schema>, OrderCreatedByFilterMeta, RequiredFilterValueTypes>) {
+  const [options, setOptions] = React.useState<{ label: React.ReactNode; keywords: string[]; value: string }[]>([]);
   const [search, { loading, data }] = useLazyQuery(createdByFilterSearchQuery, {
-    variables: { expectedFundsFilter: 'ONLY_PENDING', hostContext: 'ALL' },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
   });
@@ -63,11 +77,13 @@ function CreatedByFilter({ meta, ...props }: FilterComponentProps<z.infer<typeof
         variables: {
           account: { slug: meta.accountSlug },
           searchTerm: searchTerm || undefined,
-          account: { slug: meta.accountSlug },
+          hostContext: values.hostContext,
+          expectedFundsFilter: values.expectedFundsFilter,
+          status: values.status,
         },
       });
     },
-    [meta.accountSlug, search],
+    [meta.accountSlug, search, values.hostContext, values.expectedFundsFilter, values.status],
   );
 
   // Load initial options on mount
@@ -76,9 +92,12 @@ function CreatedByFilter({ meta, ...props }: FilterComponentProps<z.infer<typeof
       variables: {
         account: { slug: meta.accountSlug },
         searchTerm: undefined,
+        hostContext: values.hostContext,
+        expectedFundsFilter: values.expectedFundsFilter,
+        status: values.status,
       },
     });
-  }, [meta.accountSlug, search]);
+  }, [meta.accountSlug, search, values.hostContext, values.expectedFundsFilter, values.status]);
 
   React.useEffect(() => {
     if (!loading && data?.orders?.createdByUsers?.nodes) {
@@ -89,11 +108,11 @@ function CreatedByFilter({ meta, ...props }: FilterComponentProps<z.infer<typeof
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} isMulti {...props} />;
 }
 
-export const createdByFilter: FilterConfig<z.infer<typeof schema>> = {
+export const orderCreatedByFilter: FilterConfig<z.infer<typeof schema>> = {
   schema: schema,
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Created by', id: 'Agreement.createdBy' }),
-    Component: CreatedByFilter,
+    Component: OrderCreatedByFilter,
     valueRenderer: ({ value, ...props }) => <AccountRenderer account={{ slug: value }} {...props} />,
   },
   toVariables: (values, key) => ({ [key]: values.map(slug => ({ slug })) }),

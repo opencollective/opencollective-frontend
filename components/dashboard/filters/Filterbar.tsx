@@ -12,12 +12,15 @@ import { Separator } from '../../ui/Separator';
 import FilterDropdown from './FilterDropdown';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
-  const filterKeys = Object.keys(filters);
+  const filterKeys = React.useMemo(() => Object.keys(filters), [filters]);
   const [displayedFilters, setDisplayedFilters] = React.useState(
     filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta })),
   );
-  const remainingFilters = filterKeys.filter(key =>
-    filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta }),
+
+  const remainingFilters = React.useMemo(
+    () =>
+      filterKeys.filter(key => filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta })),
+    [filterKeys, values, filters, defaultSchemaValues, meta],
   );
 
   // When the values change, this effect makes sure to update the displayed filter keys array and maintain the order of the filters

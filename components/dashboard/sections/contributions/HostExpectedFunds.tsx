@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { gql } from '../../../../lib/graphql/helpers';
@@ -16,9 +16,9 @@ import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanC
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
-import { createdByFilter, type CreatedByFilterMeta } from '../../filters/CreatedByFilter';
 import { expectedDateFilter } from '../../filters/DateFilter';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
+import { orderCreatedByFilter, type OrderCreatedByFilterMeta } from '../../filters/OrderCreatedByFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import ContributionsTable from './ContributionsTable';
@@ -101,23 +101,24 @@ const hostExpectedFundsMetadataQuery = gql`
 const schema = baseSchema.extend({
   expectedDate: expectedDateFilter.schema,
   hostContext: hostContextFilter.schema,
-  createdBy: createdByFilter.schema,
+  createdBy: orderCreatedByFilter.schema,
+  expectedFundsFilter: z.literal(ExpectedFundsFilter.ONLY_PENDING).default(ExpectedFundsFilter.ONLY_PENDING),
 });
 
-type FilterMeta = BaseFilterMeta & CreatedByFilterMeta;
+type FilterMeta = BaseFilterMeta & OrderCreatedByFilterMeta;
 
 type FilterValues = z.infer<typeof schema>;
 
 const toVariables: FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta> = {
   ...(baseToVariables as FiltersToVariables<FilterValues, DashboardOrdersQueryVariables, FilterMeta>),
   expectedDate: expectedDateFilter.toVariables,
-  createdBy: createdByFilter.toVariables,
+  createdBy: orderCreatedByFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...baseFilters,
   expectedDate: expectedDateFilter.filter,
-  createdBy: createdByFilter.filter,
+  createdBy: orderCreatedByFilter.filter,
 };
 
 function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
@@ -194,7 +195,6 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
       slug: accountSlug,
       filter: 'INCOMING',
       includeIncognito: true,
-      expectedFundsFilter: ExpectedFundsFilter.ONLY_PENDING,
       ...queryFilter.variables,
     },
 
