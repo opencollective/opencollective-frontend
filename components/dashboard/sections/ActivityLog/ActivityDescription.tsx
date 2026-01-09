@@ -182,7 +182,7 @@ export const getActivityVariables = (
           href={`${getCollectivePageRoute(activity.order.toAccount)}/contributions/${activity.order.legacyId}`}
           title={activity.order.description}
         >
-          {msg} #{activity.order.legacyId}
+          {msg || <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />} #{activity.order.legacyId}
         </Link>
       </ResourceTag>
     ),
