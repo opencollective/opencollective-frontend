@@ -77,6 +77,7 @@ export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter
         valueRenderer={filterConfig.valueRenderer}
         labelMsg={filterConfig.labelMsg}
         meta={meta}
+        values={values}
       />
       <div className="border-t p-2">
         <Button

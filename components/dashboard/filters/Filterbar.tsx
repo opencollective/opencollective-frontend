@@ -53,6 +53,7 @@ const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilte
         highlighted={highlighted}
         intl={intl}
         meta={meta}
+        values={values}
       />
     );
   } else {

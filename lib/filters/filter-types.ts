@@ -19,7 +19,7 @@ export type FiltersToVariables<FilterValues, QueryVariables, FilterMeta = any> =
   [K in keyof FilterValues]: FilterToVariables<FilterValues[K], K, FilterMeta, QueryVariables, FilterValues>;
 };
 
-export type FilterComponentProps<FilterValue, Meta = Record<string, any>> = {
+export type FilterComponentProps<FilterValue, Meta = Record<string, any>, FilterValues = Record<string, any>> = {
   value: FilterValue;
   onChange: (val: FilterValue) => void;
   intl: IntlShape;
@@ -28,6 +28,7 @@ export type FilterComponentProps<FilterValue, Meta = Record<string, any>> = {
   highlighted?: boolean;
   locked?: boolean;
   valueRenderer?: ValueRenderer<FilterValue, Meta>;
+  values?: FilterValues;
 };
 
 type ValueRenderer<FilterValue, Meta> = (props: {
