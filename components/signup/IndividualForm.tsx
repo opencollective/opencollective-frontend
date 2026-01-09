@@ -423,6 +423,9 @@ export function CompleteProfileSteps({ nextStep }: SignupStepProps) {
     }
     if (data?.me && !formikRef.current?.values?.id) {
       formikRef.current?.setFieldValue('id', data.me.id);
+      if (!formikRef.current?.values?.name && data.me.name) {
+        formikRef.current?.setFieldValue('name', data.me.name);
+      }
     }
   }, [data, LoggedInUser, refetchMe]);
 
