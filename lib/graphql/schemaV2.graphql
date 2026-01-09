@@ -691,6 +691,11 @@ interface Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -2094,6 +2099,26 @@ type OrderCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Order]
+
+  """
+  The accounts that created the orders in this collection (only scoped to the `account`, `hostContext`, `includeChildrenAccounts`, `expectedFundsFilter` and `status` arguments), regardless of pagination. Returns a paginated and searchable collection.
+  """
+  createdByUsers(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term to filter by name, slug, or email
+    """
+    searchTerm: String
+  ): AccountCollection!
 }
 
 """
@@ -3421,6 +3446,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -6190,6 +6220,11 @@ type PaymentMethod {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection
 }
 
@@ -9597,6 +9632,11 @@ type Bot implements Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10607,6 +10647,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -12175,6 +12220,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -13459,6 +13509,11 @@ type Individual implements Account {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14759,6 +14814,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15899,6 +15959,11 @@ type Vendor implements Account & AccountWithContributions {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -16730,9 +16795,19 @@ type Query {
     offset: Int! = 0
 
     """
+    The individual associated with the Activity
+    """
+    individual: AccountReferenceInput
+
+    """
     The accounts associated with the Activity
     """
-    account: [AccountReferenceInput!]!
+    account: [AccountReferenceInput!]
+
+    """
+    The hosts associated with the Activity
+    """
+    host: AccountReferenceInput
 
     """
     If account is a parent, also include child accounts
@@ -16768,6 +16843,11 @@ type Query {
     If true, return the timeline of activities for this account
     """
     timeline: Boolean! = false
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): ActivityCollection!
   application(
     """
@@ -17347,6 +17427,11 @@ type Query {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   organization(
     """
@@ -19872,6 +19957,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -21029,6 +21119,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return orders only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return only orders created by these users. Limited to 1000 users at a time.
+    """
+    createdBy: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection

@@ -68,6 +68,87 @@ export const peopleHostDashboardQuery = gql`
   ${kycStatusFields}
 `;
 
+const communityAccountDetailActivityFields = gql`
+  fragment CommunityAccountDetailActivityFields on Activity {
+    id
+    type
+    createdAt
+    data
+    isSystem
+    account {
+      id
+      ...AccountHoverCardFields
+    }
+    fromAccount {
+      id
+      ...AccountHoverCardFields
+    }
+    individual {
+      id
+      isIncognito
+      ...AccountHoverCardFields
+    }
+    expense {
+      id
+      legacyId
+      description
+      amountV2 {
+        valueInCents
+        currency
+      }
+      payee {
+        id
+        name
+        slug
+        imageUrl
+        ...AccountHoverCardFields
+      }
+      account {
+        id
+        name
+        type
+        slug
+        ...AccountHoverCardFields
+        ... on AccountWithParent {
+          parent {
+            id
+            slug
+          }
+        }
+      }
+    }
+    order {
+      id
+      legacyId
+      description
+      toAccount {
+        id
+        name
+        slug
+        ... on AccountWithParent {
+          parent {
+            id
+            slug
+          }
+        }
+      }
+    }
+    update {
+      id
+      legacyId
+      title
+      summary
+      slug
+    }
+    conversation {
+      id
+      title
+      summary
+      slug
+    }
+  }
+`;
+
 export const communityAccountDetailQuery = gql`
   query CommunityAccountDetail($accountId: String!, $hostSlug: String!) {
     account(id: $accountId) {
@@ -173,10 +254,33 @@ export const communityAccountDetailQuery = gql`
         }
       }
     }
+
+    firstActivity: activities(
+      host: { slug: $hostSlug }
+      individual: { id: $accountId }
+      orderBy: { field: CREATED_AT, direction: ASC }
+      limit: 1
+    ) {
+      nodes {
+        ...CommunityAccountDetailActivityFields
+      }
+    }
+
+    lastActivity: activities(
+      host: { slug: $hostSlug }
+      individual: { id: $accountId }
+      orderBy: { field: CREATED_AT, direction: DESC }
+      limit: 1
+    ) {
+      nodes {
+        ...CommunityAccountDetailActivityFields
+      }
+    }
   }
   ${accountHoverCardFields}
   ${kycVerificationFields}
   ${legalDocumentFields}
+  ${communityAccountDetailActivityFields}
 `;
 
 export const communityAccountActivitiesQuery = gql`
@@ -188,88 +292,14 @@ export const communityAccountActivitiesQuery = gql`
           limit
           offset
           nodes {
-            id
-            type
-            createdAt
-            data
-            isSystem
-            account {
-              id
-              ...AccountHoverCardFields
-            }
-            fromAccount {
-              id
-              ...AccountHoverCardFields
-            }
-            individual {
-              id
-              isIncognito
-              ...AccountHoverCardFields
-            }
-            expense {
-              id
-              legacyId
-              description
-              amountV2 {
-                valueInCents
-                currency
-              }
-              payee {
-                id
-                name
-                slug
-                imageUrl
-                ...AccountHoverCardFields
-              }
-              account {
-                id
-                name
-                type
-                slug
-                ...AccountHoverCardFields
-                ... on AccountWithParent {
-                  parent {
-                    id
-                    slug
-                  }
-                }
-              }
-            }
-            order {
-              id
-              legacyId
-              description
-              toAccount {
-                id
-                name
-                slug
-                ... on AccountWithParent {
-                  parent {
-                    id
-                    slug
-                  }
-                }
-              }
-            }
-            update {
-              id
-              legacyId
-              title
-              summary
-              slug
-            }
-            conversation {
-              id
-              title
-              summary
-              slug
-            }
+            ...CommunityAccountDetailActivityFields
           }
         }
       }
     }
   }
   ${accountHoverCardFields}
+  ${communityAccountDetailActivityFields}
 `;
 
 export const communityAccountExpensesDetailQuery = gql`

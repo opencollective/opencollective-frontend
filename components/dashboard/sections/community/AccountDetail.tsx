@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, pick } from 'lodash';
-import { ArrowLeft, BookKey, Dot, Mail } from 'lucide-react';
+import { capitalize, compact, pick } from 'lodash';
+import { ArrowLeft, BookKey, Dot, HelpCircle, Mail } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
@@ -11,6 +11,7 @@ import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
 import type { Account, AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 import { KycProvider } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -26,6 +27,7 @@ import { actionsColumn, DataTable } from '@/components/table/DataTable';
 import Tabs from '@/components/Tabs';
 import { Badge } from '@/components/ui/Badge';
 import { InfoList, InfoListItem } from '@/components/ui/InfoList';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import Avatar from '../../../Avatar';
 import { CopyID } from '../../../CopyId';
@@ -36,6 +38,7 @@ import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
+import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 
 import { ActivitiesTab } from './AccountDetailActivitiesTab';
 import { ContributionsTab } from './AccountDetailContributionsTab';
@@ -43,6 +46,35 @@ import { ExpensesTab } from './AccountDetailExpensesTab';
 import { AccountTaxFormStatus } from './AccountTaxFormStatus';
 import { useAssociatedCollectiveActions } from './common';
 import { communityAccountDetailQuery } from './queries';
+
+type ActivityType = NonNullable<CommunityAccountDetailQuery['firstActivity']['nodes'][0]>;
+
+const RichActivityDate = ({ date, activity }: { date: string | null | undefined; activity?: ActivityType | null }) => {
+  const intl = useIntl();
+  if (!date) {
+    return null;
+  } else if (!activity) {
+    return <DateTime value={date} dateStyle="long" />;
+  }
+
+  return (
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger asChild>
+        <div className="inline-flex cursor-help items-center gap-1.5">
+          <span className="border-b border-dashed border-muted-foreground/40">
+            <DateTime value={date} dateStyle="long" />
+          </span>
+          <HelpCircle size={14} className="shrink-0 text-muted-foreground" />
+        </div>
+      </TooltipTrigger>
+      <TooltipContent className="z-[9999] max-w-xs text-left">
+        {ActivityDescriptionI18n[activity.type]
+          ? intl.formatMessage(ActivityDescriptionI18n[activity.type], getActivityVariables(intl, activity))
+          : capitalize(activity.type.replace(/_/g, ' '))}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
 
 const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false) =>
   compact([
@@ -359,18 +391,20 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="First interaction with Host" id="mJq3cC" />}
                     value={
-                      account?.communityStats?.firstInteractionAt && (
-                        <DateTime value={account?.communityStats?.firstInteractionAt} dateStyle="long" />
-                      )
+                      <RichActivityDate
+                        date={account?.communityStats?.firstInteractionAt}
+                        activity={query.data?.firstActivity?.nodes?.[0]}
+                      />
                     }
                     isLoading={isLoading}
                   />
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Last interaction with Host" id="0k5yUb" />}
                     value={
-                      account?.communityStats?.lastInteractionAt && (
-                        <DateTime value={account?.communityStats?.lastInteractionAt} dateStyle="long" />
-                      )
+                      <RichActivityDate
+                        date={account?.communityStats?.lastInteractionAt}
+                        activity={query.data?.lastActivity?.nodes?.[0]}
+                      />
                     }
                     isLoading={isLoading}
                   />
