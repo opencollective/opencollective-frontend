@@ -190,7 +190,7 @@ const AgreementForm = ({
             <Form data-cy="agreement-form">
               <StyledInputFormikField
                 name="account"
-                label={intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' })}
+                label={intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
               >
