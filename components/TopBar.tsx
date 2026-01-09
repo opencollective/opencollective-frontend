@@ -1,19 +1,15 @@
 import React, { useRef, useState } from 'react';
-import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
-import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import { ChevronDown, ChevronUp, Menu } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { styled } from 'styled-components';
 
-import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import useWhitelabelProvider from '../lib/hooks/useWhitelabel';
-import theme from '../lib/theme';
 import { getEnvVar } from '@/lib/env-utils';
 import { MemberRole } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import { parseToBoolean } from '@/lib/utils';
+import { cn, parseToBoolean } from '@/lib/utils';
 
 import { Button } from '@/components/ui/Button';
 
@@ -21,80 +17,30 @@ import ChangelogTrigger from './changelog/ChangelogTrigger';
 import { legacyTopBarItems, newMarketingTopbarItems } from './navigation/menu-items';
 import ProfileMenu from './navigation/ProfileMenu';
 import { SearchCommand } from './search/SearchCommand';
-import Container from './Container';
-import { Box, Flex } from './Grid';
-import Hide from './Hide';
 import Image from './Image';
 import Link from './Link';
 import PopupMenu from './PopupMenu';
 import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
-import StyledButton from './StyledButton';
-import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
-
-const NavList = styled(Flex)`
-  list-style: none;
-  min-width: 12.5rem;
-  text-align: right;
-  align-items: center;
-`;
-
-const NavLinkContainer = styled(Box)`
-  text-align: center;
-  width: 140px;
-`;
-
-const NavButton = styled(StyledButton)`
-  color: var(--color-slate-800);
-  font-weight: 500;
-  font-size: 16px;
-  padding: 10px;
-  cursor: pointer;
-  @media (hover: hover) {
-    &:hover {
-      background-color: white !important;
-    }
-  }
-  &:focus {
-    background-color: white;
-    border-radius: 1px;
-  }
-  &:active {
-    color: black;
-  }
-`;
-
-const NavItem = styled(StyledLink)`
-  color: #323334;
-  font-weight: 500;
-  font-size: 14px;
-  @media (hover: hover) {
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
 
 const TopBarIcon = ({ provider }) => {
   return (
     <Link href={`/${provider?.slug || ''}`}>
-      <Flex alignItems="center">
+      <div className="flex items-center">
         {provider?.logo ? (
           <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
         ) : (
           <React.Fragment>
             <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />{' '}
             {!provider && (
-              <Hide xs sm md>
-                <Box mx={2}>
-                  <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
-                </Box>
-              </Hide>
+              <div className="mx-2 hidden lg:block">
+                <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+              </div>
             )}
           </React.Fragment>
         )}
-      </Flex>
+      </div>
     </Link>
   );
 };
@@ -131,13 +77,40 @@ const GoToDashboardButton = () => {
   );
 };
 
+interface NavButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+}
+
+const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(({ className, children, ...props }, ref) => (
+  <button
+    ref={ref}
+    className={cn(
+      'cursor-pointer bg-transparent p-2.5 text-base font-medium text-slate-800',
+      'hover:bg-white focus:rounded-sm focus:bg-white active:text-black',
+      className,
+    )}
+    {...props}
+  >
+    {children}
+  </button>
+));
+NavButton.displayName = 'NavButton';
+
+interface NavItemProps {
+  children: React.ReactNode;
+}
+
+const NavItem = ({ children }: NavItemProps) => (
+  <div className="my-4 text-sm font-medium text-slate-800 hover:underline">{children}</div>
+);
+
 const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangelogMenu = true }) => {
   const intl = useIntl();
   const whitelabel = useWhitelabelProvider();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
-  const ref = useRef(undefined);
+  const ref = useRef<HTMLDivElement>(null);
   const { LoggedInUser } = useLoggedInUser();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
   const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
@@ -158,29 +131,21 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
   }, [LoggedInUser, router]);
 
   return (
-    <Flex
-      px={[3, '24px']}
-      py={2}
-      alignItems="center"
-      flexDirection="row"
-      css={{
-        height: theme.sizes.navbarHeight,
-        background: 'white',
-        borderBottom: whitelabel?.border ?? '1px solid rgb(232, 233, 235)',
-        display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
-        gridTemplateAreas: '"left center right"',
-      }}
+    <div
       ref={ref}
+      className="grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b border-slate-200 bg-white px-3 py-2 sm:px-6"
+      style={whitelabel?.border ? { borderBottom: whitelabel.border } : undefined}
     >
-      <div className="max-w-fit" style={{ gridArea: 'left' }}>
+      {/* Left aligned section */}
+      <div className="max-w-fit">
         <TopBarIcon provider={whitelabel} />
       </div>
 
-      <Flex alignItems="center" justifyContent="center" css={{ gridArea: 'center' }}>
-        <Hide xs sm>
+      {/* Centered section */}
+      <div className="flex items-center justify-center">
+        <div className="hidden md:block">
           {showMenu && (
-            <NavList as="ul" p={0} m={0} justifyContent="center" css="margin: 0;">
+            <ul className="m-0 flex min-w-[12.5rem] list-none items-center justify-center p-0 text-right">
               {!whitelabel && (
                 <React.Fragment>
                   {menuItems.map(section => (
@@ -189,45 +154,41 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
                       zIndex={2000}
                       closingEvents={['focusin', 'mouseover']}
                       Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
-                        <NavButton
-                          isBorderless
-                          onMouseOver={onMouseOver}
-                          onFocus={onFocus}
-                          onClick={onClick}
-                          whiteSpace="nowrap"
-                        >
-                          {intl.formatMessage(section.label)}
-                          {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        <NavButton onMouseOver={onMouseOver} onFocus={onFocus} onClick={onClick}>
+                          <span className="whitespace-nowrap">
+                            {intl.formatMessage(section.label)}
+                            {popupOpen ? (
+                              <ChevronUp className="ml-0.5 inline h-5 w-5" />
+                            ) : (
+                              <ChevronDown className="ml-0.5 inline h-5 w-5" />
+                            )}
+                          </span>
                         </NavButton>
                       )}
                       placement="bottom"
                       popupMarginTop="-10px"
                     >
-                      <NavLinkContainer>
+                      <div className="w-[140px] text-center">
                         {section.items.map(item => (
                           <Link key={item.label.id} href={item.href} target={item.target}>
-                            <NavItem as={Container} mt={16} mb={16}>
-                              {intl.formatMessage(item.label)}
-                            </NavItem>
+                            <NavItem>{intl.formatMessage(item.label)}</NavItem>
                           </Link>
                         ))}
-                      </NavLinkContainer>
+                      </div>
                     </PopupMenu>
                   ))}
                 </React.Fragment>
               )}
               {whitelabel?.links?.map(({ label, href }) => (
                 <a key={href} href={href}>
-                  <NavButton as={Container} whiteSpace="nowrap">
-                    {label}
-                  </NavButton>
+                  <NavButton className="whitespace-nowrap">{label}</NavButton>
                 </a>
               ))}
 
               {showSearch && (
                 <React.Fragment>
-                  <Container borderRight="1px solid #DCDDE0" height="20px" />
-                  <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+                  <div className="h-5 border-r border-[#DCDDE0]" />
+                  <NavButton onClick={() => setShowSearchModal(true)}>
                     <div className="flex items-center">
                       <SearchIcon fill="#75777A" size={18} />
                       <span className="ml-1 hidden text-base lg:block">
@@ -237,24 +198,24 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
                   </NavButton>
                 </React.Fragment>
               )}
-            </NavList>
+            </ul>
           )}
-        </Hide>
+        </div>
         {useSearchCommandMenu ? (
           <SearchCommand open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
         ) : (
           <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
         )}
-      </Flex>
+      </div>
 
       {/* Right section - Profile, and Mobile Menu */}
-      <Flex alignItems="center" justifyContent="flex-end" css={{ gridArea: 'right' }}>
+      <div className="flex items-center justify-end">
         {showSearch && (
-          <Hide md lg>
-            <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+          <div className="md:hidden">
+            <NavButton onClick={() => setShowSearchModal(true)}>
               <SearchIcon fill="#75777A" size={18} />
             </NavButton>
-          </Hide>
+          </div>
         )}
         {showProfileAndChangelogMenu && (
           <React.Fragment>
@@ -265,16 +226,17 @@ const TopBar = ({ showSearch = true, showMenuItems = true, showProfileAndChangel
             <ProfileMenu />
           </React.Fragment>
         )}
-        <Hide md lg>
-          <Box mx={3} onClick={toggleMobileMenu}>
-            <Flex as="a">
-              <MenuIcon color="#aaaaaa" size={24} />
-            </Flex>
-          </Box>
-          {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
-        </Hide>
-      </Flex>
-    </Flex>
+        <button
+          type="button"
+          className="mx-3 flex cursor-pointer bg-transparent md:hidden"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+        >
+          <Menu className="h-6 w-6 text-[#aaaaaa]" />
+        </button>
+        {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
+      </div>
+    </div>
   );
 };
 
