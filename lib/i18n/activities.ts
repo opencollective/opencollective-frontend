@@ -24,7 +24,7 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     id: '6J42kW',
   },
   COLLECTIVE_FROZEN: { defaultMessage: '<Individual></Individual> froze <Account></Account>', id: 'CU72pt' },
-  COLLECTIVE_UNFROZEN: { defaultMessage: '<Individual></Individual> unfreezed <Account></Account>', id: '468Qmg' },
+  COLLECTIVE_UNFROZEN: { defaultMessage: '<Individual></Individual> unfrozen <Account></Account>', id: '6JDhU5' },
   COLLECTIVE_UNHOSTED: {
     defaultMessage: '<Individual></Individual> unhosted <Account></Account>',
     id: 'F1HIGZ',

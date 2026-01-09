@@ -269,8 +269,8 @@ function ContributionTimeline(props: OrderTimelineProps) {
         />
       ) : (
         <FormattedMessage
-          defaultMessage="<Individual></Individual> sucessfully paid contribution"
-          id="OD2ut4"
+          defaultMessage="<Individual></Individual> successfully paid contribution"
+          id="d+zPjq"
           values={{ ...getActivityVariables(intl, props.order) }}
         />
       );
