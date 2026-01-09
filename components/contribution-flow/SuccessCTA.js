@@ -101,7 +101,7 @@ const CTAContainer = styled(Container)`
     `}
 `;
 
-const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
+const SuccessCTAWrapper = ({ type, email, account, ...props }) => {
   switch (type) {
     case SUCCESS_CTA_TYPE.JOIN:
       return (
@@ -109,7 +109,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
           as={Link}
           display="block"
           data-cy="join-opencollective-link"
-          href={{ pathname: '/create-account/guest', query: { OrderId: orderId, email } }}
+          href={{ pathname: '/signup', query: { email } }}
           color="black.800"
           {...props}
         />
@@ -134,12 +134,12 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
   }
 };
 
-const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
+const SuccessCTA = ({ type, email, account, isPrimary }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
   return (
     <Container px={[3, 0]} my={3} maxWidth={600}>
-      <SuccessCTAWrapper account={account} type={type} orderId={orderId} email={email}>
+      <SuccessCTAWrapper account={account} type={type} email={email}>
         <CTAContainer px={4} py={2} hoverable={!isNewsletter} $isPrimary={isPrimary}>
           <Flex
             flexDirection="column"

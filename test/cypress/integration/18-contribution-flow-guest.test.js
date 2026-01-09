@@ -3,6 +3,9 @@ import * as cheerio from 'cheerio';
 import { defaultTestUserEmail } from '../support/data';
 import { randomEmail } from '../support/faker';
 
+const getEmailToMatcher = (To, email) =>
+  To[0].Address.includes(email) || To[0].Address.includes(email.replace(/@/g, '-at-'));
+
 describe('Contribution Flow: Guest contributions', () => {
   before(() => {
     cy.mailpitDeleteAllEmails();
@@ -60,30 +63,20 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
     cy.contains('[data-cy="order-success"]', '$10.00 USD');
     cy.getByDataCy('join-opencollective-link').click();
-
-    cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${email}`);
-
-    // Open email
-    const expectedEmailSubject = 'Open Collective: Verify your email';
-    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
-      const $html = cheerio.load(email.HTML);
-      const verifyLink = $html('a[href*="/confirm/guest"]:contains("Verify")');
-      const href = verifyLink.attr('href');
-      const parsedUrl = new URL(href);
-      cy.visit(parsedUrl.pathname + parsedUrl.search);
-    });
-
-    // Redirected from email
-    cy.location('pathname').should('include', '/confirm/guest');
-    cy.contains('Your email has been confirmed');
-
-    // Redirected to profile, contains all transactions
-    cy.location('pathname').should('include', '/user-');
-    cy.contains('Incognito'); // Default user name
-    cy.contains('[data-cy="hero-total-amount-contributed"]', '$10.00 USD');
-    cy.contains('[data-cy="transaction-item"]', 'Financial contribution to APEX').should('have.length', 1);
-    cy.contains('[data-cy="transaction-item"]', '$10.00');
+    cy.getByDataCy('signup-form').as('form');
+    cy.get('@form').find('input[name="email"]').should('have.value', email);
+    cy.get('@form').find('button[type="submit"]').click();
+    cy.url().should('include', `/signup/verify?email=${encodeURIComponent(email)}`);
+    cy.getByDataCy('signup-form').as('otp-form');
+    cy.get('@otp-form').contains(`Enter the code sent to ${email}.`);
+    cy.openEmail(({ Subject, To }) => getEmailToMatcher(To, email) && Subject.includes('Email Confirmation')).then(
+      email => {
+        const $html = cheerio.load(email.HTML);
+        const otp = $html('h3 > span').text();
+        cy.get('@otp-form').find('input[data-slot="input-otp"]').type(otp);
+      },
+    );
+    cy.url().should('include', '/signup/profile');
   });
 
   describe('Make multiple contributions in the same session', () => {
@@ -119,9 +112,11 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
       cy.contains('[data-cy="order-success"]', '$10.00 USD');
 
-      cy.location('search').then(search => {
-        cy.getByDataCy('join-opencollective-link').should('have.attr', 'href', `/create-account/guest${search}`);
-      });
+      cy.getByDataCy('join-opencollective-link').should(
+        'have.attr',
+        'href',
+        `/signup?email=${encodeURIComponent(firstEmail)}`,
+      );
     });
 
     it('Make a medium contribution ($500)', () => {
@@ -149,9 +144,11 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
       cy.contains('[data-cy="order-success"]', '$500.00 USD');
 
-      cy.location('search').then(search => {
-        cy.getByDataCy('join-opencollective-link').should('have.attr', 'href', `/create-account/guest${search}`);
-      });
+      cy.getByDataCy('join-opencollective-link').should(
+        'have.attr',
+        'href',
+        `/signup?email=${encodeURIComponent(firstEmail)}`,
+      );
     });
 
     it('Make a large contribution ($5000)', () => {
@@ -190,50 +187,11 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
       cy.contains('[data-cy="order-success"]', '$5,000.00 USD');
 
-      cy.location('search').then(search => {
-        cy.getByDataCy('join-opencollective-link').should('have.attr', 'href', `/create-account/guest${search}`);
-      });
-    });
-
-    /**
-     * This test depends on the previous ones, as we expect data from local storage to be
-     * persisted between them.
-     */
-    it('Join Open Collective', () => {
-      cy.mailpitDeleteAllEmails();
-      cy.visit('/create-account/guest');
-      cy.contains('We found 2 emails that you used to contribute');
-      cy.contains(firstEmail);
-      cy.contains(secondEmail);
-      cy.getByDataCy('send-verification-email-btn').should('be.disabled');
-
-      cy.contains('[data-cy="guest-email-entry"]', firstEmail).click();
-      cy.getByDataCy('send-verification-email-btn').click();
-      cy.contains('Your magic link is on its way!');
-      cy.contains(`We've sent it to ${firstEmail}`);
-
-      // Open email
-      const expectedEmailSubject = 'Open Collective: Verify your email';
-
-      cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
-        const $html = cheerio.load(email.HTML);
-        const verifyLink = $html('a[href*="/confirm/guest"]:contains("Verify")');
-        const href = verifyLink.attr('href');
-        const parsedUrl = new URL(href);
-        cy.visit(parsedUrl.pathname + parsedUrl.search);
-      });
-
-      // Redirected from email
-      cy.location('pathname').should('include', '/confirm/guest');
-      cy.contains('Your email has been confirmed');
-
-      // Redirected to profile, contains all transactions
-      cy.location('pathname').should('include', '/rick-astley'); // Used name to generate the profile
-      cy.contains('Rick Astley');
-      cy.contains('[data-cy="hero-total-amount-contributed"]', '$510.00 USD');
-      cy.get('[data-cy="transaction-item"]').should('have.length', 2);
-      cy.contains('[data-cy="transaction-item"]', '$10.00');
-      cy.contains('[data-cy="transaction-item"]', '$500.00');
+      cy.getByDataCy('join-opencollective-link').should(
+        'have.attr',
+        'href',
+        `/signup?email=${encodeURIComponent(secondEmail)}`,
+      );
     });
   });
 });
