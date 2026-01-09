@@ -3191,6 +3191,7 @@
   "Payout.Automatic": "Automatické",
   "Payout.Manual": "Ručné",
   "PayoutBankInformationForm.AccountInfo": "Informácie o účte",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "Pri načítaní dostupných mien pre tohto hostiteľa nastala chyba",
   "PayoutBankInformationForm.Error.RequiredFields": "Pri načítaní požadovaných polí nastala chyba",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

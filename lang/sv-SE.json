@@ -3191,6 +3191,7 @@
   "Payout.Automatic": "Automatisk",
   "Payout.Manual": "Manuellt",
   "PayoutBankInformationForm.AccountInfo": "Kontoinformation",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "Det gick inte att ladda tillgängliga valutor för denna värd",
   "PayoutBankInformationForm.Error.RequiredFields": "Det gick inte att hämta de obligatoriska fälten",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

@@ -3191,6 +3191,7 @@
   "Payout.Automatic": "自动 ",
   "Payout.Manual": "指南",
   "PayoutBankInformationForm.AccountInfo": "账号信息",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
   "PayoutBankInformationForm.Error.RequiredFields": "在获取必要字段时出错",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

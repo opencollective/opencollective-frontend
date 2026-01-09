@@ -3191,6 +3191,7 @@
   "Payout.Automatic": "Automático",
   "Payout.Manual": "Manual",
   "PayoutBankInformationForm.AccountInfo": "Información de Cuenta",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "Hubo un error al cargar las monedas disponibles para este Anfitrión",
   "PayoutBankInformationForm.Error.RequiredFields": "Hubo un error al recuperar la información requerida",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

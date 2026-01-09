@@ -3191,6 +3191,7 @@
   "Payout.Automatic": "Автоматически",
   "Payout.Manual": "Вручную",
   "PayoutBankInformationForm.AccountInfo": "Информация о аккаунте",
+  "PayoutBankInformationForm.Currency": "Bank Account Currency",
   "PayoutBankInformationForm.Error.AvailableCurrencies": "There was an error loading available currencies for this host",
   "PayoutBankInformationForm.Error.RequiredFields": "There was an error fetching the required fields",
   "PayoutBankInformationForm.Field.AccountHolderName": "Full name of the account holder",

@@ -25,10 +25,6 @@ const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => 
 const WISE_PLATFORM_COLLECTIVE_SLUG = process.env.WISE_PLATFORM_COLLECTIVE_SLUG || process.env.TW_API_COLLECTIVE_SLUG;
 
 const msg = defineMessages({
-  currency: {
-    id: 'Currency',
-    defaultMessage: 'Currency',
-  },
   fieldRequired: {
     id: 'FieldRequired',
     defaultMessage: '{name} is required.',
@@ -591,7 +587,7 @@ const PayoutBankInformationForm = ({
     <React.Fragment>
       <FormField
         name={currencyFieldName}
-        label={formatMessage(msg.currency)}
+        label={<FormattedMessage id="PayoutBankInformationForm.Currency" defaultMessage="Bank Account Currency" />}
         disabled={Boolean(fixedCurrency && !optional) || !isNew || disabled}
         validate={validateCurrencyMinimumAmount}
       >
