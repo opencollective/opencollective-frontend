@@ -1,13 +1,18 @@
 import React from 'react';
+import { startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import type { Account, ConnectedAccount } from '@/lib/graphql/types/v2/schema';
+import { ConnectedAccountService } from '@/lib/graphql/types/v2/schema';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import Link from '@/components/Link';
+import { useModal } from '@/components/ModalContext';
 import { Badge } from '@/components/ui/Badge';
 import { AsyncCallButton } from '@/components/ui/Button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/Table';
+
+import I18nFormatters from './I18nFormatters';
 
 const DescriptionLink = ({ account }: { account: Pick<Account, 'name' | 'slug'> }) => (
   <Link className="text-primary hover:underline" href={getDashboardRoute(account, 'sending-money')}>
@@ -29,6 +34,76 @@ type ConnectedAccountsTableProps = {
 };
 
 export const ConnectedAccountsTable = ({ connectedAccounts, disconnect, reconnect }: ConnectedAccountsTableProps) => {
+  const { showConfirmationModal } = useModal();
+
+  const handleDisconnect = React.useCallback(
+    (connectedAccount: Partial<ConnectedAccountV1V2>) => {
+      if (!disconnect) {
+        return;
+      }
+
+      showConfirmationModal({
+        variant: 'destructive',
+        type: 'remove',
+        title: (
+          <FormattedMessage
+            defaultMessage="Disconnect {serviceName}"
+            id="ktcy9f"
+            values={{ serviceName: startCase(connectedAccount.service) }}
+          />
+        ),
+        description:
+          connectedAccount.service === ConnectedAccountService.stripe ? (
+            <FormattedMessage
+              defaultMessage="If your account has recurring contributions, disconnecting will cause them to fail and contributors will need to update their payment methods. Linking a new Stripe account will <strong>not</strong> restore these contributions, as they are permanently linked to this account."
+              id="Oys5cL"
+              values={I18nFormatters}
+            />
+          ) : (
+            <FormattedMessage defaultMessage="Are you sure you want to disconnect this account?" id="JA425F" />
+          ),
+        onConfirm: () => disconnect(connectedAccount),
+        confirmLabel: (
+          <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
+        ),
+      });
+    },
+    [disconnect, showConfirmationModal],
+  );
+
+  const handleReconnect = React.useCallback(
+    (connectedAccount: Partial<ConnectedAccountV1V2>) => {
+      if (!reconnect) {
+        return;
+      }
+
+      const isStripe = connectedAccount.service === ConnectedAccountService.stripe;
+
+      if (isStripe) {
+        showConfirmationModal({
+          variant: 'destructive',
+          type: 'confirm',
+          title: (
+            <FormattedMessage defaultMessage="Reconnect {serviceName}" id="FsJ+PB" values={{ serviceName: 'Stripe' }} />
+          ),
+          description: (
+            <FormattedMessage
+              defaultMessage="If you have active recurring contributions, you must reconnect the same Stripe account. Connecting a different Stripe account will cause existing recurring contributions to fail, forcing contributors to update their payment methods."
+              id="lgRyBX"
+            />
+          ),
+          onConfirm: () => reconnect(connectedAccount),
+          confirmLabel: (
+            <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
+          ),
+        });
+      } else {
+        reconnect(connectedAccount);
+      }
+    },
+    [reconnect, showConfirmationModal],
+  );
+
   return (
     <Table className="w-full">
       <TableBody>
@@ -86,7 +161,7 @@ export const ConnectedAccountsTable = ({ connectedAccounts, disconnect, reconnec
                   size="xs"
                   className="w-fit"
                   variant="outline"
-                  onClick={() => reconnect(connectedAccount)}
+                  onClick={() => handleReconnect(connectedAccount)}
                 >
                   <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
                 </AsyncCallButton>
@@ -96,7 +171,7 @@ export const ConnectedAccountsTable = ({ connectedAccounts, disconnect, reconnec
                   size="xs"
                   className="w-fit"
                   variant="outline"
-                  onClick={() => disconnect(connectedAccount)}
+                  onClick={() => handleDisconnect(connectedAccount)}
                 >
                   <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
                 </AsyncCallButton>
