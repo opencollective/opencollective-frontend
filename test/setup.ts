@@ -6,6 +6,7 @@ import { TextDecoder, TextEncoder } from 'util';
 
 // eslint-disable-next-line n/no-extraneous-import
 import { jest } from '@jest/globals';
+import { randomUUID } from 'node:crypto';
 
 // The `supported-languages` file relies on require.context which is not available in Jest
 jest.mock('../lib/i18n/supported-languages', () => ['en']);
@@ -16,9 +17,8 @@ jest.mock('../lib/i18n/supported-languages', () => ['en']);
 // 2) switch call sites to the CJS build (e.g. deep import), which couples us to internal paths;
 // 3) downgrade `uuid` or adjust Jest to run in ESM mode, both heavier changes for a test-only issue.
 jest.mock('uuid', () => {
-  // Use Node's native UUID generator when available to keep behavior realistic.
-  const { randomUUID } = require('crypto');
-  return { v4: () => (typeof randomUUID === 'function' ? randomUUID() : '00000000-0000-0000-0000-000000000000') };
+  // Use Node's native UUID generator to keep behavior realistic.
+  return { v4: randomUUID };
 });
 
 // Polyfill for libraries (e.g., Radix/cmdk) that rely on ResizeObserver in jsdom
