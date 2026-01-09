@@ -4,8 +4,8 @@ import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
 
-import { overflow, resize } from '../lib/styled-system-custom-properties';
 import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+import { overflow, resize } from '../lib/styled-system-custom-properties';
 
 import Container from './Container';
 import StyledTag from './StyledTag';

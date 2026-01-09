@@ -116,7 +116,6 @@ exports[`HTMLContent cannot inject malicious content 1`] = `
     <div
       class="c0 c1"
       font-size="14px"
-      maxcollapsedheight="20"
     >
       
           
@@ -261,7 +260,6 @@ exports[`HTMLContent handles broken HTML 1`] = `
     <div
       class="c0 c1"
       font-size="14px"
-      maxcollapsedheight="20"
     >
       <p>
         Broken 
@@ -390,7 +388,6 @@ exports[`HTMLContent renders simple HTML string 1`] = `
     <div
       class="c0 c1"
       font-size="14px"
-      maxcollapsedheight="20"
     >
       A 
       <strong>
