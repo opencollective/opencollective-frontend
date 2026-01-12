@@ -80,19 +80,26 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
   compact([
     {
       accessorKey: 'account',
+      meta: {
+        className: 'max-w-48',
+      },
       header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
       cell: ({ row }) => {
         const { account } = row.original;
         return (
-          <div className="flex items-center text-nowrap">
+          <div className="flex min-w-0 items-center overflow-hidden">
             {account.isFrozen && (
-              <Badge type="info" size="xs" className="mr-2">
+              <Badge type="info" size="xs" className="mr-2 shrink-0">
                 <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
               </Badge>
             )}
-            <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
+            <LinkCollective
+              collective={account}
+              className="flex min-w-0 items-center gap-1 overflow-hidden"
+              withHoverCard
+            >
               <Avatar size={24} collective={account} mr={2} />
-              {account.name}
+              <span className="truncate">{account.name}</span>
             </LinkCollective>
           </div>
         );
