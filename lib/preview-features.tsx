@@ -18,6 +18,7 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   SEARCH_RESULTS_PAGE = 'SEARCH_RESULTS_PAGE',
   PLATFORM_BILLING = 'PLATFORM_BILLING',
+  SIDEBAR_REORG_DISBURSEMENTS = 'SIDEBAR_REORG_DISBURSEMENTS',
 }
 
 enum Categories {
@@ -189,5 +190,14 @@ export const previewFeatures: PreviewFeature[] = [
       }
     },
     category: Categories.FOR_NERDS,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
+    title: 'Disbursements Sidebar Reorganization',
+    description: 'Reorganization of the "Expenses" section in the Host Dashboard',
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
+    category: Categories.HOSTING,
+    alwaysEnableInDev: true,
   },
 ];

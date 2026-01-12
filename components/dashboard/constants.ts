@@ -42,6 +42,7 @@ export const SECTIONS = {
   APPROVE_GRANT_REQUESTS: 'approve-grant-requests',
   PLATFORM_SUBSCRIPTION: 'platform-subscription',
   SEARCH: 'search',
+  PAID_DISBURSEMENTS: 'paid-disbursements',
 };
 
 export const ROOT_SECTIONS = {

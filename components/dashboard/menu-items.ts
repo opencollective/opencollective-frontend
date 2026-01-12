@@ -179,7 +179,17 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           if: hasHosting,
           section: ALL_SECTIONS.HOST_EXPENSES,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+          label: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+            ? intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' })
+            : intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+        },
+        {
+          section: ALL_SECTIONS.PAID_DISBURSEMENTS,
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          label: intl.formatMessage({
+            defaultMessage: 'Paid Disbursements',
+            id: 'rwMrEx',
+          }),
         },
         {
           if: !isIndividual,
