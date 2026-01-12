@@ -1,6 +1,7 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { AccountingCategorySelectFieldsFragment } from '../../../AccountingCategorySelect';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
@@ -320,4 +321,121 @@ export const hostDashboardMetadataQuery = gql`
 
   ${accountHoverCardFields}
   ${hostInfoCardFields}
+`;
+
+/**
+ * Fragment for paid disbursements list - optimized for the Paid Disbursements table
+ */
+export const paidDisbursementsFieldsFragment = gql`
+  fragment PaidDisbursementsFields on Expense {
+    id
+    legacyId
+    createdAt
+    description
+    type
+    status
+    currency
+    amount
+    tags
+    amountInHostCurrency: amountV2(currencySource: HOST) {
+      valueInCents
+      currency
+    }
+    accountingCategory {
+      id
+      name
+      code
+      ...AccountingCategorySelectFields
+    }
+    payoutMethod {
+      id
+      type
+      name
+    }
+    account {
+      id
+      slug
+      name
+      type
+      imageUrl
+      ...AccountHoverCardFields
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          name
+          type
+        }
+      }
+    }
+    payee {
+      id
+      slug
+      name
+      type
+      imageUrl
+      ...AccountHoverCardFields
+    }
+    paidBy {
+      id
+      slug
+      name
+      type
+      imageUrl
+      ...AccountHoverCardFields
+    }
+    comments {
+      totalCount
+    }
+  }
+  ${AccountingCategorySelectFieldsFragment}
+  ${accountHoverCardFields}
+`;
+
+/**
+ * Query for the Paid Disbursements page - fetches paid expenses with fields optimized for the table
+ */
+export const paidDisbursementsQuery = gql`
+  query PaidDisbursements(
+    $hostSlug: String!
+    $limit: Int!
+    $offset: Int!
+    $type: ExpenseType
+    $tags: [String]
+    $status: [ExpenseStatusFilter]
+    $amount: AmountRangeInput
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $sort: ChronologicalOrderInput
+    $account: AccountReferenceInput
+    $accountingCategory: [String]
+  ) {
+    expenses(
+      host: { slug: $hostSlug }
+      account: $account
+      limit: $limit
+      offset: $offset
+      type: $type
+      tag: $tags
+      status: $status
+      amount: $amount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $sort
+      accountingCategory: $accountingCategory
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...PaidDisbursementsFields
+      }
+    }
+  }
+  ${paidDisbursementsFieldsFragment}
 `;

@@ -8407,8 +8407,6 @@ export type Mutation = {
   revokeOAuthAuthorization: OAuthAuthorization;
   /** [Root only] Anonymizes an account */
   rootAnonymizeAccount: Account;
-  /** Sends an email for guest to confirm their emails and create their Open Collective account */
-  sendGuestConfirmationEmail: Scalars['Boolean']['output'];
   /** Send a message to an account. Scope: "account" */
   sendMessage?: Maybe<SendMessageResult>;
   /** Send In-App Survey response */
@@ -9388,12 +9386,6 @@ export type MutationRevokeOAuthAuthorizationArgs = {
 /** This is the root mutation */
 export type MutationRootAnonymizeAccountArgs = {
   account: AccountReferenceInput;
-};
-
-
-/** This is the root mutation */
-export type MutationSendGuestConfirmationEmailArgs = {
-  email: Scalars['EmailAddress']['input'];
 };
 
 
