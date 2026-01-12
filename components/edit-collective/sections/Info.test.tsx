@@ -33,6 +33,7 @@ const buildQueryMock = (account: AccountFromQuery) => ({
         isActive: false,
         isHost: false,
         currency: 'USD',
+        image: null,
         imageUrl: null,
         type: AccountType.COLLECTIVE,
         id: 'acc1',
