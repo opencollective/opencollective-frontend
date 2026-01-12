@@ -5333,10 +5333,21 @@ export type ExpenseQuote = {
   __typename?: 'ExpenseQuote';
   /** The date on which the item was created */
   estimatedDeliveryAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Notices related to this quote */
+  notices?: Maybe<Array<Maybe<ExpenseQuoteNotice>>>;
   /** Amount of payment processor fee */
   paymentProcessorFeeAmount: Amount;
   /** Amount of this item */
   sourceAmount: Amount;
+};
+
+/** Fields for an expense quote notice */
+export type ExpenseQuoteNotice = {
+  __typename?: 'ExpenseQuoteNotice';
+  code: Scalars['String']['output'];
+  link: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+  type: Scalars['String']['output'];
 };
 
 export type ExpenseReferenceInput = {
