@@ -22820,16 +22820,6 @@ type Mutation {
   ): PaymentIntent!
 
   """
-  Sends an email for guest to confirm their emails and create their Open Collective account
-  """
-  sendGuestConfirmationEmail(
-    """
-    The email to validate
-    """
-    email: EmailAddress!
-  ): Boolean!
-
-  """
   Mark an account as confirmed
   """
   confirmGuestAccount(
