@@ -141,7 +141,11 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
 
         return (
           <div className="text-sm">
-            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <FormattedMoneyAmount
+              amount={Math.abs(total.valueInCents)}
+              currency={total.currency}
+              showCurrencyCode={false}
+            />
             <span className="ml-1 text-muted-foreground">({count})</span>
           </div>
         );
@@ -162,7 +166,11 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
 
         return (
           <div className="text-sm">
-            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <FormattedMoneyAmount
+              amount={Math.abs(total.valueInCents)}
+              currency={total.currency}
+              showCurrencyCode={false}
+            />
             <span className="ml-1 text-muted-foreground">({count})</span>
           </div>
         );
