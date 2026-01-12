@@ -159,10 +159,6 @@ export function Filterbar<FV extends Record<string, any>, FM>({
             <FilterDropdown
               filters={filters}
               values={values}
-              // If last option display it directly
-              {...(remainingFilters.length === 1 && {
-                filterKey: remainingFilters[0],
-              })}
               remainingFilters={remainingFilters}
               setFilter={setFilter}
               meta={meta}
