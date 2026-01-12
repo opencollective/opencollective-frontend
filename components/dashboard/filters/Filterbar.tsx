@@ -12,12 +12,15 @@ import { Separator } from '../../ui/Separator';
 import FilterDropdown from './FilterDropdown';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
-  const filterKeys = Object.keys(filters);
+  const filterKeys = React.useMemo(() => Object.keys(filters), [filters]);
   const [displayedFilters, setDisplayedFilters] = React.useState(
     filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta })),
   );
-  const remainingFilters = filterKeys.filter(key =>
-    filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta }),
+
+  const remainingFilters = React.useMemo(
+    () =>
+      filterKeys.filter(key => filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta })),
+    [filterKeys, values, filters, defaultSchemaValues, meta],
   );
 
   // When the values change, this effect makes sure to update the displayed filter keys array and maintain the order of the filters
@@ -53,6 +56,7 @@ const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilte
         highlighted={highlighted}
         intl={intl}
         meta={meta}
+        values={values}
       />
     );
   } else {
@@ -155,10 +159,6 @@ export function Filterbar<FV extends Record<string, any>, FM>({
             <FilterDropdown
               filters={filters}
               values={values}
-              // If last option display it directly
-              {...(remainingFilters.length === 1 && {
-                filterKey: remainingFilters[0],
-              })}
               remainingFilters={remainingFilters}
               setFilter={setFilter}
               meta={meta}

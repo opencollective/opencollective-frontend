@@ -76,7 +76,7 @@ type FilterMeta = {
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
-  account: hostedAccountFilter.filter,
+  account: { static: true, ...hostedAccountFilter.filter },
 };
 
 const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {

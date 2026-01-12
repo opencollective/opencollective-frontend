@@ -77,6 +77,7 @@ export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter
         valueRenderer={filterConfig.valueRenderer}
         labelMsg={filterConfig.labelMsg}
         meta={meta}
+        values={values}
       />
       <div className="border-t p-2">
         <Button
@@ -203,7 +204,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, highlight
 };
 
 function FilterDropdown<FV, FM>({
-  filterKey: currentFilterKey,
+  filterKey: initialFilterKey,
   remainingFilters,
   filters,
   setFilter,
@@ -222,28 +223,34 @@ function FilterDropdown<FV, FM>({
   locked?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
-  const [filterKey, setFilterKey] = React.useState(currentFilterKey);
-  const [tmpValue, setTmpValue] = React.useState(values[currentFilterKey]);
+  const [activeFilterKey, setActiveFilterKey] = React.useState(initialFilterKey);
+  const currentFilterValue = values[initialFilterKey];
+  const [tmpValue, setTmpValue] = React.useState(currentFilterValue);
 
   React.useEffect(() => {
-    setFilterKey(currentFilterKey);
-    setTmpValue(values[currentFilterKey]);
-  }, [remainingFilters, currentFilterKey, values]);
+    // Reset if the currently selected filter type is no longer available
+    // (e.g., it was just applied and moved to displayed filters)
+    if (activeFilterKey && remainingFilters && !remainingFilters.includes(activeFilterKey)) {
+      setActiveFilterKey(initialFilterKey);
+    }
+    // Always sync tmpValue with the current filter value
+    setTmpValue(currentFilterValue);
+  }, [activeFilterKey, initialFilterKey, currentFilterValue, remainingFilters]);
 
   return (
     <Popover
       open={open}
       onOpenChange={open => {
         if (!locked) {
-          setFilterKey(currentFilterKey);
-          setTmpValue(values[currentFilterKey]);
+          setActiveFilterKey(initialFilterKey);
+          setTmpValue(values[initialFilterKey]);
           setOpen(open);
         }
       }}
     >
       <PopoverAnchor>
         <FilterButton
-          filterKey={filterKey}
+          filterKey={activeFilterKey}
           filters={filters}
           tmpValue={tmpValue}
           setFilter={setFilter}
@@ -254,19 +261,19 @@ function FilterDropdown<FV, FM>({
         />
       </PopoverAnchor>
       <PopoverContent className="w-[260px] p-0" align="start">
-        {filterKey ? (
+        {activeFilterKey ? (
           <SetFilter
             tmpValue={tmpValue}
             setTmpValue={setTmpValue}
             filters={filters}
-            filterKey={filterKey}
+            filterKey={activeFilterKey}
             setFilter={setFilter}
             setOpen={setOpen}
             meta={meta}
             values={values}
           />
         ) : (
-          <ChooseFilterType remainingFilters={remainingFilters} filters={filters} setFilterKey={setFilterKey} />
+          <ChooseFilterType remainingFilters={remainingFilters} filters={filters} setFilterKey={setActiveFilterKey} />
         )}
       </PopoverContent>
     </Popover>
