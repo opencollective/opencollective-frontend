@@ -443,6 +443,7 @@ export type AccountTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -1972,6 +1973,7 @@ export type BotTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -2591,6 +2593,7 @@ export type CollectiveTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -4711,6 +4714,7 @@ export type EventTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -6017,6 +6021,7 @@ export type FundTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -6870,6 +6875,7 @@ export type HostTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -7764,6 +7770,7 @@ export type IndividualTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -10461,6 +10468,7 @@ export type OrganizationTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -11823,6 +11831,7 @@ export type ProjectTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -12343,6 +12352,7 @@ export type QueryTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
@@ -13172,6 +13182,7 @@ export type TransactionGroupCollection = Collection & {
 
 export enum TransactionKind {
   ADDED_FUNDS = 'ADDED_FUNDS',
+  APPLICATION_FEE = 'APPLICATION_FEE',
   BALANCE_TRANSFER = 'BALANCE_TRANSFER',
   CONTRIBUTION = 'CONTRIBUTION',
   EXPENSE = 'EXPENSE',
@@ -14231,6 +14242,7 @@ export type VendorTransactionsArgs = {
   includeGiftCardTransactions?: Scalars['Boolean']['input'];
   includeHost?: Scalars['Boolean']['input'];
   includeIncognitoTransactions?: Scalars['Boolean']['input'];
+  includePlatformTips?: Scalars['Boolean']['input'];
   includeRegularTransactions?: Scalars['Boolean']['input'];
   isRefund?: InputMaybe<Scalars['Boolean']['input']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
