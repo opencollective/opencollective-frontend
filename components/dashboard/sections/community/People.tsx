@@ -62,14 +62,18 @@ const getColumns = ({ intl, hasKYCFeature }) => {
   const account = {
     accessorKey: 'account',
     header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+    meta: {
+      className: 'max-w-64',
+    },
     cell: ({ row }) => {
       const account = row.original;
       const legalName = account.legalName !== account.name && account.legalName;
       return (
-        <div className="flex items-center text-nowrap">
+        <div className="flex items-center overflow-hidden text-nowrap">
           <Avatar size={24} collective={account} mr={2} />
-          {account.name || account.slug}
-          {legalName && <span className="ml-1 text-muted-foreground">{`(${legalName})`}</span>}
+          <span className="truncate">{account.name || account.slug}</span>
+
+          {legalName && <span className="ml-1 truncate text-muted-foreground">{`(${legalName})`}</span>}
         </div>
       );
     },
@@ -78,6 +82,9 @@ const getColumns = ({ intl, hasKYCFeature }) => {
   const email = {
     accessorKey: 'email',
     header: intl.formatMessage({ defaultMessage: 'Email', id: 'Email' }),
+    meta: {
+      className: 'max-w-64',
+    },
     cell: ({ cell }) => {
       const email = cell.getValue();
       return email ? (
@@ -162,7 +169,11 @@ const getColumns = ({ intl, hasKYCFeature }) => {
 
       return (
         <div className="text-sm">
-          <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+          <FormattedMoneyAmount
+            amount={Math.abs(total.valueInCents)}
+            currency={total.currency}
+            showCurrencyCode={false}
+          />
           <span className="ml-1 text-muted-foreground">({count})</span>
         </div>
       );
@@ -184,7 +195,11 @@ const getColumns = ({ intl, hasKYCFeature }) => {
 
       return (
         <div className="text-sm">
-          <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+          <FormattedMoneyAmount
+            amount={Math.abs(total.valueInCents)}
+            currency={total.currency}
+            showCurrencyCode={false}
+          />
           <span className="ml-1 text-muted-foreground">({count})</span>
         </div>
       );

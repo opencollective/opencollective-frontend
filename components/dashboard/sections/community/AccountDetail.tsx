@@ -76,23 +76,30 @@ const RichActivityDate = ({ date, activity }: { date: string | null | undefined;
   );
 };
 
-const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false) =>
+const associatedTableColumns = intl =>
   compact([
     {
       accessorKey: 'account',
+      meta: {
+        className: 'max-w-48',
+      },
       header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
       cell: ({ row }) => {
         const { account } = row.original;
         return (
-          <div className="flex items-center text-nowrap">
+          <div className="flex min-w-0 items-center overflow-hidden">
             {account.isFrozen && (
-              <Badge type="info" size="xs" className="mr-2">
+              <Badge type="info" size="xs" className="mr-2 shrink-0">
                 <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
               </Badge>
             )}
-            <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
+            <LinkCollective
+              collective={account}
+              className="flex min-w-0 items-center gap-1 overflow-hidden"
+              withHoverCard
+            >
               <Avatar size={24} collective={account} mr={2} />
-              {account.name}
+              <span className="truncate">{account.name}</span>
             </LinkCollective>
           </div>
         );
@@ -120,7 +127,7 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
         );
       },
     },
-    includeAssociatedCollectiveColumns && {
+    {
       accessorKey: 'expenses',
       header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
       cell: ({ row }) => {
@@ -134,14 +141,17 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
 
         return (
           <div className="text-sm">
-            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <FormattedMoneyAmount
+              amount={Math.abs(total.valueInCents)}
+              currency={total.currency}
+              showCurrencyCode={false}
+            />
             <span className="ml-1 text-muted-foreground">({count})</span>
           </div>
         );
       },
     },
-
-    includeAssociatedCollectiveColumns && {
+    {
       accessorKey: 'contributions',
       header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
       cell: ({ row }) => {
@@ -155,13 +165,17 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
 
         return (
           <div className="text-sm">
-            <FormattedMoneyAmount amount={Math.abs(total.valueInCents)} currency={total.currency} />
+            <FormattedMoneyAmount
+              amount={Math.abs(total.valueInCents)}
+              currency={total.currency}
+              showCurrencyCode={false}
+            />
             <span className="ml-1 text-muted-foreground">({count})</span>
           </div>
         );
       },
     },
-    includeAssociatedCollectiveColumns && {
+    {
       accessorKey: 'firstInteraction',
       header: intl.formatMessage({ defaultMessage: 'First Interaction', id: 'FirstInteraction' }),
       cell: ({ row }) => {
@@ -169,7 +183,7 @@ const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false
         return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
       },
     },
-    includeAssociatedCollectiveColumns && actionsColumn,
+    actionsColumn,
   ]);
 
 enum AccountDetailView {
@@ -363,7 +377,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 <h2 className="tight text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Details" id="Details" />
                 </h2>
-                <InfoList variant="compact" className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1">
+
+                <InfoList
+                  variant="compact"
+                  className="grid-cols-1 rounded-lg border p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1"
+                >
                   <InfoListItem
                     title={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
                     value={account?.legalName}
@@ -440,7 +458,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </h2>
                 <DataTable
                   data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedTableColumns(intl, true)}
+                  columns={associatedTableColumns(intl)}
                   loading={isLoading}
                   getActions={getActions}
                 />
@@ -451,6 +469,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                   data={account?.communityStats?.associatedOrganizations || []}
                   columns={associatedTableColumns(intl)}
                   loading={isLoading}
+                  getActions={getActions}
                 />
               </div>
             </div>

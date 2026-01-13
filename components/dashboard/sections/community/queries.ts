@@ -226,6 +226,19 @@ export const communityAccountDetailQuery = gql`
             ...AccountHoverCardFields
           }
           relations
+          firstInteractionAt
+          transactionSummary {
+            expenseTotal {
+              valueInCents
+              currency
+            }
+            expenseCount
+            contributionTotal {
+              valueInCents
+              currency
+            }
+            contributionCount
+          }
         }
         relations
         transactionSummary {
