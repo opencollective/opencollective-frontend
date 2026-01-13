@@ -147,7 +147,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
               queryFilter={queryFilter}
-              account={metaData?.host}
+              account={metaData?.host ?? account}
               isHostReport
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
