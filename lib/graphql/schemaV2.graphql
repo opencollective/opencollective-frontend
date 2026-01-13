@@ -478,6 +478,11 @@ interface Account {
     includeHost: Boolean! = true
 
     """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -2461,6 +2466,7 @@ enum TransactionKind {
   PAYMENT_PROCESSOR_COVER
   PAYMENT_PROCESSOR_DISPUTE_FEE
   PAYMENT_PROCESSOR_FEE
+  APPLICATION_FEE
   PLATFORM_FEE
   PLATFORM_TIP
   PLATFORM_TIP_DEBT
@@ -3247,6 +3253,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
+
+    """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -9455,6 +9466,11 @@ type Bot implements Account {
     includeHost: Boolean! = true
 
     """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -10473,6 +10489,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
+
+    """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -12055,6 +12076,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     includeHost: Boolean! = true
 
     """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -13347,6 +13373,11 @@ type Individual implements Account {
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
+
+    """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -14659,6 +14690,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     includeHost: Boolean! = true
 
     """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -15807,6 +15843,11 @@ type Vendor implements Account & AccountWithContributions {
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
+
+    """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -17757,6 +17798,11 @@ type Query {
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
+
+    """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -19817,6 +19863,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     includeHost: Boolean! = true
 
     """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -20982,6 +21033,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
     """
     includeHost: Boolean! = true
+
+    """
+    When filtering with the `host` argument, also include virtual PLATFORM_TIP transactions related to Contributions via TransactionGroup
+    """
+    includePlatformTips: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
