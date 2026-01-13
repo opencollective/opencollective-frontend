@@ -4230,6 +4230,8 @@
   "Transaction.Kind": "类别",
   "Transaction.kind.ADDED_FUNDS": "添加资金",
   "Transaction.kind.ADDED_FUNDS.definition": "Off platform contributions",
+  "Transaction.kind.APPLICATION_FEE": "Application fee",
+  "Transaction.kind.APPLICATION_FEE.definition": "Fee to the platform handled by the payment processor",
   "Transaction.kind.BALANCE_TRANSFER": "余额转账",
   "Transaction.kind.BALANCE_TRANSFER.definition": "Balance transfer from a child account to a parent account or from Hosted Collective to Fiscal Host account.",
   "Transaction.kind.CONTRIBUTION.definition": "On platform contributions",

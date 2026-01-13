@@ -4230,6 +4230,8 @@
   "Transaction.Kind": "Tipo",
   "Transaction.kind.ADDED_FUNDS": "Fondos añadidos",
   "Transaction.kind.ADDED_FUNDS.definition": "Colaboraciones fuera de la plataforma",
+  "Transaction.kind.APPLICATION_FEE": "Application fee",
+  "Transaction.kind.APPLICATION_FEE.definition": "Fee to the platform handled by the payment processor",
   "Transaction.kind.BALANCE_TRANSFER": "Transferencia de saldo",
   "Transaction.kind.BALANCE_TRANSFER.definition": "Transferencia de saldo de una cuenta secundaria a una cuenta principal o de una cuenta del Colectivo a una cuenta de su Anfitrión Fiscal.",
   "Transaction.kind.CONTRIBUTION.definition": "Colaboraciones en la plataforma",

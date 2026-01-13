@@ -4230,6 +4230,8 @@
   "Transaction.Kind": "Sort",
   "Transaction.kind.ADDED_FUNDS": "Tillagda medel",
   "Transaction.kind.ADDED_FUNDS.definition": "Off platform contributions",
+  "Transaction.kind.APPLICATION_FEE": "Application fee",
+  "Transaction.kind.APPLICATION_FEE.definition": "Fee to the platform handled by the payment processor",
   "Transaction.kind.BALANCE_TRANSFER": "Överföring av saldo",
   "Transaction.kind.BALANCE_TRANSFER.definition": "Balance transfer from a child account to a parent account or from Hosted Collective to Fiscal Host account.",
   "Transaction.kind.CONTRIBUTION.definition": "On platform contributions",

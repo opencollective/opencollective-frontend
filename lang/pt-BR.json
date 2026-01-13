@@ -4230,6 +4230,8 @@
   "Transaction.Kind": "Tipo",
   "Transaction.kind.ADDED_FUNDS": "Fundos adicionados",
   "Transaction.kind.ADDED_FUNDS.definition": "Contribuições fora da plataforma",
+  "Transaction.kind.APPLICATION_FEE": "Application fee",
+  "Transaction.kind.APPLICATION_FEE.definition": "Fee to the platform handled by the payment processor",
   "Transaction.kind.BALANCE_TRANSFER": "Transferência de saldo",
   "Transaction.kind.BALANCE_TRANSFER.definition": "Transferência de saldo de uma conta infantil para uma conta principal ou de uma conta coletiva hospedada para uma conta fiscal host.",
   "Transaction.kind.CONTRIBUTION.definition": "Contribuições sobre a plataforma",

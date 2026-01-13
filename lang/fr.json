@@ -4230,6 +4230,8 @@
   "Transaction.Kind": "Catégorie",
   "Transaction.kind.ADDED_FUNDS": "Fonds ajoutés",
   "Transaction.kind.ADDED_FUNDS.definition": "Contributions hors plateforme",
+  "Transaction.kind.APPLICATION_FEE": "Application fee",
+  "Transaction.kind.APPLICATION_FEE.definition": "Fee to the platform handled by the payment processor",
   "Transaction.kind.BALANCE_TRANSFER": "Transfert du solde",
   "Transaction.kind.BALANCE_TRANSFER.definition": "Transfert du solde d'un compte enfant vers un compte parent ou d'un Collectif Hébergé vers un Hôte Fiscal.",
   "Transaction.kind.CONTRIBUTION.definition": "Contributions via la plateforme",
