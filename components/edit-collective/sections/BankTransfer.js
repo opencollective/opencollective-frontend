@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
-import { Formik } from 'formik';
 import { findLast, get, omit } from 'lodash';
 import { Edit, X } from 'lucide-react';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -11,15 +10,11 @@ import { gql } from '../../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
-import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
-import { WebsiteName } from '../../I18nFormatters';
-import Image from '../../Image';
 import Loading from '../../Loading';
 import { P } from '../../Text';
 import { Button } from '../../ui/Button';
-import { useToast } from '../../ui/useToast';
-import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
+import { EditCustomBankPaymentMethodDialog } from './receive-money/EditCustomBankPaymentMethodDialog';
 import { formatAccountDetails } from '../utils';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -48,20 +43,6 @@ const hostQuery = gql`
         data
         type
       }
-    }
-  }
-`;
-
-const createPayoutMethodMutation = gql`
-  mutation EditCollectiveBankTransferCreatePayoutMethod(
-    $payoutMethod: PayoutMethodInput!
-    $account: AccountReferenceInput!
-  ) {
-    createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
-      data
-      id
-      name
-      type
     }
   }
 `;
@@ -96,14 +77,12 @@ const renderBankInstructions = (instructions, bankAccountInfo) => {
 };
 
 const BankTransfer = props => {
-  const { toast } = useToast();
   const { loading, data } = useQuery(hostQuery, {
     variables: { slug: props.collectiveSlug },
   });
-  const [createPayoutMethod] = useMutation(createPayoutMethodMutation);
   const [removePayoutMethod] = useMutation(removePayoutMethodMutation);
   const [editBankTransfer] = useMutation(editBankTransferMutation);
-  const [showForm, setShowForm] = React.useState(false);
+  const [showDialog, setShowDialog] = React.useState(false);
   const [showRemoveBankConfirmationModal, setShowRemoveBankConfirmationModal] = React.useState(false);
 
   if (loading) {
@@ -112,35 +91,27 @@ const BankTransfer = props => {
 
   const existingPayoutMethod = data.host.payoutMethods.find(pm => pm.data.isManualBankTransfer);
   const existingManualPaymentMethod = !!get(data.host, 'settings.paymentMethods.manual') && existingPayoutMethod;
-  const showEditManualPaymentMethod = !showForm && data.host;
-  const useStructuredForm =
-    !existingManualPaymentMethod || (existingManualPaymentMethod && existingPayoutMethod) ? true : false;
   const instructions = data.host.settings?.paymentMethods?.manual?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS;
-
-  // Fix currency if the existing payout method already matches the collective currency
-  // or if it was already defined by Stripe
-  const existingPayoutMethodMatchesCurrency = existingPayoutMethod?.data?.currency === data.host.currency;
-  const isConnectedToStripe = data.host.connectedAccounts?.find?.(ca => ca.service === 'stripe');
-  const fixedCurrency =
-    useStructuredForm && (existingPayoutMethodMatchesCurrency || isConnectedToStripe) && data.host.currency;
-
-  const initialValues = {
-    ...(existingPayoutMethod || { data: { currency: fixedCurrency || data.host.currency } }),
-    instructions,
-  };
 
   const latestBankAccount = findLast(
     data.host?.payoutMethods,
     payoutMethod => payoutMethod.type === PayoutMethodType.BANK_ACCOUNT,
   );
 
+  const handleDialogSuccess = () => {
+    // Refetch query is handled by the dialog
+    props.hideTopsection?.(false);
+  };
+
   return (
     <Flex className="EditPaymentMethods" flexDirection="column">
-      {showEditManualPaymentMethod && (
+      {data.host && (
         <Fragment>
-          <SettingsSectionTitle>
-            <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
-          </SettingsSectionTitle>
+          {!props.hideTitle && (
+            <SettingsSectionTitle>
+              <FormattedMessage id="editCollective.receivingMoney.bankTransfers" defaultMessage="Bank Transfers" />
+            </SettingsSectionTitle>
+          )}
 
           <Box>
             <p className="text-sm text-gray-700">
@@ -186,8 +157,8 @@ const BankTransfer = props => {
               variant="outline"
               disabled={!data.host.plan.manualPayments}
               onClick={() => {
-                setShowForm(true);
-                props.hideTopsection(true);
+                setShowDialog(true);
+                props.hideTopsection?.(true);
               }}
             >
               {existingManualPaymentMethod ? (
@@ -206,105 +177,16 @@ const BankTransfer = props => {
           </div>
         </Fragment>
       )}
-      {showForm && (
-        <Formik
-          initialValues={initialValues}
-          onSubmit={async (values, { setSubmitting }) => {
-            const { data, instructions } = values;
-            if (data?.currency && data?.type) {
-              await createPayoutMethod({
-                variables: {
-                  payoutMethod: { data: { ...data, isManualBankTransfer: true }, type: 'BANK_ACCOUNT' },
-                  account: { slug: props.collectiveSlug },
-                },
-              });
-            }
-            await editBankTransfer({
-              variables: {
-                key: 'paymentMethods.manual.instructions',
-                value: instructions,
-                account: { slug: props.collectiveSlug },
-              },
-              refetchQueries: [{ query: hostQuery, variables: { slug: props.collectiveSlug } }],
-              awaitRefetchQueries: true,
-            });
-            setSubmitting(false);
-            setShowForm(false);
-            props.hideTopsection(false);
-            window.scrollTo(0, 0);
-            toast({
-              variant: 'success',
-              message: <FormattedMessage defaultMessage="Bank transfer instructions have been updated" id="9BftpU" />,
-            });
-          }}
-        >
-          {({ handleSubmit, isSubmitting, setFieldValue, dirty, values }) => (
-            <form onSubmit={handleSubmit}>
-              <SettingsSectionTitle>
-                <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
-              </SettingsSectionTitle>
-              <Flex flexDirection={['column', 'row']} alignItems={['center', 'start']}>
-                <P mr={2}>
-                  <FormattedMessage
-                    id="paymentMethod.manual.edit.description"
-                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be automatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on {WebsiteName}.'
-                    values={{ WebsiteName }}
-                  />
-                </P>
-                <Image alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} height={168} />
-              </Flex>
-              {useStructuredForm && (
-                <React.Fragment>
-                  <SettingsSectionTitle className="mt-4">
-                    <FormattedMessage
-                      id="paymentMethods.manual.bankInfo.title"
-                      defaultMessage="Add your bank account information"
-                    />
-                  </SettingsSectionTitle>
-                  <Flex mr={2} flexDirection="column" width={[1, 0.5]}>
-                    <PayoutBankInformationForm
-                      getFieldName={string => string}
-                      fixedCurrency={fixedCurrency}
-                      ignoreBlockedCurrencies={false}
-                      isNew
-                      optional
-                    />
-                  </Flex>
-                </React.Fragment>
-              )}
-
-              <SettingsSectionTitle className="mt-4">
-                <FormattedMessage id="paymentMethods.manual.instructions.title" defaultMessage="Define instructions" />
-              </SettingsSectionTitle>
-              <Box mr={2} flexGrow={1}>
-                <UpdateBankDetailsForm
-                  value={instructions}
-                  onChange={({ instructions }) => setFieldValue('instructions', instructions)}
-                  useStructuredForm={useStructuredForm}
-                  bankAccount={values.data}
-                />
-              </Box>
-              <div className="mt-3 flex flex-row gap-2">
-                <Button
-                  mr={2}
-                  variant="outline"
-                  className="min-w-32"
-                  onClick={() => {
-                    setShowForm(false);
-                    props.hideTopsection(false);
-                  }}
-                  disabled={isSubmitting}
-                >
-                  <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                </Button>
-                <Button className="min-w-32" type="submit" disabled={isSubmitting || !dirty} loading={isSubmitting}>
-                  <FormattedMessage id="save" defaultMessage="Save" />
-                </Button>
-              </div>
-            </form>
-          )}
-        </Formik>
-      )}
+      <EditCustomBankPaymentMethodDialog
+        open={showDialog}
+        onClose={() => {
+          setShowDialog(false);
+          props.hideTopsection?.(false);
+        }}
+        collectiveSlug={props.collectiveSlug}
+        host={data.host}
+        onSuccess={handleDialogSuccess}
+      />
       {showRemoveBankConfirmationModal && (
         <ConfirmationModal
           width="100%"
