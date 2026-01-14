@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
+import { get, omit } from 'lodash';
 import { MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, FormattedTime, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
@@ -48,6 +48,8 @@ import {
 } from './filters';
 import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
 import { limit } from '@/lib/filters/schemas';
+import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
+import { isFeatureEnabled } from '@/lib/allowed-features';
 
 enum PaidDisbursementsTab {
   ALL = 'ALL',
@@ -95,24 +97,95 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 const getExpenseColumns = intl => [
   {
     accessorKey: 'createdAt',
-    meta: { className: 'min-w-30' },
-    header: () => <FormattedMessage defaultMessage="Date" id="P7PLVj" />,
-    cell: ({ cell }) => {
-      return <DateTime dateStyle="medium" value={cell.getValue()} />;
+    meta: { className: 'max-w-32' },
+    header: () => <FormattedMessage defaultMessage="Paid on" id="qlXxnX" />,
+    cell: ({ cell, row }) => {
+      const expense = row.original;
+      const paidBy = false; // expense.paidBy;
+      return (
+        <div>
+          <DateTime dateStyle="medium" value={cell.getValue()} />
+          <div className="flex items-center gap-2 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
+            <FormattedTime timeStyle={'short'} value={cell.getValue()} />
+            {paidBy && (
+              <React.Fragment>
+                <span>by</span>
+                <LinkCollective
+                  collective={paidBy}
+                  withHoverCard
+                  className="inline-flex items-center gap-1 overflow-hidden"
+                >
+                  <Avatar size={14} collective={paidBy} />
+                  <span className="truncate">{paidBy.name}</span>
+                </LinkCollective>
+              </React.Fragment>
+            )}
+          </div>
+        </div>
+      );
     },
   },
-
   {
     accessorKey: 'type',
-    header: () => <FormattedMessage defaultMessage="Accounting" id="uxUU0P" />,
+    header: () => <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
     cell: ({ row }) => {
       const expense = row.original;
       return (
         <div className="flex flex-col">
-          <span>
-            {i18nExpenseType(intl, expense.type)} #{expense.legacyId}
-          </span>
-          <span className="text-xs text-muted-foreground">{expense.accountingCategory?.name || '—'}</span>
+          <span>{i18nExpenseType(intl, expense.type)}</span>
+          <span className="text-xs text-muted-foreground">#{expense.legacyId}</span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'description',
+    meta: { className: 'max-w-64' },
+    header: () => <FormattedMessage defaultMessage="Title" id="9a9+ww" />,
+    cell: ({ row }) => {
+      const expense = row.original;
+      const submittedBy = expense.createdByAccount;
+      return (
+        <div className="flex flex-col">
+          <span className="font-medium">{expense.description}</span>
+          <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
+            <DateTime dateStyle="medium" value={expense.createdAt} />
+            <span>•</span>
+            <LinkCollective
+              collective={submittedBy}
+              withHoverCard
+              className="inline-flex items-center gap-1 overflow-hidden"
+            >
+              <Avatar size={14} collective={submittedBy} />
+              <span className="truncate">{submittedBy.name}</span>
+            </LinkCollective>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'accountingCategory',
+    header: () => <FormattedMessage defaultMessage="Accounting category" id="r3ZYaH" />,
+    cell: ({ row }) => {
+      const expense = row.original;
+      return (
+        <div
+          onClick={e => {
+            e.stopPropagation();
+          }}
+        >
+          <ExpenseAccountingCategoryPill
+            expense={expense}
+            host={expense.host}
+            account={expense.account}
+            canEdit={
+              isFeatureEnabled(expense.host, 'CHART_OF_ACCOUNTS') &&
+              get(expense, 'permissions.canEditAccountingCategory', false)
+            }
+            allowNone
+            showCodeInSelect={true}
+          />
         </div>
       );
     },
@@ -150,37 +223,20 @@ const getExpenseColumns = intl => [
       const payee = expense.payee;
       return (
         <div className="max-w-fit">
-          <LinkCollective collective={payee} withHoverCard className="group flex items-center gap-2 hover:no-underline">
-            <Avatar size={24} collective={payee} />
-            <div className="flex flex-col overflow-hidden">
-              <span className="truncate font-medium group-hover:underline">{payee.name}</span>
-              <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, payee.type)}</span>
+          <LinkCollective collective={payee} withHoverCard className="group hover:no-underline">
+            <div className="flex items-center gap-2">
+              <Avatar size={24} collective={payee} />
+              <div className="flex flex-col overflow-hidden">
+                <span className="truncate font-medium group-hover:underline">{payee.name}</span>
+                <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, payee.type)}</span>
+              </div>
             </div>
           </LinkCollective>
         </div>
       );
     },
   },
-  {
-    accessorKey: 'paidBy',
-    meta: { className: 'max-w-48' },
-    header: () => <FormattedMessage defaultMessage="Paid by" id="l0K8BV" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      const paidBy = expense.paidBy;
-      if (!paidBy) {
-        return <span className="text-muted-foreground">—</span>;
-      }
-      return (
-        <div className="max-w-fit">
-          <LinkCollective collective={paidBy} withHoverCard className="flex items-center gap-2 font-medium">
-            <Avatar size={24} collective={paidBy} />
-            <span className="truncate">{paidBy.name}</span>
-          </LinkCollective>
-        </div>
-      );
-    },
-  },
+
   {
     accessorKey: 'comments',
     header: () => null,
