@@ -219,7 +219,7 @@ const getColumns = ({ isVendor }) => {
         const account = row.original;
         const relations = compact([
           account.type === 'VENDOR' && 'VENDOR',
-          ...(account?.communityStats?.relations || []),
+          ...(account.communityStats?.relations || []),
         ]).filter((relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes('PAYEE')));
         return (
           <div className="flex flex-wrap gap-1 align-middle">
@@ -241,7 +241,7 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Expenses" id="TotalExpenses" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account?.communityStats?.transactionSummary?.[0];
+        const summary = account.communityStats?.transactionSummary?.[0];
         const total = summary?.expenseTotalAcc;
         const count = summary?.expenseCountAcc || 0;
 
@@ -262,7 +262,7 @@ const getColumns = ({ isVendor }) => {
       header: () => <FormattedMessage defaultMessage="Total Contributions" id="TotalContributions" />,
       cell: ({ row }) => {
         const account = row.original;
-        const summary = account?.communityStats?.transactionSummary?.[0];
+        const summary = account.communityStats?.transactionSummary?.[0];
         const total = summary?.contributionTotalAcc;
         const count = summary?.contributionCountAcc || 0;
 

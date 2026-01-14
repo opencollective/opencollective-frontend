@@ -195,7 +195,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     if (account?.type === 'ORGANIZATION') {
       const orgAdminIds = query.data?.account.members?.nodes.map(m => m.account.id);
       const hostAdminIds = query.data?.host.admins?.nodes.map(m => m.account.id);
-      return orgAdminIds.every(id => hostAdminIds.includes(id));
+      return orgAdminIds?.every(id => hostAdminIds?.includes(id));
     }
   }, [account, query.data]);
 
@@ -424,8 +424,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                     }
                     isLoading={isLoading}
                   />
-                  {account?.type === 'VENDOR' &&
-                    vendorInfo && [
+                  {account?.type === 'VENDOR' && vendorInfo && (
+                    <React.Fragment>
                       <InfoListItem
                         title={<FormattedMessage defaultMessage="Visible to" id="zJePa1" />}
                         value={
@@ -439,8 +439,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                             <FormattedMessage defaultMessage="All hosted accounts" id="M7USSD" />
                           )
                         }
-                      />,
-                      vendorInfo.contact && (
+                      />
+                      {vendorInfo.contact && (
                         <InfoListItem
                           title={<FormattedMessage defaultMessage="Vendor Contact" id="p1twtU" />}
                           value={
@@ -454,8 +454,8 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                             </VendorContactTag>
                           }
                         />
-                      ),
-                      vendorInfo.taxType && (
+                      )}
+                      {vendorInfo.taxType && (
                         <InfoListItem
                           title={<FormattedMessage defaultMessage="Company Identifier" id="K0kNyF" />}
                           value={
@@ -464,14 +464,15 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                             </React.Fragment>
                           }
                         />
-                      ),
-                      vendorInfo.notes && (
+                      )}
+                      {vendorInfo.notes && (
                         <InfoListItem
                           title={<FormattedMessage id="expense.notes" defaultMessage="Notes" />}
                           value={vendorInfo.notes}
                         />
-                      ),
-                    ]}
+                      )}
+                    </React.Fragment>
+                  )}
                 </InfoList>
               </div>
               <div className="space-y-4 xl:order-1 xl:col-span-3">
