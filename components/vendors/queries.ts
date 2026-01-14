@@ -13,7 +13,7 @@ export const vendorFieldFragment = gql`
     type
     description
     tags
-    imageUrl(height: 96)
+    imageUrl
     isArchived
     createdAt
 
