@@ -5,15 +5,14 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterConfig } from '../../../../lib/filters/filter-types';
-import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { Contributor } from '../../../../lib/graphql/types/v2/schema';
-import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { sortSelectOptions } from '../../../../lib/utils';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
-import { CommunityRelationType } from '@/lib/graphql/types/v2/graphql';
+import type { FilterConfig } from '@/lib/filters/filter-types';
+import { integer, isMulti } from '@/lib/filters/schemas';
+import { AccountType, CommunityRelationType, type Contributor } from '@/lib/graphql/types/v2/schema';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
+import { sortSelectOptions } from '@/lib/utils';
 
 import { IndividualKYCStatus } from '@/components/kyc/IndividualKYCStatus';
 
@@ -354,7 +353,12 @@ const PeopleRouter = ({ accountSlug, subpath }: ContributorsProps) => {
   if (!isEmpty(id)) {
     return (
       <div className="h-full">
-        <ContributorDetails account={{ id: subpath[0] }} host={account} onClose={() => pushSubpath('')} />
+        <ContributorDetails
+          account={{ id: subpath[0] }}
+          host={account}
+          onClose={() => pushSubpath('')}
+          expectedAccountType={AccountType.INDIVIDUAL}
+        />
       </div>
     );
   }
