@@ -177,11 +177,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
-          if: hasHosting,
+          if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
           section: ALL_SECTIONS.HOST_EXPENSES,
-          label: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
-            ? intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' })
-            : intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+        },
+        {
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.PAY_DISBURSEMENTS,
+          label: intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' }),
         },
         {
           section: ALL_SECTIONS.PAID_DISBURSEMENTS,

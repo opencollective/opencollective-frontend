@@ -43,6 +43,7 @@ export const SECTIONS = {
   PLATFORM_SUBSCRIPTION: 'platform-subscription',
   SEARCH: 'search',
   PAID_DISBURSEMENTS: 'paid-disbursements',
+  PAY_DISBURSEMENTS: 'pay-disbursements',
 };
 
 export const ROOT_SECTIONS = {
