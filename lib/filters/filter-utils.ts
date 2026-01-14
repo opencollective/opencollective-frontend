@@ -122,6 +122,7 @@ const omitForViewMatching = (values, { filters, defaultSchemaValues }) => {
       !filters[key] || // only match values that are part of the `filters` config
       key === 'orderBy' || // don't match orderBy (to keep the view active regardless of sorting)
       key === 'sort' || // don't match sort (to keep the view active regardless of sorting)
+      key === 'searchTerm' || // don't match searchTerm (to keep the view active regardless of search)
       value === defaultSchemaValues[key], // remove value from view matching if it is the default schema value
   );
 };
