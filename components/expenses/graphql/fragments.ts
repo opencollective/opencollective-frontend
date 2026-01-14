@@ -639,11 +639,15 @@ export const expensePageExpenseFieldsFragment = gql`
           amount
           feesPayer
         }
-        relatedTransactions(kind: PAYMENT_PROCESSOR_FEE) {
+        relatedTransactions(kind: [PAYMENT_PROCESSOR_FEE, EXPENSE]) {
           id
           type
           kind
           amount {
+            valueInCents
+            currency
+          }
+          netAmountInPayeeCurrency {
             valueInCents
             currency
           }
