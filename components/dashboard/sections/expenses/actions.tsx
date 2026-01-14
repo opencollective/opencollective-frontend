@@ -1,14 +1,14 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { compact } from 'lodash';
-import { Check, Download, Filter, Flag, Link, MinusCircle, Pause, Play, Trash2, Undo2 } from 'lucide-react';
+import { Check, DollarSign, Download, Filter, Flag, Link, MinusCircle, Pause, Play, Trash2, Undo2 } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import expenseTypes from '../../../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
-import type { Expense } from '../../../../lib/graphql/types/v2/schema';
+import type { Amount, Expense, Host, PayoutMethod, TaxInfo } from '../../../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
@@ -19,10 +19,48 @@ import ConfirmProcessExpenseModal from '../../../expenses/ConfirmProcessExpenseM
 import ExpenseConfirmDeletion from '../../../expenses/ExpenseConfirmDeletionModal';
 import { expensePageExpenseFieldsFragment } from '../../../expenses/graphql/fragments';
 import MarkExpenseAsUnpaidModal from '../../../expenses/MarkExpenseAsUnpaidModal';
+import PayExpenseModal from '../../../expenses/PayExpenseModal';
+import type { BaseModalProps } from '../../../ModalContext';
 import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
-
 import { DashboardContext } from '../../DashboardContext';
+
+type PayExpenseModalWrapperProps = BaseModalProps & {
+  expense: ExpenseActionQueryNode;
+  collective: ExpenseActionQueryNode['account'];
+  host: ExpenseActionQueryNode['host'];
+  canPayWithAutomaticPayment: boolean;
+  onSubmit: (values: { action: string } & Record<string, unknown>) => Promise<void>;
+};
+
+const PayExpenseModalWrapper = ({
+  open,
+  setOpen,
+  expense,
+  collective,
+  host,
+  canPayWithAutomaticPayment,
+  onSubmit,
+}: PayExpenseModalWrapperProps) => {
+  if (!open) {
+    return null;
+  }
+
+  // PayExpenseModal has LoggedInUser in its type but doesn't actually use it
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ModalComponent = PayExpenseModal as React.ComponentType<any>;
+
+  return (
+    <ModalComponent
+      expense={expense}
+      collective={collective}
+      host={host}
+      canPayWithAutomaticPayment={canPayWithAutomaticPayment}
+      onClose={() => setOpen(false)}
+      onSubmit={onSubmit}
+    />
+  );
+};
 
 const processExpenseMutation = gql`
   mutation ProcessExpenseAction(
@@ -89,11 +127,34 @@ export type ExpenseActionQueryNode = {
     slug: string;
     name?: string;
     type: string;
+    currency?: string;
+    stats?: {
+      id?: string;
+      balanceWithBlockedFunds?: Amount;
+    };
   };
-  host?: {
+  host?: Pick<
+    Host,
+    'id' | 'slug' | 'type' | 'currency' | 'plan' | 'settings' | 'features' | 'supportedPayoutMethods' | 'transferwise'
+  > | null;
+  // Fields needed for PayExpenseModal
+  amount?: number;
+  currency?: string;
+  feesPayer?: Expense['feesPayer'];
+  taxes?: Pick<TaxInfo, 'id' | 'type' | 'rate'>[];
+  payoutMethod?: Pick<PayoutMethod, 'id' | 'type' | 'name' | 'data'>;
+  amountInHostCurrency?: {
+    valueInCents?: number;
+    currency?: string;
+  };
+  payee?: {
     id: string;
-    slug: string;
-  } | null;
+    slug?: string;
+    name?: string;
+    type?: string;
+    host?: { id: string } | null;
+  };
+  requiredLegalDocuments?: string[];
 };
 
 type UseExpenseActionsOptions = {
@@ -113,7 +174,6 @@ type UseExpenseActionsOptions = {
 
 export function useExpenseActions<T extends ExpenseActionQueryNode>({
   refetchList,
-  resetFilters,
   onDelete,
 }: UseExpenseActionsOptions = {}) {
   const intl = useIntl();
@@ -190,9 +250,8 @@ export function useExpenseActions<T extends ExpenseActionQueryNode>({
       return downloadInvoiceWith(expense)();
     };
 
-    const canSeeInvoice =
-      permissions.canSeeInvoiceInfo &&
-      [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING].includes(expense.type);
+    const invoiceTypes = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING] as string[];
+    const canSeeInvoice = permissions.canSeeInvoiceInfo && invoiceTypes.includes(expense.type);
 
     const getTransactionsUrl = () => {
       if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
@@ -203,6 +262,22 @@ export function useExpenseActions<T extends ExpenseActionQueryNode>({
       return null;
     };
 
+    const handlePayExpense = (action: string, paymentParams?: Record<string, unknown>) => {
+      return processExpense({
+        variables: { id: expense.id, legacyId: expense.legacyId, action, paymentParams },
+      })
+        .then(() => {
+          onMutationSuccess();
+          return true;
+        })
+        .catch(e => {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          return false;
+        });
+    };
+
+    const canPay = permissions.canPay || permissions.canMarkAsPaid;
+
     return {
       primary: compact([
         // Approve action (for Collective admins)
@@ -211,6 +286,32 @@ export function useExpenseActions<T extends ExpenseActionQueryNode>({
           label: intl.formatMessage({ defaultMessage: 'Approve', id: 'QYfCQa' }),
           onClick: () => showConfirmModal('APPROVE'),
           Icon: Check,
+        },
+        // Pay / Mark as Paid action (for Host admins)
+        canPay && {
+          key: 'pay',
+          label: intl.formatMessage({ defaultMessage: 'Go to Pay', id: 'actions.goToPay' }),
+          onClick: () => {
+            showModal(
+              PayExpenseModalWrapper,
+              {
+                expense,
+                collective: expense.account,
+                host: expense.host,
+                canPayWithAutomaticPayment: Boolean(permissions.canPay),
+                onSubmit: async (values: { action: string } & Record<string, unknown>) => {
+                  const { action, ...paymentParams } = values;
+                  const success = await handlePayExpense(action, paymentParams);
+                  if (success) {
+                    return;
+                  }
+                  throw new Error('Payment failed');
+                },
+              },
+              `pay-expense-${expense.id}`,
+            );
+          },
+          Icon: DollarSign,
         },
         // Reject action
         permissions.canReject && {

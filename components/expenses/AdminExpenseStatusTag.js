@@ -183,7 +183,16 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
           )}
       </Manager>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={expense}
+        />
       )}
     </React.Fragment>
   );

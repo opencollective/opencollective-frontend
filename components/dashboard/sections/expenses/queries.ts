@@ -395,7 +395,7 @@ export const paidDisbursementsFieldsFragment = gql`
     }
     host {
       id
-      slug
+      ...ExpenseHostFields
     }
     comments {
       totalCount
@@ -426,6 +426,7 @@ export const paidDisbursementsFieldsFragment = gql`
   }
   ${AccountingCategorySelectFieldsFragment}
   ${accountHoverCardFields}
+  ${expenseHostFields}
 `;
 
 /**

@@ -117,7 +117,7 @@ const ExpenseMoreActionsButton = ({
   onCloneModalOpenChange,
   ...props
 }) => {
-  const [processModal, setProcessModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState(null);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
@@ -377,7 +377,16 @@ const ExpenseMoreActionsButton = ({
         )}
       </PopupMenu>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={expense}
+        />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion
