@@ -13,7 +13,6 @@ import {
   type PaidDisbursementsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import formatAccountType from '../../../../lib/i18n/account-type';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
@@ -35,6 +34,7 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
+import { useExpenseActions } from './actions';
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import {
   ExpenseAccountingCategoryKinds,
@@ -46,7 +46,7 @@ import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  status: z.literal(ExpenseStatus.PAID).default(ExpenseStatus.PAID),
+  // status: z.literal(ExpenseStatus.PAID).default(ExpenseStatus.PAID),
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -201,8 +201,6 @@ const getExpenseColumns = intl => [
   actionsColumn,
 ];
 
-const getExpenseActions = () => ({ primary: [] });
-
 export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
@@ -235,6 +233,11 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const expenses = useQuery(paidDisbursementsQuery, {
     variables,
   });
+
+  const getExpenseActions = useExpenseActions({
+    refetchList: expenses.refetch,
+  });
+
   const pushSubpath = makePushSubpath(router);
   const openExpenseId = subpath[0];
 

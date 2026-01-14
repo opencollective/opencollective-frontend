@@ -334,6 +334,7 @@ export const paidDisbursementsFieldsFragment = gql`
     description
     type
     status
+    onHold
     currency
     amount
     tags
@@ -384,8 +385,43 @@ export const paidDisbursementsFieldsFragment = gql`
       imageUrl
       ...AccountHoverCardFields
     }
+    createdByAccount {
+      id
+      slug
+      name
+      type
+      legacyId
+      ...AccountHoverCardFields
+    }
+    host {
+      id
+      slug
+    }
     comments {
       totalCount
+    }
+    permissions {
+      id
+      canDelete
+      canApprove
+      canUnapprove
+      canReject
+      canMarkAsSpam
+      canPay
+      canMarkAsPaid
+      canMarkAsUnpaid
+      canMarkAsIncomplete
+      canSeeInvoiceInfo
+      canEditTags
+      canEditAccountingCategory
+      canUnschedulePayment
+      canHold
+      canRelease
+      approve {
+        allowed
+        reason
+        reasonDetails
+      }
     }
   }
   ${AccountingCategorySelectFieldsFragment}
