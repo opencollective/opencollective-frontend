@@ -72,18 +72,6 @@ export const vendorFieldFragment = gql`
   ${accountHoverCardFields}
 `;
 
-export const vendorDetailQuery = gql`
-  query VendorDetail($id: String!) {
-    account(id: $id) {
-      id
-      ... on Vendor {
-        ...VendorFields
-      }
-    }
-  }
-  ${vendorFieldFragment}
-`;
-
 export const setVendorArchiveMutation = gql`
   mutation SetVendorArchive($vendor: VendorEditInput!, $archive: Boolean!) {
     editVendor(archive: $archive, vendor: $vendor) {
