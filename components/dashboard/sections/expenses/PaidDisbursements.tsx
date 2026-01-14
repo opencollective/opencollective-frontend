@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
 import { MessageCircle } from 'lucide-react';
@@ -6,10 +6,12 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import {
   type AccountHoverCardFieldsFragment,
   ExpenseStatus,
+  ExpenseType,
+  HostContext,
   type PaidDisbursementsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -25,10 +27,12 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
@@ -43,10 +47,20 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
+import { limit } from '@/lib/filters/schemas';
+
+enum PaidDisbursementsTab {
+  ALL = 'ALL',
+  INVOICES = 'INVOICES',
+  REIMBURSEMENTS = 'REIMBURSEMENTS',
+  GRANTS = 'GRANTS',
+}
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  // status: z.literal(ExpenseStatus.PAID).default(ExpenseStatus.PAID),
+  status: z.literal(ExpenseStatus.PAID).default(ExpenseStatus.PAID),
+  hostContext: hostContextFilter.schema,
+  limit: limit.default(20),
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -59,16 +73,21 @@ type FilterMeta = CommonFilterMeta & {
 };
 
 const toVariables: FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta> = {
-  ...commonToVariables,
-  // ...(omit(commonToVariables, 'status') as unknown as Partial<
-  //   FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta>
-  // >),
-  account: hostedAccountFilter.toVariables,
+  ...(omit(commonToVariables, 'status') as unknown as Partial<
+    FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta>
+  >),
+  account: (value, key, allValues, meta) => {
+    // If hostContext is INTERNAL, filter to host's own account
+    if ((allValues as FilterValues).hostContext === HostContext.INTERNAL) {
+      return { slug: (meta as FilterMeta).hostSlug };
+    }
+    // Otherwise, use the normal account filter
+    return hostedAccountFilter.toVariables(value, key, allValues, meta);
+  },
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  ...commonFilters,
-  // ...omit(commonFilters, 'status'),
+  ...omit(commonFilters, 'status'),
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
@@ -205,10 +224,40 @@ const getExpenseColumns = intl => [
 export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
+  const { account } = useContext(DashboardContext);
 
   const { data: metaData } = useQuery(hostDashboardMetadataQuery, {
     variables: { hostSlug, withHoverCard: true },
   });
+
+  const views: Views<FilterValues> = [
+    {
+      id: PaidDisbursementsTab.ALL,
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+      filter: {},
+    },
+    {
+      id: PaidDisbursementsTab.INVOICES,
+      label: intl.formatMessage({ defaultMessage: 'Invoices', id: 'c0bGFo' }),
+      filter: {
+        type: ExpenseType.INVOICE,
+      },
+    },
+    {
+      id: PaidDisbursementsTab.REIMBURSEMENTS,
+      label: intl.formatMessage({ defaultMessage: 'Reimbursements', id: 'wdu2yl' }),
+      filter: {
+        type: ExpenseType.RECEIPT,
+      },
+    },
+    {
+      id: PaidDisbursementsTab.GRANTS,
+      label: intl.formatMessage({ defaultMessage: 'Grants', id: '8NsXQh' }),
+      filter: {
+        type: ExpenseType.GRANT,
+      },
+    },
+  ];
 
   const meta: FilterMeta = {
     currency: metaData?.host?.currency,
@@ -224,6 +273,8 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     toVariables,
     filters,
     meta,
+    views,
+    skipFiltersOnReset: ['hostContext'],
   });
 
   const variables = {
@@ -252,7 +303,20 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage defaultMessage="Paid Disbursements" id="rwMrEx" />} />
+      <DashboardHeader
+        title={
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
+            <FormattedMessage defaultMessage="Paid Disbursements" id="rwMrEx" />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
+          </div>
+        }
+      />
 
       <Filterbar {...queryFilter} />
 
