@@ -59,15 +59,16 @@ type FilterMeta = CommonFilterMeta & {
 };
 
 const toVariables: FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta> = {
-  ...(omit(commonToVariables, 'status') as unknown as Partial<
-    FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta>
-  >),
-  limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
+  ...commonToVariables,
+  // ...(omit(commonToVariables, 'status') as unknown as Partial<
+  //   FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta>
+  // >),
   account: hostedAccountFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  ...omit(commonFilters, 'status'),
+  ...commonFilters,
+  // ...omit(commonFilters, 'status'),
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };

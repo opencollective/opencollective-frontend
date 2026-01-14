@@ -385,9 +385,12 @@ const ProcessExpenseButtons = ({
       {confirmProcessExpenseAction && (
         <ConfirmProcessExpenseModal
           type={confirmProcessExpenseAction}
-          onClose={() => {
-            setConfirmProcessExpenseAction(null);
-            onModalToggle?.(false);
+          open={!!confirmProcessExpenseAction}
+          setOpen={open => {
+            if (!open) {
+              setConfirmProcessExpenseAction(null);
+              onModalToggle?.(false);
+            }
           }}
           expense={expense}
         />
