@@ -1,4 +1,4 @@
-import speakeasy from 'speakeasy';
+import { generateSecret, generateSync } from 'otplib';
 
 describe('signin', () => {
   it('redirects directly when using a dev test account', () => {
@@ -108,11 +108,11 @@ describe('signin with 2FA', () => {
     cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` })
       .then(async u => {
         user = u;
-        secret = speakeasy.generateSecret({ length: 64 });
+        secret = generateSecret({ length: 64 });
         return await cy.enableTwoFactorAuth({
           userEmail: user.email,
           userSlug: user.collective.slug,
-          secret: secret.base32,
+          secret: secret,
         });
       })
       .then(() => cy.logout());
@@ -123,11 +123,7 @@ describe('signin with 2FA', () => {
     cy.login({ email: user.email, redirect: '/apex' });
     cy.complete2FAPrompt('123456');
     cy.contains('Two-factor authentication code failed. Please try again').should.exist;
-    TOTPCode = speakeasy.totp({
-      algorithm: 'SHA1',
-      encoding: 'base32',
-      secret: secret.base32,
-    });
+    TOTPCode = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
     cy.complete2FAPrompt(TOTPCode);
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
