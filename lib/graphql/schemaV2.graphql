@@ -2354,7 +2354,7 @@ interface Transaction {
     """
     fetchTax: Boolean = false
   ): Amount!
-  netAmountInPayeeCurrency: Amount!
+  netAmountInPayeeCurrency: Amount
   taxAmount(
     """
     Fetch TAX transaction for retro-compatiblity.
@@ -11450,7 +11450,7 @@ type Credit implements Transaction {
     """
     fetchTax: Boolean = false
   ): Amount!
-  netAmountInPayeeCurrency: Amount!
+  netAmountInPayeeCurrency: Amount
   taxAmount(
     """
     Fetch TAX transaction for retro-compatiblity.
@@ -11597,7 +11597,7 @@ type Debit implements Transaction {
     """
     fetchTax: Boolean = false
   ): Amount!
-  netAmountInPayeeCurrency: Amount!
+  netAmountInPayeeCurrency: Amount
   taxAmount(
     """
     Fetch TAX transaction for retro-compatiblity.

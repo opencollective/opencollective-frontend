@@ -19,6 +19,7 @@ const collectivePickerSearchQuery = gqlV1 /* GraphQL */ `
     $skipGuests: Boolean
     $includeArchived: Boolean
     $includeVendorsForHostId: Int
+    $includeAllVendors: Boolean
     $vendorVisibleToAccountIds: [Int]
   ) {
     search(
@@ -30,6 +31,7 @@ const collectivePickerSearchQuery = gqlV1 /* GraphQL */ `
       skipGuests: $skipGuests
       includeArchived: $includeArchived
       includeVendorsForHostId: $includeVendorsForHostId
+      includeAllVendors: $includeAllVendors
       vendorVisibleToAccountIds: $vendorVisibleToAccountIds
     ) {
       id
@@ -146,6 +148,7 @@ const CollectivePickerAsync = ({
   includeArchived = false,
   includeVendorsForHostId = undefined,
   defaultCollectives = undefined,
+  includeAllVendors = false,
   vendorVisibleToAccountIds = undefined,
   useBeneficiaryForVendor = false,
   ...props
@@ -210,10 +213,11 @@ const CollectivePickerAsync = ({
         skipGuests,
         includeArchived,
         includeVendorsForHostId,
+        includeAllVendors,
         vendorVisibleToAccountIds,
       });
     }
-  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, term]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, includeAllVendors, term]);
 
   return (
     <CollectivePicker
