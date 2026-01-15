@@ -493,7 +493,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </h2>
                 <DataTable
                   data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedTableColumns(intl)}
+                  columns={associatedTableColumns(intl, true)}
                   loading={isLoading}
                   getActions={getActions}
                 />
