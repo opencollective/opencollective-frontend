@@ -17,7 +17,6 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { renderDetailsString } from '../../lib/transactions';
 import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/schema';
 
-import { Box as Container } from '../Grid';
 /**
  * Defines activities display metadata.
  * **All** keys must have a matching entry in `MESSAGES` below.
@@ -227,12 +226,12 @@ function ExpenseTransactionRenderer({ activity }: ExpenseTransactionRendererProp
   }
 
   return (
-    <Container fontSize="12px" mt={2}>
+    <div className="mt-1 flex flex-col gap-1 text-xs">
       {renderDetailsString({
         ...activity.transaction,
         isCredit: activity.transaction.type === 'CREDIT',
         intl,
       })}
-    </Container>
+    </div>
   );
 }
