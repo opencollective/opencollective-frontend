@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -48,9 +48,21 @@ import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './querie
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { isMulti } from '@/lib/filters/schemas';
+import { hostContextFilter, HostContextFilter } from '../../filters/HostContextFilter';
+import { DashboardContext } from '../../DashboardContext';
+
+const ExpenseStatusFilterWithoutPaid = Object.fromEntries(
+  Object.entries(ExpenseStatusFilter).filter(([key]) => key !== 'PAID'),
+) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
+const ExpenseStatusFilterWithoutPaidAndReadyToPay = Object.fromEntries(
+  Object.entries(ExpenseStatusFilter).filter(([key]) => key !== 'PAID' && key !== 'READY_TO_PAY'),
+) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID' | 'READY_TO_PAY'>]: (typeof ExpenseStatusFilter)[K] };
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
+  status: isMulti(z.nativeEnum(ExpenseStatusFilterWithoutPaid)).nullable().default(null),
+  hostContext: hostContextFilter.schema,
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -66,6 +78,8 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
   ...commonToVariables,
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
+  status: value =>
+    isEmpty(value) ? { status: Object.values(ExpenseStatusFilterWithoutPaidAndReadyToPay) } : { status: value },
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
@@ -99,6 +113,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;
+  const { account } = React.useContext(DashboardContext);
 
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
@@ -229,7 +244,20 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage defaultMessage="Pay Disbursements" id="El6h63" />} />
+      <DashboardHeader
+        title={
+          <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
+            <FormattedMessage defaultMessage="Pay Disbursements" id="El6h63" />
+            {account.hasHosting && (
+              <HostContextFilter
+                value={queryFilter.values.hostContext}
+                onChange={val => queryFilter.setFilter('hostContext', val)}
+                intl={intl}
+              />
+            )}
+          </div>
+        }
+      />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>
           {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
