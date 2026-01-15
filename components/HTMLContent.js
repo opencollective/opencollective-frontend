@@ -7,6 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
+import { defaultShouldForwardProp } from '../lib/styled_components_utils';
+
 import { Button } from './ui/Button';
 
 /**
@@ -31,7 +33,9 @@ export const isEmptyHTMLValue = value => {
   }
 };
 
-const InlineDisplayBox = styled.div`
+const InlineDisplayBox = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   overflow-y: hidden;
   p {
     margin: 1em 0;
@@ -39,7 +43,9 @@ const InlineDisplayBox = styled.div`
   ${props => props.maxHeight && `max-height: ${props.maxHeight + 20}px;`}
 `;
 
-const CollapsedDisplayBox = styled.div`
+const CollapsedDisplayBox = styled.div.withConfig({
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+})`
   overflow-y: hidden;
   ${props => props.maxCollapsedHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
