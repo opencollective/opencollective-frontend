@@ -286,6 +286,7 @@ const ExpenseSummary = ({
                   values={{
                     name: (
                       <AccountHoverCard
+                        key="name"
                         account={createdByAccount}
                         includeAdminMembership={{
                           accountSlug: expense.account?.slug,
@@ -307,6 +308,7 @@ const ExpenseSummary = ({
                   values={{
                     name: (
                       <AccountHoverCard
+                        key="name"
                         account={createdByAccount}
                         includeAdminMembership={{
                           accountSlug: expense.account?.slug,
@@ -331,6 +333,7 @@ const ExpenseSummary = ({
                     values={{
                       name: (
                         <AccountHoverCard
+                          key="name"
                           account={expense.approvedBy.find(Boolean)}
                           includeAdminMembership={{
                             accountSlug: expense.account.slug,
@@ -375,7 +378,12 @@ const ExpenseSummary = ({
                   defaultMessage="Ref: {reference}"
                   values={{
                     reference: (
-                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                      <TruncatedTextWithTooltip
+                        key="reference"
+                        value={expense.reference}
+                        length={10}
+                        truncatePosition="middle"
+                      />
                     ),
                   }}
                 />
@@ -491,7 +499,7 @@ const ExpenseSummary = ({
                             id="withColon"
                             defaultMessage="{item}:"
                             values={{
-                              item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+                              item: <FormattedMessage key="item" id="expense.incurredAt" defaultMessage="Date" />,
                             }}
                           />{' '}
                           {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}

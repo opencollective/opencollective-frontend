@@ -177,7 +177,11 @@ function InputPagination(props: InputPaginationProps & CommonVariantProps) {
                 data-cy="pagination-current"
               />
             ),
-            total: <span data-cy="pagination-total">{props.totalPages || 1}</span>,
+            total: (
+              <span key="total" data-cy="pagination-total">
+                {props.totalPages || 1}
+              </span>
+            ),
           }}
         />
       </Container>

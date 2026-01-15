@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const formatPrivateNoteLabel = msg => {
   return (
-    <Tooltip>
+    <Tooltip key="private-note">
       <TooltipTrigger className="cursor-help underline decoration-slate-400 decoration-dashed">{msg}</TooltipTrigger>
       <TooltipContent>
         <FormattedMessage defaultMessage="Private notes are only visible to you and other Host admins." id="0b9yMU" />
@@ -65,7 +65,7 @@ export const CommentMetadata = ({
           <FormattedMessage
             defaultMessage="on {date}"
             id="mzGohi"
-            values={{ date: <DateTime value={comment.createdAt} /> }}
+            values={{ date: <DateTime key="date" value={comment.createdAt} /> }}
           />
         </p>
       </div>

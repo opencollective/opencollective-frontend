@@ -130,7 +130,9 @@ export default class SectionContributors extends React.PureComponent {
               defaultMessage="Our contributors {count}"
               values={{
                 count: (
-                  <Span color="black.600">{stats.backers.all + coreContributors.filter(c => !c.isBacker).length}</Span>
+                  <Span key="count" color="black.600">
+                    {stats.backers.all + coreContributors.filter(c => !c.isBacker).length}
+                  </Span>
                 ),
               }}
             />

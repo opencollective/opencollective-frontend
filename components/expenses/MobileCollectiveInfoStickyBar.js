@@ -60,7 +60,9 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
-                values={{ item: <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" /> }}
+                values={{
+                  item: <FormattedMessage key="item" id="Fiscalhost" defaultMessage="Fiscal Host" />,
+                }}
               />
             </P>
             <LinkCollective collective={host}>

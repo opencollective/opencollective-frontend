@@ -60,6 +60,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
           values={{
             totalPaidInvoices: (
               <FormattedMoneyAmount
+                key="total-paid-invoices"
                 amount={stats.totalPaidInvoices.valueInCents}
                 currency={stats.totalPaidInvoices.currency}
                 precision={2}
@@ -67,6 +68,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
             ),
             totalPaidReceipts: (
               <FormattedMoneyAmount
+                key="total-paid-receipts"
                 amount={stats.totalPaidReceipts.valueInCents}
                 currency={stats.totalPaidReceipts.currency}
                 precision={2}
@@ -74,12 +76,13 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
             ),
             totalPaidGrants: (
               <FormattedMoneyAmount
+                key="total-paid-grants"
                 amount={stats.totalPaidGrants.valueInCents}
                 currency={stats.totalPaidGrants.currency}
                 precision={2}
               />
             ),
-            currentYear: <span>{currentYear}</span>,
+            currentYear: <span key="year">{currentYear}</span>,
           }}
         />
       )}
@@ -171,7 +174,7 @@ const ExpenseSummaryAdditionalInformation = ({
                 <FormattedMessage
                   id="withColon"
                   defaultMessage="{item}:"
-                  values={{ item: <FormattedMessage id="Balance" defaultMessage="Balance" /> }}
+                  values={{ item: <FormattedMessage key="item" id="Balance" defaultMessage="Balance" /> }}
                 />
               </Container>
               <Box mt={2}>
@@ -196,7 +199,11 @@ const ExpenseSummaryAdditionalInformation = ({
                   defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
                   id="uX+lpu"
                   values={{
-                    Color: text => <Span color="primary.600">{text}</Span>,
+                    Color: text => (
+                      <Span key="color" color="primary.600">
+                        {text}
+                      </Span>
+                    ),
                     agreementsCount: collective.hostAgreements.totalCount,
                   }}
                 />

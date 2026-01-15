@@ -242,7 +242,9 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
                     <FormattedMessage
                       id="Transaction.from"
                       defaultMessage="from {name}"
-                      values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={fromAccount} /> }}
+                      values={{
+                        name: <StyledLink key="name" as={LinkCollective} withHoverCard collective={fromAccount} />,
+                      }}
                     />
                     &nbsp;
                   </Fragment>
@@ -251,7 +253,9 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
                   <FormattedMessage
                     id="Transaction.to"
                     defaultMessage="to {name}"
-                    values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={toAccount} /> }}
+                    values={{
+                      name: <StyledLink key="name" as={LinkCollective} withHoverCard collective={toAccount} />,
+                    }}
                   />
                 }
                 {giftCardEmitterAccount && (
@@ -261,9 +265,14 @@ const TransactionItem = ({ displayActions, collective, transaction }) => {
                       id="transaction.usingGiftCardFrom"
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
-                        giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
+                        giftCard: <DefinedTerm key="gift-card" term={Terms.GIFT_CARD} textTransform="lowercase" />,
                         collective: (
-                          <StyledLink as={LinkCollective} withHoverCard collective={giftCardEmitterAccount} />
+                          <StyledLink
+                            key="collective"
+                            as={LinkCollective}
+                            withHoverCard
+                            collective={giftCardEmitterAccount}
+                          />
                         ),
                       }}
                     />
