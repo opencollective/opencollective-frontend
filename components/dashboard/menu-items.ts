@@ -177,9 +177,22 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
-          if: hasHosting,
+          if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
           section: ALL_SECTIONS.HOST_EXPENSES,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+        },
+        {
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.PAY_DISBURSEMENTS,
+          label: intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' }),
+        },
+        {
+          section: ALL_SECTIONS.PAID_DISBURSEMENTS,
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          label: intl.formatMessage({
+            defaultMessage: 'Paid Disbursements',
+            id: 'rwMrEx',
+          }),
         },
         {
           if: !isIndividual,

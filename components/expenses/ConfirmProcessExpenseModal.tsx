@@ -6,13 +6,20 @@ import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Expense } from '../../lib/graphql/types/v2/schema';
 
-import { Flex } from '../Grid';
-import MessageBox from '../MessageBox';
+import type { BaseModalProps } from '../ModalContext';
 import RichTextEditor from '../RichTextEditor';
-import StyledButton from '../StyledButton';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import { P } from '../Text';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/AlertDialog';
 import { toast } from '../ui/useToast';
+import MessageBox from '../MessageBox';
 
 const messages = defineMessages({
   reasonPlaceholder: {
@@ -178,13 +185,18 @@ export type ConfirmProcessExpenseModalType =
   | 'HOLD'
   | 'RELEASE';
 
-type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = BaseModalProps & {
   type: ConfirmProcessExpenseModalType;
-  onClose: () => void;
-  expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;
+  expense: Pick<Expense, 'id' | 'legacyId'>;
 };
 
-export default function ConfirmProcessExpenseModal({ type, onClose, expense }: ConfirmProcessExpenseModalProps) {
+export default function ConfirmProcessExpenseModal({
+  type,
+  open,
+  setOpen,
+  expense,
+  onCloseFocusRef,
+}: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
 
   const [message, setMessage] = React.useState<string>();
@@ -246,61 +258,68 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
           break;
         }
       }
-      onClose();
+      setOpen(false);
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
-  }, [type, message, intl, processExpense]);
+  }, [type, message, intl, processExpense, setOpen]);
+
+  const onCloseAutoFocus = (e: Event) => {
+    if (onCloseFocusRef?.current) {
+      e.preventDefault();
+      onCloseFocusRef.current.focus();
+    }
+  };
 
   return (
-    <StyledModal role="alertdialog" onClose={onClose}>
-      <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
-      <ModalBody pt={2}>
-        <Flex>
-          <MessageBox lineHeight="20px" mb={10} type="warning" withIcon>
-            {intl.formatMessage(MessagesPerType[type].description)}
-          </MessageBox>
-        </Flex>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogContent onCloseAutoFocus={onCloseAutoFocus} className="max-w-md">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{intl.formatMessage(MessagesPerType[type].title)}</AlertDialogTitle>
+        </AlertDialogHeader>
+        <MessageBox lineHeight="20px" mb={10} type="warning" withIcon>
+          {intl.formatMessage(MessagesPerType[type].description)}
+        </MessageBox>
+        <div className="space-y-4">
+          {MessagesPerType[type].label && (
+            <label htmlFor="expense-ban-reason" className="mb-2 block text-sm font-medium text-slate-700">
+              {intl.formatMessage(
+                { id: 'OptionalFieldLabel', defaultMessage: '{field} (optional)' },
+                { field: intl.formatMessage(MessagesPerType[type].label) },
+              )}
+            </label>
+          )}
 
-        {MessagesPerType[type].label && (
-          <P as="label" htmlFor="expense-ban-reason" mb={2} color="black.700" fontWeight="500">
-            {intl.formatMessage(
-              { id: 'OptionalFieldLabel', defaultMessage: '{field} (optional)' },
-              { field: intl.formatMessage(MessagesPerType[type].label) },
-            )}
-          </P>
-        )}
+          <RichTextEditor
+            data-cy="confirm-action-text"
+            kind="COMMENT"
+            version="simplified"
+            withBorders
+            editorMinHeight={150}
+            placeholder={intl.formatMessage(messages.reasonPlaceholder)}
+            fontSize="13px"
+            onChange={e => setMessage(e.target.value)}
+            setUploading={setUploading}
+          />
+        </div>
 
-        <RichTextEditor
-          data-cy="confirm-action-text"
-          kind="COMMENT"
-          version="simplified"
-          withBorders
-          editorMinHeight={150}
-          placeholder={intl.formatMessage(messages.reasonPlaceholder)}
-          fontSize="13px"
-          onChange={e => setMessage(e.target.value)}
-          setUploading={setUploading}
-        />
-      </ModalBody>
-      <ModalFooter>
-        <Flex gap="16px" justifyContent="flex-end">
-          <StyledButton
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={uploading || processExpense.loading}>
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+          </AlertDialogCancel>
+          <AlertDialogAction
             data-cy="confirm-action-button"
+            loading={processExpense.loading}
             disabled={uploading}
-            buttonStyle="secondary"
-            buttonSize="small"
-            onClick={onConfirm}
-            minWidth={180}
-            loading={uploading || processExpense.loading}
+            onClick={async e => {
+              e.preventDefault();
+              await onConfirm();
+            }}
           >
             {intl.formatMessage(MessagesPerType[type].confirmBtn)}
-          </StyledButton>
-          <StyledButton buttonStyle="standard" buttonSize="small" onClick={onClose}>
-            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-          </StyledButton>
-        </Flex>
-      </ModalFooter>
-    </StyledModal>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
