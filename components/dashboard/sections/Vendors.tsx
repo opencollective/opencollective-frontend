@@ -235,7 +235,6 @@ const getColumns = ({ isVendor }) => {
         );
       },
     },
-
     {
       accessorKey: 'expenses',
       header: () => <FormattedMessage defaultMessage="Total Expenses" id="TotalExpenses" />,
@@ -322,7 +321,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
     },
     {
       id: VendorsTab.ORGANIZATIONS,
-      label: intl.formatMessage({ defaultMessage: 'Community Organizations', id: 'brl/S5' }),
+      label: intl.formatMessage({ defaultMessage: 'Platform Organizations', id: 'nwgM4C' }),
       filter: {
         onlyVendors: false,
       },
@@ -421,7 +420,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
         description={
           <FormattedMessage
             id="VendorsAndOrganizations.Description"
-            defaultMessage="Manage all the external organizations you work with as vendors and quickly surface all the activity between your hosted Collectives and community Organizations."
+            defaultMessage="Manage all the external organizations you work with as vendors and quickly surface all the activity between your hosted Collectives and other platform Organizations."
           />
         }
         actions={
@@ -450,12 +449,10 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
               getActions={getActions}
               mobileTableView
             />
-
             <Pagination queryFilter={queryFilter} total={tableData?.totalCount} />
           </React.Fragment>
         )
       )}
-
       {createEditVendor && (
         <StyledModal onClose={() => setCreateEditVendor(false)}>
           <VendorForm
