@@ -296,23 +296,23 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 {props.account.id.split('-')[0]}...
               </CopyID>
             </div>
-            {account['email'] && (
+            {account && 'email' in account && (
               <React.Fragment>
                 <Dot size={14} />
                 <div className="flex items-center gap-1">
                   <Mail size={14} />
                   <CopyID
-                    value={account['email']}
+                    value={account.email}
                     tooltipLabel={<FormattedMessage defaultMessage="Copy Email" id="8NlxGY" />}
                     className="inline-flex items-center gap-1"
                     Icon={null}
                   >
-                    {account['email']}
+                    {account.email}
                   </CopyID>
                 </div>
               </React.Fragment>
             )}
-            {account.location?.country && (
+            {account?.location?.country && (
               <React.Fragment>
                 <Dot size={14} />
                 <div className="flex items-center gap-1">
@@ -321,7 +321,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </div>
               </React.Fragment>
             )}
-            {account.socialLinks?.length > 0 && (
+            {account?.socialLinks?.length > 0 && (
               <React.Fragment>
                 <Dot size={14} />
                 <HeroSocialLinks className="size-6" socialLinks={account.socialLinks} />
