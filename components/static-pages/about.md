@@ -33,3 +33,7 @@ Today, the Open Collective Platform, operated by OFiTech under OFiCo's stewardsh
 Our work continues to evolve, but the core principle remains unchanged: **money should move in the open, in service of communities**.
 
 As we enter this new chapter, our mission is to strengthen and expand this infrastructure for the long term, ensuring that the tools of open finance remain open, sustainable, and collectively governed for the years ahead.
+
+### Our team
+
+We are proud to welcome **François** as a new member of our team. François brings valuable expertise and passion to help us continue building transparent financial infrastructure for communities worldwide.
