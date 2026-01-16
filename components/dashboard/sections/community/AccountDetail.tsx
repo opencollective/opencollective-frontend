@@ -478,7 +478,9 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </InfoList>
               </div>
               <div className="space-y-4 xl:order-1 xl:col-span-3">
-                {[AccountType.ORGANIZATION, AccountType.COLLECTIVE].includes(props.expectedAccountType) && (
+                {[AccountType.ORGANIZATION, AccountType.COLLECTIVE].includes(
+                  account?.type || props.expectedAccountType,
+                ) && (
                   <React.Fragment>
                     <h2 className="text-xl font-bold text-slate-800">
                       <FormattedMessage defaultMessage="Members" id="+a+2ug" />
@@ -490,12 +492,13 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                     />
                   </React.Fragment>
                 )}
+
                 <h2 className="text-xl font-bold text-slate-800">
                   <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
                 </h2>
                 <DataTable
                   data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedTableColumns(intl, true)}
+                  columns={associatedTableColumns(intl)}
                   loading={isLoading}
                   getActions={getActions}
                 />
@@ -504,10 +507,22 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </h2>
                 <DataTable
                   data={account?.communityStats?.associatedOrganizations || []}
-                  columns={associatedTableColumns(intl, true)}
+                  columns={associatedTableColumns(intl)}
                   loading={isLoading}
                   getActions={getActions}
                 />
+                {account && 'adminOf' in account && [AccountType.INDIVIDUAL].includes(props.expectedAccountType) && (
+                  <React.Fragment>
+                    <h2 className="text-xl font-bold text-slate-800">
+                      <FormattedMessage defaultMessage="Related Organizations" id="/bnZoN" />
+                    </h2>
+                    <DataTable
+                      data={account.adminOf.nodes || []}
+                      columns={getMembersTableColumns(intl, true)}
+                      loading={isLoading}
+                    />
+                  </React.Fragment>
+                )}
               </div>
             </div>
             {selectedTab === AccountDetailView.CONTRIBUTIONS && (
