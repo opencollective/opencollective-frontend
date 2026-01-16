@@ -309,6 +309,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
+      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.VENDORS,
+      Icon: Store,
+    },
+    {
       if:
         !isIndividual &&
         hasMoneyManagement &&
@@ -382,11 +387,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
-    {
-      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.VENDORS,
-      Icon: Store,
-    },
+
     {
       if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TICKETS,

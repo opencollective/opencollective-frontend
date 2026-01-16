@@ -2,6 +2,7 @@ import { gql } from '@apollo/client';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
 import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
+import { vendorFieldFragment } from '@/components/vendors/queries';
 
 import { legalDocumentFields } from '../legal-documents/HostDashboardTaxForms';
 
@@ -150,7 +151,7 @@ const communityAccountDetailActivityFields = gql`
 `;
 
 export const communityAccountDetailQuery = gql`
-  query CommunityAccountDetail($accountId: String!, $hostSlug: String!) {
+  query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $isIndividual: Boolean!) {
     account(id: $accountId) {
       id
       legacyId
@@ -175,6 +176,49 @@ export const communityAccountDetailQuery = gql`
         kycStatus(requestedByAccount: { slug: $hostSlug }) {
           manual {
             ...KYCVerificationFields
+          }
+        }
+        adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR]) {
+          nodes {
+            id
+            role
+            createdAt
+            account {
+              id
+              slug
+              name
+              type
+              ...AccountHoverCardFields
+              communityStats(host: { slug: $hostSlug }) {
+                transactionSummary {
+                  expenseTotalAcc {
+                    valueInCents
+                    currency
+                  }
+                  expenseCountAcc
+                  contributionTotalAcc {
+                    valueInCents
+                    currency
+                  }
+                  contributionCountAcc
+                }
+              }
+            }
+          }
+        }
+      }
+      ... on Vendor {
+        ...VendorFields
+      }
+      members(role: [ADMIN, ACCOUNTANT, MEMBER, COMMUNITY_MANAGER]) {
+        nodes {
+          id
+          role
+          description
+          createdAt
+          account {
+            id
+            ...AccountHoverCardFields
           }
         }
       }
@@ -266,6 +310,17 @@ export const communityAccountDetailQuery = gql`
           ...LegalDocumentFields
         }
       }
+      admins: members(role: [ADMIN]) {
+        nodes {
+          id
+          role
+          description
+          createdAt
+          account {
+            id
+          }
+        }
+      }
     }
 
     firstActivity: activities(
@@ -273,7 +328,7 @@ export const communityAccountDetailQuery = gql`
       individual: { id: $accountId }
       orderBy: { field: CREATED_AT, direction: ASC }
       limit: 1
-    ) {
+    ) @include(if: $isIndividual) {
       nodes {
         ...CommunityAccountDetailActivityFields
       }
@@ -284,7 +339,7 @@ export const communityAccountDetailQuery = gql`
       individual: { id: $accountId }
       orderBy: { field: CREATED_AT, direction: DESC }
       limit: 1
-    ) {
+    ) @include(if: $isIndividual) {
       nodes {
         ...CommunityAccountDetailActivityFields
       }
@@ -294,6 +349,7 @@ export const communityAccountDetailQuery = gql`
   ${kycVerificationFields}
   ${legalDocumentFields}
   ${communityAccountDetailActivityFields}
+  ${vendorFieldFragment}
 `;
 
 export const communityAccountActivitiesQuery = gql`
