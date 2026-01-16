@@ -11289,6 +11289,8 @@ export type ProcessExpensePaymentParams = {
   paymentMethodService?: InputMaybe<PaymentMethodService>;
   /** The fee charged by payment processor in host currency */
   paymentProcessorFeeInHostCurrency?: InputMaybe<Scalars['Int']['input']>;
+  /** The exact amount of payment processor fees to refund when triggering MARK_AS_UNPAID */
+  refundedPaymentProcessorFeeAmount?: InputMaybe<Scalars['Int']['input']>;
   /** Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID */
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']['input']>;
   /** The total amount paid in host currency */

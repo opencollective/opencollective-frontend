@@ -11,6 +11,7 @@ import ConfirmationModal from '../ConfirmationModal';
 import { Box } from '../Grid';
 import RichTextEditor from '../RichTextEditor';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledInputAmount from '../StyledInputAmount';
 import StyledSelect from '../StyledSelect';
 import { Label, P } from '../Text';
 import { Button } from '../ui/Button';
@@ -50,7 +51,7 @@ const messages = defineMessages({
 });
 
 type MarkExpenseAsUnpaidButtonProps = {
-  expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;
+  expense: Pick<Expense, 'id' | 'legacyId' | 'permissions' | 'currency' | 'type'>;
 };
 
 const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidButtonProps) => {
@@ -61,6 +62,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
   const [message, setMessage] = React.useState<string>();
   const [hasModal, setHasModal] = React.useState(false);
   const [refundPaymentProcessorFee, setRefundPaymentProcessorFee] = React.useState(true);
+  const [refundedPaymentProcessorFeeAmount, setRefundedPaymentProcessorFeeAmount] = React.useState<number | null>(null);
 
   const processExpense = useProcessExpense({
     expense,
@@ -72,6 +74,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
         paymentParams: {
           markAsUnPaidStatus: newExpenseStatusOption.value,
           shouldRefundPaymentProcessorFee: refundPaymentProcessorFee,
+          refundedPaymentProcessorFeeAmount: refundPaymentProcessorFee ? refundedPaymentProcessorFeeAmount : null,
         },
         message,
       });
@@ -80,7 +83,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
     }
 
     setHasModal(false);
-  }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message]);
+  }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, refundedPaymentProcessorFeeAmount, message, intl]);
 
   const button = (
     <Button {...props} variant="outlineDestructive" onClick={() => setHasModal(true)}>
@@ -139,6 +142,23 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
               defaultMessage="The amount will be credited back to the Collective balance."
             />
           </P>
+          {refundPaymentProcessorFee && (
+            <Box mt={2} ml="1.4rem">
+              <Label mb={1}>
+                <FormattedMessage
+                  id="refundedPaymentProcessorFeeAmount.label"
+                  defaultMessage="Refunded processor fee amount"
+                />
+              </Label>
+              <StyledInputAmount
+                id="refunded-processor-fee-amount"
+                currency={expense.currency || 'USD'}
+                value={refundedPaymentProcessorFeeAmount}
+                onChange={value => setRefundedPaymentProcessorFeeAmount(value)}
+                placeholder="0.00"
+              />
+            </Box>
+          )}
         </Box>
         <Box mt={3}>
           <RichTextEditor

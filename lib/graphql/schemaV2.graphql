@@ -25354,6 +25354,11 @@ input ProcessExpensePaymentParams {
   shouldRefundPaymentProcessorFee: Boolean
 
   """
+  The exact amount of payment processor fees to refund when triggering MARK_AS_UNPAID
+  """
+  refundedPaymentProcessorFeeAmount: Int
+
+  """
   New expense status when triggering MARK_AS_UNPAID
   """
   markAsUnPaidStatus: MarkAsUnPaidExpenseStatus = APPROVED
