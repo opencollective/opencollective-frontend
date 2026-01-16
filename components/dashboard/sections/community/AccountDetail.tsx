@@ -16,6 +16,7 @@ import type {
 import type { Account, AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import formatCollectiveType from '@/lib/i18n/collective-type';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { getDashboardRoute } from '@/lib/url-helpers';
@@ -181,10 +182,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   );
 
   const getActions = useAssociatedCollectiveActions({ accountSlug: account?.slug });
-  const relations = compact([
-    account?.type === 'VENDOR' && 'VENDOR',
-    ...(account?.communityStats?.relations || []),
-  ]).filter(
+  const relations = compact(account?.communityStats?.relations).filter(
     (relation, _, relations) => !(relation === 'EXPENSE_SUBMITTER' && relations.includes(CommunityRelationType.PAYEE)),
   );
 
@@ -218,16 +216,6 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 <Avatar collective={account} size={36} />
                 {account.name || account.slug}
                 {legalName && <span className="font-semibold text-muted-foreground">{`(${legalName})`}</span>}
-                <div className="flex flex-wrap gap-1 align-middle">
-                  {relations.map(role => (
-                    <div
-                      key={role}
-                      className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
-                    >
-                      {formatCommunityRelation(intl, role)}
-                    </div>
-                  ))}
-                </div>
               </React.Fragment>
             )}
           </div>
@@ -283,6 +271,20 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           <Skeleton className="h-4 w-32" />
         ) : (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex gap-1 align-middle">
+              <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
+                {formatCollectiveType(intl, account?.type || props.expectedAccountType)}
+              </div>
+              {relations.map(role => (
+                <div
+                  key={role}
+                  className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset"
+                >
+                  {formatCommunityRelation(intl, role)}
+                </div>
+              ))}
+            </div>
+            <Dot size={14} />
             <div className="flex items-center gap-1">
               <BookKey size={14} />
               <CopyID
