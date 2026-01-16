@@ -3636,7 +3636,7 @@ export type Credit = Transaction & {
   merchantId?: Maybe<Scalars['String']['output']>;
   netAmount: Amount;
   netAmountInHostCurrency: Amount;
-  netAmountInPayeeCurrency: Amount;
+  netAmountInPayeeCurrency?: Maybe<Amount>;
   /** The account on the opposite side of the transaction (CREDIT -> sender, DEBIT -> recipient) */
   oppositeAccount?: Maybe<Account>;
   /** The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT) */
@@ -4099,7 +4099,7 @@ export type Debit = Transaction & {
   merchantId?: Maybe<Scalars['String']['output']>;
   netAmount: Amount;
   netAmountInHostCurrency: Amount;
-  netAmountInPayeeCurrency: Amount;
+  netAmountInPayeeCurrency?: Maybe<Amount>;
   /** The account on the opposite side of the transaction (CREDIT -> sender, DEBIT -> recipient) */
   oppositeAccount?: Maybe<Account>;
   /** The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT) */
@@ -13065,7 +13065,7 @@ export type Transaction = {
   merchantId?: Maybe<Scalars['String']['output']>;
   netAmount: Amount;
   netAmountInHostCurrency: Amount;
-  netAmountInPayeeCurrency: Amount;
+  netAmountInPayeeCurrency?: Maybe<Amount>;
   oppositeAccount?: Maybe<Account>;
   /** The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT) */
   oppositeTransaction?: Maybe<Transaction>;

@@ -4498,6 +4498,11 @@ type Query {
     vendorVisibleToAccountIds: [Int]
 
     """
+    Include all vendors. Cannot be used together with includeVendorsForHostId. Must be root.
+    """
+    includeAllVendors: Boolean! = false
+
+    """
     Whether to skip recent accounts (48h)
     """
     skipRecentAccounts: Boolean = false
