@@ -165,12 +165,17 @@ const getProfileUrl = (
         ? contextAccount
         : null;
 
-  return context &&
-    loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
-    account?.type === CollectiveType.INDIVIDUAL &&
-    typeof account?.id === 'string'
-    ? getDashboardRoute({ slug: context.slug }, `people/${account?.id}`)
-    : null;
+  if (context && typeof account?.id === 'string') {
+    if (
+      loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
+      account?.type === CollectiveType.INDIVIDUAL
+    ) {
+      return getDashboardRoute({ slug: context.slug }, `people/${account?.id}`);
+    } else if ([CollectiveType.VENDOR, CollectiveType.ORGANIZATION].includes(account?.type as any)) {
+      return getDashboardRoute({ slug: context.slug }, `vendors/${account?.id}`);
+    }
+  }
+  return null;
 };
 
 function getBlocker(LoggedInUser, account, section) {

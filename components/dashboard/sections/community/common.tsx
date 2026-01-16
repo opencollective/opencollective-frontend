@@ -158,7 +158,7 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
 
       return actions;
     },
-    [intl, showModal, router, opts.accountSlug, opts.hasKYCFeature],
+    [intl, showModal, router, opts],
   );
 }
 
@@ -292,7 +292,7 @@ export const RichActivityDate = ({
   );
 };
 
-export const associatedTableColumns = (intl, includeAssociatedCollectiveColumns = false) =>
+export const associatedTableColumns = intl =>
   compact([
     {
       accessorKey: 'account',
@@ -343,7 +343,7 @@ export const associatedTableColumns = (intl, includeAssociatedCollectiveColumns 
         );
       },
     },
-    includeAssociatedCollectiveColumns && {
+    {
       accessorKey: 'expenses',
       header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
       cell: ({ row }) => {
@@ -367,8 +367,7 @@ export const associatedTableColumns = (intl, includeAssociatedCollectiveColumns 
         );
       },
     },
-
-    includeAssociatedCollectiveColumns && {
+    {
       accessorKey: 'contributions',
       header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
       cell: ({ row }) => {
@@ -392,7 +391,7 @@ export const associatedTableColumns = (intl, includeAssociatedCollectiveColumns 
         );
       },
     },
-    includeAssociatedCollectiveColumns && {
+    {
       accessorKey: 'firstInteraction',
       header: intl.formatMessage({ defaultMessage: 'First Interaction', id: 'FirstInteraction' }),
       cell: ({ row }) => {
@@ -400,44 +399,100 @@ export const associatedTableColumns = (intl, includeAssociatedCollectiveColumns 
         return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
       },
     },
-    includeAssociatedCollectiveColumns && actionsColumn,
+    actionsColumn,
   ]);
 
-export const getMembersTableColumns = intl => [
-  {
-    accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
-    cell: ({ row }) => {
-      const { account } = row.original;
-      const legalName = account.legalName !== account.name && account.legalName;
-      return (
-        <div className="flex items-center text-nowrap">
-          <LinkCollective collective={account} className="flex items-center gap-1" withHoverCard>
-            <Avatar size={24} collective={account} mr={2} />
-            {account.name || account.slug}
-            {legalName && <span className="ml-1 text-muted-foreground">{`(${legalName})`}</span>}
-          </LinkCollective>
-        </div>
-      );
+export const getMembersTableColumns = (intl, includeTransactionSummary = false) =>
+  [
+    {
+      accessorKey: 'account',
+      header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+      meta: {
+        className: 'max-w-48',
+      },
+      cell: ({ row }) => {
+        const { account } = row.original;
+        const legalName = account.legalName !== account.name && account.legalName;
+        return (
+          <div className="flex items-center text-nowrap">
+            <LinkCollective
+              collective={account}
+              className="flex min-w-0 items-center gap-1 overflow-hidden"
+              withHoverCard
+            >
+              <Avatar size={24} collective={account} mr={2} />
+              <span className="truncate">{account.name || account.slug}</span>
+              {legalName && <span className="ml-1 truncate text-muted-foreground">{`(${legalName})`}</span>}
+            </LinkCollective>
+          </div>
+        );
+      },
     },
-  },
-  {
-    accessorKey: 'role',
-    header: intl.formatMessage({ defaultMessage: 'Role', id: 'members.role.label' }),
-    cell: ({ row }) => {
-      return (
-        <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
-          {capitalize(row.original.role.replace('_', ' ').toLowerCase())}
-        </div>
-      );
+    {
+      accessorKey: 'role',
+      header: intl.formatMessage({ defaultMessage: 'Role', id: 'members.role.label' }),
+      cell: ({ row }) => {
+        return (
+          <div className="inline-flex items-center gap-0.5 rounded-md bg-transparent px-2 py-1 align-middle text-xs font-medium text-nowrap text-muted-foreground ring-1 ring-slate-300 ring-inset">
+            {capitalize(row.original.role.replace('_', ' ').toLowerCase())}
+          </div>
+        );
+      },
     },
-  },
-  {
-    accessorKey: 'createdAt',
-    header: intl.formatMessage({ defaultMessage: 'Member Since', id: 'MemberSince' }),
-    cell: ({ row }) => {
-      const date = row.original.createdAt;
-      return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
+    {
+      accessorKey: 'createdAt',
+      header: intl.formatMessage({ defaultMessage: 'Member Since', id: 'MemberSince' }),
+      cell: ({ row }) => {
+        const date = row.original.createdAt;
+        return date ? <DateTime value={date} dateStyle="medium" /> : <span className="text-muted-foreground">—</span>;
+      },
     },
-  },
-];
+    includeTransactionSummary && {
+      accessorKey: 'expenses',
+      header: intl.formatMessage({ defaultMessage: 'Total Expenses', id: 'TotalExpenses' }),
+      cell: ({ row }) => {
+        const summary = row.original.account?.communityStats?.transactionSummary?.[0];
+        const total = summary?.expenseTotalAcc;
+        const count = summary?.expenseCountAcc || 0;
+
+        if (!total || count === 0) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        return (
+          <div className="text-sm">
+            <FormattedMoneyAmount
+              amount={Math.abs(total.valueInCents)}
+              currency={total.currency}
+              showCurrencyCode={false}
+            />
+            <span className="ml-1 text-muted-foreground">({count})</span>
+          </div>
+        );
+      },
+    },
+    includeTransactionSummary && {
+      accessorKey: 'contributions',
+      header: intl.formatMessage({ defaultMessage: 'Total Contributions', id: 'TotalContributions' }),
+      cell: ({ row }) => {
+        const summary = row.original.account.communityStats?.transactionSummary?.[0];
+        const total = summary?.contributionTotalAcc;
+        const count = summary?.contributionCountAcc || 0;
+
+        if (!total || count === 0) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        return (
+          <div className="text-sm">
+            <FormattedMoneyAmount
+              amount={Math.abs(total.valueInCents)}
+              currency={total.currency}
+              showCurrencyCode={false}
+            />
+            <span className="ml-1 text-muted-foreground">({count})</span>
+          </div>
+        );
+      },
+    },
+  ].filter(Boolean);
