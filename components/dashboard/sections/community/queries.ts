@@ -178,6 +178,34 @@ export const communityAccountDetailQuery = gql`
             ...KYCVerificationFields
           }
         }
+        adminOf: memberOf(role: [ADMIN], accountType: [ORGANIZATION, VENDOR]) {
+          nodes {
+            id
+            role
+            createdAt
+            account {
+              id
+              slug
+              name
+              type
+              ...AccountHoverCardFields
+              communityStats(host: { slug: $hostSlug }) {
+                transactionSummary {
+                  expenseTotalAcc {
+                    valueInCents
+                    currency
+                  }
+                  expenseCountAcc
+                  contributionTotalAcc {
+                    valueInCents
+                    currency
+                  }
+                  contributionCountAcc
+                }
+              }
+            }
+          }
+        }
       }
       ... on Vendor {
         ...VendorFields
