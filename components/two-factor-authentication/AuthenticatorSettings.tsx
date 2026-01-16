@@ -2,9 +2,9 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { Plus } from 'lucide-react';
+import { generateSecret, generateURI, verifySync } from 'otplib';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import speakeasy from 'speakeasy';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
@@ -25,21 +25,21 @@ import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
 function generateNewAuthenticatorAppSecret(email: string) {
   let issuer;
   if (window.location.hostname === 'localhost') {
-    issuer = '&issuer=Open%20Collective%20Local';
+    issuer = 'Open Collective Local';
   } else if (window.location.hostname === 'staging.opencollective.com') {
-    issuer = '&issuer=Open%20Collective%20Staging';
+    issuer = 'Open Collective Staging';
   } else {
-    issuer = '&issuer=Open%20Collective';
+    issuer = 'Open Collective';
   }
-  const options = {
-    name: email,
-    length: 64,
-  };
-  const secret = speakeasy.generateSecret(options);
-  const otpAuthUrl = secret.otpauth_url + issuer;
+  const base32 = generateSecret({ length: 64 });
+  const otpAuthUrl = generateURI({
+    issuer,
+    label: email,
+    secret: base32,
+  });
   return {
     otpAuthUrl,
-    base32: secret.base32,
+    base32,
   };
 }
 
@@ -175,15 +175,18 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
       const errors: Record<string, unknown> = {};
       if (!values.twoFactorAuthenticatorCode) {
         errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.REQUIRED);
+      } else if (!/^[0-9]{6}$/.test(values.twoFactorAuthenticatorCode)) {
+        errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.INVALID_TOTP_CODE);
       } else {
-        const verified = speakeasy.totp.verify({
-          secret: base32,
-          encoding: 'base32',
+        const result = verifySync({
           token: values.twoFactorAuthenticatorCode,
-          window: 2,
+          secret: base32,
+          epochTolerance: 60,
+          strategy: 'totp',
+          algorithm: 'sha1',
         });
 
-        if (!verified) {
+        if (!result.valid) {
           errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.INVALID_TOTP_CODE);
         }
       }

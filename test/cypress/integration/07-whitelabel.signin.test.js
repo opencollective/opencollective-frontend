@@ -1,4 +1,4 @@
-import speakeasy from 'speakeasy';
+import { generateSecret, generateSync } from 'otplib';
 
 import { randomSlug } from '../support/faker';
 
@@ -47,7 +47,7 @@ describe('white-label signin', () => {
     let TOTPCode;
 
     before(() => {
-      secret = speakeasy.generateSecret({ length: 64 });
+      secret = generateSecret({ length: 64 });
       return cy
         .signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` })
         .then(u => {
@@ -58,7 +58,7 @@ describe('white-label signin', () => {
           return cy.enableTwoFactorAuth({
             userEmail: user.email,
             userSlug: user.collective.slug,
-            secret: secret.base32,
+            secret: secret,
           });
         });
     });
@@ -68,11 +68,7 @@ describe('white-label signin', () => {
       cy.login({ email: user.email, redirect: `http://local.opencollective:3000/${colSlug}` });
       cy.complete2FAPrompt('123456');
       cy.contains('Two-factor authentication code failed. Please try again').should.exist;
-      TOTPCode = speakeasy.totp({
-        algorithm: 'SHA1',
-        encoding: 'base32',
-        secret: secret.base32,
-      });
+      TOTPCode = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
       cy.complete2FAPrompt(TOTPCode);
       cy.assertLoggedIn();
       cy.url().should('eq', `http://local.opencollective:3000/${colSlug}`);

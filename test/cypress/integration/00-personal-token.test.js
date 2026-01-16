@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import speakeasy from 'speakeasy';
+import { generateSecret, generateSync } from 'otplib';
 
 describe('Personal Token', () => {
   let user;
@@ -77,11 +77,11 @@ describe('Personal Token', () => {
     cy.signup({ user: { name: 'Personal token tester', settings: { features: { adminPanel: true } } } }).then(user => {
       cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
-      const secret = speakeasy.generateSecret({ length: 64 });
+      const secret = generateSecret({ length: 64 });
       cy.enableTwoFactorAuth({
         userEmail: user.email,
         userSlug: user.collective.slug,
-        secret: secret.base32,
+        secret: secret,
       });
 
       cy.getByDataCy('create-token-link').click();
@@ -90,13 +90,7 @@ describe('Personal Token', () => {
       cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
       cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
 
-      cy.complete2FAPrompt(
-        speakeasy.totp({
-          algorithm: 'SHA1',
-          encoding: 'base32',
-          secret: secret.base32,
-        }),
-      );
+      cy.complete2FAPrompt(generateSync({ secret, algorithm: 'sha1', strategy: 'totp' }));
 
       cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token with 2fa" created');
       cy.getByDataCy('personalToken-token').should('exist');

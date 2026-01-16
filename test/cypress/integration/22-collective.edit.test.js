@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import speakeasy from 'speakeasy';
+import { generateSync } from 'otplib';
 
 import { randomEmail, randomSlug } from '../support/faker';
 
@@ -191,11 +191,7 @@ describe('edit user collective', () => {
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('InputField-twoFactorAuthenticatorCode').contains('Invalid code');
         // typing the right code passes
-        const TOTPCode = speakeasy.totp({
-          algorithm: 'SHA1',
-          encoding: 'base32',
-          secret,
-        });
+        const TOTPCode = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
         cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('recovery-codes-container').should('exist');
