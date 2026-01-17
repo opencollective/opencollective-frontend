@@ -137,7 +137,7 @@ const fetchAuthorize = (
     }
   }
 
-  return fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
+  return fetch(`${process.env.API_URL}/oauth/authorize?${authorizeParams.toString()}`, {
     method: 'POST',
     redirect: 'manual',
     headers: {
