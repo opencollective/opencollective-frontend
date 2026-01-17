@@ -64,29 +64,5 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
 /** Fetches the i18n messages for the given locale, async */
 export function getLocaleMessages(locale: string): Promise<Record<string, string>> {
   // creates a async split chunks of the available languages.
-  return import(
-    /* webpackInclude: /\.json$/i */
-    /* webpackChunkName: "i18n-messages-[request]" */
-    /* webpackMode: "lazy" */
-    `../../lang/${locale}.json`
-  );
-}
-
-/** Client only. The message chunk (i18n-messages-${locale}) created from getLocaleMessages is injected as a script by _document,
- * making it available for a sync require during hydration.
- */
-export function getPreloadedLocaleMessages(locale: string) {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  // checks if the module is loaded using a weak require (does not include the dependency in this bundle)
-  const moduleId = require.resolveWeak(`../../lang/${locale}.json`);
-  // eslint-disable-next-line camelcase
-  if (moduleId && __webpack_modules__[moduleId]) {
-    // if the module is loaded, require it using the webpack raw require to avoid adding it to this bundle as a dependency.
-
-    return __webpack_require__(moduleId);
-  }
-
-  return;
+  return import(`../../lang/${locale}.json`);
 }

@@ -1,6 +1,6 @@
 const supportedLanguages = ['en'];
 
-const languages = require.context('../../lang', false, /\.json$/i, 'weak');
+const languages = require.context('../../lang', false, /\.json$/i);
 
 languages.keys().forEach(element => {
   const match = element.match(/\.?\/?([^.]+)\.json$/);

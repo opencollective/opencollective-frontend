@@ -1,7 +1,8 @@
 import React from 'react';
 import { createIntl, RawIntlProvider } from 'react-intl';
 
-import { getLocaleMessages, getPreloadedLocaleMessages } from '../../lib/i18n/request';
+import dayjs from '../../lib/dayjs';
+import { getLocaleMessages } from '../../lib/i18n/request';
 
 import { useSSRIntlContext } from './SSRIntlProvider';
 
@@ -16,7 +17,7 @@ export function useLocaleContext() {
 
 export default function IntlProvider({ children, locale }) {
   const [selectedLocale, setSelectedLocale] = React.useState(locale);
-  const [messages, setMessages] = React.useState(getPreloadedLocaleMessages(locale));
+  const [messages, setMessages] = React.useState(locale);
   // SSR only: contains the messages used during this render
   const ssrContext = useSSRIntlContext();
 
@@ -24,6 +25,9 @@ export default function IntlProvider({ children, locale }) {
   React.useEffect(() => {
     async function loadLocaleMessages() {
       setMessages(await getLocaleMessages(selectedLocale));
+      import(`dayjs/locale/${selectedLocale}`).then(() => {
+        dayjs.locale(selectedLocale);
+      });
     }
     loadLocaleMessages();
   }, [selectedLocale]);
