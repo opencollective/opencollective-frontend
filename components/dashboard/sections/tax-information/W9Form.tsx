@@ -30,8 +30,8 @@ const FederalTaxClassificationLabels = {
   [FederalTaxClassification.Other]: 'Other',
 };
 
-export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) =>
-  BaseFormSchema.merge(
+export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) => {
+  const baseSchema = BaseFormSchema.merge(
     z.object({
       taxIdNumberType: z.enum(['SSN', 'EIN']),
       taxIdNumber: z.string().min(9).max(11),
@@ -45,11 +45,28 @@ export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) =>
             organizationName: z.string().min(1).max(255),
             businessName: z.string().max(255).or(z.literal('')).optional(),
             federalTaxClassificationDetails: z.string().max(255).or(z.literal('')).optional(),
+            llcTaxClassification: z.enum(['C', 'S', 'P']).or(z.literal('')).optional(),
             exemptPayeeCode: z.string().max(5).or(z.literal('')).optional(),
             fatcaExemptionCode: z.string().max(14).or(z.literal('')).optional(),
           }),
     }),
   );
+
+  return baseSchema.superRefine((data, ctx) => {
+    if (
+      submitterType === SubmitterType.Business &&
+      data.federalTaxClassification === FederalTaxClassification.LimitedLiabilityCompany
+    ) {
+      if (!data.llcTaxClassification) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'LLC tax classification is required',
+          path: ['llcTaxClassification'],
+        });
+      }
+    }
+  });
+};
 
 type W9TaxFormValues = z.infer<ReturnType<typeof getW9TaxFormValuesSchema>>;
 
@@ -135,6 +152,22 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
               </Select>
             )}
           </StyledInputFormikField>
+          {values.federalTaxClassification === FederalTaxClassification.LimitedLiabilityCompany && (
+            <StyledInputFormikField name="llcTaxClassification" label="LLC tax classification" required>
+              {({ field }) => (
+                <Select value={field.value || ''} onValueChange={value => setFieldValue(field.name, value)}>
+                  <SelectTrigger id={field.name} className={cn('truncate', { 'border-red-500': field.error })}>
+                    <SelectValue placeholder="Select tax classification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="C">C Corporation</SelectItem>
+                    <SelectItem value="S">S Corporation</SelectItem>
+                    <SelectItem value="P">Partnership</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </StyledInputFormikField>
+          )}
           {values.federalTaxClassification === 'Other' && (
             <StyledInputFormikField name="federalTaxClassificationDetails" label="Federal tax classification details" />
           )}
