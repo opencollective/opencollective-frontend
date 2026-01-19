@@ -14,6 +14,7 @@ import { getDashboardTransactionsRoute, getHostDashboardTransactionsRoute } from
 import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
@@ -203,6 +204,10 @@ const TransactionDetails = ({ displayActions, transaction }) => {
             <React.Fragment>
               <DetailTitle>
                 <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
+                {` `}
+                <PrivateInfoIcon size={12}>
+                  <FormattedMessage defaultMessage="Visible only to Host admins" id="JM47p6" />
+                </PrivateInfoIcon>
               </DetailTitle>
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
