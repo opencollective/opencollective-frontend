@@ -167,23 +167,19 @@ function FormFields({ collective, values, hideTypeSelect }) {
               />
             )}
           </StyledInputFormikField>
-          {taxes.map(({ type, percentage }) => (
-            <Flex key={`${type}-${percentage}`} mt={3}>
-              <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
-                <Span fontWeight="bold">
-                  <FormattedMessage
-                    id="withColon"
-                    defaultMessage="{item}:"
-                    values={{ item: i18nTaxType(intl, type) }}
-                  />{' '}
-                  {percentage}%
-                </Span>
-                <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
-              </MessageBox>
-            </Flex>
-          ))}
         </React.Fragment>
       )}
+      {taxes.map(({ type, percentage }) => (
+        <Flex key={`${type}-${percentage}`} mt={3}>
+          <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+            <Span fontWeight="bold">
+              <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: i18nTaxType(intl, type) }} />{' '}
+              {percentage}%
+            </Span>
+            <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+          </MessageBox>
+        </Flex>
+      ))}
       <StyledInputFormikField
         name="name"
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
@@ -553,21 +549,16 @@ function FormFields({ collective, values, hideTypeSelect }) {
 }
 
 const EditSectionContainer = styled(Flex)`
-  overflow-y: scroll;
   flex-grow: 1;
   min-height: 200px;
   flex-direction: column;
   padding-right: 0.65rem;
   min-width: 250px;
-
-  @media (min-width: 700px) {
-    max-height: 400px;
-  }
+  padding-bottom: 1rem;
 `;
 
 const PreviewSectionContainer = styled(Flex)`
   overflow: hidden;
-  max-height: 400px;
   flex-grow: 1;
   min-width: 300px;
   justify-content: center;
@@ -826,7 +817,9 @@ function EditTierFormInner({
             <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
           </EditSectionContainer>
           <PreviewSectionContainer>
-            <ContributeCardPreview collective={collective} tier={values} />
+            <div className="block">
+              <ContributeCardPreview collective={collective} tier={values} />
+            </div>
           </PreviewSectionContainer>
         </ModalSectionContainer>
       </div>
