@@ -148,8 +148,10 @@ export const ACTIVITIES_INFO = {
       defaultMessage: 'Expense error',
     }),
     renderDetails: ({ error }) => {
-      const message = error?.message || <FormattedMessage defaultMessage="An unknown error occurred." id="3c9Xiy" />;
-      let details;
+      const message = error?.message || (
+        <FormattedMessage defaultMessage="An unknown error occurred" id="Error.Unknown" />
+      );
+      let details = null;
       if (error?.details && Array.isArray(error.details)) {
         details = (
           <ul>
