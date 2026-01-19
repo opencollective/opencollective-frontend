@@ -8,12 +8,8 @@ import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import { gql } from '@/lib/graphql/helpers';
-import type {
-  CommunityAccountDetailQuery,
-  HostFieldsFragment,
-  VendorFieldsFragment,
-} from '@/lib/graphql/types/v2/graphql';
-import type { Account, AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
+import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 import { AccountType, CommunityRelationType, KycProvider, LegalDocumentType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import formatCollectiveType from '@/lib/i18n/collective-type';
@@ -44,6 +40,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
 import { useToast } from '../../../ui/useToast';
+import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 
@@ -80,7 +77,7 @@ enum AccountDetailView {
 type ContributionDrawerProps = {
   onClose: () => void;
   account?: AccountReferenceInput;
-  host?: Pick<Account, 'id' | 'currency' | 'slug'> | HostFieldsFragment;
+  host?: DashboardContextType['account'];
   expectedAccountType?: AccountType;
 };
 
@@ -99,7 +96,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const query = useQuery<CommunityAccountDetailQuery>(communityAccountDetailQuery, {
     variables: {
       accountId: props.account.id,
-      hostSlug: props.host.slug,
+      hostSlug: dashboardAccount.slug,
       isIndividual: props.expectedAccountType === AccountType.INDIVIDUAL,
     },
     // Since tabs data is loaded on demand, we don't want to refetch when switching tabs
@@ -124,7 +121,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const handleConvertOrganizationToVendor = React.useCallback(async () => {
     try {
       const result = await convertOrganizationToVendor({
-        variables: { organization: { id: account.id }, host: { id: props.host.id } },
+        variables: { organization: { id: account.id }, host: { id: dashboardAccount.id } },
       });
       toast({
         variant: 'success',
@@ -136,7 +133,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-  }, [convertOrganizationToVendor, account, props.host, toast, intl, query]);
+  }, [convertOrganizationToVendor, account, dashboardAccount, toast, intl, query]);
 
   const kycStatus = query.data?.account && 'kycStatus' in query.data.account ? query.data.account['kycStatus'] : {};
   const tabs = React.useMemo(
@@ -416,7 +413,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                           {taxForms?.totalCount > 1 && (
                             <Link
                               className="font-normal text-muted-foreground hover:text-foreground hover:underline"
-                              href={getDashboardRoute(props.host, `host-tax-forms?account=${account?.slug}`)}
+                              href={getDashboardRoute(dashboardAccount, `host-tax-forms?account=${account?.slug}`)}
                             >
                               <FormattedMessage defaultMessage="View all" id="TaxForm.ViewAll" />
                             </Link>
@@ -478,35 +475,24 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 </InfoList>
               </div>
               <div className="space-y-4 xl:order-1 xl:col-span-3">
-                {[AccountType.ORGANIZATION, AccountType.COLLECTIVE].includes(
-                  account?.type || props.expectedAccountType,
-                ) && (
-                  <React.Fragment>
-                    <h2 className="text-xl font-bold text-slate-800">
-                      <FormattedMessage defaultMessage="Members" id="+a+2ug" />
-                    </h2>
-                    <DataTable
-                      data={account?.members?.nodes || []}
-                      columns={getMembersTableColumns(intl)}
-                      loading={isLoading}
+                <h2 className="text-xl font-bold text-slate-800">
+                  <FormattedMessage
+                    defaultMessage="With {hostName}"
+                    id="WithHostname"
+                    values={{ hostName: dashboardAccount.name }}
+                  />
+                  <p className="text-sm font-normal text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="Interactions between this {type, select, ORGANIZATION {organization} INDIVIDUAL {individual} VENDOR {vendor} other {account}} and {hostName}."
+                      id="e6Nl5I"
+                      values={{ type: account?.type || props.expectedAccountType, hostName: dashboardAccount.name }}
                     />
-                  </React.Fragment>
-                )}
-
-                <h2 className="text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Associated Collectives" id="AssociatedCollectives" />
+                  </p>
                 </h2>
                 <DataTable
-                  data={account?.communityStats?.associatedCollectives || []}
-                  columns={associatedTableColumns(intl)}
-                  loading={isLoading}
-                  getActions={getActions}
-                />
-                <h2 className="text-xl font-bold text-slate-800">
-                  <FormattedMessage defaultMessage="Associated Organizations" id="E9PjGp" />
-                </h2>
-                <DataTable
-                  data={account?.communityStats?.associatedOrganizations || []}
+                  data={[]
+                    .concat(account?.communityStats?.associatedCollectives || [])
+                    .concat(account?.communityStats?.associatedOrganizations || [])}
                   columns={associatedTableColumns(intl)}
                   loading={isLoading}
                   getActions={getActions}
@@ -514,11 +500,39 @@ export function ContributorDetails(props: ContributionDrawerProps) {
                 {account && 'adminOf' in account && [AccountType.INDIVIDUAL].includes(props.expectedAccountType) && (
                   <React.Fragment>
                     <h2 className="text-xl font-bold text-slate-800">
-                      <FormattedMessage defaultMessage="Related Organizations" id="/bnZoN" />
+                      <FormattedMessage defaultMessage="Associated Organizations" id="E9PjGp" />
+                      <p className="text-sm font-normal text-muted-foreground">
+                        <FormattedMessage
+                          defaultMessage="Organizations managed by this {type, select, ORGANIZATION {organization} INDIVIDUAL {individual} VENDOR {vendor} other {account}}."
+                          id="psQUwJ"
+                          values={{ type: account?.type || props.expectedAccountType, hostName: dashboardAccount.name }}
+                        />
+                      </p>
                     </h2>
                     <DataTable
                       data={account.adminOf.nodes || []}
-                      columns={getMembersTableColumns(intl, true)}
+                      columns={getMembersTableColumns(intl, false)}
+                      loading={isLoading}
+                    />
+                  </React.Fragment>
+                )}
+                {[AccountType.ORGANIZATION, AccountType.COLLECTIVE].includes(
+                  account?.type || props.expectedAccountType,
+                ) && (
+                  <React.Fragment>
+                    <h2 className="text-xl font-bold text-slate-800">
+                      <FormattedMessage defaultMessage="Members" id="+a+2ug" />
+                      <p className="text-sm font-normal text-muted-foreground">
+                        <FormattedMessage
+                          defaultMessage="Individuals that manage this {type, select, ORGANIZATION {organization} COLLECTIVE {collective} other {account}}."
+                          id="X1b0YV"
+                          values={{ type: account?.type || props.expectedAccountType }}
+                        />
+                      </p>
+                    </h2>
+                    <DataTable
+                      data={account?.members?.nodes || []}
+                      columns={getMembersTableColumns(intl)}
                       loading={isLoading}
                     />
                   </React.Fragment>
@@ -531,16 +545,16 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             {!isLoading && selectedTab === AccountDetailView.EXPENSES && (
               <ExpensesTab
                 account={account}
-                host={props.host}
+                host={dashboardAccount}
                 setOpenExpenseId={setOpenExpenseId}
                 expectedAccountType={props.expectedAccountType}
               />
             )}
             {selectedTab === AccountDetailView.ACTIVITIES && (
-              <ActivitiesTab account={account} host={props.host} setOpenExpenseId={setOpenExpenseId} />
+              <ActivitiesTab account={account} host={dashboardAccount} setOpenExpenseId={setOpenExpenseId} />
             )}
             {selectedTab === AccountDetailView.KYC && (
-              <KYCTabPeopleDashboard requestedByAccount={props.host} verifyAccount={props.account} />
+              <KYCTabPeopleDashboard requestedByAccount={dashboardAccount} verifyAccount={props.account} />
             )}
           </React.Fragment>
         )}
@@ -559,10 +573,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
       {editVendor && (
         <StyledModal onClose={() => setEditVendor(null)}>
           <VendorForm
-            host={props.host as HostFieldsFragment}
+            host={dashboardAccount}
             supportsTaxForm={
-              'requiredLegalDocuments' in props.host &&
-              props.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
+              'host' in dashboardAccount &&
+              'requiredLegalDocuments' in dashboardAccount.host &&
+              dashboardAccount.host?.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
             }
             vendor={editVendor}
             onSuccess={() => {

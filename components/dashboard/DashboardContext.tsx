@@ -1,13 +1,15 @@
 import React from 'react';
 
+import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
+
 import { ALL_SECTIONS } from './constants';
 
-type DashboardContextType = {
+export type DashboardContextType = {
   selectedSection: string;
   subpath: string[];
   expandedSection: string | null;
   setExpandedSection: (section: string | null) => void;
-  account: any;
+  account: DashboardQuery['account'] | null;
   activeSlug: string | null;
   defaultSlug: string | null;
   setDefaultSlug: (slug: string | null) => void;
