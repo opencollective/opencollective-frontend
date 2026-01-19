@@ -49,7 +49,8 @@ describe('Chart of Accounts', () => {
 
     cy.get('[data-cy=filter-kind]').click();
     cy.get('[data-cy=combo-select-option]').contains('Expenses').click();
-    cy.get('[data-cy=apply-filter]').click();
+    // Wait for the button to be enabled and stable before clicking
+    cy.get('[data-cy=apply-filter]').should('not.be.disabled').click();
     cy.contains('Workspace Expenses');
 
     // Clear filtering by kind
@@ -61,13 +62,13 @@ describe('Chart of Accounts', () => {
     cy.get('[data-cy=add-filter]').click();
     cy.get('[data-value="Visible only to host admins"]').click();
     cy.get('[data-cy=combo-select-option]').contains('Yes').click();
-    cy.get('[data-cy=apply-filter]').click();
+    cy.get('[data-cy=apply-filter]').should('not.be.disabled').click();
     cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('No chart of accounts');
 
     cy.get('[data-cy=filter-hostOnly]').click();
     cy.get('[data-cy=combo-select-option]').contains('No').click();
-    cy.get('[data-cy=apply-filter]').click();
+    cy.get('[data-cy=apply-filter]').should('not.be.disabled').click();
     cy.contains('Workspace Expenses');
 
     // Clear filtering by visibility
