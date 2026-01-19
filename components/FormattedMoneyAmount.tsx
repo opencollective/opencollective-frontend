@@ -55,14 +55,21 @@ const FormattedMoneyAmount = ({
   isApproximate,
 }: FormattedMoneyAmountProps) => {
   if (!currency) {
-    return <span className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>{EMPTY_AMOUNT_PLACEHOLDER}</span>;
+    return (
+      <span key="amount" className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>
+        {EMPTY_AMOUNT_PLACEHOLDER}
+      </span>
+    );
   }
 
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <span className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>{EMPTY_AMOUNT_PLACEHOLDER}</span>
+      <span key="amount" className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>
+        {EMPTY_AMOUNT_PLACEHOLDER}
+      </span>
     ) : (
       <Currency
+        key="amount"
         value={amount}
         currency={currency as GraphQLCurrency}
         precision={precision}
@@ -76,7 +83,13 @@ const FormattedMoneyAmount = ({
     interval = getIntervalFromContributionFrequency(frequency);
   }
 
-  const currencyCode = showCurrencyCode ? <span className={currencyCodeClassName}>{currency}</span> : '';
+  const currencyCode = showCurrencyCode ? (
+    <span key="currency-code" className={currencyCodeClassName}>
+      {currency}
+    </span>
+  ) : (
+    ''
+  );
   if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
     return showCurrencyCode ? (
       <FormattedMessage

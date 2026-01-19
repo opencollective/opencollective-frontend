@@ -35,7 +35,7 @@ const NotFound = ({ searchTerm, showAltLinks = true }: NotFoundProps) => {
               <FormattedMessage
                 id="notFound.search"
                 defaultMessage="Search for {term}"
-                values={{ term: <strong>{searchTerm}</strong> }}
+                values={{ term: <strong key="term">{searchTerm}</strong> }}
               />
             </StyledButton>
           </Link>
