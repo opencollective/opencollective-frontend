@@ -101,11 +101,11 @@ const getExpenseColumns = intl => [
     header: () => <FormattedMessage defaultMessage="Paid on" id="qlXxnX" />,
     cell: ({ cell, row }) => {
       const expense = row.original;
-      const paidBy = false; // expense.paidBy;
+      const paidBy = expense.paidBy;
       return (
         <div>
           <DateTime dateStyle="medium" value={cell.getValue()} />
-          <div className="flex items-center gap-2 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
+          <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
             <FormattedTime timeStyle={'short'} value={cell.getValue()} />
             {paidBy && (
               <React.Fragment>
@@ -116,7 +116,7 @@ const getExpenseColumns = intl => [
                   className="inline-flex items-center gap-1 overflow-hidden"
                 >
                   <Avatar size={14} collective={paidBy} />
-                  <span className="truncate">{paidBy.name}</span>
+                  {/* <span className="truncate">{paidBy.name}</span> */}
                 </LinkCollective>
               </React.Fragment>
             )}
@@ -141,7 +141,7 @@ const getExpenseColumns = intl => [
   {
     accessorKey: 'description',
     meta: { className: 'max-w-64' },
-    header: () => <FormattedMessage defaultMessage="Title" id="9a9+ww" />,
+    header: () => <FormattedMessage defaultMessage="Submitted details" id="QwFHnc"  />,
     cell: ({ row }) => {
       const expense = row.original;
       const submittedBy = expense.createdByAccount;
@@ -237,24 +237,24 @@ const getExpenseColumns = intl => [
     },
   },
 
-  {
-    accessorKey: 'comments',
-    header: () => null,
-    cell: ({ row }) => {
-      const expense = row.original;
-      const commentCount = expense.comments?.totalCount || 0;
-      if (!commentCount) {
-        return null;
-      }
-      return (
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <MessageCircle className="h-4 w-4" />
-          <span>{commentCount}</span>
-        </div>
-      );
-    },
-    meta: { className: 'w-16' },
-  },
+  // {
+  //   accessorKey: 'comments',
+  //   header: () => null,
+  //   cell: ({ row }) => {
+  //     const expense = row.original;
+  //     const commentCount = expense.comments?.totalCount || 0;
+  //     if (!commentCount) {
+  //       return null;
+  //     }
+  //     return (
+  //       <div className="flex items-center gap-1 text-muted-foreground">
+  //         <MessageCircle className="h-4 w-4" />
+  //         <span>{commentCount}</span>
+  //       </div>
+  //     );
+  //   },
+  //   meta: { className: 'w-16' },
+  // },
   {
     accessorKey: 'amount',
     meta: { className: 'min-w-32 text-right' },
