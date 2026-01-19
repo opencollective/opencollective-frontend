@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import speakeasy from 'speakeasy';
+import { generateSecret, generateSync } from 'otplib';
 
 describe('passwords', () => {
   let user;
@@ -153,8 +153,8 @@ describe('passwords', () => {
 
   it('can be used in combination with 2FA', () => {
     // Enable 2FA on user
-    const secret = speakeasy.generateSecret({ length: 64 });
-    cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.collective.slug, secret: secret.base32 });
+    const secret = generateSecret({ length: 64 });
+    cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.collective.slug, secret: secret });
 
     // Sign-in flow
     cy.visit(`/signin?next=/dashboard/${user.collective.slug}/info`);
@@ -166,7 +166,7 @@ describe('passwords', () => {
     cy.getByDataCy('signin-btn').click();
     cy.complete2FAPrompt('123456');
     cy.contains('Two-factor authentication code failed. Please try again').should.exist;
-    const code = speakeasy.totp({ algorithm: 'SHA1', encoding: 'base32', secret: secret.base32 });
+    const code = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
     cy.complete2FAPrompt(code);
 
     // Wait for redirect
