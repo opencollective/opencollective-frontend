@@ -27,7 +27,14 @@ type TextProps = ColorProps &
     css?: CSSProp;
   };
 
-const CUSTOM_TEXT_PROPS = new Set(['fontSize', 'letterSpacing', 'textDecoration', 'whiteSpace']);
+const CUSTOM_TEXT_PROPS = new Set([
+  'fontSize',
+  'letterSpacing',
+  'textDecoration',
+  'whiteSpace',
+  'textAlign',
+  'wordBreak',
+]);
 
 export const P = styled.p
   .withConfig({
