@@ -100,8 +100,10 @@ describe('host dashboard', () => {
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
-      cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
-      cy.contains(`@brusselstogetherasbl`).click();
+      const vendorName = randStr();
+      cy.get('[data-cy="add-funds-source"]').type(vendorName);
+      cy.contains(`Create vendor: ${vendorName}`).click();
+      cy.contains(`I confirm that`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
 
       cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
