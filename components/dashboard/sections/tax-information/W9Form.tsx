@@ -30,8 +30,8 @@ const FederalTaxClassificationLabels = {
   [FederalTaxClassification.Other]: 'Other',
 };
 
-export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) =>
-  BaseFormSchema.merge(
+export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) => {
+  const baseSchema = BaseFormSchema.merge(
     z.object({
       taxIdNumberType: z.enum(['SSN', 'EIN']),
       taxIdNumber: z.string().min(9).max(11),
@@ -45,11 +45,28 @@ export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) =>
             organizationName: z.string().min(1).max(255),
             businessName: z.string().max(255).or(z.literal('')).optional(),
             federalTaxClassificationDetails: z.string().max(255).or(z.literal('')).optional(),
+            llcTaxClassification: z.enum(['C', 'S', 'P']).or(z.literal('')).optional(),
             exemptPayeeCode: z.string().max(5).or(z.literal('')).optional(),
             fatcaExemptionCode: z.string().max(14).or(z.literal('')).optional(),
           }),
     }),
   );
+
+  return baseSchema.superRefine((data, ctx) => {
+    if (
+      submitterType === SubmitterType.Business &&
+      data.federalTaxClassification === FederalTaxClassification.LimitedLiabilityCompany
+    ) {
+      if (!data.llcTaxClassification) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'LLC tax classification is required',
+          path: ['llcTaxClassification'],
+        });
+      }
+    }
+  });
+};
 
 type W9TaxFormValues = z.infer<ReturnType<typeof getW9TaxFormValuesSchema>>;
 
@@ -77,17 +94,6 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
   const { values, setFieldValue } = formik;
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="mt-2">
-        <p className="text-lg font-bold">Submitter Full name</p>
-        <HintText>The name should match the name on your tax return.</HintText>
-      </div>
-      <StyledInputFormikField name="signer.firstName" label="First Name" />
-      <StyledInputFormikField name="signer.middleName" label="Middle Name" />
-      <StyledInputFormikField
-        name="signer.lastName"
-        label="Last Name"
-        hint="If you have changed your last name without informing the Social Security Administration (SSA) of the name change, enter your first name, the last name as shown on your social security card, and your new last name."
-      />
       <div className="mt-2">
         <p className="text-lg font-bold">Address</p>
         <HintText>This is where we will mail your information returns.</HintText>
@@ -135,6 +141,22 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
               </Select>
             )}
           </StyledInputFormikField>
+          {values.federalTaxClassification === FederalTaxClassification.LimitedLiabilityCompany && (
+            <StyledInputFormikField name="llcTaxClassification" label="LLC tax classification" required>
+              {({ field }) => (
+                <Select value={field.value || ''} onValueChange={value => setFieldValue(field.name, value)}>
+                  <SelectTrigger id={field.name} className={cn('truncate', { 'border-red-500': field.error })}>
+                    <SelectValue placeholder="Select tax classification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="C">C Corporation</SelectItem>
+                    <SelectItem value="S">S Corporation</SelectItem>
+                    <SelectItem value="P">Partnership</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </StyledInputFormikField>
+          )}
           {values.federalTaxClassification === 'Other' && (
             <StyledInputFormikField name="federalTaxClassificationDetails" label="Federal tax classification details" />
           )}
@@ -231,6 +253,17 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
           </label>
         )}
       </StyledInputFormikField>
+      <div className="mt-2">
+        <p className="text-lg font-bold">Submitter Full name</p>
+        <HintText>The name should match the name on your tax return.</HintText>
+      </div>
+      <StyledInputFormikField name="signer.firstName" label="First Name" />
+      <StyledInputFormikField name="signer.middleName" label="Middle Name" />
+      <StyledInputFormikField
+        name="signer.lastName"
+        label="Last Name"
+        hint="If you have changed your last name without informing the Social Security Administration (SSA) of the name change, enter your first name, the last name as shown on your social security card, and your new last name."
+      />
     </div>
   );
 };
