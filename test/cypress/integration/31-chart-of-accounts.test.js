@@ -42,14 +42,19 @@ describe('Chart of Accounts', () => {
     // Test filtering by kind
     cy.get('[data-cy=add-filter]').click();
     cy.get('[data-value="Kind"]').click();
-    cy.contains('Added Funds').click();
+    cy.contains('[data-cy=combo-select-option]', 'Added Funds').click();
     cy.get('[data-cy=apply-filter]').click();
     cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('No chart of accounts');
 
-    cy.get('[data-cy=filter-kind]').click();
-    cy.get('[data-cy=combo-select-option]').contains('Expenses').click();
+    // Change filter to Expenses - first remove old filter, then add new one
+    // (Kind filter is multi-select, so editing in place would add, not replace)
+    cy.get('[data-cy=remove-filter-kind]').click();
+    cy.get('[data-cy=add-filter]').click();
+    cy.get('[data-value="Kind"]').click();
+    cy.contains('[data-cy=combo-select-option]', 'Expenses').click();
     cy.get('[data-cy=apply-filter]').click();
+    cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('Workspace Expenses');
 
     // Clear filtering by kind
@@ -60,14 +65,15 @@ describe('Chart of Accounts', () => {
     // Test filtering by visibility
     cy.get('[data-cy=add-filter]').click();
     cy.get('[data-value="Visible only to host admins"]').click();
-    cy.get('[data-cy=combo-select-option]').contains('Yes').click();
+    cy.contains('[data-cy=combo-select-option]', 'Yes').click();
     cy.get('[data-cy=apply-filter]').click();
     cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('No chart of accounts');
 
     cy.get('[data-cy=filter-hostOnly]').click();
-    cy.get('[data-cy=combo-select-option]').contains('No').click();
+    cy.contains('[data-cy=combo-select-option]', 'No').click();
     cy.get('[data-cy=apply-filter]').click();
+    cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('Workspace Expenses');
 
     // Clear filtering by visibility
