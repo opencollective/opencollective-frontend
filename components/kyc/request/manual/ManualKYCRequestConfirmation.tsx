@@ -4,6 +4,7 @@ import { ArrowLeft, FileText as FileTextIcon, Info, MapPin, Shield, User } from 
 import { FormattedMessage, useIntl } from 'react-intl';
 import type z from 'zod';
 
+import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
 import type { AccountReferenceInput } from '@/lib/graphql/types/v2/schema';
 
@@ -49,7 +50,7 @@ export function ManualKYCRequestConfirmation(props: ManualKYCRequestConfirmation
     {
       refetchQueries: props.refetchQueries,
       variables: {
-        requestedByAccount: props.requestedByAccount,
+        requestedByAccount: getAccountReferenceInput(props.requestedByAccount),
         verifyAccount: props.verifyAccount,
         request: { manual: props.request },
       },
