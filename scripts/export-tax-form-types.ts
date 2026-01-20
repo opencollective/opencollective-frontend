@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 /**
  * Export types for tax forms to easily retrieve them in other services.
  */
