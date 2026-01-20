@@ -2,6 +2,8 @@ import '../env';
 import 'raf/polyfill';
 import '@testing-library/jest-dom';
 
+import { TextDecoder, TextEncoder } from 'util';
+
 // eslint-disable-next-line n/no-extraneous-import
 import { jest } from '@jest/globals';
 
@@ -15,6 +17,11 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   unobserve: jest.fn(),
   disconnect: jest.fn(),
 }));
+
+// For OTPLib
+global.TextDecoder = TextDecoder;
+// @ts-expect-error - global.TextEncoder is not defined
+global.TextEncoder = TextEncoder;
 
 // JSDOM doesn't implement scrollIntoView
 if (!HTMLElement.prototype.scrollIntoView) {

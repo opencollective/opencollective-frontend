@@ -190,6 +190,7 @@
     "start:e2e": "cross-env TZ=UTC NODE_ENV=production OC_ENV=e2e node server",
     "styled-components-migration-progress": "tsx scripts/styled-components-migration-progress.ts",
     "test": "npm run test:jest",
+    "test:watch": "npm run test:jest -- --watch",
     "test:coverage": "npm run test:jest -- --coverage --reporters=default --reporters=jest-junit",
     "test:clean": "shx rm -rf test/cypress/screenshots test/cypress/videos coverage .nyc_output",
     "test:e2e": "npm run cypress:run",
