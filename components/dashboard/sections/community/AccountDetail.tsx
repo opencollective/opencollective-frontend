@@ -577,7 +577,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             supportsTaxForm={
               'host' in dashboardAccount &&
               'requiredLegalDocuments' in dashboardAccount.host &&
-              dashboardAccount.host?.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
+              dashboardAccount.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
             }
             vendor={editVendor}
             onSuccess={() => {
