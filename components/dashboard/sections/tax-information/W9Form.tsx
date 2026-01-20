@@ -95,17 +95,6 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
   return (
     <div className="flex flex-col gap-y-4">
       <div className="mt-2">
-        <p className="text-lg font-bold">Submitter Full name</p>
-        <HintText>The name should match the name on your tax return.</HintText>
-      </div>
-      <StyledInputFormikField name="signer.firstName" label="First Name" />
-      <StyledInputFormikField name="signer.middleName" label="Middle Name" />
-      <StyledInputFormikField
-        name="signer.lastName"
-        label="Last Name"
-        hint="If you have changed your last name without informing the Social Security Administration (SSA) of the name change, enter your first name, the last name as shown on your social security card, and your new last name."
-      />
-      <div className="mt-2">
         <p className="text-lg font-bold">Address</p>
         <HintText>This is where we will mail your information returns.</HintText>
       </div>
@@ -264,6 +253,17 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
           </label>
         )}
       </StyledInputFormikField>
+      <div className="mt-2">
+        <p className="text-lg font-bold">Submitter Full name</p>
+        <HintText>The name should match the name on your tax return.</HintText>
+      </div>
+      <StyledInputFormikField name="signer.firstName" label="First Name" />
+      <StyledInputFormikField name="signer.middleName" label="Middle Name" />
+      <StyledInputFormikField
+        name="signer.lastName"
+        label="Last Name"
+        hint="If you have changed your last name without informing the Social Security Administration (SSA) of the name change, enter your first name, the last name as shown on your social security card, and your new last name."
+      />
     </div>
   );
 };
