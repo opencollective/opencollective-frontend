@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
@@ -22,16 +22,23 @@ import {
 } from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { ExpenseMetaStatuses } from '@/lib/expense';
+import { isMulti, isNullable } from '@/lib/filters/schemas';
+import { i18nExpenseStatus } from '@/lib/i18n/expense';
+import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { HostContextFilter,hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
@@ -46,22 +53,17 @@ import {
 } from './filters';
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { isMulti } from '@/lib/filters/schemas';
-import { hostContextFilter, HostContextFilter } from '../../filters/HostContextFilter';
-import { DashboardContext } from '../../DashboardContext';
 
-const ExpenseStatusFilterWithoutPaid = Object.fromEntries(
-  Object.entries(ExpenseStatusFilter).filter(([key]) => key !== 'PAID'),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
-const ExpenseStatusFilterWithoutPaidAndReadyToPay = Object.fromEntries(
-  Object.entries(ExpenseStatusFilter).filter(([key]) => key !== 'PAID' && key !== 'READY_TO_PAY'),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID' | 'READY_TO_PAY'>]: (typeof ExpenseStatusFilter)[K] };
+const ExpenseStatusesToExclude = ['PAID', 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'];
+
+const PayExpenseStatusFilter = Object.fromEntries(
+  Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
+) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID' | 'PENDING' | 'REJECTED' | "INVITE_DECLINED">]: (typeof ExpenseStatusFilter)[K] };
+
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  status: isMulti(z.nativeEnum(ExpenseStatusFilterWithoutPaid)).nullable().default(null),
+  status: isNullable(isMulti(z.nativeEnum(PayExpenseStatusFilter))).default(null),
   hostContext: hostContextFilter.schema,
 });
 
@@ -78,12 +80,36 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
   ...commonToVariables,
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
-  status: value =>
-    isEmpty(value) ? { status: Object.values(ExpenseStatusFilterWithoutPaidAndReadyToPay) } : { status: value },
+  status: value => {
+    /**
+     * As `status` is "nullable", this function will run even if the value is null.
+     * In that case we provide all possible status values as the variables to filter out anything else.
+     * We also exclude "READY_TO_PAY" since this can't be combined with other status filters,
+     * and is a subset of "APPROVED".
+     */
+    return isEmpty(value) ? { status: Object.values(PayExpenseStatusFilter).filter(s => s !== 'READY_TO_PAY') } : { status: value };
+  },
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
+  status: {
+    labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
+    Component: ({ valueRenderer, intl, ...props }) => (
+      <ComboSelectFilter
+        options={Object.values(PayExpenseStatusFilter)
+          .filter(
+            value =>
+              !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
+          )
+          .map(value => ({ label: valueRenderer({ intl, value }), value }))
+          .sort(sortSelectOptions)}
+        isMulti
+        {...props}
+      />
+    ),
+    valueRenderer: ({ intl, value }) => i18nExpenseStatus(intl, value),
+  },
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
@@ -116,7 +142,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { account } = React.useContext(DashboardContext);
 
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
-  const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
+  const pageRoute = `/dashboard/${hostSlug}/pay-disbursements`;
 
   // Konami Code
   useKeyboardSequence({

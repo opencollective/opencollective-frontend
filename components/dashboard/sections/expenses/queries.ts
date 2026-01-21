@@ -153,6 +153,7 @@ export const accountExpensesMetadataQuery = gql`
 export const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
+    $hostContext: HostContext
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -174,6 +175,7 @@ export const hostDashboardExpensesQuery = gql`
   ) {
     expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       account: $account
       fromAccount: $fromAccount
       limit: $limit
@@ -331,6 +333,7 @@ export const paidDisbursementsFieldsFragment = gql`
     id
     legacyId
     createdAt
+    paidAt
     description
     type
     status
@@ -435,6 +438,7 @@ export const paidDisbursementsFieldsFragment = gql`
 export const paidDisbursementsQuery = gql`
   query PaidDisbursements(
     $hostSlug: String!
+    $hostContext: HostContext
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -451,6 +455,7 @@ export const paidDisbursementsQuery = gql`
   ) {
     expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       account: $account
       limit: $limit
       offset: $offset

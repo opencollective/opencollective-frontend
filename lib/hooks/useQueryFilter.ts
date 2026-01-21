@@ -170,6 +170,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
       const filtersToKeep = pick(values, opts.skipFiltersOnReset);
       const result = opts.schema.safeParse({ ...filtersToKeep, ...newFilters });
 
+      console.log({newFilters, filtersToKeep, result})
       if (result.success) {
         const filterValues = result.data;
         // Get replacements for default values that should not be part of the URL query
@@ -180,16 +181,19 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
               filterValues[filterName],
               defaultFilterValues[filterName],
               defaultSchemaValues?.[filterName],
+              filterName === 'status',
             ),
           }),
           filterValues,
         );
+        console.log({queryWithReplacementsForDefaults, defaultFilterValues, defaultSchemaValues})
         const destructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
+        console.log({destructuredQueryValues})
 
         if (opts.skipRouter && !newPath) {
           setStateQuery(destructuredQueryValues);
         } else {
-          const query = omitBy(destructuredQueryValues, isNil);
+          const query = omitBy(destructuredQueryValues, isUndefined);
           const basePath = newPath || router.asPath.split('?')[0];
 
           router.push(

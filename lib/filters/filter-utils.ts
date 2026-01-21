@@ -72,18 +72,31 @@ export function destructureFilterValues(values: { [key: string]: any }): { [key:
 // Fallback value to use in the URL query when the filter value is undefined but there is a default value from the view
 const ALL = 'ALL';
 
-export function getQueryValueFromFilterValue(filterValue, defaultFilterValue, defaultSchemaValue) {
+export function getQueryValueFromFilterValue(filterValue, defaultFilterValue, defaultSchemaValue, log) {
   // If the filter value being set is undefined (i.e. the intention is to clear the filter) but there is a default filter from `defaultFilterValues`
   // then we need to set something in the query string, otherwise the default "user configured" value will be set when reading the router query.
   // Use the defaultSchemaValue if it exists, otherwise use 'ALL' as the default value.
+  if(log) {
+    console.log({filterValue, defaultSchemaValue, })
+  }
   if (isUndefined(filterValue) && !isUndefined(defaultFilterValue)) {
+    if(log) {
+      console.log("1", {filterValue, defaultFilterValue})
+    }
     return defaultSchemaValue ?? ALL;
 
     // If the filterValue is equal to the default value from the schema, then we can omit it from the query string
     // (if it's also not in the user configured default values)
   } else if (isEqual(filterValue, defaultSchemaValue) && isUndefined(defaultFilterValue)) {
+    if(log) {
+      console.log("2", {filterValue, defaultFilterValue, defaultSchemaValue})
+    }
     return undefined;
   } else {
+    if(log) {
+      console.log("3", {filterValue})
+
+    }
     return filterValue;
   }
 }
