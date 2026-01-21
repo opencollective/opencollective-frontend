@@ -154,7 +154,7 @@ export default function MarkExpenseAsUnpaidModal({
               id="processorFeeRefunded"
               name="processorFeeRefunded"
               checked={refundPaymentProcessorFee}
-              onCheckedChange={setRefundPaymentProcessorFee}
+              onCheckedChange={checked => setRefundPaymentProcessorFee(Boolean(checked))}
             />
             <Label htmlFor="processorFeeRefunded" className="cursor-pointer font-normal">
               <FormattedMessage

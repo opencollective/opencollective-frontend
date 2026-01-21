@@ -15,7 +15,7 @@ import { AccountHoverCard } from '@/components/AccountHoverCard';
 import AmountWithExchangeRateInfo from '@/components/AmountWithExchangeRateInfo';
 import { AvatarWithLink } from '@/components/AvatarWithLink';
 import DateTime from '@/components/DateTime';
-import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal, { ConfirmProcessExpenseModalType } from '@/components/expenses/ConfirmProcessExpenseModal';
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
@@ -137,7 +137,7 @@ type MoreActionsMenuProps = {
 function MoreActionsMenu(props: MoreActionsMenuProps) {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
-  const [processModal, setProcessModal] = React.useState<string | null>(null);
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType | null>(null);
   const [isGrantFlowOpen, setIsGrantFlowOpen] = React.useState(false);
   const permissions = props.grant?.permissions;
   const processExpense = useProcessExpense({
