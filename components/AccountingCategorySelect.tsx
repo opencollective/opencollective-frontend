@@ -396,7 +396,14 @@ const AccountingCategorySelect = ({
   return (
     <div>
       <Popover open={isOpen} onOpenChange={setOpen}>
-        <PopoverTrigger asChild onBlur={onBlur} disabled={disabled}>
+        <PopoverTrigger
+          asChild
+          onBlur={onBlur}
+          disabled={disabled}
+          onClick={e => {
+            e.stopPropagation();
+          }}
+        >
           {children || (
             <Button
               id={id}
@@ -423,7 +430,11 @@ const AccountingCategorySelect = ({
             </Button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+        <PopoverContent
+          onClick={e => e.stopPropagation()}
+          className="min-w-[280px] p-0"
+          style={{ width: 'var(--radix-popover-trigger-width)' }}
+        >
           <Command>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
 
