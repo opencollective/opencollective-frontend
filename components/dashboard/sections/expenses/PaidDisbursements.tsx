@@ -50,6 +50,7 @@ import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
 import { limit } from '@/lib/filters/schemas';
 import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
 import { isFeatureEnabled } from '@/lib/allowed-features';
+import { buildSortFilter } from '../../filters/SortFilter';
 
 enum PaidDisbursementsTab {
   ALL = 'ALL',
@@ -57,12 +58,19 @@ enum PaidDisbursementsTab {
   REIMBURSEMENTS = 'REIMBURSEMENTS',
   GRANTS = 'GRANTS',
 }
-
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['PAID_AT']),
+  defaultValue: {
+    field: 'PAID_AT',
+    direction: 'DESC',
+  },
+});
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
   status: z.literal(ExpenseStatus.PAID).default(ExpenseStatus.PAID),
   hostContext: hostContextFilter.schema,
   limit: limit.default(20),
+  sort: sortFilter.schema,
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -92,11 +100,12 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, 'status'),
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
+  sort: sortFilter.filter,
 };
 
 const getExpenseColumns = intl => [
   {
-    accessorKey: 'createdAt',
+    accessorKey: 'paidAt',
     meta: { className: 'max-w-32' },
     header: () => <FormattedMessage defaultMessage="Paid on" id="qlXxnX" />,
     cell: ({ cell, row }) => {
@@ -116,7 +125,6 @@ const getExpenseColumns = intl => [
                   className="inline-flex items-center gap-1 overflow-hidden"
                 >
                   <Avatar size={14} collective={paidBy} />
-                  {/* <span className="truncate">{paidBy.name}</span> */}
                 </LinkCollective>
               </React.Fragment>
             )}
