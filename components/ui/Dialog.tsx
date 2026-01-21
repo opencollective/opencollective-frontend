@@ -63,28 +63,90 @@ const DialogContent = React.forwardRef<
       overlayClassName?: string;
       ignoreOutsideInteraction?: boolean;
     }
->(({ className, children, hideCloseButton, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay size={props.size} className={props.overlayClassName}>
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(dialogVariants({ size: props.size, className }))}
-        onInteractOutside={props.ignoreOutsideInteraction ? e => e.preventDefault() : props.onInteractOutside}
-        {...props}
-      >
-        {children}
-        {!hideCloseButton && (
-          <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <X className="h-4 w-4" />
-            <span className="sr-only">
-              <FormattedMessage defaultMessage="Close" id="Close" />
-            </span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogOverlay>
-  </DialogPortal>
-));
+>(({ className, children, hideCloseButton, ignoreOutsideInteraction, onPointerDownOutside, ...props }, ref) => {
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  const handlePointerDownOutside = React.useCallback(
+    (
+      e: Parameters<
+        NonNullable<React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>['onPointerDownOutside']>
+      >[0],
+    ) => {
+      if (ignoreOutsideInteraction) {
+        e.preventDefault();
+        return;
+      }
+
+      // Check if click is specifically on the scrollbar (not overlay background)
+      const originalEvent = e.detail?.originalEvent as PointerEvent | undefined;
+      if (originalEvent && contentRef.current?.parentElement) {
+        const overlayEl = contentRef.current.parentElement;
+        const overlayRect = overlayEl.getBoundingClientRect();
+        const { clientX: x, clientY: y } = originalEvent;
+
+        // Calculate scrollbar width (difference between offsetWidth and clientWidth)
+        const scrollbarWidth = overlayEl.offsetWidth - overlayEl.clientWidth;
+
+        // Only check for scrollbar if one exists
+        if (scrollbarWidth > 0) {
+          // Check if click is in the scrollbar area (right edge of overlay)
+          // The scrollbar extends the full height of the overlay, not just the content
+          const isInScrollbarArea =
+            x > overlayRect.right - scrollbarWidth - 5 && // Near right edge (5px tolerance)
+            x <= overlayRect.right && // Within overlay right edge
+            y >= overlayRect.top && // Within overlay vertical bounds
+            y <= overlayRect.bottom; // Within overlay vertical bounds
+
+          if (isInScrollbarArea) {
+            // This is a scrollbar click, prevent closing
+            e.preventDefault();
+            return;
+          }
+        }
+      }
+
+      if (onPointerDownOutside) {
+        onPointerDownOutside(e);
+      }
+    },
+    [ignoreOutsideInteraction, onPointerDownOutside],
+  );
+
+  return (
+    <DialogPortal>
+      <DialogOverlay size={props.size} className={props.overlayClassName}>
+        <DialogPrimitive.Content
+          ref={node => {
+            contentRef.current = node;
+            if (typeof ref === 'function') {
+              ref(node);
+            } else if (ref) {
+              (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+            }
+          }}
+          className={cn(dialogVariants({ size: props.size, className }))}
+          onInteractOutside={
+            ignoreOutsideInteraction
+              ? e => e.preventDefault()
+              : (props as React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>).onInteractOutside
+          }
+          onPointerDownOutside={handlePointerDownOutside}
+          {...props}
+        >
+          {children}
+          {!hideCloseButton && (
+            <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">
+                <FormattedMessage defaultMessage="Close" id="Close" />
+              </span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </DialogOverlay>
+    </DialogPortal>
+  );
+});
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
