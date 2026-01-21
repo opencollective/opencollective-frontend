@@ -174,7 +174,7 @@ const getExpenseColumns = intl => [
   },
   {
     accessorKey: 'accountingCategory',
-    header: () => <FormattedMessage defaultMessage="Accounting category" id="r3ZYaH" />,
+    header: () => <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />,
     cell: ({ row }) => {
       const expense = row.original;
       return (
@@ -225,7 +225,7 @@ const getExpenseColumns = intl => [
   {
     accessorKey: 'payee',
     meta: { className: 'max-w-48' },
-    header: () => <FormattedMessage defaultMessage="Paid to" id="wfH1yB" />,
+    header: () => <FormattedMessage defaultMessage="Paid to" id="Expense.PaidTo" />,
     cell: ({ row }) => {
       const expense = row.original;
       const payee = expense.payee;
@@ -316,7 +316,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     },
     {
       id: PaidDisbursementsTab.GRANTS,
-      label: intl.formatMessage({ defaultMessage: 'Grants', id: '8NsXQh' }),
+      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX',  }),
       filter: {
         type: ExpenseType.GRANT,
       },

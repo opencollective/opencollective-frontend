@@ -225,7 +225,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         // Approve action (for Collective admins)
         permissions.canApprove && {
           key: 'approve',
-          label: intl.formatMessage({ defaultMessage: 'Approve', id: 'QYfCQa' }),
+          label: intl.formatMessage({ defaultMessage: 'Approve', id: 'actions.approve' }),
           onClick: () => showConfirmModal('APPROVE'),
           Icon: Check,
         },
@@ -266,7 +266,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         permissions.canUnapprove &&
           !isHostAdmin && {
             key: 'unapprove',
-            label: intl.formatMessage({ defaultMessage: 'Unapprove', id: 'O4qGZU' }),
+            label: intl.formatMessage({ defaultMessage: 'Unapprove', id: 'expense.unapprove.btn' }),
             onClick: () => showConfirmModal('UNAPPROVE'),
             Icon: Undo2,
           },
