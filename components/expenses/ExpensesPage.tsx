@@ -66,10 +66,6 @@ export const expensesPageQuery = gql`
       settings
       createdAt
       supportedExpenseTypes
-      expensesTags {
-        id
-        tag
-      }
       features {
         id
         ...NavbarFields
@@ -182,6 +178,7 @@ type FilterValues = z.infer<typeof schema>;
 type FilterMeta = CommonFilterMeta & {
   expenseTags?: string[];
   includeUncategorized?: boolean;
+  accountSlug: string;
 };
 
 export const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
@@ -208,7 +205,7 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
   const { LoggedInUser } = useLoggedInUser();
   const meta: FilterMeta = {
     currency: account?.currency,
-    expenseTags: account?.expensesTags?.map(tag => tag.tag) || [],
+    accountSlug: account.slug,
   };
 
   const queryFilter = useQueryFilter({

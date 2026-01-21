@@ -326,8 +326,6 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const meta: FilterMeta = {
     currency: metaData?.host?.currency,
     hostSlug: hostSlug,
-    hostedAccounts: metaData?.hostedAccounts.nodes,
-    expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
     includeUncategorized: true,
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };

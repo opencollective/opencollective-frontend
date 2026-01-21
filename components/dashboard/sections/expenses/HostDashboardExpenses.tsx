@@ -190,8 +190,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const meta: FilterMeta = {
     currency: metaData?.host?.currency,
     hostSlug: hostSlug,
-    hostedAccounts: metaData?.hostedAccounts.nodes,
-    expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
     includeUncategorized: true,
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };

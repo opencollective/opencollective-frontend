@@ -270,7 +270,7 @@ export const hostInfoCardFields = gql`
 `;
 
 export const hostDashboardMetadataQuery = gql`
-  query HostDashboardMetadata($hostSlug: String!) {
+  query HostDashboardMetadata($hostSlug: String!, $hostContext: HostContext) {
     host(slug: $hostSlug) {
       id
       ...HostInfoCardFields
@@ -285,39 +285,30 @@ export const hostDashboardMetadataQuery = gql`
     }
     unreplied: expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
       lastCommentBy: [NON_HOST_ADMIN]
     ) {
       totalCount
     }
-    ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [READY_TO_PAY]) {
       totalCount
     }
-    scheduled_for_payment: expenses(host: { slug: $hostSlug }, status: [SCHEDULED_FOR_PAYMENT]) {
+    scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      status: [SCHEDULED_FOR_PAYMENT]
+    ) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, status: [ON_HOLD]) {
+    on_hold: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [ON_HOLD]) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, status: [INCOMPLETE]) {
+    incomplete: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [INCOMPLETE]) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
+    error: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [ERROR]) {
       totalCount
-    }
-
-    hostedAccounts: accounts(host: { slug: $hostSlug }, orderBy: { field: ACTIVITY, direction: DESC }) {
-      nodes {
-        id
-        ...AccountHoverCardFields
-      }
-    }
-
-    expenseTags: expenseTagStats(host: { slug: $hostSlug }) {
-      nodes {
-        id
-        tag
-      }
     }
   }
 

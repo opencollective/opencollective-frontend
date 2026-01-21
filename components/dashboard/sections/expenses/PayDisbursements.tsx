@@ -163,14 +163,6 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
   });
 
-  const {
-    data: metaData,
-    error: errorMetaData,
-    refetch: refetchMetaData,
-  } = useQuery(hostDashboardMetadataQuery, {
-    variables: { hostSlug, withHoverCard: true },
-  });
-
   const views: Views<FilterValues> = [
     {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
@@ -181,7 +173,6 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
       filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'ready_to_pay',
-      count: metaData?.ready_to_pay?.totalCount,
     },
     {
       label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
@@ -195,7 +186,6 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         ],
       },
       id: 'unreplied',
-      count: metaData?.unreplied?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
@@ -204,45 +194,54 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         sort: { field: 'CREATED_AT', direction: 'ASC' },
       },
       id: 'scheduled_for_payment',
-      count: metaData?.scheduled_for_payment?.totalCount,
     },
     {
       label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
       filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'on_hold',
-      count: metaData?.on_hold?.totalCount,
     },
     {
       label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
       filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'incomplete',
-      count: metaData?.incomplete?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
       filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'error',
-      count: metaData?.error?.totalCount,
     },
   ];
-
-  const meta: FilterMeta = {
-    currency: metaData?.host?.currency,
-    hostSlug: hostSlug,
-    hostedAccounts: metaData?.hostedAccounts.nodes,
-    expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
-    includeUncategorized: true,
-    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
-  };
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
     defaultFilterValues: views[1].filter,
     filters,
-    meta,
+    meta: {
+      currency: account.currency,
+      hostSlug: hostSlug,
+      includeUncategorized: true,
+      accountingCategoryKinds: ExpenseAccountingCategoryKinds,
+    },
     views,
+    skipFiltersOnReset: ['hostContext'],
   });
+
+  const {
+    data: metaData,
+    error: errorMetaData,
+    refetch: refetchMetaData,
+  } = useQuery(hostDashboardMetadataQuery, {
+    variables: {
+      hostSlug,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+    },
+  });
+
+  const viewsWithCount: Views<FilterValues> = views.map(view => ({
+    ...view,
+    count: metaData?.[view.id]?.totalCount,
+  }));
 
   const variables = {
     hostSlug,
@@ -340,7 +339,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
           ) : null
         }
       />
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} views={viewsWithCount} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
