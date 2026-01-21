@@ -32,7 +32,7 @@ export const expenseTagsQuery = gql`
   }
 `;
 
-export type ExpenseTagsFilterMeta = {
+type ExpenseTagsFilterMeta = {
   accountSlug?: string;
   hostSlug?: string;
 };

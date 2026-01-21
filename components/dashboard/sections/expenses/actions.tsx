@@ -8,7 +8,11 @@ import type { GetActions } from '../../../../lib/actions/types';
 import expenseTypes from '../../../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
-import type { Amount, Expense, Host, PayoutMethod, TaxInfo } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  ExpenseHostFieldsFragment,
+  ExpensesListAdminFieldsFragmentFragment,
+  ExpensesListFieldsFragmentFragment,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
@@ -25,10 +29,21 @@ import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
 
+/**
+ * Type for expense data used in actions. Combines ExpensesListFieldsFragment and
+ * ExpensesListAdminFieldsFragment with optional additional fields that may be present
+ * in some contexts (e.g., host field when querying from host dashboard).
+ */
+type ExpenseQueryNode = ExpensesListFieldsFragmentFragment &
+  ExpensesListAdminFieldsFragmentFragment & {
+    // Host field is present when querying from host dashboard contexts
+    host?: ExpenseHostFieldsFragment | null;
+  };
+
 type PayExpenseModalWrapperProps = BaseModalProps & {
-  expense: ExpenseActionQueryNode;
-  collective: ExpenseActionQueryNode['account'];
-  host: ExpenseActionQueryNode['host'];
+  expense: ExpenseQueryNode;
+  collective: ExpenseQueryNode['account'];
+  host: ExpenseQueryNode['host'];
   canPayWithAutomaticPayment: boolean;
   onSubmit: (values: { action: string } & Record<string, unknown>) => Promise<void>;
 };
@@ -84,79 +99,6 @@ const processExpenseMutation = gql`
   ${expensePageExpenseFieldsFragment}
 `;
 
-export type ExpenseActionPermissions = {
-  id: string;
-  canDelete?: boolean;
-  canApprove?: boolean;
-  canUnapprove?: boolean;
-  canReject?: boolean;
-  canMarkAsSpam?: boolean;
-  canPay?: boolean;
-  canMarkAsPaid?: boolean;
-  canMarkAsUnpaid?: boolean;
-  canMarkAsIncomplete?: boolean;
-  canSeeInvoiceInfo?: boolean;
-  canEditTags?: boolean;
-  canEditAccountingCategory?: boolean;
-  canUnschedulePayment?: boolean;
-  canHold?: boolean;
-  canRelease?: boolean;
-  approve?: {
-    allowed: boolean;
-    reason?: string;
-    reasonDetails?: Record<string, unknown>;
-  };
-};
-
-export type ExpenseActionQueryNode = {
-  id: string;
-  legacyId: number;
-  type: Expense['type'];
-  status?: Expense['status'];
-  onHold?: boolean;
-  permissions?: ExpenseActionPermissions;
-  createdByAccount?: {
-    id: string;
-    slug: string;
-    name: string;
-    type: string;
-    legacyId?: number;
-  };
-  account: {
-    id: string;
-    slug: string;
-    name?: string;
-    type: string;
-    currency?: string;
-    stats?: {
-      id?: string;
-      balanceWithBlockedFunds?: Amount;
-    };
-  };
-  host?: Pick<
-    Host,
-    'id' | 'slug' | 'type' | 'currency' | 'plan' | 'settings' | 'features' | 'supportedPayoutMethods' | 'transferwise'
-  > | null;
-  // Fields needed for PayExpenseModal
-  amount?: number;
-  currency?: string;
-  feesPayer?: Expense['feesPayer'];
-  taxes?: Pick<TaxInfo, 'id' | 'type' | 'rate'>[];
-  payoutMethod?: Pick<PayoutMethod, 'id' | 'type' | 'name' | 'data'>;
-  amountInHostCurrency?: {
-    valueInCents?: number;
-    currency?: string;
-  };
-  payee?: {
-    id: string;
-    slug?: string;
-    name?: string;
-    type?: string;
-    host?: { id: string } | null;
-  };
-  requiredLegalDocuments?: string[];
-};
-
 type UseExpenseActionsOptions = {
   /**
    * Called after successful mutation to refetch the list
@@ -169,10 +111,10 @@ type UseExpenseActionsOptions = {
   /**
    * Called after expense is deleted
    */
-  onDelete?: (expense: ExpenseActionQueryNode) => void;
+  onDelete?: (expense: ExpenseQueryNode) => void;
 };
 
-export function useExpenseActions<T extends ExpenseActionQueryNode>({
+export function useExpenseActions<T extends ExpenseQueryNode>({
   refetchList,
   onDelete,
 }: UseExpenseActionsOptions = {}) {

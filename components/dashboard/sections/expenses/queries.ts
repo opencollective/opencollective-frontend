@@ -317,113 +317,6 @@ export const hostDashboardMetadataQuery = gql`
 `;
 
 /**
- * Fragment for paid disbursements list - optimized for the Paid Disbursements table
- */
-export const paidDisbursementsFieldsFragment = gql`
-  fragment PaidDisbursementsFields on Expense {
-    id
-    legacyId
-    createdAt
-    paidAt
-    description
-    type
-    status
-    onHold
-    currency
-    amount
-    tags
-    amountInHostCurrency: amountV2(currencySource: HOST) {
-      valueInCents
-      currency
-    }
-    accountingCategory {
-      id
-      name
-      code
-      ...AccountingCategorySelectFields
-    }
-    payoutMethod {
-      id
-      type
-      name
-    }
-    account {
-      id
-      slug
-      name
-      type
-      imageUrl
-      ...AccountHoverCardFields
-      ... on AccountWithParent {
-        parent {
-          id
-          slug
-          name
-          type
-        }
-      }
-    }
-    payee {
-      id
-      slug
-      name
-      type
-      imageUrl
-      ...AccountHoverCardFields
-    }
-    paidBy {
-      id
-      slug
-      name
-      type
-      imageUrl
-      ...AccountHoverCardFields
-    }
-    createdByAccount {
-      id
-      slug
-      name
-      type
-      legacyId
-      ...AccountHoverCardFields
-    }
-    host {
-      id
-      ...ExpenseHostFields
-    }
-    comments {
-      totalCount
-    }
-    permissions {
-      id
-      canDelete
-      canApprove
-      canUnapprove
-      canReject
-      canMarkAsSpam
-      canPay
-      canMarkAsPaid
-      canMarkAsUnpaid
-      canMarkAsIncomplete
-      canSeeInvoiceInfo
-      canEditTags
-      canEditAccountingCategory
-      canUnschedulePayment
-      canHold
-      canRelease
-      approve {
-        allowed
-        reason
-        reasonDetails
-      }
-    }
-  }
-  ${AccountingCategorySelectFieldsFragment}
-  ${accountHoverCardFields}
-  ${expenseHostFields}
-`;
-
-/**
  * Query for the Paid Disbursements page - fetches paid expenses with fields optimized for the table
  */
 export const paidDisbursementsQuery = gql`
@@ -466,9 +359,12 @@ export const paidDisbursementsQuery = gql`
       limit
       nodes {
         id
-        ...PaidDisbursementsFields
+        ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
+        paidAt
       }
     }
   }
-  ${paidDisbursementsFieldsFragment}
+  ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
 `;

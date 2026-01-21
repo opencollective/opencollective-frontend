@@ -6,6 +6,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Expense } from '../../lib/graphql/types/v2/schema';
 
+import MessageBox from '../MessageBox';
 import type { BaseModalProps } from '../ModalContext';
 import RichTextEditor from '../RichTextEditor';
 import {
@@ -13,13 +14,11 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/AlertDialog';
 import { toast } from '../ui/useToast';
-import MessageBox from '../MessageBox';
 
 const messages = defineMessages({
   reasonPlaceholder: {
