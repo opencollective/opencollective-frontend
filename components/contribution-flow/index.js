@@ -429,7 +429,7 @@ class ContributionFlow extends React.Component {
       const result = isAlipay
         ? await stripe.confirmAlipayPayment(response.paymentIntent.client_secret, {
             // eslint-disable-next-line camelcase
-            return_url: `${window.location.origin}/api/services/stripe/alipay/callback?OrderId=${order.id}`,
+            return_url: `${process.env.API_URL}/services/stripe/alipay/callback?OrderId=${order.id}`,
           })
         : await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {
