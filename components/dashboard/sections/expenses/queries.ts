@@ -311,8 +311,6 @@ export const hostDashboardMetadataQuery = gql`
       totalCount
     }
   }
-
-  ${accountHoverCardFields}
   ${hostInfoCardFields}
 `;
 
