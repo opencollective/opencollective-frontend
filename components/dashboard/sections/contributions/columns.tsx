@@ -15,6 +15,7 @@ import Avatar from '@/components/Avatar';
 import { CopyID } from '@/components/CopyId';
 import DateTime from '@/components/DateTime';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import { OrderAdminAccountingCategoryPill } from '@/components/orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { PaymentMethodTypeLabel } from '@/components/PaymentMethodTypeWithIcon';
 import { ColumnHeader } from '@/components/table/ColumnHeader';
@@ -121,6 +122,22 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
               </div>
             </div>
           }
+        />
+      );
+    },
+  }),
+  columnHelper.accessor('accountingCategory', {
+    meta: { labelMsg: defineMessage({ defaultMessage: 'Accounting Category', id: 'ckcrQ7' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
+    cell: ({ row }) => {
+      const order = row.original;
+      return (
+        <OrderAdminAccountingCategoryPill
+          labelClassName="whitespace-nowrap"
+          buttonClassName="w-full"
+          order={order}
+          account={order.toAccount}
+          host={order.toAccount && 'host' in order.toAccount ? order.toAccount.host : undefined}
         />
       );
     },
