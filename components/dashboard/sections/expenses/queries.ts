@@ -360,9 +360,18 @@ export const paidDisbursementsQuery = gql`
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
         paidAt
+        paidBy {
+          id
+          slug
+          name
+          type
+          imageUrl
+          ...AccountHoverCardFields
+        }
       }
     }
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
+  ${accountHoverCardFields}
 `;
