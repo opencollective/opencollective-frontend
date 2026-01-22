@@ -1585,6 +1585,7 @@
   "expense.page.description": "Tarifas do processador de pagamento podem ser aplicadas.",
   "expense.page.total": "Total de páginas",
   "expense.paid": "Paga",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Pago a",
   "expense.pay.btn": "Pagar com {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Saldo insuficiente",

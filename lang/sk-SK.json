@@ -1585,6 +1585,7 @@
   "expense.page.description": "Je možné, že sa budú účtovať poplatky za spracovanie platby.",
   "expense.page.total": "Celkovo strán",
   "expense.paid": "Zaplatené",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Zaplatené pre",
   "expense.pay.btn": "Zaplatiť pomocou {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Nedostatočný zostatok",

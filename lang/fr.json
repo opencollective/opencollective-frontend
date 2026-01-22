@@ -1585,6 +1585,7 @@
   "expense.page.description": "Des frais de paiements peuvent s'appliquer.",
   "expense.page.total": "Total de la page",
   "expense.paid": "Payée",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Payé à",
   "expense.pay.btn": "Payer avec {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Solde insuffisant",

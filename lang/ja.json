@@ -1585,6 +1585,7 @@
   "expense.page.description": "決済代行手数料が追加される場合があります。",
   "expense.page.total": "ページ合計",
   "expense.paid": "支払い済み",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "支払先",
   "expense.pay.btn": "{paymentMethod} で支払う",
   "expense.pay.error.insufficientBalance": "残高不足",

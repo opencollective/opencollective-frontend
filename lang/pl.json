@@ -1585,6 +1585,7 @@
   "expense.page.description": "Mogą obowiązywać opłaty za przetwarzanie płatności.",
   "expense.page.total": "Strony łącznie",
   "expense.paid": "Zapłacone",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Zapłacono dla",
   "expense.pay.btn": "Zapłać za pomocą {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Niewystarczające saldo",

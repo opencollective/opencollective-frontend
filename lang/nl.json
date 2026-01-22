@@ -1585,6 +1585,7 @@
   "expense.page.description": "Payment processor fees may apply.",
   "expense.page.total": "Paginatotaal",
   "expense.paid": "Betaald",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Betaald aan",
   "expense.pay.btn": "Betaal met {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Onvoldoende saldo",

@@ -1585,6 +1585,7 @@
   "expense.page.description": "Може стягуватися комісія за обробку платежів.",
   "expense.page.total": "Всього на сторінці",
   "expense.paid": "Сплачено",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Сплачено для",
   "expense.pay.btn": "Сплатити за допомогою {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Недостатньо коштів",

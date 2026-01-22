@@ -1585,6 +1585,7 @@
   "expense.page.description": "可能要支付手续费",
   "expense.page.total": "总页数",
   "expense.paid": "已支付",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "支付给",
   "expense.pay.btn": "使用 {paymentMethod} 支付",
   "expense.pay.error.insufficientBalance": "余额不足",

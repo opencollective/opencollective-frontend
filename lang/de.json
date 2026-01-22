@@ -1585,6 +1585,7 @@
   "expense.page.description": "Es können Gebühren für die Zahlungsabwicklung anfallen.",
   "expense.page.total": "Summe dieser Seite",
   "expense.paid": "Ausgezahlt",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Gezahlt an",
   "expense.pay.btn": "Mit {paymentMethod} bezahlen",
   "expense.pay.error.insufficientBalance": "Unzureichendes Guthaben",

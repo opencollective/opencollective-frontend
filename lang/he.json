@@ -1585,6 +1585,7 @@
   "expense.page.description": "ייתכנו עמלות סליקה או גבייה.",
   "expense.page.total": "סה\"כ בעמוד",
   "expense.paid": "שולם",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "שלום ל",
   "expense.pay.btn": "תשלום באמצעות {paymentMethod}",
   "expense.pay.error.insufficientBalance": "אין יתרה מספיקה",

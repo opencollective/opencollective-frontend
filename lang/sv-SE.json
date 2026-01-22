@@ -1585,6 +1585,7 @@
   "expense.page.description": "Betalningshanteringsavgift kan tillkomma.",
   "expense.page.total": "Totalt antal sidor",
   "expense.paid": "Betald",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Betalas till",
   "expense.pay.btn": "Betala med {paymentMethod}",
   "expense.pay.error.insufficientBalance": "För lågt saldo",

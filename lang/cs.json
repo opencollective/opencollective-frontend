@@ -1585,6 +1585,7 @@
   "expense.page.description": "Payment processor fees may apply.",
   "expense.page.total": "Page Total",
   "expense.paid": "Zaplaceno",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Paid to",
   "expense.pay.btn": "Zaplatit pomocí {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Nedostatečný zůstatek",

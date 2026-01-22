@@ -1585,6 +1585,7 @@
   "expense.page.description": "Payment processor fees may apply.",
   "expense.page.total": "Page Total",
   "expense.paid": "Pagato",
+  "Expense.PaidOnBy": "{paidOnDate} by {paidByAccount}",
   "Expense.PaidTo": "Pagato a",
   "expense.pay.btn": "Paga con {paymentMethod}",
   "expense.pay.error.insufficientBalance": "Credito insufficiente",

@@ -112,23 +112,27 @@ const getExpenseColumns = intl => [
     cell: ({ cell, row }) => {
       const expense = row.original;
       const paidBy = expense.paidBy;
+      const paidAt = cell.getValue();
       return (
         <div>
-          <DateTime dateStyle="medium" value={cell.getValue()} />
+          {paidAt && <DateTime dateStyle="medium" value={paidAt} />}
           <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
-            <FormattedTime timeStyle={'short'} value={cell.getValue()} />
-            {paidBy && (
-              <React.Fragment>
-                <span>by</span>
-                <LinkCollective
-                  collective={paidBy}
-                  withHoverCard
-                  className="inline-flex items-center gap-1 overflow-hidden"
-                >
-                  <Avatar size={14} collective={paidBy} />
-                </LinkCollective>
-              </React.Fragment>
-            )}
+            {paidBy ? (
+              <FormattedMessage
+                defaultMessage="{paidOnDate} by {paidByAccount}"
+                id="Expense.PaidOnBy"
+                values={{
+                  paidOnDate: paidAt && <FormattedTime timeStyle={'short'} value={paidAt} />,
+                  paidByAccount: (
+                    <LinkCollective collective={paidBy} withHoverCard className="text-xs">
+                      <Avatar size={14} collective={paidBy} />
+                    </LinkCollective>
+                  ),
+                }}
+              />
+            ) : paidAt ? (
+              <FormattedTime timeStyle={'short'} value={paidAt} />
+            ) : null}
           </div>
         </div>
       );
