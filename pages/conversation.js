@@ -63,7 +63,7 @@ const conversationPageQuery = gql`
       }
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
       conversationsTags {
         id
