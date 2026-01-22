@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ALL_SECTIONS } from './constants';
 
-type DashboardContextType = {
+export type DashboardContextType = {
   selectedSection: string;
   subpath: string[];
   expandedSection: string | null;

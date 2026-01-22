@@ -243,6 +243,7 @@ export type AccountExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -1765,6 +1766,7 @@ export type BotExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -2344,6 +2346,7 @@ export type CollectiveExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -4063,7 +4066,9 @@ export enum DateTimeField {
   /** Transactions only: The date when a transaction was cleared by the payment processor */
   EFFECTIVE_DATE = 'EFFECTIVE_DATE',
   /** Orders only: The date when an order was last charged, defaults to createdAt if never charged */
-  LAST_CHARGED_AT = 'LAST_CHARGED_AT'
+  LAST_CHARGED_AT = 'LAST_CHARGED_AT',
+  /** Expenses only: The date when an expense was paid (based on the related transaction clearedAt) */
+  PAID_AT = 'PAID_AT'
 }
 
 /** This represents a Debit transaction */
@@ -4472,6 +4477,7 @@ export type EventExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -4871,6 +4877,8 @@ export type Expense = {
   merchantId?: Maybe<Scalars['String']['output']>;
   /** Whether this expense is on hold */
   onHold?: Maybe<Scalars['Boolean']['output']>;
+  /** The date on which the expense was paid */
+  paidAt?: Maybe<Scalars['DateTime']['output']>;
   /** The account who paid this expense */
   paidBy?: Maybe<Account>;
   /** The account being paid by this expense */
@@ -5778,6 +5786,7 @@ export type FundExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -6496,6 +6505,7 @@ export type HostExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -7525,6 +7535,7 @@ export type IndividualExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -10237,6 +10248,7 @@ export type OrganizationExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -11584,6 +11596,7 @@ export type ProjectExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -12103,6 +12116,7 @@ export type QueryExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
@@ -14014,6 +14028,7 @@ export type VendorExpensesArgs = {
   fromAccount?: InputMaybe<AccountReferenceInput>;
   fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
+  hostContext?: InputMaybe<HostContext>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
   limit?: Scalars['Int']['input'];
