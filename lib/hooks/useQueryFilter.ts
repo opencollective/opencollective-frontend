@@ -189,7 +189,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape>, GQL
         if (opts.skipRouter && !newPath) {
           setStateQuery(destructuredQueryValues);
         } else {
-          const query = omitBy(destructuredQueryValues, isUndefined);
+          const query = omitBy(destructuredQueryValues, isNil);
           const basePath = newPath || router.asPath.split('?')[0];
 
           router.push(

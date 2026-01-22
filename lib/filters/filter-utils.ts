@@ -1,4 +1,4 @@
-import { forOwn, isEqual, isPlainObject, isUndefined, omitBy, pick, setWith } from 'lodash';
+import { forOwn, isEqual, isNil, isNull, isPlainObject, isUndefined, omitBy, pick, setWith } from 'lodash';
 
 /* 
   Will take values in a flat object and if the key has structure of `key[subkey]` turn those into nested objects
@@ -78,6 +78,10 @@ export function getQueryValueFromFilterValue(filterValue, defaultFilterValue, de
   // Use the defaultSchemaValue if it exists, otherwise use 'ALL' as the default value.
   if (isUndefined(filterValue) && !isUndefined(defaultFilterValue)) {
     return defaultSchemaValue ?? ALL;
+
+    // For the case of nullable filters, we also want to represent `null` as "ALL" if the there is a defaultFilterValue
+  } else if (isNull(defaultSchemaValue) && isNull(filterValue) && !isNil(defaultFilterValue)) {
+    return ALL;
 
     // If the filterValue is equal to the default value from the schema, then we can omit it from the query string
     // (if it's also not in the user configured default values)

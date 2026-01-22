@@ -38,7 +38,7 @@ import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
-import { HostContextFilter,hostContextFilter } from '../../filters/HostContextFilter';
+import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
@@ -55,15 +55,14 @@ import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './querie
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 // TODO: As we add the "Approve Payment Requests" tool, also exclude 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'
-const ExpenseStatusesToExclude = ['PAID'] 
+const ExpenseStatusesToExclude = ['PAID'];
 const PayExpenseStatusFilter = Object.fromEntries(
   Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
 ) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
 
-
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  status: isNullable(isMulti(z.nativeEnum(PayExpenseStatusFilter))).default(null),
+  status: isNullable(isMulti(z.nativeEnum(PayExpenseStatusFilter))),
   hostContext: hostContextFilter.schema,
 });
 
@@ -87,7 +86,9 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
      * We also exclude "READY_TO_PAY" since this can't be combined with other status filters,
      * and is a subset of "APPROVED".
      */
-    return isEmpty(value) ? { status: Object.values(PayExpenseStatusFilter).filter(s => s !== 'READY_TO_PAY') } : { status: value };
+    return isEmpty(value)
+      ? { status: Object.values(PayExpenseStatusFilter).filter(s => s !== 'READY_TO_PAY') }
+      : { status: value };
   },
 };
 
