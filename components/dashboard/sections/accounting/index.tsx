@@ -16,7 +16,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect.tsx';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -50,7 +50,7 @@ const accountingCategoriesQuery = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 // TODO adapt for host types other than organization
@@ -72,7 +72,7 @@ const editAccountingCategoryMutation = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {

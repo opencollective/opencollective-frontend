@@ -35,13 +35,13 @@ import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-imp
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import {
-  TransactionsImportAssignmentFieldsFragment,
-  TransactionsImportRowFieldsFragment,
-  TransactionsImportStatsFragment,
+  transactionsImportAssignmentFieldsFragment,
+  transactionsImportRowFieldsFragment,
+  transactionsImportStatsFragment,
 } from './lib/graphql';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
 import Avatar from '../../../Avatar';
@@ -116,7 +116,7 @@ const transactionsImportHostFieldsFragment = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 const transactionsImportStatsQuery = gql`
@@ -128,7 +128,7 @@ const transactionsImportStatsQuery = gql`
       }
     }
   }
-  ${TransactionsImportStatsFragment}
+  ${transactionsImportStatsFragment}
 `;
 
 const transactionsImportQuery = gql`
@@ -210,10 +210,10 @@ const transactionsImportQuery = gql`
       }
     }
   }
-  ${TransactionsImportRowFieldsFragment}
+  ${transactionsImportRowFieldsFragment}
   ${transactionsImportHostFieldsFragment}
-  ${TransactionsImportStatsFragment}
-  ${TransactionsImportAssignmentFieldsFragment}
+  ${transactionsImportStatsFragment}
+  ${transactionsImportAssignmentFieldsFragment}
 `;
 
 const DEFAULT_PAGE_SIZE = 50;

@@ -26,7 +26,7 @@ import PayExpensesScheduledForPaymentButton from './PayExpensesScheduledForPayme
 import { getPaypalExpiryInfo } from './PaypalPreApprovalDetailsIcon';
 import TransferwiseDetailsIcon, { BalancesBreakdown } from './TransferwiseDetailsIcon';
 
-const ExpensePipelineOverviewQuery = gql`
+const expensePipelineOverviewQuery = gql`
   query ExpensePipelineOverview($hostSlug: String!, $currency: Currency!) {
     wiseReadyToPay: expenses(
       host: { slug: $hostSlug }
@@ -112,7 +112,7 @@ export default function ExpensePipelineOverview(props: ExpensePipelineOverviewPr
     wiseScheduledForPayment: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
     paypalReadyToPay: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
     paypalScheduledForPayment: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
-  }>(ExpensePipelineOverviewQuery, {
+  }>(expensePipelineOverviewQuery, {
     variables: {
       hostSlug: props.host.slug,
       currency: props.host.currency,

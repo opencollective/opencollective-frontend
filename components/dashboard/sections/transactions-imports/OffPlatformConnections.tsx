@@ -9,7 +9,7 @@ import { integer } from '../../../../lib/filters/schemas';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { transactionImportListFieldsFragment } from './lib/graphql';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
@@ -57,7 +57,7 @@ const offPlatformConnectionsQuery = gql`
       }
     }
   }
-  ${TransactionImportListFieldsFragment}
+  ${transactionImportListFieldsFragment}
 `;
 
 export const OffPlatformConnections = ({ accountSlug }) => {

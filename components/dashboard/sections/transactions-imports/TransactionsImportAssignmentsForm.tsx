@@ -5,7 +5,7 @@ import { uniqBy } from 'lodash';
 import { Building, ChartCandlestick, ChartLine, CreditCard, HandCoins, Landmark, Wallet } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { TransactionsImportAssignmentFieldsFragment } from './lib/graphql';
+import { transactionsImportAssignmentFieldsFragment } from './lib/graphql';
 import { DEFAULT_ASSIGNMENT_ACCOUNT_ID } from './lib/types';
 import { getAccountReferenceInput } from '@/lib/collective';
 import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
@@ -30,7 +30,7 @@ const editTransactionsImportAssignmentsMutation = gql`
       }
     }
   }
-  ${TransactionsImportAssignmentFieldsFragment}
+  ${transactionsImportAssignmentFieldsFragment}
 `;
 
 const CollectivePickerReactSelectStyles = {

@@ -1,10 +1,10 @@
 import { gql } from '@apollo/client';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
-import { kycStatusFields, kycVerificationFields } from '@/components/kyc/graphql';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
+import { kycStatusFieldsFragment, kycVerificationFieldsFragment } from '@/components/kyc/graphql';
 import { vendorFieldFragment } from '@/components/vendors/queries';
 
-import { legalDocumentFields } from '../legal-documents/HostDashboardTaxForms';
+import { legalDocumentFieldsFragment } from '../legal-documents/HostDashboardTaxForms';
 
 export const peopleHostDashboardQuery = gql`
   query PeopleHostDashboard(
@@ -66,10 +66,10 @@ export const peopleHostDashboardQuery = gql`
       }
     }
   }
-  ${kycStatusFields}
+  ${kycStatusFieldsFragment}
 `;
 
-const communityAccountDetailActivityFields = gql`
+const communityAccountDetailActivityFieldsFragment = gql`
   fragment CommunityAccountDetailActivityFields on Activity {
     id
     type
@@ -345,10 +345,10 @@ export const communityAccountDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
-  ${kycVerificationFields}
-  ${legalDocumentFields}
-  ${communityAccountDetailActivityFields}
+  ${accountHoverCardFieldsFragment}
+  ${kycVerificationFieldsFragment}
+  ${legalDocumentFieldsFragment}
+  ${communityAccountDetailActivityFieldsFragment}
   ${vendorFieldFragment}
 `;
 
@@ -367,8 +367,8 @@ export const communityAccountActivitiesQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
-  ${communityAccountDetailActivityFields}
+  ${accountHoverCardFieldsFragment}
+  ${communityAccountDetailActivityFieldsFragment}
 `;
 
 export const communityAccountExpensesDetailQuery = gql`
@@ -512,7 +512,7 @@ export const communityAccountExpensesDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const communityAccountContributionsDetailQuery = gql`
@@ -566,5 +566,5 @@ export const communityAccountContributionsDetailQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
