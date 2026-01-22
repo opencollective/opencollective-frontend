@@ -37,10 +37,7 @@ type ExpenseTagsFilterMeta = {
   hostSlug?: string;
 };
 
-function ExpenseTagsFilter({
-  meta,
-  ...props
-}: FilterComponentProps<ExpenseTagFilterValue, ExpenseTagsFilterMeta>) {
+function ExpenseTagsFilter({ meta, ...props }: FilterComponentProps<ExpenseTagFilterValue, ExpenseTagsFilterMeta>) {
   const [options, setOptions] = React.useState<{ label: string; value: string }[]>([]);
 
   const [search, { loading, data }] = useLazyQuery(expenseTagsQuery, {

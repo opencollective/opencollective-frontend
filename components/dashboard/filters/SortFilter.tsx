@@ -38,7 +38,7 @@ const i18nFieldLabels = defineMessages({
   [OrderByFieldType.CREATED_AT]: { defaultMessage: 'Date', id: 'expense.incurredAt' },
   [OrderByFieldType.NAME]: { defaultMessage: 'Name', id: 'Fields.name' },
   [OrderByFieldType.UNHOSTED_AT]: { defaultMessage: 'Unhosted since', id: 'UnhostedSince' },
-  [DateTimeField.PAID_AT]: { defaultMessage: 'Date Paid', id: '/SrpzP',  },
+  [DateTimeField.PAID_AT]: { defaultMessage: 'Date Paid', id: '/SrpzP' },
 });
 
 const i18nDefaultDirectionLabels = defineMessages({

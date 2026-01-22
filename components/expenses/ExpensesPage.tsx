@@ -205,7 +205,7 @@ const Expenses = ({ account, expenses: _expenses, direction }: ExpensesProps) =>
   const { LoggedInUser } = useLoggedInUser();
   const meta: FilterMeta = {
     currency: account?.currency,
-    accountSlug: account.slug,
+    accountSlug: account?.slug,
   };
 
   const queryFilter = useQueryFilter({
