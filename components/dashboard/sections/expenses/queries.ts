@@ -1,7 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
-import { AccountingCategorySelectFieldsFragment } from '../../../AccountingCategorySelect';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
@@ -218,7 +217,6 @@ export const hostDashboardExpensesQuery = gql`
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
 `;
 
 export const hostInfoCardFields = gql`
