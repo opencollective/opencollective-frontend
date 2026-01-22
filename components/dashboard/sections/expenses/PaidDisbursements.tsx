@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage, FormattedTime, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, FormattedTime, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
@@ -98,7 +98,8 @@ const toVariables: FiltersToVariables<FilterValues, PaidDisbursementsQueryVariab
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, 'status'),
-  account: hostedAccountFilter.filter,
+  date: { ...commonFilters.date, labelMsg: defineMessage({ defaultMessage: 'Date submitted', id: 'jKIFOK' }) },
+  account: { ...hostedAccountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Paid from', id: 'jhYP1/' }) },
   tag: expenseTagFilter.filter,
   sort: sortFilter.filter,
 };
@@ -149,7 +150,7 @@ const getExpenseColumns = intl => [
   {
     accessorKey: 'description',
     meta: { className: 'max-w-64' },
-    header: () => <FormattedMessage defaultMessage="Title" id="9a9+ww" />,
+    header: () => <FormattedMessage defaultMessage="Title" id="Title" />,
     cell: ({ row }) => {
       const expense = row.original;
       const submittedBy = expense.createdByAccount;
@@ -179,7 +180,6 @@ const getExpenseColumns = intl => [
     header: () => <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />,
     cell: ({ row }) => {
       const expense = row.original;
-      console.log({ host: expense.host });
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div onClick={e => e.stopPropagation()}>
@@ -201,7 +201,7 @@ const getExpenseColumns = intl => [
   {
     accessorKey: 'account',
     meta: { className: 'max-w-48' },
-    header: () => <FormattedMessage defaultMessage="Paid from" id="Kz1xPl" />,
+    header: () => <FormattedMessage defaultMessage="Paid from" id="jhYP1/" />,
     cell: ({ row }) => {
       const expense = row.original;
       const account = expense.account;
@@ -382,8 +382,8 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
             loading={loading}
             getActions={getExpenseActions}
           />
-          <ExpenseDrawer openExpenseLegacyId={Number(openExpenseId)} handleClose={drawerProps.onClose} />
           <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
+          <ExpenseDrawer openExpenseLegacyId={Number(openExpenseId)} handleClose={drawerProps.onClose} />
         </React.Fragment>
       )}
     </div>
