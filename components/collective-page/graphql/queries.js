@@ -52,7 +52,7 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
       supportedExpenseTypes
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
         id
