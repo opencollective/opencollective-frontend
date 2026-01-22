@@ -10,12 +10,12 @@ import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { gql } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
 import Container from '../../Container';
-import { expenseHostFields, expensesListFieldsFragment } from '../../expenses/graphql/fragments';
+import { expenseHostFieldsFragment, expensesListFieldsFragment } from '../../expenses/graphql/fragments';
 import { Box, Flex } from '../../Grid';
 import Image from '../../Image';
 import Link from '../../Link';
@@ -90,7 +90,7 @@ const budgetSectionAccountFieldsFragment = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 const budgetSectionQuery = gql`
@@ -103,13 +103,13 @@ const budgetSectionQuery = gql`
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
     expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
         host {
           id
           ...ExpenseHostFields
@@ -123,7 +123,7 @@ const budgetSectionQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
   ${budgetSectionAccountFieldsFragment}
 `;
 
@@ -136,13 +136,13 @@ const budgetSectionForIndividualQuery = gql`
       includeIncognitoTransactions: true
       includeGiftCardTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
     expenses(createdByAccount: { slug: $slug }, limit: $limit) {
       totalCount
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
         host {
           id
           ...ExpenseHostFields
@@ -168,7 +168,7 @@ const budgetSectionForIndividualQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
 `;
 
 const budgetSectionWithHostQuery = gql`
@@ -188,13 +188,13 @@ const budgetSectionWithHostQuery = gql`
       includeGiftCardTransactions: true
       includeChildrenTransactions: true
     ) {
-      ...TransactionsQueryCollectionFragment
+      ...TransactionsQueryCollection
     }
     expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         id
-        ...ExpensesListFieldsFragment
+        ...ExpensesListFields
       }
     }
     account(slug: $slug) {
@@ -210,7 +210,7 @@ const budgetSectionWithHostQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
-  ${expenseHostFields}
+  ${expenseHostFieldsFragment}
   ${budgetSectionAccountFieldsFragment}
 `;
 

@@ -32,7 +32,7 @@ import { useToast } from '../ui/useToast';
 
 import VirtualCardRequestCard from './VirtualCardRequestCard';
 
-const RejectVirtualCardRequestMutation = gql`
+const rejectVirtualCardRequestMutation = gql`
   mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
     rejectVirtualCardRequest(virtualCardRequest: $virtualCardRequest) {
       id
@@ -53,7 +53,7 @@ function VirtualCardRequestTableActions({
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
-  const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(RejectVirtualCardRequestMutation, {
+  const [rejectRequestMutation, rejectRequestMutationResult] = useMutation(rejectVirtualCardRequestMutation, {
     variables: {
       virtualCardRequest: {
         id: virtualCardRequest.id,

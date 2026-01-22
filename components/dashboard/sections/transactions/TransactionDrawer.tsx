@@ -15,7 +15,7 @@ import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import LinkCollective from '@/components/LinkCollective';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import { getCategoryLabel } from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
 import ExpenseBudgetItem from '../../../budget/ExpenseBudgetItem';
@@ -218,7 +218,7 @@ const transactionQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export function TransactionDrawer({ open, onOpenChange, onCloseAutoFocus, transactionId, getActions }) {

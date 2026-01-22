@@ -1,6 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../../AccountHoverCard';
 import { transactionsTableQueryCollectionFragment } from '../transactions/queries';
 
 export const editAccountSettingMutation = gql`
@@ -131,7 +131,7 @@ export const timelineQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const collectiveBalanceQuery = gql`
@@ -176,7 +176,7 @@ export const collectiveBalanceQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const metricsPerAccountQuery = gql`
@@ -249,7 +249,7 @@ export const metricsPerAccountQuery = gql`
       comparison: contributionsCount(dateFrom: $compareFrom, dateTo: $compareTo) @include(if: $includeComparison)
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const overviewMetricsQuery = gql`
@@ -406,7 +406,7 @@ export const overviewMetricsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const orgOverviewMetricsQuery = gql`
@@ -439,11 +439,11 @@ export const orgOverviewMetricsQuery = gql`
         dateTo: $dateTo
         orderBy: { direction: DESC, field: CREATED_AT }
       ) {
-        ...TransactionsTableQueryCollectionFragment
+        ...TransactionsTableQueryCollection
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
   ${transactionsTableQueryCollectionFragment}
 `;
 
@@ -493,9 +493,9 @@ export const hostOverviewMetricsQuery = gql`
       dateTo: $dateTo
       orderBy: { direction: DESC, field: CREATED_AT }
     ) {
-      ...TransactionsTableQueryCollectionFragment
+      ...TransactionsTableQueryCollection
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
   ${transactionsTableQueryCollectionFragment}
 `;

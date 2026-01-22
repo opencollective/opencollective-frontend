@@ -1,6 +1,6 @@
 import { gql } from '../../../../lib/graphql/helpers';
 
-export const PayoutMethodFragment = gql`
+export const payoutMethodFragment = gql`
   fragment PayoutMethodFields on PayoutMethod {
     id
     type
@@ -12,7 +12,7 @@ export const PayoutMethodFragment = gql`
   }
 `;
 
-const PaymentMethodFragment = gql`
+const paymentMethodFragment = gql`
   fragment PaymentMethodFields on PaymentMethod {
     id
     legacyId
@@ -79,6 +79,6 @@ export const managePaymentMethodsQuery = gql`
     }
   }
 
-  ${PaymentMethodFragment}
-  ${PayoutMethodFragment}
+  ${paymentMethodFragment}
+  ${payoutMethodFragment}
 `;

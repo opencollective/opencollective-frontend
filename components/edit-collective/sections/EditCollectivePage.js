@@ -33,8 +33,8 @@ import { Skeleton } from '../../ui/Skeleton';
 import { editAccountSettingsMutation } from '../mutations';
 import SettingsSubtitle from '../SettingsSubtitle';
 
-export const getSettingsQuery = gql`
-  query GetSettingsForEditCollectivePage($slug: String!) {
+export const collectiveSettingsEditQuery = gql`
+  query CollectiveSettingsEdit($slug: String!) {
     account(slug: $slug) {
       id
       type
@@ -380,7 +380,7 @@ const EditCollectivePage = ({ collective }) => {
   const [sections, setSections] = React.useState([]);
   const [draggingId, setDraggingId] = React.useState(null);
 
-  const { loading, data } = useQuery(getSettingsQuery, {
+  const { loading, data } = useQuery(collectiveSettingsEditQuery, {
     variables: { slug: collective.slug },
   });
 

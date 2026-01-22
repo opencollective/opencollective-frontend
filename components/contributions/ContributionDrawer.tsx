@@ -11,8 +11,8 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
-import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
+import { accountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyID } from '../CopyId';
 import DateTime from '../DateTime';
@@ -246,8 +246,8 @@ const contributionDrawerQuery = gql`
     }
     paymentProcessorUrl
   }
-  ${accountHoverCardFields}
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountHoverCardFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 type ContributionDrawerProps = {

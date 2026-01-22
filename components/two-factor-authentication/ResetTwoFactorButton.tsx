@@ -15,7 +15,7 @@ import { P } from '../Text';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
-const RemoveTwoFactorAuthenticationMutation = gql`
+const removeTwoFactorAuthenticationMutation = gql`
   mutation RemoveTwoFactorAuthentication($account: AccountReferenceInput!) {
     removeTwoFactorAuthTokenFromIndividual(account: $account) {
       id
@@ -41,7 +41,7 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
   const { toast } = useToast();
 
   const [isRemovingTwoFactorAuthentication, setIsRemovingTwoFactorAuthentication] = React.useState(false);
-  const [removeTwoFactorAuthentication] = useMutation(RemoveTwoFactorAuthenticationMutation);
+  const [removeTwoFactorAuthentication] = useMutation(removeTwoFactorAuthenticationMutation);
 
   const prompt = useTwoFactorAuthenticationPrompt();
 

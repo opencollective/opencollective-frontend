@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { transactionImportListFieldsFragment } from './lib/graphql';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
 import { FormikZod } from '../../../FormikZod';
@@ -67,7 +67,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
           ...TransactionImportListFields
         }
       }
-      ${TransactionImportListFieldsFragment}
+      ${transactionImportListFieldsFragment}
     `,
     {},
   );

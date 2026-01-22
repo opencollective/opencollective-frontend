@@ -1,8 +1,8 @@
 import { gql } from '@/lib/graphql/helpers';
 
-import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 
-export const planFeatures = gql`
+export const planFeaturesFragment = gql`
   fragment PlanFeatures on PlatformSubscriptionFeatures {
     TRANSFERWISE
     PAYPAL_PAYOUTS
@@ -24,7 +24,7 @@ export const planFeatures = gql`
   }
 `;
 
-const fields = gql`
+const subscriberFieldsFragment = gql`
   fragment SubscriberFields on Account {
     id
     name
@@ -118,8 +118,8 @@ const fields = gql`
       }
     }
   }
-  ${planFeatures}
-  ${accountHoverCardFields}
+  ${planFeaturesFragment}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export const subscribersQuery = gql`
@@ -162,7 +162,7 @@ export const subscribersQuery = gql`
       }
     }
   }
-  ${fields}
+  ${subscriberFieldsFragment}
 `;
 
 export const availablePlansQuery = gql`
@@ -192,7 +192,7 @@ export const availablePlansQuery = gql`
       }
     }
   }
-  ${planFeatures}
+  ${planFeaturesFragment}
 `;
 
 export const updateAccountPlatformSubscriptionMutation = gql`
@@ -208,7 +208,7 @@ export const updateAccountPlatformSubscriptionMutation = gql`
       ...SubscriberFields
     }
   }
-  ${fields}
+  ${subscriberFieldsFragment}
 `;
 
 export const subscriberDrawerQuery = gql`
@@ -244,5 +244,5 @@ export const subscriberDrawerQuery = gql`
     }
   }
 
-  ${fields}
+  ${subscriberFieldsFragment}
 `;

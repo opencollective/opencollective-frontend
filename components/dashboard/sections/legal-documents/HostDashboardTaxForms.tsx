@@ -33,7 +33,7 @@ import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
 
-export const legalDocumentFields = gql`
+export const legalDocumentFieldsFragment = gql`
   fragment LegalDocumentFields on LegalDocument {
     id
     year
@@ -88,7 +88,7 @@ const hostDashboardTaxFormsQuery = gql`
       }
     }
   }
-  ${legalDocumentFields}
+  ${legalDocumentFieldsFragment}
 `;
 
 const NB_LEGAL_DOCUMENTS_DISPLAYED = 10;

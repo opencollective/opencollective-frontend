@@ -13,7 +13,7 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nVirtualCardRequestStatus } from '../../../lib/i18n/virtual-card-request';
 import { sortSelectOptions } from '../../../lib/utils';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
@@ -137,7 +137,7 @@ const hostVirtualCardRequestsQuery = gql`
       }
     }
   }
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 export default function HostVirtualCardRequests({ accountSlug: hostSlug }: DashboardSectionProps) {

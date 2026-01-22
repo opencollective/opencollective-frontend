@@ -10,7 +10,7 @@ import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-import';
 import { capitalize } from '../../../../lib/utils';
-import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { transactionImportListFieldsFragment } from './lib/graphql';
 import { FEATURES, requiresUpgrade } from '@/lib/allowed-features';
 import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
@@ -50,7 +50,7 @@ const ledgerCSVImportsQuery = gql`
       }
     }
   }
-  ${TransactionImportListFieldsFragment}
+  ${transactionImportListFieldsFragment}
 `;
 
 export const CSVTransactionsImportsTable = ({ accountSlug }) => {

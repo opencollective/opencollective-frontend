@@ -1,10 +1,10 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
-export const paymentMethodFragment = gql`
-  fragment UpdatePaymentMethodFragment on PaymentMethod {
+export const updatePaymentMethodFragment = gql`
+  fragment UpdatePaymentMethod on PaymentMethod {
     id
     name
     data
@@ -28,7 +28,7 @@ export const managedOrderFragment = gql`
     legacyId
     nextChargeDate
     paymentMethod {
-      ...UpdatePaymentMethodFragment
+      ...UpdatePaymentMethod
     }
     manualPaymentProvider {
       id
@@ -154,8 +154,8 @@ export const managedOrderFragment = gql`
       code
     }
   }
-  ${accountHoverCardFields}
-  ${paymentMethodFragment}
+  ${accountHoverCardFieldsFragment}
+  ${updatePaymentMethodFragment}
 `;
 
 export const manageContributionsQuery = gql`

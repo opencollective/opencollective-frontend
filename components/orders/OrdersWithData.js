@@ -10,7 +10,7 @@ import { gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
-import { accountHoverCardFields } from '../AccountHoverCard';
+import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { confirmContributionFieldsFragment } from '../contributions/ConfirmContributionForm';
 import { DisputedContributionsWarning } from '../dashboard/sections/collectives/DisputedContributionsWarning';
@@ -113,7 +113,7 @@ const accountOrdersQuery = gql`
     }
   }
   ${confirmContributionFieldsFragment}
-  ${accountHoverCardFields}
+  ${accountHoverCardFieldsFragment}
 `;
 
 const ORDERS_PER_PAGE = 15;
