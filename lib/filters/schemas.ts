@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Handles parsing from single value into array
-export function isMulti<T>(value: z.ZodType<T, any, any>) {
+export function isMulti<T>(value: z.ZodType<T, z.ZodTypeDef, unknown>) {
   const singleValueToArray = value.transform((val: T) => [val]);
   const enumArray = z.array(value);
   return z.union([singleValueToArray, enumArray]);

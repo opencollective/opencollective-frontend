@@ -4,9 +4,10 @@ import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import type { Account, DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { DashboardOrdersQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
+import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
@@ -29,7 +30,7 @@ const schema = baseSchema.extend({ tier: tierFilter.schema, account: childAccoun
 
 type FilterValues = z.infer<typeof schema>;
 type FilterMeta = BaseFilterMeta & {
-  childrenAccounts?: Account[];
+  childrenAccounts?: DashboardContextType['account']['childrenAccounts']['nodes'];
   selectedAccountSlug?: string;
 };
 

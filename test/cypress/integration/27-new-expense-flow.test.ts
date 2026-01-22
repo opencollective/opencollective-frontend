@@ -433,14 +433,16 @@ function submitExpense(options: {
       cy.root().closest('html').contains('[role="option"]', opts.invitee.slug).click();
     } else {
       cy.contains('Invite someone').click();
-      cy.contains('Invite someone').parent().within(() => {
-        cy.get('[role="combobox"]').click();
-        cy.root().closest('html').contains('Invite someone to submit an expense').click();
-        cy.contains('Contact name').click();
-        cy.contains('Contact name').type(opts.invitee.name);
-        cy.contains('Email address').click();
-        cy.contains('Email address').type(opts.invitee.email);
-      });
+      cy.contains('Invite someone')
+        .parent()
+        .within(() => {
+          cy.get('[role="combobox"]').click();
+          cy.root().closest('html').contains('Invite someone to submit an expense').click();
+          cy.contains('Contact name').click();
+          cy.contains('Contact name').type(opts.invitee.name);
+          cy.contains('Email address').click();
+          cy.contains('Email address').type(opts.invitee.email);
+        });
     }
   });
 
@@ -458,7 +460,10 @@ function submitExpense(options: {
       }
 
       cy.contains('[role="radio"]', opts.payoutMethod.slug).click();
-      cy.contains('[role="radio"]', opts.payoutMethod.slug).siblings('input[type="radio"]').first().should('be.checked');
+      cy.contains('[role="radio"]', opts.payoutMethod.slug)
+        .siblings('input[type="radio"]')
+        .first()
+        .should('be.checked');
     });
   }
 

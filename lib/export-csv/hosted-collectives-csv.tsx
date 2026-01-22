@@ -366,7 +366,7 @@ export const FIELDS: Array<{
 
 export const GROUP_FIELDS = Object.keys(GROUPS).reduce((dict, groupId) => {
   return { ...dict, [groupId]: FIELDS.filter(f => f.group === groupId).map(f => f.id) };
-}, {});
+}, {}) as Record<keyof typeof GROUPS, readonly string[]>;
 
 const DEFAULT_FIELDS: Array<Fields> = [
   'name',

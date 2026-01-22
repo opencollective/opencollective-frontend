@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { hasAccountMoneyManagement } from '@/lib/collective';
 import { API_V1_CONTEXT, gql } from '@/lib/graphql/helpers';
 import type { FiscalHostingQuery } from '@/lib/graphql/types/v2/graphql';
+import type { Account } from '@/lib/graphql/types/v2/schema';
 import { editCollectivePageQuery } from '@/lib/graphql/v1/queries';
 
 import I18nFormatters from '@/components/I18nFormatters';
@@ -53,7 +54,7 @@ export const ToggleMoneyManagementButton = ({
   children,
   ...props
 }: {
-  account: any;
+  account: Account;
   refetchQueries?: InternalRefetchQueriesInclude;
   children?: React.ReactNode;
 } & ButtonProps) => {
@@ -66,7 +67,7 @@ export const ToggleMoneyManagementButton = ({
   });
 
   const totalHostedAccounts = data?.host?.totalHostedAccounts;
-  const hasHosting = account.hasHosting;
+  const hasHosting = (account as { hasHosting?: boolean }).hasHosting;
   const hasMoneyManagement = hasAccountMoneyManagement(account);
 
   const handleMoneyManagementUpdate = async ({ activate }) => {
@@ -154,12 +155,12 @@ export const ToggleFiscalHostingButton = ({
   children,
   ...props
 }: {
-  account: any;
+  account: Account;
   refetchQueries?: InternalRefetchQueriesInclude;
   children?: React.ReactNode;
 } & ButtonProps) => {
   const { showConfirmationModal } = useModal();
-  const hasHosting = account.hasHosting;
+  const hasHosting = (account as { hasHosting?: boolean }).hasHosting;
   const hasMoneyManagement = hasAccountMoneyManagement(account);
   const { data, loading } = useQuery<FiscalHostingQuery>(fiscalHostingQuery, {
     variables: { id: account.id },

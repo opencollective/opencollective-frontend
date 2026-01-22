@@ -215,7 +215,10 @@ const rowStatusFilter: FilterConfig<z.infer<typeof rowStatusFilterSchema>> = {
   },
 };
 
-const subAccountFilter: FilterConfig<z.infer<typeof subAccountFilterSchema>> = {
+const subAccountFilter: FilterConfig<
+  z.infer<typeof subAccountFilterSchema>,
+  { institutionAccounts?: (TransactionsImportAccount & { accountId: string })[] }
+> = {
   schema: subAccountFilterSchema,
   toVariables: value => ({ subAccountId: value }),
   filter: {
@@ -241,14 +244,17 @@ const subAccountFilter: FilterConfig<z.infer<typeof subAccountFilterSchema>> = {
   },
 };
 
-const transactionsImportFilter: FilterConfig<z.infer<typeof transactionsImportFilterSchema>> = {
+const transactionsImportFilter: FilterConfig<
+  z.infer<typeof transactionsImportFilterSchema>,
+  { transactionsImports?: TransactionsImport[] }
+> = {
   schema: transactionsImportFilterSchema,
   toVariables: value => ({ import: value }),
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Connection', id: 'KtZV9p' }),
     static: true,
     Component: ({ meta, ...props }) => {
-      const transactionsImports = meta.transactionsImports as TransactionsImport[];
+      const transactionsImports = meta.transactionsImports;
       return (
         <ComboSelectFilter
           options={transactionsImports

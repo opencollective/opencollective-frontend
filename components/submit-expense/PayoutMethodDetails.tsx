@@ -17,10 +17,10 @@ import { Skeleton } from '../ui/Skeleton';
 
 import type { ExpenseForm } from './useExpenseForm';
 
-function flattenDetailsObject(details: any) {
+function flattenDetailsObject(details: Record<string, unknown>) {
   return Object.entries(details).reduce((acc, [key, value]) => {
-    if (typeof value === 'object') {
-      return [...acc, ...flattenDetailsObject(value)];
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      return [...acc, ...flattenDetailsObject(value as Record<string, unknown>)];
     }
     return [
       ...acc,

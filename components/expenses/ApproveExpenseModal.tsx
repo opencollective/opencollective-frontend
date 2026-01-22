@@ -18,7 +18,7 @@ type ConfirmProcessExpenseModalProps = {
   expense: Expense;
   host: Host;
   account: Account;
-  onConfirm?: () => Promise<any>;
+  onConfirm?: () => Promise<void>;
 };
 
 export default function ApproveExpenseModal({

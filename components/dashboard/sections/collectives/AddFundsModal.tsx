@@ -13,7 +13,15 @@ import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
 import { API_V1_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  Account,
+  Amount,
+  ExpenseTaxInput,
+  Order,
+  TaxInput,
+  Tier,
+  TransactionReferenceInput,
+} from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
@@ -336,11 +344,11 @@ type FundDetails = {
   taxAmount?: Amount;
   hostFeePercent?: number;
   paymentProcessorFee?: Amount;
-  taxes?: any[];
+  taxes?: ExpenseTaxInput[];
   description?: string;
   memo?: string;
   processedAt?: string;
-  source?: any;
+  source?: Record<string, unknown>;
   tier?: Tier;
 };
 
@@ -354,7 +362,7 @@ type AddFundsFormValues = {
   hostFeePercent?: number;
   memo?: string;
   tier?: TierReferenceInput;
-  tax?: any;
+  tax?: TaxInput;
   transactionsImportRow?: TransactionReferenceInput | null;
   invoiceTemplate?: { value: string };
   accountingCategory?: { id: string };

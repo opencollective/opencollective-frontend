@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 import dayjs from '../../../../lib/dayjs';
 import type { AccountConversionsQuery, AccountConversionsQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import type { Host } from '@/lib/graphql/types/v2/schema';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
@@ -14,6 +13,7 @@ import Link from '@/components/Link';
 import DismissibleMessage from '../../../DismissibleMessage';
 import { AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
+import type { DashboardContextType } from '../../DashboardContext';
 
 const accountConversionsQuery = gql`
   query AccountConversions($slug: String!) {
@@ -55,11 +55,7 @@ const shouldDisplayConvertedAccountMessage = (activity: AccountConversionsQuery[
   return false;
 };
 
-export function ConvertedAccountMessage({
-  account,
-}: {
-  account: { slug: string; legacyId: number; host: Pick<Host, 'id'> };
-}) {
+export function ConvertedAccountMessage({ account }: { account: DashboardContextType['account'] }) {
   const { data: conversionData } = useQuery<AccountConversionsQuery, AccountConversionsQueryVariables>(
     accountConversionsQuery,
     {

@@ -68,7 +68,7 @@ const AccountRenderer = ({
 
 const schema = z.string().optional();
 
-export const hostsFilter: FilterConfig<z.infer<typeof schema>> = {
+export const hostsFilter: FilterConfig<z.infer<typeof schema>, { inOptionsList?: boolean }> = {
   schema,
   toVariables: (value, key) => ({ [key]: { slug: value } }),
   filter: {

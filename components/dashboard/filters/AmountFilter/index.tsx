@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { i18nAmountFilterLabel } from '../../../../lib/i18n/amount-filter';
+import type { Currency } from '@/lib/graphql/types/v2/graphql';
 
 import { Input } from '../../../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/Select';
@@ -114,7 +115,7 @@ const AmountFilter = React.memo(
   }: {
     value: AmountFilterValueType;
     onChange: (value: AmountFilterValueType) => void;
-    meta?: { currency?: string };
+    meta?: { currency?: Currency };
   }) => {
     const intl = useIntl();
     value = value ?? { type: AmountFilterType.IS_EQUAL_TO, currency: meta?.currency };
@@ -144,7 +145,12 @@ const AmountFilter = React.memo(
   },
 );
 
-export const amountFilter: FilterConfig<z.infer<typeof amountFilterSchema>> = {
+export const amountFilter: FilterConfig<
+  z.infer<typeof amountFilterSchema>,
+  object & { currency?: Currency },
+  string,
+  ReturnType<typeof amountToVariables>
+> = {
   schema: amountFilterSchema,
   toVariables: amountToVariables,
   filter: {

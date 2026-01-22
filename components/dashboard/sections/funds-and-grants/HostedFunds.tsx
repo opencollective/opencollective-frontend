@@ -11,6 +11,7 @@ import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import type { HostedCollectiveFieldsFragment, HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type { AccountWithHost } from '@/lib/graphql/types/v2/schema';
 import { HostFeeStructure } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
@@ -278,7 +279,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
                   {
                     ...cols.collective,
                     header: () => <FormattedMessage defaultMessage="Fund name" id="nPLfxb" />,
-                  } as ColumnDef<any, any>,
+                  } as ColumnDef<HostedCollectiveFieldsFragment, unknown>,
                   cols.team,
                   !isUnhosted && cols.fee,
                   !isUnhosted && cols.hostedSince,
@@ -318,7 +319,11 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
       >
         {showCollectiveOverview && (
           <CollectiveDetails
-            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
+            collective={
+              isString(showCollectiveOverview)
+                ? null
+                : (showCollectiveOverview as HostedCollectiveFieldsFragment & Partial<AccountWithHost>)
+            }
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}
             onCancel={() => handleDrawer(null)}

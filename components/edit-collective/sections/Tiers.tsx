@@ -185,6 +185,7 @@ const Tiers = ({ collective }) => {
             <AdminContributeCardsContainer
               collective={collective}
               cards={contributeCards}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               CardsContainer={CardsContainer as any}
               enableReordering={true}
               onTierUpdate={() => refetch()}

@@ -11,7 +11,7 @@ declare global {
           props?: Record<string, string | boolean | number>;
         },
       ): void;
-      q?: any[];
+      q?: Array<Parameters<Window['plausible']>>;
     };
   }
 }

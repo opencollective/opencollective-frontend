@@ -8,12 +8,12 @@ type FieldsConfig = {
   [key: string]:
     | {
         type: 'amount' | 'boolean' | 'color' | 'integer' | 'interval' | 'json' | 'stringArray' | 'float';
-        modifier?: (value: any) => any;
+        modifier?: (value: unknown) => unknown;
       }
     | {
         type: 'alias';
         on: string;
-        modifier?: (value: any) => any;
+        modifier?: (value: unknown) => unknown;
       };
 };
 

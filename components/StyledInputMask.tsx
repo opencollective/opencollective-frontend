@@ -4,7 +4,7 @@ import MaskedInput from 'react-text-mask';
 import StyledInput from './StyledInput';
 
 interface StyledInputMaskProps extends React.ComponentProps<typeof MaskedInput> {
-  render?: (ref: React.Ref<any>, props: any) => React.ReactNode;
+  render?: (ref: React.Ref<HTMLInputElement>, props: React.InputHTMLAttributes<HTMLInputElement>) => React.ReactNode;
 }
 
 const DefaultMaskRenderer = (ref, props) => <StyledInput ref={ref} {...props} />;

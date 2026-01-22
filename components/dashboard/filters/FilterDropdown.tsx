@@ -20,7 +20,7 @@ function ChooseFilterType<FV>({
   setFilterKey,
 }: {
   remainingFilters: (keyof FV)[];
-  filters: FilterComponentConfigs<FV, any>;
+  filters: FilterComponentConfigs<FV, unknown>;
   setFilterKey: (key: keyof FV) => void;
 }) {
   const intl = useIntl();
@@ -53,7 +53,7 @@ function ChooseFilterType<FV>({
   );
 }
 
-export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter, setOpen, values, meta }) {
+export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter, setOpen, values, meta = {} }) {
   const intl = useIntl();
   const filterConfig = filters[filterKey];
   if (!filterConfig.Component) {

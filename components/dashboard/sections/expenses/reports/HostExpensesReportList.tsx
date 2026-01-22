@@ -182,11 +182,11 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
         period: {
           dateFrom: dayjs
             .utc(date)
-            .startOf(timeUnit as any)
+            .startOf(timeUnit.toLowerCase() as 'month' | 'quarter' | 'year')
             .toISOString(),
           dateTo: dayjs
             .utc(date)
-            .endOf(timeUnit as any)
+            .endOf(timeUnit.toLowerCase() as 'month' | 'quarter' | 'year')
             .toISOString(),
           timeUnit,
         },

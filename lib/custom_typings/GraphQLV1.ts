@@ -32,7 +32,7 @@ export interface GraphQLV1PaymentMethod {
   service: string;
   type: string;
   batch: string;
-  data: any;
+  data: Record<string, unknown>;
   initialBalance: number;
   monthlyLimitPerMember: number;
   balance: number;

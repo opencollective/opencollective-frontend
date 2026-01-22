@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import { groupBy, mapValues, pick, toPairs } from 'lodash';
 import { Pencil } from 'lucide-react';
@@ -159,7 +159,9 @@ export const cols = {
     header: '',
     cell: ({ row, table }) => {
       const collective = row.original;
-      const { onClickEdit } = table.options.meta as any;
+      const { onClickEdit } = table.options.meta as TableMeta<SubscriberFieldsFragment> & {
+        onClickEdit: (collective: SubscriberFieldsFragment) => void;
+      };
       return (
         // Stop propagation since the row is clickable
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions

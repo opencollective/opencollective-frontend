@@ -8,6 +8,7 @@ import { Eraser } from 'lucide-react';
 import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
+import type z from 'zod';
 
 import { setRestAuthorizationCookie } from '../../lib/auth';
 import { getEnvVar } from '../../lib/env-utils';
@@ -221,7 +222,7 @@ const editAccountSettingsMutation = gql`
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
+  queryFilter: useQueryFilterReturnType<z.AnyZodObject, TransactionsPageQueryVariables | HostReportsQueryVariables>;
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
@@ -239,7 +240,7 @@ const ExportTransactionsCSVModal = ({
 }: ExportTransactionsCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
-  const [fields, setFields] = React.useState([]);
+  const [fields, setFields] = React.useState<string[]>([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const [useFieldNames, setUseFieldNames] = React.useState(false);
@@ -401,7 +402,7 @@ const ExportTransactionsCSVModal = ({
         ]),
       );
     } else {
-      setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
+      setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f)));
     }
   };
 

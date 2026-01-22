@@ -5,6 +5,7 @@ import type { z } from 'zod';
 
 import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { i18nAmountFilterLabel } from '../../../lib/i18n/amount-filter';
+import type { Currency } from '@/lib/graphql/types/v2/schema';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select';
 
@@ -23,7 +24,7 @@ const BalanceFilter = React.memo(function BalanceFilter({
 }: {
   value: AmountFilterValueType;
   onChange: (value: AmountFilterValueType) => void;
-  meta?: { currency?: string };
+  meta?: { currency?: Currency };
 }) {
   const intl = useIntl();
   value = value ?? { type: AmountFilterType.IS_GREATER_THAN, currency: meta?.currency };
@@ -52,7 +53,7 @@ const BalanceFilter = React.memo(function BalanceFilter({
   );
 });
 
-export const consolidatedBalanceFilter: FilterConfig<z.infer<typeof amountFilterSchema>> = {
+export const consolidatedBalanceFilter: FilterConfig<z.infer<typeof amountFilterSchema>, { currency?: Currency }> = {
   schema: amountFilterSchema,
   toVariables: (value: z.infer<typeof amountFilterSchema>) => ({
     consolidatedBalance: {

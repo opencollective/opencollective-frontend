@@ -89,25 +89,27 @@ type RadioListProps = {
     checked: boolean;
     index: number;
     key: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any;
     radio: React.ReactNode;
   }) => React.ReactNode;
   /** A function that returns the key to use for each item */
-  keyGetter?: string | ((item: any) => string);
+  keyGetter?: string | ((item: unknown) => string);
   /** A list of options to use */
-  options: any[];
+  options: unknown[];
   /** Called when the selected item change */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (value: any) => void;
   /** The default value to use */
-  defaultValue?: any;
+  defaultValue?: unknown;
   /** The current value */
-  value?: any;
+  value?: unknown;
   /** If true, all radio buttons will be disabled */
   disabled?: boolean;
   /** Container props */
-  containerProps?: any;
+  containerProps?: React.HTMLAttributes<HTMLFieldSetElement>;
   /** Label props */
-  labelProps?: any;
+  labelProps?: React.LabelHTMLAttributes<HTMLLabelElement>;
   /** Radio size */
   radioSize?: number;
   /** Data-cy */

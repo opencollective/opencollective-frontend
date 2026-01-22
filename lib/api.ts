@@ -273,6 +273,7 @@ export async function signup(body: {
   email?: string;
   password?: string;
   captcha?: { token?: string; provider?: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): Promise<{ success?: true; sessionId?: string; error?: any }> {
   const response = await fetch('/api/users/signup', {
     method: 'POST',

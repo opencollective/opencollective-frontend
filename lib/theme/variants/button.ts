@@ -184,6 +184,7 @@ const generateSecondaryButtonVariant = ({
 /**
  * Generate buttons styles based on the colors defined in https://www.figma.com/file/1jyGC3MjtqI7uUsGf1447P/%5BDS%5D-01-Colors?node-id=1354%3A2
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getButtonStyles = ({ colors }): Record<ButtonStyle, Record<string, any>> => {
   return {
     // Base

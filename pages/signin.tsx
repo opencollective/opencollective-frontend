@@ -58,6 +58,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
     const requestedByWhitelabelProvider = getWhitelabelProviderFromRedirectionUrl(next as string);
     email = typeof email === 'string' && decodeURIComponent(email);
     const userAgent =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       req && typeof req['get'] === 'function' ? (req as any).get('User-Agent') : req?.headers?.['user-agent'];
     return {
       token,

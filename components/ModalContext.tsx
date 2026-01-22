@@ -6,7 +6,7 @@ import ConfirmationModal from './NewConfirmationModal';
 export interface BaseModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onCloseFocusRef?: React.MutableRefObject<any>;
+  onCloseFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
 type ShowModalReturnType = {
@@ -32,8 +32,8 @@ type BaseModal = {
   id: string;
   type: ModalType;
   open: boolean;
-  component?: React.FC<any>;
-  modalProps?: any;
+  component?: React.ComponentType<BaseModalProps>;
+  modalProps?: Record<string, unknown>;
 };
 
 let count = 0;
@@ -69,8 +69,8 @@ type OpenModalAction = BaseModalAction & {
   payload: {
     id: string;
     type: ModalType;
-    component?: React.FC<any>;
-    modalProps?: unknown;
+    component?: React.ComponentType<BaseModalProps>;
+    modalProps?: Record<string, unknown>;
   };
 };
 
@@ -123,7 +123,12 @@ const ModalRoot = () => {
   return modals.map(({ component: Component, modalProps, type, id, open }) => {
     if (type === ModalType.CONFIRMATION) {
       return (
-        <ConfirmationModal key={id} {...modalProps} open={open} setOpen={open => (!open ? hideModal(id) : null)} />
+        <ConfirmationModal
+          key={id}
+          {...(modalProps as Omit<ConfirmationModalProps, 'open' | 'setOpen'>)}
+          open={open}
+          setOpen={open => (!open ? hideModal(id) : null)}
+        />
       );
     }
     return (
@@ -131,10 +136,12 @@ const ModalRoot = () => {
         key={id}
         {...modalProps}
         open={open}
-        setOpen={open => {
+        setOpen={(open: boolean) => {
           if (!open) {
             hideModal(id);
-            modalProps.onClose?.();
+            if (typeof modalProps === 'object' && modalProps && 'onClose' in modalProps) {
+              (modalProps.onClose as () => void)?.();
+            }
           }
         }}
       />

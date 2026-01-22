@@ -437,7 +437,7 @@ type SearchResultsGroupProps<
   onStandaloneTab?: boolean;
   entity: E;
   loading?: boolean;
-  queryFilter: useQueryFilterReturnType<any, any>;
+  queryFilter: useQueryFilterReturnType<z.ZodObject<z.ZodRawShape>, Record<string, unknown>>;
 };
 
 function SearchResultsGroup<E extends Exclude<keyof SearchEntityNodeMap, SearchEntity.DASHBOARD_TOOL>>({

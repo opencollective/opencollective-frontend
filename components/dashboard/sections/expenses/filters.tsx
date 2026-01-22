@@ -67,12 +67,14 @@ export type FilterMeta = {
   currency?: Currency;
   hideExpensesMetaStatuses?: boolean;
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
+  hostSlug?: string;
 };
 
 // Only needed when either the key or the expected query variables are different
 export const toVariables: FiltersToVariables<
   FilterValues,
-  HostDashboardExpensesQueryVariables & AccountExpensesQueryVariables
+  HostDashboardExpensesQueryVariables & AccountExpensesQueryVariables,
+  FilterMeta
 > = {
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,

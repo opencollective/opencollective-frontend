@@ -207,7 +207,7 @@ const messages = defineMessages({
   },
 });
 
-const ButtonsContainer = ({ children, ...props }: { children: React.ReactNode; [key: string]: any }) => (
+const ButtonsContainer = ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
   <div
     className="flex flex-wrap justify-end transition-opacity duration-75 max-sm:justify-center [&>*:last-child]:mr-0"
     data-cy="order-actions"
@@ -229,7 +229,7 @@ const TransactionDetails = ({
   ...props
 }: {
   children: [React.ReactNode, React.ReactNode, React.ReactNode?, React.ReactNode?];
-  [key: string]: any;
+  [key: string]: unknown;
 }) => (
   <div
     data-cy="transaction-details-wrapper"
@@ -247,7 +247,7 @@ const TransactionDetails = ({
   </div>
 );
 
-const OverdueTag = ({ children, ...props }: { children: React.ReactNode; [key: string]: any }) => (
+const OverdueTag = ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
   <span className="rounded bg-yellow-300 px-1.5 py-0.5 text-yellow-900" {...props}>
     {children}
   </span>

@@ -280,10 +280,12 @@ type CreatePendingContributionFormProps = {
   onClose: () => void;
   onSuccess?: () => void;
   loading?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error?: any;
 };
 
 const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePendingContributionFormProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formik = useFormikContext<any>();
   const { values, isSubmitting, setFieldValue } = formik;
   const intl = useIntl();

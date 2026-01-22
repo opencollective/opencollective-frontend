@@ -12,7 +12,7 @@ type EntityOption = (typeof entityFilterOptions)[keyof typeof entityFilterOption
 
 interface EntityFilterItemProps {
   opt: EntityOption;
-  queryFilter: useQueryFilterReturnType<typeof schema, any>;
+  queryFilter: useQueryFilterReturnType<typeof schema, Record<string, unknown>>;
   intl: IntlShape;
 }
 

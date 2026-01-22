@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { compact, flatten, groupBy } from 'lodash';
@@ -64,6 +65,7 @@ const PaymentMethodCard = ({ paymentMethods, onRemove, onConfirm, moreActions }:
       <div className="flex w-full justify-between leading-5">
         <div className="flex items-center gap-2">
           {getPaymentMethodIcon(paymentMethod, paymentMethod.account, 16)}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           {getPaymentMethodName(paymentMethod as any)}
         </div>
         <div className="flex gap-2">

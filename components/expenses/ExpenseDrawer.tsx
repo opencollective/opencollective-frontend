@@ -15,7 +15,7 @@ import Expense from './Expense';
 type ExpenseDrawerProps = {
   handleClose: () => void;
   openExpenseLegacyId?: number;
-  initialExpenseValues?: any;
+  initialExpenseValues?: Record<string, unknown>;
   /**
    * A set of rules that the expense must pass to be displayed in the drawer, used to address
    * Insecure Direct Object Reference (IDOR) vulnerabilities.

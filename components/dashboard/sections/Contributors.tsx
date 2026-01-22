@@ -56,7 +56,10 @@ const memberRoleFilter: FilterConfig<z.infer<typeof MemberRoleSchema>> = {
 };
 
 const TierReferenceSchema = z.union([z.coerce.number(), z.literal('__NO_TIER__')]).optional();
-const tierFilter: FilterConfig<z.infer<typeof TierReferenceSchema>> = {
+const tierFilter: FilterConfig<
+  z.infer<typeof TierReferenceSchema>,
+  { tierOptions?: { label: string; value: number | string }[] }
+> = {
   schema: TierReferenceSchema,
   toVariables: value => {
     if (!value) {

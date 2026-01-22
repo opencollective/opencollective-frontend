@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 type useNavigationWarningOpts = {
   enabled?: boolean;
-  confirmationMessage?: any;
+  confirmationMessage?: string;
 };
 
 export function useNavigationWarning(opts: useNavigationWarningOpts) {

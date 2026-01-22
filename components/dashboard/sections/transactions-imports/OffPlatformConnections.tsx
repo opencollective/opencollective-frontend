@@ -26,6 +26,7 @@ import { useToast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
+import type { DashboardSectionProps } from '../../types';
 
 import { NewOffPlatformTransactionsConnection } from './NewOffPlatformTransactionsConnection';
 import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
@@ -60,7 +61,7 @@ const offPlatformConnectionsQuery = gql`
   ${TransactionImportListFieldsFragment}
 `;
 
-export const OffPlatformConnections = ({ accountSlug }) => {
+export const OffPlatformConnections = ({ accountSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const router = useRouter();

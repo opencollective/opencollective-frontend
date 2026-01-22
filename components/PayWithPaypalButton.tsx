@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash';
-import { injectIntl } from 'react-intl';
+import { injectIntl, type IntlShape } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
@@ -46,7 +46,7 @@ type PayWithPaypalButtonProps = {
     label?: 'checkout' | 'credit' | 'pay' | 'buynow' | 'paypal' | 'installment';
     tagline?: boolean;
     layout?: 'horizontal' | 'vertical';
-    funding?: { allowed: Array<any>; disallowed: Array<any> };
+    funding?: { allowed?: string[]; disallowed?: string[] };
     fundingicons?: boolean;
   };
   host: {
@@ -59,8 +59,9 @@ type PayWithPaypalButtonProps = {
     name: string;
   };
   tier?: { id: string };
-  data?: any;
-  intl?: any;
+  order?: { id: string | number };
+  data?: { loading?: boolean; paypalPlan?: { id: string } };
+  intl?: IntlShape;
   subscriptionStartDate?: string;
 };
 
@@ -89,7 +90,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
     }
   }
 
-  paypalTarget: any;
+  paypalTarget: React.RefObject<HTMLDivElement>;
   static defaultStyle = {
     color: 'blue',
     tagline: false,
@@ -230,7 +231,7 @@ const paypalPlanQuery = gql`
 const addPaypalPlan = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
   skip: props => !props.interval || props.interval === INTERVALS.oneTime,
-  options: (props: any) => ({
+  options: (props: PayWithPaypalButtonProps) => ({
     variables: {
       account: { id: props.collective.id },
       tier: props.tier ? { id: props.tier.id } : null,
@@ -239,7 +240,7 @@ const addPaypalPlan = graphql(paypalPlanQuery, {
         : typeof props.order.id === 'string'
           ? { id: props.order.id }
           : { legacyId: props.order.id },
-      frequency: getGQLV2FrequencyFromInterval(props.interval),
+      frequency: getGQLV2FrequencyFromInterval(props.interval as 'oneTime' | 'month' | 'year' | 'flexible' | undefined),
       amount: {
         valueInCents: props.totalAmount,
         currency: props.currency,

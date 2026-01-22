@@ -102,7 +102,7 @@ const Option = ({
   isChild,
   isDisplay,
 }: {
-  collective: any;
+  collective: GraphQLV1Collective;
   description?: string | ReactElement;
   isChild?: boolean;
   className?: string;
@@ -135,7 +135,7 @@ const MenuEntry = ({
   activeSlug,
   handleClose,
 }: {
-  account: any;
+  account: GraphQLV1Collective;
   activeSlug: string;
   handleClose: () => void;
 }) => {

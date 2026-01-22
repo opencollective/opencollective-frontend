@@ -31,7 +31,10 @@ async function main() {
   const progress = await fetchProgress();
   const simplifyLocale = (locale: string) => locale.split('-')[0];
   const crowdinLocales = new Set(
-    progress.flatMap((locale: any) => [locale.data.languageId, simplifyLocale(locale.data.languageId)]),
+    progress.flatMap((locale: { data: { languageId: string } }) => [
+      locale.data.languageId,
+      simplifyLocale(locale.data.languageId),
+    ]),
   );
 
   const files = fs.readdirSync(path.join(__dirname, '../lang'));

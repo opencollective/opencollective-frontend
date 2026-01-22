@@ -1,8 +1,10 @@
 import React from 'react';
 import { Receipt } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
+import type { z } from 'zod';
 
 import type { Account, Amount, Expense } from '../../../../lib/graphql/types/v2/schema';
+import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -32,7 +34,7 @@ export const SuggestedExpensesTable = <ExpenseType extends ExpenseForRow>({
   setSelectedExpense: (expense: ExpenseType) => void;
   expenses: ExpenseType[];
   totalExpenses: number;
-  queryFilter: any;
+  queryFilter: useQueryFilterReturnType<z.ZodObject<z.ZodRawShape>, unknown> | null;
   onCreateExpenseClick: () => void;
 }) => {
   return (
@@ -49,9 +51,9 @@ export const SuggestedExpensesTable = <ExpenseType extends ExpenseForRow>({
         }
         emptyMessage={() => (
           <EmptyResults
-            hasFilters={queryFilter.hasFilters}
+            hasFilters={queryFilter?.hasFilters ?? false}
             entityType="EXPENSES"
-            onResetFilters={() => queryFilter.resetFilters()}
+            onResetFilters={() => queryFilter?.resetFilters?.({})}
             imageSize={120}
             otherActions={
               <Button data-cy="create-expense" variant="outline" onClick={onCreateExpenseClick}>

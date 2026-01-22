@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';

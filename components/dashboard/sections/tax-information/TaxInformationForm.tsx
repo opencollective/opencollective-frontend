@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import type { FormikProps } from 'formik';

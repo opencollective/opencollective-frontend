@@ -67,7 +67,10 @@ export const AccountRenderer = (props: {
 
 const schema = z.string().optional();
 
-export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
+export const hostedAccountFilter: FilterConfig<
+  z.infer<typeof schema>,
+  { inOptionsList?: boolean; hostSlug: string }
+> = {
   schema,
   toVariables: (value, key) => ({ [key]: { slug: value } }),
   filter: {
@@ -81,7 +84,10 @@ export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
 
 const multiSchema = isMulti(z.string()).optional();
 
-export const hostedAccountsFilter: FilterConfig<z.infer<typeof multiSchema>> = {
+export const hostedAccountsFilter: FilterConfig<
+  z.infer<typeof multiSchema>,
+  { inOptionsList?: boolean; hostSlug: string }
+> = {
   schema: multiSchema,
   toVariables: (value, key) => ({ [key]: value.map(slug => ({ slug })) }),
   filter: {

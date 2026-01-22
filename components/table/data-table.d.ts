@@ -3,6 +3,7 @@ import '@tanstack/react-table';
 import type { OnChangeFn, Row, RowData, VisibilityState } from '@tanstack/react-table';
 import type { RefObject } from 'react';
 import type { IntlShape, MessageDescriptor } from 'react-intl';
+import type { z } from 'zod';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { Account } from '../../lib/graphql/types/v2/schema';
@@ -15,7 +16,7 @@ declare module '@tanstack/react-table' {
   }
   interface TableMeta<TData extends RowData> {
     intl?: IntlShape;
-    queryFilter?: useQueryFilterReturnType<any>;
+    queryFilter?: useQueryFilterReturnType<z.ZodObject<z.ZodRawShape>, Record<string, unknown>>;
     setColumnVisibility?: OnChangeFn<VisibilityState>;
     columnVisibility?: VisibilityState;
     defaultColumnVisibility?: VisibilityState;
@@ -30,7 +31,7 @@ declare module '@tanstack/react-table' {
 
     // AccountingCateriesTable
     disabled?: boolean;
-    onDelete?: (v: any) => void;
-    [key: string]: any; // Allow additional properties for flexibility
+    onDelete?: (v: unknown) => void;
+    [key: string]: unknown; // Allow additional properties for flexibility
   }
 }

@@ -107,15 +107,15 @@ function getTransactionGroupLink(
   return url.toString();
 }
 
-const formatValue = (key: string, value: any, context: any) => {
+const formatValue = (key: string, value: unknown, context: { currency: string }) => {
   switch (key) {
     case 'totalAmount':
     case 'paymentProcessorFee':
     case 'amount':
     case 'taxAmount':
-      return <FormattedMoneyAmount amount={value} currency={context.currency} />;
+      return <FormattedMoneyAmount amount={value as number} currency={context.currency} />;
     case 'processedAt':
-      return <DateTime value={value} timeStyle="short" omitTimeIfMidnight />;
+      return <DateTime value={value as string} timeStyle="short" omitTimeIfMidnight />;
     default:
       return value.toString();
   }

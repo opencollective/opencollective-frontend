@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { clsx } from 'clsx';
 import { includes, truncate } from 'lodash';
@@ -6,6 +7,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
+import type { Amount } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import useClipboard from '../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
@@ -151,7 +153,9 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
 
           {hasExchangeRate && (
             <div className="my-1 text-xs text-slate-600">
-              <AmountWithExchangeRateInfo amount={props.expense.amountInAccountCurrency as any} />
+              <AmountWithExchangeRateInfo
+                amount={(props.expense as { amountInAccountCurrency?: Amount }).amountInAccountCurrency as any}
+              />
             </div>
           )}
         </div>

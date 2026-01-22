@@ -280,6 +280,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       >
         {showCollectiveOverview && (
           <CollectiveDetails
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}

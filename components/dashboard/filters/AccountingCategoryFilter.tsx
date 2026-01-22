@@ -30,7 +30,7 @@ const schema = isMulti(z.string()).optional();
 
 export const UNCATEGORIZED_VALUE = '__uncategorized__';
 
-export const accountingCategoryFilter: FilterConfig<z.infer<typeof schema>> = {
+export const accountingCategoryFilter: FilterConfig<z.infer<typeof schema>, { hostSlug?: string }> = {
   schema,
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Accounting Category', id: 'ckcrQ7' }),

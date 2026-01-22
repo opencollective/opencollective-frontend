@@ -26,9 +26,8 @@ type LinkProps = {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   openInNewTab?: boolean;
   'data-cy'?: string;
-  innerRef?: any;
-  // TODO: remove "any" when we get rid of StyledLink using styled-components "as" prop
-  as?: string | NextLinkProps['as'] | any;
+  innerRef?: React.Ref<HTMLAnchorElement>;
+  as?: string | NextLinkProps['as'];
   $isActive?: boolean;
 } & NextLinkProps;
 
@@ -73,7 +72,7 @@ const Link = ({ href, children, className, openInNewTab, innerRef, onClick, titl
   }
 };
 
-export default React.forwardRef<typeof Link, LinkProps>((props, ref) => <Link innerRef={ref} {...props} />);
+export default React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => <Link innerRef={ref} {...props} />);
 
 export const DocumentationLink = ({ href, children, className }: Omit<LinkProps, 'href'> & { href: string }) => {
   return (

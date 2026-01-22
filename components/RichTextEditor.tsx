@@ -18,7 +18,7 @@ type RichTextEditorContainerProps = {
   /** This component is borderless by default. Set this to `true` to change that. */
   withBorders?: boolean;
   /** If truthy, will display a red outline */
-  error?: any;
+  error?: boolean | string | undefined;
   /** Min height for the full component */
   editorMinHeight?: number | string | number[] | string[];
   /** Max height for the full component */
@@ -58,7 +58,7 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   /** This component is borderless by default. Set this to `true` to change that. */
   withBorders?: boolean;
   /** If truthy, will display a red outline */
-  error?: any;
+  error?: boolean | string | undefined;
   /** Min height for the full component */
   editorMinHeight?: number | string | number[] | string[];
   /** Max height for the full component */
@@ -243,7 +243,7 @@ type RichTextEditorState = {
   id: string;
   value: string;
   text: string;
-  error: any;
+  error: boolean | string | undefined;
 };
 
 /**

@@ -6,10 +6,10 @@ import type { z } from 'zod';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import type { TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
+import type { DashboardContextType } from '../../DashboardContext';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -24,7 +24,7 @@ import { transactionsTableQuery } from './queries';
 import TransactionsTable from './TransactionsTable';
 
 type FilterMeta = CommonFilterMeta & {
-  childrenAccounts: Account[];
+  childrenAccounts: DashboardContextType['account']['childrenAccounts']['nodes'];
   accountSlug: string;
 };
 

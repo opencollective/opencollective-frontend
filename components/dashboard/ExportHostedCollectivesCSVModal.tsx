@@ -8,6 +8,7 @@ import { Eraser } from 'lucide-react';
 import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
+import type z from 'zod';
 
 import { setRestAuthorizationCookie } from '../../lib/auth';
 import {
@@ -146,7 +147,7 @@ const editAccountSettingsMutation = gql`
 type ExportHostedCollectivesCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
+  queryFilter: useQueryFilterReturnType<z.AnyZodObject, TransactionsPageQueryVariables | HostReportsQueryVariables>;
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
@@ -162,7 +163,7 @@ const ExportHostedCollectivesCSVModal = ({
 }: ExportHostedCollectivesCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
-  const [fields, setFields] = React.useState([]);
+  const [fields, setFields] = React.useState<string[]>([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
   const [presetName, setPresetName] = React.useState('');
@@ -255,7 +256,7 @@ const ExportHostedCollectivesCSVModal = ({
     if (checked) {
       setFields(uniq([...fields, ...GROUP_FIELDS[name]]));
     } else {
-      setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
+      setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f)));
     }
   };
 

@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
+import type { DashboardAccountsQueryFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import formatAccountType from '@/lib/i18n/account-type';
 
 import type { BaseModalProps } from '@/components/ModalContext';
@@ -13,7 +14,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
 import AddFundsModal from '../collectives/AddFundsModal';
 
-export const cols: Record<string, ColumnDef<any, any>> = {
+export const cols: Record<string, ColumnDef<DashboardAccountsQueryFieldsFragment, unknown>> = {
   collective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,

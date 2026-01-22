@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import type { Currency } from '@/lib/graphql/types/v2/schema';
+
 export enum AmountFilterType {
   IS_EQUAL_TO = 'IS_EQUAL_TO',
   IS_BETWEEN = 'IS_BETWEEN',
@@ -15,24 +17,36 @@ const amountFilter = z.union([
       type: z.literal(IS_EQUAL_TO).default(IS_EQUAL_TO),
       gte: z.coerce.number().int(),
       lte: z.coerce.number().int(),
-      currency: z.string().optional(),
+      currency: z
+        .string()
+        .optional()
+        .transform(str => str as Currency),
     })
     .refine(({ gte, lte }) => gte === lte),
   z.object({
     type: z.literal(IS_BETWEEN).default(IS_BETWEEN),
     gte: z.coerce.number().int(),
     lte: z.coerce.number().int(),
-    currency: z.string().optional(),
+    currency: z
+      .string()
+      .optional()
+      .transform(str => str as Currency),
   }),
   z.object({
     type: z.literal(IS_GREATER_THAN).default(IS_GREATER_THAN),
     gte: z.coerce.number().int(),
-    currency: z.string().optional(),
+    currency: z
+      .string()
+      .optional()
+      .transform(str => str as Currency),
   }),
   z.object({
     type: z.literal(IS_LESS_THAN).default(IS_LESS_THAN),
     lte: z.coerce.number().int(),
-    currency: z.string().optional(),
+    currency: z
+      .string()
+      .optional()
+      .transform(str => str as Currency),
   }),
 ]);
 

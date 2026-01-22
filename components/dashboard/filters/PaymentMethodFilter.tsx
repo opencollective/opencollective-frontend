@@ -10,6 +10,7 @@ import { i18nPaymentMethodType } from '../../../lib/i18n/payment-method-type';
 import { PaymentMethodLabel, PaymentMethodServiceLabel } from '../../PaymentMethodLabel';
 import { Label } from '../../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select';
+import type { FilterMeta } from '../sections/transactions/filters';
 
 const schema = z
   .object({
@@ -46,7 +47,7 @@ const options: Partial<Record<PaymentMethodService, PaymentMethodType[]>> = {
   [PaymentMethodService.THEGIVINGBLOCK]: [PaymentMethodType.CRYPTO],
 };
 
-export const paymentMethodFilter: FilterConfig<PaymentMethodFilterValue> = {
+export const paymentMethodFilter: FilterConfig<PaymentMethodFilterValue, FilterMeta> = {
   schema,
   toVariables: value => {
     return {

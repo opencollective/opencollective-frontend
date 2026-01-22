@@ -19,7 +19,7 @@ const recursivelyRemoveEmptyValues = (obj: Record<string, unknown>): Record<stri
       }
       return acc;
     },
-    {} as Record<string, any>,
+    {} as Record<string, unknown>,
   );
 };
 

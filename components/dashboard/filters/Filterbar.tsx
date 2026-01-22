@@ -75,7 +75,7 @@ const renderFilter = ({ filters, values, key, activeViewId, views, lockViewFilte
   }
 };
 
-export function Filterbar<FV extends Record<string, any>, FM>({
+export function Filterbar<FV extends Record<string, unknown>, FM>({
   values,
   filters,
   views,
@@ -143,7 +143,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
           {primaryFilters.includes(sortFilterKey) && (
             <sortFilter.StandaloneComponent
               onChange={value => setFilter(sortFilterKey, value)}
-              value={values[sortFilterKey]}
+              value={values[sortFilterKey] as FV[typeof sortFilterKey]}
               intl={intl}
             />
           )}
@@ -169,7 +169,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
           <div className="flex w-full flex-1 justify-end">
             <sortFilter.StandaloneComponent
               onChange={value => setFilter(sortFilterKey, value)}
-              value={values[sortFilterKey]}
+              value={values[sortFilterKey] as FV[typeof sortFilterKey]}
               intl={intl}
             />
           </div>

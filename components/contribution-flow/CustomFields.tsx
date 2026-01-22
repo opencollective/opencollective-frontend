@@ -50,8 +50,8 @@ type FieldsConfig = {
 };
 
 type CustomFieldsProps = {
-  data: Record<string, any>;
-  onChange: (data: Record<string, any>) => void;
+  data: Record<string, unknown>;
+  onChange: (data: Record<string, unknown>) => void;
   config: FieldsConfig;
 };
 
@@ -89,25 +89,38 @@ const CustomFieldSelect = ({
   translate,
   value,
 }: {
-  fieldProps: Record<string, any>;
+  fieldProps: Record<string, unknown>;
   customField: SelectFieldAttributes;
-  onChange: (value: any) => void;
+  onChange: (value: unknown) => void;
   translate: (value: string) => string;
-  value: any;
+  value: unknown;
 }) => {
   const options = customField.options?.map(option => ({ ...option, label: translate(option.label) })) || [];
+  const isMulti = (customField as SelectFieldAttributes).settings?.isMulti;
   return (
     <StyledSelect
-      inputId={fieldProps.id}
-      name={fieldProps.name}
-      required={fieldProps.required}
-      disabled={fieldProps.disabled}
-      onChange={onChange}
-      isMulti={(customField as SelectFieldAttributes).settings?.isMulti}
+      inputId={fieldProps.id as string}
+      name={fieldProps.name as string}
+      required={fieldProps.required as boolean | undefined}
+      disabled={fieldProps.disabled as boolean | undefined}
+      onChange={(selectedOption: { value: unknown } | Array<{ value: unknown }> | null) => {
+        if (Array.isArray(selectedOption)) {
+          onChange(selectedOption.map(opt => opt.value));
+        } else if (selectedOption) {
+          onChange(selectedOption.value ?? selectedOption);
+        } else {
+          onChange(null);
+        }
+      }}
+      isMulti={isMulti as boolean | undefined}
       placeholder={translate(customField.placeholder)}
       width={1}
       options={options}
-      value={options.find(option => option.value === value)}
+      value={
+        isMulti
+          ? (options.filter(option => (value as unknown[]).includes(option.value)) as unknown)
+          : options.find(option => option.value === value) || null
+      }
     />
   );
 };

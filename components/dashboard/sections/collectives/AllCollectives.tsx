@@ -12,6 +12,7 @@ import type {
   HostedCollectiveFieldsFragment,
   HostedCollectivesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -195,7 +196,11 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
       >
         {showCollectiveOverview && (
           <CollectiveDetails
-            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
+            collective={
+              isString(showCollectiveOverview)
+                ? null
+                : (showCollectiveOverview as HostedCollectiveFieldsFragment & Partial<AccountWithHost>)
+            }
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             onCancel={() => handleDrawer(null)}
             openCollectiveDetails={handleDrawer}

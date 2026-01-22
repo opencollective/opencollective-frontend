@@ -53,7 +53,7 @@ function ChildAccountFilter({
   return <ComboSelectFilter groupedOptions={groupedOptions} {...props} />;
 }
 
-export const childAccountFilter: FilterConfig<z.infer<typeof schema>> = {
+export const childAccountFilter: FilterConfig<z.infer<typeof schema>, object & { childrenAccounts?: unknown[] }> = {
   schema,
   toVariables: (value, key, meta) => {
     if (meta?.childrenAccounts && !meta.childrenAccounts.length) {

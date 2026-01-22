@@ -52,10 +52,12 @@ import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
 import UnhostAccountModal from './UnhostAccountModal';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
     accessorKey: 'collective',
@@ -396,7 +398,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: '',
     cell: ({ row, table }) => {
       const collective = row.original;
-      const { onEdit, host, openCollectiveDetails } = table.options.meta as any;
+      const { onEdit, host, openCollectiveDetails } = table.options.meta as HostedCollectivesDataTableMeta;
       return (
         host?.id === collective.host?.id && (
           // Stop propagation since the row is clickable

@@ -108,7 +108,7 @@ type SocialLinkTypePickerProps = {
   value: SocialLinkType;
   onChange: (value: SocialLinkType) => void;
   useLegacyInput?: boolean;
-} & any;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 const options = Object.keys(SocialLinkType).map(value => ({ value, label: SocialLinkLabel[value] }));
 
@@ -120,13 +120,13 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
         data-cy="social-link-type-picker"
         value={options.find(o => o.value === value?.toString())}
         defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
-        onChange={({ value }) => onChange(value)}
+        onChange={({ value }: { value: string }) => onChange(value as SocialLinkType)}
         options={sortBy(options, 'label')}
       />
     );
   } else {
     return (
-      <Select value={value} onValueChange={value => onChange(value)}>
+      <Select value={value} onValueChange={(value: string) => onChange(value as SocialLinkType)}>
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>

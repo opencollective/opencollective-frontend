@@ -3,12 +3,13 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Markup } from 'interweave';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, type IntlShape } from 'react-intl';
 import { styled } from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { gql } from '../lib/graphql/helpers';
+import type { Account, Update } from '../lib/graphql/types/v2/schema';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 import type LoggedInUser from '@/lib/LoggedInUser';
@@ -59,16 +60,16 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
 `;
 
 type StyledUpdateProps = {
-  collective: any;
-  update: any;
+  collective: Account & { host?: { slug: string } | null };
+  update: Update;
   compact?: boolean;
   LoggedInUser?: LoggedInUser;
   isReloadingData?: boolean;
   deleteUpdate?: ({ variables }: { variables: { id: string } }) => void;
-  intl: any;
+  intl: IntlShape;
   router: Router;
   /** Reactions associated with this update **/
-  reactions?: any;
+  reactions?: Record<string, number>;
 };
 
 class StyledUpdate extends Component<
@@ -93,7 +94,7 @@ class StyledUpdate extends Component<
     });
   }
 
-  private messages: any;
+  private messages: ReturnType<typeof defineMessages>;
 
   deleteUpdate = async () => {
     if (!confirm('😱 Are you really sure you want to delete this update?')) {
@@ -266,7 +267,8 @@ class StyledUpdate extends Component<
     const { mode } = this.state;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
     const editable = !compact && canEditUpdate;
-    const fromAccount = update.fromCollective || update.fromAccount;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fromAccount = (update as any).fromCollective || update.fromAccount;
 
     return (
       <React.Fragment>

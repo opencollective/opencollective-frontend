@@ -53,6 +53,7 @@ const i18nReasons = defineMessages({
 export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod' | 'editAddedFunds';
 
 type EditOrderModalProps = BaseModalProps & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   order: any;
   accountSlug: string;
   action: EditOrderActions;

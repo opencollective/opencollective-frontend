@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';

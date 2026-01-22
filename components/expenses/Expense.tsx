@@ -70,7 +70,7 @@ const getVariableFromProps = props => {
   };
 };
 
-const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
+const ExpenseHeader = styled(H1) <{ inDrawer?: boolean }>`
   ${props =>
     props.inDrawer
       ? css`
@@ -106,6 +106,7 @@ interface ExpenseProps {
   edit?: string;
   client?: ApolloClient<object>;
   loading?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error?: any;
   refetch?: () => void;
   fetchMore?: FetchMoreFunction<unknown, unknown>;
@@ -119,28 +120,28 @@ interface ExpenseProps {
   data?: {
     loggedInAccount: Pick<Account, 'id' | 'slug' | 'type'>;
     expense: React.ComponentProps<typeof ExpenseInviteWelcome> &
-      React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
-      React.ComponentProps<typeof ExpenseInviteWelcome> &
-      React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
-      Pick<
-        ExpenseType,
-        | 'id'
-        | 'legacyId'
-        | 'type'
-        | 'account'
-        | 'status'
-        | 'permissions'
-        | 'items'
-        | 'comments'
-        | 'activities'
-        | 'privateMessage'
-        | 'onHold'
-        | 'recurringExpense'
-        | 'requiredLegalDocuments'
-        | 'draft'
-      > & {
-        account: Pick<AccountWithHost, 'host'>;
-      };
+    React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
+    React.ComponentProps<typeof ExpenseInviteWelcome> &
+    React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
+    Pick<
+      ExpenseType,
+      | 'id'
+      | 'legacyId'
+      | 'type'
+      | 'account'
+      | 'status'
+      | 'permissions'
+      | 'items'
+      | 'comments'
+      | 'activities'
+      | 'privateMessage'
+      | 'onHold'
+      | 'recurringExpense'
+      | 'requiredLegalDocuments'
+      | 'draft'
+    > & {
+      account: Pick<AccountWithHost, 'host'>;
+    };
   };
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { checkVATNumberFormat, GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
 import type { FormikProps } from 'formik';
@@ -200,9 +201,9 @@ export const TaxesFormikFields = ({
           idNumberLabelRenderer
             ? idNumberLabelRenderer(shortTaxTypeLabel)
             : intl.formatMessage(
-                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
-                { taxName: shortTaxTypeLabel },
-              )
+              { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+              { taxName: shortTaxTypeLabel },
+            )
         }
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         required={!isOptional && taxSpecificValues.requireIdNumber}

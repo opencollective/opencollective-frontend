@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
+import type { z } from 'zod';
 
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '@/lib/hooks/useQueryFilter';
@@ -92,7 +93,7 @@ type SearchCommandGroupProps<E extends SearchCommandGroupEntity = SearchCommandG
   nodes?: SearchEntityNodeMap[E][];
   renderNode: (node: SearchEntityNodeMap[E]) => React.ReactNode;
   input: string;
-  queryFilter: useQueryFilterReturnType<any, any>;
+  queryFilter: useQueryFilterReturnType<z.ZodObject<z.ZodRawShape>, Record<string, unknown>>;
   entity: E;
   setOpen: (open: boolean) => void;
   isInfiniteScrollEnabled?: boolean;
@@ -149,7 +150,7 @@ export function SearchCommandGroup<E extends SearchCommandGroupEntity>({
           onSelect={handleSeeMoreSelect}
           key={`more-${String(entity)}`}
           totalCount={totalCount}
-          limit={queryFilter.variables.limit}
+          limit={queryFilter.variables.limit as number}
           label={i18nSearchEntity(intl, entity)}
         />
       )}

@@ -53,7 +53,7 @@ export function structureQueryValues(queryValues) {
   }
 */
 
-export function destructureFilterValues(values: { [key: string]: any }): { [key: string]: string | string[] } {
+export function destructureFilterValues(values: Record<string, unknown>): { [key: string]: string | string[] } {
   const flatValues = {};
 
   forOwn(values, (value, key) => {

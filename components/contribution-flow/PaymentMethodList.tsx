@@ -143,6 +143,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
         : { legacyId: props.stepProfile.id },
     guestInfo: props.stepProfile.isGuest ? getGuestInfoFromStepProfile(props.stepProfile) : undefined,
     toAccount: pick(props.toAccount, 'id'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     frequency: getGQLV2FrequencyFromInterval(props.stepDetails.interval as any) as any,
   });
 
@@ -157,6 +158,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       props.isEmbed,
       props.disabledPaymentMethodTypes,
       paymentIntent,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any[];
   }, [
     paymentMethodsData?.account?.paymentMethods,

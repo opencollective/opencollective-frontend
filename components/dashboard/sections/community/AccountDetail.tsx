@@ -576,8 +576,11 @@ export function ContributorDetails(props: ContributionDrawerProps) {
             host={dashboardAccount}
             supportsTaxForm={
               'host' in dashboardAccount &&
+              dashboardAccount.host &&
+              typeof dashboardAccount.host === 'object' &&
               'requiredLegalDocuments' in dashboardAccount.host &&
-              dashboardAccount.host.requiredLegalDocuments?.includes?.(LegalDocumentType.US_TAX_FORM)
+              Array.isArray(dashboardAccount.host.requiredLegalDocuments) &&
+              dashboardAccount.host.requiredLegalDocuments.includes(LegalDocumentType.US_TAX_FORM)
             }
             vendor={editVendor}
             onSuccess={() => {

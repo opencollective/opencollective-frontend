@@ -46,7 +46,7 @@ export interface ConfirmationModalProps extends BaseModalProps {
   children?: React.ReactNode;
   variant?: 'default' | 'destructive';
   type?: 'confirm' | 'delete' | 'remove';
-  onConfirm: (state?) => void | Promise<any>;
+  onConfirm: (state?: Record<string, boolean>) => void | Promise<unknown>;
   confirmLabel?: React.ReactNode;
   ConfirmIcon?: LucideIcon;
   onCancel?: () => void;

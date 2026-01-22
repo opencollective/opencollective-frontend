@@ -14,13 +14,22 @@ type LocalFilePreviewProps = {
 
 const SUPPORTED_IMAGE_REGEX = /^image\/(jpeg|jpg|png|gif|webp)$/;
 
+type LinkProps = {
+  href: string;
+  openInNewTab?: boolean;
+  fontWeight?: string;
+  $hoverColor?: string;
+  color?: string;
+  $underlineOnHover?: boolean;
+} | null;
+
 const OptionallyLinkable = ({
   isLinkable,
   linkProps,
   children,
 }: {
   isLinkable: boolean;
-  linkProps: any;
+  linkProps: LinkProps;
   children: React.ReactNode;
 }) => {
   return isLinkable ? <StyledLink {...linkProps}>{children}</StyledLink> : <React.Fragment>{children}</React.Fragment>;

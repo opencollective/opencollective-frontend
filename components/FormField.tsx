@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import type { FormikProps } from 'formik';
+import type { FieldValidator, FormikProps } from 'formik';
 import { FastField, Field } from 'formik';
 import { pickBy } from 'lodash';
 import type { InputHTMLAttributes } from 'react';
@@ -34,6 +34,7 @@ export function FormField({
   name: string;
   hint?: string | React.ReactNode;
   placeholder?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children?: (props: { form: FormikProps<any>; meta: any; field: any; hasError?: boolean }) => React.ReactNode;
   required?: boolean;
   min?: number;
@@ -45,7 +46,7 @@ export function FormField({
   error?: string;
   isPrivate?: boolean;
   privateMessage?: React.ReactNode;
-  validate?: any;
+  validate?: FieldValidator;
   className?: string;
   autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
   autoFocus?: boolean;

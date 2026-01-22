@@ -465,7 +465,7 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Max file size, in bytes */
   maxSize: number;
   /** A truthy/falsy value defining if the field has an error (ie. if it's required) */
-  error?: any;
+  error?: boolean | string | undefined;
   /** required field */
   required?: boolean;
   /** A unique identified for the category of uploaded files */
@@ -474,6 +474,7 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
   disabled?: boolean;
   showInstructions?: boolean;
   showIcon?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value?: any;
   useGraphQL?: boolean;
   showActions?: boolean;

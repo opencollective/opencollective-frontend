@@ -106,7 +106,7 @@ export function OrgOverview() {
       <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
       {hasMoneyManagement ? (
         <React.Fragment>
-          {account.platformSubscription && (
+          {account && 'platformSubscription' in account && account.platformSubscription && (
             <Collapsible open={showSubscriptionCard}>
               <CollapsibleContent>
                 <PlatformBillingOverviewCard

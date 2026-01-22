@@ -129,6 +129,7 @@ interface GiftCardsPaginationProps {
   total: number;
   limit: number;
   collectiveSlug: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getQueryParams: (picked: string[], newParams: Record<string, any>) => Record<string, any>;
   router: ReturnType<typeof useRouter>;
 }
@@ -238,6 +239,7 @@ const GiftCards: React.FC<GiftCardsProps> = ({ collectiveId, collectiveSlug, lim
   const { filter, batch, offset } = router.query;
 
   const getQueryParams = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (picked: string[], newParams: Record<string, any>) => {
       return omitBy({ ...router.query, ...newParams }, (value, key) => !value || !picked.includes(key));
     },

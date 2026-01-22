@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import type {
   CellContext as TanCellContext,
@@ -226,7 +227,7 @@ function DataTableRow({
   onHoverRow,
 }) {
   // Reference that can be picked up by the actions column, to enable returning focus when closing a drawer or modal opened from actions menu
-  const actionsMenuTriggerRef = React.useRef(null);
+  const actionsMenuTriggerRef = React.useRef<HTMLButtonElement>(null);
   return (
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
@@ -265,7 +266,7 @@ function DataTableRow({
 }
 
 type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
-  actionsMenuTriggerRef?: React.MutableRefObject<any>;
+  actionsMenuTriggerRef?: React.RefObject<HTMLButtonElement>;
 };
 
 export const actionsColumn = {

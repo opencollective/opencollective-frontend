@@ -123,18 +123,18 @@ const i18nSortDirectionLabel = (intl, direction, field) => {
 
 const sortDirectionSchema = z.enum(['ASC', 'DESC']);
 
-export function buildSortFilter({
+export function buildSortFilter<T extends z.ZodEnum<[string, ...string[]]>>({
   fieldSchema,
   defaultValue,
   i18nCustomLabels,
 }: {
-  fieldSchema: z.ZodEnum<any>;
-  defaultValue: any;
+  fieldSchema: T;
+  defaultValue: z.infer<z.ZodObject<{ field: T; direction: typeof sortDirectionSchema }>>;
   i18nCustomLabels?: Record<string, MessageDescriptor>;
 }): FilterConfig<
   z.infer<
     z.ZodObject<{
-      field: typeof fieldSchema;
+      field: T;
       direction: typeof sortDirectionSchema;
     }>
   >
@@ -145,7 +145,8 @@ export function buildSortFilter({
         field: fieldSchema,
         direction: sortDirectionSchema,
       })
-      .default(defaultValue),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .default(defaultValue as any),
     filter: {
       static: true,
       StandaloneComponent: buildSortFilterComponent(fieldSchema, i18nCustomLabels),
@@ -154,7 +155,11 @@ export function buildSortFilter({
 }
 const getIcon = (direction, field) => Icons[FieldIconTypes[field]][direction] ?? Icons.DEFAULT[direction];
 
-function buildSortFilterComponent(fieldSchema: z.ZodEnum<any>, i18nCustomLabels?: Record<string, MessageDescriptor>) {
+function buildSortFilterComponent(
+  fieldSchema: z.ZodEnum<[string, ...string[]]>,
+  i18nCustomLabels?: Record<string, MessageDescriptor>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): (props: FilterComponentProps<any>) => React.ReactNode {
   return function SortFilter({
     onChange,
     value,

@@ -1,4 +1,5 @@
 import React from 'react';
+import type { DataValue } from '@apollo/client/react/hoc';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, omit, pick } from 'lodash';
 import type { Router } from 'next/router';
@@ -34,7 +35,11 @@ class EmbedContributionFlowPage extends React.Component<{
   loadStripe: () => void;
   intl: IntlShape;
   LoggedInUser: LoggedInUser;
-  data: Record<string, any>;
+  data: DataValue<{
+    account: { slug: string; host: { slug: string } };
+    tier: { id: number };
+    me: { contributorProfiles: { account: { slug: string } }[] };
+  }>;
 }> {
   static getInitialProps({ query, res }) {
     if (res) {

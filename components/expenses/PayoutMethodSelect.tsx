@@ -58,7 +58,7 @@ type PayoutMethodSelectProps = {
   /** @ignore from injectIntl */
   intl: IntlShape;
   /** @ignore from mutation */
-  removePayoutMethod?: (object) => Promise<any>;
+  removePayoutMethod?: (object: { variables: { id: string | number } }) => Promise<{ id: string } | void>;
   /** Use this prop to control the component */
   payoutMethod?: {
     id: string | number;
@@ -78,8 +78,8 @@ type PayoutMethodSelectProps = {
   collective?: {
     host?: {
       id: string;
-      connectedAccounts: any[];
-      supportedPayoutMethods: any[];
+      connectedAccounts: Array<{ id: string }>;
+      supportedPayoutMethods: Array<{ id: string; type: string }>;
       isTrustedHost: boolean;
     };
   };

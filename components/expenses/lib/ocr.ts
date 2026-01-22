@@ -143,7 +143,7 @@ const compareItemOCRValue = (
   field: Omit<keyof ExpenseItemFormValues, `_${string}`>,
 ): {
   hasMismatch: boolean;
-  ocrValue: any;
+  ocrValue: unknown;
 } => {
   const existingValue = item[field as keyof ExpenseItemFormValues];
   const checkValue = ocrValue => {
@@ -170,7 +170,7 @@ const compareItemOCRValue = (
   return checkValue(ocrValue);
 };
 
-type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: any }>;
+type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: unknown }>;
 
 export const compareItemOCRValues = (item: ExpenseItemFormValues): ExpenseOCRValuesComparison => {
   return Object.keys(ITEM_OCR_FIELD_MAPPING).reduce((result, field) => {

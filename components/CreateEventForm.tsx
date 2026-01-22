@@ -192,6 +192,7 @@ export default function CreateEventForm({
   return (
     <div>
       <FormikZod
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         schema={eventSchema as any}
         initialValues={initialValues}
         onSubmit={handleSubmit}

@@ -5,7 +5,7 @@ import { useToast } from '../../components/ui/useToast';
 
 import { formatErrorMessage } from '../errors';
 
-export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
+export const useAsyncCall = <T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   { useErrorToast = false, defaultData = null } = {},
 ): {

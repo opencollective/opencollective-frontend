@@ -556,6 +556,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                       />
                     </p>
                     <PayoutMethodSelect
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       collective={{ host } as any}
                       payoutMethods={vendor?.payoutMethods || []}
                       payoutMethod={formik.values.payoutMethod}

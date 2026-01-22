@@ -38,7 +38,7 @@ export type StyledButtonProps = BackgroundProps &
     isBorderless?: boolean;
     type?: 'button' | 'submit' | 'reset';
     truncateOverflow?: boolean;
-    as?: any;
+    as?: React.ElementType;
     'data-cy'?: string;
   };
 

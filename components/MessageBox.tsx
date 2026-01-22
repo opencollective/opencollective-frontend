@@ -4,6 +4,7 @@ import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
+import type { Interpolation } from 'styled-components';
 import { styled } from 'styled-components';
 import type {
   BordersProps,
@@ -36,7 +37,7 @@ type MessageProps = BordersProps &
   FlexboxProps &
   WhiteSpaceProps & {
     type: MessageType;
-    color?: any; // ColorProps has a type inconsistency
+    color?: string | undefined; // ColorProps has a type inconsistency
   };
 
 type MessageBoxProps = MessageProps & {
@@ -46,7 +47,7 @@ type MessageBoxProps = MessageProps & {
   children: React.ReactNode;
   icon?: React.ReactNode;
   alignIcon?: 'start' | 'center';
-  css?: any;
+  css?: Interpolation<MessageProps>;
 };
 
 const FILTERED_PROPS = new Set(['display', 'width', 'height', 'type']);

@@ -172,15 +172,15 @@ const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedVirtualCards
   orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
   amount: (value, key, meta) => {
-    const { minAmount, maxAmount } = amountFilter.toVariables(value, key, meta);
+    const { amount } = amountFilter.toVariables(value, key, meta);
     return omitBy(
       {
         amountFrom: {
-          valueInCents: minAmount,
+          valueInCents: amount.gte,
           currency: meta?.currency,
         },
         amountTo: {
-          valueInCents: maxAmount,
+          valueInCents: amount.lte,
           currency: meta?.currency,
         },
       },

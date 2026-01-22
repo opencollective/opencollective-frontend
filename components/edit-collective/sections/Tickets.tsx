@@ -91,6 +91,7 @@ const Tickets = ({ collective }) => {
             <AdminContributeCardsContainer
               collective={collective}
               cards={getSortedContributeCards(collective, sortedTickets)}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               CardsContainer={CardsContainer as any}
               enableReordering={true}
               createNewType="TICKET"

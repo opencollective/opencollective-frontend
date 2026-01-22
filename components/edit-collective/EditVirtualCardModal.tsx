@@ -172,7 +172,7 @@ type EditVirtualCardModalProps = {
   virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;
-  modalProps?: any;
+  modalProps?: Record<string, unknown>;
 };
 
 export default function EditVirtualCardModal({
@@ -265,8 +265,14 @@ export default function EditVirtualCardModal({
       onSuccess?.(<FormattedMessage defaultMessage="Card successfully updated" id="Nd9ioQ" />);
       handleClose();
     },
-    validate(values: any) {
-      const errors: any = {};
+    validate(values: {
+      collective?: Account;
+      cardName?: string;
+      assignee?: Account;
+      limitAmount?: number;
+      limitInterval?: VirtualCardLimitInterval;
+    }) {
+      const errors: Partial<Record<keyof typeof values, string>> = {};
       if (!isEditing && !values.collective) {
         errors.collective = 'Required';
       }

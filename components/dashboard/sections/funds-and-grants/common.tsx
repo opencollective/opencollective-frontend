@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { includes } from 'lodash';
@@ -7,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '@/lib/constants/collectives';
 import useProcessExpense from '@/lib/expenses/useProcessExpense';
-import { type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
+import { type Amount, type Expense, ExpenseStatus } from '@/lib/graphql/types/v2/schema';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
@@ -34,7 +35,7 @@ import { TableActionsButton } from '@/components/ui/Table';
 
 import { DashboardContext } from '../../DashboardContext';
 
-export const grantColumns: Record<string, ColumnDef<any, any>> = {
+export const grantColumns: Record<string, ColumnDef<Expense, unknown>> = {
   account: {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Fund" id="Tags.FUND" />,
@@ -54,7 +55,7 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'createdAt',
     header: () => <FormattedMessage defaultMessage="Date" id="expense.incurredAt" />,
     cell: ({ cell }) => {
-      return <DateTime value={cell.getValue()} />;
+      return <DateTime value={cell.getValue() as string} />;
     },
   },
   amount: {
@@ -62,8 +63,8 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage defaultMessage="Amount" id="Fields.amount" />,
     cell: ({ row }) => {
       const grant = row.original;
-      const hasExchangeRate =
-        grant.amountInAccountCurrency && grant.amountInAccountCurrency?.currency !== grant.currency;
+      const amountInAccountCurrency = (grant as { amountInAccountCurrency?: Amount }).amountInAccountCurrency;
+      const hasExchangeRate = amountInAccountCurrency && amountInAccountCurrency?.currency !== grant.currency;
       return (
         <div className="flex flex-col items-end text-sm font-medium text-slate-800">
           <span>
@@ -72,7 +73,7 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
 
           {hasExchangeRate && (
             <div className="text-xs text-slate-600">
-              <AmountWithExchangeRateInfo amount={grant.amountInAccountCurrency as any} />
+              <AmountWithExchangeRateInfo amount={amountInAccountCurrency as any} />
             </div>
           )}
         </div>
@@ -122,7 +123,7 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
   },
 };
 
-export type GrantsTableMeta = TableMeta<any> & {
+export type GrantsTableMeta = TableMeta<Expense> & {
   onViewDetailsClick: (grant: Expense) => void;
   enableViewGrantsByBeneficiary?: boolean;
   refetch: () => void;

@@ -58,7 +58,7 @@ export function FundraisingPage() {
                     <iframe
                       width={node.getAttribute('width')}
                       height={node.getAttribute('height')}
-                      allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                      allowFullScreen={node.getAttribute('allowfullscreen') as unknown as boolean}
                       title={node.getAttribute('title') || 'Embed content'}
                       referrerPolicy="strict-origin-when-cross-origin"
                       src={src}
