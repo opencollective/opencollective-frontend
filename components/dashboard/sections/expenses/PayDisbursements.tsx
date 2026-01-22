@@ -6,9 +6,9 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import type {
-  AccountHoverCardFieldsFragment,
-  HostDashboardExpensesQueryVariables,
+import {
+  type AccountHoverCardFieldsFragment,
+  type HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
 import {
@@ -54,11 +54,11 @@ import {
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-const ExpenseStatusesToExclude = ['PAID', 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'];
-
+// TODO: As we add the "Approve Payment Requests" tool, also exclude 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'
+const ExpenseStatusesToExclude = ['PAID'] 
 const PayExpenseStatusFilter = Object.fromEntries(
   Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID' | 'PENDING' | 'REJECTED' | "INVITE_DECLINED">]: (typeof ExpenseStatusFilter)[K] };
+) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
 
 
 const filterSchema = commonSchema.extend({

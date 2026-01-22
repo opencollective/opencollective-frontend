@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash';
-import { MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedDate, FormattedMessage, FormattedTime, useIntl } from 'react-intl';
+import { FormattedMessage, FormattedTime, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
@@ -18,7 +17,11 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
+import { isFeatureEnabled } from '@/lib/allowed-features';
+import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
+
+import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -35,6 +38,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
+import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
 
@@ -47,10 +51,6 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
-import { limit } from '@/lib/filters/schemas';
-import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
-import { isFeatureEnabled } from '@/lib/allowed-features';
-import { buildSortFilter } from '../../filters/SortFilter';
 
 enum PaidDisbursementsTab {
   ALL = 'ALL',
@@ -149,7 +149,7 @@ const getExpenseColumns = intl => [
   {
     accessorKey: 'description',
     meta: { className: 'max-w-64' },
-    header: () => <FormattedMessage defaultMessage="Submitted details" id="QwFHnc"  />,
+    header: () => <FormattedMessage defaultMessage="Title" id="9a9+ww" />,
     cell: ({ row }) => {
       const expense = row.original;
       const submittedBy = expense.createdByAccount;
@@ -157,16 +157,22 @@ const getExpenseColumns = intl => [
         <div className="flex flex-col">
           <span className="font-medium">{expense.description}</span>
           <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
-            <DateTime dateStyle="medium" value={expense.createdAt} />
-            <span>•</span>
-            <LinkCollective
-              collective={submittedBy}
-              withHoverCard
-              className="inline-flex items-center gap-1 overflow-hidden"
-            >
-              <Avatar size={14} collective={submittedBy} />
-              <span className="truncate">{submittedBy.name}</span>
-            </LinkCollective>
+            <FormattedMessage
+              defaultMessage={'Submitted on {date} by {submittedByAccount}'}
+              values={{
+                date: <DateTime dateStyle="medium" value={expense.createdAt} />,
+                submittedByAccount: (
+                  <LinkCollective
+                    collective={submittedBy}
+                    withHoverCard
+                    className="inline-flex items-center gap-1 overflow-hidden"
+                  >
+                    <Avatar size={14} collective={submittedBy} />
+                    <span className="truncate">{submittedBy.name}</span>
+                  </LinkCollective>
+                ),
+              }}
+            />
           </div>
         </div>
       );
@@ -316,7 +322,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     },
     {
       id: PaidDisbursementsTab.GRANTS,
-      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX',  }),
+      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
       filter: {
         type: ExpenseType.GRANT,
       },
