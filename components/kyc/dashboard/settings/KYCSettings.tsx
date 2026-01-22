@@ -47,7 +47,12 @@ export function KYCSettings(props: DashboardSectionProps) {
         {query.loading ? (
           <Skeleton className="h-[300px]" />
         ) : (
-          <PersonaSettingsForm account={props.account} initialValues={personaAccount?.settings ?? {}} />
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">
+              <FormattedMessage defaultMessage="Persona account settings" id="8VYikx" />
+            </h3>
+            <PersonaSettingsForm account={props.account} initialValues={personaAccount?.settings ?? {}} />
+          </div>
         )}
       </div>
       <DocumentationCardList

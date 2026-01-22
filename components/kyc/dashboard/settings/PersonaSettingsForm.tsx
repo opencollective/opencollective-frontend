@@ -26,6 +26,10 @@ const personaAccountSetupFormSchema = z.object({
 type PersonaSettingsFormProps = {
   account: AccountReferenceInput;
   initialValues: z.infer<typeof personaAccountSetupFormSchema>;
+  renderFormButtons?: (
+    form: ReturnType<typeof useFormikZod<PersonaSettingsFormProps['initialValues']>>,
+  ) => React.ReactNode;
+  onSuccess?: () => void;
 };
 
 export function PersonaSettingsForm(props: PersonaSettingsFormProps) {
@@ -86,6 +90,7 @@ export function PersonaSettingsForm(props: PersonaSettingsFormProps) {
             id: 'r4WIFQ',
           }),
         });
+        props.onSuccess?.();
       } catch (e) {
         toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
       }
@@ -95,10 +100,6 @@ export function PersonaSettingsForm(props: PersonaSettingsFormProps) {
   return (
     <FormikContext value={form}>
       <div className="space-y-6 py-2">
-        <h3 className="text-base font-semibold text-slate-900">
-          <FormattedMessage defaultMessage="Persona account settings" id="8VYikx" />
-        </h3>
-
         {helpOpen ? (
           <Alert variant="info" className="relative">
             <div className="pr-8">
@@ -204,11 +205,15 @@ export function PersonaSettingsForm(props: PersonaSettingsFormProps) {
             required
           />
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="submit" loading={form.isSubmitting}>
-              <FormattedMessage defaultMessage="Save Persona settings" id="OBAUs0" />
-            </Button>
-          </div>
+          {props.renderFormButtons ? (
+            props.renderFormButtons(form)
+          ) : (
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="submit" loading={form.isSubmitting}>
+                <FormattedMessage defaultMessage="Save Persona settings" id="OBAUs0" />
+              </Button>
+            </div>
+          )}
         </form>
       </div>
     </FormikContext>
