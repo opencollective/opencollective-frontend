@@ -57,7 +57,8 @@ describe('Grant Submission Flow', () => {
     cy.get('input[name="newPayoutMethod.name"]').type('My Bank Account');
 
     // Application content section
-    cy.contains('Application Content').scrollIntoView().should('be.visible');
+    cy.contains('Application Content').scrollIntoView();
+    cy.contains('Application Content').should('be.visible');
     cy.get('textarea[name="expenseItems.0.description"]').type('Grant application for community project');
     cy.get('input[name="expenseItems.0.amount.valueInCents"]').type('{selectall}1000');
 

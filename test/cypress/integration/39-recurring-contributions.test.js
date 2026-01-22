@@ -62,7 +62,7 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('actions-menu-trigger').first().click();
           cy.contains('Update payment method').click();
           cy.get('input[type=radio][value="stripe-payment-element"]').check();
-          cy.wait(500);
+          cy.getStripePaymentElement({ timeout: 10000 }).should('be.visible');
           cy.fillStripePaymentElementInput();
           cy.getByDataCy('recurring-contribution-submit-pm-button').click();
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
@@ -120,13 +120,15 @@ describe('Recurring contributions', () => {
         cy.get('input[type="radio"]').check();
       });
 
-      cy.wait(250);
+      cy.getByDataCy('tier-amount-select', { timeout: 10000 }).should('be.visible');
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', 'Other').click();
       cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');
-      cy.getByDataCy('recurring-contribution-custom-amount-input').clear().type('150');
+      cy.getByDataCy('recurring-contribution-custom-amount-input').clear();
+      cy.getByDataCy('recurring-contribution-custom-amount-input').type('150');
 
-      cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
+      cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView();
+      cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
       cy.contains('[data-cy^="datatable-row"]', '$150.00').should('exist');
     });
@@ -140,13 +142,14 @@ describe('Recurring contributions', () => {
         cy.get('input[type="radio"]').check();
       });
 
-      cy.wait(250);
+      cy.getByDataCy('tier-amount-select', { timeout: 10000 }).should('be.visible');
       cy.getByDataCy('tier-amount-select').click();
       cy.contains('[data-cy="select-option"]', 'Other').click();
       cy.getByDataCy('recurring-contribution-tier-box').contains('Min. amount: $100.00');
       cy.getByDataCy('recurring-contribution-custom-amount-input').type('{selectall}50');
 
-      cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView().click();
+      cy.getByDataCy('recurring-contribution-update-order-button').scrollIntoView();
+      cy.getByDataCy('recurring-contribution-update-order-button').click();
       cy.getByDataCy('toast-notification').contains('Amount is less than minimum value allowed for this Tier.');
     });
   });
@@ -163,13 +166,13 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('UPDATING_ORDER').contains('Changing payment method or amount');
       cy.getByDataCy('cancellation-text-area').should('not.exist');
       cy.getByDataCy('OTHER').click();
-      cy.getByDataCy('cancellation-text-area').clear().type('Because I want to');
-      cy.getByDataCy('recurring-contribution-cancel-yes')
-        .click()
-        .then(() => {
-          cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
-          cy.getByDataCy('contribution-status').contains('Canceled');
-        });
+      cy.getByDataCy('cancellation-text-area').clear();
+      cy.getByDataCy('cancellation-text-area').type('Because I want to');
+      cy.getByDataCy('recurring-contribution-cancel-yes').click();
+      cy.getByDataCy('recurring-contribution-cancel-yes').then(() => {
+        cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
+        cy.getByDataCy('contribution-status').contains('Canceled');
+      });
       cy.openEmail(({ Subject }) => Subject.includes(`Contribution cancelled to Test Collective`)).then(email => {
         const $html = cheerio.load(email.HTML);
         const emailBody = $html('body').text();

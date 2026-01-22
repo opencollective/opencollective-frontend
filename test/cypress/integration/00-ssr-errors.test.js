@@ -21,8 +21,8 @@ describe('the NotFound page when logged out', () => {
     cy.contains('Search for').should('contain', notFoundSlug).click();
 
     // Search page shows an error in tests and dev so we don't have an
-    // observable element to watch, fallback on cy.wait
-    cy.wait(1000);
+    // observable element to watch, wait for URL change
+    cy.location('pathname').should('equal', '/search');
     cy.location().should(location => {
       expect(location.pathname).to.equal('/search');
       expect(location.search).to.equal(`?q=${notFoundSlug}`);

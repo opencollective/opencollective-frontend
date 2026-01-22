@@ -59,7 +59,7 @@ describe('event.create.test.js', () => {
 
     // edit event info
     cy.get('input[name="name"]').type(`{selectall}${updatedTitle}`);
-    cy.wait(400);
+    cy.get('[data-cy="save"]', { timeout: 10000 }).should('be.enabled');
     cy.get('[data-cy="save"]').click();
     // edit event tickets
     cy.getByDataCy('menu-item-tickets').click();
@@ -75,11 +75,10 @@ describe('event.create.test.js', () => {
     cy.get('input[data-cy=amount]').type('200');
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Tier created.' });
-    cy.wait(2000);
+    cy.getByDataCy('public-profile-link', { timeout: 10000 }).should('be.visible');
     // verify update
     cy.getByDataCy('public-profile-link').click();
-    cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
-    cy.wait(100);
+    cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]', { timeout: 10000 }).should('have.length', 1);
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.get('h1[data-cy=collective-title]').contains(updatedTitle);
     // delete event tiers
@@ -88,7 +87,7 @@ describe('event.create.test.js', () => {
     cy.getByDataCy('menu-item-advanced').should('be.visible').click();
     cy.contains('button', 'Delete this Event').click();
     cy.get('[data-cy=delete]').click();
-    cy.wait(1000);
+    cy.location('search', { timeout: 10000 }).should('eq', '?type=EVENT');
     cy.location().should(location => {
       expect(location.search).to.eq('?type=EVENT');
     });

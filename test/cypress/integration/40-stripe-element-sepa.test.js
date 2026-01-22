@@ -3,8 +3,7 @@ import { randomSlug } from '../support/faker';
 function contributeNewSEPADebit({ name } = {}) {
   cy.contains('New payment method').click();
 
-  cy.wait(2000);
-  cy.getStripePaymentElement().within(() => {
+  cy.getStripePaymentElement({ timeout: 10000 }).within(() => {
     cy.get('.p-PaymentMethodSelector').then($selector => {
       if ($selector.find('#sepa_debit-tab').length) {
         cy.get('#sepa_debit-tab').click();
@@ -24,9 +23,9 @@ function contributeNewSEPADebit({ name } = {}) {
     cy.get('#Field-postalCodeInput').type('01562');
     cy.get('#Field-localityInput').type('Paris');
   });
-  cy.wait(2000);
+  cy.get('button[data-cy="cf-next-step"]', { timeout: 10000 }).should('be.enabled');
   cy.get('button[data-cy="cf-next-step"]').click();
-  cy.wait(3000);
+  cy.getByDataCy('order-success', { timeout: 60000 }).should('be.visible');
 }
 
 const testConfig = {

@@ -26,7 +26,7 @@ describe('host dashboard', () => {
       cy.get(`input[name="slug"]`).type(`{selectall}${collectiveSlug}`);
       cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
       cy.getByDataCy('checkbox-tos').click();
-      cy.wait(300);
+      cy.get('button[type="submit"]', { timeout: 10000 }).should('be.enabled');
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
@@ -97,7 +97,7 @@ describe('host dashboard', () => {
         cy.getByDataCy('more-actions-btn').click();
       });
       cy.getByDataCy('actions-add-funds').click();
-      cy.wait(300);
+      cy.get('[data-cy="add-funds-amount"]', { timeout: 10000 }).should('be.visible');
       cy.get('[data-cy="add-funds-amount"]').type('{selectall}20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
@@ -155,9 +155,12 @@ describe('host dashboard', () => {
 
       // Mark as paid
       cy.getByDataCy('MARK_AS_PAID-button').click();
-      cy.getByDataCy('payment-processor-fee').clear().type('4');
-      cy.getByDataCy('platform-tip').clear().type('10');
-      cy.getByDataCy('host-fee-percent').clear().type('9');
+      cy.getByDataCy('payment-processor-fee').clear();
+      cy.getByDataCy('payment-processor-fee').type('4');
+      cy.getByDataCy('platform-tip').clear();
+      cy.getByDataCy('platform-tip').type('10');
+      cy.getByDataCy('host-fee-percent').clear();
+      cy.getByDataCy('host-fee-percent').type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
 
@@ -253,7 +256,7 @@ describe('host dashboard', () => {
     it.skip('Can add funds and platform tip as collective host', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
-      cy.wait(300);
+      cy.get('[data-cy="add-funds-amount"]', { timeout: 10000 }).should('be.visible');
       cy.get('[data-cy="add-funds-amount"]').type('20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').click();
@@ -262,15 +265,14 @@ describe('host dashboard', () => {
       cy.get('[data-cy="mini-form-name-field"]').type('cypress user');
       cy.get('[data-cy="collective-mini-form-scroll"]').scrollTo('bottom', { duration: 5000 });
       cy.get('[data-cy="mini-form-save-button"]').click();
-      cy.wait(1000);
+      cy.get('[data-cy="add-funds-submit-btn"]', { timeout: 10000 }).should('be.enabled');
       cy.get('[data-cy="add-funds-submit-btn"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
+      cy.get('[data-cy="funds-added"]', { timeout: 10000 }).should('contain', 'Funds Added ✅');
       cy.contains('[data-cy="donation-percentage"]', 'No thank you').click();
       cy.contains('[data-cy="select-option"]', '€2.00').click();
       cy.get('[data-cy="add-platform-tip-btn"]').contains('Tip and Finish');
       cy.get('[data-cy="add-platform-tip-btn"]').click();
-      cy.wait(300);
+      cy.get('[data-cy="collective-avatar"]', { timeout: 10000 }).first().should('be.visible');
       cy.get('[data-cy="collective-avatar"]').first().click();
       scrollToSection(Sections.BUDGET);
       cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');

@@ -76,7 +76,8 @@ describe('Gift cards admin', () => {
     cy.get(multiEmailSelector).type(
       '{selectall} test1@opencollective.com test2@opencollective.com test3@opencollective.com',
     );
-    cy.get('#giftcard-amount').type('{selectall}').type('12');
+    cy.get('#giftcard-amount').type('{selectall}');
+    cy.get('#giftcard-amount').type('12');
     checkSubmit(true, 'Create 3 gift cards');
     cy.getByDataCy('submit-new-gift-cards').click();
     cy.contains('Your 3 gift cards have been sent!');

@@ -16,16 +16,15 @@ describe('apply to host', () => {
     cy.getByDataCy('host-apply-collective-picker').click();
     cy.getByDataCy('host-apply-new-collective-link').click();
     cy.get('#email').type('testuser@opencollective.com');
-    cy.wait(500);
+    cy.getByDataCy('signin-btn', { timeout: 10000 }).should('be.enabled');
     cy.getByDataCy('signin-btn').click();
     cy.get(`input[name="name"]`).type('New collective');
     cy.get(`input[name="slug"]`).type(`{selectall}${collectiveSlug}`);
     cy.get(`input[name="description"]`).type('short description for new collective');
     cy.getByDataCy('checkbox-tos').click();
-    cy.wait(300);
+    cy.get('button[type="submit"]', { timeout: 10000 }).should('be.enabled');
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
-    cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
+    cy.get('[data-cy="collective-title"]', { timeout: 10000 }).should('contain', 'New collective');
     cy.url().then(currentUrl => {
       const collectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
       cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-applications#application-${collectiveId}` });

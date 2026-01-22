@@ -15,7 +15,7 @@ describe('Account Deletion', () => {
     cy.visit(`/dashboard/${collectiveSlug}/advanced`);
     cy.contains('button', 'Delete this Collective', { timeout: 15000 }).click();
     cy.get('[data-cy=delete]').click();
-    cy.wait(1000);
+    cy.location('search', { timeout: 10000 }).should('eq', '?type=COLLECTIVE');
     cy.location().should(location => {
       expect(location.search).to.eq('?type=COLLECTIVE');
     });
@@ -30,7 +30,7 @@ describe('Account Deletion', () => {
     cy.signup({ user: userParams, visitParams, redirect: `/dashboard/${userSlug}/advanced` });
     cy.contains('button', 'Delete this account').click();
     cy.get('[data-cy=delete]').click();
-    cy.wait(1000);
+    cy.location('search', { timeout: 10000 }).should('eq', '?type=USER');
     cy.location().should(location => {
       expect(location.search).to.eq('?type=USER');
     });

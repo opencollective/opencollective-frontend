@@ -39,13 +39,11 @@ describe('New organization profile', () => {
 
       // Filter for expenses
       cy.get('button[data-cy="filter-button expenses"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="transaction-sign"]').first().contains('+');
+      cy.get('[data-cy="transaction-sign"]', { timeout: 10000 }).first().should('contain', '+');
 
       // Filter for contributions
       cy.get('button[data-cy="filter-button contributions"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="transaction-sign"]').first().contains('-');
+      cy.get('[data-cy="transaction-sign"]', { timeout: 10000 }).first().should('contain', '-');
 
       // Check transaction details
       cy.get('[data-cy="transaction-item"]:first').as('firstItem');

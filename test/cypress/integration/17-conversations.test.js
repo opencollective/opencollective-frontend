@@ -49,7 +49,8 @@ describe('Conversations', () => {
       const sampleTag = 'alot more amazing stuff';
       cy.getByDataCy('InlineEditField-Trigger-tags').click();
       cy.getByDataCy('edit-tags-open').click();
-      cy.getByDataCy('edit-tags-input').type(`${sampleTag}{enter}`).blur();
+      cy.getByDataCy('edit-tags-input').type(`${sampleTag}{enter}`);
+      cy.getByDataCy('edit-tags-input').blur();
       cy.contains(`${sampleTag}`.toLowerCase());
 
       // Add comment

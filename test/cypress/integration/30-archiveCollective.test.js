@@ -20,8 +20,7 @@ describe('Archive Collective', () => {
     it('Should archive organization', () => {
       cy.contains('button', 'Archive this Organization').click();
       cy.get('[data-cy=action]').click();
-      cy.wait(500);
-      cy.contains('This organization has been archived');
+      cy.contains('This organization has been archived', { timeout: 10000 });
     });
   });
 
@@ -33,8 +32,7 @@ describe('Archive Collective', () => {
     it('Should archive collective', () => {
       cy.contains('button', 'Archive this Collective').click();
       cy.get('[data-cy=action]').click();
-      cy.wait(500);
-      cy.contains('This collective has been archived');
+      cy.contains('This collective has been archived', { timeout: 10000 });
 
       // test to confirm expenses cannot be submitted for an archived collective
       cy.visit(`${collectiveSlug}/expenses`);

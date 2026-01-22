@@ -3,8 +3,7 @@ import { randomSlug } from '../support/faker';
 function contributeNewBancontact({ name } = {}) {
   cy.contains('New payment method').click();
 
-  cy.wait(2000);
-  cy.getStripePaymentElement().within(() => {
+  cy.getStripePaymentElement({ timeout: 10000 }).within(() => {
     // Wait for the Bancontact option to be available somewhere
     cy.get(
       '.p-PaymentMethodSelector #bancontact-tab, .p-PaymentMethodSelector .p-AdditionalPaymentMethods-menu select option[value="bancontact"]',
@@ -23,10 +22,11 @@ function contributeNewBancontact({ name } = {}) {
       cy.get('#Field-nameInput').type(name);
     }
   });
-  cy.wait(1000);
+  cy.get('button[data-cy="cf-next-step"]', { timeout: 10000 }).should('be.enabled');
   cy.get('button[data-cy="cf-next-step"]').click();
+  cy.contains('a', 'Authorize Test Payment', { timeout: 10000 }).should('be.visible');
   cy.contains('a', 'Authorize Test Payment').click();
-  cy.wait(3000);
+  cy.getByDataCy('order-success', { timeout: 60000 }).should('be.visible');
 }
 
 const testConfig = {

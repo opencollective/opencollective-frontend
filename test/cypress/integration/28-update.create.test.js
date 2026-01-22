@@ -23,12 +23,11 @@ describe('create an update', () => {
     cy.get('[data-cy=update] header').contains('Draft').should('not.exist');
 
     cy.get('[data-cy=update-edit-btn').click();
-    cy.wait(300);
+    cy.get('[data-cy="update-type-select"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-cy="update-type-select"').click(); // Make private
     cy.get('[data-cy="update-type-private"').click(); // Make private
     cy.getByDataCy('update-save-btn').click();
-    cy.wait(1000);
-    cy.get('[data-cy=update] header').contains('Restricted');
+    cy.get('[data-cy=update] header', { timeout: 10000 }).should('contain', 'Restricted');
   });
 });
 

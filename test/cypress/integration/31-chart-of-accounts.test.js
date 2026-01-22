@@ -86,16 +86,19 @@ describe('Chart of Accounts', () => {
     cy.contains('Workspace Expenses');
     cy.contains('Contractor Expenses').should('not.exist');
 
-    cy.get('[data-cy=admin-panel-container] input').clear().type('009');
+    cy.get('[data-cy=admin-panel-container] input').clear();
+    cy.get('[data-cy=admin-panel-container] input').type('009');
     cy.contains('No chart of accounts');
 
     // Test search by name
-    cy.get('[data-cy=admin-panel-container] input').clear().type('Workspace');
+    cy.get('[data-cy=admin-panel-container] input').clear();
+    cy.get('[data-cy=admin-panel-container] input').type('Workspace');
     cy.contains('Workspace Expenses');
     cy.contains('Contractor Expenses').should('not.exist');
 
     // Test search by friendly name
-    cy.get('[data-cy=admin-panel-container] input').clear().type('Contractor Expenses');
+    cy.get('[data-cy=admin-panel-container] input').clear();
+    cy.get('[data-cy=admin-panel-container] input').type('Contractor Expenses');
     cy.contains('Contractor Expenses');
     cy.contains('Workspace Expenses').should('not.exist');
 

@@ -40,8 +40,10 @@ describe('Host agreements', () => {
     // ---- Edit the agreement ----
     cy.getByDataCy('agreement-drawer').find('button[data-cy="btn-edit-agreement"]').click();
     cy.getByDataCy('agreement-form').as('agreementForm');
-    cy.get('@agreementForm').find('#input-title').clear().type('Unlimited potatoes (updated)');
-    cy.get('@agreementForm').find('#input-expiresAt').clear().type('2062-11-07');
+    cy.get('@agreementForm').find('#input-title').clear();
+    cy.get('@agreementForm').find('#input-title').type('Unlimited potatoes (updated)');
+    cy.get('@agreementForm').find('#input-expiresAt').clear();
+    cy.get('@agreementForm').find('#input-expiresAt').type('2062-11-07');
     cy.contains('button', 'Save Changes').click();
     cy.checkToast({ variant: 'success', message: 'Agreement updated' });
     cy.getByDataCy('agreement-drawer').contains('Unlimited potatoes (updated)');
@@ -53,7 +55,8 @@ describe('Host agreements', () => {
 
     // ---- Filters the agreements ----
     cy.getByDataCy('filter-account').click();
-    cy.getByDataCy('combo-select-input').click().type('brussels');
+    cy.getByDataCy('combo-select-input').click();
+    cy.getByDataCy('combo-select-input').type('brussels');
     // cy.getByDataCy('select-agreements-account').type('brussels');
     cy.contains('[data-cy="combo-select-option"]', 'BrusselsTogether').click();
     cy.getByDataCy('apply-filter').click();

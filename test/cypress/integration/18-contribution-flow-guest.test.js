@@ -21,7 +21,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.get('input[name=email]').type(defaultTestUserEmail);
     cy.getByDataCy('input-name').type('Jack London');
     cy.getByDataCy('input-legalName').type('Very Legal Organization');
-    cy.wait(200);
+    cy.get('button[data-cy="cf-next-step"]', { timeout: 10000 }).should('be.enabled');
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.useAnyPaymentMethod();
@@ -57,7 +57,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.get('input[name=email]').type(`{selectall}${email}`);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.useAnyPaymentMethod();
-    cy.wait(500);
+    cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10', { timeout: 10000 }).should('be.enabled');
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -106,7 +106,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
-      cy.wait(500);
+      cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10', { timeout: 10000 }).should('be.enabled');
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -181,7 +181,7 @@ describe('Contribution Flow: Guest contributions', () => {
 
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
-      cy.wait(500);
+      cy.contains('button[data-cy="cf-next-step"]', 'Contribute $5,000', { timeout: 10000 }).should('be.enabled');
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $5,000').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');

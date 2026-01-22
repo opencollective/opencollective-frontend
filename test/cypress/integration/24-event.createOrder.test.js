@@ -6,14 +6,12 @@ describe('event.createOrder page', () => {
   const createEvent = name => {
     cy.login({ redirect: `${collective.slug}/events/new` });
     cy.get('input[name="name"]').type(name);
-    cy.get('input[name="startsAt"]')
-      .clear()
-      .type(`${dayjs().format('YYYY-MM-DD')}T19:00`)
-      .blur();
-    cy.get('input[name="endsAt"]')
-      .clear()
-      .type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}T19:00`)
-      .blur();
+    cy.get('input[name="startsAt"]').clear();
+    cy.get('input[name="startsAt"]').type(`${dayjs().format('YYYY-MM-DD')}T19:00`);
+    cy.get('input[name="startsAt"]').blur();
+    cy.get('input[name="endsAt"]').clear();
+    cy.get('input[name="endsAt"]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}T19:00`);
+    cy.get('input[name="endsAt"]').blur();
     cy.get('input[name="description"]').type('We are going to the Eiffel Tower');
     cy.contains('button', 'Create Event').click();
   };
@@ -47,7 +45,6 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('cf-next-step').click();
     cy.getByDataCy('cf-next-step').contains('Get ticket').click();
 
-    cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
 
@@ -75,9 +72,8 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('cf-next-step').click();
 
     cy.useAnyPaymentMethod();
-    cy.wait(500);
+    cy.contains('button', 'Get ticket').should('be.enabled');
     cy.contains('button', 'Get ticket').click();
-    cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
 
@@ -108,9 +104,8 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('cf-next-step').click();
 
     cy.useAnyPaymentMethod();
-    cy.wait(500);
+    cy.contains('button', 'Get ticket').should('be.enabled');
     cy.contains('button', 'Get ticket').click();
-    cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
 
@@ -149,7 +144,6 @@ describe('event.createOrder page', () => {
     cy.contains(breakdownLineSelector, 'Contribution to Test Event with VAT - "Ticket with VAT"').contains('$10.00');
     cy.contains(breakdownLineSelector, 'Quantity').contains('8');
     cy.contains(breakdownLineSelector, "Today's charge").contains('$80.00');
-    cy.wait(1000);
 
     // Algeria should not have taxes
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
@@ -223,9 +217,8 @@ describe('event.createOrder page', () => {
     // Let's submit this order!
     cy.getByDataCy('cf-next-step').click();
     cy.useAnyPaymentMethod();
-    cy.wait(500);
+    cy.contains('button', 'Get tickets', { timeout: 10000 }).should('be.enabled');
     cy.contains('button', 'Get tickets').click();
-    cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
 

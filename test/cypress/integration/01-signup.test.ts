@@ -110,7 +110,8 @@ describe('/signup', () => {
       it('should create organization', () => {
         cy.get('[data-cy="create-organization-form"]').as('form');
         cy.getByDataCy('organization-country-trigger').click();
-        cy.getByDataCy('organization-country-search').focus().type('Puerto');
+        cy.getByDataCy('organization-country-search').focus();
+        cy.getByDataCy('organization-country-search').type('Puerto');
         cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
         cy.get('@form').find('input[name="organization.legalName"]').type('Cool Stuff 2 Inc.');
         cy.get('@form').find('input[name="organization.name"]').type('Cool Stuff 2');
@@ -144,7 +145,8 @@ describe('/signup', () => {
         cy.visit('/signup/organization?active=true', visitParams);
         cy.get('[data-cy="create-organization-form"]').as('form');
         cy.getByDataCy('organization-country-trigger').click();
-        cy.getByDataCy('organization-country-search').focus().type('Puerto');
+        cy.getByDataCy('organization-country-search').focus();
+        cy.getByDataCy('organization-country-search').type('Puerto');
         cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
         cy.get('@form').find('input[name="organization.legalName"]').type('Active Org Inc.');
         cy.get('@form').find('input[name="organization.name"]').type('Active Org');
@@ -164,7 +166,8 @@ describe('/signup', () => {
         cy.visit('/signup/organization?host=true', visitParams);
         cy.get('[data-cy="create-organization-form"]').as('form');
         cy.getByDataCy('organization-country-trigger').click();
-        cy.getByDataCy('organization-country-search').focus().type('Puerto');
+        cy.getByDataCy('organization-country-search').focus();
+        cy.getByDataCy('organization-country-search').type('Puerto');
         cy.getByDataCy('organization-country-list').find('[data-cy="organization-country-PR"]').click();
         cy.get('@form').find('input[name="organization.legalName"]').type('Fiscal Host Inc.');
         cy.get('@form').find('input[name="organization.name"]').type('Fiscal Host');
@@ -248,7 +251,6 @@ describe('/signup', () => {
           // @ts-expect-error 2339
           expect(email.HTML).to.include('just invited you to the role of Administrator of');
         });
-        cy.wait(500); // Wait for redirect
         cy.url().should('include', `/dashboard/${slug}/overview`);
       });
 
@@ -261,7 +263,6 @@ describe('/signup', () => {
         cy.get('@form').find('input[name="collective.slug"]').type(`{selectall}${slug}`);
         cy.get('@form').find('button[type="submit"]').click();
         cy.getByDataCy('skip-button').click();
-        cy.wait(500); // Wait for redirect
         cy.url().should('include', `/dashboard/${slug}/overview`);
       });
     },

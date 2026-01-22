@@ -30,9 +30,12 @@ describe('OAuth Applications', () => {
 
     cy.log('Go and edit the app');
     cy.getByDataCy('oauth-app').contains('a', 'Settings').click();
-    cy.get('input[name=name]').clear().type('{selectall}My first App (edited)');
-    cy.get('textarea[name=description]').clear().type('{selectall}A very accurate description (edited)');
-    cy.get('input[name=redirectUri]').clear().type('https://example2.com/callback');
+    cy.get('input[name=name]').clear();
+    cy.get('input[name=name]').type('{selectall}My first App (edited)');
+    cy.get('textarea[name=description]').clear();
+    cy.get('textarea[name=description]').type('{selectall}A very accurate description (edited)');
+    cy.get('input[name=redirectUri]').clear();
+    cy.get('input[name=redirectUri]').type('https://example2.com/callback');
     cy.get('[data-cy="oauth-app-settings"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Application "My first App (edited)" updated');
 
@@ -60,8 +63,12 @@ describe('OAuth Applications', () => {
     cy.getByDataCy('unhidden-secret').should('not.exist'); // client secret is hidden
     cy.getByDataCy('show-secret-btn').click();
     cy.getByDataCy('unhidden-secret').should('exist'); // client secret is hidden
-    cy.getByDataCy('oauth-app-client-id').then($elem => (clientId = $elem.text()));
-    cy.getByDataCy('unhidden-secret').then($elem => (clientSecret = $elem.text()));
+    cy.getByDataCy('oauth-app-client-id').then($elem => {
+      clientId = $elem.text();
+    });
+    cy.getByDataCy('unhidden-secret').then($elem => {
+      clientSecret = $elem.text();
+    });
   });
 
   it('create application with 2fa enabled', () => {

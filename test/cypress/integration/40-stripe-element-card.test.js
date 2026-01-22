@@ -2,9 +2,9 @@ import { randomSlug } from '../support/faker';
 
 function contributeWithNewCard() {
   cy.contains('New payment method').click();
-  cy.wait(2000);
+  cy.getStripePaymentElement({ timeout: 10000 }).should('be.visible');
   cy.fillStripePaymentElementInput();
-  cy.wait(2000);
+  cy.get('button[data-cy="cf-next-step"]', { timeout: 10000 }).should('be.enabled');
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 
@@ -88,7 +88,6 @@ describe('Contribute Flow: Stripe Payment Element', () => {
         cy.get('button[data-cy="cf-next-step"]').click();
         cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
-        cy.wait(2000);
         cy.get('@collective').then(col => {
           cy.visit(`${col.slug}/orders`);
         });

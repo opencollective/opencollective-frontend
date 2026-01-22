@@ -15,13 +15,11 @@ describe('Contribution Flow: Order success', () => {
       cy.signup({ user: userParams, redirect: newFlowRoute, visitParams }).then(() => {
         cy.waitForLoggedIn();
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.wait(50);
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.wait(4000); // Wait for stripe to be loaded
+        cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
         cy.useAnyPaymentMethod();
-        cy.wait(1000);
         cy.contains('button', 'Contribute').click();
-        cy.wait(4000);
+        cy.getByDataCy('order-success', { timeout: 20000 }).should('be.visible');
       });
     });
 

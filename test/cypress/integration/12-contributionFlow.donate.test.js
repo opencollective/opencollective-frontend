@@ -63,7 +63,7 @@ describe('Contribution Flow: Donate', () => {
     // As this is a new account, not payment method is configured yet so
     // we should have the credit card form selected by default.
     cy.get('input[type=checkbox][name=save]').should('be.checked');
-    cy.wait(1000); // Wait for stripe to be loaded
+    cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
 
     // Ensure we display errors
     cy.fillStripeInput({ card: { creditCardNumber: 123 } });
@@ -111,7 +111,7 @@ describe('Contribution Flow: Donate', () => {
 
     // Submit form
     cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
-    cy.wait(2000);
+    cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
     cy.fillStripeInput();
     cy.contains('button', 'Contribute $20').click();
 
@@ -129,7 +129,7 @@ describe('Contribution Flow: Donate', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile'] });
     cy.get('button[data-cy="cf-next-step"]').click();
-    cy.wait(2000); // Wait for stripe to be loaded
+    cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
     cy.fillStripeInput();
 
     // Should display the contribution details
@@ -148,10 +148,10 @@ describe('Contribution Flow: Donate', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
-    cy.wait(3000); // Wait for stripe to be loaded
+    cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
     cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
     cy.contains('button', 'Contribute $42').click();
-    cy.wait(8000); // Wait for order to be submitted and popup to appear
+    cy.get('iframe[name^="__privateStripeFrame"]', { timeout: 15000 }).should('be.visible');
 
     // Rejecting the validation should produce an error
     cy.complete3dSecure(false, { version: 2 });
@@ -164,7 +164,7 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('button', 'Contribute $42').click();
 
     // Approving the validation should create the order
-    cy.wait(8000); // Wait for order to be submitted and popup to appear
+    cy.get('iframe[name^="__privateStripeFrame"]', { timeout: 15000 }).should('be.visible');
     cy.complete3dSecure(true, { version: 2 });
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
@@ -181,7 +181,7 @@ describe('Contribution Flow: Donate', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
-    cy.wait(3000); // Wait for stripe to be loaded
+    cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
     cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_ALWAYS_AUTHENTICATE });
 
     // Submit the order, intercept the response to get the order ID
@@ -199,7 +199,7 @@ describe('Contribution Flow: Donate', () => {
       // At this point, the order has been created but not confirmed yet. We're leaving this page without doing
       // so to instead go to the confirmation page directly.
       cy.visit(`/orders/${orderId}/confirm`);
-      cy.wait(2000);
+      cy.get('iframe[name^="__privateStripeFrame"]', { timeout: 10000 }).should('be.visible');
 
       // Rejecting the validation should produce an error
       cy.complete3dSecure(true, { version: 2 });
@@ -211,7 +211,7 @@ describe('Contribution Flow: Donate', () => {
     cy.signup({ redirect: donateRoute, visitParams, user: { name: 'John Doe' } });
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.get('button[data-cy="cf-next-step"]').click();
-    cy.wait(3000); // Wait for stripe to be loaded
+    cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
     cy.fillStripeInput({ card: CreditCards.CARD_DECLINED });
     cy.getByDataCy('cf-next-step').click();
     cy.contains('[data-cy="contribution-flow-error"]', 'Your card was declined.');

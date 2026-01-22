@@ -11,6 +11,7 @@ describe('edit collective', () => {
       collectiveSlug = slug;
     });
     // Give it a few ms to actually receive the email before we clean the inbox
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(200);
     cy.mailpitDeleteAllEmails();
   });
@@ -24,9 +25,9 @@ describe('edit collective', () => {
 
     // Add a new member by creating it inline with the collective picker
     cy.getByDataCy('menu-item-team').click();
-    cy.wait(200);
+    cy.getByDataCy('invite-member-btn', { timeout: 10000 }).should('be.visible');
     cy.getByDataCy('invite-member-btn').click();
-    cy.wait(200);
+    cy.getByDataCy('member-collective-picker', { timeout: 10000 }).should('be.visible');
     cy.getByDataCy('member-collective-picker').click();
     cy.getByDataCy('collective-type-picker-USER').click();
     cy.getByDataCy('create-collective-mini-form').then($form => {
@@ -34,8 +35,7 @@ describe('edit collective', () => {
       cy.wrap($form).find('input[name="name"]').type('AmazingNewUser');
       cy.wrap($form).find('button[type="submit"]').click();
     });
-    cy.wait(200);
-    cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
+    cy.getByDataCy('create-collective-mini-form', { timeout: 10000 }).should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="members-table"]').find('span:contains("Pending")').should('exist');
     cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').then(result => {
@@ -83,11 +83,10 @@ describe('edit collective', () => {
     cy.focused().type('https://twitter.com/opencollective');
     cy.contains('Add social link').click();
     cy.focused().type('https://github.com/opencollective');
-    cy.wait(500);
+    cy.get('[data-cy="save"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-cy="save"]').click(); // save changes
     cy.getByDataCy('public-profile-link').click();
-    cy.wait(500);
-    cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
+    cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]', { timeout: 10000 }).should('contain', 'edited');
     cy.get('[data-cy="social-link-0"]').should('have.attr', 'href', 'https://opencollective.com/');
     cy.get('[data-cy="social-link-1"]').should('have.attr', 'href', 'https://twitter.com/opencollective');
     cy.get('[data-cy="social-link-2"]').should('have.attr', 'href', 'https://github.com/opencollective');
@@ -192,7 +191,8 @@ describe('edit user collective', () => {
         cy.getByDataCy('InputField-twoFactorAuthenticatorCode').contains('Invalid code');
         // typing the right code passes
         const TOTPCode = generateSync({ secret, algorithm: 'sha1', strategy: 'totp' });
-        cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
+        cy.getByDataCy('add-two-factor-auth-totp-code-field').clear();
+        cy.getByDataCy('add-two-factor-auth-totp-code-field').type(TOTPCode);
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
         cy.getByDataCy('recovery-codes-container').should('exist');
         cy.getByDataCy('recovery-codes-container').children().should('have.length', 6);

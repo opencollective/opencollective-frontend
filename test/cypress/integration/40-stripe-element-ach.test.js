@@ -3,15 +3,14 @@ import { randomSlug } from '../support/faker';
 function contributeWithNewUsBankAccount({ name } = {}) {
   cy.contains('New payment method').click();
 
-  cy.wait(2000);
-  cy.getStripePaymentElement().within(() => {
+  cy.getStripePaymentElement({ timeout: 10000 }).within(() => {
     cy.get('#us_bank_account-tab').click();
     if (name) {
       cy.get('#Field-nameInput').type(name);
     }
     cy.contains('Test (Non-OAuth)').click();
   });
-  cy.wait(2000);
+  cy.get('iframe', { timeout: 10000 }).should('be.visible');
 
   cy.get('iframe')
     .first()
@@ -25,7 +24,7 @@ function contributeWithNewUsBankAccount({ name } = {}) {
       cy.get('[data-testid="done-button"]').click();
     });
 
-  cy.wait(3000);
+  cy.get('button[data-cy="cf-next-step"]', { timeout: 10000 }).should('be.enabled');
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 

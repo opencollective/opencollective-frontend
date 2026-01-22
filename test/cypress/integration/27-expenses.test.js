@@ -40,11 +40,9 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-create-help').should('exist');
       cy.getByDataCy('dismiss-expense-create-help').click();
       cy.getByDataCy('expense-create-help').should('not.exist');
-      cy.wait(250); // Give some time for the GQL request
       cy.reload();
       cy.waitForLoggedIn();
-      cy.wait(200); // Give some time to make sure frontend can fully refresh after logged in
-      cy.getByDataCy('expense-create-help').should('not.exist');
+      cy.getByDataCy('expense-create-help', { timeout: 10000 }).should('not.exist');
     });
 
     it('submits new expense then edit it', () => {
@@ -56,7 +54,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
-      cy.wait(100);
+      cy.getByDataCy('expense-next').should('be.enabled');
       cy.getByDataCy('expense-next').click();
 
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
@@ -219,7 +217,8 @@ describe('Expense flow', () => {
       // Check mismatch warnings
       cy.contains('Please verify the dates and amounts before proceeding.');
       cy.get('[data-cy="expense-attachment-form"]:eq(2) [data-cy="mismatch-warning"]').should('have.length', 2);
-      cy.get('input[name="items[1].amountV2"]').type('{selectall}7').blur();
+      cy.get('input[name="items[1].amountV2"]').type('{selectall}7');
+      cy.get('input[name="items[1].amountV2"]').blur();
       cy.get('[data-cy="expense-attachment-form"]:eq(1) [data-cy="mismatch-warning"]').should('have.length', 1);
 
       // Confirm mismatches on the final step
@@ -281,7 +280,8 @@ describe('Expense flow', () => {
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}{backspace}');
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100').blur();
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').blur();
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '100.00');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
@@ -299,7 +299,8 @@ describe('Expense flow', () => {
       // With a values that's too low, but still accepted
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}64.88').blur();
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}64.88');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').blur();
       cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '64.88');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
@@ -432,9 +433,7 @@ describe('Expense flow', () => {
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
-        cy.wait(500);
-
-        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
+        cy.getByDataCy('expense-status-msg', { timeout: 10000 }).should('contain', 'Draft');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
         cy.getByDataCy('expense-draft-banner').should(
           'contain',
@@ -475,9 +474,7 @@ describe('Expense flow', () => {
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
-        cy.wait(500);
-
-        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
+        cy.getByDataCy('expense-status-msg', { timeout: 10000 }).should('contain', 'Draft');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
         cy.getByDataCy('expense-draft-banner').should(
           'contain',
@@ -521,8 +518,7 @@ describe('Expense flow', () => {
         cy.getByDataCy('expense-summary-btn').click();
         cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
         cy.getByDataCy('save-expense-btn').click();
-        cy.wait(500);
-        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
+        cy.getByDataCy('expense-status-msg', { timeout: 10000 }).should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Submitted by');
         cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
         cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
@@ -558,9 +554,7 @@ describe('Expense flow', () => {
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
-        cy.wait(500);
-
-        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
+        cy.getByDataCy('expense-status-msg', { timeout: 10000 }).should('contain', 'Draft');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
         cy.getByDataCy('expense-draft-banner').should(
           'contain',
@@ -606,8 +600,7 @@ describe('Expense flow', () => {
         cy.getByDataCy('expense-summary-btn').click();
         cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
         cy.getByDataCy('save-expense-btn').click();
-        cy.wait(500);
-        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
+        cy.getByDataCy('expense-status-msg', { timeout: 10000 }).should('contain', 'Pending');
 
         cy.get('@createdExpense').then(createdExpense => {
           cy.login({
@@ -656,7 +649,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'Algeria').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="address-city"]').type('Citycitycity');
-      cy.wait(100);
+      cy.getByDataCy('expense-next').should('be.enabled');
       cy.getByDataCy('expense-next').click();
 
       // Fill details
@@ -831,8 +824,10 @@ describe('Expense flow', () => {
       cy.get('[data-cy="go-to-dashboard-btn"]').click();
       cy.getByDataCy('menu-item-Settings').click();
       cy.getByDataCy('menu-item-policies').should('be.visible').click();
-      cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
-      cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
+      cy.getByDataCy('invoice-expense-policy-input').click();
+      cy.getByDataCy('invoice-expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('receipt-expense-policy-input').click();
+      cy.getByDataCy('receipt-expense-policy-input').type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.checkToast({ variant: 'success', message: 'Policies updated successfully' });
       cy.visit(`${expenseUrl}?forceLegacyFlow=true`);
@@ -842,8 +837,10 @@ describe('Expense flow', () => {
 
     it('Projects inherit and display expense policy from parent collective', () => {
       cy.login({ email: user.email, redirect: `/dashboard/${collective.slug}/policies` });
-      cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
-      cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
+      cy.getByDataCy('invoice-expense-policy-input').click();
+      cy.getByDataCy('invoice-expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('receipt-expense-policy-input').click();
+      cy.getByDataCy('receipt-expense-policy-input').type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.checkToast({ variant: 'success', message: 'Policies updated successfully' });
       cy.createProject({ userEmail: user.email, collective }).then(project => {

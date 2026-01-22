@@ -22,7 +22,7 @@ const uploadImage = ({ dropzone, fileName }) => {
     },
   );
 
-  cy.wait(900);
+  cy.get('[data-cy="toast-notification"]', { timeout: 10000 }).should('be.visible');
 };
 
 describe('Collective page', () => {
@@ -33,13 +33,15 @@ describe('Collective page', () => {
       githubHandle: 'testCollective',
       website: 'opencollective.com/testCollective',
     })
-      .then(({ slug }) => (collectiveSlug = slug))
+      .then(({ slug }) => {
+        collectiveSlug = slug;
+      })
       .then(() => cy.visit(`/${collectiveSlug}`));
   });
 
   beforeEach(() => {
     cy.login({ redirect: `/${collectiveSlug}` });
-    cy.wait(900);
+    cy.getByDataCy('collective-title', { timeout: 10000 }).should('be.visible');
   });
 
   it('Should not have no-index meta', () => {
@@ -125,7 +127,7 @@ describe('Collective page', () => {
     it('Has a link to create new update and one to view all updates', () => {
       scrollToSection(Sections.UPDATES);
       cy.get('[data-cy=create-new-update-btn]').click();
-      cy.wait(3000);
+      cy.get('[data-cy=update-title]', { timeout: 10000 }).should('be.visible');
       cy.get('[data-cy=update-title]').type('Sample Update');
       cy.get('[data-cy="update-content-editor"] trix-editor').type('Hello World');
       cy.get('[data-cy=update-publish-btn]').click();
@@ -160,11 +162,10 @@ describe('Collective page', () => {
       const ctrlOrMetaKey = Cypress.platform === 'darwin' ? '{meta}' : '{ctrl}';
 
       // Type "Hello world!" and make it bold
-      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor')
-        .type('Hello world!')
-        .type('{selectall}')
-        .type(`${ctrlOrMetaKey}b`)
-        .type('{rightArrow} ');
+      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type('Hello world!');
+      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type('{selectall}');
+      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type(`${ctrlOrMetaKey}b`);
+      cy.get('#section-about [data-cy="RichTextEditor"] trix-editor').type('{rightArrow} ');
 
       // Add a YouTube video
       cy.get('#section-about [data-cy="RichTextEditor"] button[data-trix-action=x-video-dialog-open]').click();
@@ -226,19 +227,15 @@ describe('Edit public message after contribution', () => {
         cy.get('button[data-cy="cf-next-step"]').click();
         cy.contains('Contribute as').should('be.visible');
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.wait(2000); // Wait for stripe to be loaded
+        cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
         cy.fillStripeInput();
         cy.contains('button', 'Contribute').click();
-        cy.wait(1000); // It takes a little bit of time to create the order.
         // Wait for the order to succeed
         cy.getByDataCy('order-success', { timeout: 20000 });
 
         // SECTION: Go to the collective page and change the public message
         cy.visit(`/${slug}#${Sections.CONTRIBUTORS}`);
-        /** Cypress can't find the public message text unless we do this.
-         * Probably related to this issue: https://github.com/cypress-io/cypress/issues/695
-         */
-        cy.wait(1000);
+        cy.getByDataCy('Contributors', { timeout: 10000 }).should('be.visible');
         scrollToSection(Sections.CONTRIBUTORS);
         cy.get('[data-cy=ContributorCard_EditPublicMessageButton]').click();
         const publicMessage = 'Writing a long public message!';

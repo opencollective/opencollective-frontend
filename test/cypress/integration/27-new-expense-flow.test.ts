@@ -203,7 +203,8 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
         expenseType: expenseType,
         hasInvoice: true,
       });
-      cy.get('form').contains('Submit Expense').scrollIntoView().click();
+      cy.get('form').contains('Submit Expense').scrollIntoView();
+      cy.get('form').contains('Submit Expense').click();
       cy.contains('has been submitted successfully!').should('exist');
     });
 
@@ -277,7 +278,8 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
         expenseType: expenseType,
         hasInvoice: false,
       });
-      cy.get('form').contains('Submit Expense').scrollIntoView().click();
+      cy.get('form').contains('Submit Expense').scrollIntoView();
+      cy.get('form').contains('Submit Expense').click();
       cy.contains('has been submitted successfully!').should('exist');
     });
   });
@@ -326,7 +328,8 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
         cy.get('[role="listitem"]')
           .first()
           .within(() => {
-            cy.contains('Date').click().type('2025-09-29');
+            cy.contains('Date').click();
+            cy.contains('Date').type('2025-09-29');
             if (expenseType === 'reimbursement') {
               cy.contains('Drag & drop').selectFile(getReceiptFixture({ fileName: 'receipt0.jpg' }), {
                 action: 'drag-drop',
@@ -336,7 +339,8 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
           });
       });
 
-      cy.get('form').contains('button', 'Submit Expense').scrollIntoView().click();
+      cy.get('form').contains('button', 'Submit Expense').scrollIntoView();
+      cy.get('form').contains('button', 'Submit Expense').click();
       cy.contains('has been submitted successfully!').should('exist');
     });
   });
@@ -403,7 +407,9 @@ function submitExpense(options: {
   };
 
   cy.get('#WHO_IS_PAYING').within(() => {
-    cy.contains('Find account').click().parent().get('[role="combobox"]').click().type(`${opts.accountSlug}{enter}`);
+    cy.contains('Find account').click();
+    cy.contains('Find account').parent().get('[role="combobox"]').click();
+    cy.contains('Find account').parent().get('[role="combobox"]').type(`${opts.accountSlug}{enter}`);
     cy.root().closest('html').contains('[role="option"]', opts.accountSlug).click();
   });
 
@@ -412,29 +418,29 @@ function submitExpense(options: {
       cy.root().then($section => {
         const $option = $section.find(`button[role="radio"][value="${opts.payeeSlug}"]`);
         if ($option.length) {
-          cy.wrap($option.first()).click().siblings('input[type="radio"]').first().should('be.checked');
+          cy.wrap($option.first()).click();
+          cy.wrap($option.first()).siblings('input[type="radio"]').first().should('be.checked');
         } else {
-          cy.contains('An account I administer')
-            .click()
-            .parent()
-            .get('[role="combobox"]')
-            .click()
-            .type(`${opts.payeeSlug}{enter}`);
+          cy.contains('An account I administer').click();
+          cy.contains('An account I administer').parent().get('[role="combobox"]').click();
+          cy.contains('An account I administer').parent().get('[role="combobox"]').type(`${opts.payeeSlug}{enter}`);
         }
       });
     } else if (opts.invitee.slug) {
-      cy.contains('Invite someone').click().parent().get('[role="combobox"]').click().type(opts.invitee.slug);
+      cy.contains('Invite someone').click();
+      cy.contains('Invite someone').parent().get('[role="combobox"]').click();
+      cy.contains('Invite someone').parent().get('[role="combobox"]').type(opts.invitee.slug);
       cy.root().closest('html').contains('[role="option"]', opts.invitee.slug).click();
     } else {
-      cy.contains('Invite someone')
-        .click()
-        .parent()
-        .within(() => {
-          cy.get('[role="combobox"]').click();
-          cy.root().closest('html').contains('Invite someone to submit an expense').click();
-          cy.contains('Contact name').click().type(opts.invitee.name);
-          cy.contains('Email address').click().type(opts.invitee.email);
-        });
+      cy.contains('Invite someone').click();
+      cy.contains('Invite someone').parent().within(() => {
+        cy.get('[role="combobox"]').click();
+        cy.root().closest('html').contains('Invite someone to submit an expense').click();
+        cy.contains('Contact name').click();
+        cy.contains('Contact name').type(opts.invitee.name);
+        cy.contains('Email address').click();
+        cy.contains('Email address').type(opts.invitee.email);
+      });
     }
   });
 
@@ -451,11 +457,8 @@ function submitExpense(options: {
         return;
       }
 
-      cy.contains('[role="radio"]', opts.payoutMethod.slug)
-        .click()
-        .siblings('input[type="radio"]')
-        .first()
-        .should('be.checked');
+      cy.contains('[role="radio"]', opts.payoutMethod.slug).click();
+      cy.contains('[role="radio"]', opts.payoutMethod.slug).siblings('input[type="radio"]').first().should('be.checked');
     });
   }
 
@@ -470,9 +473,12 @@ function submitExpense(options: {
     cy.get('[role="listitem"]')
       .first()
       .within(() => {
-        cy.contains('Item Description').click().type('First item description');
-        cy.contains('Date').click().type('2025-09-29');
-        cy.contains('Amount').click().type('{selectall}125');
+        cy.contains('Item Description').click();
+        cy.contains('Item Description').type('First item description');
+        cy.contains('Date').click();
+        cy.contains('Date').type('2025-09-29');
+        cy.contains('Amount').click();
+        cy.contains('Amount').type('{selectall}125');
         if (opts.expenseType === 'reimbursement') {
           cy.contains('Drag & drop').selectFile(getReceiptFixture({ fileName: 'receipt0.jpg' }), {
             action: 'drag-drop',
@@ -485,9 +491,12 @@ function submitExpense(options: {
     cy.get('[role="listitem"]')
       .eq(1)
       .within(() => {
-        cy.contains('Item Description').click().type('Second item description');
-        cy.contains('Date').click().type('2024-09-29');
-        cy.contains('Amount').click().type('{selectall}500');
+        cy.contains('Item Description').click();
+        cy.contains('Item Description').type('Second item description');
+        cy.contains('Date').click();
+        cy.contains('Date').type('2024-09-29');
+        cy.contains('Amount').click();
+        cy.contains('Amount').type('{selectall}500');
         cy.contains('USD').click();
         cy.focused().should('have.attr', 'placeholder', 'Search...').type('BRL{enter}');
 
@@ -508,8 +517,10 @@ function submitExpense(options: {
 
     if (opts.taxes?.hasTax) {
       cy.contains('Apply Value-added tax').click();
-      cy.contains('VAT identifier').click().type('EU000011111');
-      cy.contains('VAT rate').click().type('20');
+      cy.contains('VAT identifier').click();
+      cy.contains('VAT identifier').type('EU000011111');
+      cy.contains('VAT rate').click();
+      cy.contains('VAT rate').type('20');
       cy.contains('$135.00 USD').should('exist');
       cy.contains('$810.00 USD').should('exist');
     }
@@ -517,10 +528,11 @@ function submitExpense(options: {
 
   cy.get('#ADDITIONAL_DETAILS').within(() => {
     cy.root().scrollIntoView();
-    cy.get('input[value="First item description"]').click().type(`{selectall}The expense title ${opts.titleSlug}`);
+    cy.get('input[value="First item description"]').click();
+    cy.get('input[value="First item description"]').type(`{selectall}The expense title ${opts.titleSlug}`);
     cy.contains('Add tag').click();
-    cy.focused().should('have.attr', 'placeholder', 'Add tag').type('A tag');
-    cy.wait(100);
+    cy.focused().should('have.attr', 'placeholder', 'Add tag');
+    cy.focused().type('A tag');
     cy.focused().type('{enter}');
   });
 
@@ -597,7 +609,8 @@ function submitExpense(options: {
           cy.contains('Edit recurrence frequency').click();
           cy.getByDataCy('expense-frequency').click();
           cy.root().closest('html').contains('[data-cy="expense-frequency-option"]', 'Monthly').click();
-          cy.get('#expenseRecurrenceEndAt').click().type('2125-09-29');
+          cy.get('#expenseRecurrenceEndAt').click();
+          cy.get('#expenseRecurrenceEndAt').type('2125-09-29');
           cy.contains('Save changes').click();
           cy.contains(
             'Once submitted, you will also be prompted to review and submit a copy of this expense every month. The prompts will stop on Sep 29, 2125',
@@ -605,7 +618,8 @@ function submitExpense(options: {
         });
     }
   });
-  cy.get('form').contains('button', 'Submit Expense').scrollIntoView().click();
+  cy.get('form').contains('button', 'Submit Expense').scrollIntoView();
+  cy.get('form').contains('button', 'Submit Expense').click();
   cy.contains('has been submitted successfully!').should('exist');
   cy.contains('button', 'View all expenses').click();
 }
@@ -667,7 +681,7 @@ function commonEditScenario(expenseType: 'invoice' | 'reimbursement') {
       // USD should be selected by default
       cy.get('[data-cy=reference-currency-option-USD] span[data-state="checked"]').should('exist');
       cy.get('[data-cy=reference-currency-option-EUR]').click(); // Switch to EUR
-      cy.wait(50);
+      cy.get('[data-cy=reference-currency-option-EUR] span[data-state="checked"]', { timeout: 10000 }).should('exist');
 
       cy.get('form').contains('button', 'Save').click();
       cy.checkToast({ variant: 'success', message: 'Expense edited' });
@@ -715,11 +729,9 @@ function fillNewPayoutMethod(payoutMethod: {
       .click();
     cy.contains('Currency').click();
     cy.focused().should('have.attr', 'placeholder', 'Search...').type(`${payoutMethod.data.currency}{enter}`);
-    cy.contains('label', 'Info')
-      .should('be.visible')
-      .click()
-      .type(payoutMethod.data.content as string);
-    cy.wait(400);
+    cy.contains('label', 'Info').should('be.visible');
+    cy.contains('label', 'Info').click();
+    cy.contains('label', 'Info').type(payoutMethod.data.content as string);
     cy.contains('label', 'Alias').click();
     cy.get('input#input-newPayoutMethod\\.name').type(payoutMethod.slug);
     cy.get('input#input-newPayoutMethod\\.name').should('have.value', payoutMethod.slug);
@@ -745,7 +757,8 @@ function fillTypeOfExpense(opts: { expenseType: 'invoice' | 'reimbursement'; has
         cy.contains('Yes, I have an invoice').click();
         cy.contains('Attach your invoice file').selectFile(getReceiptFixture({ fileName: 'invoice0.jpg' }));
         cy.contains('Clear').should('exist');
-        cy.contains('Invoice reference').click().type('INV0001');
+        cy.contains('Invoice reference').click();
+        cy.contains('Invoice reference').type('INV0001');
       } else {
         cy.contains('No, generate an invoice for me').click();
       }

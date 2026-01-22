@@ -325,9 +325,9 @@ Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } 
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
   cy.getByDataCy('add-credit-card-button').click();
-  cy.wait(2000);
+  cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
   fillStripeInput();
-  cy.wait(1000);
+  cy.getByDataCy('save-credit-card-button').should('be.enabled');
   cy.getByDataCy('save-credit-card-button').click();
   cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('exist');
   cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('not.exist', { timeout: 30_000 });
@@ -379,8 +379,7 @@ Cypress.Commands.add('complete3dSecure', (approve = true, { version = 1 } = {}) 
         $btnContainer = $btnContainer.find('iframe[name="acsFrame"]').contents();
       }
 
-      const btn = cy.wrap($btnContainer.find('body').find(targetBtn));
-      btn.click();
+      cy.wrap($btnContainer.find('body').find(targetBtn)).click();
     });
 });
 
@@ -406,7 +405,7 @@ Cypress.Commands.add('useAnyPaymentMethod', () => {
   return cy.get('#PaymentMethod').then($paymentMethod => {
     // Checks if the organization already has a payment method configured
     if (!$paymentMethod.text().includes('VISA **** 4242')) {
-      cy.wait(1000); // Wait for stripe to be loaded
+      cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
       cy.fillStripeInput();
     }
   });
@@ -426,9 +425,9 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
 });
 
 Cypress.Commands.add('checkToast', ({ variant, message }) => {
-  const $toast = cy.contains('[data-cy="toast-notification"]', message);
+  cy.contains('[data-cy="toast-notification"]', message).as('toast');
   if (variant) {
-    $toast.should('have.attr', 'data-variant', variant);
+    cy.get('@toast').should('have.attr', 'data-variant', variant);
   }
 });
 
@@ -757,10 +756,11 @@ function getLoggedInUserFromToken(token) {
 function fillStripeInput(params) {
   const { container, card } = params || {};
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
-  const iframePromise = container ? container.find(stripeIframeSelector) : cy.get(stripeIframeSelector);
   const cardParams = card || CreditCards.CARD_DEFAULT;
 
-  return iframePromise.then(iframe => {
+  const getIframe = container ? () => container.find(stripeIframeSelector) : () => cy.get(stripeIframeSelector);
+
+  return getIframe().then(iframe => {
     const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;
     const body = iframe.contents().find('body');
     const fillInput = (index, value) => {
@@ -788,6 +788,7 @@ function getEmail(emailMatcher, timeout = 8000) {
     if (email) {
       return cy.mailpitGetMail(email.ID);
     }
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
     return getEmail(emailMatcher, timeout - 100);
   });
@@ -795,9 +796,11 @@ function getEmail(emailMatcher, timeout = 8000) {
 
 function getStripePaymentElement() {
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
-  const iframePromise = cy.get(stripeIframeSelector).first();
 
-  return iframePromise.then(iframe => {
-    return iframe.contents().find('body');
-  });
+  return cy
+    .get(stripeIframeSelector)
+    .first()
+    .then(iframe => {
+      return iframe.contents().find('body');
+    });
 }
