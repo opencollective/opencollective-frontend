@@ -17,7 +17,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
-import type { type Contributor, Contributor , KycProvider } from '@/lib/graphql/types/v2/schema';
+import type { Contributor } from '@/lib/graphql/types/v2/schema';
+import { KycProvider } from '@/lib/graphql/types/v2/schema';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 
