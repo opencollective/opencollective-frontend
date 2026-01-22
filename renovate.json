@@ -10,7 +10,8 @@
         "@sentry/**",
         "interweave**",
         "lottie-react",
-        "sanitize-html"
+        "sanitize-html",
+        "lib-address"
       ]
     },
     {
@@ -19,7 +20,7 @@
     },
     {
       "assignees": ["kewitz"],
-      "matchPackageNames": ["@shopify/address", "@transferwise/**"]
+      "matchPackageNames": ["@transferwise/**"]
     },
     {
       "assignees": ["gustavlrsn"],
