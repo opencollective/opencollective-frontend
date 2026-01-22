@@ -11,7 +11,6 @@ import type { Context } from '@/lib/apollo-client';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 import type LoggedInUser from '@/lib/LoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getDashboardRoute } from '@/lib/url-helpers';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
@@ -166,10 +165,7 @@ const getProfileUrl = (
         : null;
 
   if (context && typeof account?.id === 'string') {
-    if (
-      loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD) &&
-      account?.type === CollectiveType.INDIVIDUAL
-    ) {
+    if (account?.type === CollectiveType.INDIVIDUAL) {
       return getDashboardRoute({ slug: context.slug }, `people/${account?.id}`);
     } else if ([CollectiveType.VENDOR, CollectiveType.ORGANIZATION].includes(account?.type as any)) {
       return getDashboardRoute({ slug: context.slug }, `vendors/${account?.id}`);
