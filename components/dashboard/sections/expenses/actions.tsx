@@ -15,6 +15,7 @@ import {
   Trash2,
   Undo2,
 } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -126,6 +127,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
   onDelete,
 }: UseExpenseActionsOptions = {}) {
   const intl = useIntl();
+  const router = useRouter();
   const { showModal, showConfirmationModal } = useModal();
   const { LoggedInUser } = useLoggedInUser();
   const { account: dashboardAccount } = React.useContext(DashboardContext);
@@ -176,7 +178,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
       onMutationSuccess();
     };
 
-    const showConfirmModal = (type: ConfirmProcessExpenseModalType) => {
+    const showProcessExpenseModal = (type: ConfirmProcessExpenseModalType) => {
       showModal(
         ConfirmProcessExpenseModal,
         {
@@ -202,13 +204,17 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     const invoiceTypes = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT, expenseTypes.PLATFORM_BILLING] as string[];
     const canSeeInvoice = permissions.canSeeInvoiceInfo && invoiceTypes.includes(expense.type);
 
-    const getTransactionsUrl = () => {
-      if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
-        return getDashboardRoute(expense.host, `host-transactions?expenseId=${expense.legacyId}`);
-      } else if (dashboardAccount?.slug === expense.account?.slug) {
-        return getDashboardRoute(expense.account, `transactions?expenseId=${expense.legacyId}`);
+    const transactionsUrl =
+      dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id
+        ? getDashboardRoute(expense.host, `host-transactions?expenseId=${expense.legacyId}`)
+        : dashboardAccount?.slug === expense.account?.slug
+          ? getDashboardRoute(expense.account, `transactions?expenseId=${expense.legacyId}`)
+          : null;
+
+    const handleViewTransactions = () => {
+      if (transactionsUrl) {
+        router.push(transactionsUrl);
       }
-      return null;
     };
 
     const handlePayExpense = (action: string, paymentParams?: Record<string, unknown>) => {
@@ -225,7 +231,6 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         });
     };
 
-    const canPay = permissions.canPay || permissions.canMarkAsPaid;
     const shouldAllowDuplicateExpense = shouldShowDuplicateExpenseButton(LoggedInUser, expense);
 
     return {
@@ -234,11 +239,11 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         permissions.canApprove && {
           key: 'approve',
           label: intl.formatMessage({ defaultMessage: 'Approve', id: 'actions.approve' }),
-          onClick: () => showConfirmModal('APPROVE'),
+          onClick: () => showProcessExpenseModal('APPROVE'),
           Icon: Check,
         },
-        // Pay / Mark as Paid action (for Host admins)
-        canPay && {
+        // Pay / Mark as Paid action
+        (permissions.canPay || permissions.canMarkAsPaid) && {
           key: 'pay',
           label: intl.formatMessage({ defaultMessage: 'Go to Pay', id: 'actions.goToPay' }),
           onClick: () => {
@@ -267,7 +272,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         permissions.canReject && {
           key: 'reject',
           label: intl.formatMessage({ defaultMessage: 'Reject', id: 'actions.reject' }),
-          onClick: () => showConfirmModal('REJECT'),
+          onClick: () => showProcessExpenseModal('REJECT'),
           Icon: MinusCircle,
         },
         // Unapprove action (for Collective context)
@@ -275,7 +280,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           !isHostAdmin && {
             key: 'unapprove',
             label: intl.formatMessage({ defaultMessage: 'Unapprove', id: 'expense.unapprove.btn' }),
-            onClick: () => showConfirmModal('UNAPPROVE'),
+            onClick: () => showProcessExpenseModal('UNAPPROVE'),
             Icon: Undo2,
           },
         // Request re-approval (for Host context)
@@ -283,28 +288,28 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           isHostAdmin && {
             key: 'request-re-approval',
             label: intl.formatMessage({ defaultMessage: 'Request re-approval', id: 'expense.requestReApproval.btn' }),
-            onClick: () => showConfirmModal('REQUEST_RE_APPROVAL'),
+            onClick: () => showProcessExpenseModal('REQUEST_RE_APPROVAL'),
             Icon: Undo2,
           },
         // Hold action
         permissions.canHold && {
           key: 'hold',
           label: intl.formatMessage({ defaultMessage: 'Put On Hold', id: 'actions.hold' }),
-          onClick: () => showConfirmModal('HOLD'),
+          onClick: () => showProcessExpenseModal('HOLD'),
           Icon: Pause,
         },
         // Release hold action
         permissions.canRelease && {
           key: 'release',
           label: intl.formatMessage({ defaultMessage: 'Release Hold', id: 'actions.release' }),
-          onClick: () => showConfirmModal('RELEASE'),
+          onClick: () => showProcessExpenseModal('RELEASE'),
           Icon: Play,
         },
         // Mark as incomplete
         permissions.canMarkAsIncomplete && {
           key: 'mark-as-incomplete',
           label: intl.formatMessage({ defaultMessage: 'Mark as Incomplete', id: 'actions.markAsIncomplete' }),
-          onClick: () => showConfirmModal('MARK_AS_INCOMPLETE'),
+          onClick: () => showProcessExpenseModal('MARK_AS_INCOMPLETE'),
           Icon: Flag,
         },
       ]),
@@ -327,7 +332,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
               return;
             }
 
-            showConfirmModal('MARK_AS_SPAM');
+            showProcessExpenseModal('MARK_AS_SPAM');
           },
           Icon: Flag,
         },
@@ -422,15 +427,10 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           Icon: Download,
         },
         // View transactions
-        getTransactionsUrl() && {
+        transactionsUrl && {
           key: 'view-transactions',
           label: intl.formatMessage({ defaultMessage: 'View Transactions', id: 'viewTransactions' }),
-          onClick: () => {
-            const url = getTransactionsUrl();
-            if (url) {
-              window.location.href = url;
-            }
-          },
+          onClick: handleViewTransactions,
           Icon: Filter,
         },
       ]),
