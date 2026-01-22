@@ -16,6 +16,7 @@ import { formatCommunityRelation } from '@/lib/i18n/community-relation';
 
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import StackedAvatars from '@/components/StackedAvatars';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Avatar from '../../Avatar';
 import { i18nWithColon } from '../../I18nFormatters';
@@ -424,12 +425,16 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
           />
         }
         actions={
-          <Button size="sm" className="gap-1" onClick={() => setCreateEditVendor(true)}>
-            <span>
-              <FormattedMessage defaultMessage="Create vendor" id="jrCJwo" />
-            </span>
-            <PlusIcon size={20} />
-          </Button>
+          !host ? (
+            <Skeleton className="h-10 w-32" />
+          ) : (
+            <Button size="sm" className="gap-1" onClick={() => setCreateEditVendor(true)}>
+              <span>
+                <FormattedMessage defaultMessage="Create vendor" id="jrCJwo" />
+              </span>
+              <PlusIcon size={20} />
+            </Button>
+          )
         }
       />
       <Filterbar {...queryFilter} />
