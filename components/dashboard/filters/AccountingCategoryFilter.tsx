@@ -8,7 +8,7 @@ import { isMulti } from '../../../lib/filters/schemas';
 import { gql } from '../../../lib/graphql/helpers';
 import type { AccountingCategoryKind } from '@/lib/graphql/types/v2/schema';
 
-import { AccountingCategorySelectFieldsFragment, getCategoryLabel } from '../../AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment, getCategoryLabel } from '../../AccountingCategorySelect';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
@@ -23,7 +23,7 @@ const accountingCategoriesQuery = gql`
       }
     }
   }
-  ${AccountingCategorySelectFieldsFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 const schema = isMulti(z.string()).optional();

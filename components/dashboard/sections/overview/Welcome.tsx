@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import type { Category, Step } from '@/lib/welcome';
 import { COLLECTIVE_CATEGORIES, INDIVIDUAL_CATEGORIES, ORGANIZATION_CATEGORIES, sortSteps } from '@/lib/welcome';
 
-import { AccountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
+import { accountingCategorySelectFieldsFragment } from '@/components/AccountingCategorySelect';
 import { Drawer } from '@/components/Drawer';
 import { DocumentationLink } from '@/components/Link';
 import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
@@ -20,7 +20,7 @@ import { Collapsible, CollapsibleContent } from '@/components/ui/Collapsible';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 
-import { planFeatures } from '../subscriptions/queries';
+import { planFeaturesFragment } from '../subscriptions/queries';
 
 const welcomeOrganizationQuery = gql`
   query WelcomeOrganization($accountSlug: String!) {
@@ -135,8 +135,8 @@ const welcomeOrganizationQuery = gql`
       }
     }
   }
-  ${planFeatures}
-  ${AccountingCategorySelectFieldsFragment}
+  ${planFeaturesFragment}
+  ${accountingCategorySelectFieldsFragment}
 `;
 
 const ActionStep = (props: Step) => {

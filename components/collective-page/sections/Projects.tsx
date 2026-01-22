@@ -36,7 +36,7 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
   ssr: false,
 });
 
-const ProjectSectionCardFields = gql`
+const projectSectionCardFieldsFragment = gql`
   fragment ProjectSectionCardFields on Account {
     id
     legacyId
@@ -106,7 +106,7 @@ export default function Projects(props: ProjectsProps) {
         }
       }
 
-      ${ProjectSectionCardFields}
+      ${projectSectionCardFieldsFragment}
     `,
     {
       variables: {

@@ -15,7 +15,7 @@ import StyledInputField from '../StyledInputField';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
-const RemoveTwoFactorAuthFromIndividualMutation = gql`
+const removeTwoFactorAuthFromIndividualMutation = gql`
   mutation RemoveTwoFactorAuthFromIndividual(
     $account: AccountReferenceInput!
     $userTwoFactorMethod: UserTwoFactorMethodReferenceInput!
@@ -35,7 +35,7 @@ const RemoveTwoFactorAuthFromIndividualMutation = gql`
   }
 `;
 
-const EditTwoFactorAuthenticationMethodMutation = gql`
+const editTwoFactorAuthenticationMethodMutation = gql`
   mutation EditTwoFactorAuthenticationMethod($userTwoFactorMethod: UserTwoFactorMethodReferenceInput!, $name: String!) {
     editTwoFactorAuthenticationMethod(userTwoFactorMethod: $userTwoFactorMethod, name: $name) {
       id
@@ -65,7 +65,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
   const intl = useIntl();
   const { toast } = useToast();
 
-  const [removeTwoFactorMethod, removing] = useMutation(RemoveTwoFactorAuthFromIndividualMutation, {
+  const [removeTwoFactorMethod, removing] = useMutation(removeTwoFactorAuthFromIndividualMutation, {
     variables: {
       account: {
         id: props.individual.id,
@@ -76,7 +76,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
     },
   });
 
-  const [editTwoFactorMethod, editing] = useMutation(EditTwoFactorAuthenticationMethodMutation, {
+  const [editTwoFactorMethod, editing] = useMutation(editTwoFactorAuthenticationMethodMutation, {
     variables: {
       userTwoFactorMethod: {
         id: props.userTwoFactorMethod.id,
