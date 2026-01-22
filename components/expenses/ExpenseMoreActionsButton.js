@@ -84,7 +84,7 @@ const getTransactionsUrl = (dashboardAccount, expense) => {
   return null;
 };
 
-const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
+export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
   if (!LoggedInUser || !expense) {
     return false;
   }

@@ -201,7 +201,6 @@ export const hostDashboardExpensesQuery = gql`
         id
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
-
         payee {
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })
             @include(if: $fetchGrantHistory) {
@@ -215,10 +214,6 @@ export const hostDashboardExpensesQuery = gql`
           }
         }
       }
-    }
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
     }
   }
   ${expensesListFieldsFragment}
@@ -368,10 +363,15 @@ export const paidDisbursementsQuery = gql`
           imageUrl
           ...AccountHoverCardFields
         }
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
   }
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
   ${accountHoverCardFields}
+  ${expenseHostFields}
 `;

@@ -1,7 +1,20 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { compact } from 'lodash';
-import { Check, DollarSign, Download, Filter, Flag, Link, MinusCircle, Pause, Play, Trash2, Undo2 } from 'lucide-react';
+import {
+  Check,
+  Copy,
+  DollarSign,
+  Download,
+  Filter,
+  Flag,
+  Link,
+  MinusCircle,
+  Pause,
+  Play,
+  Trash2,
+  Undo2,
+} from 'lucide-react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -18,6 +31,8 @@ import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL, getDashboardRoute } from '../../../../lib/url-helpers';
 
+import { shouldShowDuplicateExpenseButton } from '@/components/expenses/ExpenseMoreActionsButton';
+
 import type { ConfirmProcessExpenseModalType } from '../../../expenses/ConfirmProcessExpenseModal';
 import ConfirmProcessExpenseModal from '../../../expenses/ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from '../../../expenses/ExpenseConfirmDeletionModal';
@@ -32,21 +47,11 @@ import { DashboardContext } from '../../DashboardContext';
 /**
  * Type for expense data used in actions. Combines ExpensesListFieldsFragment and
  * ExpensesListAdminFieldsFragment with optional additional fields that may be present
- * in some contexts (e.g., host field when querying from host dashboard).
  */
 type ExpenseQueryNode = ExpensesListFieldsFragmentFragment &
   ExpensesListAdminFieldsFragmentFragment & {
-    // Host field is present when querying from host dashboard contexts
     host?: ExpenseHostFieldsFragment | null;
   };
-
-type PayExpenseModalWrapperProps = BaseModalProps & {
-  expense: ExpenseQueryNode;
-  collective: ExpenseQueryNode['account'];
-  host: ExpenseQueryNode['host'];
-  canPayWithAutomaticPayment: boolean;
-  onSubmit: (values: { action: string } & Record<string, unknown>) => Promise<void>;
-};
 
 const PayExpenseModalWrapper = ({
   open,
@@ -56,17 +61,19 @@ const PayExpenseModalWrapper = ({
   host,
   canPayWithAutomaticPayment,
   onSubmit,
-}: PayExpenseModalWrapperProps) => {
+}: BaseModalProps & {
+  expense: ExpenseQueryNode;
+  collective: ExpenseQueryNode['account'];
+  host: ExpenseHostFieldsFragment;
+  canPayWithAutomaticPayment: boolean;
+  onSubmit: (values: { action: string } & Record<string, unknown>) => Promise<void>;
+}) => {
   if (!open) {
     return null;
   }
 
-  // PayExpenseModal has LoggedInUser in its type but doesn't actually use it
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ModalComponent = PayExpenseModal as React.ComponentType<any>;
-
   return (
-    <ModalComponent
+    <PayExpenseModal
       expense={expense}
       collective={collective}
       host={host}
@@ -219,6 +226,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     };
 
     const canPay = permissions.canPay || permissions.canMarkAsPaid;
+    const shouldAllowDuplicateExpense = shouldShowDuplicateExpenseButton(LoggedInUser, expense);
 
     return {
       primary: compact([
@@ -397,6 +405,14 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
             : intl.formatMessage({ defaultMessage: 'Copy link', id: 'CopyLink' }),
           onClick: handleCopyLink,
           Icon: isCopied ? Check : Link,
+        },
+        // Duplicate expense
+        {
+          key: 'duplicate',
+          label: intl.formatMessage({ defaultMessage: 'Duplicate', id: '4fHiNl' }),
+          onClick: () => {},
+          disabled: shouldAllowDuplicateExpense,
+          Icon: Copy,
         },
         // Download invoice (for invoice-type expenses)
         canSeeInvoice && {

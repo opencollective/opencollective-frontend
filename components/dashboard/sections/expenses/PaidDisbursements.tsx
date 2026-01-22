@@ -179,6 +179,7 @@ const getExpenseColumns = intl => [
     header: () => <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />,
     cell: ({ row }) => {
       const expense = row.original;
+      console.log({ host: expense.host });
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div onClick={e => e.stopPropagation()}>
