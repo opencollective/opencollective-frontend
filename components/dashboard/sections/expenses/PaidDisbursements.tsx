@@ -155,20 +155,16 @@ const getExpenseColumns = intl => [
       const submittedBy = expense.createdByAccount;
       return (
         <div className="flex flex-col">
-          <span className="font-medium">{expense.description}</span>
+          <span className="truncate font-medium">{expense.description}</span>
           <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
             <FormattedMessage
-              defaultMessage={'Submitted on {date} by {submittedByAccount}'}
+              defaultMessage="Submitted on {date} by {submittedByAccount}"
+              id="yBOgGq"
               values={{
                 date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                 submittedByAccount: (
-                  <LinkCollective
-                    collective={submittedBy}
-                    withHoverCard
-                    className="inline-flex items-center gap-1 overflow-hidden"
-                  >
+                  <LinkCollective collective={submittedBy} withHoverCard className="">
                     <Avatar size={14} collective={submittedBy} />
-                    <span className="truncate">{submittedBy.name}</span>
                   </LinkCollective>
                 ),
               }}
@@ -184,11 +180,8 @@ const getExpenseColumns = intl => [
     cell: ({ row }) => {
       const expense = row.original;
       return (
-        <div
-          onClick={e => {
-            e.stopPropagation();
-          }}
-        >
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={e => e.stopPropagation()}>
           <ExpenseAccountingCategoryPill
             expense={expense}
             host={expense.host}
@@ -250,25 +243,6 @@ const getExpenseColumns = intl => [
       );
     },
   },
-
-  // {
-  //   accessorKey: 'comments',
-  //   header: () => null,
-  //   cell: ({ row }) => {
-  //     const expense = row.original;
-  //     const commentCount = expense.comments?.totalCount || 0;
-  //     if (!commentCount) {
-  //       return null;
-  //     }
-  //     return (
-  //       <div className="flex items-center gap-1 text-muted-foreground">
-  //         <MessageCircle className="h-4 w-4" />
-  //         <span>{commentCount}</span>
-  //       </div>
-  //     );
-  //   },
-  //   meta: { className: 'w-16' },
-  // },
   {
     accessorKey: 'amount',
     meta: { className: 'min-w-32 text-right' },
