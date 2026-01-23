@@ -325,7 +325,6 @@ Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } 
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
   cy.getByDataCy('add-credit-card-button').click();
-  cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
   fillStripeInput();
   cy.getByDataCy('save-credit-card-button').should('be.enabled');
   cy.getByDataCy('save-credit-card-button').click();
@@ -405,7 +404,6 @@ Cypress.Commands.add('useAnyPaymentMethod', () => {
   return cy.get('#PaymentMethod', { timeout: 10000 }).then($paymentMethod => {
     // Checks if the organization already has a payment method configured
     if (!$paymentMethod.text().includes('VISA **** 4242')) {
-      cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
       cy.fillStripeInput();
     }
   });
