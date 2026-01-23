@@ -201,9 +201,9 @@ export const TaxesFormikFields = ({
           idNumberLabelRenderer
             ? idNumberLabelRenderer(shortTaxTypeLabel)
             : intl.formatMessage(
-              { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
-              { taxName: shortTaxTypeLabel },
-            )
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: shortTaxTypeLabel },
+              )
         }
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         required={!isOptional && taxSpecificValues.requireIdNumber}

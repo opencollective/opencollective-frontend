@@ -83,20 +83,20 @@ type PaymentMethodPickerProps = {
 
 export type PaymentMethodOption =
   | {
-    id: 'stripe-payment-element';
-    stripe?: Stripe;
-    elements?: StripeElements;
-    paymentElement?: StripePaymentElement;
-    setupIntent?: StripeSetupIntent;
-  }
+      id: 'stripe-payment-element';
+      stripe?: Stripe;
+      elements?: StripeElements;
+      paymentElement?: StripePaymentElement;
+      setupIntent?: StripeSetupIntent;
+    }
   | {
-    id: 'pay-with-paypal';
-  }
+      id: 'pay-with-paypal';
+    }
   | {
-    id: string;
-    name?: string;
-    type?: PaymentMethodType;
-  };
+      id: string;
+      name?: string;
+      type?: PaymentMethodType;
+    };
 
 export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
   const [error, setError] = React.useState();

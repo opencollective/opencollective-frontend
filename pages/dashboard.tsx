@@ -348,9 +348,9 @@ const DashboardPage = () => {
                 data-cy="admin-panel-container"
               >
                 {LoggedInUser &&
-                  require2FAForAdmins(account) &&
-                  !LoggedInUser.hasTwoFactorAuth &&
-                  selectedSection !== 'user-security' ? (
+                require2FAForAdmins(account) &&
+                !LoggedInUser.hasTwoFactorAuth &&
+                selectedSection !== 'user-security' ? (
                   <TwoFactorAuthRequiredMessage className="lg:mt-16" />
                 ) : (
                   <div className="max-w-(--breakpoint-xl) min-w-0 flex-1 2xl:max-w-(--breakpoint-2xl)">
