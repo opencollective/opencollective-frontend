@@ -146,7 +146,7 @@ export default defineConfig([
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-exports': 'warn',
       '@typescript-eslint/consistent-type-imports': 'warn',
       '@typescript-eslint/no-unused-expressions': 'error',
