@@ -120,7 +120,7 @@ const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito
     if (account) {
       throttledSearch(searchOrders, { searchTerm });
     }
-  }, [account, searchTerm]);
+  }, [account, searchTerm, searchOrders]);
 
   return (
     <StyledSelect

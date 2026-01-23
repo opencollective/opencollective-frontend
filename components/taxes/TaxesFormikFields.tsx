@@ -150,7 +150,15 @@ export const TaxesFormikFields = ({
     ) {
       dispatchChange(taxSpecificValues.forcedRate);
     }
-  }, []);
+  }, [
+    currentTaxValue?.rate,
+    currentTaxValue?.type,
+    dispatchChange,
+    dispatchDefaultValueOnMount,
+    isOptional,
+    taxSpecificValues.forcedRate,
+    taxType,
+  ]);
 
   if (!taxType) {
     return null;
@@ -201,9 +209,9 @@ export const TaxesFormikFields = ({
           idNumberLabelRenderer
             ? idNumberLabelRenderer(shortTaxTypeLabel)
             : intl.formatMessage(
-              { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
-              { taxName: shortTaxTypeLabel },
-            )
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: shortTaxTypeLabel },
+              )
         }
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         required={!isOptional && taxSpecificValues.requireIdNumber}

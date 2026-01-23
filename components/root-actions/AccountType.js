@@ -48,7 +48,7 @@ const AccountType = () => {
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-  }, [selectedAccountOption, callToAction]);
+  }, [selectedAccountOption, callToAction, editAccountType, intl, toast]);
 
   return (
     <React.Fragment>

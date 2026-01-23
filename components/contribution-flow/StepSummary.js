@@ -301,7 +301,7 @@ const StepSummary = ({
       // Remove stepSummary if taxes are not applied
       onChange({ stepSummary: { isReady: true } });
     }
-  }, [taxes]);
+  }, [taxes, data?.countryISO, data?.isReady, data?.number, dispatchChange, onChange, stepProfile]);
 
   return (
     <Box width="100%" px={[0, null, null, 2]}>

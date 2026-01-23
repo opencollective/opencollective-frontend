@@ -117,7 +117,7 @@ export default function StyledFilters(props: StyledFiltersProps) {
         return selected === filter;
       }
     },
-    [selected],
+    [selected, multiSelect],
   );
 
   const getLabel = props.getLabel ?? ((filter: string) => filter);

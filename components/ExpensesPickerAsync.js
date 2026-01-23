@@ -91,7 +91,7 @@ const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) =>
     if (account) {
       throttledSearch(searchExpenses, { searchTerm });
     }
-  }, [account, searchTerm]);
+  }, [account, searchTerm, searchExpenses]);
 
   return (
     <StyledSelect

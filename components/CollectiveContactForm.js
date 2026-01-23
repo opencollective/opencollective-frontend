@@ -35,7 +35,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose = undefine
     if (onChange) {
       onChange({ subject, message });
     }
-  }, [subject, message]);
+  }, [subject, message, onChange]);
 
   if (get(data, 'sendMessage.success') && !isModal) {
     return (

@@ -62,7 +62,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
         }
       },
     }),
-    [account],
+    [intl, removePayoutMethod, restorePayoutMethod, toast],
   );
 
   const [archived, active] = React.useMemo(() => {

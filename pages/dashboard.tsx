@@ -283,14 +283,14 @@ const DashboardPage = () => {
     if (slug === 'me' && LoggedInUser) {
       router.replace(`/dashboard/${LoggedInUser.collective.slug}${section ? `/${section}` : ''}`);
     }
-  }, [activeSlug, LoggedInUser]);
+  }, [activeSlug, LoggedInUser, router, section, setWorkspace, slug]);
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
     if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
       setWorkspace({ slug: undefined });
     }
-  }, [account]);
+  }, [account, LoggedInUser, isRootProfile, isRootUser, setWorkspace]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
@@ -348,9 +348,9 @@ const DashboardPage = () => {
                 data-cy="admin-panel-container"
               >
                 {LoggedInUser &&
-                  require2FAForAdmins(account) &&
-                  !LoggedInUser.hasTwoFactorAuth &&
-                  selectedSection !== 'user-security' ? (
+                require2FAForAdmins(account) &&
+                !LoggedInUser.hasTwoFactorAuth &&
+                selectedSection !== 'user-security' ? (
                   <TwoFactorAuthRequiredMessage className="lg:mt-16" />
                 ) : (
                   <div className="max-w-(--breakpoint-xl) min-w-0 flex-1 2xl:max-w-(--breakpoint-2xl)">

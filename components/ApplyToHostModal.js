@@ -261,7 +261,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
     if (host && !useTwoSteps) {
       setStep(STEPS.APPLY);
     }
-  }, [useTwoSteps]);
+  }, [useTwoSteps, host]);
 
   return (
     <StyledModal onClose={onClose} {...props}>

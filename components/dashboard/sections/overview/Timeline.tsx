@@ -45,7 +45,7 @@ export function Timeline({ accountSlug, withTitle = false }) {
     } else if (data?.account?.feed) {
       setIsTimelineBeingGenerated(false);
     }
-  }, [error, data]);
+  }, [error, data, refetch]);
 
   return (
     <Card className="pb-3">

@@ -146,7 +146,10 @@ const ExpenseFormPayeeInviteNewStep = ({
   const { formatMessage } = intl;
   const { values, touched, errors } = formik;
   const payeeValue = get(formik.values, payeeFieldName);
-  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue(payoutMethodFieldName, value), []);
+  const setPayoutMethod = React.useCallback(
+    ({ value }) => formik.setFieldValue(payoutMethodFieldName, value),
+    [formik, payoutMethodFieldName],
+  );
   const payeeType = payeeValue?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER;
   const [showAdditionalInfo, setAdditionalInfo] = React.useState(
     !isEmpty(values.payeeLocation) || !isEmpty(get(values, payoutMethodFieldName)),
@@ -159,7 +162,13 @@ const ExpenseFormPayeeInviteNewStep = ({
         formik.setFieldValue(`${payeeFieldName}.organization.slug`, suggestSlug(payeeValue.organization.name));
       }
     }
-  }, [payeeValue?.organization?.name]);
+  }, [
+    payeeValue?.organization?.name,
+    formik,
+    payeeFieldName,
+    payeeValue?.organization?.slug,
+    touched.payee?.organization?.slug,
+  ]);
 
   const changePayeeType = e => {
     e.stopPropagation();

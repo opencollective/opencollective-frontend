@@ -260,18 +260,18 @@ const ExpenseFormPayeeStep = ({
   });
   const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA, canEditPayoutMethod);
-  const allPayoutMethods = React.useMemo(
-    () => getPayoutMethodsFromPayee(values.payee),
-    [values.payee, loggedInAccount],
-  );
+  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
 
-  const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
-  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
+  const onPayoutMethodRemove = React.useCallback(
+    () => refreshPayoutProfile(formik, payoutProfiles),
+    [payoutProfiles, formik],
+  );
+  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), [formik]);
 
   const vendors = get(data, 'host.vendors.nodes', []).filter(v => v.hasPayoutMethod);
   const payeeOptions = React.useMemo(
     () => getPayeeOptions(intl, [...payoutProfiles, ...vendors]),
-    [payoutProfiles, vendors],
+    [payoutProfiles, vendors, intl],
   );
   const requiresAddress = checkRequiresAddress(values);
   const requiresPayoutMethod = !isOnBehalf && values.payee?.type !== VENDOR;

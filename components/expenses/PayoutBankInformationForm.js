@@ -280,7 +280,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
   // and only be visible after the user reselect the country.
   useEffect(() => {
     refetch({ accountDetails: get(formik.values, getFieldName('data')) });
-  }, []);
+  }, [formik.values, getFieldName, refetch]);
 
   const transactionTypeValues = React.useMemo(
     () =>

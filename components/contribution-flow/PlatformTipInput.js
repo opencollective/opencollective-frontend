@@ -62,7 +62,7 @@ const getOptions = (amount, currency, intl) => {
 const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed }) => {
   const intl = useIntl();
   const orderAmount = amount * quantity;
-  const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency]);
+  const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency, intl]);
   const formatOptionLabel = option => {
     if (option.currency) {
       return (
@@ -86,7 +86,7 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
       setSelectedOption(option);
     }
     setReady(true);
-  }, []);
+  }, [options, value]);
 
   // Dispatch new platform tip when amount changes
   React.useEffect(() => {
@@ -101,7 +101,7 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
         setSelectedOption(newOption);
       }
     }
-  }, [selectedOption, orderAmount, isReady]);
+  }, [selectedOption, orderAmount, isReady, currency, onChange, value]);
 
   return (
     <Container data-cy="PlatformTipInput" display={amount === 0 ? 'none' : 'block'}>

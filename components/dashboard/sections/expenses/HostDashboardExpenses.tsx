@@ -221,7 +221,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       setPaypalPreApprovalError(query.paypalApprovalError);
       router.replace(pageRoute, omit(query, 'paypalApprovalError'), { shallow: true });
     }
-  }, [query.paypalApprovalError]);
+  }, [query.paypalApprovalError, pageRoute, paypalPreApprovalError, query, router]);
 
   const { data, error, loading } = expenses;
 

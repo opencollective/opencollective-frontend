@@ -108,7 +108,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
       ];
     }
-  }, [collective.type, intl]);
+  }, [collective, intl]);
 
   const amountTypeOptions = React.useMemo(
     () => [
@@ -140,7 +140,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
     if ([PRODUCT, TICKET].includes(values.type)) {
       formik.setFieldValue('interval', null);
     }
-  }, [values.interval, values.type]);
+  }, [values.interval, values.type, values.amountType, formik]);
 
   React.useEffect(() => {}, [values.type]);
 

@@ -67,7 +67,7 @@ function VirtualCardRequestTableActions({
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-  }, [rejectRequestMutation, intl]);
+  }, [rejectRequestMutation, intl, toast]);
   const loading = rejectRequestMutationResult.loading;
 
   return (

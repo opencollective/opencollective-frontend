@@ -2130,7 +2130,13 @@ export function useExpenseForm(opts: {
         setFieldValue('invoiceFile', null);
       }
     }
-  }, [expenseForm.values.expenseTypeOption]);
+  }, [
+    expenseForm.values.expenseTypeOption,
+    expenseForm.values.additionalAttachments?.length,
+    expenseForm.values.expenseItems,
+    expenseForm.values.invoiceFile,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     setFieldValue('payoutMethodNameDiscrepancyReason', '');
@@ -2173,6 +2179,7 @@ export function useExpenseForm(opts: {
     expenseForm.values.tax,
     expenseForm.values.payeeSlug,
     formOptions.vendorsForAccount,
+    formOptions?.taxType,
     setFieldValue,
   ]);
 

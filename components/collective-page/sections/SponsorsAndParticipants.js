@@ -80,7 +80,7 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
     };
 
     refreshData();
-  }, [LoggedInUser]);
+  }, [LoggedInUser, canEditEvent, refetch]);
 
   return (
     <Box pb={4}>

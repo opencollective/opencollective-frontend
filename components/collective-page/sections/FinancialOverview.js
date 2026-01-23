@@ -71,7 +71,7 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
     if (LoggedInUser) {
       refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, refetch]);
 
   return (
     <ContainerSectionContent pb={4}>

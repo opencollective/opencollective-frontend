@@ -48,7 +48,7 @@ const AddNewAttachedFilesButton = ({
         uploadFiles(acceptedFiles, fileRejections);
       }
     },
-    [onSuccess, uploadFiles],
+    [onSuccess, uploadFiles, intl, parseDocument, parsingOptions, uploadFileWithGraphQL, useGraphQL, toast],
   );
 
   return (

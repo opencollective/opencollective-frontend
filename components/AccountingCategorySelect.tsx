@@ -269,7 +269,7 @@ const useExpenseCategoryPredictionService = (
   expenseValues?: AccountingCategorySelectProps['expenseValues'],
 ) => {
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
-  const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), []);
+  const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), [fetchPredictionsCall]);
   const [showPreviousPredictions, setShowPreviousPredictions] = React.useState(true);
   const inputData = getCleanInputData(expenseValues);
   const hasValidParams = Boolean(
@@ -287,7 +287,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-  }, [host.slug, account?.slug, hasValidParams, ...Object.values(inputData)]);
+  }, [host.slug, account?.slug, hasValidParams, inputData, showPreviousPredictions, throttledFetchPredictions]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {

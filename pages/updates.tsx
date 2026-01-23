@@ -148,7 +148,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
     if (LoggedInUser?.isAdminOfCollective?.(collective)) {
       queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, collective, queryResult]);
 
   const updateQuery = (router, newParams) => {
     const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));

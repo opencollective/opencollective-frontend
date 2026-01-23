@@ -219,7 +219,7 @@ const Policies = ({ collective }) => {
       label: value,
     }));
     return optionsArray;
-  }, [MODERATION_CATEGORIES]);
+  }, []);
 
   // Form
   const formik = useFormik({
@@ -302,7 +302,7 @@ const Policies = ({ collective }) => {
       });
       setSelected(alreadyPickedCategories);
     }
-  }, [loading, collectiveContributionFilteringCategories]);
+  }, [loading, collectiveContributionFilteringCategories, selectOptions, selected]);
 
   React.useEffect(() => {
     if (data) {
@@ -311,7 +311,7 @@ const Policies = ({ collective }) => {
         document.querySelector(window.location.hash)?.scrollIntoView();
       }
     }
-  }, [data]);
+  }, [data, formik]);
 
   const numberOfAdminsOptions = [0, 2, 3, 4, 5].map(n => ({
     value: n,

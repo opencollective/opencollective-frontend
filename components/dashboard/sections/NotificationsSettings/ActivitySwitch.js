@@ -61,7 +61,7 @@ const ActivitySwitch = ({ account, activityType }) => {
     } else {
       setSubscribed(existingSetting ? existingSetting.active : true);
     }
-  }, [isOverridedByAll]);
+  }, [isOverridedByAll, existingSetting]);
 
   const handleToggle = async variables => {
     try {

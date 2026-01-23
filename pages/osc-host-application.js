@@ -147,7 +147,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
           : intl.formatMessage(messages['error.unauthorized.description'], { name: collective.name }),
       });
     }
-  }, [collectiveSlug, collective]);
+  }, [collectiveSlug, collective, canApplyWithCollective, hasHost, intl, step, toast]);
 
   return (
     <Page title="Open Source Collective application">

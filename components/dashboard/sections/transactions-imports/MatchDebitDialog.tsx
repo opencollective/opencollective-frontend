@@ -283,7 +283,7 @@ const useMatchDebitDialogQueryFilter = (
 
   const defaultFilterValues = React.useMemo(
     () => getDefaultFilterValues(row, accounts, activeViewId, host),
-    [row, accounts, activeViewId],
+    [row, accounts, activeViewId, host],
   );
 
   const queryFilterMeta = React.useMemo(() => {

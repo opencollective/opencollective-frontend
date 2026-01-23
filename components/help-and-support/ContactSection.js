@@ -110,7 +110,7 @@ const ContactForm = () => {
           .map(member => getCollectivePageCanonicalURL(member.collective)),
       );
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, setFieldValue]);
 
   return (
     <Flex flexDirection="column" alignItems="center" justifyContent="center" px="16px" mt="48px" mb="120px">

@@ -388,7 +388,7 @@ const ExpenseFormBody = ({
         }
       }
     }
-  }, [payoutProfiles, loggedInAccount]);
+  }, [payoutProfiles, loggedInAccount, expense, formik, isDraft, isOnBehalf, isRecurring, router.query?.key, values]);
 
   // Pre-fill with OCR data when the expense type is set
   React.useEffect(() => {
@@ -396,14 +396,14 @@ const ExpenseFormBody = ({
       updateExpenseFormWithUploadResult(collective, formik, initWithOCR);
       setInitWithOCR(null);
     }
-  }, [initWithOCR, values.type]);
+  }, [initWithOCR, values.type, collective, formik]);
 
   // Pre-fill address based on the payout profile
   React.useEffect(() => {
     if (!values.payeeLocation?.address && values.payee?.location) {
       setLocationFromPayee(formik, values.payee);
     }
-  }, [values.payee]);
+  }, [values.payee, formik, values.payeeLocation?.address]);
 
   // Return to Payee step if type is changed and reset some values
   const previousType = usePrevious(values.type);
@@ -434,13 +434,25 @@ const ExpenseFormBody = ({
       const updatedItems = values.items.map(item => (itemHasExpenseCurrency(item) ? item : resetItemAmount(item)));
       formik.setFieldValue('items', updatedItems);
     }
-  }, [values.type]);
+  }, [
+    values.type,
+    formik,
+    isCreditCardCharge,
+    isDraft,
+    isHostAdmin,
+    previousType,
+    values.accountingCategory,
+    values.currency,
+    values.items,
+    values.payee?.isInvite,
+    values.taxes,
+  ]);
 
   React.useEffect(() => {
     if (values.payeeLocation?.structured) {
       formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
     }
-  }, [values.payeeLocation]);
+  }, [values.payeeLocation, formik]);
 
   // Handle currency updates
   React.useEffect(() => {
@@ -472,7 +484,7 @@ const ExpenseFormBody = ({
       // When the payout method changes, if there's no items yet, we set the default currency to the payout method's currency
       formik.setFieldValue('currency', payoutMethodCurrency);
     }
-  }, [loading, values.payoutMethod]);
+  }, [loading, values.payoutMethod, availableCurrencies, formik, values.currency, values.items]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -492,7 +504,7 @@ const ExpenseFormBody = ({
         );
       }
     }
-  }, [formPersister, dirty]);
+  }, [formPersister, dirty, host?.transferwise, isDraft, setValues, shouldLoadValuesFromPersister]);
 
   // Save values in localstorage
   React.useEffect(() => {

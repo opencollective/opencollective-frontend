@@ -143,7 +143,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
     if (LoggedInUser) {
       queryResult.refetch();
     }
-  }, [LoggedInUser, update]);
+  }, [LoggedInUser, update, queryResult]);
 
   React.useEffect(() => {
     addParentToURLIfMissing(router, account, `/updates/${updateSlug}`);

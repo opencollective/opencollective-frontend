@@ -198,7 +198,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
         });
       }
     }
-  }, [hasErrors, firstIncompleteSection, submitCount]);
+  }, [hasErrors, firstIncompleteSection, submitCount, form.errors, intl, toast]);
 
   return (
     <div className={cn(props.className)}>

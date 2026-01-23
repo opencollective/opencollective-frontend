@@ -239,7 +239,7 @@ export const useContributeOptions = (order, tiers, tiersLoading, disableCustomCo
       setSelectedAmountOption(option);
       setInputAmountValue(option.value || order.amount.valueInCents);
     }
-  }, [selectedContributeOption]);
+  }, [selectedContributeOption, intl.locale, order]);
 
   return {
     loading,

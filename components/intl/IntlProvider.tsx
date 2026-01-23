@@ -30,7 +30,7 @@ export default function IntlProvider({ children, locale }) {
 
   const clientIntl = React.useMemo(
     () => createIntl({ locale: selectedLocale, defaultLocale: 'en', messages }),
-    [messages],
+    [messages, selectedLocale],
   );
 
   const setLocale = React.useCallback((newLocale: string) => {

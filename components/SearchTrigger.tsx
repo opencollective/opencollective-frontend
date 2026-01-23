@@ -20,7 +20,7 @@ const SearchTrigger = ({ setShowSearchModal }) => {
     };
     document.addEventListener('keydown', handleKeydown);
     return () => document.removeEventListener('keydown', handleKeydown);
-  }, []);
+  }, [setShowSearchModal]);
 
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (

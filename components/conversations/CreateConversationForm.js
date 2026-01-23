@@ -101,14 +101,14 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
     if (formValues && !values.title && !values.html && !values.tags.length) {
       setValues(formValues);
     }
-  }, [loading, LoggedInUser]);
+  }, [loading, LoggedInUser, collectiveSlug, formPersister, setValues, values.html, values.tags.length, values.title]);
 
   // Save values in localstorage
   useEffect(() => {
     if (values.title || values.html || values.tags.length || !formPersister.loadValues()) {
       formPersister.saveValues({ html: values.html, tags: values.tags, title: values.title });
     }
-  }, [values.title, values.html, values.tags]);
+  }, [values.title, values.html, values.tags, formPersister]);
 
   const onChangeTags = useCallback(
     options =>

@@ -112,7 +112,7 @@ const ZoneSelect = ({
         onChange({ target: { name: name, value: null } });
       }
     }
-  }, [zoneOptions]);
+  }, [zoneOptions, name, onChange, value]);
 
   if (useLegacyComponent) {
     return (
@@ -371,7 +371,7 @@ const I18nAddressFields = ({
     };
 
     fetchData();
-  }, [selectedCountry]);
+  }, [selectedCountry, country, onCountryChange, onLoadError, onLoadSuccess, value]);
 
   if (!selectedCountry) {
     return null;

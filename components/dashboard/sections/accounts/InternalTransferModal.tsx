@@ -83,7 +83,7 @@ export default function InternalTransferModal({
     if (data?.account?.currency && formikRef.current) {
       formikRef.current.setFieldValue('amount.currency', data.account.currency);
     }
-  }, [data?.accout]);
+  }, [data?.account?.currency]);
 
   const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation);
 

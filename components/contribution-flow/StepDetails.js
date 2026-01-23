@@ -71,7 +71,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
     if (selectedInterval && ((!isFixedInterval && !supportsRecurring) || amount === 0)) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
-  }, [selectedInterval, isFixedInterval, supportsRecurring, amount]);
+  }, [selectedInterval, isFixedInterval, supportsRecurring, amount, dispatchChange]);
 
   React.useEffect(() => {
     track(AnalyticsEvent.CONTRIBUTION_STARTED, {

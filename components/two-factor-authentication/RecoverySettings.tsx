@@ -40,7 +40,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
     } catch (err) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
     }
-  }, [intl, props.onRecoveryCodes]);
+  }, [intl, props.onRecoveryCodes, regenerateRecoveryCodes, toast]);
 
   return (
     <React.Fragment>

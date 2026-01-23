@@ -70,7 +70,7 @@ const getVariableFromProps = props => {
   };
 };
 
-const ExpenseHeader = styled(H1) <{ inDrawer?: boolean }>`
+const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
   ${props =>
     props.inDrawer
       ? css`
@@ -120,28 +120,28 @@ interface ExpenseProps {
   data?: {
     loggedInAccount: Pick<Account, 'id' | 'slug' | 'type'>;
     expense: React.ComponentProps<typeof ExpenseInviteWelcome> &
-    React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
-    React.ComponentProps<typeof ExpenseInviteWelcome> &
-    React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
-    Pick<
-      ExpenseType,
-      | 'id'
-      | 'legacyId'
-      | 'type'
-      | 'account'
-      | 'status'
-      | 'permissions'
-      | 'items'
-      | 'comments'
-      | 'activities'
-      | 'privateMessage'
-      | 'onHold'
-      | 'recurringExpense'
-      | 'requiredLegalDocuments'
-      | 'draft'
-    > & {
-      account: Pick<AccountWithHost, 'host'>;
-    };
+      React.ComponentProps<typeof ExpenseInviteNotificationBanner> &
+      React.ComponentProps<typeof ExpenseInviteWelcome> &
+      React.ComponentProps<typeof ExpenseForm>['originalExpense'] &
+      Pick<
+        ExpenseType,
+        | 'id'
+        | 'legacyId'
+        | 'type'
+        | 'account'
+        | 'status'
+        | 'permissions'
+        | 'items'
+        | 'comments'
+        | 'activities'
+        | 'privateMessage'
+        | 'onHold'
+        | 'recurringExpense'
+        | 'requiredLegalDocuments'
+        | 'draft'
+      > & {
+        account: Pick<AccountWithHost, 'host'>;
+      };
   };
 }
 
@@ -340,7 +340,7 @@ function Expense(props: ExpenseProps) {
     const comments = expense?.comments?.nodes || [];
     const activities = expense?.activities || [];
     return orderBy([...comments, ...activities], 'createdAt', 'asc');
-  }, [expense, inDrawer]);
+  }, [expense]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const showTaxFormMsg =

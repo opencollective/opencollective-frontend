@@ -250,7 +250,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
-  }, [type, message, intl, processExpense]);
+  }, [type, message, intl, processExpense, onClose, toast]);
 
   return (
     <StyledModal role="alertdialog" onClose={onClose}>

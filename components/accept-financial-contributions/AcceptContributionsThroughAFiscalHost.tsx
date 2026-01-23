@@ -79,7 +79,7 @@ export default function AcceptContributionsThroughAFiscalHost(props: StartAccept
     setSelectedCommunityType([]);
     setSelectedCountry('ALL');
     setSelectedCurrency(currencyOptions[0]);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, currencyOptions]);
 
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];

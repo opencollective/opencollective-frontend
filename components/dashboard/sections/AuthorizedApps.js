@@ -35,7 +35,7 @@ const AuthorizedAppsSection = () => {
       router.push({ pathname, query: { offset, limit: variables.limit } });
       refetch();
     }
-  }, [authorizations?.totalCount, variables.offset]);
+  }, [authorizations?.totalCount, variables.offset, variables.limit, refetch, router]);
 
   return loading ? (
     <LoadingPlaceholder height={300} />

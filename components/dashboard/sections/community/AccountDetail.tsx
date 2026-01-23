@@ -168,7 +168,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
           ]
         : []),
     ],
-    [query.data, query.data?.account?.type, LoggedInUser, kycStatus],
+    [query.data, query.data?.account?.type, LoggedInUser, kycStatus, dashboardAccount],
   );
 
   const handleTabChange = React.useCallback(

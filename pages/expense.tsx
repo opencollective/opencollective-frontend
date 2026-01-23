@@ -93,7 +93,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     if (LoggedInUser && !queryResult.data?.loggedInAccount) {
       queryResult.refetch();
     }
-  }, [LoggedInUser, queryResult.data?.loggedInAccount]);
+  }, [LoggedInUser, queryResult]);
 
   useEffect(() => {
     addParentToURLIfMissing(router, queryResult.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);

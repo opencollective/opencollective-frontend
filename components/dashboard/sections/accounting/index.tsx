@@ -142,7 +142,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           kind: kindFilter.schema,
           ...(hasHosting ? { hostOnly: hostOnlyFilter.schema } : {}),
         }),
-      [],
+      [hasHosting],
     ),
     filters: {
       searchTerm: searchFilter.filter,
