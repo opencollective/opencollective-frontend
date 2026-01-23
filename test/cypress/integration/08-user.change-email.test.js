@@ -65,9 +65,9 @@ describe('Users can change their email address', () => {
     cy.get('[data-cy=EditUserEmailForm] input[name=email]').type(`{selectall}${emailForDoubleConfirmation}`);
     cy.contains('[data-cy=EditUserEmailForm] button', 'Confirm new email').click();
     cy.contains('[data-cy=EditUserEmailForm] button', 'Re-send confirmation').click();
-    cy.mailpitGetEmailsBySubject(`Confirm your email ${emailForDoubleConfirmation} on Open Collective`, {
-      timeout: 10000,
-    }).then(result => {
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000);
+    cy.mailpitGetEmailsBySubject(`Confirm your email ${emailForDoubleConfirmation} on Open Collective`).then(result => {
       expect(result).to.have.property('messages');
       expect(result.messages).to.have.length(2);
     });

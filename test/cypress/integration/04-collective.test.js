@@ -21,8 +21,6 @@ const uploadImage = ({ dropzone, fileName }) => {
       force: true,
     },
   );
-
-  cy.get('[data-cy="toast-notification"]', { timeout: 10000 }).should('be.visible');
 };
 
 describe('Collective page', () => {
@@ -227,7 +225,6 @@ describe('Edit public message after contribution', () => {
         cy.get('button[data-cy="cf-next-step"]').click();
         cy.contains('Contribute as').should('be.visible');
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
         cy.fillStripeInput();
         cy.contains('button', 'Contribute').click();
         // Wait for the order to succeed

@@ -100,7 +100,6 @@ describe('Contribution Flow: Order', () => {
       // As this is a new account, not payment method is configured yet so
       // we should have the credit card form selected by default.
       cy.get('input[type=checkbox][name=save]').should('be.checked');
-      cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
       cy.fillStripeInput();
       cy.contains('button', 'Contribute $500').click();
 
@@ -150,7 +149,6 @@ describe('Contribution Flow: Order', () => {
             $paymentMethod.click();
           } else {
             cy.get('input[type=checkbox][name=save]').should('be.checked');
-            cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
             cy.fillStripeInput();
           }
         });

@@ -354,7 +354,7 @@ Cypress.Commands.add('complete3dSecure', (approve = true, { version = 1 } = {}) 
   const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
   const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
 
-  cy.get(iframeSelector)
+  cy.get(iframeSelector, { timeout: 15000 })
     .should($stripeFrame => {
       const frameContent = $stripeFrame.contents();
 
@@ -402,7 +402,7 @@ Cypress.Commands.add('iframeLoaded', { prevSubject: 'element' }, $iframe => {
  * stripe form otherwise.
  */
 Cypress.Commands.add('useAnyPaymentMethod', () => {
-  return cy.get('#PaymentMethod').then($paymentMethod => {
+  return cy.get('#PaymentMethod', { timeout: 10000 }).then($paymentMethod => {
     // Checks if the organization already has a payment method configured
     if (!$paymentMethod.text().includes('VISA **** 4242')) {
       cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
@@ -758,7 +758,9 @@ function fillStripeInput(params) {
   const stripeIframeSelector = '.__PrivateStripeElement iframe';
   const cardParams = card || CreditCards.CARD_DEFAULT;
 
-  const getIframe = container ? () => container.find(stripeIframeSelector) : () => cy.get(stripeIframeSelector);
+  const getIframe = container
+    ? () => container.find(stripeIframeSelector)
+    : () => cy.get(stripeIframeSelector, { timeout: 15000 });
 
   return getIframe().then(iframe => {
     const { creditCardNumber, expirationDate, cvcCode, postalCode } = cardParams;

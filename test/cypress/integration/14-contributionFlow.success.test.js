@@ -15,6 +15,8 @@ describe('Contribution Flow: Order success', () => {
       cy.signup({ user: userParams, redirect: newFlowRoute, visitParams }).then(() => {
         cy.waitForLoggedIn();
         cy.get('button[data-cy="cf-next-step"]').click();
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(50);
         cy.get('button[data-cy="cf-next-step"]').click();
         cy.get('[name="cardNumber"]', { timeout: 10000 }).should('be.visible');
         cy.useAnyPaymentMethod();
