@@ -10,7 +10,6 @@ import {
   type AccountHoverCardFieldsFragment,
   ExpenseStatus,
   ExpenseType,
-  HostContext,
   type PaidDisbursementsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';

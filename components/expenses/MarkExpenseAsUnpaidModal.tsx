@@ -109,7 +109,12 @@ export default function MarkExpenseAsUnpaidModal({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent onCloseAutoFocus={onCloseAutoFocus} className="max-w-md">
+      <AlertDialogContent
+        id="mark-expense-as-unpaid-modal"
+        data-cy="mark-expense-as-unpaid-modal"
+        onCloseAutoFocus={onCloseAutoFocus}
+        className="max-w-md"
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>
             <FormattedMessage id="Expense.markAsUnpaid" defaultMessage="Mark expense as unpaid" />
@@ -187,6 +192,7 @@ export default function MarkExpenseAsUnpaidModal({
             variant="destructive"
             loading={submitting}
             disabled={uploading}
+            data-cy="confirmation-modal-continue"
             onClick={async e => {
               e.preventDefault();
               await onConfirm();
