@@ -66,6 +66,10 @@ export const expensesPageQuery = gql`
       settings
       createdAt
       supportedExpenseTypes
+      expensesTags {
+        id
+        tag
+      }
       features {
         id
         ...NavbarFields

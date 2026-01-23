@@ -418,7 +418,8 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
 
     // Check if the new expense flow is enabled (via preview feature or query param)
     const hasNewSubmitExpenseFlow =
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) ||
+      router.query.newExpenseFlowEnabled;
     const canDuplicateExpense = hasNewSubmitExpenseFlow && shouldShowDuplicateExpenseButton(LoggedInUser, expense);
 
     return {

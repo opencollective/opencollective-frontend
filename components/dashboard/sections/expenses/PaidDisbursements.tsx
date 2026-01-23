@@ -86,14 +86,7 @@ const toVariables: FiltersToVariables<FilterValues, PaidDisbursementsQueryVariab
   ...(omit(commonToVariables, 'status') as unknown as Partial<
     FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta>
   >),
-  account: (value, key, allValues, meta) => {
-    // If hostContext is INTERNAL, filter to host's own account
-    if ((allValues as FilterValues).hostContext === HostContext.INTERNAL) {
-      return { slug: (meta as FilterMeta).hostSlug };
-    }
-    // Otherwise, use the normal account filter
-    return hostedAccountFilter.toVariables(value, key, allValues, meta);
-  },
+  account: hostedAccountFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
