@@ -15,7 +15,6 @@ import { FormField } from '../FormField';
 import { I18nSupportLink } from '../I18nFormatters';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
 import MessageBox from '../MessageBox';
-import Spinner from '../Spinner';
 import { Input } from '../ui/Input';
 import { Separator } from '../ui/Separator';
 import { Skeleton } from '../ui/Skeleton';

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import type { LucideIcon } from 'lucide-react';
-import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Edit, HandCoins, Landmark, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Edit, X } from 'lucide-react';
 import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account, CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 
 import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
@@ -16,10 +15,10 @@ import { getCustomPaymentProviderIconComponent } from './CustomPaymentProviderIc
 
 type CustomPaymentMethodsListProps = {
   account: Pick<Account, 'slug' | 'currency'>;
-  customPaymentProviders: CustomPaymentProvider[];
+  customPaymentProviders: ManualPaymentProvider[];
   onClickEdit: (providerId: string) => void;
   onClickRemove: (providerId: string) => void;
-  onReorder: (newList: CustomPaymentProvider[]) => void;
+  onReorder: (newList: ManualPaymentProvider[]) => void;
   canEdit?: boolean;
 };
 

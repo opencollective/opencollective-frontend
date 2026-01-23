@@ -55,7 +55,6 @@ const ValueRenderers: Record<
 
 /**
  * Replaces variables in HTML instructions with formatted values.
- * Uses the same logic as formatManualInstructions but preserves HTML structure.
  * Escapes HTML in variable values to prevent XSS and ensure they're displayed as text.
  */
 const replaceVariablesInHTML = (

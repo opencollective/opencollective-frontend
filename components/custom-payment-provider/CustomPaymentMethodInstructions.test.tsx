@@ -145,7 +145,9 @@ describe('CustomPaymentMethodInstructions', () => {
 
     it('handles multiple occurrences of the same variable', () => {
       const instructions = '{collective} is the collective. Donate to {collective}.';
-      const { container } = render(<CustomPaymentMethodInstructions instructions={instructions} values={defaultValues} />);
+      const { container } = render(
+        <CustomPaymentMethodInstructions instructions={instructions} values={defaultValues} />,
+      );
 
       // Verify the text content contains the replaced value multiple times
       const textContent = container.textContent || '';

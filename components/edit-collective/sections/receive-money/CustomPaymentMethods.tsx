@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
+import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { v7 as uuidv7 } from 'uuid';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
-import type { Account, CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import { type Account, type ManualPaymentProvider, ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
 
 import { useModal } from '@/components/ModalContext';
 
@@ -15,37 +15,63 @@ import { EditCustomPaymentMethodDialog } from '../../../custom-payment-provider/
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
-import { editCustomPaymentMethodsMutation, getCacheUpdaterAfterEditCustomPaymentMethods } from './gql';
-import { updateCustomPaymentMethods } from './lib';
+import {
+  createManualPaymentProviderMutation,
+  deleteManualPaymentProviderMutation,
+  reorderManualPaymentProvidersMutation,
+  updateManualPaymentProviderMutation,
+} from './gql';
 
 type CustomPaymentMethodsProps = {
-  customPaymentMethods: CustomPaymentProvider[];
+  manualPaymentProviders: ManualPaymentProvider[];
   canEdit: boolean;
-  account: Pick<Account, 'slug' | 'currency' | 'settings'>;
+  account: Pick<Account, 'slug' | 'currency'>;
+  onRefetch: () => void;
 };
 
-const CustomPaymentMethods = ({ account, customPaymentMethods, canEdit }: CustomPaymentMethodsProps) => {
+const CustomPaymentMethods = ({ account, manualPaymentProviders, canEdit, onRefetch }: CustomPaymentMethodsProps) => {
   const { toast } = useToast();
   const intl = useIntl();
-  const [editCustomPaymentMethods] = useMutation(editCustomPaymentMethodsMutation);
   const { showConfirmationModal } = useModal();
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const submitCustomPaymentMethods = React.useCallback(
-    async (updatedProviders: CustomPaymentProvider[], { onSuccess }: { onSuccess?: () => void } = {}) => {
+  const [createProvider] = useMutation(createManualPaymentProviderMutation);
+  const [updateProvider] = useMutation(updateManualPaymentProviderMutation);
+  const [deleteProvider] = useMutation(deleteManualPaymentProviderMutation);
+  const [reorderProviders] = useMutation(reorderManualPaymentProvidersMutation);
+
+  const otherProviders = manualPaymentProviders.filter(p => p.type === 'OTHER' && !p.isArchived);
+
+  const handleSave = React.useCallback(
+    async (values: { name: string; instructions: string; icon?: string }, editingProvider?: ManualPaymentProvider) => {
       try {
-        const allCustomMethods = updateCustomPaymentMethods(
-          account.settings.customPaymentProviders,
-          'OTHER',
-          updatedProviders,
-        );
-        await editCustomPaymentMethods({
-          variables: {
-            account: getAccountReferenceInput(account),
-            value: allCustomMethods,
-          },
-          update: getCacheUpdaterAfterEditCustomPaymentMethods(account),
-        });
+        if (editingProvider) {
+          // Update existing
+          await updateProvider({
+            variables: {
+              manualPaymentProvider: { id: editingProvider.id },
+              input: {
+                type: ManualPaymentProviderType.OTHER,
+                name: values.name,
+                instructions: values.instructions,
+                icon: values.icon,
+              },
+            },
+          });
+        } else {
+          // Create new
+          await createProvider({
+            variables: {
+              host: getAccountReferenceInput(account),
+              manualPaymentProvider: {
+                type: 'OTHER',
+                name: values.name,
+                instructions: values.instructions,
+                icon: values.icon,
+              },
+            },
+          });
+        }
 
         toast({
           variant: 'success',
@@ -56,7 +82,8 @@ const CustomPaymentMethods = ({ account, customPaymentMethods, canEdit }: Custom
             />
           ),
         });
-        onSuccess?.();
+        setEditingId(null);
+        onRefetch();
       } catch (error: unknown) {
         toast({
           variant: 'error',
@@ -64,31 +91,11 @@ const CustomPaymentMethods = ({ account, customPaymentMethods, canEdit }: Custom
         });
       }
     },
-    [editCustomPaymentMethods, account, intl, toast],
-  );
-
-  const handleSave = React.useCallback(
-    async (values: CustomPaymentProvider, editingProvider: CustomPaymentProvider | null) => {
-      const updatedProviders = [...customPaymentMethods];
-
-      if (editingProvider) {
-        // Update existing
-        const index = updatedProviders.findIndex(p => p.id === editingProvider.id);
-        if (index !== -1) {
-          updatedProviders[index] = { ...updatedProviders[index], ...values };
-        }
-      } else {
-        // Add new
-        updatedProviders.push({ id: uuidv7(), ...values });
-      }
-
-      await submitCustomPaymentMethods(updatedProviders, { onSuccess: () => setEditingId(null) });
-    },
-    [customPaymentMethods, submitCustomPaymentMethods],
+    [createProvider, updateProvider, account, intl, toast, onRefetch],
   );
 
   const onClickRemove = React.useCallback(
-    id => {
+    (id: string) => {
       showConfirmationModal({
         variant: 'destructive',
         title: <FormattedMessage defaultMessage="Delete custom payment method" id="CustomPaymentMethod.DeleteTitle" />,
@@ -99,28 +106,41 @@ const CustomPaymentMethods = ({ account, customPaymentMethods, canEdit }: Custom
           />
         ),
         onConfirm: async () => {
-          const updatedProviders = account.settings.customPaymentProviders.filter(p => p.id !== id);
-          await editCustomPaymentMethods({
-            variables: { account: getAccountReferenceInput(account), value: updatedProviders },
-            update: getCacheUpdaterAfterEditCustomPaymentMethods(account),
+          await deleteProvider({
+            variables: { manualPaymentProvider: { id } },
           });
+          onRefetch();
         },
       });
     },
-    [account, editCustomPaymentMethods, showConfirmationModal],
+    [deleteProvider, showConfirmationModal, onRefetch],
   );
 
   const handleReorder = React.useCallback(
-    async (updatedProviders: CustomPaymentProvider[]) => {
-      await submitCustomPaymentMethods(updatedProviders);
+    async (updatedProviders: ManualPaymentProvider[]) => {
+      try {
+        await reorderProviders({
+          variables: {
+            host: getAccountReferenceInput(account),
+            type: 'OTHER',
+            providers: updatedProviders.map(p => pick(p, 'id')),
+          },
+        });
+        onRefetch();
+      } catch (error: unknown) {
+        toast({
+          variant: 'error',
+          message: i18nGraphqlException(intl, error),
+        });
+      }
     },
-    [submitCustomPaymentMethods],
+    [reorderProviders, account, intl, toast, onRefetch],
   );
 
   return (
     <div className="flex flex-col">
       <CustomPaymentMethodsList
-        customPaymentProviders={customPaymentMethods.filter(p => p.type === 'OTHER')}
+        customPaymentProviders={otherProviders}
         onClickEdit={setEditingId}
         onClickRemove={onClickRemove}
         onReorder={handleReorder}
@@ -130,7 +150,7 @@ const CustomPaymentMethods = ({ account, customPaymentMethods, canEdit }: Custom
 
       {canEdit && (
         <div>
-          <Button size="sm" variant="outline" onClick={() => setEditingId(uuidv7())}>
+          <Button size="sm" variant="outline" onClick={() => setEditingId('new')}>
             <Add size="1em" className="mr-1" />
             <FormattedMessage defaultMessage="Add Custom Payment Method" id="//3qi9" />
           </Button>
@@ -139,7 +159,7 @@ const CustomPaymentMethods = ({ account, customPaymentMethods, canEdit }: Custom
 
       {editingId && (
         <EditCustomPaymentMethodDialog
-          provider={customPaymentMethods.find(p => p.id === editingId)}
+          provider={editingId !== 'new' ? otherProviders.find(p => p.id === editingId) : undefined}
           onSave={handleSave}
           onClose={() => setEditingId(null)}
           defaultCurrency={account.currency}

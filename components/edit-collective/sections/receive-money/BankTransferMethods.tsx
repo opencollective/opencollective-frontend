@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
+import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { v7 as uuidv7 } from 'uuid';
 
 import { getAccountReferenceInput } from '@/lib/collective';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
   EditCollectiveBankTransferHostQuery,
   EditCollectiveBankTransferHostQueryVariables,
-  EditCollectiveCustomPaymentMethodsMutation,
 } from '@/lib/graphql/types/v2/graphql';
-import { type Account, type CustomPaymentProvider, CustomPaymentProviderType } from '@/lib/graphql/types/v2/schema';
+import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 
 import { useToast } from '@/components/ui/useToast';
 
@@ -22,30 +21,29 @@ import { useModal } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 
 import {
+  deleteManualPaymentProviderMutation,
   editCollectiveBankTransferHostQuery,
-  editCustomPaymentMethodsMutation,
-  getCacheUpdaterAfterEditCustomPaymentMethods,
+  reorderManualPaymentProvidersMutation,
 } from './gql';
-import { updateCustomPaymentMethods } from './lib';
 
 type BankTransferProps = {
-  account: Pick<Account, 'slug' | 'currency' | 'legacyId' | 'settings'>;
-  customPaymentMethods: CustomPaymentProvider[];
+  account: Pick<Account, 'slug' | 'currency'>;
+  manualPaymentProviders: ManualPaymentProvider[];
   canEdit: boolean;
 };
 
-const BankTransfer = ({ account, customPaymentMethods, canEdit }: BankTransferProps) => {
+const BankTransfer = ({ account, manualPaymentProviders, canEdit }: BankTransferProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { showConfirmationModal } = useModal();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { loading, data } = useQuery<EditCollectiveBankTransferHostQuery, EditCollectiveBankTransferHostQueryVariables>(
-    editCollectiveBankTransferHostQuery,
-    { variables: { slug: account.slug } },
-  );
-  const [editCustomPaymentMethods] = useMutation<EditCollectiveCustomPaymentMethodsMutation>(
-    editCustomPaymentMethodsMutation,
-  );
+  const { loading, data, refetch } = useQuery<
+    EditCollectiveBankTransferHostQuery,
+    EditCollectiveBankTransferHostQueryVariables
+  >(editCollectiveBankTransferHostQuery, { variables: { slug: account.slug } });
+
+  const [deleteProvider] = useMutation(deleteManualPaymentProviderMutation);
+  const [reorderProviders] = useMutation(reorderManualPaymentProvidersMutation);
 
   if (loading) {
     return <Loading />;
@@ -53,11 +51,13 @@ const BankTransfer = ({ account, customPaymentMethods, canEdit }: BankTransferPr
     return null;
   }
 
+  const bankTransferProviders = manualPaymentProviders.filter(p => p.type === 'BANK_TRANSFER' && !p.isArchived);
+
   return (
     <div className="flex flex-col">
       <div className="mt-4 w-full">
         <CustomPaymentMethodsList
-          customPaymentProviders={customPaymentMethods.filter(p => p.type === 'BANK_TRANSFER')}
+          customPaymentProviders={bankTransferProviders}
           canEdit={canEdit}
           account={account}
           onClickEdit={id => {
@@ -74,26 +74,23 @@ const BankTransfer = ({ account, customPaymentMethods, canEdit }: BankTransferPr
                 />
               ),
               onConfirm: async () => {
-                const updatedProviders = account.settings.customPaymentProviders.filter(p => p.id !== id);
-                await editCustomPaymentMethods({
-                  variables: { account: getAccountReferenceInput(account), value: updatedProviders },
-                  update: getCacheUpdaterAfterEditCustomPaymentMethods(account),
+                await deleteProvider({
+                  variables: { manualPaymentProvider: { id } },
                 });
+                refetch();
               },
             })
           }
           onReorder={async updatedProviders => {
             try {
-              const allCustomMethods = updateCustomPaymentMethods(
-                account.settings.customPaymentProviders,
-                CustomPaymentProviderType.BANK_TRANSFER,
-                updatedProviders,
-              );
-
-              await editCustomPaymentMethods({
-                variables: { account: getAccountReferenceInput(account), value: allCustomMethods },
-                update: getCacheUpdaterAfterEditCustomPaymentMethods(account),
+              await reorderProviders({
+                variables: {
+                  host: getAccountReferenceInput(account),
+                  type: 'BANK_TRANSFER',
+                  providers: updatedProviders.map(p => pick(p, 'id')),
+                },
               });
+              refetch();
             } catch (e) {
               toast({
                 variant: 'error',
@@ -105,7 +102,7 @@ const BankTransfer = ({ account, customPaymentMethods, canEdit }: BankTransferPr
       </div>
       {canEdit && (
         <div>
-          <Button size="sm" variant="outline" onClick={() => setEditingId(uuidv7())}>
+          <Button size="sm" variant="outline" onClick={() => setEditingId('new')}>
             <Add size="1em" className="mr-1" />
             <FormattedMessage defaultMessage="Add bank details" id="7aqY1c" />
           </Button>
@@ -119,7 +116,11 @@ const BankTransfer = ({ account, customPaymentMethods, canEdit }: BankTransferPr
           }}
           account={account}
           host={data.host}
-          customPaymentProvider={editingId && customPaymentMethods.find(p => p.id === editingId)}
+          manualPaymentProvider={editingId !== 'new' ? bankTransferProviders.find(p => p.id === editingId) : undefined}
+          onSuccess={() => {
+            setEditingId(null);
+            refetch();
+          }}
         />
       )}
     </div>

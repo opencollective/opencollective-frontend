@@ -1,6 +1,7 @@
 import React from 'react';
+import { useQuery } from '@apollo/client';
 import { Paypal } from '@styled-icons/fa-brands/Paypal';
-import { get, partition } from 'lodash';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
@@ -12,12 +13,13 @@ import Stripe from '@/components/icons/Stripe';
 import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
-import type { CustomPaymentProvider } from '../../custom-payment-provider/EditCustomPaymentMethodDialog';
+import Loading from '../../Loading';
 import EditConnectedAccount from '../EditConnectedAccount';
 import EditPayPalAccount from '../EditPayPalAccount';
 
 import BankTransferMethods from './receive-money/BankTransferMethods';
 import CustomPaymentMethods from './receive-money/CustomPaymentMethods';
+import { editCollectiveBankTransferHostQuery } from './receive-money/gql';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const ReceivingMoney = ({
@@ -27,12 +29,22 @@ const ReceivingMoney = ({
     connectedAccounts: Pick<ConnectedAccount, 'service'>[];
   };
 }) => {
-  const customPaymentMethods = get(collective, 'settings.customPaymentProviders') as CustomPaymentProvider[];
+  const { data, loading, refetch } = useQuery(editCollectiveBankTransferHostQuery, {
+    variables: { slug: collective.slug },
+  });
+
   if (!hasAccountMoneyManagement(collective)) {
     return <PageFeatureNotSupported />;
   }
 
-  const canEditCustomPaymentMethods = get(collective, 'plan.manualPayments'); // TODO
+  const host = data?.host;
+  const manualPaymentProviders = host?.manualPaymentProviders || [];
+  const canEditCustomPaymentMethods = get(host, 'plan.manualPayments');
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div className="space-y-12">
       {/* Automatic Payments Section */}
@@ -112,7 +124,7 @@ const ReceivingMoney = ({
             <CardContent>
               <BankTransferMethods
                 account={collective}
-                customPaymentMethods={customPaymentMethods}
+                manualPaymentProviders={manualPaymentProviders}
                 canEdit={canEditCustomPaymentMethods}
               />
             </CardContent>
@@ -128,9 +140,10 @@ const ReceivingMoney = ({
             </CardHeader>
             <CardContent>
               <CustomPaymentMethods
-                customPaymentMethods={customPaymentMethods}
+                manualPaymentProviders={manualPaymentProviders}
                 canEdit={canEditCustomPaymentMethods}
                 account={collective}
+                onRefetch={refetch}
               />
             </CardContent>
           </Card>
