@@ -183,7 +183,7 @@ const StyledModal = ({
     }
 
     onClose();
-  }, [hasUnsavedChanges, onClose, preventClose, intl]);
+  }, [hasUnsavedChanges, onClose, preventClose]);
 
   return (
     <React.Fragment>

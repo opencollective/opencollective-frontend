@@ -60,15 +60,12 @@ const PDFViewer = ({
       }
     });
 
-    const contentWrapper = contentWrapperRef.current;
-    if (contentWrapper) {
-      resizeObserver.observe(contentWrapper);
-    }
+    resizeObserver.observe(contentWrapperRef.current);
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, [throttledSetWrapperWidth]);
+  }, []);
 
   return (
     <DocumentContainer>

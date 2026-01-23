@@ -301,14 +301,14 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
       debouncedLazyQuery(getCollectiveInfo, { slug: values.toAccount.slug });
     }
     setFieldValue('accountingCategory', null);
-  }, [values.toAccount, getCollectiveInfo, setFieldValue]);
+  }, [values.toAccount]);
 
   React.useEffect(() => {
     setFieldValue('amount.currency', data?.account?.currency || host.currency);
     if (formik.touched.hostFeePercent !== true) {
       setFieldValue('hostFeePercent', data?.account?.bankTransfersHostFeePercent || host.hostFeePercent);
     }
-  }, [data?.account, formik.touched.hostFeePercent, host.currency, host.hostFeePercent, setFieldValue]);
+  }, [data?.account]);
 
   React.useEffect(() => {
     if (values.fromAccount?.type === 'VENDOR') {
@@ -329,15 +329,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         setFieldValue('fromAccountInfo.email', '');
       }
     }
-  }, [
-    values.fromAccount,
-    formik.touched.fromAccountInfo,
-    formik.values?.fromAccount?.id,
-    formik.values?.fromAccountInfo?.email,
-    formik.values?.fromAccountInfo?.name,
-    host?.vendors?.nodes,
-    setFieldValue,
-  ]);
+  }, [values.fromAccount]);
 
   const collective = data?.account;
   const currency = collective?.currency || host.currency;

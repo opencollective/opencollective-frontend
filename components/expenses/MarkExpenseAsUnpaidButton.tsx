@@ -80,7 +80,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
     }
 
     setHasModal(false);
-  }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message, intl]);
+  }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message]);
 
   const button = (
     <Button {...props} variant="outlineDestructive" onClick={() => setHasModal(true)}>

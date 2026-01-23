@@ -125,7 +125,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
     return () => {
       router.events.off('routeChangeStart', handler);
     };
-  }, [router.events]);
+  }, []);
 
   if (!LoggedInUser) {
     return <SignupLogin whitelabel={whitelabel} />;

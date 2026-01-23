@@ -51,7 +51,7 @@ const ExpensesTotal = ({ collective, host, expenses, expenseFieldForTotalAmount 
     }
 
     return { total, currency, isApproximate };
-  }, [expenses, collective?.currency, expenseFieldForTotalAmount, host?.currency]);
+  }, [expenses]);
 
   return (
     <React.Fragment>

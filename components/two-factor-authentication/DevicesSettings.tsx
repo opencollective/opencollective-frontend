@@ -98,7 +98,7 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     } catch (e) {
       toast({ variant: 'error', message: e.message });
     }
-  }, [props.individual.id, intl, props.onRecoveryCodes, toast]);
+  }, [props.individual.id, intl]);
 
   return (
     <StyledCard px={3} py={2}>

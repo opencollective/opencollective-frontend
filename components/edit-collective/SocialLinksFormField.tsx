@@ -35,7 +35,7 @@ export default function SocialLinksFormField({
 
   React.useEffect(() => {
     onChange(items.map(({ url, type }) => ({ url, type })));
-  }, [items, onChange]);
+  }, [items]);
 
   const onItemChange = React.useCallback(
     (socialLink, sortId) => {
@@ -47,7 +47,7 @@ export default function SocialLinksFormField({
       });
       setItems(newItems);
     },
-    [items],
+    [items, onChange],
   );
 
   const onRemoveItem = React.useCallback(
@@ -55,7 +55,7 @@ export default function SocialLinksFormField({
       const newItems = items.filter(item => item.sortId !== sortId);
       setItems(newItems);
     },
-    [items],
+    [items, onChange],
   );
 
   const addItem = React.useCallback(() => {
@@ -64,7 +64,7 @@ export default function SocialLinksFormField({
       sortId: i.toString(),
     }));
     setItems(newItems);
-  }, [items]);
+  }, [items, onChange]);
 
   function handleDragEnd(event) {
     const { active, over } = event;

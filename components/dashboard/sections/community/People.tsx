@@ -306,7 +306,10 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
 
   const getActions = usePersonActions({ accountSlug, hasKYCFeature });
 
-  const columns = React.useMemo(() => getColumns({ intl, hasKYCFeature }), [intl, hasKYCFeature]);
+  const columns = React.useMemo(
+    () => getColumns({ intl, hasKYCFeature }),
+    [intl, queryFilter.activeViewId, hasKYCFeature],
+  );
 
   return (
     <div className="flex flex-col gap-4">

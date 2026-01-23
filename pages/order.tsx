@@ -298,7 +298,7 @@ export default function OrderPage(props) {
     if (!prevLoggedInUser && LoggedInUser) {
       queryResult.refetch();
     }
-  }, [LoggedInUser, prevLoggedInUser, queryResult]);
+  }, [LoggedInUser, prevLoggedInUser]);
 
   if (!order && error) {
     return <ErrorPage loading={queryResult.loading} data={queryResult.data} error={error} />;

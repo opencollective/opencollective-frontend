@@ -90,7 +90,7 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
     if (collective) {
       addParentToURLIfMissing(router, collective, `/contribute/${tierSlug}-${tierId}`);
     }
-  }, [collective, router, tierId, tierSlug]);
+  }, [collective]);
 
   if (!loading) {
     if (error) {

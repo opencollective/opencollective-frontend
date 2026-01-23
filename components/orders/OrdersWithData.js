@@ -188,7 +188,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
     if (!prevLoggedInUser && LoggedInUser) {
       refetch();
     }
-  }, [LoggedInUser, prevLoggedInUser, refetch]);
+  }, [LoggedInUser]);
 
   return (
     <Box maxWidth={1000} width="100%" m="0 auto">

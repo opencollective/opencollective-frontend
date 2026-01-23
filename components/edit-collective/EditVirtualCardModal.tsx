@@ -321,7 +321,7 @@ export default function EditVirtualCardModal({
     if (cardCollective?.slug) {
       throttledCall(getCollectiveUsers, { slug: cardCollective.slug });
     }
-  }, [cardCollective, getCollectiveUsers]);
+  }, [cardCollective]);
 
   const intl = useIntl();
 

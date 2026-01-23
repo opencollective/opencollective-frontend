@@ -166,7 +166,7 @@ const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFie
         formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
       }
     }
-  }, [data, expense, formik, generateReference]);
+  }, [data]);
 
   if (error) {
     return (
@@ -664,28 +664,28 @@ const PayExpenseModal = ({
               isManualPayment,
               formik.values.paymentProcessorFeeInHostCurrency,
             ) && (
-              <Flex mt={16}>
-                <StyledTooltip
-                  content={
-                    <FormattedMessage
-                      defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)"
-                      id="ewvfiF"
-                    />
-                  }
-                >
-                  <StyledCheckbox
-                    name="feesPayer"
-                    checked={formik.values.feesPayer === 'PAYEE'}
-                    onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
-                    label={
-                      <Span fontSize="12px">
-                        <FormattedMessage defaultMessage="The payee is covering the fees" id="zoC8Gb" />
-                      </Span>
+                <Flex mt={16}>
+                  <StyledTooltip
+                    content={
+                      <FormattedMessage
+                        defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)"
+                        id="ewvfiF"
+                      />
                     }
-                  />
-                </StyledTooltip>
-              </Flex>
-            )}
+                  >
+                    <StyledCheckbox
+                      name="feesPayer"
+                      checked={formik.values.feesPayer === 'PAYEE'}
+                      onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
+                      label={
+                        <Span fontSize="12px">
+                          <FormattedMessage defaultMessage="The payee is covering the fees" id="zoC8Gb" />
+                        </Span>
+                      }
+                    />
+                  </StyledTooltip>
+                </Flex>
+              )}
             <Box mt={19} mb={3}>
               <SectionLabel>
                 <FormattedMessage id="PaymentBreakdown" defaultMessage="Payment breakdown" />

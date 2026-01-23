@@ -444,12 +444,12 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
 
   const handleClose = React.useCallback(() => {
     props.setOpen(false);
-  }, [props]);
+  }, [props.setOpen]);
 
   const handleSuccess = React.useCallback(() => {
     props.setOpen(false);
     props.onSuccess?.();
-  }, [props]);
+  }, [props.setOpen, props.onSuccess]);
 
   const onSaveClick = React.useCallback(async () => {
     let paymentMethodId;
@@ -510,17 +510,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     } finally {
       setSubmitting(false);
     }
-  }, [
-    option,
-    handleClose,
-    handleSuccess,
-    intl,
-    addStripePaymentMethodFromSetupIntent,
-    props.accountSlug,
-    props.order.id,
-    toast,
-    updatePaymentMethod,
-  ]);
+  }, [option, handleClose, handleSuccess, intl]);
 
   const onPaypalSubscription = React.useCallback(
     async paypalSubscriptionId => {
@@ -537,7 +527,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         setSubmitting(false);
       }
     },
-    [handleSuccess, updatePaymentMethod],
+    [handleSuccess],
   );
 
   React.useEffect(() => {
@@ -573,16 +563,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     ) {
       onPaymentMethodSetup();
     }
-  }, [
-    router.query.orderId,
-    router.query.stripeAccount,
-    router.query.setup_intent,
-    router.query.redirect_status,
-    addStripePaymentMethodFromSetupIntent,
-    intl,
-    props.accountSlug,
-    toast,
-  ]);
+  }, [router.query.orderId, router.query.stripeAccount, router.query.setup_intent, router.query.redirect_status]);
 
   return (
     <Dialog open={props.open} onOpenChange={props.setOpen}>

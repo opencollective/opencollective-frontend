@@ -361,7 +361,7 @@ const Transactions = ({ LoggedInUser, account, ...props }: TransactionsProps) =>
     if (LoggedInUser !== prevLoggedInUser) {
       refetch();
     }
-  }, [LoggedInUser, prevLoggedInUser, refetch]);
+  }, [LoggedInUser]);
 
   const canDownloadInvoice = React.useMemo(() => {
     if (!account || !LoggedInUser) {

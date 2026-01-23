@@ -75,7 +75,7 @@ const ExternalRedirectPage = () => {
     } else {
       setReady(true);
     }
-  }, [router, query.url, fallback, shouldRedirectParent]);
+  }, [router, query.url]);
 
   return (
     <Page noRobots>

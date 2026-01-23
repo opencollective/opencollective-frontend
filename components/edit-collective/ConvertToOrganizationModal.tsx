@@ -97,7 +97,7 @@ export function ConvertToOrganizationModal({ open, setOpen, collective }: Conver
     if (!open) {
       formik.resetForm();
     }
-  }, [open, formik]);
+  }, [open]);
 
   return (
     <FormikProvider value={formik}>

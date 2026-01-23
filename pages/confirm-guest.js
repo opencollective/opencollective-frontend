@@ -76,7 +76,7 @@ const ConfirmGuestPage = () => {
       setStatus(STATUS.SUBMITTING);
       confirmGuestAccount();
     }
-  }, [email, confirmGuestAccount]);
+  }, []);
 
   return (
     <Page title={intl.formatMessage(MESSAGES.pageTitle)}>

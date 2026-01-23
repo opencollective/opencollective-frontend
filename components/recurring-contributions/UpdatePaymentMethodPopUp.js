@@ -285,7 +285,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
   // load stripe on mount
   useEffect(() => {
     loadStripe();
-  }, [loadStripe]);
+  }, []);
 
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null);
@@ -293,7 +293,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
   const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
   const paymentOptions = React.useMemo(
     () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
-    [filterPaymentMethodsParams],
+    filterPaymentMethodsParams,
   );
 
   useEffect(() => {
@@ -306,7 +306,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
       setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
     }
     setLoadingSelectedPaymentMethod(false);
-  }, [paymentOptions, addedPaymentMethod, contribution.paymentMethod, selectedPaymentMethod]);
+  }, [paymentOptions, addedPaymentMethod]);
 
   return (
     <Fragment>

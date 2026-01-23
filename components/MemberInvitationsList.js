@@ -18,7 +18,7 @@ const MemberInvitationsList = ({ invitations, selectedInvitationId }) => {
         window.scroll({ top: elemTop - 100, behavior: 'smooth' });
       }
     }
-  }, [selectedInvitationId]);
+  }, []);
 
   if (invitations.length === 0) {
     return (

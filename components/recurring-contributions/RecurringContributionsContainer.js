@@ -97,17 +97,14 @@ const RecurringContributionsContainer = ({
     if (!displayedRecurringContributions.some(c => c.id === editingContributionId)) {
       setEditingContributionId(null);
     }
-  }, [displayedRecurringContributions, editingContributionId]);
+  }, [displayedRecurringContributions]);
 
-  const filterOptions = React.useMemo(
-    () => [
-      { value: FILTERS.ACTIVE, label: intl.formatMessage(I18nFilters[FILTERS.ACTIVE]) },
-      { value: FILTERS.MONTHLY, label: intl.formatMessage(I18nFilters[FILTERS.MONTHLY]) },
-      { value: FILTERS.YEARLY, label: intl.formatMessage(I18nFilters[FILTERS.YEARLY]) },
-      { value: FILTERS.CANCELLED, label: intl.formatMessage(I18nFilters[FILTERS.CANCELLED]) },
-    ],
-    [intl],
-  );
+  const filterOptions = React.useMemo(() => [
+    { value: FILTERS.ACTIVE, label: intl.formatMessage(I18nFilters[FILTERS.ACTIVE]) },
+    { value: FILTERS.MONTHLY, label: intl.formatMessage(I18nFilters[FILTERS.MONTHLY]) },
+    { value: FILTERS.YEARLY, label: intl.formatMessage(I18nFilters[FILTERS.YEARLY]) },
+    { value: FILTERS.CANCELLED, label: intl.formatMessage(I18nFilters[FILTERS.CANCELLED]) },
+  ]);
 
   if (isLoading) {
     return <LoadingPlaceholder height="400px" mt={3} />;

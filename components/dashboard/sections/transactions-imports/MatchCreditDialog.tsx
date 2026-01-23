@@ -300,7 +300,7 @@ const useMatchCreditDialogQueryFilter = (
 
   const defaultFilterValues = React.useMemo(
     () => getDefaultFilterValues(row, accounts, activeViewId, host),
-    [row, accounts, activeViewId, host],
+    [row, accounts, activeViewId],
   );
 
   const queryFilterMeta = React.useMemo(() => {

@@ -169,7 +169,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
     if (formik.values.collective?.slug) {
       throttledCall(getCollectiveUsers, { slug: formik.values.collective.slug });
     }
-  }, [formik.values.collective, getCollectiveUsers]);
+  }, [formik.values.collective]);
 
   const handleClose = () => {
     formik.resetForm(initialValues);

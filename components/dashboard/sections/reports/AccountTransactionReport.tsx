@@ -174,7 +174,7 @@ const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
     if (localStorageLayout) {
       setLayout(localStorageLayout as TestLayout);
     }
-  }, [setLayout]);
+  }, []);
   React.useEffect(() => {
     localStorage.setItem('host-reports-layout', layout);
   }, [layout]);

@@ -42,14 +42,13 @@ export function Drawer({
       const width = entries[0].contentRect.width;
       document.documentElement.style.setProperty('--drawer-width', `${width}px`);
     });
-    const drawerElement = drawerRef.current;
-    observer.observe(drawerElement);
+    observer.observe(drawerRef.current);
     return () => {
-      if (drawerElement) {
-        observer.unobserve(drawerElement);
+      if (drawerRef.current) {
+        observer.unobserve(drawerRef.current);
       }
     };
-  }, []);
+  }, [drawerRef.current]);
 
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>

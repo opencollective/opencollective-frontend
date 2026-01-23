@@ -92,7 +92,7 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-  }, [rejectRequestMutation, intl, toast]);
+  }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;
 
   if (!virtualCardRequest || virtualCardRequest.status !== VirtualCardRequestStatus.PENDING) {

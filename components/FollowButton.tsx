@@ -81,7 +81,7 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
     } finally {
       setIsLoading(false);
     }
-  }, [isFollowingAccount, account, intl, followAccount, refetchLoggedInUser, toast, unfollowAccount]);
+  }, [isFollowingAccount, account, intl]);
 
   if (
     !LoggedInUser ||

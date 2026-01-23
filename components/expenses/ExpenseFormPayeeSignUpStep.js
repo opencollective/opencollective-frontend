@@ -136,7 +136,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expe
     (values.type === expenseTypes.RECEIPT ||
       (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
 
-  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), [formik]);
+  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [payeeType, setPayeeType] = React.useState(values.payee?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER);
   const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery);
 
@@ -152,20 +152,20 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expe
         formik.setFieldValue('payee.organization.slug', suggestSlug(values.payee.organization.name));
       }
     }
-  }, [values.payee?.organization?.name, formik, touched.payee?.organization?.slug, values.payee?.organization?.slug]);
+  }, [values.payee?.organization?.name]);
   React.useEffect(() => {
     if (payeeType === PAYEE_TYPE.USER) {
       formik.setFieldValue('payee', omit(values.payee, ['organization']));
     } else if (payeeType === PAYEE_TYPE.ORG && values.draft?.payee?.organization) {
       formik.setFieldValue('payee', { ...values.payee, organization: values.draft.payee.organization });
     }
-  }, [payeeType, formik, values.payee, values.draft?.payee?.organization]);
+  }, [payeeType]);
   // Slug Validation
   React.useEffect(() => {
     if (values.payee?.organization?.slug) {
       throttledSearch(validateSlug, { slug: values.payee.organization.slug });
     }
-  }, [values.payee?.organization?.slug, validateSlug]);
+  }, [values.payee?.organization?.slug]);
 
   const handleSlugValidation = async value => {
     if (value === existingSlugAccount?.account?.slug) {

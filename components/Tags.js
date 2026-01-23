@@ -45,7 +45,7 @@ const TagsForAdmins = ({ expense, order, suggestedTags }) => {
         toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
       }
     },
-    [expense, order, intl, setTags, toast],
+    [expense, order],
   );
 
   if (expense) {

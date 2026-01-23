@@ -61,7 +61,7 @@ const AmountFilter = ({ currency, onChange, value, steps = [0, 50, 500, 5000], .
   const allExpensesOption = { label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' };
   const options = React.useMemo(() => {
     return [allExpensesOption, ...steps.map((step, idx) => getOption(intl, currency, step, steps[idx + 1]))];
-  }, [steps, allExpensesOption, currency, intl]);
+  }, [steps]);
   const [min, max] = parseAmountRange(value);
 
   return (

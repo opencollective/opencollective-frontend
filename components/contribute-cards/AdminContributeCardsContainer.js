@@ -38,14 +38,14 @@ const AdminContributeCardsContainer = ({
     if (!isEqual(cards, items)) {
       setItems(cards);
     }
-  }, [cards, items]);
+  }, [JSON.stringify(cards)]);
 
   // Save reorder to the backend if internal order has changed
   React.useEffect(() => {
     if (!isEqual(cards, items)) {
       onReorder?.(items);
     }
-  }, [items, cards, onReorder]);
+  }, [items]);
 
   function handleDragStart(event) {
     setDraggingId(event.active.id);

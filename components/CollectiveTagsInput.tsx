@@ -119,7 +119,7 @@ function CollectiveTagsInput({
 
   useEffect(() => {
     onChange(selected);
-  }, [selected, onChange]);
+  }, [selected]);
 
   useEffect(() => {
     if (input?.length) {
@@ -131,7 +131,7 @@ function CollectiveTagsInput({
       // Skip debouncing when input is empty (on initial load for instance)
       searchTags();
     }
-  }, [input, searchTags]);
+  }, [input]);
 
   useEffect(() => {
     if (!fetching) {

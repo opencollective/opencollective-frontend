@@ -706,11 +706,14 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     [intl, deletePayoutMethod, props, showConfirmationModal, toast],
   );
 
-  const onEditClick = React.useCallback(e => {
-    e.stopPropagation();
-    e.preventDefault();
-    setIsEditingPayoutMethod(true);
-  }, []);
+  const onEditClick = React.useCallback(
+    e => {
+      e.stopPropagation();
+      e.preventDefault();
+      setIsEditingPayoutMethod(true);
+    },
+    [isEditingPayoutMethod, props.payoutMethod],
+  );
 
   const { onPaymentMethodEdited } = props;
   const onSaveClick = React.useCallback(

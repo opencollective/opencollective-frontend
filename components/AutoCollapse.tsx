@@ -50,7 +50,7 @@ export const AutoCollapse = ({ children, maxCollapsedHeight }: AutoCollapseProps
         setIsCollapsed(true);
       }
     }
-  }, [children, maxCollapsedHeight]);
+  }, [children]);
 
   return (
     <React.Fragment>

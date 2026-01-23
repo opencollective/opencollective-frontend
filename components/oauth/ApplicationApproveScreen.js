@@ -212,7 +212,7 @@ export const ApplicationApproveScreen = ({
     if (autoApprove) {
       callAuthorize();
     }
-  }, [autoApprove, callAuthorize]);
+  }, []);
 
   return (
     <Container position="relative" mt="48px" width="100%">

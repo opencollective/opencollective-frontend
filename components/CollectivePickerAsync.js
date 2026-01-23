@@ -217,20 +217,7 @@ const CollectivePickerAsync = ({
         vendorVisibleToAccountIds,
       });
     }
-  }, [
-    types,
-    limit,
-    hostCollectiveIds,
-    parentCollectiveIds,
-    vendorVisibleToAccountIds,
-    includeAllVendors,
-    term,
-    preload,
-    searchCollectives,
-    skipGuests,
-    includeArchived,
-    includeVendorsForHostId,
-  ]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, includeAllVendors, term]);
 
   return (
     <CollectivePicker

@@ -65,7 +65,7 @@ export default function MoveExpenses() {
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-  }, [selectedExpenses, destinationAccount, callToAction, intl, submitMoveExpenses, toast]);
+  }, [selectedExpenses, destinationAccount, callToAction]);
 
   return (
     <div>

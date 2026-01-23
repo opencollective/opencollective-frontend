@@ -150,7 +150,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     if (open) {
       queryFilter.setFilters({ workspace: account?.slug, entity: SearchEntity.ALL });
     }
-  }, [open, account?.slug, queryFilter]);
+  }, [open, account?.slug]);
 
   const {
     data,
@@ -178,7 +178,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     } else {
       queryFilter.setFilter('searchTerm', undefined);
     }
-  }, [debouncedInput, queryFilter]);
+  }, [debouncedInput]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {

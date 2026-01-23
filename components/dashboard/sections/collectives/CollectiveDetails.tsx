@@ -258,7 +258,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
     ) {
       handleUpdate(expenseTypes);
     }
-  }, [expenseTypes, collective, data?.editAccountSetting?.settings, handleUpdate, loading]);
+  }, [expenseTypes, collective]);
 
   return (
     <Popover open={isOpen} onOpenChange={open => !loading && setOpen(open)}>

@@ -98,7 +98,7 @@ export default function TwoFactorAuthenticationModal() {
     setSelectedMethod(null);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
-  }, [prompt]);
+  }, []);
 
   const confirm = React.useCallback(() => {
     const code = twoFactorCode;
@@ -116,7 +116,7 @@ export default function TwoFactorAuthenticationModal() {
     });
 
     setConfirming(false);
-  }, [twoFactorCode, supportedMethods, selectedMethod, prompt]);
+  }, [twoFactorCode, supportedMethods, selectedMethod]);
 
   const router = useRouter();
 
@@ -126,7 +126,7 @@ export default function TwoFactorAuthenticationModal() {
     };
     router.events.on('routeChangeStart', handleRouteChange);
     return () => router.events.off('routeChangeStart', handleRouteChange);
-  }, [cancel, router.events]);
+  }, [cancel]);
 
   const verifyBtnEnabled =
     supportedMethods.length > 0 &&

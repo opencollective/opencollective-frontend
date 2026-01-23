@@ -83,20 +83,20 @@ type PaymentMethodPickerProps = {
 
 export type PaymentMethodOption =
   | {
-      id: 'stripe-payment-element';
-      stripe?: Stripe;
-      elements?: StripeElements;
-      paymentElement?: StripePaymentElement;
-      setupIntent?: StripeSetupIntent;
-    }
+    id: 'stripe-payment-element';
+    stripe?: Stripe;
+    elements?: StripeElements;
+    paymentElement?: StripePaymentElement;
+    setupIntent?: StripeSetupIntent;
+  }
   | {
-      id: 'pay-with-paypal';
-    }
+    id: 'pay-with-paypal';
+  }
   | {
-      id: string;
-      name?: string;
-      type?: PaymentMethodType;
-    };
+    id: string;
+    name?: string;
+    type?: PaymentMethodType;
+  };
 
 export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
   const [error, setError] = React.useState();
@@ -122,13 +122,13 @@ export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
         currency: props.order?.totalAmount?.currency,
       }),
     );
-  }, [query?.data?.host, query?.data?.account?.paymentMethods, props.order?.totalAmount?.currency]);
+  }, [query?.data?.host, query?.data?.account?.paymentMethods]);
 
   const onChange = React.useCallback(
     (option: PaymentMethodOption) => {
       props.onChange(option);
     },
-    [props],
+    [props.onChange],
   );
 
   if (query.loading) {
@@ -226,7 +226,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
 
   React.useEffect(() => {
     props?.onError?.(error);
-  }, [error, props]);
+  }, [error, props?.onError]);
 
   const [elements, paymentElement] = React.useMemo(() => {
     if (!stripe || !setupIntent) {
@@ -255,7 +255,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     });
 
     return [elements, paymentElement];
-  }, [stripe, setupIntent, props.currency]);
+  }, [stripe, setupIntent]);
 
   React.useEffect(() => {
     paymentElement?.update({
@@ -266,19 +266,19 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
         },
       },
     });
-  }, [paymentElement, props.account, LoggedInUser?.email]);
+  }, [paymentElement, props.account?.name, LoggedInUser?.email]);
 
   React.useEffect(() => {
     if (props.checked) {
       paymentElement?.mount(elementContainer.current);
     }
     return () => paymentElement?.unmount();
-  }, [paymentElement, props]);
+  }, [paymentElement, props.checked]);
 
   React.useEffect(() => {
     (inputRef.current as any).stripeElements = elements;
     (inputRef.current as any).paymentElement = paymentElement;
-  }, [paymentElement, elements]);
+  }, [paymentElement, elements, inputRef.current]);
 
   React.useEffect(() => {
     function onChange(e: StripePaymentElementChangeEvent) {
@@ -297,7 +297,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     return () => {
       paymentElement?.off('change', onChange);
     };
-  }, [stripe, paymentElement, elements, setupIntent, props, setPaymentMethodType]);
+  }, [stripe, paymentElement, elements, setupIntent, props.onChange]);
 
   const availableMethodLabels = React.useMemo(() => {
     if (!setupIntent?.payment_method_types) {

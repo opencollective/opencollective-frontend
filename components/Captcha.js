@@ -86,7 +86,7 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
 
   React.useEffect(() => {
     onVerify(null);
-  }, [onVerify]);
+  }, []);
 
   if (!isCaptchaEnabled()) {
     return null;

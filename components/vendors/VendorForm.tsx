@@ -116,7 +116,7 @@ const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReje
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       uploadFiles(acceptedFiles, fileRejections);
     },
-    [uploadFiles],
+    [onSuccess, uploadFiles],
   );
   const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
