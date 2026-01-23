@@ -22,7 +22,7 @@ export default defineConfig([
   pluginCypress.configs.recommended,
   jsxA11y.flatConfigs.recommended,
   styledA11y.flatConfigs.recommended,
-  reactHooks.configs['recommended-latest'],
+  reactHooks.configs.flat.recommended,
   includeIgnoreFile(gitignorePath),
   globalIgnores(['lib/graphql/types/v2/*', 'lib/graphql/*.graphql']),
 
@@ -97,6 +97,25 @@ export default defineConfig([
       'styled-components-a11y/label-has-associated-control': 'off',
       'styled-components-a11y/html-has-lang': ['off'],
       'styled-components-a11y/iframe-has-title': ['off'],
+
+      // Disable new React Compiler rules from eslint-plugin-react-hooks v7
+      // These rules are stricter and would require significant refactoring
+      'react-hooks/refs': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/use-memo': 'off',
+      'react-hooks/incompatible-library': 'off',
+      'react-hooks/static-components': 'off',
+      'react-hooks/void-use-memo': 'off',
+      'react-hooks/component-hook-factories': 'off',
+      'react-hooks/globals': 'off',
+      'react-hooks/error-boundaries': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/set-state-in-render': 'off',
+      'react-hooks/unsupported-syntax': 'off',
+      'react-hooks/config': 'off',
+      'react-hooks/gating': 'off',
 
       // Format.js rules
       'formatjs/enforce-default-message': ['error'],
