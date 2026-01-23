@@ -73,6 +73,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     confirmStub.returns(false); // Do not accept
     cy.on('window:confirm', confirmStub);
     cy.get('[data-cy="platform-tip-other-amount"]').type('{selectall}48');
+    // eslint-disable-next-line cypress/unsafe-to-chain-command
     cy.getByDataCy('cf-next-step')
       .click()
       .then(() => {
