@@ -202,8 +202,8 @@ export default defineConfig([
   {
     files: ['test/cypress/**/*.js', 'test/cypress/**/*.ts'],
     rules: {
-      'cypress/no-unnecessary-waiting': 'warn',
-      'cypress/unsafe-to-chain-command': 'warn',
+      'cypress/no-unnecessary-waiting': 'error',
+      'cypress/unsafe-to-chain-command': 'error',
       'cypress/no-assigning-return-values': 'warn',
     },
   },
