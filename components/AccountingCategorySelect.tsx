@@ -39,7 +39,7 @@ type RequiredHostFields = Pick<Host, 'id' | 'slug' | 'type'> & {
 
 type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' | 'code' | 'kind'>;
 
-type AccountingCategorySelectProps = {
+export type AccountingCategorySelectProps = {
   host: RequiredHostFields;
   /** The account holding the expense. Only used when using the prediction service */
   account?: { id: Account['id']; slug: Account['slug']; parent?: { id: Account['id'] } };

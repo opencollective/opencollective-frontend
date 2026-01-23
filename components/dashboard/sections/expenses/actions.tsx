@@ -1,6 +1,6 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
-import { compact } from 'lodash';
+import { useLazyQuery, useMutation } from '@apollo/client';
+import { compact, pick } from 'lodash';
 import {
   Check,
   Copy,
@@ -8,7 +8,7 @@ import {
   Download,
   Filter,
   Flag,
-  Link,
+  Link as LinkIcon,
   MinusCircle,
   Pause,
   Play,
@@ -16,7 +16,7 @@ import {
   Undo2,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import expenseTypes from '../../../../lib/constants/expenseTypes';
@@ -27,23 +27,66 @@ import type {
   ExpensesListAdminFieldsFragmentFragment,
   ExpensesListFieldsFragmentFragment,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { getCollectivePageCanonicalURL, getDashboardRoute } from '../../../../lib/url-helpers';
+import { collectiveAdminsMustConfirmAccountingCategory } from '@/components/expenses/lib/accounting-categories';
 
 import { shouldShowDuplicateExpenseButton } from '@/components/expenses/ExpenseMoreActionsButton';
+import { getDisabledMessage } from '@/components/expenses/PayExpenseButton';
+import SecurityChecksModal, { expenseRequiresSecurityConfirmation } from '@/components/expenses/SecurityChecksModal';
 
+import ApproveExpenseModal from '../../../expenses/ApproveExpenseModal';
 import type { ConfirmProcessExpenseModalType } from '../../../expenses/ConfirmProcessExpenseModal';
 import ConfirmProcessExpenseModal from '../../../expenses/ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from '../../../expenses/ExpenseConfirmDeletionModal';
 import { expensePageExpenseFieldsFragment } from '../../../expenses/graphql/fragments';
 import MarkExpenseAsUnpaidModal from '../../../expenses/MarkExpenseAsUnpaidModal';
 import PayExpenseModal from '../../../expenses/PayExpenseModal';
+import { FullscreenFlowLoadingPlaceholder } from '../../../FullscreenFlowLoadingPlaceholder';
+import Link from '../../../Link';
 import type { BaseModalProps } from '../../../ModalContext';
 import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
+
+import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from './ScheduledExpensesBanner';
+
+/**
+ * Helper function to get error content with special handling for PayPal balance errors
+ */
+const getErrorContent = (
+  intl: ReturnType<typeof useIntl>,
+  error: Error | { message?: string },
+  host?: ExpenseHostFieldsFragment | null,
+): { title?: string; message: React.ReactNode } => {
+  const message = error?.message;
+  if (message) {
+    if (message.startsWith('Insufficient Paypal balance') && host?.slug) {
+      return {
+        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
+        message: (
+          <Link href={`/dashboard/${host.slug}/host-expenses`}>
+            <FormattedMessage
+              id="PayExpenseModal.RefillBalanceError"
+              defaultMessage="Refill your balance from the Host dashboard"
+            />
+          </Link>
+        ),
+      };
+    }
+  }
+
+  return { message: i18nGraphqlException(intl, error) };
+};
+
+// Lazy load the submit expense flow
+const SubmitExpenseFlow = React.lazy(() =>
+  import('../../../submit-expense/SubmitExpenseFlow').then(module => ({ default: module.SubmitExpenseFlow })),
+);
 
 /**
  * Type for expense data used in actions. Combines ExpensesListFieldsFragment and
@@ -53,6 +96,31 @@ type ExpenseQueryNode = ExpensesListFieldsFragmentFragment &
   ExpensesListAdminFieldsFragmentFragment & {
     host?: ExpenseHostFieldsFragment | null;
   };
+
+const SecurityChecksModalWrapper = ({
+  open,
+  setOpen,
+  expense,
+  onConfirm,
+}: BaseModalProps & {
+  expense: ExpenseQueryNode;
+  onConfirm: () => void;
+}) => {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <SecurityChecksModal
+      expense={expense}
+      onClose={() => setOpen(false)}
+      onConfirm={() => {
+        setOpen(false);
+        onConfirm();
+      }}
+    />
+  );
+};
 
 const PayExpenseModalWrapper = ({
   open,
@@ -85,6 +153,63 @@ const PayExpenseModalWrapper = ({
   );
 };
 
+const ApproveExpenseModalWrapper = ({
+  open,
+  setOpen,
+  expense,
+  host,
+  account,
+  onConfirm,
+}: BaseModalProps & {
+  expense: ExpenseQueryNode;
+  host: ExpenseHostFieldsFragment;
+  account: ExpenseQueryNode['account'];
+  onConfirm: () => Promise<void>;
+}) => {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <ApproveExpenseModal
+      expense={expense}
+      host={host}
+      account={account}
+      onConfirm={onConfirm}
+      onClose={() => setOpen(false)}
+    />
+  );
+};
+
+const DuplicateExpenseFlowWrapper = ({
+  open,
+  setOpen,
+  expenseId,
+  onSuccess,
+}: BaseModalProps & {
+  expenseId: number;
+  onSuccess?: () => void;
+}) => {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <React.Suspense fallback={<FullscreenFlowLoadingPlaceholder handleOnClose={() => setOpen(false)} />}>
+      <SubmitExpenseFlow
+        onClose={submittedExpense => {
+          setOpen(false);
+          if (submittedExpense) {
+            onSuccess?.();
+          }
+        }}
+        expenseId={expenseId}
+        duplicateExpense={true}
+      />
+    </React.Suspense>
+  );
+};
+
 const processExpenseMutation = gql`
   mutation ProcessExpenseAction(
     $id: String
@@ -100,6 +225,19 @@ const processExpenseMutation = gql`
       paymentParams: $paymentParams
     ) {
       id
+      ...ExpensePageExpenseFields
+    }
+  }
+
+  ${expensePageExpenseFieldsFragment}
+`;
+
+const expenseStatusQuery = gql`
+  query ExpenseActionsExpenseStatus($expense: ExpenseReferenceInput!) {
+    expense(expense: $expense) {
+      id
+      legacyId
+      status
       ...ExpensePageExpenseFields
     }
   }
@@ -134,6 +272,36 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
   const { copy, isCopied } = useClipboard();
 
   const [processExpense] = useMutation(processExpenseMutation);
+  const [getExpenseStatus] = useLazyQuery(expenseStatusQuery);
+
+  /**
+   * Polls the expense status after a Stripe payment until it reaches PAID or PROCESSING status.
+   * This is needed because Stripe payments are asynchronous and the status update may not be immediate.
+   */
+  const waitExpenseStatus = React.useCallback(
+    async (expense: Pick<T, 'id' | 'legacyId'>) => {
+      let maxAttempts = 10;
+      while (maxAttempts-- > 0) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        const result = await getExpenseStatus({
+          variables: {
+            expense: pick(expense, ['id', 'legacyId']),
+          },
+        });
+
+        if (result.error) {
+          continue;
+        }
+
+        const updatedExpense = result.data?.expense;
+        if (updatedExpense?.status === ExpenseStatus.PAID || updatedExpense?.status === ExpenseStatus.PROCESSING) {
+          return;
+        }
+      }
+    },
+    [getExpenseStatus],
+  );
 
   const { callWith: downloadInvoiceWith } = useAsyncCall(
     async (expense: T) => {
@@ -164,7 +332,9 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
       return {};
     }
 
-    const isHostAdmin = LoggedInUser?.isAdminOfCollective(expense.host);
+    // Determine if we're viewing the expense in the host context (from host dashboard)
+    // This affects which actions are available (e.g., "Unapprove" vs "Request re-approval")
+    const isViewingExpenseInHostContext = dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id;
 
     const onMutationSuccess = () => {
       refetchList?.();
@@ -191,10 +361,6 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
 
     const handleCopyLink = () => {
       copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`);
-      toast({
-        variant: 'success',
-        message: intl.formatMessage({ defaultMessage: 'Link copied!', id: 'X18xOQ' }),
-      });
     };
 
     const handleDownloadInvoice = () => {
@@ -217,21 +383,43 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
       }
     };
 
-    const handlePayExpense = (action: string, paymentParams?: Record<string, unknown>) => {
-      return processExpense({
-        variables: { id: expense.id, legacyId: expense.legacyId, action, paymentParams },
-      })
-        .then(() => {
-          onMutationSuccess();
-          return true;
-        })
-        .catch(e => {
-          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-          return false;
+    const payExpenseDisabledMsg = getDisabledMessage(expense, expense.account, expense.host, expense.payoutMethod);
+    const payExpenseDisabled = Boolean(payExpenseDisabledMsg);
+
+    const handlePayExpense = async (action: string, paymentParams?: Record<string, unknown>) => {
+      // Build refetchQueries for scheduled payment actions
+      const refetchQueries = [];
+      if ((action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') && expense.host?.slug) {
+        refetchQueries.push({
+          query: scheduledExpensesQuery,
+          variables: getScheduledExpensesQueryVariables(expense.host.slug),
         });
+      }
+
+      try {
+        await processExpense({
+          variables: { id: expense.id, legacyId: expense.legacyId, action, paymentParams },
+          refetchQueries,
+        });
+
+        // For Stripe payments, wait for the expense status to update
+        if (action === 'MARK_AS_PAID_WITH_STRIPE') {
+          await waitExpenseStatus(expense);
+        }
+
+        onMutationSuccess();
+        return true;
+      } catch (e) {
+        const errorContent = getErrorContent(intl, e, expense.host);
+        toast({ variant: 'error', title: errorContent.title, message: errorContent.message });
+        return false;
+      }
     };
 
-    const shouldAllowDuplicateExpense = shouldShowDuplicateExpenseButton(LoggedInUser, expense);
+    // Check if the new expense flow is enabled (via preview feature or query param)
+    const hasNewSubmitExpenseFlow =
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
+    const canDuplicateExpense = hasNewSubmitExpenseFlow && shouldShowDuplicateExpenseButton(LoggedInUser, expense);
 
     return {
       primary: compact([
@@ -239,7 +427,35 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         permissions.canApprove && {
           key: 'approve',
           label: intl.formatMessage({ defaultMessage: 'Approve', id: 'actions.approve' }),
-          onClick: () => showProcessExpenseModal('APPROVE'),
+          onClick: () => {
+            // Check if accounting category confirmation is required by policy
+            // Only check if the required policy data is available in the query
+            const requiresCategoryConfirmation =
+              expense.account &&
+              expense.host &&
+              'policies' in expense.account &&
+              collectiveAdminsMustConfirmAccountingCategory(
+                expense.account as Parameters<typeof collectiveAdminsMustConfirmAccountingCategory>[0],
+                expense.host as Parameters<typeof collectiveAdminsMustConfirmAccountingCategory>[1],
+              );
+
+            if (requiresCategoryConfirmation) {
+              showModal(
+                ApproveExpenseModalWrapper,
+                {
+                  expense,
+                  host: expense.host,
+                  account: expense.account,
+                  onConfirm: async () => {
+                    await handleProcessExpense('APPROVE');
+                  },
+                },
+                `approve-expense-${expense.id}`,
+              );
+            } else {
+              showProcessExpenseModal('APPROVE');
+            }
+          },
           Icon: Check,
         },
         // Pay / Mark as Paid action
@@ -247,25 +463,44 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           key: 'pay',
           label: intl.formatMessage({ defaultMessage: 'Go to Pay', id: 'actions.goToPay' }),
           onClick: () => {
-            showModal(
-              PayExpenseModalWrapper,
-              {
-                expense,
-                collective: expense.account,
-                host: expense.host,
-                canPayWithAutomaticPayment: Boolean(permissions.canPay),
-                onSubmit: async (values: { action: string } & Record<string, unknown>) => {
-                  const { action, ...paymentParams } = values;
-                  const success = await handlePayExpense(action, paymentParams);
-                  if (success) {
-                    return;
-                  }
-                  throw new Error('Payment failed');
+            const requiresSecurityCheck = expenseRequiresSecurityConfirmation(expense);
+
+            const openPayExpenseModal = () => {
+              showModal(
+                PayExpenseModalWrapper,
+                {
+                  expense,
+                  collective: expense.account,
+                  host: expense.host,
+                  canPayWithAutomaticPayment: Boolean(permissions.canPay),
+                  onSubmit: async (values: { action: string } & Record<string, unknown>) => {
+                    const { action, ...paymentParams } = values;
+                    const success = await handlePayExpense(action, paymentParams);
+                    if (success) {
+                      return;
+                    }
+                    throw new Error('Payment failed');
+                  },
                 },
-              },
-              `pay-expense-${expense.id}`,
-            );
+                `pay-expense-${expense.id}`,
+              );
+            };
+
+            if (requiresSecurityCheck) {
+              showModal(
+                SecurityChecksModalWrapper,
+                {
+                  expense,
+                  onConfirm: openPayExpenseModal,
+                },
+                `security-check-expense-${expense.id}`,
+              );
+            } else {
+              openPayExpenseModal();
+            }
           },
+          disabled: payExpenseDisabled,
+          tooltip: payExpenseDisabled ? payExpenseDisabledMsg : undefined,
           Icon: DollarSign,
         },
         // Reject action
@@ -277,7 +512,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         },
         // Unapprove action (for Collective context)
         permissions.canUnapprove &&
-          !isHostAdmin && {
+          !isViewingExpenseInHostContext && {
             key: 'unapprove',
             label: intl.formatMessage({ defaultMessage: 'Unapprove', id: 'expense.unapprove.btn' }),
             onClick: () => showProcessExpenseModal('UNAPPROVE'),
@@ -285,7 +520,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
           },
         // Request re-approval (for Host context)
         permissions.canUnapprove &&
-          isHostAdmin && {
+          isViewingExpenseInHostContext && {
             key: 'request-re-approval',
             label: intl.formatMessage({ defaultMessage: 'Request re-approval', id: 'expense.requestReApproval.btn' }),
             onClick: () => showProcessExpenseModal('REQUEST_RE_APPROVAL'),
@@ -409,14 +644,22 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
             ? intl.formatMessage({ defaultMessage: 'Copied!', id: 'Clipboard.Copied' })
             : intl.formatMessage({ defaultMessage: 'Copy link', id: 'CopyLink' }),
           onClick: handleCopyLink,
-          Icon: isCopied ? Check : Link,
+          Icon: isCopied ? Check : LinkIcon,
         },
         // Duplicate expense
-        {
+        canDuplicateExpense && {
           key: 'duplicate',
-          label: intl.formatMessage({ defaultMessage: 'Duplicate', id: '4fHiNl' }),
-          onClick: () => {},
-          disabled: shouldAllowDuplicateExpense,
+          label: intl.formatMessage({ defaultMessage: 'Duplicate Expense', id: 'MXaO+R' }),
+          onClick: () => {
+            showModal(
+              DuplicateExpenseFlowWrapper,
+              {
+                expenseId: expense.legacyId,
+                onSuccess: onMutationSuccess,
+              },
+              `duplicate-expense-${expense.id}`,
+            );
+          },
           Icon: Copy,
         },
         // Download invoice (for invoice-type expenses)

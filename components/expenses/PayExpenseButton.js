@@ -17,7 +17,7 @@ import { Button } from '../ui/Button';
 import PayExpenseModal from './PayExpenseModal';
 import SecurityChecksModal, { expenseRequiresSecurityConfirmation } from './SecurityChecksModal';
 
-const getDisabledMessage = (expense, collective, host, payoutMethod) => {
+export const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   // Collective / Balance can be v1 or v2 there ...
   const expenseAmountInAccountCurrency = getAmountInCents(expense.amountInAccountCurrency);
   const balance = get(
