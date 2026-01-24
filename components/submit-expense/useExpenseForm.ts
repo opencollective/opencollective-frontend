@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl';
 import type { ZodObjectDef } from 'zod';
 import { z } from 'zod';
 
+import { isIndividualAccount } from '../../lib/collective';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
 import type {
@@ -48,6 +49,7 @@ import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
+import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { AccountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
@@ -1882,6 +1884,20 @@ export function useExpenseForm(opts: {
             onSuccess(result, 'invite');
           }
 
+          // Refetch budget section queries to update the UI after expense submission
+          if (formOptions.account?.slug) {
+            const isIndividual = isIndividualAccount(formOptions.account);
+            const hasHost = !!formOptions.host;
+            await apolloClient.refetchQueries({
+              include: [
+                {
+                  query: getBudgetSectionQuery(hasHost, isIndividual),
+                  variables: getBudgetSectionQueryVariables(formOptions.account.slug, isIndividual, formOptions.host),
+                },
+              ],
+            });
+          }
+
           track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
         } catch (err) {
           track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
@@ -1902,6 +1918,7 @@ export function useExpenseForm(opts: {
       createExpense,
       draftExpenseAndInviteUser,
       onError,
+      apolloClient,
     ],
   );
 
