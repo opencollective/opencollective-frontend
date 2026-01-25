@@ -51,9 +51,7 @@ export default function ToastDialogRepro() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Test Dialog</DialogTitle>
-            <DialogDescription>
-              This dialog should stay open when you dismiss the toast.
-            </DialogDescription>
+            <DialogDescription>This dialog should stay open when you dismiss the toast.</DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4 py-4">
