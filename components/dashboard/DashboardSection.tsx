@@ -20,6 +20,7 @@ import MergeAccountsForm from '../root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../root-actions/MoveAuthoredContributions';
 import MoveExpenses from '../root-actions/MoveExpenses';
 import MoveReceivedContributions from '../root-actions/MoveReceivedContributions';
+import PlatformPeople from '../root-actions/PlatformPeople';
 import RecurringContributions from '../root-actions/RecurringContributions';
 import RootActivityLog from '../root-actions/RootActivityLog';
 import UnhostAccountForm from '../root-actions/UnhostAccountForm';
@@ -145,6 +146,7 @@ const ROOT_COMPONENTS = {
   [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
   [ROOT_SECTIONS.LEGACY_SUBSCRIBERS]: LegacyPlatformSubscribers,
   [ROOT_SECTIONS.SUBSCRIBERS]: PlatformSubscribers,
+  [ROOT_SECTIONS.PLATFORM_PEOPLE]: PlatformPeople,
 };
 
 interface DashboardSectionProps {

@@ -74,6 +74,12 @@ const ROOT_MENU = [
   },
   {
     type: 'group',
+    label: 'Community',
+    Icon: Users2,
+    subMenu: [{ label: 'Platform People', section: ROOT_SECTIONS.PLATFORM_PEOPLE }],
+  },
+  {
+    type: 'group',
     label: 'Subscriptions',
     Icon: HandCoins,
     subMenu: [

@@ -61,6 +61,7 @@ export const ROOT_SECTIONS = {
   RECURRING_CONTRIBUTIONS: 'recurring-contributions',
   SUBSCRIBERS: 'subscribers',
   LEGACY_SUBSCRIBERS: 'legacy-subscribers',
+  PLATFORM_PEOPLE: 'platform-people',
 };
 
 export const SETTINGS_SECTIONS = {
