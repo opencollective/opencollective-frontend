@@ -69,7 +69,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
   return (
     <div
       role="button"
-      className={clsx('grid grid-cols-[1fr_auto_auto] grid-rows-1 gap-4 p-4', props.className)}
+      className={clsx('grid-rows-1 gap-4 space-y-4 p-4 sm:grid sm:grid-cols-[1fr_auto_auto]', props.className)}
       tabIndex={0}
       onClick={props.onClick}
       onKeyDown={e => {
@@ -93,7 +93,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
                 payoutMethod: (
                   <PayoutMethodLabel
                     iconSize={14}
-                    className="inline-flex min-h-0 items-baseline"
+                    className="inline-flex min-h-0 max-w-[150px] items-baseline overflow-hidden"
                     showIcon
                     payoutMethod={props.expense.payoutMethod}
                   />
@@ -143,7 +143,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
           </span>
         </div>
       </div>
-      <div>
+      <div className="flex flex-col justify-center">
         <div className="mb-1 flex flex-col items-end text-sm font-medium text-slate-800">
           <span>
             <FormattedMoneyAmount amount={props.expense.amount} currency={props.expense.currency} precision={2} />
@@ -168,7 +168,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
           />
         </div>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center justify-end sm:justify-normal">
         <DropdownMenu>
           <DropdownMenuTrigger onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()} asChild>
             <Button size="icon-xs" variant="outline">

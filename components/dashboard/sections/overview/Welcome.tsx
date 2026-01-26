@@ -75,6 +75,7 @@ const welcomeOrganizationQuery = gql`
         }
       }
       policies {
+        id
         EXPENSE_POLICIES {
           invoicePolicy
           receiptPolicy
@@ -117,6 +118,7 @@ const welcomeOrganizationQuery = gql`
           slug
           hostFeePercent
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
             EXPENSE_POLICIES {
               invoicePolicy

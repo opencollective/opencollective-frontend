@@ -736,6 +736,11 @@ interface Account {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -1981,6 +1986,11 @@ enum DateTimeField {
   Orders only: The date when an order was last charged, defaults to createdAt if never charged
   """
   LAST_CHARGED_AT
+
+  """
+  Expenses only: The date when an expense was paid (based on the related transaction clearedAt)
+  """
+  PAID_AT
 }
 
 """
@@ -2625,6 +2635,11 @@ type Expense {
   The account who paid this expense
   """
   paidBy: Account
+
+  """
+  The date on which the expense was paid
+  """
+  paidAt: DateTime
 
   """
   Whether this expense is on hold
@@ -3490,6 +3505,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -9693,6 +9713,11 @@ type Bot implements Account {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -10706,6 +10731,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -12283,6 +12313,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -13570,6 +13605,11 @@ type Individual implements Account {
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -14877,6 +14917,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -16022,6 +16067,11 @@ type Vendor implements Account & AccountWithContributions {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -17016,6 +17066,11 @@ type Query {
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
@@ -20020,6 +20075,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     host: AccountReferenceInput
 
     """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
+
+    """
     Return expenses only created by this INDIVIDUAL account
     """
     createdByAccount: AccountReferenceInput
@@ -21180,6 +21240,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    If `host` is provided, select whether to include ALL, INTERNAL or HOSTED accounts expenses.
+    """
+    hostContext: HostContext
 
     """
     Return expenses only created by this INDIVIDUAL account
