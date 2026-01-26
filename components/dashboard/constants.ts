@@ -44,6 +44,7 @@ export const SECTIONS = {
   SEARCH: 'search',
   PAID_DISBURSEMENTS: 'paid-disbursements',
   PAY_DISBURSEMENTS: 'pay-disbursements',
+  APPROVE_PAYMENT_REQUESTS: 'approve-payment-requests',
 };
 
 export const ROOT_SECTIONS = {
@@ -334,5 +335,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SUBMITTED_GRANTS]: {
     defaultMessage: 'Issued Grant Requests',
     id: 'qKKz2G',
+  },
+  [ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS]: {
+    defaultMessage: 'Approve Payment Requests',
+    id: 'ApprovePaymentRequests',
   },
 });
