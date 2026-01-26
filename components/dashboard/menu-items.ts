@@ -7,6 +7,7 @@ import {
   BookOpenCheck,
   BookUserIcon,
   Building,
+  ClipboardCheck,
   CreditCard,
   FileText,
   HandCoins,
@@ -180,6 +181,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
           section: ALL_SECTIONS.HOST_EXPENSES,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+        },
+        {
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS,
+          Icon: ClipboardCheck,
+          label: intl.formatMessage({ defaultMessage: 'Approve Payment Requests', id: 'ApprovePaymentRequests' }),
         },
         {
           if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),

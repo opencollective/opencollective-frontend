@@ -36,6 +36,7 @@ import IncomingContributions from './sections/contributions/IncomingContribution
 import IncompleteContributions from './sections/contributions/IncompleteContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
+import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
 import PayDisbursements from './sections/expenses/PayDisbursements';
@@ -92,6 +93,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
   [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
+  [SECTIONS.APPROVE_PAYMENT_REQUESTS]: ApprovePaymentRequests,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
