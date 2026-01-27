@@ -3,6 +3,7 @@ import type { QueryResult } from '@apollo/client';
 import { MockedProvider } from '@apollo/client/testing';
 import { render, screen } from '@testing-library/react';
 
+import type { AddressFieldConfig } from '@/lib/address';
 import { type AccountTaxInformationQuery, AccountType } from '@/lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../../test/providers';
 
@@ -11,6 +12,10 @@ import Info, { infoSettingsDashboardQuery } from './Info';
 // Heavy HTML editor is not needed for this test; stub them
 jest.mock('../../../components/RichTextEditor', () => () => <div data-testid="rich-text-editor-mock" />);
 jest.mock('../../../lib/hooks/useLoggedInUser', () => () => ({}));
+// Mock the address lib - now returns synchronously (lib-address/lite has all data bundled)
+jest.mock('../../../lib/address', () => ({
+  getAddressFormFields: () => jest.fn<{ fields: AddressFieldConfig[]; optionalFields: string[] }, [string, string?]>,
+}));
 
 type AccountFromQuery = QueryResult<AccountTaxInformationQuery>['data']['account'];
 
