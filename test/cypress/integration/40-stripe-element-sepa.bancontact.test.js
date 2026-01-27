@@ -20,7 +20,7 @@ function contributeNewBancontact({ name } = {}) {
     });
 
     if (name) {
-      cy.get('#Field-nameInput').type(name);
+      cy.get('#payment-nameInput').type(name);
     }
   });
   cy.wait(1000);
