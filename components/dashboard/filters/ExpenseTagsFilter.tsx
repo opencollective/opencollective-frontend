@@ -1,10 +1,11 @@
 import React from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
+import { gql } from '../../../lib/graphql/helpers';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
@@ -31,42 +32,49 @@ export const expenseTagsQuery = gql`
   }
 `;
 
-function ExpenseTagsFilter({
-  meta: { expenseTags, hostSlug, accountSlug },
-  ...props
-}: FilterComponentProps<ExpenseTagFilterValue, { accountSlug?: string; hostSlug?: string; expenseTags?: string[] }>) {
-  const defaultOptions = expenseTags?.map(tag => ({ label: tag, value: tag })) || [];
-  const [options, setOptions] = React.useState<{ label: string; value: string }[]>(defaultOptions);
+type ExpenseTagsFilterMeta = {
+  accountSlug?: string;
+  hostSlug?: string;
+};
+
+function ExpenseTagsFilter({ meta, ...props }: FilterComponentProps<ExpenseTagFilterValue, ExpenseTagsFilterMeta>) {
+  const [options, setOptions] = React.useState<{ label: string; value: string }[]>([]);
 
   const [search, { loading, data }] = useLazyQuery(expenseTagsQuery, {
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
-    variables: {
-      ...(hostSlug
-        ? { host: { slug: hostSlug } }
-        : accountSlug
-          ? {
-              account: { slug: accountSlug },
-            }
-          : {}),
-    },
   });
 
-  const searchFunc = searchTerm => {
-    if (!searchTerm) {
-      setOptions(defaultOptions);
-    } else {
+  const accountVariables = React.useMemo(
+    () =>
+      meta.hostSlug
+        ? { host: { slug: meta.hostSlug } }
+        : meta.accountSlug
+          ? { account: { slug: meta.accountSlug } }
+          : {},
+    [meta.hostSlug, meta.accountSlug],
+  );
+
+  const searchFunc = React.useCallback(
+    (searchTerm: string) => {
       search({
         variables: {
-          searchTerm,
+          searchTerm: searchTerm || undefined,
+          ...accountVariables,
         },
       });
-    }
-  };
+    },
+    [accountVariables, search],
+  );
+
+  // Load initial options on mount
+  React.useEffect(() => {
+    searchFunc('');
+  }, [searchFunc]);
 
   React.useEffect(() => {
-    if (!loading) {
-      setOptions(data?.tagStats?.nodes.map(({ tag }) => ({ label: tag, value: tag })) || defaultOptions);
+    if (!loading && data?.tagStats?.nodes) {
+      setOptions(data.tagStats.nodes.map(({ tag }) => ({ label: tag, value: tag })));
     }
   }, [loading, data]);
 

@@ -37,6 +37,8 @@ import IncompleteContributions from './sections/contributions/IncompleteContribu
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
+import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
+import PayDisbursements from './sections/expenses/PayDisbursements';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
@@ -88,6 +90,8 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
   [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
+  [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
+  [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
