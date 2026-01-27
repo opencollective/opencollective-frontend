@@ -30,20 +30,27 @@ export const StyledInputAmountWithDynamicFxRate = ({
 }: Omit<React.ComponentProps<typeof StyledInputAmount>, 'currency' | 'loadingExchangeRate' | 'hasCurrencyPicker'>) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const { loading } = useQuery(currencyExchangeRateQuery, {
+  const { loading, data, error } = useQuery(currencyExchangeRateQuery, {
     skip: !fromCurrency || !toCurrency || fromCurrency === toCurrency,
-
     variables: {
       requests: [{ fromCurrency, toCurrency, date }],
     },
-    onCompleted: data => {
-      props.onExchangeRateChange?.(data?.currencyExchangeRate[0]);
-    },
-    onError: e => {
-      // If the API fails (e.g. network error), we'll ask the user to provide an exchange rate manually
-      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-    },
   });
+
+  // Handle successful data fetch
+  React.useEffect(() => {
+    if (data?.currencyExchangeRate) {
+      props.onExchangeRateChange?.(data.currencyExchangeRate[0]);
+    }
+  }, [data]);
+
+  // Handle error
+  React.useEffect(() => {
+    if (error) {
+      // If the API fails (e.g. network error), we'll ask the user to provide an exchange rate manually
+      toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+    }
+  }, [error, intl, toast]);
 
   // Reset FX rate when currencies are the same
   React.useEffect(() => {

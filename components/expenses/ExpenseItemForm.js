@@ -255,9 +255,12 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
     }
   }, [form, itemPath]);
 
-  const { loading } = useQuery(currencyExchangeRateQuery, {
+  const {
+    loading,
+    data: exchangeRateData,
+    error: exchangeRateError,
+  } = useQuery(currencyExchangeRateQuery, {
     skip: shouldSkipExchangeRateQuery(),
-
     variables: {
       requests: [
         {
@@ -267,13 +270,17 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
         },
       ],
     },
-    onCompleted: data => {
+  });
+
+  // Handle successful exchange rate data fetch
+  React.useEffect(() => {
+    if (exchangeRateData) {
       // Re-check condition in case it changed since triggering the query
       const { expenseCurrency, item } = formValues.current;
       const itemCurrency = get(item, 'amountV2.currency') || expenseCurrency;
       const existingExchangeRate = get(item, 'amountV2.exchangeRate');
       if (!shouldSkipExchangeRateQuery() && !isValidExchangeRate(existingExchangeRate, itemCurrency, expenseCurrency)) {
-        const exchangeRate = get(data, 'currencyExchangeRate[0]');
+        const exchangeRate = get(exchangeRateData, 'currencyExchangeRate[0]');
         if (exchangeRate && exchangeRate.fromCurrency === itemCurrency && exchangeRate.toCurrency === expenseCurrency) {
           form.setFieldValue(itemPath, {
             ...item,
@@ -289,13 +296,17 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
           });
         }
       }
-    },
-    onError: () => {
+    }
+  }, [exchangeRateData]);
+
+  // Handle exchange rate query error
+  React.useEffect(() => {
+    if (exchangeRateError) {
       // If the API fails (e.g. network error), we'll ask the user to provide an exchange rate manually
       const { expenseCurrency, item } = formValues.current;
       form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, getDefaultExchangeRate(item.currency, expenseCurrency));
-    },
-  });
+    }
+  }, [exchangeRateError]);
 
   // Not returning data as we don't want to encourage using it directly (values are set directly in the form)
   return { loading };

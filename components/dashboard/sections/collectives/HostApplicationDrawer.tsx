@@ -198,9 +198,15 @@ function HostApplication({
         limit: 100,
       },
       skip: !open || !applicationId,
-      onCompleted: onDataComplete,
     },
   );
+
+  // Handle data completion
+  React.useEffect(() => {
+    if (applicationQuery.data) {
+      onDataComplete(applicationQuery.data);
+    }
+  }, [applicationQuery.data, onDataComplete]);
 
   const error = applicationQuery.error;
   const loading = applicationQuery.loading || loadingMutation;

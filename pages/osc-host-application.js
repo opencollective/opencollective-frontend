@@ -116,17 +116,26 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
 
   const { data: hostData } = useQuery(oscHostApplicationPageQuery);
 
-  const { data, loading: loadingCollective } = useQuery(oscCollectiveApplicationQuery, {
+  const {
+    data,
+    loading: loadingCollective,
+    error: collectiveQueryError,
+  } = useQuery(oscCollectiveApplicationQuery, {
     variables: { slug: collectiveSlug },
     skip: !(LoggedInUser && collectiveSlug && step === 'form'),
-    onError: error => {
+  });
+
+  // Handle query error
+  React.useEffect(() => {
+    if (collectiveQueryError) {
       toast({
         variant: 'error',
         title: intl.formatMessage(messages['error.title']),
-        message: i18nGraphqlException(intl, error),
+        message: i18nGraphqlException(intl, collectiveQueryError),
       });
-    },
-  });
+    }
+  }, [collectiveQueryError, intl, toast]);
+
   const collective = data?.account;
   const canApplyWithCollective = collective && collective.isAdmin && collective.type === CollectiveType.COLLECTIVE;
   const hasHost = collective && collective?.host?.id;
