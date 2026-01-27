@@ -2,18 +2,21 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { v7 as uuidv7 } from 'uuid';
 
 import { getAccountReferenceInput } from '@/lib/collective';
-import type { Account, EditCollectiveBankTransferHostQuery } from '@/lib/graphql/types/v2/graphql';
-import { type CustomPaymentProvider, CustomPaymentProviderType } from '@/lib/graphql/types/v2/schema';
+import type {
+  Account,
+  EditCollectiveBankTransferHostQuery,
+  ManualPaymentProvider,
+} from '@/lib/graphql/types/v2/graphql';
+import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
 
 import { InputGroup } from '@/components/ui/Input';
 
 import {
+  createManualPaymentProviderMutation,
   editCollectiveBankTransferHostQuery,
-  editCustomPaymentMethodsMutation,
-  getCacheUpdaterAfterEditCustomPaymentMethods,
+  updateManualPaymentProviderMutation,
 } from '../edit-collective/sections/receive-money/gql';
 import PayoutBankInformationForm from '../expenses/PayoutBankInformationForm';
 import { Button } from '../ui/Button';
@@ -28,60 +31,79 @@ import { CustomPaymentMethodTemplateEditor } from './CustomPaymentMethodTemplate
 type EditCustomBankPaymentMethodDialogProps = {
   open: boolean;
   onClose: () => void;
-  account: Pick<Account, 'slug' | 'currency' | 'legacyId'>;
+  account: Pick<Account, 'slug' | 'currency'>;
   host: EditCollectiveBankTransferHostQuery['host'];
   onSuccess?: () => void;
-  customPaymentProvider?: CustomPaymentProvider;
+  manualPaymentProvider?: ManualPaymentProvider;
 };
 
 const BANK_TRANSFER_DEFAULT_INSTRUCTIONS =
-  '<div>Thank you for your contribution!<br><br>Here are the payment instructions. Be sure to include the reference details, so we can match your payment to the correct transaction. Sometimes it can take a few days for the funds to arrive and be confirmed. You will automatically be issued a receipt.<br><br><strong>Amount:</strong> {amount}<br><strong>Reference:</strong> {reference}<br><strong>Collective: </strong>{collective}<br><br>{account}&nbsp;</div>';
+  '<div>To complete your contribution, please transfer the amount below using the provided bank details. Include the reference number exactly as shown to ensure your payment is matched correctly.<br><br>Your receipt will be issued automatically once the transfer is confirmed.<br><br><strong>Amount:</strong> {amount}<br><strong>Reference:</strong> {reference}<br><strong>Collective:</strong> {collective}<br><br>{account}</div>';
+
+type FormValues = {
+  name: string;
+  instructions: string;
+  icon: string;
+  accountDetails: Record<string, unknown>;
+};
 
 export const EditCustomBankPaymentMethodDialog = ({
   open,
   onClose,
   account,
-  host,
   onSuccess,
-  customPaymentProvider,
+  manualPaymentProvider,
 }: EditCustomBankPaymentMethodDialogProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [editCustomPaymentMethods] = useMutation(editCustomPaymentMethodsMutation, {
+
+  const [createProvider] = useMutation(createManualPaymentProviderMutation, {
     refetchQueries: [{ query: editCollectiveBankTransferHostQuery, variables: { slug: account.slug } }],
     awaitRefetchQueries: true,
   });
 
-  const initialValues: CustomPaymentProvider = {
-    ...{
-      id: customPaymentProvider?.id || uuidv7(),
-      type: CustomPaymentProviderType.BANK_TRANSFER,
-      name: customPaymentProvider?.name || '',
-      instructions: customPaymentProvider?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS,
-      icon: customPaymentProvider?.icon || 'Landmark',
-      accountDetails: customPaymentProvider?.accountDetails || {},
-    },
+  const [updateProvider] = useMutation(updateManualPaymentProviderMutation, {
+    refetchQueries: [{ query: editCollectiveBankTransferHostQuery, variables: { slug: account.slug } }],
+    awaitRefetchQueries: true,
+  });
+
+  const initialValues: FormValues = {
+    name: manualPaymentProvider?.name || '',
+    instructions: manualPaymentProvider?.instructions || BANK_TRANSFER_DEFAULT_INSTRUCTIONS,
+    icon: manualPaymentProvider?.icon || 'Landmark',
+    accountDetails: (manualPaymentProvider?.accountDetails as Record<string, unknown>) || {},
   };
 
-  const handleSubmit = async (
-    values: typeof initialValues,
-    { setSubmitting }: { setSubmitting: (val: boolean) => void },
-  ) => {
+  const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (val: boolean) => void }) => {
     try {
-      const allCustomMethods = [...(host.settings.customPaymentProviders || [])];
-      if (customPaymentProvider) {
-        const index = allCustomMethods.findIndex(method => method.id === customPaymentProvider.id);
-        if (index !== -1) {
-          allCustomMethods[index] = values;
-        }
+      if (manualPaymentProvider) {
+        // Update existing
+        await updateProvider({
+          variables: {
+            manualPaymentProvider: { id: manualPaymentProvider.id },
+            input: {
+              name: values.name,
+              instructions: values.instructions,
+              icon: values.icon,
+              accountDetails: values.accountDetails,
+            },
+          },
+        });
       } else {
-        allCustomMethods.push(values);
+        // Create new
+        await createProvider({
+          variables: {
+            host: getAccountReferenceInput(account),
+            manualPaymentProvider: {
+              type: ManualPaymentProviderType.BANK_TRANSFER,
+              name: values.name,
+              instructions: values.instructions,
+              icon: values.icon,
+              accountDetails: values.accountDetails,
+            },
+          },
+        });
       }
-
-      await editCustomPaymentMethods({
-        variables: { account: getAccountReferenceInput(account), value: allCustomMethods },
-        update: getCacheUpdaterAfterEditCustomPaymentMethods(account),
-      });
       setSubmitting(false);
       toast({
         variant: 'success',
@@ -106,7 +128,7 @@ export const EditCustomBankPaymentMethodDialog = ({
       <DialogContent className="sm:max-w-xl" size="default">
         <DialogHeader>
           <DialogTitle>
-            {customPaymentProvider ? (
+            {manualPaymentProvider ? (
               <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit bank details" />
             ) : (
               <FormattedMessage defaultMessage="Add bank details" id="7aqY1c" />
@@ -143,13 +165,33 @@ export const EditCustomBankPaymentMethodDialog = ({
                 {errors.name && touched.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
               </div>
 
-              <div className="w-full">
+              <div className="mt-6 border-t pt-6">
+                <Label className="mb-1 block text-sm font-bold">
+                  <FormattedMessage defaultMessage="Bank Account Details" id="yyMC04" />
+                </Label>
+                <p className="mb-4 text-xs text-gray-600">
+                  <FormattedMessage
+                    defaultMessage="Optional. Providing these details enables validation and allows you to use the <AccountVariable></AccountVariable> template variable in your instructions - a pre-formatted text with all the necessary bank details."
+                    id="txRdqy"
+                    values={{
+                      AccountVariable: () => (
+                        <code className="rounded bg-slate-100 px-1 py-0.5 text-[11px] text-slate-700">
+                          {'{account}'}
+                        </code>
+                      ),
+                    }}
+                  />
+                </p>
                 <PayoutBankInformationForm
                   host={account}
                   ignoreBlockedCurrencies={true}
                   isNew={true}
                   optional={false}
                   onlyDataFields={true}
+                  sectionHeaderClassName="text-sm font-medium"
+                  labelClassName="text-xs"
+                  errorClassName="text-xs"
+                  fieldClassName="mt-4 flex-1"
                   getFieldName={fieldName => {
                     // Skip "data" prefix
                     if (fieldName === 'data') {
@@ -172,15 +214,12 @@ export const EditCustomBankPaymentMethodDialog = ({
                 </Label>
                 <p className="mb-2 text-xs text-gray-600">
                   <FormattedMessage
-                    defaultMessage="Payment instructions template. You can use variables:"
-                    id="CustomPaymentMethod.Instructions.Help"
+                    defaultMessage="Payment instructions that will be displayed to the contributors. You can use variables:"
+                    id="ghmpbR"
                   />
                 </p>
                 <CustomPaymentMethodInstructionsVariablesHelp
-                  variables={[
-                    ...(values.accountDetails.currency ? [BANK_ACCOUNT_TEMPLATE_VARIABLE] : []),
-                    ...COMMON_TEMPLATE_VARIABLES,
-                  ]}
+                  variables={[BANK_ACCOUNT_TEMPLATE_VARIABLE, ...COMMON_TEMPLATE_VARIABLES]}
                 />
                 <CustomPaymentMethodTemplateEditor
                   value={values.instructions}

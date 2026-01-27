@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import type { LucideIcon } from 'lucide-react';
-import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Edit, HandCoins, Landmark, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Edit, X } from 'lucide-react';
 import FlipMove from 'react-flip-move';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Account, CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 
 import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
@@ -16,10 +15,10 @@ import { getCustomPaymentProviderIconComponent } from './CustomPaymentProviderIc
 
 type CustomPaymentMethodsListProps = {
   account: Pick<Account, 'slug' | 'currency'>;
-  customPaymentProviders: CustomPaymentProvider[];
+  customPaymentProviders: ManualPaymentProvider[];
   onClickEdit: (providerId: string) => void;
   onClickRemove: (providerId: string) => void;
-  onReorder: (newList: CustomPaymentProvider[]) => void;
+  onReorder: (newList: ManualPaymentProvider[]) => void;
   canEdit?: boolean;
 };
 
@@ -31,6 +30,7 @@ export const CustomPaymentMethodsList = ({
   onReorder,
   canEdit = false,
 }: CustomPaymentMethodsListProps) => {
+  const intl = useIntl();
   const [openInstructions, setOpenInstructions] = useState<Set<string>>(new Set());
   const [isMoving, setIsMoving] = useState(false);
 
@@ -66,7 +66,10 @@ export const CustomPaymentMethodsList = ({
   return (
     <div className="relative mb-4">
       {isMoving && (
-        <div className="absolute inset-0 z-[9999] flex flex-col items-center justify-center bg-white/75 backdrop-blur-sm">
+        <div
+          data-testid="moving-overlay"
+          className="absolute inset-0 z-[9999] flex flex-col items-center justify-center bg-white/75 backdrop-blur-sm"
+        >
           <Spinner size={64} />
           <p className="mt-3 text-sm">
             <FormattedMessage id="Saving" defaultMessage="Saving..." />
@@ -157,7 +160,8 @@ export const CustomPaymentMethodsList = ({
                     variant="ghost"
                     onClick={() => handleMove(provider.id, 'up')}
                     disabled={isFirst || isMoving}
-                    title={isFirst ? undefined : 'Move up'}
+                    data-testid="move-up-button"
+                    title={isFirst ? undefined : intl.formatMessage({ defaultMessage: 'Move up', id: 'wmFdws' })}
                   >
                     <ArrowUp size={14} />
                   </Button>
@@ -166,7 +170,8 @@ export const CustomPaymentMethodsList = ({
                     variant="ghost"
                     onClick={() => handleMove(provider.id, 'down')}
                     disabled={isLast || isMoving}
-                    title={isLast ? undefined : 'Move down'}
+                    data-testid="move-down-button"
+                    title={isLast ? undefined : intl.formatMessage({ defaultMessage: 'Move down', id: 'H/r5m6' })}
                   >
                     <ArrowDown size={14} />
                   </Button>

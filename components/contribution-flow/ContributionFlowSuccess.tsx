@@ -39,8 +39,9 @@ import StyledLink from '../../components/StyledLink';
 import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
-import { getCustomPaymentProviderIconComponent } from '../custom-payment-provider/CustomPaymentProviderIcon';
+import Avatar from '../Avatar';
 import { CustomPaymentMethodInstructions } from '../custom-payment-provider/CustomPaymentMethodInstructions';
+import { getCustomPaymentProviderIconComponent } from '../custom-payment-provider/CustomPaymentProviderIcon';
 import Link from '../Link';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Badge } from '../ui/Badge';
@@ -168,18 +169,11 @@ class ContributionFlowSuccess extends React.Component<
   {
     paymentIntentResult: PaymentIntentResult;
     loaded: boolean;
+    surveyShown: boolean;
   }
 > {
   async componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
-
-    // TODO order may not be loaded yet, move this to componentDidUpdate
-    if (this.props.LoggedInUser && this.props.data?.order?.status !== ORDER_STATUS.PENDING) {
-      toast({
-        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
-        duration: 20000,
-      });
-    }
 
     const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
 
@@ -203,7 +197,17 @@ class ContributionFlowSuccess extends React.Component<
       router: { query: queryParams },
       data: { order },
       intl,
+      LoggedInUser,
     } = this.props;
+
+    // Show survey for logged-in users on non-pending orders (only once)
+    if (LoggedInUser && order && order.status !== ORDER_STATUS.PENDING && !this.state?.surveyShown) {
+      this.setState({ surveyShown: true });
+      toast({
+        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
+        duration: 20000,
+      });
+    }
 
     const paymentIntentResult = this.state?.paymentIntentResult;
     if (order && paymentIntentResult) {
@@ -308,45 +312,37 @@ class ContributionFlowSuccess extends React.Component<
   renderPendingView() {
     const { data } = this.props;
     const { order } = data;
-    const customPaymentProvider = order.customPaymentProvider;
+    const manualPaymentProvider = order.manualPaymentProvider;
     const amount = order.amount.valueInCents;
     const platformTipAmount = order.platformTipAmount.valueInCents;
     const totalAmount = amount + platformTipAmount;
     const currency = order.amount.currency;
-    const IconComponent = customPaymentProvider && getCustomPaymentProviderIconComponent(customPaymentProvider);
+    const IconComponent = manualPaymentProvider && getCustomPaymentProviderIconComponent(manualPaymentProvider);
 
     return (
       <div
-        className="relative isolate flex min-h-[calc(100vh-69px)] w-full flex-col items-center justify-center"
+        className="relative isolate flex min-h-[calc(100vh-64px)] w-full flex-col items-center justify-center"
         data-cy="order-success"
       >
         <div className="absolute inset-0 -z-10 bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png')] bg-cover bg-no-repeat lg:bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png')] lg:bg-cover lg:bg-[position:0%_0%] xl:bg-[position:0%_-60vw] xl:bg-repeat" />
         <div className="flex w-full max-w-xl flex-col items-center px-4 py-6 lg:py-12">
           <div className="mb-5 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
             <div className="flex flex-col items-center border-b border-gray-100 bg-gray-50 px-6 py-6">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full">
-                <Clock className="h-7 w-7 text-gray-400" />
-              </div>
+              <Avatar className="mb-3" collective={order.toAccount} radius={64} />
               <h1 className="mb-1 text-center text-xl font-bold text-gray-900 sm:text-2xl">
-                <FormattedMessage
-                  id="NewContributionFlow.Pending.Header"
-                  defaultMessage="Your contribution is pending"
-                />
+                <FormattedMessage defaultMessage="Contribution request received" id="pd8V15" />
               </h1>
               <p className="mb-4 text-center text-sm text-gray-600">
                 <FormattedMessage
-                  defaultMessage="You need to complete the payment to finalize it."
-                  id="contribution.finalize"
-                />{' '}
-                <FormattedMessage
-                  id="NewContributionFlow.Pending.EmailNotice"
-                  defaultMessage="You will also receive these instructions by email. Once your payment is received, your contribution will be confirmed."
+                  defaultMessage="Please follow the instructions below to complete your payment. These instructions have also been sent to your email. We’ll notify you once your contribution has been received, processed, and credited to {collective}."
+                  id="n5a/81"
+                  values={{ collective: <strong>{order.toAccount.name}</strong> }}
                 />
               </p>
             </div>
 
             {/* Payment instructions */}
-            {customPaymentProvider && (
+            {manualPaymentProvider && (
               <div className="px-2 py-8 sm:px-4 lg:px-6">
                 <div className="mb-5 flex w-full flex-col items-center gap-1 px-1 lg:flex-row lg:justify-between">
                   <h2 className="flex items-center text-lg font-semibold text-gray-900">
@@ -356,12 +352,12 @@ class ContributionFlowSuccess extends React.Component<
                     />
                   </h2>
                   <Badge>
-                    <IconComponent className="mr-1 h-4 w-4" /> <span>{customPaymentProvider.name}</span>
+                    <IconComponent className="mr-1 h-4 w-4" /> <span>{manualPaymentProvider.name}</span>
                   </Badge>
                 </div>
                 <div className="rounded border-l-4 border-blue-400 bg-gray-50 px-5 py-5 text-sm shadow lg:text-base">
                   <CustomPaymentMethodInstructions
-                    instructions={customPaymentProvider.instructions}
+                    instructions={manualPaymentProvider.instructions}
                     values={{
                       amount: { valueInCents: totalAmount, currency },
                       collectiveSlug: get(data, 'order.toAccount.name', ''),
@@ -438,7 +434,7 @@ class ContributionFlowSuccess extends React.Component<
           </div>
         )}
         <div
-          className="flex h-full min-h-[calc(100vh-69px)] w-full flex-col md:justify-center lg:flex-row"
+          className="flex h-full min-h-[calc(100vh-64px)] w-full flex-col md:justify-center lg:flex-row"
           data-cy="order-success"
         >
           {loading ? (

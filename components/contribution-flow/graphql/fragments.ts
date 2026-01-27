@@ -14,6 +14,11 @@ const contributionFlowHostFieldsFragment = gql`
     }
     paypalClientId
     supportedPaymentMethods
+    manualPaymentProviders {
+      id
+      name
+      icon
+    }
     payoutMethods {
       id
       name
@@ -114,7 +119,7 @@ export const orderSuccessFragment = gql`
     status
     frequency
     data
-    customPaymentProvider {
+    manualPaymentProvider {
       id
       name
       instructions

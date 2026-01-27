@@ -222,16 +222,17 @@ export const generatePaymentMethodOptions = (
       });
     }
 
-    // Custom payment providers
-    const customPaymentProviders = get(collective, 'host.settings.customPaymentProviders', []);
+    // Manual payment providers
+    const manualPaymentProviders = get(collective, 'host.manualPaymentProviders', []);
     if (
       hostHasManual &&
-      Array.isArray(customPaymentProviders) &&
-      customPaymentProviders.length > 0 &&
+      Array.isArray(manualPaymentProviders) &&
+      manualPaymentProviders.length > 0 &&
       stepDetails.interval === INTERVALS.oneTime &&
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
     ) {
-      customPaymentProviders.forEach(provider => {
+      manualPaymentProviders.forEach(provider => {
+        const Icon = getCustomPaymentProviderIconComponent(provider);
         uniquePMs.push({
           key: `custom-${provider.id}`,
           title: provider.name,
@@ -239,10 +240,10 @@ export const generatePaymentMethodOptions = (
             service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
             type: PAYMENT_METHOD_TYPE.MANUAL,
             data: {
-              customPaymentProviderId: provider.id,
+              manualPaymentProvider: { id: provider.id },
             },
           },
-          icon: getCustomPaymentProviderIconComponent(provider),
+          icon: <Icon className="h-5 w-5" />,
           subtitle: (
             <FormattedMessage
               id="NewContributionFlow.customPaymentInstructions"

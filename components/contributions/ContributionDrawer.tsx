@@ -55,7 +55,7 @@ const contributionDrawerQuery = gql`
         id
         type
       }
-      customPaymentProvider {
+      manualPaymentProvider {
         id
         type
         name
@@ -504,12 +504,12 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                         <Skeleton className="h-5 w-44" />
                       ) : query.data.order.paymentMethod?.type ? (
                         <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
-                      ) : query.data.order.customPaymentProvider ? (
+                      ) : query.data.order.manualPaymentProvider ? (
                         <div className="flex items-center gap-1">
                           <Badge size="xs" type="neutral">
                             <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
                           </Badge>
-                          <span>{query.data.order.customPaymentProvider.name}</span>
+                          <span>{query.data.order.manualPaymentProvider.name}</span>
                         </div>
                       ) : query.data.order.status === OrderStatus.PENDING ? (
                         i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)

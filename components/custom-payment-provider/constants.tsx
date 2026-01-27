@@ -92,14 +92,6 @@ export const COMMON_TEMPLATE_VARIABLES: TemplateVariableInfo[] = [
 export const BANK_ACCOUNT_TEMPLATE_VARIABLE: TemplateVariableInfo = {
   variable: 'account',
   description: (
-    <FormattedMessage
-      id="bankaccount.instructions.account"
-      defaultMessage="The bank account details you added above."
-    />
+    <FormattedMessage defaultMessage="Formatted bank account details based on the above account." id="AbOvK4" />
   ),
 };
-
-export const ALL_TEMPLATE_VARIABLES: TemplateVariableInfo[] = [
-  ...COMMON_TEMPLATE_VARIABLES,
-  BANK_ACCOUNT_TEMPLATE_VARIABLE,
-];

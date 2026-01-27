@@ -1,7 +1,18 @@
-import type { ApolloCache, FetchResult } from '@apollo/client';
-
 import { gql } from '../../../../lib/graphql/helpers';
-import type { EditCollectiveCustomPaymentMethodsMutation } from '@/lib/graphql/types/v2/graphql';
+
+const manualPaymentProviderFragment = gql`
+  fragment ManualPaymentProviderFragment on ManualPaymentProvider {
+    id
+    type
+    name
+    instructions
+    icon
+    accountDetails
+    isArchived
+    createdAt
+    updatedAt
+  }
+`;
 
 export const editCollectiveBankTransferHostQuery = gql`
   query EditCollectiveBankTransferHost($slug: String) {
@@ -28,16 +39,12 @@ export const editCollectiveBankTransferHostQuery = gql`
         data
         type
       }
+      manualPaymentProviders {
+        ...ManualPaymentProviderFragment
+      }
     }
   }
-`;
-
-export const removePayoutMethodMutation = gql`
-  mutation EditCollectiveBankTransferRemovePayoutMethod($payoutMethodId: String!) {
-    removePayoutMethod(payoutMethodId: $payoutMethodId) {
-      id
-    }
-  }
+  ${manualPaymentProviderFragment}
 `;
 
 export const createPayoutMethodMutation = gql`
@@ -54,20 +61,48 @@ export const createPayoutMethodMutation = gql`
   }
 `;
 
-export const editCustomPaymentMethodsMutation = gql`
-  mutation EditCollectiveCustomPaymentMethods($account: AccountReferenceInput!, $value: JSON!) {
-    editAccountSetting(account: $account, key: "customPaymentProviders", value: $value) {
-      id
-      legacyId
-      settings
+export const createManualPaymentProviderMutation = gql`
+  mutation CreateManualPaymentProvider(
+    $host: AccountReferenceInput!
+    $manualPaymentProvider: ManualPaymentProviderCreateInput!
+  ) {
+    createManualPaymentProvider(host: $host, manualPaymentProvider: $manualPaymentProvider) {
+      ...ManualPaymentProviderFragment
     }
   }
+  ${manualPaymentProviderFragment}
 `;
 
-export const getCacheUpdaterAfterEditCustomPaymentMethods =
-  account => (cache: ApolloCache<any>, result: FetchResult<EditCollectiveCustomPaymentMethodsMutation>) => {
-    cache.modify({
-      id: cache.identify(account),
-      fields: { settings: () => result.data.editAccountSetting.settings },
-    });
-  };
+export const updateManualPaymentProviderMutation = gql`
+  mutation UpdateManualPaymentProvider(
+    $manualPaymentProvider: ManualPaymentProviderReferenceInput!
+    $input: ManualPaymentProviderUpdateInput!
+  ) {
+    updateManualPaymentProvider(manualPaymentProvider: $manualPaymentProvider, input: $input) {
+      ...ManualPaymentProviderFragment
+    }
+  }
+  ${manualPaymentProviderFragment}
+`;
+
+export const deleteManualPaymentProviderMutation = gql`
+  mutation DeleteManualPaymentProvider($manualPaymentProvider: ManualPaymentProviderReferenceInput!) {
+    deleteManualPaymentProvider(manualPaymentProvider: $manualPaymentProvider) {
+      ...ManualPaymentProviderFragment
+    }
+  }
+  ${manualPaymentProviderFragment}
+`;
+
+export const reorderManualPaymentProvidersMutation = gql`
+  mutation ReorderManualPaymentProviders(
+    $host: AccountReferenceInput!
+    $type: ManualPaymentProviderType!
+    $providers: [ManualPaymentProviderReferenceInput!]!
+  ) {
+    reorderManualPaymentProviders(host: $host, type: $type, providers: $providers) {
+      ...ManualPaymentProviderFragment
+    }
+  }
+  ${manualPaymentProviderFragment}
+`;

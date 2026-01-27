@@ -289,11 +289,9 @@ describe('CustomPaymentMethodsList', () => {
         ),
       );
 
-      const buttons = screen.getAllByRole('button');
-      const upButton = buttons.find(
-        btn => btn.getAttribute('title') === 'Move up' || btn.querySelector('[data-testid*="up"]'),
-      );
-      // First item should have up button disabled (if implemented)
+      const upButton = screen.getByTestId('move-up-button');
+      expect(upButton).toBeInTheDocument();
+      expect(upButton).toBeDisabled();
     });
 
     it('disables down button for last item', () => {
@@ -310,11 +308,9 @@ describe('CustomPaymentMethodsList', () => {
         ),
       );
 
-      const buttons = screen.getAllByRole('button');
-      const downButton = buttons.find(
-        btn => btn.getAttribute('title') === 'Move down' || btn.querySelector('[data-testid*="down"]'),
-      );
-      // Last item should have down button disabled (if implemented)
+      const downButton = screen.getByTestId('move-down-button');
+      expect(downButton).toBeInTheDocument();
+      expect(downButton).toBeDisabled();
     });
 
     it('calls onReorder when moving item up', async () => {
@@ -384,9 +380,14 @@ describe('CustomPaymentMethodsList', () => {
 
   describe('Loading state', () => {
     it('shows loading overlay when isMoving is true', async () => {
-      // This is tested indirectly through the reorder functionality
-      // The component manages isMoving state internally
-      const onReorder = jest.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+      const user = userEvent.setup();
+      let resolvePromise;
+      const onReorder = jest.fn().mockImplementation(
+        () =>
+          new Promise(resolve => {
+            resolvePromise = resolve;
+          }),
+      );
 
       const providers = [
         { ...mockProvider, id: '1', name: 'First Payment Method' },
@@ -406,9 +407,23 @@ describe('CustomPaymentMethodsList', () => {
         ),
       );
 
-      // The loading state is managed internally, so we verify the component renders
-      expect(screen.getByText('First Payment Method')).toBeInTheDocument();
-      expect(screen.getByText('Second Payment Method')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByTestId('moving-overlay')).not.toBeInTheDocument();
+      });
+
+      // Click on the up button for the second item
+      await user.click(screen.getAllByTestId('move-down-button')[0]);
+
+      // Ensure the moving overlay is rendered
+      await waitFor(() => {
+        expect(screen.getByTestId('moving-overlay')).toBeInTheDocument();
+      });
+
+      resolvePromise();
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('moving-overlay')).not.toBeInTheDocument();
+      });
     });
   });
 });
