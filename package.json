@@ -229,7 +229,7 @@
     "cheerio": "^1.0.0",
     "circular-dependency-plugin": "^5.2.2",
     "commitizen": "^4.3.0",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.0.0",
     "css-loader": "^7.1.2",
     "cypress": "^15.0.0",
     "cypress-mailpit": "^1.2.1",
@@ -320,7 +320,8 @@
       "jest-junit",
       "mocha-junit-reporter",
       "cypress-multi-reporters",
-      "@jest/globals"
+      "@jest/globals",
+      "cross-env"
     ]
   },
   "overrides": {
