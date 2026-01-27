@@ -15,8 +15,9 @@ import { AccountHoverCard } from '@/components/AccountHoverCard';
 import AmountWithExchangeRateInfo from '@/components/AmountWithExchangeRateInfo';
 import { AvatarWithLink } from '@/components/AvatarWithLink';
 import DateTime from '@/components/DateTime';
-import type { ConfirmProcessExpenseModalType } from '@/components/expenses/ConfirmProcessExpenseModal';
-import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal, {
+  ConfirmProcessExpenseModalType,
+} from '@/components/expenses/ConfirmProcessExpenseModal';
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
@@ -138,9 +139,9 @@ type MoreActionsMenuProps = {
 function MoreActionsMenu(props: MoreActionsMenuProps) {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType | null>(null);
   const [isGrantFlowOpen, setIsGrantFlowOpen] = React.useState(false);
   const permissions = props.grant?.permissions;
-  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
   const processExpense = useProcessExpense({
     expense: props.grant,
   });
@@ -204,9 +205,16 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={props.grant} onClose={() => setProcessModal(null)} />
-      )}
+      <ConfirmProcessExpenseModal
+        type={processModal}
+        open={!!processModal}
+        setOpen={open => {
+          if (!open) {
+            setProcessModal(null);
+          }
+        }}
+        expense={props.grant}
+      />
       {isGrantFlowOpen && (
         <SubmitGrantFlow
           handleOnClose={() => {

@@ -1,3 +1,5 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
@@ -17,7 +19,7 @@ import { Button } from '../ui/Button';
 import PayExpenseModal from './PayExpenseModal';
 import SecurityChecksModal, { expenseRequiresSecurityConfirmation } from './SecurityChecksModal';
 
-const getDisabledMessage = (expense, collective, host, payoutMethod) => {
+export const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   // Collective / Balance can be v1 or v2 there ...
   const expenseAmountInAccountCurrency = getAmountInCents(expense.amountInAccountCurrency);
   const balance = get(

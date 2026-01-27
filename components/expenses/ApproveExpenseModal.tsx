@@ -4,30 +4,31 @@ import { isUndefined } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
+import type {
+  ExpensesListAdminFieldsFragmentFragment,
+  ExpensesListFieldsFragmentFragment,
+} from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
+import type { AccountingCategorySelectProps } from '../AccountingCategorySelect';
 import AccountingCategorySelect from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../ui/useToast';
 
 import { editExpenseCategoryMutation } from './graphql/mutations';
 
-type ConfirmProcessExpenseModalProps = {
+type ApproveExpenseModalProps = {
   onClose: () => void;
-  expense: Expense;
-  host: Host;
-  account: Account;
-  onConfirm?: () => Promise<any>;
+  expense: Pick<
+    ExpensesListFieldsFragmentFragment & ExpensesListAdminFieldsFragmentFragment,
+    'id' | 'type' | 'accountingCategory' | 'description' | 'items' | 'valuesByRole'
+  >;
+  host: AccountingCategorySelectProps['host'];
+  account: AccountingCategorySelectProps['account'];
+  onConfirm?: () => Promise<void>;
 };
 
-export default function ApproveExpenseModal({
-  onClose,
-  onConfirm,
-  host,
-  account,
-  expense,
-}: ConfirmProcessExpenseModalProps) {
+export default function ApproveExpenseModal({ onClose, onConfirm, host, account, expense }: ApproveExpenseModalProps) {
   const intl = useIntl();
   const [editExpense] = useMutation(editExpenseCategoryMutation);
   const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory || undefined);
@@ -73,7 +74,7 @@ export default function ApproveExpenseModal({
           expenseType={expense.type}
           expenseValues={expense}
           selectedCategory={selectedCategory}
-          valuesByRole={expense.valuesByRole}
+          valuesByRole={expense.valuesByRole as AccountingCategorySelectProps['valuesByRole']}
           allowNone={false}
           predictionStyle="full"
           selectFirstOptionIfSingle
