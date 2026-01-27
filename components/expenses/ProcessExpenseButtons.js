@@ -1,3 +1,4 @@
+// @deprecated: Use `useGetExpenseActions` instead
 import React from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';

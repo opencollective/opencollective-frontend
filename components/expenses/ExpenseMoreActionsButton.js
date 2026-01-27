@@ -1,3 +1,5 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';

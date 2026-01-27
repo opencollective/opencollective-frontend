@@ -1,3 +1,5 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { University as OtherIcon } from '@styled-icons/fa-solid/University';
