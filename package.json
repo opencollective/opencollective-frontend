@@ -320,7 +320,8 @@
       "jest-junit",
       "mocha-junit-reporter",
       "cypress-multi-reporters",
-      "@jest/globals"
+      "@jest/globals",
+      "cross-env"
     ]
   },
   "overrides": {
