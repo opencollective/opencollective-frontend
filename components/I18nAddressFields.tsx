@@ -339,7 +339,7 @@ export const NewSimpleLocationFieldRenderer: React.FC<FieldRendererProps> = ({
   );
 };
 
-export type I18nAddressFieldsProps = {
+type I18nAddressFieldsProps = {
   /** The selected country code (ISO 3166-1 alpha-2) */
   selectedCountry: string;
   /** The current address values */
