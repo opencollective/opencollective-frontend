@@ -225,13 +225,13 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
     cell: ({ row, table }) => {
       const { intl } = table.options.meta;
       const pm = row.original.paymentMethod;
-      if (row.original.customPaymentProvider) {
+      if (row.original.manualPaymentProvider) {
         return (
           <div className="flex items-center gap-1">
             <Badge size="xs" type="neutral">
               <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
             </Badge>
-            <span>{row.original.customPaymentProvider.name}</span>
+            <span>{row.original.manualPaymentProvider.name}</span>
           </div>
         );
       } else if (row.original.pendingContributionData?.paymentMethod) {

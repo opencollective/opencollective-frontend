@@ -30,7 +30,6 @@ const AccountSettings = ({ account, section }) => {
     skip: !LoggedInUser,
     context: API_V1_CONTEXT,
   });
-
   const collective = data?.Collective;
   const [editCollective] = useMutation(editCollectivePageMutation, { context: API_V1_CONTEXT });
 

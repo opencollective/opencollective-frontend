@@ -30,7 +30,7 @@ export const managedOrderFragment = gql`
     paymentMethod {
       ...UpdatePaymentMethodFragment
     }
-    customPaymentProvider {
+    manualPaymentProvider {
       id
       type
       name

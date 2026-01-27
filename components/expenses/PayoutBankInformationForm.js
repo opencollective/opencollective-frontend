@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
+import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { useFormikContext } from 'formik';
 import { compact, get, kebabCase, partition } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -15,13 +16,19 @@ import { FormField } from '../FormField';
 import { I18nSupportLink } from '../I18nFormatters';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
 import MessageBox from '../MessageBox';
-import Spinner from '../Spinner';
 import { Input } from '../ui/Input';
 import { Separator } from '../ui/Separator';
 import { Skeleton } from '../ui/Skeleton';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
-const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ value: key, label: name }));
+const formatTransferWiseSelectOptions = (fieldName, values) => {
+  const lastPart = fieldName.split('.').pop();
+  if (lastPart === 'country') {
+    return values.map(({ key, name }) => ({ value: key, label: `${getEmojiByCountryCode(key)} ${name}` }));
+  }
+
+  return values.map(({ key, name }) => ({ value: key, label: name }));
+};
 
 const WISE_PLATFORM_COLLECTIVE_SLUG = process.env.WISE_PLATFORM_COLLECTIVE_SLUG || process.env.TW_API_COLLECTIVE_SLUG;
 
@@ -103,7 +110,18 @@ const i18nFieldLabels = defineMessages({
   },
 });
 
-const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
+const Field = ({
+  input,
+  getFieldName,
+  disabled,
+  loading,
+  refetch,
+  formik,
+  labelClassName,
+  hintClassName,
+  errorClassName,
+  fieldClassName,
+}) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
@@ -112,7 +130,7 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   const comboOptions = React.useMemo(
     () =>
       input.type === 'radio' || input.type === 'select'
-        ? formatTransferWiseSelectOptions(input.valuesAllowed || [])
+        ? formatTransferWiseSelectOptions(fieldName, input.valuesAllowed || [])
         : [],
     [input.type, input.valuesAllowed],
   );
@@ -150,7 +168,7 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
       };
     }
     return (
-      <div className="mt-2 flex-1" key={input.key}>
+      <div className={fieldClassName || 'mt-2 flex-1'} key={input.key}>
         <FormField
           disabled={disabled}
           name={fieldName}
@@ -160,12 +178,15 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
           max={input.maxLength}
           min={input.minLength}
           validate={validate}
+          labelClassName={labelClassName}
+          hintClassName={hintClassName}
+          errorClassName={errorClassName}
         />
       </div>
     );
   } else if (input.type === 'date') {
     return (
-      <div className="mt-2 flex-1" key={input.key}>
+      <div className={fieldClassName || 'mt-2 flex-1'} key={input.key}>
         <FormField
           label={label}
           name={fieldName}
@@ -173,6 +194,9 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
           required={required}
           disabled={disabled}
           validate={validate}
+          labelClassName={labelClassName}
+          hintClassName={hintClassName}
+          errorClassName={errorClassName}
         >
           {({ field }) => <Input type="date" {...field} value={get(formik.values, field.name) || ''} />}
         </FormField>
@@ -180,7 +204,7 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
     );
   } else if (input.type === 'radio' || input.type === 'select') {
     return (
-      <div className="mt-2 flex-1">
+      <div className={fieldClassName || 'mt-2 flex-1'}>
         <FormField
           disabled={disabled}
           name={fieldName}
@@ -188,6 +212,9 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
           hint={input.hint}
           required={required}
           validate={validate}
+          labelClassName={labelClassName}
+          hintClassName={hintClassName}
+          errorClassName={errorClassName}
         >
           {({ field }) => (
             <ComboSelect
@@ -209,11 +236,19 @@ const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   }
 };
 
-export const FieldGroup = ({ field, ...props }) => {
+export const FieldGroup = ({ field, labelClassName, hintClassName, errorClassName, fieldClassName, ...props }) => {
   return (
     <div className="flex-1">
       {field.group.map(input => (
-        <Field key={input.key} input={input} {...props} />
+        <Field
+          key={input.key}
+          input={input}
+          labelClassName={labelClassName}
+          hintClassName={hintClassName}
+          errorClassName={errorClassName}
+          fieldClassName={fieldClassName}
+          {...props}
+        />
       ))}
     </div>
   );
@@ -247,7 +282,20 @@ const i18nTransactionTypeLabels = defineMessages({
   // TODO: Figure out the "Wire" option
 });
 
-const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, currency, alwaysSave }) => {
+const DetailsForm = ({
+  disabled,
+  getFieldName,
+  onlyDataFields,
+  formik,
+  host,
+  currency,
+  alwaysSave,
+  sectionHeaderClassName,
+  labelClassName,
+  hintClassName,
+  errorClassName,
+  fieldClassName,
+}) => {
   const intl = useIntl();
   const needsRefetchRef = React.useRef(false);
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
@@ -361,6 +409,9 @@ const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, cur
         name={transactionMethodFieldName}
         label={transactionMethodLabel}
         validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
+        labelClassName={labelClassName}
+        hintClassName={hintClassName}
+        errorClassName={errorClassName}
       >
         {({ field }) => {
           return (
@@ -378,7 +429,7 @@ const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, cur
       {transactionMethod && (
         <React.Fragment>
           <div className="mt-6 flex-1">
-            <p className="text-base font-semibold">
+            <p className={sectionHeaderClassName || 'text-base font-semibold'}>
               <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
             </p>
           </div>
@@ -393,6 +444,10 @@ const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, cur
               key={kebabCase(field.name)}
               loading={loading}
               refetch={doRefetchOnChange}
+              labelClassName={labelClassName}
+              hintClassName={hintClassName}
+              errorClassName={errorClassName}
+              fieldClassName={fieldClassName}
             />
           ))}
         </React.Fragment>
@@ -400,7 +455,7 @@ const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, cur
       {Boolean(addressFields.length) && (
         <React.Fragment>
           <div className="mt-6 flex flex-1 items-center gap-2">
-            <span className="text-base font-semibold">
+            <span className={sectionHeaderClassName || 'text-base font-semibold'}>
               <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
             </span>
             <InfoTooltipIcon>
@@ -422,6 +477,10 @@ const DetailsForm = ({ disabled, getFieldName, onlyDataFields, formik, host, cur
               key={kebabCase(field.name)}
               loading={loading}
               refetch={doRefetchOnChange}
+              labelClassName={labelClassName}
+              hintClassName={hintClassName}
+              errorClassName={errorClassName}
+              fieldClassName={fieldClassName}
             />
           ))}
         </React.Fragment>
@@ -488,6 +547,11 @@ const PayoutBankInformationForm = ({
   disabled = false,
   alwaysSave = false,
   onlyDataFields = false,
+  sectionHeaderClassName = null,
+  labelClassName = null,
+  hintClassName = null,
+  errorClassName = null,
+  fieldClassName = null,
 }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     variables: { slug: WISE_PLATFORM_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
@@ -590,6 +654,9 @@ const PayoutBankInformationForm = ({
         label={<FormattedMessage id="PayoutBankInformationForm.Currency" defaultMessage="Bank Account Currency" />}
         disabled={Boolean(fixedCurrency && !optional) || !isNew || disabled}
         validate={validateCurrencyMinimumAmount}
+        labelClassName={labelClassName}
+        hintClassName={hintClassName}
+        errorClassName={errorClassName}
       >
         {({ field }) => {
           return (
@@ -612,6 +679,11 @@ const PayoutBankInformationForm = ({
           host={wiseHost}
           alwaysSave={alwaysSave}
           onlyDataFields={onlyDataFields}
+          sectionHeaderClassName={sectionHeaderClassName}
+          labelClassName={labelClassName}
+          hintClassName={hintClassName}
+          errorClassName={errorClassName}
+          fieldClassName={fieldClassName}
         />
       )}
       {!selectedCurrency && !currencies?.length && (

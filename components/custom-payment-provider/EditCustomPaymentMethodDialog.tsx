@@ -1,10 +1,9 @@
 import React from 'react';
 import { Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { v7 as uuidv7 } from 'uuid';
 
-import type { CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
-import { Currency, CustomPaymentProviderType } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import { Currency } from '@/lib/graphql/types/v2/schema';
 
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/Dialog';
@@ -16,11 +15,15 @@ import { CustomPaymentMethodIconInput } from './CustomPaymentMethodIconInput';
 import { CustomPaymentMethodInstructionsVariablesHelp } from './CustomPaymentMethodInstructionsVariablesHelp';
 import { CustomPaymentMethodTemplateEditor } from './CustomPaymentMethodTemplateEditor';
 
-// TODO: Use type from API
+type FormValues = {
+  name: string;
+  instructions: string;
+  icon: string;
+};
 
 type EditCustomPaymentMethodDialogProps = {
-  provider: CustomPaymentProvider | null | undefined;
-  onSave: (values: CustomPaymentProvider, editingProvider: CustomPaymentProvider | null) => Promise<void>;
+  provider: ManualPaymentProvider | null | undefined;
+  onSave: (values: FormValues, editingProvider?: ManualPaymentProvider) => Promise<void>;
   onClose: () => void;
   defaultCurrency: string;
 };
@@ -28,9 +31,7 @@ type EditCustomPaymentMethodDialogProps = {
 export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: EditCustomPaymentMethodDialogProps) => {
   const intl = useIntl();
 
-  const initialValues: CustomPaymentProvider = {
-    id: provider?.id || uuidv7(),
-    type: CustomPaymentProviderType.OTHER,
+  const initialValues: FormValues = {
     name: provider?.name || '',
     instructions: provider?.instructions || '',
     icon: provider?.icon || '',
@@ -55,7 +56,7 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
         <Formik
           initialValues={initialValues}
           validate={values => {
-            const errors: Partial<Record<keyof CustomPaymentProvider, string>> = {};
+            const errors: Partial<Record<keyof FormValues, string>> = {};
             if (!values.name || values.name.trim() === '') {
               errors.name = intl.formatMessage({
                 defaultMessage: 'Name is required',
@@ -71,9 +72,8 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
             return errors;
           }}
           onSubmit={async (values, { setSubmitting }) => {
-            await onSave(values, provider || null);
+            await onSave(values, provider || undefined);
             setSubmitting(false);
-            // Modal will close automatically when editingId is set to null in handleSave
           }}
         >
           {({ handleSubmit, isSubmitting, values, setFieldValue, setFieldTouched, dirty, errors, touched }) => {
@@ -118,8 +118,8 @@ export const EditCustomPaymentMethodDialog = ({ provider, onSave, onClose }: Edi
                   </Label>
                   <p className="mb-2 text-xs text-gray-600">
                     <FormattedMessage
-                      defaultMessage="Payment instructions template. You can use variables:"
-                      id="CustomPaymentMethod.Instructions.Help"
+                      defaultMessage="Payment instructions that will be displayed to the contributors. You can use variables:"
+                      id="ghmpbR"
                     />
                   </p>
                   <CustomPaymentMethodInstructionsVariablesHelp variables={COMMON_TEMPLATE_VARIABLES} />
