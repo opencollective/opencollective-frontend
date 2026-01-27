@@ -6,12 +6,11 @@ import { defineMessage, FormattedMessage, FormattedTime, useIntl } from 'react-i
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import {
-  type AccountHoverCardFieldsFragment,
-  ExpenseStatus,
-  ExpenseType,
-  type PaidDisbursementsQueryVariables,
+import type {
+  AccountHoverCardFieldsFragment,
+  PaidDisbursementsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
@@ -66,7 +65,7 @@ const sortFilter = buildSortFilter({
 });
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
-  status: z.literal(ExpenseStatus.PAID).default(ExpenseStatus.PAID),
+  status: z.literal(ExpenseStatusFilter.PAID).default(ExpenseStatusFilter.PAID),
   hostContext: hostContextFilter.schema,
   limit: limit.default(20),
   sort: sortFilter.schema,
@@ -85,6 +84,7 @@ const toVariables: FiltersToVariables<FilterValues, PaidDisbursementsQueryVariab
   ...(omit(commonToVariables, 'status') as unknown as Partial<
     FiltersToVariables<FilterValues, PaidDisbursementsQueryVariables, FilterMeta>
   >),
+  status: value => ({ status: [value] }),
   account: hostedAccountFilter.toVariables,
 };
 
