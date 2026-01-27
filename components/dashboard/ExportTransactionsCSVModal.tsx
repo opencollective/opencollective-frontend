@@ -41,6 +41,8 @@ import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
 
+const safeJoinString = (value: string[] | string) => (Array.isArray(value) ? value.join(',') : value);
+
 const makeUrl = ({
   account,
   isHostReport,
@@ -54,13 +56,13 @@ const makeUrl = ({
     : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
 
   if (isHostReport) {
-    if (queryFilter.values.account) {
-      url.searchParams.set('account', queryFilter.values.account);
+    if (queryFilter.variables.account) {
+      url.searchParams.set('account', queryFilter.variables.account.slug);
     }
-    if (queryFilter.values.excludeAccount) {
-      url.searchParams.set('excludeAccount', queryFilter.values.excludeAccount);
+    if (queryFilter.variables.excludeAccount) {
+      url.searchParams.set('excludeAccount', queryFilter.variables.excludeAccount.slug);
     }
-    if (queryFilter.values.excludeHost) {
+    if (queryFilter.variables.excludeHost) {
       url.searchParams.set('includeHost', '0');
     }
   }
@@ -69,36 +71,36 @@ const makeUrl = ({
   url.searchParams.set('includeIncognitoTransactions', '1');
   url.searchParams.set('includeChildrenTransactions', '1');
 
-  if (queryFilter.values.expenseType) {
-    url.searchParams.set('expenseType', queryFilter.values.expenseType.join(','));
+  if (queryFilter.variables.expenseType) {
+    url.searchParams.set('expenseType', safeJoinString(queryFilter.variables.expenseType));
   }
 
-  if (queryFilter.values.kind) {
-    url.searchParams.set('kind', queryFilter.values.kind.join(','));
+  if (queryFilter.variables.kind) {
+    url.searchParams.set('kind', safeJoinString(queryFilter.variables.kind));
   }
 
-  if (queryFilter.values.amount) {
-    const toAmountStr = ({ gte, lte }) => (lte ? `${gte}-${lte}` : `${gte}+`);
-    url.searchParams.set('amount', toAmountStr(queryFilter.values.amount));
+  if (queryFilter.variables.amount) {
+    const toAmountStr = ({ gte, lte }) => (lte ? `${gte.valueInCents}-${lte.valueInCents}` : `${gte.valueInCents}+`);
+    url.searchParams.set('amount', toAmountStr(queryFilter.variables.amount));
   }
 
-  if (queryFilter.values.paymentMethodService) {
-    url.searchParams.set('paymentMethodService', queryFilter.values.paymentMethodService.join(','));
+  if (queryFilter.variables.paymentMethodService) {
+    url.searchParams.set('paymentMethodService', safeJoinString(queryFilter.variables.paymentMethodService));
   }
 
-  if (queryFilter.values.paymentMethodType) {
-    url.searchParams.set('paymentMethodType', queryFilter.values.paymentMethodType.join(','));
+  if (queryFilter.variables.paymentMethodType) {
+    url.searchParams.set('paymentMethodType', safeJoinString(queryFilter.variables.paymentMethodType));
   }
 
-  if (queryFilter.values.type) {
-    url.searchParams.set('type', queryFilter.values.type);
+  if (queryFilter.variables.type) {
+    url.searchParams.set('type', queryFilter.variables.type);
   }
 
-  if (queryFilter.values.searchTerm) {
-    url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
+  if (queryFilter.variables.searchTerm) {
+    url.searchParams.set('searchTerm', queryFilter.variables.searchTerm);
   }
 
-  if (queryFilter.values.date) {
+  if (queryFilter.variables.date) {
     if (queryFilter.variables.dateFrom) {
       url.searchParams.set('dateFrom', queryFilter.variables.dateFrom);
     }
@@ -107,7 +109,7 @@ const makeUrl = ({
     }
   }
 
-  if (queryFilter.values.clearedAt) {
+  if (queryFilter.variables.clearedAt) {
     if (queryFilter.variables.clearedFrom) {
       url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
     }
@@ -116,32 +118,32 @@ const makeUrl = ({
     }
   }
 
-  if (!isNil(queryFilter.values.isRefund)) {
-    url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  if (!isNil(queryFilter.variables.isRefund)) {
+    url.searchParams.set('isRefund', queryFilter.variables.isRefund ? '1' : '0');
   }
 
-  if (!isNil(queryFilter.values.hasDebt)) {
-    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
+  if (!isNil(queryFilter.variables.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.variables.hasDebt ? '1' : '0');
   }
 
-  if (queryFilter.values.orderId) {
-    url.searchParams.set('orderId', queryFilter.values.orderId);
+  if (queryFilter.variables.order) {
+    url.searchParams.set('orderId', queryFilter.variables.order.legacyId);
   }
 
-  if (queryFilter.values.expenseId) {
-    url.searchParams.set('expenseId', queryFilter.values.expenseId);
+  if (queryFilter.variables.expense) {
+    url.searchParams.set('expenseId', queryFilter.variables.expense.id);
   }
 
-  if (queryFilter.values.merchantId) {
-    url.searchParams.set('merchantId', queryFilter.values.merchantId);
+  if (queryFilter.variables.merchantId) {
+    url.searchParams.set('merchantId', queryFilter.variables.merchantId);
   }
 
-  if (queryFilter.values.accountingCategory) {
-    url.searchParams.set('accountingCategory', queryFilter.values.accountingCategory.join(','));
+  if (queryFilter.variables.accountingCategory) {
+    url.searchParams.set('accountingCategory', safeJoinString(queryFilter.variables.accountingCategory));
   }
 
-  if (queryFilter.values.group) {
-    url.searchParams.set('group', queryFilter.values.group.join(','));
+  if (queryFilter.variables.group) {
+    url.searchParams.set('group', safeJoinString(queryFilter.variables.group));
   }
 
   if (flattenTaxesAndPaymentProcessorFees) {
@@ -153,11 +155,21 @@ const makeUrl = ({
     url.searchParams.set('useFieldNames', '1');
   }
 
+  const params = {
+    ...queryFilter.variables,
+    flattenTaxesAndPaymentProcessorFees,
+    fields,
+    useFieldNames,
+    isHostReport,
+    accountSlug: account.slug,
+  };
+
   if (!isEmpty(fields)) {
     const selectedFields = fields.join(',').replace('debitAndCreditAmounts', 'debitAmount,creditAmount');
     url.searchParams.set('fields', selectedFields);
   }
 
+  console.debug(JSON.stringify(params));
   return url.toString();
 };
 
