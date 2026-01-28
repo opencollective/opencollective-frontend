@@ -205,16 +205,18 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <ConfirmProcessExpenseModal
-        type={processModal}
-        open={!!processModal}
-        setOpen={open => {
-          if (!open) {
-            setProcessModal(null);
-          }
-        }}
-        expense={props.grant}
-      />
+      {processModal && (
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={props.grant}
+        />
+      )}
       {isGrantFlowOpen && (
         <SubmitGrantFlow
           handleOnClose={() => {
