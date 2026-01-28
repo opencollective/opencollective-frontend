@@ -352,4 +352,4 @@ const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 /**
  * @deprecated Use `ui/Select` instead
  */
-export default injectIntl(StyledSelect) as undefined as StyledSelectCustomComponent;
+export default injectIntl(StyledSelect, { forwardRef: true }) as undefined as StyledSelectCustomComponent;

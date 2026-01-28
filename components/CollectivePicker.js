@@ -104,6 +104,7 @@ class CollectivePicker extends React.PureComponent {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
+    this.selectRef = React.createRef();
     this.state = {
       createFormCollectiveType: null,
       displayInviteMenu: null,
@@ -270,6 +271,21 @@ class CollectivePicker extends React.PureComponent {
     }
   };
 
+  onNewCollectiveOptionCreated = collective => {
+    this.onInputChange('');
+    this.selectRef.current.blur();
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange({ label: collective.name, value: collective, isNew: true });
+    }
+    this.setState(state => ({
+      menuIsOpen: false,
+      createFormCollectiveType: null,
+      createdCollectives: [...state.createdCollectives, collective],
+      showCreatedCollective: true,
+    }));
+  };
+
   render() {
     const {
       inputId,
@@ -306,6 +322,7 @@ class CollectivePicker extends React.PureComponent {
         <PopoverAnchor asChild>
           <Container position="relative" minWidth={minWidth} maxWidth={maxWidth} width={width} ref={this.containerRef}>
             <StyledSelect
+              ref={this.selectRef}
               inputId={inputId}
               options={allOptions}
               defaultValue={getDefaultOptions && getDefaultOptions(this.buildCollectiveOption, allOptions)}
@@ -322,7 +339,10 @@ class CollectivePicker extends React.PureComponent {
                   return formatOptionLabel(option, context, intl);
                 } else if (option[FLAG_NEW_COLLECTIVE]) {
                   return renderNewCollectiveOption ? (
-                    renderNewCollectiveOption()
+                    renderNewCollectiveOption({
+                      searchText: this.state.searchText,
+                      onCreatedCollective: this.onNewCollectiveOptionCreated,
+                    })
                   ) : (
                     <CollectiveTypePicker
                       onChange={this.setCreateFormCollectiveType}
