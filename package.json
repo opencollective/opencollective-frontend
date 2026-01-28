@@ -210,7 +210,7 @@
     "@formatjs/cli": "^6.2.12",
     "@graphql-codegen/cli": "6.1.1",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
-    "@next/bundle-analyzer": "15.5.9",
+    "@next/bundle-analyzer": "16.1.6",
     "@tailwindcss/typography": "^0.5.13",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.4",
