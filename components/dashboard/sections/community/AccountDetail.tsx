@@ -186,13 +186,7 @@ export function ContributorDetails(props: ContributionDrawerProps) {
   const legalName = account?.legalName !== account?.name && account?.legalName;
   const taxForms = query.data?.host?.hostedLegalDocuments;
   const vendorInfo = account?.type === 'VENDOR' ? account['vendorInfo'] : null;
-  const canBeConvertedToVendor = React.useMemo(() => {
-    if (account?.type === 'ORGANIZATION') {
-      const orgAdminIds = query.data?.account.members?.nodes.map(m => m.account.id);
-      const hostAdminIds = query.data?.host.admins?.nodes.map(m => m.account.id);
-      return orgAdminIds?.every(id => hostAdminIds?.includes(id));
-    }
-  }, [account, query.data]);
+  const canBeConvertedToVendor = account?.type === 'ORGANIZATION' ? account['canBeVendorOf'] : false;
 
   return (
     <div className="flex h-full flex-col">

@@ -161,6 +161,9 @@ export const communityAccountDetailQuery = gql`
       type
       createdAt
       imageUrl
+      ... on Organization {
+        canBeVendorOf(host: { slug: $hostSlug })
+      }
       socialLinks {
         type
         url
@@ -308,17 +311,6 @@ export const communityAccountDetailQuery = gql`
         totalCount
         nodes {
           ...LegalDocumentFields
-        }
-      }
-      admins: members(role: [ADMIN]) {
-        nodes {
-          id
-          role
-          description
-          createdAt
-          account {
-            id
-          }
         }
       }
     }
