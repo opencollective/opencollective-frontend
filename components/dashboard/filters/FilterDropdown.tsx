@@ -97,7 +97,11 @@ function FilterPill<FV, FM>({
   const hasValue = !isNil(value);
   const isFilterWithoutComponent = filterConfig && !filterConfig.Component;
   const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta });
-  const filterLabel = filterConfig?.labelMsg ? intl.formatMessage(filterConfig.labelMsg) : filterKey ? String(filterKey) : null;
+  const filterLabel = filterConfig?.labelMsg
+    ? intl.formatMessage(filterConfig.labelMsg)
+    : filterKey
+      ? String(filterKey)
+      : null;
 
   const button = (
     <Button
@@ -148,7 +152,11 @@ function FilterPill<FV, FM>({
             highlighted={highlighted}
             valueRenderer={
               'valueRenderer' in (filterConfig || {})
-                ? (filterConfig as { valueRenderer?: (props: { intl: IntlShape; value: unknown; meta?: FM }) => React.ReactNode }).valueRenderer
+                ? (
+                    filterConfig as {
+                      valueRenderer?: (props: { intl: IntlShape; value: unknown; meta?: FM }) => React.ReactNode;
+                    }
+                  ).valueRenderer
                 : undefined
             }
             meta={meta}
@@ -307,9 +315,12 @@ function FilterDropdown<FV, FM>({
   const [draftValue, setDraftValue] = React.useState(appliedValue);
 
   // Sync draft value when the applied value changes externally (e.g., URL change)
+  // Only sync when popover is closed to avoid resetting user's draft mid-edit
   React.useEffect(() => {
-    setDraftValue(appliedValue);
-  }, [appliedValue]);
+    if (!open) {
+      setDraftValue(appliedValue);
+    }
+  }, [appliedValue, open]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (locked) {
