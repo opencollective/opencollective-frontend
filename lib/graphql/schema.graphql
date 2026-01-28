@@ -3,6 +3,7 @@ Collective interface
 """
 interface CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -2059,6 +2060,7 @@ This represents a Collective
 """
 type Collective implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -2347,6 +2349,7 @@ This represents an Event
 """
 type Event implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -2635,6 +2638,7 @@ This represents a Fund
 """
 type Fund implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -2923,6 +2927,7 @@ This represents a Organization Collective
 """
 type Organization implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -3211,6 +3216,7 @@ This represents a Project
 """
 type Project implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -3794,6 +3800,7 @@ This represents a User Collective
 """
 type User implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!
@@ -4084,6 +4091,7 @@ This represents a Vendor
 """
 type Vendor implements CollectiveInterface {
   id: Int
+  idV2: String
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
   children: [CollectiveInterface]!

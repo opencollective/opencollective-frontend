@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import z from 'zod';
 
 import { getAccountReferenceInput } from '@/lib/collective';
+import { CollectiveType } from '@/lib/constants/collectives';
 import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '@/lib/i18n/expense';
@@ -195,7 +196,7 @@ const ExpensesSection = ({
   );
 };
 
-export function ExpensesTab({ account, host, setOpenExpenseId }) {
+export function ExpensesTab({ account, host, setOpenExpenseId, expectedAccountType }) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -208,6 +209,7 @@ export function ExpensesTab({ account, host, setOpenExpenseId }) {
     filters: {},
   });
 
+  const isIndividual = expectedAccountType === CollectiveType.INDIVIDUAL;
   const { data, loading, error, fetchMore } = useQuery(communityAccountExpensesDetailQuery, {
     fetchPolicy: 'cache-and-network',
     variables: {
@@ -216,8 +218,8 @@ export function ExpensesTab({ account, host, setOpenExpenseId }) {
       host: getAccountReferenceInput(host),
       statsCurrency: host.currency,
       skipSubmittedExpenses: false,
-      skipPaidExpenses: false,
-      skipApprovedExpenses: false,
+      skipPaidExpenses: !isIndividual,
+      skipApprovedExpenses: !isIndividual,
       defaultLimit: FETCH_MORE_SIZE,
     },
   });

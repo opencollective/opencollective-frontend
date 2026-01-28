@@ -106,46 +106,52 @@ export type HostedAccountFilterMeta = {
 };
 
 function HostedAccountFilter({
-  meta: { hostSlug, hostedAccounts, disableHostedAccountsSearch },
+  meta,
   ...props
 }: FilterComponentProps<z.infer<typeof schema | typeof multiSchema>, HostedAccountFilterMeta> &
   React.ComponentProps<typeof ComboSelectFilter>) {
-  const defaultAccounts = React.useMemo(() => hostedAccounts?.map(resultNodeToOption) || [], [hostedAccounts]);
+  const defaultAccounts = React.useMemo(
+    () => meta.hostedAccounts?.map(resultNodeToOption) || [],
+    [meta.hostedAccounts],
+  );
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
-    variables: { hostSlug },
+    variables: { hostSlug: meta.hostSlug },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,
   });
 
   const searchFunc = React.useCallback(
     (searchTerm: string) => {
-      if (!searchTerm && defaultAccounts.length) {
-        setOptions(defaultAccounts);
-      } else {
-        search({
-          variables: {
-            searchTerm,
-            ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
-          },
-        });
-      }
+      search({
+        variables: {
+          searchTerm: searchTerm || undefined,
+          ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
+        },
+      });
     },
-    [defaultAccounts, search],
+    [search],
   );
 
+  // Load initial options on mount if no default accounts provided
   React.useEffect(() => {
-    if (!loading) {
-      setOptions(data?.accounts?.nodes.map(resultNodeToOption) || defaultAccounts);
+    if (!defaultAccounts.length) {
+      searchFunc('');
     }
-  }, [loading, data, defaultAccounts]);
+  }, [defaultAccounts.length, searchFunc]);
+
+  React.useEffect(() => {
+    if (!loading && data?.accounts?.nodes) {
+      setOptions(data.accounts.nodes.map(resultNodeToOption));
+    }
+  }, [loading, data]);
 
   return (
     <ComboSelectFilter
       options={options}
       loading={loading}
-      searchFunc={disableHostedAccountsSearch ? undefined : searchFunc}
+      searchFunc={meta.disableHostedAccountsSearch ? undefined : searchFunc}
       {...props}
     />
   );

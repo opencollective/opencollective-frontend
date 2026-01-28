@@ -13,7 +13,7 @@ export const vendorFieldFragment = gql`
     type
     description
     tags
-    imageUrl(height: 96)
+    imageUrl
     isArchived
     createdAt
 
@@ -70,18 +70,6 @@ export const vendorFieldFragment = gql`
     }
   }
   ${accountHoverCardFields}
-`;
-
-export const vendorDetailQuery = gql`
-  query VendorDetail($id: String!) {
-    account(id: $id) {
-      id
-      ... on Vendor {
-        ...VendorFields
-      }
-    }
-  }
-  ${vendorFieldFragment}
 `;
 
 export const setVendorArchiveMutation = gql`

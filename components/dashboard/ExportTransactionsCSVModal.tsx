@@ -204,7 +204,7 @@ const DownloadLink = ({ url, disabled, children }: { url: string; disabled?: boo
   disabled ? (
     children
   ) : (
-    <a href={url} rel="noreferrer" target="_blank">
+    <a href={url} rel="noreferrer" target="_blank" onClick={() => setRestAuthorizationCookie()}>
       {children}
     </a>
   );

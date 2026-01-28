@@ -329,13 +329,13 @@ export default function Pricing({ data }) {
               <h3 className="mb-2 text-xl font-medium text-foreground">
                 <FormattedMessage defaultMessage="What are Platform Tips?" id="pricing.new.faq.tips.question" />
               </h3>
-              <p className="text-muted-foreground">
+              <div className="text-muted-foreground">
                 <FormattedMessage
                   defaultMessage="<p><strong>Platform Tips</strong> are optional contributions that financial contributors can add when they contribute on the platform. These tips support the <strong>Open Collective Platform</strong>, and they help ensure that we can keep the core service available at no cost to Collectives. Tips do not reduce the amount your <strong>Organization</strong> or the <strong>Collectives</strong> you host receive, because they are added on top of the intended support.</p><p>If you prefer a more traditional pricing model, you can opt for a simple <strong>5% platform fee</strong> instead of tips. This removes tips from the contribution flow and applies a fixed fee to incoming funds. If that sounds better for you, please contact us and we will switch you over.</p>"
                   id="pricing.new.faq.tips.answer"
                   values={I18nFormatters}
                 />
-              </p>
+              </div>
             </div>
           </div>
         </div>

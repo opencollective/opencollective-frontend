@@ -152,6 +152,7 @@ export const accountExpensesMetadataQuery = gql`
 export const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
+    $hostContext: HostContext
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -173,6 +174,7 @@ export const hostDashboardExpensesQuery = gql`
   ) {
     expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       account: $account
       fromAccount: $fromAccount
       limit: $limit
@@ -267,7 +269,7 @@ export const hostInfoCardFields = gql`
 `;
 
 export const hostDashboardMetadataQuery = gql`
-  query HostDashboardMetadata($hostSlug: String!) {
+  query HostDashboardMetadata($hostSlug: String!, $hostContext: HostContext) {
     host(slug: $hostSlug) {
       id
       ...HostInfoCardFields
@@ -282,42 +284,98 @@ export const hostDashboardMetadataQuery = gql`
     }
     unreplied: expenses(
       host: { slug: $hostSlug }
+      hostContext: $hostContext
       status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
       lastCommentBy: [NON_HOST_ADMIN]
     ) {
       totalCount
     }
-    ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [READY_TO_PAY]) {
       totalCount
     }
-    scheduled_for_payment: expenses(host: { slug: $hostSlug }, status: [SCHEDULED_FOR_PAYMENT]) {
+    scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      status: [SCHEDULED_FOR_PAYMENT]
+    ) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, status: [ON_HOLD]) {
+    on_hold: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [ON_HOLD]) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, status: [INCOMPLETE]) {
+    incomplete: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [INCOMPLETE]) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
+    error: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [ERROR]) {
       totalCount
     }
+  }
+  ${hostInfoCardFields}
+`;
 
-    hostedAccounts: accounts(host: { slug: $hostSlug }, orderBy: { field: ACTIVITY, direction: DESC }) {
+/**
+ * Query for the Paid Disbursements page - fetches paid expenses with fields optimized for the table
+ */
+export const paidDisbursementsQuery = gql`
+  query PaidDisbursements(
+    $hostSlug: String!
+    $hostContext: HostContext
+    $limit: Int!
+    $offset: Int!
+    $type: ExpenseType
+    $tags: [String]
+    $status: [ExpenseStatusFilter]
+    $amount: AmountRangeInput
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $sort: ChronologicalOrderInput
+    $account: AccountReferenceInput
+    $accountingCategory: [String]
+  ) {
+    expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      account: $account
+      limit: $limit
+      offset: $offset
+      type: $type
+      tag: $tags
+      status: $status
+      amount: $amount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $sort
+      accountingCategory: $accountingCategory
+    ) {
+      totalCount
+      offset
+      limit
       nodes {
         id
-        ...AccountHoverCardFields
-      }
-    }
-
-    expenseTags: expenseTagStats(host: { slug: $hostSlug }) {
-      nodes {
-        id
-        tag
+        ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
+        paidAt
+        paidBy {
+          id
+          slug
+          name
+          type
+          imageUrl
+          ...AccountHoverCardFields
+        }
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
   }
-
+  ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
   ${accountHoverCardFields}
-  ${hostInfoCardFields}
+  ${expenseHostFields}
 `;

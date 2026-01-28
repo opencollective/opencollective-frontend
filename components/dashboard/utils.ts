@@ -1,6 +1,7 @@
 import { compact, omit } from 'lodash';
+import type { NextRouter } from 'next/router';
 
-export const makePushSubpath = router => subpath => {
+export const makePushSubpath = (router: NextRouter) => subpath => {
   router.push(
     {
       pathname: compact([router.pathname, router.query.slug, router.query.section, subpath]).join('/'),
@@ -9,6 +10,7 @@ export const makePushSubpath = router => subpath => {
     undefined,
     {
       shallow: true,
+      scroll: true,
     },
   );
 };

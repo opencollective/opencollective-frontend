@@ -389,11 +389,6 @@ describe('Expense flow', () => {
 
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
-      cy.intercept({
-        method: 'POST',
-        url: 'https://country-service.shopifycloud.com/graphql',
-        query: { fixture: 'countries.json' },
-      });
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
@@ -401,7 +396,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('select-content').should('not.exist');
       cy.getByDataCy('country-select').click();
-      cy.contains('[data-cy="select-option"]', 'Angola').click();
+      cy.contains('[data-cy="select-option"]', 'Algeria').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="address-city"]').type('Citycitycity');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
@@ -506,7 +501,7 @@ describe('Expense flow', () => {
         });
 
         cy.getByDataCy('country-select').click();
-        cy.contains('[data-cy="select-option"]', 'Angola').click();
+        cy.contains('[data-cy="select-option"]', 'Algeria').click();
         cy.get('[data-cy="address-address1"]').type('Street Name, 123');
         cy.get('[data-cy="address-city"]').type('City');
 
@@ -590,7 +585,7 @@ describe('Expense flow', () => {
         });
 
         cy.getByDataCy('country-select').click();
-        cy.contains('[data-cy="select-option"]', 'Angola').click();
+        cy.contains('[data-cy="select-option"]', 'Algeria').click();
         cy.get('[data-cy="address-address1"]').type('Street Name, 123');
         cy.get('[data-cy="address-city"]').type('City');
 
@@ -658,7 +653,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('country-select').click();
-      cy.contains('[data-cy="select-option"]', 'Angola').click();
+      cy.contains('[data-cy="select-option"]', 'Algeria').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="address-city"]').type('Citycitycity');
       cy.wait(100);

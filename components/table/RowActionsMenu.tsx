@@ -3,6 +3,8 @@ import type { Row, Table } from '@tanstack/react-table';
 import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import type { Action } from '@/lib/actions/types';
+
 import Spinner from '../Spinner';
 import { Button } from '../ui/Button';
 import {
@@ -12,11 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
-export function DropdownActionItem({ action }) {
-  return (
+export function DropdownActionItem({ action }: { action: Action }) {
+  const item = (
     <DropdownMenuItem
-      key={action.label}
       onClick={action.onClick}
       className="gap-2.5"
       disabled={action.disabled}
@@ -27,6 +29,17 @@ export function DropdownActionItem({ action }) {
       {action.isLoading && <Spinner className="ml-auto size-4 text-muted-foreground" />}
     </DropdownMenuItem>
   );
+
+  if (action.tooltip) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{item}</TooltipTrigger>
+        <TooltipContent side="left">{action.tooltip}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return item;
 }
 interface RowActionsMenuProps<TData> {
   table: Table<TData>;

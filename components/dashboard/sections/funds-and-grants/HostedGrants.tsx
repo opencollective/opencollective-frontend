@@ -62,7 +62,6 @@ type FilterValues = z.infer<typeof filterSchema>;
 type FilterMeta = CommonFilterMeta & {
   hostSlug: string;
   hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
-  expenseTags?: string[];
   includeUncategorized?: boolean;
   accountingCategoryKinds: readonly AccountingCategoryKind[];
 };
@@ -172,7 +171,6 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     currency: metaData?.host?.currency,
     hostSlug: hostSlug,
     hostedAccounts: metaData?.hostedAccounts.nodes,
-    expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
     includeUncategorized: true,
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };

@@ -180,6 +180,7 @@ const transactionsImportQuery = gql`
         slug
         currency
         policies {
+          id
           REQUIRE_2FA_FOR_ADMINS
         }
         ... on AccountWithHost {

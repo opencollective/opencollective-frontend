@@ -15,13 +15,16 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { gql } from '../../lib/graphql/helpers';
-import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
+import type {
+  ExpenseHostFieldsFragment,
+  ExpensesListAdminFieldsFragmentFragment,
+  ExpensesListFieldsFragmentFragment,
+} from '../../lib/graphql/types/v2/graphql';
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
-import type LoggedInUser from '@/lib/LoggedInUser';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -394,15 +397,40 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
   return onSubmit({ ...omit(values, 'expenseAmountInHostCurrency'), totalAmountPaidInHostCurrency });
 };
 
+/** Expense fields needed by PayExpenseModal - combines list and admin fragments */
+type PayExpenseModalExpense = Pick<
+  ExpensesListFieldsFragmentFragment,
+  | 'id'
+  | 'legacyId'
+  | 'currency'
+  | 'amount'
+  | 'reference'
+  | 'feesPayer'
+  | 'type'
+  | 'payoutMethod'
+  | 'amountInHostCurrency'
+> &
+  Pick<ExpensesListAdminFieldsFragmentFragment, 'taxes'> & {
+    account: Pick<ExpensesListFieldsFragmentFragment['account'], 'name' | 'slug'>;
+  };
+
+/** Host fields needed by PayExpenseModal */
+type PayExpenseModalHost = Pick<
+  ExpenseHostFieldsFragment,
+  'currency' | 'settings' | 'transferwise' | 'features' | 'supportedPayoutMethods' | 'platformSubscription'
+>;
+
+/** Collective fields needed by PayExpenseModal */
+type PayExpenseModalCollective = Pick<ExpensesListFieldsFragmentFragment['account'], 'currency'>;
+
 type PayExpenseModalProps = {
   canPayWithAutomaticPayment: boolean;
-  expense: Expense & { amountInHostCurrency?: { valueInCents: number; currency?: string } };
-  collective: Pick<Account, 'currency'>;
-  host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings' | 'features' | 'platformSubscription'>;
+  expense: PayExpenseModalExpense;
+  collective: PayExpenseModalCollective | null;
+  host: PayExpenseModalHost;
   onClose: () => void;
   onSubmit: (values: unknown) => Promise<void>;
   error?: Error;
-  LoggedInUser: LoggedInUser;
 };
 
 /**

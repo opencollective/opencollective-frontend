@@ -9,6 +9,7 @@ export type Action = {
   disabled?: boolean;
   'data-cy'?: string;
   key: string;
+  tooltip?: React.ReactNode;
 };
 
 export type GetActions<V> = (

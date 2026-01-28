@@ -90,7 +90,7 @@ ToastAction.displayName = ToastPrimitives.Action.displayName;
 const ToastClose = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Close>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
->(({ className, ...props }, ref) => (
+>(({ className, onClick, onPointerDown, ...props }, ref) => (
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
@@ -99,6 +99,14 @@ const ToastClose = React.forwardRef<
     )}
     data-cy="dismiss-toast-btn"
     toast-close=""
+    onPointerDown={e => {
+      e.stopPropagation();
+      onPointerDown?.(e);
+    }}
+    onClick={e => {
+      e.stopPropagation();
+      onClick?.(e);
+    }}
     {...props}
   >
     <X className="h-4 w-4" />

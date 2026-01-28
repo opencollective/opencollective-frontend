@@ -27,7 +27,7 @@ export function CommentResult({
             id="CommentResult.commentFrom"
             defaultMessage="Comment from {name} on {context}"
             values={{
-              name: <span className="text-foreground">{comment.fromAccount.name}</span>,
+              name: <span className="text-foreground">{comment.fromAccount?.name || 'Incognito'}</span>,
               context: comment.update ? (
                 <FormattedMessage defaultMessage="Update #{id}" id="VVgt/a" values={{ id: comment.update.legacyId }} />
               ) : comment.expense ? (

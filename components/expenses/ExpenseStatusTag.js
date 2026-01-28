@@ -85,16 +85,16 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...pro
     return <BaseTag status={status} {...tagProps} />;
   } else if (!payee?.isAdmin) {
     return (
-      <Flex alignItems="center">
+      <div className="flex flex-wrap items-center justify-end gap-y-1">
         <BaseTag status={status} {...tagProps} />
         <ExtendedTag fontSize="10px">
           <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
         </ExtendedTag>
-      </Flex>
+      </div>
     );
   } else {
     return (
-      <Flex alignItems="center">
+      <div className="flex flex-wrap items-center justify-end gap-y-1">
         <BaseTag status={status} {...tagProps} />
         <StyledTooltip
           content={() => (
@@ -111,7 +111,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...pro
             <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
           </ExtendedTag>
         </StyledTooltip>
-      </Flex>
+      </div>
     );
   }
 };
