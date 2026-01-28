@@ -230,12 +230,12 @@ function FilterDropdown<FV, FM>({
   React.useEffect(() => {
     // Reset if the currently selected filter type is no longer available
     // (e.g., it was just applied and moved to displayed filters)
-    if (activeFilterKey && remainingFilters && !remainingFilters.includes(activeFilterKey)) {
+    if (activeFilterKey && remainingFilters && !remainingFilters.includes(activeFilterKey) && !open) {
       setActiveFilterKey(initialFilterKey);
     }
     // Always sync tmpValue with the current filter value
     setTmpValue(currentFilterValue);
-  }, [activeFilterKey, initialFilterKey, currentFilterValue, remainingFilters]);
+  }, [activeFilterKey, initialFilterKey, currentFilterValue, remainingFilters, open]);
 
   return (
     <Popover
