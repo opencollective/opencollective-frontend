@@ -2717,6 +2717,7 @@ export type CollectiveFeatures = {
   ORDER?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_DONATIONS?: Maybe<CollectiveFeatureStatus>;
   PAYPAL_PAYOUTS?: Maybe<CollectiveFeatureStatus>;
+  PERSONA_KYC?: Maybe<CollectiveFeatureStatus>;
   PROJECTS?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_EXPENSES?: Maybe<CollectiveFeatureStatus>;
   RECEIVE_FINANCIAL_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -2917,6 +2918,7 @@ export enum ConnectedAccountService {
   /** @deprecated Not using this service anymore */
   meetup = 'meetup',
   paypal = 'paypal',
+  persona = 'persona',
   plaid = 'plaid',
   /** @deprecated Not using this service anymore */
   privacy = 'privacy',
@@ -7869,15 +7871,17 @@ export type InviteMemberInput = {
 };
 
 export enum KycProvider {
-  MANUAL = 'MANUAL'
+  MANUAL = 'MANUAL',
+  PERSONA = 'PERSONA'
 }
 
-export type KycProviderData = ManualKycProviderData;
+export type KycProviderData = ManualKycProviderData | PersonaKycProviderData;
 
 /** A individual KYC verified status */
 export type KycStatus = {
   __typename?: 'KYCStatus';
   manual?: Maybe<KycVerification>;
+  persona?: Maybe<KycVerification>;
 };
 
 /** A KYC Verification */
@@ -10926,6 +10930,19 @@ export type Permission = {
   reasonDetails?: Maybe<Scalars['JSON']['output']>;
 };
 
+/** Persona KYC data */
+export type PersonaKycProviderData = {
+  __typename?: 'PersonaKYCProviderData';
+  /** Contains KYC data verified by this inquiry */
+  fields: Scalars['JSON']['output'];
+  /** ID of the Persona inquiry */
+  id: Scalars['String']['output'];
+  /** Whether this persona inquiry was imported */
+  imported: Scalars['Boolean']['output'];
+  /** Status of the Persona inquiry */
+  status: Scalars['String']['output'];
+};
+
 /** A personal token */
 export type PersonalToken = {
   __typename?: 'PersonalToken';
@@ -12477,12 +12494,17 @@ export enum RefundKind {
 
 export type RequestKycVerificationInput = {
   manual?: InputMaybe<RequestManualKycVerificationInput>;
+  persona?: InputMaybe<RequestPersonaKycVerificationInput>;
 };
 
 export type RequestManualKycVerificationInput = {
   legalAddress?: InputMaybe<Scalars['String']['input']>;
   legalName: Scalars['String']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type RequestPersonaKycVerificationInput = {
+  importInquiryId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SearchResponse = {
