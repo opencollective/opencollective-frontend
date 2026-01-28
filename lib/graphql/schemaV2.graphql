@@ -25948,11 +25948,6 @@ input OrderCreateInput {
   paymentMethod: PaymentMethodInput
 
   """
-  The manual payment provider for this order. Use this when paymentMethod is null.
-  """
-  manualPaymentProvider: ManualPaymentProviderReferenceInput
-
-  """
   Platform tip attached to this order
   """
   platformTipAmount: AmountInput
@@ -26115,6 +26110,11 @@ input PaymentMethodInput {
   The Payment Intent ID used in this checkout
   """
   paymentIntentId: String
+
+  """
+  The Manual Payment Provider ID used in this checkout
+  """
+  manualPaymentProvider: ManualPaymentProviderReferenceInput
 }
 
 input CreditCardCreateInput {

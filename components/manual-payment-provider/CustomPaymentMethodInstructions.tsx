@@ -8,9 +8,8 @@ import { formatCurrency } from '@/lib/currency-utils';
 import type { Amount } from '@/lib/graphql/types/v2/schema';
 import { cn } from '@/lib/utils';
 
-import { formatAccountDetails } from '../edit-collective/utils';
-
 import type { TEMPLATE_VARIABLES } from './constants';
+import { formatAccountDetails } from './utils';
 
 type CustomPaymentMethodInstructionsProps = {
   /** HTML instructions template with variables like {account}, {amount}, etc. */

@@ -4,10 +4,11 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
 import { withRequiredProviders } from '../../test/providers';
 
 import { CustomPaymentMethodsList } from './CustomPaymentMethodsList';
-import type { CustomPaymentProvider } from './EditCustomPaymentMethodDialog';
 
 // Mock FlipMove animation library
 jest.mock('react-flip-move', () => ({
@@ -20,13 +21,15 @@ const mockAccount = {
   currency: 'USD',
 };
 
-const mockProvider: CustomPaymentProvider = {
+const mockProvider: ManualPaymentProvider = {
   id: '1',
-  type: 'OTHER',
+  type: ManualPaymentProviderType.OTHER,
   name: 'Test Payment Method',
-  currency: 'USD',
   instructions: 'Send {amount} to {account}',
   accountDetails: 'AC123456',
+  createdAt: new Date(),
+  isArchived: false,
+  updatedAt: new Date(),
 };
 
 describe('CustomPaymentMethodsList', () => {
@@ -68,9 +71,9 @@ describe('CustomPaymentMethodsList', () => {
     });
 
     it('renders icon for BANK_TRANSFER type', () => {
-      const bankProvider: CustomPaymentProvider = {
+      const bankProvider: ManualPaymentProvider = {
         ...mockProvider,
-        type: 'BANK_TRANSFER',
+        type: ManualPaymentProviderType.BANK_TRANSFER,
         name: 'Bank Transfer',
       };
 
@@ -108,7 +111,7 @@ describe('CustomPaymentMethodsList', () => {
     });
 
     it('does not render instructions section when instructions are empty', () => {
-      const providerWithoutInstructions: CustomPaymentProvider = {
+      const providerWithoutInstructions: ManualPaymentProvider = {
         ...mockProvider,
         instructions: '',
       };
@@ -316,7 +319,7 @@ describe('CustomPaymentMethodsList', () => {
     it('calls onReorder when moving item up', async () => {
       const user = userEvent.setup();
       const onReorder = jest.fn();
-      const providers: CustomPaymentProvider[] = [
+      const providers: ManualPaymentProvider[] = [
         { ...mockProvider, id: '1', name: 'First' },
         { ...mockProvider, id: '2', name: 'Second' },
       ];
@@ -353,7 +356,7 @@ describe('CustomPaymentMethodsList', () => {
 
   describe('Multiple providers', () => {
     it('renders all providers', () => {
-      const providers: CustomPaymentProvider[] = [
+      const providers: ManualPaymentProvider[] = [
         { ...mockProvider, id: '1', name: 'Venmo' },
         { ...mockProvider, id: '2', name: 'CashApp' },
         { ...mockProvider, id: '3', name: 'PayPal' },

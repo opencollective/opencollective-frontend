@@ -9957,8 +9957,6 @@ export type OrderCreateInput = {
   guestInfo?: InputMaybe<GuestInfoInput>;
   /** Whether this is transferring the remaining balance from a project/event/collective */
   isBalanceTransfer?: InputMaybe<Scalars['Boolean']['input']>;
-  /** The manual payment provider for this order. Use this when paymentMethod is null. */
-  manualPaymentProvider?: InputMaybe<ManualPaymentProviderReferenceInput>;
   /** The payment method used for this order */
   paymentMethod?: InputMaybe<PaymentMethodInput>;
   /** Platform tip attached to this order */
@@ -10780,6 +10778,8 @@ export type PaymentMethodInput = {
    * @deprecated 2021-03-02: Please use service + type
    */
   legacyType?: InputMaybe<PaymentMethodLegacyType>;
+  /** The Manual Payment Provider ID used in this checkout */
+  manualPaymentProvider?: InputMaybe<ManualPaymentProviderReferenceInput>;
   /** Name of this payment method */
   name?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated 2021-08-20: Please use type instead */

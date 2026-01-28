@@ -40,6 +40,9 @@ const mockProvider: ManualPaymentProvider = {
   name: 'Test Provider',
   instructions: '<p>Test instructions</p>',
   icon: 'Wallet',
+  createdAt: new Date(),
+  isArchived: false,
+  updatedAt: new Date(),
 };
 
 describe('EditCustomPaymentMethodDialog', () => {
@@ -271,12 +274,7 @@ describe('EditCustomPaymentMethodDialog', () => {
 
       render(
         withRequiredProviders(
-          <EditCustomPaymentMethodDialog
-            provider={null}
-            onSave={onSave}
-            onClose={jest.fn()}
-            defaultCurrency="USD"
-          />,
+          <EditCustomPaymentMethodDialog provider={null} onSave={onSave} onClose={jest.fn()} defaultCurrency="USD" />,
         ),
       );
 
@@ -339,12 +337,7 @@ describe('EditCustomPaymentMethodDialog', () => {
 
       render(
         withRequiredProviders(
-          <EditCustomPaymentMethodDialog
-            provider={null}
-            onSave={onSave}
-            onClose={jest.fn()}
-            defaultCurrency="USD"
-          />,
+          <EditCustomPaymentMethodDialog provider={null} onSave={onSave} onClose={jest.fn()} defaultCurrency="USD" />,
         ),
       );
 
@@ -369,12 +362,7 @@ describe('EditCustomPaymentMethodDialog', () => {
 
       render(
         withRequiredProviders(
-          <EditCustomPaymentMethodDialog
-            provider={null}
-            onSave={jest.fn()}
-            onClose={onClose}
-            defaultCurrency="USD"
-          />,
+          <EditCustomPaymentMethodDialog provider={null} onSave={jest.fn()} onClose={onClose} defaultCurrency="USD" />,
         ),
       );
 
@@ -390,12 +378,7 @@ describe('EditCustomPaymentMethodDialog', () => {
 
       render(
         withRequiredProviders(
-          <EditCustomPaymentMethodDialog
-            provider={null}
-            onSave={jest.fn()}
-            onClose={onClose}
-            defaultCurrency="USD"
-          />,
+          <EditCustomPaymentMethodDialog provider={null} onSave={jest.fn()} onClose={onClose} defaultCurrency="USD" />,
         ),
       );
 

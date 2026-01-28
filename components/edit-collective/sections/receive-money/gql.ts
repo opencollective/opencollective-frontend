@@ -47,20 +47,6 @@ export const editCollectiveBankTransferHostQuery = gql`
   ${manualPaymentProviderFragment}
 `;
 
-export const createPayoutMethodMutation = gql`
-  mutation EditCollectiveBankTransferCreatePayoutMethod(
-    $payoutMethod: PayoutMethodInput!
-    $account: AccountReferenceInput!
-  ) {
-    createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
-      data
-      id
-      name
-      type
-    }
-  }
-`;
-
 export const createManualPaymentProviderMutation = gql`
   mutation CreateManualPaymentProvider(
     $host: AccountReferenceInput!

@@ -236,7 +236,14 @@ const Field = ({
   }
 };
 
-export const FieldGroup = ({ field, labelClassName, hintClassName, errorClassName, fieldClassName, ...props }) => {
+export const FieldGroup = ({
+  field,
+  labelClassName = null,
+  hintClassName = null,
+  errorClassName = null,
+  fieldClassName = null,
+  ...props
+}) => {
   return (
     <div className="flex-1">
       {field.group.map(input => (

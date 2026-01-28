@@ -2,10 +2,11 @@ import React from 'react';
 import { startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { CUSTOM_PAYMEMENT_ICON_MAP } from '../custom-payment-provider/constants';
 import { Button } from '../ui/Button';
 import { Label } from '../ui/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+
+import { CUSTOM_PAYMEMENT_ICON_MAP } from './constants';
 
 type CustomPaymentMethodIconInputProps = {
   icon?: string;

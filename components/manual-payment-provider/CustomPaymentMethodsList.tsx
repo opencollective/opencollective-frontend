@@ -11,7 +11,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '../ui/Card
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
 
 import { CustomPaymentMethodInstructions } from './CustomPaymentMethodInstructions';
-import { getCustomPaymentProviderIconComponent } from './CustomPaymentProviderIcon';
+import { getManualPaymentProviderIconComponent } from './ManualPaymentProviderIcon';
 
 type CustomPaymentMethodsListProps = {
   account: Pick<Account, 'slug' | 'currency'>;
@@ -68,7 +68,7 @@ export const CustomPaymentMethodsList = ({
       {isMoving && (
         <div
           data-testid="moving-overlay"
-          className="absolute inset-0 z-[9999] flex flex-col items-center justify-center bg-white/75 backdrop-blur-sm"
+          className="absolute inset-0 z-[9999] flex flex-col items-center justify-center rounded-lg bg-white/75 backdrop-blur-sm"
         >
           <Spinner size={64} />
           <p className="mt-3 text-sm">
@@ -87,7 +87,7 @@ export const CustomPaymentMethodsList = ({
                 <CardHeader className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                     {(() => {
-                      const IconComponent = getCustomPaymentProviderIconComponent(provider);
+                      const IconComponent = getManualPaymentProviderIconComponent(provider);
                       return <IconComponent className="h-5 w-5" />;
                     })()}
                     {provider.name}

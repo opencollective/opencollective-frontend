@@ -386,9 +386,7 @@ function PayPalSetupOption(props: PayPalSetupOptionProps) {
           <PayPal size={24} />
         </div>
         <div>
-          <p className="text-xs leading-5 font-semibold text-black">
-            <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
-          </p>
+          <p className="text-xs leading-5 font-semibold text-black">PayPal</p>
         </div>
       </label>
     </div>

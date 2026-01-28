@@ -14,9 +14,9 @@ import type { Account, ManualPaymentProvider } from '@/lib/graphql/types/v2/sche
 
 import { useToast } from '@/components/ui/useToast';
 
-import { CustomPaymentMethodsList } from '../../../custom-payment-provider/CustomPaymentMethodsList';
-import { EditCustomBankPaymentMethodDialog } from '../../../custom-payment-provider/EditCustomBankPaymentMethodDialog';
 import Loading from '../../../Loading';
+import { CustomPaymentMethodsList } from '../../../manual-payment-provider/CustomPaymentMethodsList';
+import { EditCustomBankPaymentMethodDialog } from '../../../manual-payment-provider/EditCustomBankPaymentMethodDialog';
 import { useModal } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 

@@ -121,9 +121,11 @@ export const orderSuccessFragment = gql`
     data
     manualPaymentProvider {
       id
+      type
       name
       instructions
       icon
+      accountDetails
     }
     amount {
       value
