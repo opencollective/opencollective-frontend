@@ -25,6 +25,7 @@ import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCateg
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import Tags from '../Tags';
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
 import { InfoList, InfoListItem } from '../ui/InfoList';
@@ -53,6 +54,11 @@ const contributionDrawerQuery = gql`
       paymentMethod {
         id
         type
+      }
+      manualPaymentProvider {
+        id
+        type
+        name
       }
       status
       description
@@ -496,11 +502,18 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     <DataListItemValue>
                       {isLoading ? (
                         <Skeleton className="h-5 w-44" />
+                      ) : query.data.order.paymentMethod?.type ? (
+                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
+                      ) : query.data.order.manualPaymentProvider ? (
+                        <div className="flex items-center gap-1">
+                          <Badge size="xs" type="neutral">
+                            <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
+                          </Badge>
+                          <span>{query.data.order.manualPaymentProvider.name}</span>
+                        </div>
                       ) : query.data.order.status === OrderStatus.PENDING ? (
                         i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)
-                      ) : (
-                        <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
-                      )}
+                      ) : null}
                     </DataListItemValue>
                   </DataListItem>
                   {query.data?.order?.status === OrderStatus.PENDING && (

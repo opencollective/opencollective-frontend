@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
@@ -147,4 +147,4 @@ const ContributionFlowPublicMessage = ({ order, publicMessage }) => {
   );
 };
 
-export default injectIntl(ContributionFlowPublicMessage);
+export default ContributionFlowPublicMessage;
