@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { Plus } from 'lucide-react';
 import { generateSecret, generateURI, verifySync } from 'otplib';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -211,7 +211,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
         <ModalBody>
           <div className="flex flex-col gap-4">
             <div className="self-center">
-              <QRCode value={otpAuthUrl} renderAs="svg" size={256} level="L" includeMargin data-cy="qr-code" />
+              <QRCodeSVG value={otpAuthUrl} size={256} level="L" includeMargin data-cy="qr-code" />
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-bold">
