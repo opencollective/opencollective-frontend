@@ -233,9 +233,12 @@ function FilterDropdown<FV, FM>({
     if (activeFilterKey && remainingFilters && !remainingFilters.includes(activeFilterKey) && !open) {
       setActiveFilterKey(initialFilterKey);
     }
-    // Always sync tmpValue with the current filter value
+  }, [activeFilterKey, initialFilterKey, remainingFilters, open]);
+
+  React.useEffect(() => {
+    // Sync tmpValue with the current filter value
     setTmpValue(currentFilterValue);
-  }, [activeFilterKey, initialFilterKey, currentFilterValue, remainingFilters, open]);
+  }, [activeFilterKey, currentFilterValue]);
 
   return (
     <Popover
