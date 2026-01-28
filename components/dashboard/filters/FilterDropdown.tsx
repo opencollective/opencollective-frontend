@@ -15,10 +15,6 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../../ui
 import { Separator } from '../../ui/Separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 
-// ============================================================================
-// Shared Components
-// ============================================================================
-
 /**
  * Renders the value badges for a filter (e.g., "2 selected" or individual value badges)
  */
@@ -96,7 +92,7 @@ function FilterPill<FV, FM>({
   const filterConfig = filterKey ? filters[filterKey] : null;
   const hasValue = !isNil(value);
   const isFilterWithoutComponent = filterConfig && !filterConfig.Component;
-  const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta });
+  const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta }) && onClear;
   const filterLabel = filterConfig?.labelMsg
     ? intl.formatMessage(filterConfig.labelMsg)
     : filterKey
