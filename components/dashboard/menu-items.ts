@@ -177,9 +177,22 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
-          if: hasHosting,
+          if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
           section: ALL_SECTIONS.HOST_EXPENSES,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+        },
+        {
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.PAY_DISBURSEMENTS,
+          label: intl.formatMessage({ defaultMessage: 'Pay Disbursements', id: 'El6h63' }),
+        },
+        {
+          section: ALL_SECTIONS.PAID_DISBURSEMENTS,
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          label: intl.formatMessage({
+            defaultMessage: 'Paid Disbursements',
+            id: 'rwMrEx',
+          }),
         },
         {
           if: !isIndividual,
@@ -309,10 +322,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
-      if:
-        !isIndividual &&
-        hasMoneyManagement &&
-        LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.PEOPLE_DASHBOARD),
+      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
+      section: ALL_SECTIONS.VENDORS,
+      Icon: Store,
+    },
+    {
+      if: !isIndividual && hasMoneyManagement,
       label: intl.formatMessage({ id: 'People', defaultMessage: 'People' }),
       section: ALL_SECTIONS.PEOPLE,
       Icon: Users2,
@@ -386,11 +401,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
-    {
-      if: hasMoneyManagement && !isAccountantOnly && !isCommunityManagerOnly,
-      section: ALL_SECTIONS.VENDORS,
-      Icon: Store,
-    },
+
     {
       if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TICKETS,

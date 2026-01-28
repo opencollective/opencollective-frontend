@@ -79,6 +79,7 @@ const offPlatformTransactionsQuery = gql`
       currency
       type
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
       accountingCategories @skip(if: $fetchOnlyRowIds) {

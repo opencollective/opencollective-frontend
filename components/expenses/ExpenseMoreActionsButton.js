@@ -1,3 +1,5 @@
+// @deprecated: Use `useGetExpenseActions` instead
+
 import React from 'react';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
@@ -84,7 +86,7 @@ const getTransactionsUrl = (dashboardAccount, expense) => {
   return null;
 };
 
-const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
+export const shouldShowDuplicateExpenseButton = (LoggedInUser, expense) => {
   if (!LoggedInUser || !expense) {
     return false;
   }
@@ -117,7 +119,7 @@ const ExpenseMoreActionsButton = ({
   onCloneModalOpenChange,
   ...props
 }) => {
-  const [processModal, setProcessModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState(null);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
@@ -377,7 +379,16 @@ const ExpenseMoreActionsButton = ({
         )}
       </PopupMenu>
       {processModal && (
-        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
+        <ConfirmProcessExpenseModal
+          type={processModal}
+          open={!!processModal}
+          setOpen={open => {
+            if (!open) {
+              setProcessModal(null);
+            }
+          }}
+          expense={expense}
+        />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion

@@ -22,6 +22,7 @@ const schema = baseSchema.extend({
 enum IncompleteContributionsView {
   PENDING = 'PENDING',
   EXPIRED = 'EXPIRED',
+  PAID = 'PAID',
 }
 
 const incompleteContributionsMetadataQuery = gql`
@@ -42,6 +43,15 @@ const incompleteContributionsMetadataQuery = gql`
       EXPIRED: orders(
         filter: INCOMING
         status: [EXPIRED]
+        includeIncognito: true
+        hostContext: $hostContext
+        expectedFundsFilter: ONLY_MANUAL
+      ) {
+        totalCount
+      }
+      PAID: orders(
+        filter: INCOMING
+        status: [PAID]
         includeIncognito: true
         hostContext: $hostContext
         expectedFundsFilter: ONLY_MANUAL
@@ -77,6 +87,13 @@ export default function IncompleteContributions({ accountSlug }: DashboardSectio
       label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
       filter: {
         status: [OrderStatus.EXPIRED],
+      },
+    },
+    {
+      id: IncompleteContributionsView.PAID,
+      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+      filter: {
+        status: [OrderStatus.PAID],
       },
     },
   ];
