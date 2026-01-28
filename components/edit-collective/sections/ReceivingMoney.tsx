@@ -57,7 +57,7 @@ const ReceivingMoney = ({
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Stripe className="h-4 w-4" />
-                <FormattedMessage id="PayoutMethod.Type.Stripe" defaultMessage="Stripe" />
+                Stripe
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -75,7 +75,7 @@ const ReceivingMoney = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Paypal className="h-4 w-4" />
-                  <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
+                  PayPal
                 </CardTitle>
               </CardHeader>
               <CardContent>

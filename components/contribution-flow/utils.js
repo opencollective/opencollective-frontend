@@ -22,8 +22,8 @@ import {
 import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
-import { getCustomPaymentProviderIconComponent } from '../custom-payment-provider/CustomPaymentProviderIcon';
 import CreditCardInactive from '../icons/CreditCardInactive';
+import { getManualPaymentProviderIconComponent } from '../manual-payment-provider/ManualPaymentProviderIcon';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
@@ -232,7 +232,7 @@ export const generatePaymentMethodOptions = (
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
     ) {
       manualPaymentProviders.forEach(provider => {
-        const Icon = getCustomPaymentProviderIconComponent(provider);
+        const Icon = getManualPaymentProviderIconComponent(provider);
         uniquePMs.push({
           key: `custom-${provider.id}`,
           title: provider.name,

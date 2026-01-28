@@ -11,7 +11,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '../ui/Card
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
 
 import { CustomPaymentMethodInstructions } from './CustomPaymentMethodInstructions';
-import { getCustomPaymentProviderIconComponent } from './CustomPaymentProviderIcon';
+import { getManualPaymentProviderIconComponent } from './ManualPaymentProviderIcon';
 
 type CustomPaymentMethodsListProps = {
   account: Pick<Account, 'slug' | 'currency'>;
@@ -87,7 +87,7 @@ export const CustomPaymentMethodsList = ({
                 <CardHeader className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                     {(() => {
-                      const IconComponent = getCustomPaymentProviderIconComponent(provider);
+                      const IconComponent = getManualPaymentProviderIconComponent(provider);
                       return <IconComponent className="h-5 w-5" />;
                     })()}
                     {provider.name}

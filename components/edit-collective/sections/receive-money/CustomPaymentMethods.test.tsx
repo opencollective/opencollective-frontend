@@ -5,17 +5,21 @@ import { MockedProvider } from '@apollo/client/testing';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import type { CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 import { withRequiredProviders } from '../../../../test/providers';
 
 import CustomPaymentMethods from './CustomPaymentMethods';
-import { editCustomPaymentMethodsMutation } from './gql';
+import {
+  createManualPaymentProviderMutation,
+  deleteManualPaymentProviderMutation,
+  updateManualPaymentProviderMutation,
+} from './gql';
 
 // Mock child components
-jest.mock('../../../custom-payment-provider/CustomPaymentMethodsList', () => ({
+jest.mock('../../../manual-payment-provider/CustomPaymentMethodsList', () => ({
   CustomPaymentMethodsList: ({ customPaymentProviders, onClickEdit, onClickRemove, canEdit }: any) => (
     <div data-testid="custom-payment-methods-list">
-      {customPaymentProviders.map((p: CustomPaymentProvider) => (
+      {customPaymentProviders.map((p: ManualPaymentProvider) => (
         <div key={p.id} data-testid={`payment-method-${p.id}`}>
           {p.name}
           {canEdit && (
@@ -30,17 +34,14 @@ jest.mock('../../../custom-payment-provider/CustomPaymentMethodsList', () => ({
   ),
 }));
 
-jest.mock('../../../custom-payment-provider/EditCustomPaymentMethodDialog', () => ({
+jest.mock('../../../manual-payment-provider/EditCustomPaymentMethodDialog', () => ({
   EditCustomPaymentMethodDialog: ({ provider, onSave, onClose }: any) => (
     <div data-testid="edit-dialog">
       <div>Dialog Open</div>
       {provider && <div>Editing: {provider.name}</div>}
       <button
         onClick={async () => {
-          await onSave(
-            { id: provider?.id || 'new', type: 'OTHER', name: 'Test', currency: 'USD', instructions: 'Test' },
-            provider || null,
-          );
+          await onSave({ name: 'Test', instructions: 'Test instructions', icon: 'venmo' }, provider || undefined);
         }}
       >
         Save
@@ -65,25 +66,89 @@ jest.mock('../../../ui/useToast', () => ({ useToast: () => ({ toast: mockToast }
 const mockAccount = {
   slug: 'test-collective',
   currency: 'USD',
-  settings: {
-    customPaymentProviders: [],
-  },
 } as React.ComponentProps<typeof CustomPaymentMethods>['account'];
 
-const buildEditCustomPaymentMethodsMock = (value?: any) => ({
+const mockOnRefetch = jest.fn();
+
+const buildCreateProviderMock = () => ({
   request: {
-    query: editCustomPaymentMethodsMutation,
+    query: createManualPaymentProviderMutation,
     variables: {
-      account: { slug: mockAccount.slug },
-      value: value !== undefined ? value : expect.anything(),
+      host: { slug: mockAccount.slug },
+      manualPaymentProvider: {
+        type: 'OTHER',
+        name: 'Test',
+        instructions: 'Test instructions',
+        icon: 'venmo',
+      },
     },
   },
   result: {
     data: {
-      editAccountSetting: {
-        id: mockAccount.slug,
-        legacyId: 1,
-        settings: { customPaymentProviders: value || [] },
+      createManualPaymentProvider: {
+        id: 'new-id',
+        type: 'OTHER',
+        name: 'Test',
+        instructions: 'Test instructions',
+        icon: 'venmo',
+        accountDetails: null,
+        isArchived: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  },
+});
+
+const buildUpdateProviderMock = (providerId: string) => ({
+  request: {
+    query: updateManualPaymentProviderMutation,
+    variables: {
+      manualPaymentProvider: { id: providerId },
+      input: {
+        type: 'OTHER',
+        name: 'Test',
+        instructions: 'Test instructions',
+        icon: 'venmo',
+      },
+    },
+  },
+  result: {
+    data: {
+      updateManualPaymentProvider: {
+        id: providerId,
+        type: 'OTHER',
+        name: 'Test',
+        instructions: 'Test instructions',
+        icon: 'venmo',
+        accountDetails: null,
+        isArchived: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  },
+});
+
+const buildDeleteProviderMock = (providerId: string) => ({
+  request: {
+    query: deleteManualPaymentProviderMutation,
+    variables: {
+      manualPaymentProvider: { id: providerId },
+    },
+  },
+  result: {
+    data: {
+      deleteManualPaymentProvider: {
+        id: providerId,
+        type: 'OTHER',
+        name: 'Deleted',
+        instructions: '',
+        icon: null,
+        accountDetails: null,
+        isArchived: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     },
   },
@@ -92,19 +157,39 @@ const buildEditCustomPaymentMethodsMock = (value?: any) => ({
 describe('CustomPaymentMethods', () => {
   beforeEach(() => {
     mockToast.mockClear();
+    mockOnRefetch.mockClear();
   });
 
   describe('Rendering', () => {
     it('renders payment methods list', () => {
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: '', accountDetails: '' },
-        { id: '2', type: 'OTHER', name: 'CashApp', currency: 'USD', instructions: '', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
+        {
+          id: '2',
+          type: 'OTHER',
+          name: 'CashApp',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -115,15 +200,72 @@ describe('CustomPaymentMethods', () => {
     });
 
     it('filters to only show OTHER type methods', () => {
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: '', accountDetails: '' },
-        { id: '2', type: 'BANK_TRANSFER', name: 'Bank', currency: 'USD', instructions: '', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
+        {
+          id: '2',
+          type: 'BANK_TRANSFER',
+          name: 'Bank',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
+          </MockedProvider>,
+        ),
+      );
+
+      expect(screen.getByTestId('custom-payment-methods-list')).toBeInTheDocument();
+      expect(screen.getByTestId('payment-method-1')).toHaveTextContent('Venmo');
+      expect(screen.queryByTestId('payment-method-2')).not.toBeInTheDocument();
+    });
+
+    it('filters out archived methods', () => {
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
+        {
+          id: '2',
+          type: 'OTHER',
+          name: 'Archived Method',
+          instructions: '',
+          accountDetails: '',
+          isArchived: true,
+        } as ManualPaymentProvider,
+      ];
+
+      render(
+        withRequiredProviders(
+          <MockedProvider mocks={[]} addTypename={false}>
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -137,7 +279,12 @@ describe('CustomPaymentMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={[]} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={[]}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -151,7 +298,12 @@ describe('CustomPaymentMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={[]} canEdit={false} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={[]}
+              canEdit={false}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -167,7 +319,12 @@ describe('CustomPaymentMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={[]} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={[]}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -179,19 +336,67 @@ describe('CustomPaymentMethods', () => {
         expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
       });
     });
+
+    it('creates new provider when saving from dialog', async () => {
+      const user = userEvent.setup();
+      const mocks = [buildCreateProviderMock()];
+
+      render(
+        withRequiredProviders(
+          <MockedProvider mocks={mocks} addTypename={false}>
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={[]}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
+          </MockedProvider>,
+        ),
+      );
+
+      const button = screen.getByRole('button', { name: /Add Custom Payment Method/i });
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByText('Save'));
+
+      await waitFor(
+        () => {
+          expect(screen.queryByTestId('edit-dialog')).not.toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      expect(mockOnRefetch).toHaveBeenCalled();
+    });
   });
 
   describe('Edit functionality', () => {
     it('opens dialog with provider when edit button is clicked', async () => {
       const user = userEvent.setup();
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: 'Test', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: 'Test',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -206,25 +411,28 @@ describe('CustomPaymentMethods', () => {
 
     it('saves updated provider', async () => {
       const user = userEvent.setup();
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: 'Test', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: 'Test',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
-      // The mock dialog saves with: { id: '1', type: 'OTHER', name: 'Test', currency: 'USD', instructions: 'Test' }
-      // handleSave will update the existing provider: it finds the index and updates updatedProviders[index] = { ...updatedProviders[index], ...values }
-      // So it will merge: { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: 'Test', accountDetails: '' }
-      // with: { id: '1', type: 'OTHER', name: 'Test', currency: 'USD', instructions: 'Test' }
-      // Result: { id: '1', type: 'OTHER', name: 'Test', currency: 'USD', instructions: 'Test', accountDetails: '' }
-      // Since account.settings.customPaymentProviders is empty, updateCustomPaymentMethods will return just this array
-      const expectedValue = [
-        { id: '1', type: 'OTHER', name: 'Test', currency: 'USD', instructions: 'Test', accountDetails: '' },
-      ];
-      const mocks = [buildEditCustomPaymentMethodsMock(expectedValue)];
+      const mocks = [buildUpdateProviderMock('1')];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={mocks} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -243,18 +451,32 @@ describe('CustomPaymentMethods', () => {
         },
         { timeout: 3000 },
       );
+
+      expect(mockOnRefetch).toHaveBeenCalled();
     });
 
     it('closes dialog when close button is clicked', async () => {
       const user = userEvent.setup();
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: 'Test', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: 'Test',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
@@ -274,53 +496,40 @@ describe('CustomPaymentMethods', () => {
   });
 
   describe('Delete functionality', () => {
-    it('calls showConfirmationModal when remove button is clicked', async () => {
+    it('calls showConfirmationModal and deletes provider when remove button is clicked', async () => {
       const user = userEvent.setup();
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: 'Test', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: 'Test',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
-      // When user clicks remove, the mock showConfirmationModal auto-calls onConfirm
-      // which will call the mutation with an empty array (since we filter out the removed one)
-      const mocks = [buildEditCustomPaymentMethodsMock([])];
+      const mocks = [buildDeleteProviderMock('1')];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={mocks} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
+            <CustomPaymentMethods
+              account={mockAccount}
+              manualPaymentProviders={methods}
+              canEdit={true}
+              onRefetch={mockOnRefetch}
+            />
           </MockedProvider>,
         ),
       );
 
       await user.click(screen.getByText('Remove 1'));
 
-      // The mock auto-confirms, so the mutation should be called
+      // The mock auto-confirms, so the mutation should be called and onRefetch triggered
       await waitFor(() => {
-        // Just verify the removal was initiated (mock auto-confirms)
-        expect(screen.getByTestId('custom-payment-methods-list')).toBeInTheDocument();
+        expect(mockOnRefetch).toHaveBeenCalled();
       });
-    });
-  });
-
-  describe('Reorder functionality', () => {
-    it('passes onReorder handler to CustomPaymentMethodsList', () => {
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: 'Test', accountDetails: '' },
-        { id: '2', type: 'OTHER', name: 'CashApp', currency: 'USD', instructions: 'Test', accountDetails: '' },
-      ];
-
-      render(
-        withRequiredProviders(
-          <MockedProvider mocks={[]} addTypename={false}>
-            <CustomPaymentMethods account={mockAccount} customPaymentMethods={methods} canEdit={true} />
-          </MockedProvider>,
-        ),
-      );
-
-      // Verify the list is rendered with multiple items that can be reordered
-      expect(screen.getByTestId('custom-payment-methods-list')).toBeInTheDocument();
-      expect(screen.getByTestId('payment-method-1')).toHaveTextContent('Venmo');
-      expect(screen.getByTestId('payment-method-2')).toHaveTextContent('CashApp');
     });
   });
 });

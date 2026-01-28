@@ -5,17 +5,17 @@ import { MockedProvider } from '@apollo/client/testing';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import type { CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 import { withRequiredProviders } from '../../../../test/providers';
 
 import BankTransferMethods from './BankTransferMethods';
-import { editCollectiveBankTransferHostQuery, editCustomPaymentMethodsMutation } from './gql';
+import { editCollectiveBankTransferHostQuery } from './gql';
 
 // Mock child components
-jest.mock('../../../custom-payment-provider/CustomPaymentMethodsList', () => ({
+jest.mock('../../../manual-payment-provider/CustomPaymentMethodsList', () => ({
   CustomPaymentMethodsList: ({ customPaymentProviders, onClickEdit, onClickRemove, canEdit }: any) => (
     <div data-testid="custom-payment-methods-list">
-      {customPaymentProviders.map((p: CustomPaymentProvider) => (
+      {customPaymentProviders.map((p: ManualPaymentProvider) => (
         <div key={p.id} data-testid={`payment-method-${p.id}`}>
           {p.name}
           {canEdit && (
@@ -30,12 +30,12 @@ jest.mock('../../../custom-payment-provider/CustomPaymentMethodsList', () => ({
   ),
 }));
 
-jest.mock('../../../custom-payment-provider/EditCustomBankPaymentMethodDialog', () => ({
-  EditCustomBankPaymentMethodDialog: ({ open, onClose, customPaymentProvider }: any) =>
+jest.mock('../../../manual-payment-provider/EditCustomBankPaymentMethodDialog', () => ({
+  EditCustomBankPaymentMethodDialog: ({ open, onClose, manualPaymentProvider }: any) =>
     open ? (
       <div data-testid="edit-dialog">
         <div>Dialog Open</div>
-        {customPaymentProvider && <div>Editing: {customPaymentProvider.name}</div>}
+        {manualPaymentProvider && <div>Editing: {manualPaymentProvider.name}</div>}
         <button onClick={onClose}>Close</button>
       </div>
     ) : null,
@@ -59,10 +59,6 @@ jest.mock('../../../ui/useToast', () => ({
 const mockAccount = {
   slug: 'test-collective',
   currency: 'USD',
-  legacyId: 1,
-  settings: {
-    customPaymentProviders: [],
-  },
 };
 
 const mockHost = {
@@ -71,7 +67,7 @@ const mockHost = {
   name: 'Test Host',
   legacyId: 2,
   currency: 'USD',
-  settings: { customPaymentProviders: [] },
+  settings: {},
   connectedAccounts: [],
   plan: {
     id: 'plan-1',
@@ -80,6 +76,7 @@ const mockHost = {
     name: 'Test Plan',
   },
   payoutMethods: [],
+  manualPaymentProviders: [],
 };
 
 const buildHostQueryMock = (host = mockHost) => ({
@@ -97,32 +94,13 @@ const buildHostQueryMock = (host = mockHost) => ({
   },
 });
 
-const buildEditCustomPaymentMethodsMock = (value: any) => ({
-  request: {
-    query: editCustomPaymentMethodsMutation,
-    variables: {
-      account: { slug: mockAccount.slug },
-      value,
-    },
-  },
-  result: {
-    data: {
-      editAccountSetting: {
-        id: mockAccount.slug,
-        legacyId: mockAccount.legacyId,
-        settings: { customPaymentProviders: value },
-      },
-    },
-  },
-});
-
 describe('BankTransferMethods', () => {
   describe('Loading state', () => {
     it('shows loading state while query is in progress', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={[]} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={[]} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -150,7 +128,7 @@ describe('BankTransferMethods', () => {
       const { container } = render(
         withRequiredProviders(
           <MockedProvider mocks={mocks} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={[]} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={[]} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -163,15 +141,29 @@ describe('BankTransferMethods', () => {
 
   describe('Rendering', () => {
     it('renders payment methods list', async () => {
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'BANK_TRANSFER', name: 'Bank 1', currency: 'USD', instructions: '', accountDetails: '' },
-        { id: '2', type: 'BANK_TRANSFER', name: 'Bank 2', currency: 'USD', instructions: '', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'BANK_TRANSFER',
+          name: 'Bank 1',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
+        {
+          id: '2',
+          type: 'BANK_TRANSFER',
+          name: 'Bank 2',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={methods} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={methods} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -184,15 +176,29 @@ describe('BankTransferMethods', () => {
     });
 
     it('filters to only show BANK_TRANSFER type methods', async () => {
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'BANK_TRANSFER', name: 'Bank 1', currency: 'USD', instructions: '', accountDetails: '' },
-        { id: '2', type: 'OTHER', name: 'Venmo', currency: 'USD', instructions: '', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'BANK_TRANSFER',
+          name: 'Bank 1',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
+        {
+          id: '2',
+          type: 'OTHER',
+          name: 'Venmo',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={methods} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={methods} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -208,7 +214,7 @@ describe('BankTransferMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={[]} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={[]} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -222,7 +228,7 @@ describe('BankTransferMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={[]} canEdit={false} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={[]} canEdit={false} />
           </MockedProvider>,
         ),
       );
@@ -236,14 +242,21 @@ describe('BankTransferMethods', () => {
   describe('Edit functionality', () => {
     it('opens dialog when edit button is clicked', async () => {
       const user = userEvent.setup();
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'BANK_TRANSFER', name: 'Bank 1', currency: 'USD', instructions: '', accountDetails: '' },
+      const methods: ManualPaymentProvider[] = [
+        {
+          id: '1',
+          type: 'BANK_TRANSFER',
+          name: 'Bank 1',
+          instructions: '',
+          accountDetails: '',
+          isArchived: false,
+        } as ManualPaymentProvider,
       ];
 
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={methods} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={methods} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -266,7 +279,7 @@ describe('BankTransferMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={[]} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={[]} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -288,7 +301,7 @@ describe('BankTransferMethods', () => {
       render(
         withRequiredProviders(
           <MockedProvider mocks={[buildHostQueryMock()]} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={[]} canEdit={true} />
+            <BankTransferMethods account={mockAccount as any} manualPaymentProviders={[]} canEdit={true} />
           </MockedProvider>,
         ),
       );
@@ -307,33 +320,6 @@ describe('BankTransferMethods', () => {
 
       await waitFor(() => {
         expect(screen.queryByTestId('edit-dialog')).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Reorder functionality', () => {
-    it('calls onReorder with updated list when reordering', async () => {
-      const methods: CustomPaymentProvider[] = [
-        { id: '1', type: 'BANK_TRANSFER', name: 'Bank 1', currency: 'USD', instructions: '', accountDetails: '' },
-        { id: '2', type: 'BANK_TRANSFER', name: 'Bank 2', currency: 'USD', instructions: '', accountDetails: '' },
-      ];
-
-      const updatedMethods = [methods[1], methods[0]];
-
-      const mocks = [buildHostQueryMock(), buildEditCustomPaymentMethodsMock(updatedMethods)];
-
-      render(
-        withRequiredProviders(
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <BankTransferMethods account={mockAccount as any} customPaymentMethods={methods} canEdit={true} />
-          </MockedProvider>,
-        ),
-      );
-
-      // Note: The actual reorder functionality is in CustomPaymentMethodsList
-      // This test verifies the component renders and passes the handler
-      await waitFor(() => {
-        expect(screen.getByTestId('custom-payment-methods-list')).toBeInTheDocument();
       });
     });
   });

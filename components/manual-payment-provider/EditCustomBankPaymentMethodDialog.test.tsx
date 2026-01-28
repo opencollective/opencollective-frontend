@@ -2,19 +2,19 @@ import '@testing-library/jest-dom';
 
 import React from 'react';
 import { MockedProvider } from '@apollo/client/testing';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 import { ManualPaymentProviderType } from '@/lib/graphql/types/v2/schema';
 import { withRequiredProviders } from '../../test/providers';
 
-import { EditCustomBankPaymentMethodDialog } from './EditCustomBankPaymentMethodDialog';
 import {
   createManualPaymentProviderMutation,
   editCollectiveBankTransferHostQuery,
-  updateManualPaymentProviderMutation,
 } from '../edit-collective/sections/receive-money/gql';
+
+import { EditCustomBankPaymentMethodDialog } from './EditCustomBankPaymentMethodDialog';
 
 // Mock RichTextEditor
 jest.mock('../RichTextEditor', () => ({
@@ -45,11 +45,7 @@ jest.mock('../expenses/PayoutBankInformationForm', () => ({
   __esModule: true,
   default: ({ getFieldName }: { getFieldName: (name: string) => string }) => (
     <div data-testid="payout-bank-form-mock">
-      <input
-        data-testid="bank-account-input"
-        placeholder="Bank account details"
-        onChange={() => {}}
-      />
+      <input data-testid="bank-account-input" placeholder="Bank account details" onChange={() => {}} />
       <span data-testid="field-name-test">{getFieldName('data.accountNumber')}</span>
     </div>
   ),
@@ -82,6 +78,9 @@ const mockProvider: ManualPaymentProvider = {
   instructions: '<p>Test bank instructions</p>',
   icon: 'Landmark',
   accountDetails: { accountNumber: '123456' },
+  createdAt: new Date(),
+  isArchived: false,
+  updatedAt: new Date(),
 };
 
 const buildHostQueryMock = () => ({
@@ -114,25 +113,6 @@ const buildCreateMutationMock = (input: any) => ({
     data: {
       createManualPaymentProvider: {
         id: 'new-provider-id',
-        type: ManualPaymentProviderType.BANK_TRANSFER,
-        ...input,
-      },
-    },
-  },
-});
-
-const buildUpdateMutationMock = (providerId: string, input: any) => ({
-  request: {
-    query: updateManualPaymentProviderMutation,
-    variables: {
-      manualPaymentProvider: { id: providerId },
-      input,
-    },
-  },
-  result: {
-    data: {
-      updateManualPaymentProvider: {
-        id: providerId,
         type: ManualPaymentProviderType.BANK_TRANSFER,
         ...input,
       },

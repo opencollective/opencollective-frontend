@@ -3,7 +3,6 @@ import type { QueryResult } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import type { PaymentIntentResult } from '@stripe/stripe-js';
 import { get, uniqBy } from 'lodash';
-import { Clock } from 'lucide-react';
 import type { NextRouter } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
@@ -40,9 +39,9 @@ import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Avatar from '../Avatar';
-import { CustomPaymentMethodInstructions } from '../custom-payment-provider/CustomPaymentMethodInstructions';
-import { getCustomPaymentProviderIconComponent } from '../custom-payment-provider/CustomPaymentProviderIcon';
 import Link from '../Link';
+import { CustomPaymentMethodInstructions } from '../manual-payment-provider/CustomPaymentMethodInstructions';
+import { getManualPaymentProviderIconComponent } from '../manual-payment-provider/ManualPaymentProviderIcon';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -317,7 +316,7 @@ class ContributionFlowSuccess extends React.Component<
     const platformTipAmount = order.platformTipAmount.valueInCents;
     const totalAmount = amount + platformTipAmount;
     const currency = order.amount.currency;
-    const IconComponent = manualPaymentProvider && getCustomPaymentProviderIconComponent(manualPaymentProvider);
+    const IconComponent = manualPaymentProvider && getManualPaymentProviderIconComponent(manualPaymentProvider);
 
     return (
       <div

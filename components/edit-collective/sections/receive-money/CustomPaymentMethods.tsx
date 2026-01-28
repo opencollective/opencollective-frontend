@@ -10,8 +10,8 @@ import { type Account, type ManualPaymentProvider, ManualPaymentProviderType } f
 
 import { useModal } from '@/components/ModalContext';
 
-import { CustomPaymentMethodsList } from '../../../custom-payment-provider/CustomPaymentMethodsList';
-import { EditCustomPaymentMethodDialog } from '../../../custom-payment-provider/EditCustomPaymentMethodDialog';
+import { CustomPaymentMethodsList } from '../../../manual-payment-provider/CustomPaymentMethodsList';
+import { EditCustomPaymentMethodDialog } from '../../../manual-payment-provider/EditCustomPaymentMethodDialog';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 

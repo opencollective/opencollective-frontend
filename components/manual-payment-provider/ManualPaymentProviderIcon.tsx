@@ -1,12 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
 import { HandCoins, Landmark } from 'lucide-react';
 
-import type { CustomPaymentProvider } from '@/lib/graphql/types/v2/schema';
+import type { ManualPaymentProvider } from '@/lib/graphql/types/v2/schema';
 
 import { CUSTOM_PAYMEMENT_ICON_MAP } from './constants';
 
-export const getCustomPaymentProviderIconComponent = (
-  provider: CustomPaymentProvider,
+export const getManualPaymentProviderIconComponent = (
+  provider: Pick<ManualPaymentProvider, 'icon' | 'type'>,
   fallback: LucideIcon = HandCoins,
 ): LucideIcon | null => {
   if (provider.icon && CUSTOM_PAYMEMENT_ICON_MAP[provider.icon]) {
