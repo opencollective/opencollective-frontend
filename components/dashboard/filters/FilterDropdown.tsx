@@ -312,18 +312,17 @@ function FilterDropdown<FV, FM>({
   const prevAppliedValueRef = React.useRef(appliedValue);
 
   // Sync draft value when the applied value changes externally (e.g., URL change)
-  // Only sync when popover is closed to avoid resetting user's draft mid-edit
   React.useEffect(() => {
-    // Only sync when appliedValue actually changed (not just when open changes)
+    // Only sync when appliedValue actually changed
     // This prevents unnecessary state updates that could cause timing issues
     // Use deep comparison since filter values can be arrays/objects
     const appliedValueChanged = !isEqual(prevAppliedValueRef.current, appliedValue);
     prevAppliedValueRef.current = appliedValue;
 
-    if (!open && appliedValueChanged) {
+    if (appliedValueChanged) {
       setDraftValue(appliedValue);
     }
-  }, [appliedValue, open]);
+  }, [appliedValue]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (locked) {
