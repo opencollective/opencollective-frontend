@@ -66,12 +66,12 @@ type FilterMeta = CommonFilterMeta & {
   hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
   expenseTags?: string[];
   includeUncategorized?: boolean;
+  hideExpensesMetaStatuses: boolean;
 };
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: hostedAccountFilter.toVariables,
-  status: value => (value?.length ? { status: value } : {}),
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
@@ -90,19 +90,7 @@ const getExpenseColumns = intl => [
       return <DateTime dateStyle="medium" value={createdAt} />;
     },
   },
-  {
-    accessorKey: 'type',
-    header: () => <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      return (
-        <div className="flex flex-col">
-          <span>{i18nExpenseType(intl, expense.type)}</span>
-          <span className="text-xs text-muted-foreground">#{expense.legacyId}</span>
-        </div>
-      );
-    },
-  },
+
   {
     accessorKey: 'account',
     meta: { className: 'max-w-48' },
@@ -123,6 +111,19 @@ const getExpenseColumns = intl => [
               <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, account.type)}</span>
             </div>
           </LinkCollective>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'type',
+    header: () => <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
+    cell: ({ row }) => {
+      const expense = row.original;
+      return (
+        <div className="flex flex-col">
+          <span>{i18nExpenseType(intl, expense.type)}</span>
+          <span className="text-xs text-muted-foreground">#{expense.legacyId}</span>
         </div>
       );
     },
@@ -250,6 +251,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       hostSlug,
       includeUncategorized: true,
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
+      hideExpensesMetaStatuses: true,
     },
     views,
     skipFiltersOnReset: ['hostContext'],
