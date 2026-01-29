@@ -87,7 +87,7 @@ const getExpenseColumns = intl => [
     header: () => <FormattedMessage defaultMessage="Date" id="Expense.Date" />,
     cell: ({ cell }) => {
       const createdAt = cell.getValue();
-      return <DateTime dateStyle="medium" value={createdAt} />;
+      return <DateTime className="whitespace-nowrap" dateStyle="medium" value={createdAt} />;
     },
   },
 
@@ -130,11 +130,30 @@ const getExpenseColumns = intl => [
   },
   {
     accessorKey: 'description',
-    meta: { className: 'max-w-64' },
+    meta: { className: 'max-w-64 flex-1' },
     header: () => <FormattedMessage defaultMessage="Title" id="Title" />,
     cell: ({ row }) => {
       const expense = row.original;
-      return <span className="truncate font-medium">{expense.description}</span>;
+      const submittedBy = expense.createdByAccount;
+      return (
+        <div className="flex flex-col">
+          <span className="truncate font-medium">{expense.description}</span>
+          <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
+            <FormattedMessage
+              defaultMessage="Submitted by {submittedByAccount}"
+              id="HJQNkj"
+              values={{
+                date: <DateTime dateStyle="medium" value={expense.createdAt} />,
+                submittedByAccount: (
+                  <LinkCollective collective={submittedBy} withHoverCard className="">
+                    <Avatar size={14} collective={submittedBy} />
+                  </LinkCollective>
+                ),
+              }}
+            />
+          </div>
+        </div>
+      );
     },
   },
   {
@@ -185,11 +204,15 @@ const getExpenseColumns = intl => [
   },
   {
     accessorKey: 'status',
-    // meta: { className: 'min-w-32 ' },
+    meta: { className: 'max-w-32 ' },
     header: () => <FormattedMessage defaultMessage="Status" id="tzMNF3" />,
     cell: ({ cell }) => {
       const status = cell.getValue();
-      return <ExpenseStatusTag status={status} />;
+      return (
+        <div>
+          <ExpenseStatusTag status={status} />
+        </div>
+      );
     },
   },
   {
@@ -219,28 +242,28 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const views: Views<FilterValues> = [
-    {
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-      id: 'all',
-    },
-    {
-      label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
-      filter: { status: [ExpenseStatusFilter.PENDING], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'pending',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-      filter: { status: [ExpenseStatusFilter.PAID], sort: { field: 'CREATED_AT', direction: 'DESC' } },
-      id: 'paid',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
-      filter: { status: [ExpenseStatusFilter.REJECTED], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'rejected',
-    },
-  ];
+  // const views: Views<FilterValues> = [
+  //   {
+  //     label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+  //     filter: {},
+  //     id: 'all',
+  //   },
+  //   {
+  //     label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
+  //     filter: { status: [ExpenseStatusFilter.PENDING], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+  //     id: 'pending',
+  //   },
+  //   {
+  //     label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+  //     filter: { status: [ExpenseStatusFilter.PAID], sort: { field: 'CREATED_AT', direction: 'DESC' } },
+  //     id: 'paid',
+  //   },
+  //   {
+  //     label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
+  //     filter: { status: [ExpenseStatusFilter.REJECTED], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+  //     id: 'rejected',
+  //   },
+  // ];
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
@@ -253,21 +276,21 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
       hideExpensesMetaStatuses: true,
     },
-    views,
+    // views,
     skipFiltersOnReset: ['hostContext'],
   });
 
-  const { data: metaData, refetch: refetchMetaData } = useQuery(hostPaymentRequestsMetadataQuery, {
-    variables: {
-      hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
-    },
-  });
+  // const { data: metaData, refetch: refetchMetaData } = useQuery(hostPaymentRequestsMetadataQuery, {
+  //   variables: {
+  //     hostSlug,
+  //     hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+  //   },
+  // });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
+  // const viewsWithCount: Views<FilterValues> = views.map(view => ({
+  //   ...view,
+  //   count: metaData?.[view.id]?.totalCount,
+  // }));
 
   const variables = {
     hostSlug,
@@ -275,15 +298,16 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
     fetchGrantHistory: false,
   };
 
-  const expenses = useQuery(hostDashboardExpensesQuery, {
+  const { data, error, loading, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables,
   });
 
   const getExpenseActions = useExpenseActions({
     refetchList: () => {
-      expenses.refetch();
-      refetchMetaData();
+      refetch();
+      //refetchMetaData();
     },
+    host: data?.host,
   });
 
   const pushSubpath = makePushSubpath(router);
@@ -294,8 +318,6 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
     onOpen: id => pushSubpath(id),
     onClose: () => pushSubpath(undefined),
   });
-
-  const { data, error, loading } = expenses;
 
   return (
     <div className="flex flex-col gap-4">
@@ -320,7 +342,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
         }
       />
 
-      <Filterbar {...queryFilter} views={viewsWithCount} />
+      <Filterbar {...queryFilter} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -333,7 +355,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       ) : (
         <React.Fragment>
           <DataTable
-            data={data?.expenses?.nodes ?? []}
+            data={data?.expenses?.nodes.map(node => ({ ...node, host: data?.host })) ?? []}
             columns={getExpenseColumns(intl)}
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowId={row => String(row.legacyId)}

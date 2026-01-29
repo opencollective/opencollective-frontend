@@ -321,12 +321,13 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     ...queryFilter.variables,
   };
 
-  const expenses = useQuery(paidDisbursementsQuery, {
+  const { data, error, loading, refetch } = useQuery(paidDisbursementsQuery, {
     variables,
   });
 
   const getExpenseActions = useExpenseActions({
-    refetchList: expenses.refetch,
+    refetchList: refetch,
+    host: data?.host,
   });
 
   const pushSubpath = makePushSubpath(router);
@@ -337,8 +338,6 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     onOpen: id => pushSubpath(id),
     onClose: () => pushSubpath(undefined),
   });
-
-  const { data, error, loading } = expenses;
 
   return (
     <div className="flex flex-col gap-4">
@@ -370,7 +369,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
       ) : (
         <React.Fragment>
           <DataTable
-            data={data?.expenses.nodes || []}
+            data={data?.expenses?.nodes.map(node => ({ ...node, host: data?.host })) ?? []}
             columns={getExpenseColumns(intl)}
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowId={row => String(row.legacyId)}

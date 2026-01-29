@@ -42,12 +42,7 @@ import {
 import { approvalMetadataQuery, hostDashboardExpensesQuery } from './queries';
 
 // Statuses relevant for approval workflow
-const ApprovalExpenseStatuses = [
-  ExpenseStatusFilter.PENDING,
-  ExpenseStatusFilter.UNVERIFIED,
-  ExpenseStatusFilter.REJECTED,
-  ExpenseStatusFilter.INVITE_DECLINED,
-] as const;
+const ApprovalExpenseStatuses = [ExpenseStatusFilter.PENDING] as const;
 const ApprovalExpenseStatusFilter = Object.fromEntries(
   Object.entries(ExpenseStatusFilter).filter(([status]) =>
     ApprovalExpenseStatuses.includes(status as ExpenseStatusFilter),
@@ -133,19 +128,9 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
 
   const views: Views<FilterValues> = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-      id: 'all',
-    },
-    {
       label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
       filter: { status: [ExpenseStatusFilter.PENDING], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'pending',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
-      filter: { status: [ExpenseStatusFilter.REJECTED], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'rejected',
     },
   ];
 
@@ -160,6 +145,7 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
       includeUncategorized: true,
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
     },
+    lockViewFilters: true,
     views,
     skipFiltersOnReset: ['hostContext'],
   });
