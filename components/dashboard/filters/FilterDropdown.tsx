@@ -92,7 +92,7 @@ function FilterPill<FV, FM>({
   const filterConfig = filterKey ? filters[filterKey] : null;
   const hasValue = !isNil(value);
   const isFilterWithoutComponent = filterConfig && !filterConfig.Component;
-  const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta }) && onClear;
+  const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta });
   const filterLabel = filterConfig?.labelMsg
     ? intl.formatMessage(filterConfig.labelMsg)
     : filterKey
@@ -309,14 +309,20 @@ function FilterDropdown<FV, FM>({
   const [open, setOpen] = React.useState(false);
   const appliedValue = values[filterKey];
   const [draftValue, setDraftValue] = React.useState(appliedValue);
+  const prevAppliedValueRef = React.useRef(appliedValue);
 
   // Sync draft value when the applied value changes externally (e.g., URL change)
-  // Only sync when popover is closed to avoid resetting user's draft mid-edit
   React.useEffect(() => {
-    if (!open) {
+    // Only sync when appliedValue actually changed
+    // This prevents unnecessary state updates that could cause timing issues
+    // Use deep comparison since filter values can be arrays/objects
+    const appliedValueChanged = !isEqual(prevAppliedValueRef.current, appliedValue);
+    prevAppliedValueRef.current = appliedValue;
+
+    if (appliedValueChanged) {
       setDraftValue(appliedValue);
     }
-  }, [appliedValue, open]);
+  }, [appliedValue]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (locked) {
