@@ -35,6 +35,17 @@ type StyledCardProps = BackgroundProps &
   ShadowProps &
   ColorProps;
 
+// Props that should not be forwarded to the DOM
+const FILTERED_PROPS = new Set([
+  'borderWidth',
+  'borderStyle',
+  'borderColor',
+  'borderRadius',
+  'overflowX',
+  'overflowY',
+  'boxShadow',
+]);
+
 /**
  * A simple styled-component to contain content in a card UI using styled-system.
  *
@@ -43,7 +54,7 @@ type StyledCardProps = BackgroundProps &
  */
 const StyledCard = styled.div
   .withConfig({
-    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+    shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
   })
   .attrs<StyledCardProps>(props => ({
     bg: props.bg ?? 'white.full',
