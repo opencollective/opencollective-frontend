@@ -57,7 +57,20 @@ export type ContainerProps = FlexboxProps &
     css?: CSSProp;
   };
 
-const FILTERED_PROPS = new Set(['display', 'width', 'height', 'overflow']);
+const FILTERED_PROPS = new Set([
+  'display',
+  'width',
+  'height',
+  'overflow',
+  'borderWidth',
+  'borderStyle',
+  'borderColor',
+  'borderRadius',
+  'overflowX',
+  'overflowY',
+  'boxShadow',
+  'textAlign',
+]);
 
 const Container = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),

@@ -14,13 +14,22 @@ type StyledHrProps = SpaceProps &
   DisplayProps &
   React.HTMLProps<HTMLHRElement>;
 
+// Props that should not be forwarded to the DOM
+const FILTERED_PROPS = new Set([
+  'borderWidth',
+  'borderStyle',
+  'borderColor',
+  'borderRadius',
+  'boxShadow',
+]);
+
 /**
  * An horizontal line. Control the color and size using border properties.
  *
  * @deprecated Use `ui/Separator` instead
  */
 const StyledHr = styled.hr.withConfig({
-  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
+  shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target) && !FILTERED_PROPS.has(prop),
 })<StyledHrProps>`
   border: 0;
   border-top: 1px solid ${themeGet('colors.black.400')};
