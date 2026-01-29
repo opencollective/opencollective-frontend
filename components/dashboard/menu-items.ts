@@ -178,15 +178,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: Receipt,
       subMenu: [
         {
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.HOST_PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'All Payment Requests', id: 'HostPaymentRequests' }),
+        },
+        {
           if: hasHosting && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
           section: ALL_SECTIONS.HOST_EXPENSES,
           label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
-        },
-        {
-          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
-          section: ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS,
-          Icon: ClipboardCheck,
-          label: intl.formatMessage({ defaultMessage: 'Approve Payment Requests', id: 'ApprovePaymentRequests' }),
         },
         {
           if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
@@ -202,7 +201,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           }),
         },
         {
-          if: !isIndividual,
+          if: hasHosting && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.APPROVE_PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'Approve Payment Requests', id: 'ApprovePaymentRequests' }),
+        },
+
+        {
+          if: !isIndividual && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
           section: ALL_SECTIONS.EXPENSES,
           label: intl.formatMessage(
             {
@@ -211,6 +216,14 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
             },
             { accountName: account.name },
           ),
+        },
+        {
+          if:
+            !isIndividual &&
+            !hasHosting &&
+            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS),
+          section: ALL_SECTIONS.PAYMENT_REQUESTS,
+          label: intl.formatMessage({ defaultMessage: 'Payment Requests', id: 'PaymentRequests' }),
         },
         {
           section: ALL_SECTIONS.SUBMITTED_EXPENSES,

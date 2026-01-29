@@ -6,9 +6,10 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import type {
-  AccountHoverCardFieldsFragment,
-  HostDashboardExpensesQueryVariables,
+import {
+  HostContext,
+  type AccountHoverCardFieldsFragment,
+  type HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatusFilter, LastCommentBy } from '../../../../lib/graphql/types/v2/schema';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
@@ -38,22 +39,25 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
+import { approvalMetadataQuery, hostDashboardExpensesQuery } from './queries';
 
 // Statuses relevant for approval workflow
 const ApprovalExpenseStatuses = [
   ExpenseStatusFilter.PENDING,
   ExpenseStatusFilter.UNVERIFIED,
+  ExpenseStatusFilter.REJECTED,
+  ExpenseStatusFilter.INVITE_DECLINED,
 ] as const;
-
 const ApprovalExpenseStatusFilter = Object.fromEntries(
-  Object.entries(ExpenseStatusFilter).filter(([status]) => ApprovalExpenseStatuses.includes(status as ExpenseStatusFilter)),
+  Object.entries(ExpenseStatusFilter).filter(([status]) =>
+    ApprovalExpenseStatuses.includes(status as ExpenseStatusFilter),
+  ),
 ) as { [K in (typeof ApprovalExpenseStatuses)[number]]: (typeof ExpenseStatusFilter)[K] };
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
   status: isNullable(isMulti(z.nativeEnum(ApprovalExpenseStatusFilter))),
-  hostContext: hostContextFilter.schema,
+  hostContext: hostContextFilter.schema.default(HostContext.INTERNAL),
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -100,6 +104,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
+// TODO: verify it works
 const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) => {
   refetchMetaData(); // Refetch the metadata to update the view counts
   if (variables.status && updatedExpense.status !== variables.status) {
@@ -138,24 +143,16 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
       id: 'pending',
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Unverified', id: 'udt3Y4' }),
-      filter: { status: [ExpenseStatusFilter.UNVERIFIED], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'unverified',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
-      filter: {
-        lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
-        status: [ExpenseStatusFilter.PENDING, ExpenseStatusFilter.UNVERIFIED],
-      },
-      id: 'unreplied',
+      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
+      filter: { status: [ExpenseStatusFilter.REJECTED], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+      id: 'rejected',
     },
   ];
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
-    defaultFilterValues: views[1].filter, // Default to "Pending" view
+    // defaultFilterValues: views[1].filter, // Default to "Pending" view
     filters,
     meta: {
       currency: account.currency,
@@ -171,7 +168,7 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
     data: metaData,
     error: errorMetaData,
     refetch: refetchMetaData,
-  } = useQuery(hostDashboardMetadataQuery, {
+  } = useQuery(approvalMetadataQuery, {
     variables: {
       hostSlug,
       hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
@@ -216,13 +213,13 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
             )}
           </div>
         }
+        description={
+          <FormattedMessage
+            defaultMessage="Approve payment requests that have been submitted to your organization."
+            id="GS5NkP"
+          />
+        }
       />
-
-      {!metaData?.host ? (
-        <LoadingPlaceholder height={50} />
-      ) : errorMetaData ? (
-        <MessageBoxGraphqlError error={errorMetaData} />
-      ) : null}
 
       <Filterbar {...queryFilter} views={viewsWithCount} />
 
