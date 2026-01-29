@@ -316,7 +316,8 @@ function FilterDropdown<FV, FM>({
   React.useEffect(() => {
     // Only sync when appliedValue actually changed (not just when open changes)
     // This prevents unnecessary state updates that could cause timing issues
-    const appliedValueChanged = prevAppliedValueRef.current !== appliedValue;
+    // Use deep comparison since filter values can be arrays/objects
+    const appliedValueChanged = !isEqual(prevAppliedValueRef.current, appliedValue);
     prevAppliedValueRef.current = appliedValue;
 
     if (!open && appliedValueChanged) {
