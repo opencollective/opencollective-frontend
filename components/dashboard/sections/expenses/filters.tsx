@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, uniq } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -80,7 +80,16 @@ export const toVariables: FiltersToVariables<
   tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
-  status: value => (isEmpty(value) ? undefined : { status: value }),
+  status: value => {
+    console.log({ value });
+    return isEmpty(value)
+      ? undefined
+      : value.includes(ExpenseStatusFilter.PENDING)
+        ? {
+            status: uniq([...value, ExpenseStatusFilter.UNVERIFIED]), // include "Unverified" as "PENDING"
+          }
+        : { status: value };
+  },
 };
 
 // The filters config is used to populate the Filters component.
@@ -95,7 +104,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
-        options={Object.values(ExpenseStatusFilter)
+        options={Object.values(omit(ExpenseStatusFilter, ExpenseStatusFilter.UNVERIFIED))
           .filter(
             value =>
               !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
