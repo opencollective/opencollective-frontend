@@ -92,7 +92,7 @@ function FilterPill<FV, FM>({
   const filterConfig = filterKey ? filters[filterKey] : null;
   const hasValue = !isNil(value);
   const isFilterWithoutComponent = filterConfig && !filterConfig.Component;
-  const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta }) && onClear;
+  const canClear = hasValue && !locked && !filterConfig?.getDisallowEmpty?.({ meta });
   const filterLabel = filterConfig?.labelMsg
     ? intl.formatMessage(filterConfig.labelMsg)
     : filterKey
