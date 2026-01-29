@@ -256,7 +256,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isIndividual && (isHostedType || hasMoneyManagement) && !isCommunityManagerOnly,
+      if: !isIndividual && isHostedType && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
       Icon: BookUserIcon,

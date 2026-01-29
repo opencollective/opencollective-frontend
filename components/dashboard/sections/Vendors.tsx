@@ -441,22 +441,20 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (
-        !loading && (
-          <React.Fragment>
-            <DataTable
-              columns={columns}
-              data={tableData?.nodes}
-              emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
-              loading={loading}
-              onClickRow={row => {
-                handleDrawer(row.original as unknown as VendorFieldsFragment);
-              }}
-              getActions={getActions}
-              mobileTableView
-            />
-            <Pagination queryFilter={queryFilter} total={tableData?.totalCount} />
-          </React.Fragment>
-        )
+        <React.Fragment>
+          <DataTable
+            columns={columns}
+            data={tableData?.nodes}
+            emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
+            loading={loading}
+            onClickRow={row => {
+              handleDrawer(row.original as unknown as VendorFieldsFragment);
+            }}
+            getActions={getActions}
+            mobileTableView
+          />
+          <Pagination queryFilter={queryFilter} total={tableData?.totalCount} />
+        </React.Fragment>
       )}
       {createEditVendor && (
         <StyledModal onClose={() => setCreateEditVendor(false)}>

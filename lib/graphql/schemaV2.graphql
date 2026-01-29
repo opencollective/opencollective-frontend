@@ -15437,6 +15437,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Returns whether the account has hosting activated.
   """
   hasHosting: Boolean!
+
+  """
+  Returns whether this organization can be a vendor of the specified host. This checks if the organization only transacted with this host and all its admins are also admins of the host.
+  """
+  canBeVendorOf(
+    """
+    The host account to check against
+    """
+    host: AccountReferenceInput!
+  ): Boolean!
 }
 
 """
