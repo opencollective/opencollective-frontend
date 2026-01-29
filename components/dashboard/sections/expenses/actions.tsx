@@ -258,11 +258,13 @@ type UseExpenseActionsOptions = {
    * Called after expense is deleted
    */
   onDelete?: (expense: ExpenseQueryNode) => void;
+  host?: ExpenseHostFieldsFragment;
 };
 
 export function useExpenseActions<T extends ExpenseQueryNode>({
   refetchList,
   onDelete,
+  host,
 }: UseExpenseActionsOptions = {}) {
   const intl = useIntl();
   const router = useRouter();
@@ -334,7 +336,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
 
     // Determine if we're viewing the expense in the host context (from host dashboard)
     // This affects which actions are available (e.g., "Unapprove" vs "Request re-approval")
-    const isViewingExpenseInHostContext = dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id;
+    const isViewingExpenseInHostContext = dashboardAccount?.isHost && host?.id === dashboardAccount.id;
 
     const onMutationSuccess = () => {
       refetchList?.();
@@ -371,8 +373,8 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
     const canSeeInvoice = permissions.canSeeInvoiceInfo && invoiceTypes.includes(expense.type);
 
     const transactionsUrl =
-      dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id
-        ? getDashboardRoute(expense.host, `host-transactions?expenseId=${expense.legacyId}`)
+      dashboardAccount?.isHost && host?.id === dashboardAccount.id
+        ? getDashboardRoute(host, `host-transactions?expenseId=${expense.legacyId}`)
         : dashboardAccount?.slug === expense.account?.slug
           ? getDashboardRoute(expense.account, `transactions?expenseId=${expense.legacyId}`)
           : null;
@@ -383,16 +385,16 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
       }
     };
 
-    const payExpenseDisabledMsg = getDisabledMessage(expense, expense.account, expense.host, expense.payoutMethod);
+    const payExpenseDisabledMsg = getDisabledMessage(expense, expense.account, host, expense.payoutMethod);
     const payExpenseDisabled = Boolean(payExpenseDisabledMsg);
 
     const handlePayExpense = async (action: string, paymentParams?: Record<string, unknown>) => {
       // Build refetchQueries for scheduled payment actions
       const refetchQueries = [];
-      if ((action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') && expense.host?.slug) {
+      if ((action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') && host?.slug) {
         refetchQueries.push({
           query: scheduledExpensesQuery,
-          variables: getScheduledExpensesQueryVariables(expense.host.slug),
+          variables: getScheduledExpensesQueryVariables(host.slug),
         });
       }
 
@@ -410,7 +412,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         onMutationSuccess();
         return true;
       } catch (e) {
-        const errorContent = getErrorContent(intl, e, expense.host);
+        const errorContent = getErrorContent(intl, e, host);
         toast({ variant: 'error', title: errorContent.title, message: errorContent.message });
         return false;
       }
@@ -433,11 +435,11 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
             // Only check if the required policy data is available in the query
             const requiresCategoryConfirmation =
               expense.account &&
-              expense.host &&
+              host &&
               'policies' in expense.account &&
               collectiveAdminsMustConfirmAccountingCategory(
                 expense.account as Parameters<typeof collectiveAdminsMustConfirmAccountingCategory>[0],
-                expense.host as Parameters<typeof collectiveAdminsMustConfirmAccountingCategory>[1],
+                host as Parameters<typeof collectiveAdminsMustConfirmAccountingCategory>[1],
               );
 
             if (requiresCategoryConfirmation) {
@@ -445,7 +447,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
                 ApproveExpenseModalWrapper,
                 {
                   expense,
-                  host: expense.host,
+                  host: host,
                   account: expense.account,
                   onConfirm: async () => {
                     await handleProcessExpense('APPROVE');
@@ -472,7 +474,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
                 {
                   expense,
                   collective: expense.account,
-                  host: expense.host,
+                  host: host,
                   canPayWithAutomaticPayment: Boolean(permissions.canPay),
                   onSubmit: async (values: { action: string } & Record<string, unknown>) => {
                     const { action, ...paymentParams } = values;

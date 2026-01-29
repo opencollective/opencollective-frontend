@@ -495,11 +495,11 @@ export const paidDisbursementsQuery = gql`
           imageUrl
           ...AccountHoverCardFields
         }
-        host {
-          id
-          ...ExpenseHostFields
-        }
       }
+    }
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
     }
   }
   ${expensesListFieldsFragment}
