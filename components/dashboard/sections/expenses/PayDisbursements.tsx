@@ -54,11 +54,15 @@ import {
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-// TODO: As we add the "Approve Payment Requests" tool, also exclude 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'
-const ExpenseStatusesToExclude = ['PAID'];
+const ExpenseStatusesToExclude = ['PAID', 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'];
 const PayExpenseStatusFilter = Object.fromEntries(
   Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
+) as {
+  [K in Exclude<
+    keyof typeof ExpenseStatusFilter,
+    'PAID' | 'PENDING' | 'REJECTED' | 'UNVERIFIED' | 'INVITE_DECLINED'
+  >]: (typeof ExpenseStatusFilter)[K];
+};
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),

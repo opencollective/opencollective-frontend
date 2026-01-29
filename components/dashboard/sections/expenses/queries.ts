@@ -156,6 +156,7 @@ export const hostDashboardExpensesQuery = gql`
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -180,6 +181,7 @@ export const hostDashboardExpensesQuery = gql`
       limit: $limit
       offset: $offset
       type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount
@@ -314,8 +316,134 @@ export const hostDashboardMetadataQuery = gql`
 `;
 
 /**
+ * Query for the Approve Payment Requests page - fetches counts for pending and unverified expenses
+ */
+export const approvalMetadataQuery = gql`
+  query ApprovalMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      ...HostInfoCardFields
+    }
+    all: expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      status: [PENDING, UNVERIFIED, REJECTED, INVITE_DECLINED]
+    ) {
+      totalCount
+    }
+    pending: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PENDING]) {
+      totalCount
+    }
+    unverified: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [UNVERIFIED]) {
+      totalCount
+    }
+    unreplied: expenses(
+      host: { slug: $hostSlug }
+      hostContext: $hostContext
+      status: [PENDING, UNVERIFIED]
+      lastCommentBy: [NON_HOST_ADMIN]
+    ) {
+      totalCount
+    }
+    rejected: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [REJECTED]) {
+      totalCount
+    }
+  }
+  ${hostInfoCardFields}
+`;
+
+/**
+ * Query for the Host Payment Requests (All Payment Requests) page - fetches counts for all, pending, paid, and rejected payment requests
+ */
+export const hostPaymentRequestsMetadataQuery = gql`
+  query HostPaymentRequestsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      ...HostInfoCardFields
+    }
+    all: expenses(host: { slug: $hostSlug }, hostContext: $hostContext) {
+      totalCount
+    }
+    pending: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PENDING]) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+    rejected: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [REJECTED]) {
+      totalCount
+    }
+  }
+  ${hostInfoCardFields}
+`;
+
+/**
  * Query for the Paid Disbursements page - fetches paid expenses with fields optimized for the table
  */
+/**
+ * Query for the Payment Requests page - fetches counts for all, pending, paid, and rejected expenses
+ */
+export const paymentRequestsMetadataQuery = gql`
+  query PaymentRequestsMetadata($accountSlug: String!) {
+    account(slug: $accountSlug) {
+      id
+      slug
+      name
+      imageUrl
+      type
+      currency
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          name
+          slug
+          imageUrl
+          currency
+          type
+          isActive
+          isArchived
+        }
+      }
+
+      ... on AccountWithHost {
+        isApproved
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
+      ... on Organization {
+        isHost
+        isActive
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
+    }
+    expenseTagStats(account: { slug: $accountSlug }) {
+      nodes {
+        id
+        tag
+      }
+    }
+    all: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true) {
+      totalCount
+    }
+    pending: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PENDING]) {
+      totalCount
+    }
+    paid: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [PAID]) {
+      totalCount
+    }
+    rejected: expenses(account: { slug: $accountSlug }, includeChildrenExpenses: true, status: [REJECTED]) {
+      totalCount
+    }
+  }
+  ${expenseHostFields}
+`;
+
 export const paidDisbursementsQuery = gql`
   query PaidDisbursements(
     $hostSlug: String!
