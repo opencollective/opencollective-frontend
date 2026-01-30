@@ -447,13 +447,7 @@ class ContributionFlowSuccess extends React.Component<
                 className="relative flex w-full shrink-0 items-center justify-center max-lg:mb-4 lg:w-1/2"
                 data-cy={`contribution-id-${order.legacyId}`}
               >
-                <div
-                  className="absolute inset-0 bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png')] bg-[length:100%_auto] bg-top bg-no-repeat lg:bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png')] lg:bg-[length:100%_auto] lg:bg-[position:0%_0%] lg:bg-no-repeat"
-                  style={{
-                    transform: 'rotate(90deg) translateY(-100%)',
-                    transformOrigin: 'top left',
-                  }}
-                />
+                <div className="absolute inset-0 bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png')] bg-[length:100%_auto] bg-top bg-no-repeat lg:bg-[url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png')] lg:bg-cover lg:bg-left lg:bg-no-repeat" />
                 <div className="relative z-10 my-4 flex w-full flex-col items-center justify-center">
                   <h3 className="mb-4 text-3xl font-bold">
                     <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
@@ -514,7 +508,7 @@ class ContributionFlowSuccess extends React.Component<
                   )}
                 </div>
               </div>
-              <div className="flex w-full flex-col items-center justify-center px-3 shadow-[0_-35px_5px_0px_#fff] sm:shadow-[-15px_0_15px_-15px_#fff]">
+              <div className="z-10 flex w-full flex-col items-center justify-center px-3 shadow-[0_-35px_5px_0px_#fff] sm:shadow-[-15px_0_15px_-15px_#fff]">
                 {this.renderCallsToAction()}
               </div>
             </Fragment>

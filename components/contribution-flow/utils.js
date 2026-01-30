@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, pick, sortBy, uniqBy } from 'lodash';
+import { find, get, pick, sortBy, startCase, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
@@ -163,7 +163,7 @@ export const generatePaymentMethodOptions = (
         <FormattedMessage
           defaultMessage="New payment method: {methods}"
           id="jwtunf"
-          values={{ methods: availableMethodLabels.join(', ') }}
+          values={{ methods: availableMethodLabels.map(startCase).join(', ') }} // amazon_pay => Amazon Pay
         />
       );
 
@@ -239,9 +239,7 @@ export const generatePaymentMethodOptions = (
           paymentMethod: {
             service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
             type: PAYMENT_METHOD_TYPE.MANUAL,
-            data: {
-              manualPaymentProvider: { id: provider.id },
-            },
+            manualPaymentProvider: { id: provider.id },
           },
           icon: <Icon className="h-5 w-5" />,
           subtitle: (

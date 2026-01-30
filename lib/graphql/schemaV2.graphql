@@ -26084,7 +26084,6 @@ input PaymentMethodInput {
   """
   legacyType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
   newType: PaymentMethodType @deprecated(reason: "2021-08-20: Please use type instead")
-  data: JSON
 
   """
   Name of this payment method

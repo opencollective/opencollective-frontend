@@ -10768,7 +10768,6 @@ export type PaymentMethodOrdersArgs = {
 export type PaymentMethodInput = {
   /** When creating a credit card, use this field to set its info */
   creditCardInfo?: InputMaybe<CreditCardCreateInput>;
-  data?: InputMaybe<Scalars['JSON']['input']>;
   /** The id assigned to the payment method */
   id?: InputMaybe<Scalars['String']['input']>;
   /** Whether this payment method should be saved for future payments */

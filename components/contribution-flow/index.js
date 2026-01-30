@@ -507,7 +507,7 @@ class ContributionFlow extends React.Component {
       return null;
     }
 
-    const paymentMethod = pick(stepPayment.paymentMethod, ['service', 'type', 'data']);
+    const paymentMethod = pick(stepPayment.paymentMethod, ['service', 'type', 'manualPaymentProvider']);
 
     // Payment Method already registered
     if (stepPayment.paymentMethod.id) {
