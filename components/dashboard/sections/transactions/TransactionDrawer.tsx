@@ -10,6 +10,8 @@ import type { GetActions } from '../../../../lib/actions/types';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -31,12 +33,10 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
 import type { TransactionDetailsQueryNode } from './types';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import { ALL_SECTIONS } from '../../constants';
 
 const transactionQuery = gql`
   query TransactionDetails($transaction: TransactionReferenceInput!) {

@@ -9,6 +9,8 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 import type { LegalDocumentFieldsFragment } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -23,12 +25,10 @@ import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { DataList, DataListItem } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
+import { ALL_SECTIONS } from '../../constants';
 
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
-import { ALL_SECTIONS } from '../../constants';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 type LegalDocumentDrawerProps = {
   open: boolean;
