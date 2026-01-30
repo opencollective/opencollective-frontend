@@ -24,6 +24,7 @@ import {
   isTaxRateValid,
 } from '../../expenses/lib/utils';
 import { DISABLE_ANIMATIONS } from '@/lib/animations';
+import { AccountType } from '@/lib/graphql/types/v2/graphql';
 import { cn } from '@/lib/utils';
 
 import { FormField } from '@/components/FormField';
@@ -288,6 +289,7 @@ type ExpenseItemProps = {
 
 function getExpenseItemProps(form: ExpenseForm) {
   return {
+    payeeType: form.options.payee?.type,
     ...pick(form, ['setFieldValue', 'isSubmitting', 'setFieldTouched']),
     ...pick(form.options, [
       'allowExpenseItemAttachment',
@@ -419,7 +421,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
         <div className="@container grow">
           <div className="mb-2">
             <FormField
-              required={props.isAdminOfPayee}
+              required={props.isAdminOfPayee || props.payeeType === AccountType.VENDOR}
               disabled={props.isDescriptionLocked || props.isSubmitting}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
@@ -436,7 +438,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
           <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
             {props.hasExpenseItemDate && (
               <FormField
-                required={props.isAdminOfPayee}
+                required={props.isAdminOfPayee || props.payeeType === AccountType.VENDOR}
                 disabled={props.isDateLocked || props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
