@@ -9,8 +9,10 @@ import z from 'zod';
 import { getAccountReferenceInput } from '@/lib/collective';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { integer } from '@/lib/filters/schemas';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '@/lib/i18n/expense';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { cn } from '@/lib/utils';
 
 import Avatar from '@/components/Avatar';
@@ -26,6 +28,7 @@ import { Button } from '@/components/ui/Button';
 import { Metric } from '../overview/Metric';
 
 import { communityAccountExpensesDetailQuery } from './queries';
+import { ALL_SECTIONS } from '../../constants';
 
 const FETCH_MORE_SIZE = 5;
 
@@ -124,6 +127,7 @@ const ExpensesSection = ({
 }) => {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   if (!expenses || expenses.nodes?.length === 0) {
@@ -181,7 +185,13 @@ const ExpensesSection = ({
         )}
         {showSeeAllButton && (
           <Button variant="outline" asChild>
-            <Link href={`/dashboard/${host.slug}/host-expenses?searchTerm=@${account.slug}`}>
+            <Link
+              href={
+                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                  ? `/dashboard/${host.slug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}?searchTerm=@${account.slug}`
+                  : `/dashboard/${host.slug}/${ALL_SECTIONS.HOST_EXPENSES}?searchTerm=@${account.slug}`
+              }
+            >
               <FormattedMessage
                 defaultMessage="See all of {name}'s expenses"
                 id="SeeAllExpenses"
@@ -199,6 +209,7 @@ const ExpensesSection = ({
 export function ExpensesTab({ account, host, setOpenExpenseId, expectedAccountType }) {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
 
   const queryFilters = useQueryFilter({
     schema: z.object({
@@ -247,7 +258,9 @@ export function ExpensesTab({ account, host, setOpenExpenseId, expectedAccountTy
         label: intl.formatMessage({ defaultMessage: 'View expenses', id: 'rZDjnQ' }),
         onClick: () => {
           router.push({
-            pathname: `/dashboard/${host.slug}/host-expenses`,
+            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? `/dashboard/${host.slug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
+              : `/dashboard/${host.slug}/${ALL_SECTIONS.HOST_EXPENSES}`,
             query: {
               searchTerm: `@${account.slug}`,
               'date[type]': 'BETWEEN',

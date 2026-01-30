@@ -19,6 +19,8 @@ import { useWorkspace } from '../WorkspaceProvider';
 import { SearchEntity } from './filters';
 import type { SearchEntityNodeMap, SearchHighlights } from './types';
 import { useRecentlyVisited } from './useRecentlyVisited';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { ALL_SECTIONS } from '../dashboard/constants';
 
 export function getHighlightsFields<T extends string>(
   highlights: SearchHighlights,
@@ -87,7 +89,12 @@ export function useGetLinkProps() {
           } else if (workspace.slug === expense.payee?.slug) {
             href = getDashboardRoute(workspace, `submitted-expenses?openExpenseId=${expense.legacyId}`);
           } else if (workspace.isHost && 'host' in expense.account && workspace.slug === expense.account.host?.slug) {
-            href = getDashboardRoute(workspace, `host-expenses?openExpenseId=${expense.legacyId}`);
+            href = getDashboardRoute(
+              workspace,
+              LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                ? `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`
+                : `${ALL_SECTIONS.HOST_EXPENSES}?openExpenseId=${expense.legacyId}`,
+            );
           } else {
             href = getExpensePageUrl(expense);
           }

@@ -54,6 +54,8 @@ import { toast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
 
 import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from './ScheduledExpensesBanner';
+import LoggedInUser from '@/lib/LoggedInUser';
+import { ALL_SECTIONS } from '../../constants';
 
 /**
  * Helper function to get error content with special handling for PayPal balance errors
@@ -62,6 +64,7 @@ const getErrorContent = (
   intl: ReturnType<typeof useIntl>,
   error: Error | { message?: string },
   host?: ExpenseHostFieldsFragment | null,
+  LoggedInUser?: LoggedInUser,
 ): { title?: string; message: React.ReactNode } => {
   const message = error?.message;
   if (message) {
@@ -69,7 +72,13 @@ const getErrorContent = (
       return {
         title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
         message: (
-          <Link href={`/dashboard/${host.slug}/host-expenses`}>
+          <Link
+            href={
+              LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                ? `/dashboard/${host.slug}/${ALL_SECTIONS.PAY_DISBURSEMENTS}`
+                : `/dashboard/${host.slug}/${ALL_SECTIONS.HOST_EXPENSES}`
+            }
+          >
             <FormattedMessage
               id="PayExpenseModal.RefillBalanceError"
               defaultMessage="Refill your balance from the Host dashboard"
@@ -412,7 +421,7 @@ export function useExpenseActions<T extends ExpenseQueryNode>({
         onMutationSuccess();
         return true;
       } catch (e) {
-        const errorContent = getErrorContent(intl, e, host);
+        const errorContent = getErrorContent(intl, e, host, LoggedInUser);
         toast({ variant: 'error', title: errorContent.title, message: errorContent.message });
         return false;
       }
