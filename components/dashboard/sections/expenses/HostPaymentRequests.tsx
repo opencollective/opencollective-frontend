@@ -67,14 +67,17 @@ function getExpenseColumns(
   return [
     columnHelper.accessor('createdAt', {
       meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'Expense.Date' }) },
-      header: ctx => <ColumnHeader {...ctx} />,
-      cell: ({ cell }) => {
-        const createdAt = cell.getValue() as HostExpensesQueryNode['createdAt'];
+      header: ctx => <ColumnHeader {...ctx} filterKey="date" />,
+      cell: ({ row }) => {
+        const createdAt = row.original.createdAt;
         return <DateTime className="whitespace-nowrap" dateStyle="medium" value={createdAt} />;
       },
     }),
     columnHelper.accessor('account', {
-      meta: { className: 'max-w-48', labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }) },
+      meta: {
+        className: 'max-w-10 xl:max-w-48',
+        labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
+      },
       header: ctx => <ColumnHeader {...ctx} />,
       cell: ({ cell }) => {
         const expense = cell.row.original;
@@ -89,8 +92,8 @@ function getExpenseColumns(
               <Avatar size={24} collective={account} />
               <div className="flex flex-col overflow-hidden">
                 <span className="truncate font-medium group-hover:underline">{account.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {intl ? formatCollectiveType(intl, account.type) : account.type}
+                <span className="truncate text-xs text-muted-foreground">
+                  {formatCollectiveType(intl, account.type)}
                 </span>
               </div>
             </LinkCollective>
@@ -99,13 +102,13 @@ function getExpenseColumns(
       },
     }),
     columnHelper.accessor('type', {
-      meta: { labelMsg: defineMessage({ defaultMessage: 'Type', id: '+U6ozc' }) },
+      meta: { className: 'max-w-24', labelMsg: defineMessage({ defaultMessage: 'Type', id: '+U6ozc' }) },
       header: ctx => <ColumnHeader {...ctx} />,
       cell: ({ cell }) => {
         const expense = cell.row.original;
         return (
-          <div className="flex flex-col">
-            <span>{i18nExpenseType(intl, expense.type)}</span>
+          <div className="flex flex-col overflow-hidden">
+            <span className="truncate">{i18nExpenseType(intl, expense.type)}</span>
             <span className="text-xs text-muted-foreground">#{expense.legacyId}</span>
           </div>
         );
@@ -140,6 +143,7 @@ function getExpenseColumns(
     }),
     columnHelper.accessor('accountingCategory', {
       meta: {
+        className: 'hidden lg:table-cell max-w-32',
         labelMsg: defineMessage({ defaultMessage: 'Accounting category', id: 'AddFundsModal.accountingCategory' }),
       },
       header: ctx => <ColumnHeader {...ctx} />,
@@ -147,7 +151,7 @@ function getExpenseColumns(
         const expense = cell.row.original;
         return (
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-          <div onClick={e => e.stopPropagation()}>
+          <div onClick={e => e.stopPropagation()} className="overflow-hidden">
             <ExpenseAccountingCategoryPill
               expense={expense as Expense}
               host={host as unknown as Host}
@@ -166,7 +170,10 @@ function getExpenseColumns(
       },
     }),
     columnHelper.accessor('payee', {
-      meta: { className: 'max-w-48', labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'hiZQdK' }) },
+      meta: {
+        className: 'hidden lg:table-cell max-w-48',
+        labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'hiZQdK' }),
+      },
       header: ctx => <ColumnHeader {...ctx} />,
       cell: ({ cell }) => {
         const expense = cell.row.original;
@@ -339,6 +346,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       ) : (
         <React.Fragment>
           <DataTable
+            mobileTableView
             data={data?.expenses?.nodes ?? []}
             columns={expenseColumns}
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
