@@ -66,7 +66,7 @@ function getExpenseColumns(
 ): ColumnDef<HostExpensesQueryNode, unknown>[] {
   return [
     columnHelper.accessor('createdAt', {
-      meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'Expense.Date' }) },
+      meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
       header: ctx => <ColumnHeader {...ctx} filterKey="date" />,
       cell: ({ row }) => {
         const createdAt = row.original.createdAt;
@@ -172,7 +172,7 @@ function getExpenseColumns(
     columnHelper.accessor('payee', {
       meta: {
         className: 'hidden lg:table-cell max-w-48',
-        labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'hiZQdK' }),
+        labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'SecurityScope.Payee' }),
       },
       header: ctx => <ColumnHeader {...ctx} />,
       cell: ({ cell }) => {

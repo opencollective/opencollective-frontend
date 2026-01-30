@@ -7,7 +7,6 @@ import {
   BookOpenCheck,
   BookUserIcon,
   Building,
-  ClipboardCheck,
   CreditCard,
   FileText,
   HandCoins,

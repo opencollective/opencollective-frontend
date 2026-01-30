@@ -3833,7 +3833,7 @@
   "solutions.features.item.all-financial-activities-are-recorded.description": "At the heart of the platform is a transaction ledger. All financial activities on the platform generate ledger transactions.",
   "solutions.features.item.all-financial-activities-are-recorded.title": "All financial activities are recorded",
   "solutions.features.item.approve-payment-requests.description": "Review payment requests that have been submitted. Approve the legitimate requests you wish to pay and reject or delete the others.",
-  "solutions.features.item.approve-payment-requests.title": "Approve Payment Requests",
+  "ApprovePaymentRequests": "Approve Payment Requests",
   "solutions.features.item.automated-security-checks-protect-against-fraud.description": "Real time security checks are integrated into the payment tool and will alert you if something is suspicious. Green means safe to pay, yellow is a heads up and red requires attention.",
   "solutions.features.item.automated-security-checks-protect-against-fraud.title": "Automated security checks protect against fraud",
   "solutions.features.item.categorize-financial-activities-for-accounting.description": "Setup your chart of accounts and categorize your disbursements and added funds. Include this in your exports and reduce the time, effort and accounting costs.",
