@@ -26,6 +26,9 @@ import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
+import { ALL_SECTIONS } from '../../constants';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 type LegalDocumentDrawerProps = {
   open: boolean;
@@ -72,6 +75,7 @@ export default function LegalDocumentDrawer({
   getActions,
 }: Readonly<LegalDocumentDrawerProps>) {
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
   const dropdownTriggerRef = React.useRef(undefined);
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     variables: { hostId: host.id, accountId: get(document, 'account.id') },
@@ -184,7 +188,22 @@ export default function LegalDocumentDrawer({
                           className="text-primary underline"
                           href={getDashboardRoute(
                             host,
-                            `host-expenses?searchTerm=@${document.account.slug}&status=ALL&types=INVOICE,GRANT,UNCLASSIFIED`,
+                            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                              ? ALL_SECTIONS.HOST_PAYMENT_REQUESTS
+                              : ALL_SECTIONS.HOST_EXPENSES,
+                            {
+                              params: new URLSearchParams([
+                                ['searchTerm', `@${document.account.slug}`],
+                                ['type', 'INVOICE'],
+                                ['type', 'GRANT'],
+                                ['type', 'UNCLASSIFIED'],
+                                ...(!LoggedInUser?.hasPreviewFeatureEnabled(
+                                  PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
+                                )
+                                  ? [['status', 'ALL']] // Only needed for the `host-expenses` tool as it has a default value for status
+                                  : []),
+                              ]),
+                            },
                           )}
                         >
                           <FormattedMessage

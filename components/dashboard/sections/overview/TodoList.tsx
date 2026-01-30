@@ -12,6 +12,9 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 import Link from '../../../Link';
 import { DashboardContext } from '../../DashboardContext';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { ALL_SECTIONS } from '../../constants';
 
 const hostTodoQuery = gql`
   query HostTodo($hostSlug: String!) {
@@ -70,6 +73,7 @@ const hostTodoQuery = gql`
 
 export const HostTodoList = () => {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
 
   const { data, loading } = useQuery(hostTodoQuery, {
@@ -84,7 +88,12 @@ export const HostTodoList = () => {
         {
           id: 'expenses',
           title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-          href: getDashboardRoute(account, 'host-expenses'),
+          href: getDashboardRoute(
+            account,
+            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? ALL_SECTIONS.PAY_DISBURSEMENTS
+              : ALL_SECTIONS.HOST_EXPENSES,
+          ),
           icon: Receipt,
           iconBgColor: 'bg-green-50',
           iconColor: 'text-green-700',
@@ -119,7 +128,7 @@ export const HostTodoList = () => {
                 },
                 { count: data?.missingReceiptExpenses.totalCount },
               ),
-              queryParams: '?chargeHasReceipts=false&status=ALL',
+              queryParams: `?chargeHasReceipts=false${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? '' : '&status=ALL'}`,
             },
 
             {

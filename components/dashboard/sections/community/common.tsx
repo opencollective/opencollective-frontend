@@ -18,8 +18,10 @@ import type { GetActions } from '@/lib/actions/types';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { CommunityAccountDetailQuery, VendorFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import type { Contributor } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { ActivityDescriptionI18n } from '@/lib/i18n/activities';
 import { formatCommunityRelation } from '@/lib/i18n/community-relation';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { KYCRequestModal } from '@/components/kyc/request/KYCRequestModal';
 import LinkCollective from '@/components/LinkCollective';
@@ -32,6 +34,7 @@ import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
+import { ALL_SECTIONS } from '../../constants';
 
 type UsePersonActionsOptions = {
   accountSlug: string;
@@ -44,6 +47,7 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
   const intl = useIntl();
   const { showModal } = useModal();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
 
   return useCallback<GetActions<Contributor>>(
     contributor => {
@@ -70,7 +74,9 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
         Icon: Receipt,
         onClick: () => {
           router.push({
-            pathname: `/dashboard/${hostSlug}/host-expenses`,
+            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
+              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
             query: { status: 'ALL', searchTerm: `@${contributorSlug}` },
           });
         },
@@ -168,6 +174,7 @@ type AssociatedCollective = CommunityAccountDetailQuery['account']['communitySta
 export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActionsOpts) {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
 
   return useCallback<GetActions<AssociatedCollective>>(
     associatedCollective => {
@@ -194,7 +201,9 @@ export function useAssociatedCollectiveActions(opts: UseAssociatedCollectiveActi
         Icon: Receipt,
         onClick: () => {
           router.push({
-            pathname: `/dashboard/${hostSlug}/host-expenses`,
+            pathname: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
+              : `/dashboard/${hostSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
             query: { status: 'ALL', searchTerm: `@${opts.accountSlug}`, account: collectiveSlug },
           });
         },

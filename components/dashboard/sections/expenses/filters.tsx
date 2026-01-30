@@ -49,7 +49,7 @@ export const schema = z.object({
   date: dateFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(ExpenseStatusFilter)).optional(),
-  type: z.nativeEnum(ExpenseType).optional(),
+  type: isMulti(z.nativeEnum(ExpenseType)).optional(),
   payout: z.nativeEnum(PayoutMethodType).optional(),
   lastCommentBy: isMulti(z.nativeEnum(LastCommentBy)).optional(),
   tag: expenseTagFilter.schema,
@@ -80,8 +80,8 @@ export const toVariables: FiltersToVariables<
   tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
+  type: value => ({ types: value }), // Note: Using the `types` variable name to allow multi-selection
   status: value => {
-    console.log({ value });
     return isEmpty(value)
       ? undefined
       : value.includes(ExpenseStatusFilter.PENDING)
@@ -121,6 +121,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
+        isMulti
         options={Object.values(omit(ExpenseType, ExpenseType.FUNDING_REQUEST))
           .map(value => ({ label: valueRenderer({ value, intl }), value }))
           .sort(sortSelectOptions)}
