@@ -15,7 +15,7 @@ import type { ZodObjectDef } from 'zod';
 import { z } from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import { getPayoutProfiles } from '../../lib/expenses';
+import { getPayoutProfiles, standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import type {
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
@@ -1788,7 +1788,7 @@ export function useExpenseForm(opts: {
                 exchangeRate: ei.amount.exchangeRate
                   ? ({
                       ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                      date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
+                      date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
                     } as CurrencyExchangeRateInput)
                   : null,
               },
