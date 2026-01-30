@@ -30,6 +30,7 @@ import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/que
 import VendorForm from '../../vendors/VendorForm';
 import { DashboardContext } from '../DashboardContext';
 import DashboardHeader from '../DashboardHeader';
+import { makeAmountFilter } from '../filters/AmountFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
@@ -73,8 +74,14 @@ const dashboardVendorsQuery = gql`
     }
     supportedPayoutMethods
     isTrustedHost
-    vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset)
-      @include(if: $onlyVendors) {
+    vendors(
+      searchTerm: $searchTerm
+      isArchived: $isArchived
+      limit: $limit
+      offset: $offset
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
+    ) @include(if: $onlyVendors) {
       totalCount
       offset
       limit
@@ -107,6 +114,8 @@ const dashboardVendorsQuery = gql`
     $isArchived: Boolean
     $limit: Int
     $offset: Int
+    $totalContributed: AmountRangeInput
+    $totalExpended: AmountRangeInput
     $onlyVendors: Boolean!
   ) {
     account(slug: $slug) {
@@ -125,8 +134,15 @@ const dashboardVendorsQuery = gql`
         }
       }
     }
-    community(host: { slug: $slug }, type: [ORGANIZATION], searchTerm: $searchTerm, limit: $limit, offset: $offset)
-      @skip(if: $onlyVendors) {
+    community(
+      host: { slug: $slug }
+      type: [ORGANIZATION]
+      searchTerm: $searchTerm
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
+      limit: $limit
+      offset: $offset
+    ) @skip(if: $onlyVendors) {
       totalCount
       offset
       limit
@@ -284,18 +300,32 @@ const getColumns = ({ isVendor }) => {
 
 const PAGE_SIZE = 20;
 
+const totalContributed = makeAmountFilter(
+  'totalContributed',
+  defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' }),
+);
+
+const totalExpended = makeAmountFilter(
+  'totalExpended',
+  defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' }),
+);
+
 const schema = z.object({
   limit: limit.default(PAGE_SIZE),
   offset,
   searchTerm: searchFilter.schema,
   isArchived: boolean.optional().default(false),
   onlyVendors: boolean.optional().default(false),
+  totalContributed: totalContributed.schema,
+  totalExpended: totalExpended.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
 
 const filters: FilterComponentConfigs<FilterValues> = {
   searchTerm: searchFilter.filter,
+  totalContributed: totalContributed.filter,
+  totalExpended: totalExpended.filter,
   isArchived: {
     labelMsg: defineMessage({ defaultMessage: 'Archived', id: '0HT+Ib' }),
     hide: () => true,
@@ -304,6 +334,11 @@ const filters: FilterComponentConfigs<FilterValues> = {
     labelMsg: defineMessage({ defaultMessage: 'Only Vendors', id: 'onlyVendors' }),
     hide: () => true,
   },
+};
+
+const toVariables = {
+  totalContributed: totalContributed.toVariables,
+  totalExpended: totalExpended.toVariables,
 };
 
 const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
@@ -340,6 +375,11 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
     filters,
     schema,
     views,
+    toVariables,
+    meta: {
+      intl,
+      currency: account?.currency,
+    },
   });
   const {
     data,
