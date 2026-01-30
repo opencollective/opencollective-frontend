@@ -25,10 +25,10 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { actionsColumn, DataTable } from '@/components/table/DataTable';
 import { Button } from '@/components/ui/Button';
 
+import { ALL_SECTIONS } from '../../constants';
 import { Metric } from '../overview/Metric';
 
 import { communityAccountExpensesDetailQuery } from './queries';
-import { ALL_SECTIONS } from '../../constants';
 
 const FETCH_MORE_SIZE = 5;
 

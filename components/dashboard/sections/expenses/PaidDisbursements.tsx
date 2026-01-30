@@ -281,21 +281,21 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
       id: PaidDisbursementsTab.INVOICES,
       label: intl.formatMessage({ defaultMessage: 'Invoices', id: 'c0bGFo' }),
       filter: {
-        type: ExpenseType.INVOICE,
+        type: [ExpenseType.INVOICE],
       },
     },
     {
       id: PaidDisbursementsTab.REIMBURSEMENTS,
       label: intl.formatMessage({ defaultMessage: 'Reimbursements', id: 'wdu2yl' }),
       filter: {
-        type: ExpenseType.RECEIPT,
+        type: [ExpenseType.RECEIPT],
       },
     },
     {
       id: PaidDisbursementsTab.GRANTS,
       label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
       filter: {
-        type: ExpenseType.GRANT,
+        type: [ExpenseType.GRANT],
       },
     },
   ];

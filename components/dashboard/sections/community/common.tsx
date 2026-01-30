@@ -33,8 +33,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 import { ALL_SECTIONS } from '../../constants';
+import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 
 type UsePersonActionsOptions = {
   accountSlug: string;

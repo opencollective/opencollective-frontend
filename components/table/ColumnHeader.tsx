@@ -50,7 +50,6 @@ export function ColumnHeader<TData, TValue>({
   const canHide = column.getCanHide() && Boolean(table.options.meta?.setColumnVisibility);
   const canFilter = Boolean(queryFilter.filters[filterKey]);
 
-  console.log(queryFilter, filterKey);
   const hasFilterValue = queryFilter.values[filterKey] !== undefined;
 
   const isSorted = queryFilter.values.sort?.field === sortField;
