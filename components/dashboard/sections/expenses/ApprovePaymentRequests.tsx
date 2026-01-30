@@ -1,30 +1,25 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { isEmpty, omit, omitBy } from 'lodash';
+import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import {
-  HostContext,
   type AccountHoverCardFieldsFragment,
+  HostContext,
   type HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, LastCommentBy } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatusFilter } from '../../../../lib/graphql/types/v2/schema';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { isMulti, isNullable } from '@/lib/filters/schemas';
-import { i18nExpenseStatus } from '@/lib/i18n/expense';
-import { sortSelectOptions } from '@/lib/utils';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
@@ -39,19 +34,10 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { approvalMetadataQuery, hostDashboardExpensesQuery } from './queries';
-
-// Statuses relevant for approval workflow
-const ApprovalExpenseStatuses = [ExpenseStatusFilter.PENDING] as const;
-const ApprovalExpenseStatusFilter = Object.fromEntries(
-  Object.entries(ExpenseStatusFilter).filter(([status]) =>
-    ApprovalExpenseStatuses.includes(status as ExpenseStatusFilter),
-  ),
-) as { [K in (typeof ApprovalExpenseStatuses)[number]]: (typeof ExpenseStatusFilter)[K] };
+import { hostDashboardExpensesQuery } from './queries';
 
 const filterSchema = commonSchema.extend({
-  account: z.string().optional(),
-  status: isNullable(isMulti(z.nativeEnum(ApprovalExpenseStatusFilter))),
+  account: hostedAccountFilter.schema,
   hostContext: hostContextFilter.schema.default(HostContext.INTERNAL),
 });
 
@@ -66,32 +52,11 @@ type FilterMeta = CommonFilterMeta & {
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
   ...commonToVariables,
-  limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
-  status: value => {
-    /**
-     * As `status` is "nullable", this function will run even if the value is null.
-     * In that case we provide all approval status values as the variables to filter.
-     */
-    return isEmpty(value) ? { status: Object.values(ApprovalExpenseStatusFilter) } : { status: value };
-  },
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
-  status: {
-    labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(ApprovalExpenseStatusFilter)
-          .map(value => ({ label: valueRenderer({ intl, value }), value }))
-          .sort(sortSelectOptions)}
-        isMulti
-        {...props}
-      />
-    ),
-    valueRenderer: ({ intl, value }) => i18nExpenseStatus(intl, value),
-  },
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
@@ -99,9 +64,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
-// TODO: verify it works
-const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) => {
-  refetchMetaData(); // Refetch the metadata to update the view counts
+const onExpenseUpdate = ({ updatedExpense, cache, variables }) => {
   if (variables.status && updatedExpense.status !== variables.status) {
     cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
       return {
@@ -128,16 +91,17 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
 
   const views: Views<FilterValues> = [
     {
-      label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
-      filter: { status: [ExpenseStatusFilter.PENDING], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'pending',
+      filter: {
+        status: [ExpenseStatusFilter.PENDING],
+      },
+      label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
     },
   ];
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
-    // defaultFilterValues: views[1].filter, // Default to "Pending" view
     filters,
     meta: {
       currency: account.currency,
@@ -145,30 +109,15 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
       includeUncategorized: true,
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
     },
-    lockViewFilters: true,
     views,
+    lockViewFilters: true,
     skipFiltersOnReset: ['hostContext'],
   });
-
-  const {
-    data: metaData,
-    error: errorMetaData,
-    refetch: refetchMetaData,
-  } = useQuery(approvalMetadataQuery, {
-    variables: {
-      hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
-    },
-  });
-
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
 
   const variables = {
     hostSlug,
     ...queryFilter.variables,
+    status: [ExpenseStatusFilter.PENDING, ExpenseStatusFilter.UNVERIFIED],
     fetchGrantHistory: false,
   };
 
@@ -207,7 +156,7 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
         }
       />
 
-      <Filterbar {...queryFilter} views={viewsWithCount} />
+      <Filterbar {...queryFilter} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -226,7 +175,7 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+              onExpenseUpdate({ updatedExpense: expense, cache, variables });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
