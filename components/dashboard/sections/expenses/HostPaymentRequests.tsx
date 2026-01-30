@@ -2,25 +2,24 @@ import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, FormattedTime, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import {
   type AccountHoverCardFieldsFragment,
-  HostContext,
   type HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { isFeatureEnabled } from '@/lib/allowed-features';
+import { limit } from '@/lib/filters/schemas';
 import { useDrawer } from '@/lib/hooks/useDrawer';
-import { i18nExpenseStatus, i18nExpenseType } from '@/lib/i18n/expense';
-import { sortSelectOptions } from '@/lib/utils';
+import { i18nExpenseType } from '@/lib/i18n/expense';
 
 import { ExpenseAccountingCategoryPill } from '@/components/expenses/ExpenseAccountingCategoryPill';
+import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -32,7 +31,6 @@ import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { HostContextFilter, hostContextFilter } from '../../filters/HostContextFilter';
@@ -49,9 +47,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { hostDashboardExpensesQuery, hostPaymentRequestsMetadataQuery } from './queries';
-import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
-import { limit } from '@/lib/filters/schemas';
+import { hostDashboardExpensesQuery } from './queries';
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
@@ -242,29 +238,6 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  // const views: Views<FilterValues> = [
-  //   {
-  //     label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-  //     filter: {},
-  //     id: 'all',
-  //   },
-  //   {
-  //     label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
-  //     filter: { status: [ExpenseStatusFilter.PENDING], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-  //     id: 'pending',
-  //   },
-  //   {
-  //     label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-  //     filter: { status: [ExpenseStatusFilter.PAID], sort: { field: 'CREATED_AT', direction: 'DESC' } },
-  //     id: 'paid',
-  //   },
-  //   {
-  //     label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
-  //     filter: { status: [ExpenseStatusFilter.REJECTED], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-  //     id: 'rejected',
-  //   },
-  // ];
-
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
@@ -276,21 +249,8 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
       hideExpensesMetaStatuses: true,
     },
-    // views,
     skipFiltersOnReset: ['hostContext'],
   });
-
-  // const { data: metaData, refetch: refetchMetaData } = useQuery(hostPaymentRequestsMetadataQuery, {
-  //   variables: {
-  //     hostSlug,
-  //     hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
-  //   },
-  // });
-
-  // const viewsWithCount: Views<FilterValues> = views.map(view => ({
-  //   ...view,
-  //   count: metaData?.[view.id]?.totalCount,
-  // }));
 
   const variables = {
     hostSlug,
@@ -305,7 +265,6 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const getExpenseActions = useExpenseActions({
     refetchList: () => {
       refetch();
-      //refetchMetaData();
     },
     host: data?.host,
   });
@@ -363,6 +322,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
             loading={loading}
             getActions={getExpenseActions}
             nbPlaceholders={queryFilter.values.limit}
+            meta={{ host: data?.host }}
           />
           <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>

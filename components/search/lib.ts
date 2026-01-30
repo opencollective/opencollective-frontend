@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { CollectiveType } from '@/lib/constants/collectives';
 import type { Comment, HostApplication, Order, Update } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import {
   getCollectivePageRoute,
   getCommentUrl,
@@ -13,14 +14,13 @@ import {
   getUpdateUrl,
 } from '@/lib/url-helpers';
 
+import { ALL_SECTIONS } from '../dashboard/constants';
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { useWorkspace } from '../WorkspaceProvider';
 
 import { SearchEntity } from './filters';
 import type { SearchEntityNodeMap, SearchHighlights } from './types';
 import { useRecentlyVisited } from './useRecentlyVisited';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import { ALL_SECTIONS } from '../dashboard/constants';
 
 export function getHighlightsFields<T extends string>(
   highlights: SearchHighlights,

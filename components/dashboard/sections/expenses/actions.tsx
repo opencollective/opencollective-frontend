@@ -34,6 +34,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { getCollectivePageCanonicalURL, getDashboardRoute } from '../../../../lib/url-helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from '@/components/expenses/lib/accounting-categories';
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import { shouldShowDuplicateExpenseButton } from '@/components/expenses/ExpenseMoreActionsButton';
 import { getDisabledMessage } from '@/components/expenses/PayExpenseButton';
@@ -51,11 +52,10 @@ import Link from '../../../Link';
 import type { BaseModalProps } from '../../../ModalContext';
 import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
+import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
 import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from './ScheduledExpensesBanner';
-import LoggedInUser from '@/lib/LoggedInUser';
-import { ALL_SECTIONS } from '../../constants';
 
 /**
  * Helper function to get error content with special handling for PayPal balance errors

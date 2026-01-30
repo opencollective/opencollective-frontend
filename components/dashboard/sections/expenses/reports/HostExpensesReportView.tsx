@@ -12,6 +12,10 @@ import {
 } from '../../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+
+import { ALL_SECTIONS } from '@/components/dashboard/constants';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import Link from '../../../../Link';
@@ -26,9 +30,6 @@ import type { DashboardSectionProps } from '../../../types';
 import { HostExpensesReportTabs } from '../../reports/HostReportTabs';
 import { ReportNavigationArrows } from '../../reports/NavigationArrows';
 import { deserializeReportSlug, ReportPeriodSelector } from '../../reports/ReportPeriodSelector';
-import { ALL_SECTIONS } from '@/components/dashboard/constants';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 const schema = z.object({
   isHost: boolean.default(false),
