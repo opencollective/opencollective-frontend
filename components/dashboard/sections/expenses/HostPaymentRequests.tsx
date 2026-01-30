@@ -221,7 +221,7 @@ const getExpenseColumns = intl => [
     header: () => <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
     cell: ({ row }) => {
       const expense = row.original;
-      const amount = expense.amountInHostCurrency || { valueInCents: expense.amount, currency: expense.currency };
+      const amount = { valueInCents: expense.amount, currency: expense.currency };
       return (
         <div className="flex flex-col">
           <span className="font-medium">
