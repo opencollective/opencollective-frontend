@@ -1,14 +1,20 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import {
-  type AccountHoverCardFieldsFragment,
-  type HostDashboardExpensesQueryVariables,
+import type {
+  Account,
+  AccountHoverCardFieldsFragment,
+  Expense,
+  Host,
+  HostDashboardExpensesQuery,
+  HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -27,6 +33,7 @@ import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { ColumnHeader } from '../../../table/ColumnHeader';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
@@ -48,6 +55,179 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { hostDashboardExpensesQuery } from './queries';
+
+type HostExpensesQueryNode = NonNullable<HostDashboardExpensesQuery['expenses']['nodes']>[number];
+
+const columnHelper = createColumnHelper<HostExpensesQueryNode>();
+
+function getExpenseColumns(
+  intl: IntlShape,
+  host: HostDashboardExpensesQuery['host'],
+): ColumnDef<HostExpensesQueryNode, unknown>[] {
+  return [
+    columnHelper.accessor('createdAt', {
+      meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'Expense.Date' }) },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const createdAt = cell.getValue() as HostExpensesQueryNode['createdAt'];
+        return <DateTime className="whitespace-nowrap" dateStyle="medium" value={createdAt} />;
+      },
+    }),
+    columnHelper.accessor('account', {
+      meta: { className: 'max-w-48', labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }) },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const expense = cell.row.original;
+        const account = expense.account;
+        return (
+          <div className="max-w-fit">
+            <LinkCollective
+              collective={account}
+              withHoverCard
+              className="group flex items-center gap-2 hover:no-underline"
+            >
+              <Avatar size={24} collective={account} />
+              <div className="flex flex-col overflow-hidden">
+                <span className="truncate font-medium group-hover:underline">{account.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {intl ? formatCollectiveType(intl, account.type) : account.type}
+                </span>
+              </div>
+            </LinkCollective>
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor('type', {
+      meta: { labelMsg: defineMessage({ defaultMessage: 'Type', id: '+U6ozc' }) },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const expense = cell.row.original;
+        return (
+          <div className="flex flex-col">
+            <span>{i18nExpenseType(intl, expense.type)}</span>
+            <span className="text-xs text-muted-foreground">#{expense.legacyId}</span>
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor('description', {
+      meta: { className: 'max-w-64 flex-1', labelMsg: defineMessage({ defaultMessage: 'Title', id: 'Title' }) },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const expense = cell.row.original;
+        const submittedBy = expense.createdByAccount;
+        return (
+          <div className="flex flex-col">
+            <span className="truncate font-medium">{expense.description}</span>
+            <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="Submitted by {submittedByAccount}"
+                id="HJQNkj"
+                values={{
+                  date: <DateTime dateStyle="medium" value={expense.createdAt} />,
+                  submittedByAccount: (
+                    <LinkCollective collective={submittedBy} withHoverCard className="">
+                      <Avatar size={14} collective={submittedBy} />
+                    </LinkCollective>
+                  ),
+                }}
+              />
+            </div>
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor('accountingCategory', {
+      meta: {
+        labelMsg: defineMessage({ defaultMessage: 'Accounting category', id: 'AddFundsModal.accountingCategory' }),
+      },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const expense = cell.row.original;
+        return (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+          <div onClick={e => e.stopPropagation()}>
+            <ExpenseAccountingCategoryPill
+              expense={expense as Expense}
+              host={host as unknown as Host}
+              account={expense.account as Account}
+              canEdit={
+                host !== undefined &&
+                host !== null &&
+                isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') &&
+                get(expense, 'permissions.canEditAccountingCategory', false)
+              }
+              allowNone
+              showCodeInSelect={true}
+            />
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor('payee', {
+      meta: { className: 'max-w-48', labelMsg: defineMessage({ defaultMessage: 'Payee', id: 'hiZQdK' }) },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const expense = cell.row.original;
+        const payee = expense.payee;
+        return (
+          <div className="max-w-fit">
+            <LinkCollective collective={payee} withHoverCard className="group hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Avatar size={24} collective={payee} />
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate font-medium group-hover:underline">{payee.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {intl ? formatCollectiveType(intl, payee.type) : payee.type}
+                  </span>
+                </div>
+              </div>
+            </LinkCollective>
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor('status', {
+      meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }) },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const status = cell.getValue();
+        return (
+          <div>
+            <ExpenseStatusTag status={status} />
+          </div>
+        );
+      },
+    }),
+    columnHelper.accessor('amount', {
+      meta: {
+        className: 'min-w-32 text-right',
+        labelMsg: defineMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
+        align: 'right',
+      },
+      header: ctx => <ColumnHeader {...ctx} />,
+      cell: ({ cell }) => {
+        const expense = cell.row.original;
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium">
+              <FormattedMoneyAmount amount={Math.abs(expense.amount)} currency={expense.currency} />
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {intl
+                ? i18nPayoutMethodType(intl, expense.payoutMethod?.type, {
+                    aliasBankAccountToTransferWise: true,
+                  })
+                : expense.payoutMethod?.type}
+            </span>
+          </div>
+        );
+      },
+    }),
+    actionsColumn,
+  ];
+}
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
@@ -75,163 +255,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
-
-const getExpenseColumns = intl => [
-  {
-    accessorKey: 'createdAt',
-    meta: { className: 'max-w-32' },
-    header: () => <FormattedMessage defaultMessage="Date" id="Expense.Date" />,
-    cell: ({ cell }) => {
-      const createdAt = cell.getValue();
-      return <DateTime className="whitespace-nowrap" dateStyle="medium" value={createdAt} />;
-    },
-  },
-
-  {
-    accessorKey: 'account',
-    meta: { className: 'max-w-48' },
-    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      const account = expense.account;
-      return (
-        <div className="max-w-fit">
-          <LinkCollective
-            collective={account}
-            withHoverCard
-            className="group flex items-center gap-2 hover:no-underline"
-          >
-            <Avatar size={24} collective={account} />
-            <div className="flex flex-col overflow-hidden">
-              <span className="truncate font-medium group-hover:underline">{account.name}</span>
-              <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, account.type)}</span>
-            </div>
-          </LinkCollective>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'type',
-    header: () => <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      return (
-        <div className="flex flex-col">
-          <span>{i18nExpenseType(intl, expense.type)}</span>
-          <span className="text-xs text-muted-foreground">#{expense.legacyId}</span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'description',
-    meta: { className: 'max-w-64 flex-1' },
-    header: () => <FormattedMessage defaultMessage="Title" id="Title" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      const submittedBy = expense.createdByAccount;
-      return (
-        <div className="flex flex-col">
-          <span className="truncate font-medium">{expense.description}</span>
-          <div className="flex items-center gap-1 overflow-hidden text-xs whitespace-nowrap text-muted-foreground">
-            <FormattedMessage
-              defaultMessage="Submitted by {submittedByAccount}"
-              id="HJQNkj"
-              values={{
-                date: <DateTime dateStyle="medium" value={expense.createdAt} />,
-                submittedByAccount: (
-                  <LinkCollective collective={submittedBy} withHoverCard className="">
-                    <Avatar size={14} collective={submittedBy} />
-                  </LinkCollective>
-                ),
-              }}
-            />
-          </div>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'accountingCategory',
-    header: () => <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-        <div onClick={e => e.stopPropagation()}>
-          <ExpenseAccountingCategoryPill
-            expense={expense}
-            host={expense.host}
-            account={expense.account}
-            canEdit={
-              isFeatureEnabled(expense.host, 'CHART_OF_ACCOUNTS') &&
-              get(expense, 'permissions.canEditAccountingCategory', false)
-            }
-            allowNone
-            showCodeInSelect={true}
-          />
-        </div>
-      );
-    },
-  },
-
-  {
-    accessorKey: 'payee',
-    meta: { className: 'max-w-48' },
-    header: () => <FormattedMessage defaultMessage="Payee" id="hiZQdK" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      const payee = expense.payee;
-      return (
-        <div className="max-w-fit">
-          <LinkCollective collective={payee} withHoverCard className="group hover:no-underline">
-            <div className="flex items-center gap-2">
-              <Avatar size={24} collective={payee} />
-              <div className="flex flex-col overflow-hidden">
-                <span className="truncate font-medium group-hover:underline">{payee.name}</span>
-                <span className="text-xs text-muted-foreground">{formatCollectiveType(intl, payee.type)}</span>
-              </div>
-            </div>
-          </LinkCollective>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'status',
-    meta: { className: 'max-w-32 ' },
-    header: () => <FormattedMessage defaultMessage="Status" id="tzMNF3" />,
-    cell: ({ cell }) => {
-      const status = cell.getValue();
-      return (
-        <div>
-          <ExpenseStatusTag status={status} />
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'amount',
-    meta: { className: 'min-w-32 text-right' },
-    header: () => <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
-    cell: ({ row }) => {
-      const expense = row.original;
-      const amount = { valueInCents: expense.amount, currency: expense.currency };
-      return (
-        <div className="flex flex-col">
-          <span className="font-medium">
-            <FormattedMoneyAmount amount={Math.abs(amount.valueInCents)} currency={amount.currency} />
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {i18nPayoutMethodType(intl, expense.payoutMethod?.type, { aliasBankAccountToTransferWise: true })}
-          </span>
-        </div>
-      );
-    },
-  },
-  actionsColumn,
-];
 
 const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const router = useRouter();
@@ -278,6 +301,8 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
     onClose: () => pushSubpath(undefined),
   });
 
+  const expenseColumns = useMemo(() => getExpenseColumns(intl, data?.host), [data?.host, intl]);
+
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
@@ -314,15 +339,14 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       ) : (
         <React.Fragment>
           <DataTable
-            data={data?.expenses?.nodes.map(node => ({ ...node, host: data?.host })) ?? []}
-            columns={getExpenseColumns(intl)}
+            data={data?.expenses?.nodes ?? []}
+            columns={expenseColumns}
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowId={row => String(row.legacyId)}
             queryFilter={queryFilter}
             loading={loading}
             getActions={getExpenseActions}
             nbPlaceholders={queryFilter.values.limit}
-            meta={{ host: data?.host }}
           />
           <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
