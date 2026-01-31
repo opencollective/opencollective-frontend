@@ -250,7 +250,7 @@ const featureSections: IFeatureSection[] = [
       },
       {
         title: defineMessage({
-          id: 'solutions.features.item.approve-payment-requests.title',
+          id: 'ApprovePaymentRequests',
           defaultMessage: 'Approve Payment Requests',
         }),
         description: defineMessage({

@@ -12,6 +12,10 @@ import {
 } from '../../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+
+import { ALL_SECTIONS } from '@/components/dashboard/constants';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import Link from '../../../../Link';
@@ -35,6 +39,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
   const variables = deserializeReportSlug(props.subpath[0]);
 
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<HostExpensesReportQuery, HostExpensesReportQueryVariables>(
     gql`
@@ -136,12 +141,21 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                 <table className="border-none">
                   <tbody>
                     {data.map((item, i) => {
+                      const hasSidebarReorg = LoggedInUser.hasPreviewFeatureEnabled(
+                        PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS,
+                      );
                       const url = new URL(
-                        item.isHost
-                          ? `/dashboard/${props.accountSlug}/expenses`
-                          : `/dashboard/${props.accountSlug}/host-expenses`,
+                        hasSidebarReorg
+                          ? `/dashboard/${props.accountSlug}/${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}`
+                          : item.isHost
+                            ? `/dashboard/${props.accountSlug}/${ALL_SECTIONS.EXPENSES}`
+                            : `/dashboard/${props.accountSlug}/${ALL_SECTIONS.HOST_EXPENSES}`,
                         window.location.href,
                       );
+
+                      if (hasSidebarReorg) {
+                        url.searchParams.set('hostContext', item.isHost ? 'INTERNAL' : 'HOSTED');
+                      }
 
                       url.searchParams.set('accountingCategory', item.accountingCategory?.code || UNCATEGORIZED_VALUE);
                       url.searchParams.set('status', ExpenseStatus.PAID);
