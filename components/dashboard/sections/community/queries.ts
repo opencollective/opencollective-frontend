@@ -14,6 +14,8 @@ export const peopleHostDashboardQuery = gql`
     $relation: [CommunityRelationType!]
     $searchTerm: String
     $account: AccountReferenceInput
+    $totalContributed: AmountRangeInput
+    $totalExpended: AmountRangeInput
   ) {
     community(
       host: { slug: $slug }
@@ -21,6 +23,8 @@ export const peopleHostDashboardQuery = gql`
       account: $account
       type: [INDIVIDUAL]
       searchTerm: $searchTerm
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
       offset: $offset
       limit: $limit
     ) {

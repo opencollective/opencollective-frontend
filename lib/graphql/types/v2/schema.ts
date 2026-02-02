@@ -6944,6 +6944,8 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  totalContributed?: InputMaybe<AmountRangeInput>;
+  totalExpended?: InputMaybe<AmountRangeInput>;
   visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
@@ -12064,8 +12066,11 @@ export type QueryCommunityArgs = {
   host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: InputMaybe<OrderByInput>;
   relation?: InputMaybe<Array<CommunityRelationType>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  totalContributed?: InputMaybe<AmountRangeInput>;
+  totalExpended?: InputMaybe<AmountRangeInput>;
   type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 
