@@ -16,8 +16,6 @@ import {
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
-import { i18nExpenseType } from '@/lib/i18n/expense';
-import { sortSelectOptions } from '@/lib/utils';
 
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
@@ -58,8 +56,8 @@ type FilterMeta = CommonFilterMeta & {
   expenseTags?: string[];
   hostSlug?: string;
   includeUncategorized: boolean;
-  omitExpenseTypesInFilter?: ExpenseType[];
 };
+
 const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: (slug, key, meta) => {
@@ -90,18 +88,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       );
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
-  },
-  type: {
-    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
-    Component: ({ meta, valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(omit(ExpenseType, [ExpenseType.FUNDING_REQUEST, ...meta.omitExpenseTypesInFilter]))
-          .map(value => ({ label: valueRenderer({ value, intl }), value }))
-          .sort(sortSelectOptions)}
-        {...props}
-      />
-    ),
-    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
   },
 };
 
@@ -154,7 +140,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
-  const omitExpenseTypesInFilter = [ExpenseType.GRANT];
+  const omitExpenseTypes = [ExpenseType.GRANT];
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
@@ -164,7 +150,7 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     accountSlug,
     hostSlug: hostSlug,
     includeUncategorized: true,
-    omitExpenseTypesInFilter,
+    omitExpenseTypes,
     accountingCategoryKinds: ExpenseAccountingCategoryKinds,
   };
 
@@ -183,9 +169,6 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
       hasAmountInCreatedByAccountCurrency: false,
       fetchGrantHistory: false,
       ...queryFilter.variables,
-      ...(!queryFilter.variables.type
-        ? { types: Object.values(ExpenseType).filter(v => !omitExpenseTypesInFilter.includes(v)) }
-        : {}),
     },
   });
 

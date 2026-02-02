@@ -385,7 +385,7 @@ export const paidDisbursementsQuery = gql`
     $hostContext: HostContext
     $limit: Int!
     $offset: Int!
-    $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $amount: AmountRangeInput
@@ -403,7 +403,7 @@ export const paidDisbursementsQuery = gql`
       account: $account
       limit: $limit
       offset: $offset
-      type: $type
+      types: $types
       tag: $tags
       status: $status
       amount: $amount

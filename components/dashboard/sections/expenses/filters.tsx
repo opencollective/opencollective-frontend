@@ -4,7 +4,7 @@ import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { boolean, isMulti, limit, offset } from '../../../../lib/filters/schemas';
+import { boolean, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
 import type {
   AccountExpensesQueryVariables,
   HostDashboardExpensesQueryVariables,
@@ -49,7 +49,7 @@ export const schema = z.object({
   date: dateFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(ExpenseStatusFilter)).optional(),
-  type: isMulti(z.nativeEnum(ExpenseType)).optional(),
+  type: isNullable(isMulti(z.nativeEnum(ExpenseType))),
   payout: z.nativeEnum(PayoutMethodType).optional(),
   lastCommentBy: isMulti(z.nativeEnum(LastCommentBy)).optional(),
   tag: expenseTagFilter.schema,
@@ -67,6 +67,7 @@ export type FilterMeta = {
   currency?: Currency;
   hideExpensesMetaStatuses?: boolean;
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
+  omitExpenseTypes?: ExpenseType[];
 };
 
 // Only needed when either the key or the expected query variables are different
@@ -80,7 +81,14 @@ export const toVariables: FiltersToVariables<
   tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
-  type: value => ({ types: value }), // Note: Using the `types` variable name to allow multi-selection
+  type: (value, key, meta) => {
+    // Note: Using the `types` GraphQL query variable to allow multi-selection
+    return isEmpty(value)
+      ? meta?.omitExpenseTypes
+        ? { types: Object.values(ExpenseType).filter(v => !meta.omitExpenseTypes.includes(v)) }
+        : undefined
+      : { types: value };
+  },
   status: value => {
     return isEmpty(value)
       ? undefined
@@ -119,10 +127,10 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
   type: {
     labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
+    Component: ({ valueRenderer, intl, meta, ...props }) => (
       <ComboSelectFilter
         isMulti
-        options={Object.values(omit(ExpenseType, ExpenseType.FUNDING_REQUEST))
+        options={Object.values(omit(ExpenseType, [ExpenseType.FUNDING_REQUEST, ...(meta?.omitExpenseTypes ?? [])]))
           .map(value => ({ label: valueRenderer({ value, intl }), value }))
           .sort(sortSelectOptions)}
         {...props}
