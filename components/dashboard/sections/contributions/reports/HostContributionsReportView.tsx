@@ -140,25 +140,48 @@ export function HostContributionsReportView(props: DashboardSectionProps) {
                 <table className="border-none">
                   <tbody>
                     {data.map((item, i) => {
-                      const url = new URL(
+                      const contributionsUrl = new URL(
                         `/dashboard/${props.accountSlug}/incoming-contributions`,
                         window.location.href,
                       );
 
                       if (item.isHost) {
-                        url.searchParams.set('hostContext', 'INTERNAL'); // operational contributions
+                        contributionsUrl.searchParams.set('hostContext', 'INTERNAL'); // operational contributions
                       } else {
-                        url.searchParams.set('hostContext', 'HOSTED'); // managed contributions
+                        contributionsUrl.searchParams.set('hostContext', 'HOSTED'); // managed contributions
                       }
 
-                      url.searchParams.set('accountingCategory', item.accountingCategory?.code || UNCATEGORIZED_VALUE);
-                      url.searchParams.set('sort[field]', 'LAST_CHARGED_AT');
-                      url.searchParams.set('sort[direction]', 'DESC');
+                      contributionsUrl.searchParams.set(
+                        'accountingCategory',
+                        item.accountingCategory?.code || UNCATEGORIZED_VALUE,
+                      );
+                      contributionsUrl.searchParams.set('sort[field]', 'LAST_CHARGED_AT');
+                      contributionsUrl.searchParams.set('sort[direction]', 'DESC');
                       if (variables.dateFrom && variables.dateTo) {
-                        url.searchParams.set('chargeDate[type]', 'BETWEEN');
-                        url.searchParams.set('chargeDate[gte]', variables.dateFrom.slice(0, 10));
-                        url.searchParams.set('chargeDate[lte]', variables.dateTo.slice(0, 10));
+                        contributionsUrl.searchParams.set('chargeDate[type]', 'BETWEEN');
+                        contributionsUrl.searchParams.set('chargeDate[gte]', variables.dateFrom.slice(0, 10));
+                        contributionsUrl.searchParams.set('chargeDate[lte]', variables.dateTo.slice(0, 10));
                       }
+
+                      const transactionsUrl = new URL(
+                        `/dashboard/${props.accountSlug}/host-transactions`,
+                        window.location.href,
+                      );
+
+                      if (item.isHost) {
+                        transactionsUrl.searchParams.set('account', props.accountSlug); // operational transactions
+                      } else {
+                        transactionsUrl.searchParams.set('excludeAccount', props.accountSlug); // managed transactions
+                      }
+
+                      if (variables.dateFrom && variables.dateTo) {
+                        transactionsUrl.searchParams.set('clearedAt[type]', 'BETWEEN');
+                        transactionsUrl.searchParams.set('clearedAt[gte]', variables.dateFrom.slice(0, 10));
+                        transactionsUrl.searchParams.set('clearedAt[lte]', variables.dateTo.slice(0, 10));
+                      }
+
+                      transactionsUrl.searchParams.set('kind', 'CONTRIBUTION');
+                      transactionsUrl.searchParams.append('kind', 'ADDED_FUNDS');
 
                       return (
                         // eslint-disable-next-line react/no-array-index-key
@@ -200,8 +223,13 @@ export function HostContributionsReportView(props: DashboardSectionProps) {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem>
-                                  <Link href={url.toString()} openInNewTab>
+                                  <Link href={contributionsUrl.toString()} openInNewTab>
                                     <FormattedMessage defaultMessage="View contributions" id="7rsA36" />
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Link href={transactionsUrl.toString()} openInNewTab>
+                                    <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
                                   </Link>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
