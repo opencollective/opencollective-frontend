@@ -309,29 +309,15 @@ function FilterDropdown<FV, FM>({
   const [open, setOpen] = React.useState(false);
   const appliedValue = values[filterKey];
   const [draftValue, setDraftValue] = React.useState(appliedValue);
-  const prevAppliedValueRef = React.useRef(appliedValue);
 
   // Sync draft value when the applied value changes externally (e.g., URL change)
-  React.useEffect(() => {
-    // Only sync when appliedValue actually changed
-    // This prevents unnecessary state updates that could cause timing issues
-    // Use deep comparison since filter values can be arrays/objects
-    const appliedValueChanged = !isEqual(prevAppliedValueRef.current, appliedValue);
-    prevAppliedValueRef.current = appliedValue;
-
-    if (appliedValueChanged) {
-      setDraftValue(appliedValue);
-    }
-  }, [appliedValue]);
+  React.useEffect(() => setDraftValue(appliedValue), [appliedValue]);
 
   const handleOpenChange = (isOpen: boolean) => {
     if (locked) {
       return;
     }
-    // Reset draft to applied value when opening
-    if (isOpen) {
-      setDraftValue(appliedValue);
-    }
+    setDraftValue(appliedValue);
     setOpen(isOpen);
   };
 
