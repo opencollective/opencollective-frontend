@@ -104,24 +104,20 @@ export function OrgOverview() {
       />
       <ConvertedAccountMessage account={account} />
       <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
-      {hasMoneyManagement ? (
-        <React.Fragment>
-          {account.platformSubscription && (
-            <Collapsible open={showSubscriptionCard}>
-              <CollapsibleContent>
-                <PlatformBillingOverviewCard
-                  accountSlug={account.slug}
-                  onDismiss={() => handleSubscriptionCardToggle(false)}
-                />
-              </CollapsibleContent>
-            </Collapsible>
-          )}
-          <HostOverviewContent accountSlug={account.slug} />
-        </React.Fragment>
+      {hasMoneyManagement && account.platformSubscription && (
+        <Collapsible open={showSubscriptionCard}>
+          <CollapsibleContent>
+            <PlatformBillingOverviewCard
+              accountSlug={account.slug}
+              onDismiss={() => handleSubscriptionCardToggle(false)}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+      {account.hasHosting ? (
+        <HostOverviewContent accountSlug={account.slug} />
       ) : (
-        <React.Fragment>
-          <OrgOverviewContent accountSlug={account.slug} />
-        </React.Fragment>
+        <OrgOverviewContent accountSlug={account.slug} />
       )}
     </div>
   );

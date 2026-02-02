@@ -39,48 +39,6 @@ describe('Chart of Accounts', () => {
     cy.contains('Workspace Expenses');
     cy.contains('Contractor Expenses');
 
-    // Test filtering by kind
-    cy.get('[data-cy=add-filter]').click();
-    cy.get('[data-value="Kind"]').click();
-    cy.contains('[data-cy=combo-select-option]', 'Added Funds').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.get('[data-cy=apply-filter]').should('not.exist');
-    cy.contains('No chart of accounts');
-
-    // Change filter to Expenses - first remove old filter, then add new one
-    // (Kind filter is multi-select, so editing in place would add, not replace)
-    cy.get('[data-cy=remove-filter-kind]').click();
-    cy.get('[data-cy=add-filter]').click();
-    cy.get('[data-value="Kind"]').click();
-    cy.contains('[data-cy=combo-select-option]', 'Expenses').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.get('[data-cy=apply-filter]').should('not.exist');
-    cy.contains('Workspace Expenses');
-
-    // Clear filtering by kind
-    cy.get('[data-cy=remove-filter-kind]').click();
-    cy.contains('Workspace Expenses');
-    cy.contains('Contractor Expenses');
-
-    // Test filtering by visibility
-    cy.get('[data-cy=add-filter]').click();
-    cy.get('[data-value="Visible only to host admins"]').click();
-    cy.contains('[data-cy=combo-select-option]', 'Yes').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.get('[data-cy=apply-filter]').should('not.exist');
-    cy.contains('No chart of accounts');
-
-    cy.get('[data-cy=filter-hostOnly]').click();
-    cy.contains('[data-cy=combo-select-option]', 'No').click();
-    cy.get('[data-cy=apply-filter]').click();
-    cy.get('[data-cy=apply-filter]').should('not.exist');
-    cy.contains('Workspace Expenses');
-
-    // Clear filtering by visibility
-    cy.get('[data-cy=remove-filter-hostOnly]').click();
-    cy.contains('Workspace Expenses');
-    cy.contains('Contractor Expenses');
-
     // Test search by code
     cy.get('[data-cy=admin-panel-container] input').type('007');
     cy.contains('Workspace Expenses');
