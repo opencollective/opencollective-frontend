@@ -777,7 +777,13 @@ const AddFundsModalContentWithCollective = ({
                   <Field
                     name="fromAccount"
                     htmlFor="addFunds-fromAccount"
-                    label={<FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />}
+                    label={
+                      host?.isTrustedHost ? (
+                        <FormattedMessage defaultMessage="Source" id="AddFundsModal.source" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Vendor" id="dU1t5Z" />
+                      )
+                    }
                     mt={3}
                   >
                     {({ form, field }) => (
@@ -786,7 +792,7 @@ const AddFundsModalContentWithCollective = ({
                           loading={isCreatingVendor}
                           inputId={field.id}
                           data-cy="add-funds-source"
-                          types={['VENDOR']}
+                          types={host?.isTrustedHost ? ['VENDOR', 'ORGANIZATION'] : ['VENDOR']}
                           error={field.error}
                           onBlur={() => form.setFieldTouched(field.name, true)}
                           onChange={({ value }) => {
