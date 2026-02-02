@@ -6944,6 +6944,8 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  totalContributed?: InputMaybe<AmountRangeInput>;
+  totalExpended?: InputMaybe<AmountRangeInput>;
   visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
@@ -10004,6 +10006,8 @@ export type Organization = Account & AccountWithContributions & AccountWithPlatf
   /** List of activities that the logged-in user is subscribed for this collective */
   activitySubscriptions?: Maybe<Array<Maybe<ActivitySubscription>>>;
   backgroundImageUrl?: Maybe<Scalars['String']['output']>;
+  /** Returns whether this organization can be a vendor of the specified host. This checks if the organization only transacted with this host and all its admins are also admins of the host. */
+  canBeVendorOf: Scalars['Boolean']['output'];
   /** Whether this account can have changelog updates */
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   /** Returns true if the remote user can start the process to resume contributions for account */
@@ -10177,6 +10181,12 @@ export type OrganizationActivitySubscriptionsArgs = {
 export type OrganizationBackgroundImageUrlArgs = {
   format?: InputMaybe<ImageFormat>;
   height?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** This represents an Organization account */
+export type OrganizationCanBeVendorOfArgs = {
+  host: AccountReferenceInput;
 };
 
 
@@ -12056,8 +12066,11 @@ export type QueryCommunityArgs = {
   host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: InputMaybe<OrderByInput>;
   relation?: InputMaybe<Array<CommunityRelationType>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  totalContributed?: InputMaybe<AmountRangeInput>;
+  totalExpended?: InputMaybe<AmountRangeInput>;
   type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 

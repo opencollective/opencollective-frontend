@@ -14,6 +14,8 @@ export const peopleHostDashboardQuery = gql`
     $relation: [CommunityRelationType!]
     $searchTerm: String
     $account: AccountReferenceInput
+    $totalContributed: AmountRangeInput
+    $totalExpended: AmountRangeInput
   ) {
     community(
       host: { slug: $slug }
@@ -21,6 +23,8 @@ export const peopleHostDashboardQuery = gql`
       account: $account
       type: [INDIVIDUAL]
       searchTerm: $searchTerm
+      totalContributed: $totalContributed
+      totalExpended: $totalExpended
       offset: $offset
       limit: $limit
     ) {
@@ -161,6 +165,9 @@ export const communityAccountDetailQuery = gql`
       type
       createdAt
       imageUrl
+      ... on Organization {
+        canBeVendorOf(host: { slug: $hostSlug })
+      }
       socialLinks {
         type
         url
@@ -308,17 +315,6 @@ export const communityAccountDetailQuery = gql`
         totalCount
         nodes {
           ...LegalDocumentFields
-        }
-      }
-      admins: members(role: [ADMIN]) {
-        nodes {
-          id
-          role
-          description
-          createdAt
-          account {
-            id
-          }
         }
       }
     }

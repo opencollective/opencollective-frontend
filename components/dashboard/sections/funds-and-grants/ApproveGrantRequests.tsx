@@ -103,7 +103,6 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
       ? [metadata.account, ...metadata.account.childrenAccounts.nodes]
       : undefined,
     accountSlug,
-    expenseTags: metadata?.expenseTagStats?.nodes?.map(({ tag }) => tag),
     hostSlug: hostSlug,
     includeUncategorized: true,
   };

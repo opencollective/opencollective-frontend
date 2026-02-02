@@ -4320,6 +4320,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
   ): VendorCollection!
 
   """
@@ -15432,6 +15442,16 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
   Returns whether the account has hosting activated.
   """
   hasHosting: Boolean!
+
+  """
+  Returns whether this organization can be a vendor of the specified host. This checks if the organization only transacted with this host and all its admins are also admins of the host.
+  """
+  canBeVendorOf(
+    """
+    The host account to check against
+    """
+    host: AccountReferenceInput!
+  ): Boolean!
 }
 
 """
@@ -16981,6 +17001,17 @@ type Query {
     """
     searchTerm: String
     relation: [CommunityRelationType!]
+    orderBy: OrderByInput
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
     limit: Int! = 100
     offset: Int! = 0
   ): AccountCollection!

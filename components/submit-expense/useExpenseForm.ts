@@ -877,7 +877,7 @@ function buildFormSchema(
             .string()
             .nullish()
             .refine(v => {
-              if (!options.isAdminOfPayee) {
+              if (!options.isAdminOfPayee && options.payee?.type !== CollectiveType.VENDOR) {
                 return true;
               }
 
