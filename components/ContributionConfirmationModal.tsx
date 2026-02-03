@@ -68,7 +68,7 @@ const ContributionConfirmationModal = ({
                 loading={submitting}
                 type="submit"
                 data-cy="order-confirmation-modal-submit"
-                className="min-w-[240px]"
+                className="min-w-[180px]"
               >
                 <FormattedMessage defaultMessage="Confirm contribution" id="k/uy+b" />
               </Button>
