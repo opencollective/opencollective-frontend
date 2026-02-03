@@ -281,33 +281,36 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const views: Views<FilterValues> = [
-    {
-      id: 'all',
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-    },
-    {
-      id: 'pending',
-      label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
-      filter: { status: [ExpenseStatusFilter.PENDING] },
-    },
-    {
-      id: 'approved',
-      label: intl.formatMessage({ id: 'expense.approved', defaultMessage: 'Approved' }),
-      filter: { status: [ExpenseStatusFilter.APPROVED] },
-    },
-    {
-      id: 'rejected',
-      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
-      filter: { status: [ExpenseStatusFilter.REJECTED] },
-    },
-    {
-      id: 'paid',
-      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-      filter: { status: [ExpenseStatusFilter.PAID] },
-    },
-  ];
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        id: 'all',
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+        filter: {},
+      },
+      {
+        id: 'pending',
+        label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
+        filter: { status: [ExpenseStatusFilter.PENDING] },
+      },
+      {
+        id: 'approved',
+        label: intl.formatMessage({ id: 'expense.approved', defaultMessage: 'Approved' }),
+        filter: { status: [ExpenseStatusFilter.APPROVED] },
+      },
+      {
+        id: 'rejected',
+        label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
+        filter: { status: [ExpenseStatusFilter.REJECTED] },
+      },
+      {
+        id: 'paid',
+        label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+        filter: { status: [ExpenseStatusFilter.PAID] },
+      },
+    ],
+    [intl],
+  );
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
@@ -341,10 +344,14 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
     },
   });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
 
   const getExpenseActions = useExpenseActions({
     refetchList: () => {

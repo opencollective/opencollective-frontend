@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
@@ -169,49 +169,52 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
   });
 
-  const views: Views<FilterValues> = [
-    {
-      label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
-      filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'ready_to_pay',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
-      filter: {
-        lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
-        status: [
-          ExpenseStatusFilter.APPROVED,
-          ExpenseStatusFilter.ERROR,
-          ExpenseStatusFilter.INCOMPLETE,
-          ExpenseStatusFilter.ON_HOLD,
-        ],
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
+        filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'ready_to_pay',
       },
-      id: 'unreplied',
-    },
-    {
-      label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
-      filter: {
-        status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
-        sort: { field: 'CREATED_AT', direction: 'ASC' },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
+        filter: {
+          lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
+          status: [
+            ExpenseStatusFilter.APPROVED,
+            ExpenseStatusFilter.ERROR,
+            ExpenseStatusFilter.INCOMPLETE,
+            ExpenseStatusFilter.ON_HOLD,
+          ],
+        },
+        id: 'unreplied',
       },
-      id: 'scheduled_for_payment',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
-      filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'on_hold',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
-      filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'incomplete',
-    },
-    {
-      label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
-      filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'error',
-    },
-  ];
+      {
+        label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
+        filter: {
+          status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+          sort: { field: 'CREATED_AT', direction: 'ASC' },
+        },
+        id: 'scheduled_for_payment',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
+        filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'on_hold',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
+        filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'incomplete',
+      },
+      {
+        label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
+        filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'error',
+      },
+    ],
+    [intl],
+  );
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
@@ -239,10 +242,14 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
   });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
 
   const variables = {
     hostSlug,

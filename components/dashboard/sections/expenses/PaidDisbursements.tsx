@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
@@ -278,34 +278,37 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const views: Views<FilterValues> = [
-    {
-      id: PaidDisbursementsTab.ALL,
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-    },
-    {
-      id: PaidDisbursementsTab.INVOICES,
-      label: intl.formatMessage({ defaultMessage: 'Invoices', id: 'c0bGFo' }),
-      filter: {
-        type: [ExpenseType.INVOICE],
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        id: PaidDisbursementsTab.ALL,
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+        filter: {},
       },
-    },
-    {
-      id: PaidDisbursementsTab.REIMBURSEMENTS,
-      label: intl.formatMessage({ defaultMessage: 'Reimbursements', id: 'wdu2yl' }),
-      filter: {
-        type: [ExpenseType.RECEIPT],
+      {
+        id: PaidDisbursementsTab.INVOICES,
+        label: intl.formatMessage({ defaultMessage: 'Invoices', id: 'c0bGFo' }),
+        filter: {
+          type: [ExpenseType.INVOICE],
+        },
       },
-    },
-    {
-      id: PaidDisbursementsTab.GRANTS,
-      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
-      filter: {
-        type: [ExpenseType.GRANT],
+      {
+        id: PaidDisbursementsTab.REIMBURSEMENTS,
+        label: intl.formatMessage({ defaultMessage: 'Reimbursements', id: 'wdu2yl' }),
+        filter: {
+          type: [ExpenseType.RECEIPT],
+        },
       },
-    },
-  ];
+      {
+        id: PaidDisbursementsTab.GRANTS,
+        label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+        filter: {
+          type: [ExpenseType.GRANT],
+        },
+      },
+    ],
+    [intl],
+  );
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
@@ -337,10 +340,14 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     },
   });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
 
   const getExpenseActions = useExpenseActions({
     refetchList: refetch,
