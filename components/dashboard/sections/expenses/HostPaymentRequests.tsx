@@ -4,7 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
-import type { IntlShape} from 'react-intl';
+import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 

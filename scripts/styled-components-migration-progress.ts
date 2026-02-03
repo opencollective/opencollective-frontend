@@ -55,6 +55,6 @@ function calculateProgress(currentCount: number, originalCount: number): number 
 const currentCount = countStyledComponentsImports(SEARCH_DIR);
 const progress = calculateProgress(currentCount, ORIGINAL_IMPORT_COUNT);
 
-console.log(`Current number of styled-components imports: ${currentCount}`);  
-console.log(`Original number of styled-components imports: ${ORIGINAL_IMPORT_COUNT}`);  
-console.log(`Migration Progress: ${progress.toFixed(2)}%`);  
+console.log(`Current number of styled-components imports: ${currentCount}`);
+console.log(`Original number of styled-components imports: ${ORIGINAL_IMPORT_COUNT}`);
+console.log(`Migration Progress: ${progress.toFixed(2)}%`);
