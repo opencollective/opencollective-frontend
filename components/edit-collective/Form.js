@@ -78,6 +78,10 @@ class EditCollectiveForm extends React.Component {
         return <EditCollectivePage collective={collective} />;
 
       case ALL_SECTIONS.EXPORT:
+      case ALL_SECTIONS.CONNECTED_ACCOUNTS:
+        return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
+
+      case ALL_SECTIONS.WIDGETS:
         return <Export collective={collective} />;
 
       case ALL_SECTIONS.HOST:
