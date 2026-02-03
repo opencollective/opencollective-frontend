@@ -17407,6 +17407,32 @@ type Query {
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!
+  exportRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The account to get export requests for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Filter by export request type
+    """
+    type: ExportRequestType
+
+    """
+    Filter by export request status
+    """
+    status: ExportRequestStatus
+  ): ExportRequestCollection!
   fund(
     """
     The public id identifying the Fund (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -19698,6 +19724,116 @@ type TagStatsCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [TagStat]
+}
+
+"""
+A collection of "ExportRequest"
+"""
+type ExportRequestCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [ExportRequest!]
+}
+
+"""
+An export request
+"""
+type ExportRequest {
+  """
+  Unique identifier for this export request
+  """
+  id: String!
+
+  """
+  Legacy numeric ID of this export request
+  """
+  legacyId: Int!
+
+  """
+  The name of the export request
+  """
+  name: String!
+
+  """
+  The type of export request
+  """
+  type: ExportRequestType!
+
+  """
+  The status of the export request
+  """
+  status: ExportRequestStatus!
+
+  """
+  The parameters of the export request
+  """
+  parameters: JSON
+
+  """
+  The account that requested this export
+  """
+  account: Account!
+
+  """
+  The user who created this export request
+  """
+  createdBy: Individual
+
+  """
+  The exported file (if completed)
+  """
+  file: FileInfo
+
+  """
+  The progress of the export request (0-100)
+  """
+  progress: Int
+
+  """
+  The error message if the export request failed
+  """
+  error: String
+
+  """
+  The time the export request was created
+  """
+  createdAt: DateTime!
+
+  """
+  The time the export request was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The time when the export will expire
+  """
+  expiresAt: DateTime
+}
+
+"""
+The type of export request
+"""
+enum ExportRequestType {
+  """
+  Export request for transactions
+  """
+  TRANSACTIONS
+
+  """
+  Export request for hosted collectives
+  """
+  HOSTED_COLLECTIVES
+}
+
+"""
+The status of an export request
+"""
+enum ExportRequestStatus {
+  ENQUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
 }
 
 """
@@ -23133,6 +23269,31 @@ type Mutation {
   ): PaymentIntent!
 
   """
+  Create a new export request. Scope: "account".
+  """
+  createExportRequest(
+    """
+    The export request to create
+    """
+    exportRequest: ExportRequestCreateInput!
+  ): ExportRequest!
+
+  """
+  Edit an existing export request. Scope: "account".
+  """
+  editExportRequest(
+    """
+    Reference to the export request to edit
+    """
+    exportRequest: ExportRequestReferenceInput!
+
+    """
+    The new name for the export request
+    """
+    name: String
+  ): ExportRequest!
+
+  """
   Mark an account as confirmed
   """
   confirmGuestAccount(
@@ -25891,6 +26052,46 @@ type PaymentIntent {
   paymentIntentClientSecret: String!
   stripeAccount: String!
   stripeAccountPublishableSecret: String!
+}
+
+"""
+Input type for creating an ExportRequest
+"""
+input ExportRequestCreateInput {
+  """
+  The account to create the export request for
+  """
+  account: AccountReferenceInput!
+
+  """
+  A name for this export request
+  """
+  name: String!
+
+  """
+  The type of export to create
+  """
+  type: ExportRequestType!
+
+  """
+  Optional parameters for the export request
+  """
+  parameters: JSON
+}
+
+"""
+Input type for referencing an ExportRequest
+"""
+input ExportRequestReferenceInput {
+  """
+  The public id identifying the export request
+  """
+  id: String
+
+  """
+  The internal id of the export request
+  """
+  legacyId: Int
 }
 
 """

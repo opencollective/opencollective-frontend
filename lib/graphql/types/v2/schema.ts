@@ -5523,6 +5523,84 @@ export type ExpenseValuesRoleDetails = {
   accountingCategory?: Maybe<AccountingCategory>;
 };
 
+/** An export request */
+export type ExportRequest = {
+  __typename?: 'ExportRequest';
+  /** The account that requested this export */
+  account: Account;
+  /** The time the export request was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** The user who created this export request */
+  createdBy?: Maybe<Individual>;
+  /** The error message if the export request failed */
+  error?: Maybe<Scalars['String']['output']>;
+  /** The time when the export will expire */
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The exported file (if completed) */
+  file?: Maybe<FileInfo>;
+  /** Unique identifier for this export request */
+  id: Scalars['String']['output'];
+  /** Legacy numeric ID of this export request */
+  legacyId: Scalars['Int']['output'];
+  /** The name of the export request */
+  name: Scalars['String']['output'];
+  /** The parameters of the export request */
+  parameters?: Maybe<Scalars['JSON']['output']>;
+  /** The progress of the export request (0-100) */
+  progress?: Maybe<Scalars['Int']['output']>;
+  /** The status of the export request */
+  status: ExportRequestStatus;
+  /** The type of export request */
+  type: ExportRequestType;
+  /** The time the export request was last updated */
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** A collection of "ExportRequest" */
+export type ExportRequestCollection = Collection & {
+  __typename?: 'ExportRequestCollection';
+  limit?: Maybe<Scalars['Int']['output']>;
+  nodes?: Maybe<Array<ExportRequest>>;
+  offset?: Maybe<Scalars['Int']['output']>;
+  totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+/** Input type for creating an ExportRequest */
+export type ExportRequestCreateInput = {
+  /** The account to create the export request for */
+  account: AccountReferenceInput;
+  /** A name for this export request */
+  name: Scalars['String']['input'];
+  /** Optional parameters for the export request */
+  parameters?: InputMaybe<Scalars['JSON']['input']>;
+  /** The type of export to create */
+  type: ExportRequestType;
+};
+
+/** Input type for referencing an ExportRequest */
+export type ExportRequestReferenceInput = {
+  /** The public id identifying the export request */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** The internal id of the export request */
+  legacyId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** The status of an export request */
+export enum ExportRequestStatus {
+  COMPLETED = 'COMPLETED',
+  ENQUEUED = 'ENQUEUED',
+  FAILED = 'FAILED',
+  PROCESSING = 'PROCESSING'
+}
+
+/** The type of export request */
+export enum ExportRequestType {
+  /** Export request for hosted collectives */
+  HOSTED_COLLECTIVES = 'HOSTED_COLLECTIVES',
+  /** Export request for transactions */
+  TRANSACTIONS = 'TRANSACTIONS'
+}
+
 /** All supported expense types */
 export enum FeesPayer {
   /** The collective will be responsible for paying the fees */
@@ -8333,6 +8411,8 @@ export type Mutation = {
   createExpense: Expense;
   /** Create a Stripe payment intent */
   createExpenseStripePaymentIntent: PaymentIntent;
+  /** Create a new export request. Scope: "account". */
+  createExportRequest: ExportRequest;
   /** Create a Fund. Scope: "account". */
   createFund?: Maybe<Fund>;
   /** Create a new manual payment provider for a host. Scope: "host". */
@@ -8421,6 +8501,8 @@ export type Mutation = {
   editConversation?: Maybe<Conversation>;
   /** To update an existing expense */
   editExpense: Expense;
+  /** Edit an existing export request. Scope: "account". */
+  editExportRequest: ExportRequest;
   /** Edit the status of a legal document */
   editLegalDocumentStatus: LegalDocument;
   /** Edit an existing member of the Collective. Scope: "account". */
@@ -8804,6 +8886,12 @@ export type MutationCreateExpenseStripePaymentIntentArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreateExportRequestArgs = {
+  exportRequest: ExportRequestCreateInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateFundArgs = {
   fund: FundCreateInput;
   host?: InputMaybe<AccountReferenceInput>;
@@ -9146,6 +9234,13 @@ export type MutationEditExpenseArgs = {
   draftKey?: InputMaybe<Scalars['String']['input']>;
   expense: ExpenseUpdateInput;
   isDraftEdit?: Scalars['Boolean']['input'];
+};
+
+
+/** This is the root mutation */
+export type MutationEditExportRequestArgs = {
+  exportRequest: ExportRequestReferenceInput;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -12081,6 +12176,7 @@ export type Query = {
   expense?: Maybe<Expense>;
   expenseTagStats: TagStatsCollection;
   expenses: ExpenseCollection;
+  exportRequests: ExportRequestCollection;
   fund?: Maybe<Fund>;
   host?: Maybe<Host>;
   hostApplication?: Maybe<HostApplication>;
@@ -12282,6 +12378,16 @@ export type QueryExpensesArgs = {
   type?: InputMaybe<ExpenseType>;
   types?: InputMaybe<Array<InputMaybe<ExpenseType>>>;
   virtualCards?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
+};
+
+
+/** This is the root query */
+export type QueryExportRequestsArgs = {
+  account: AccountReferenceInput;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  status?: InputMaybe<ExportRequestStatus>;
+  type?: InputMaybe<ExportRequestType>;
 };
 
 
