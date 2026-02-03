@@ -87,11 +87,12 @@ function getExpenseColumns(
             <LinkCollective
               collective={account}
               withHoverCard
-              className="group flex items-center gap-2 hover:no-underline"
+              className="flex items-center gap-2 hover:no-underline"
+              onClick={e => e.preventDefault()}
             >
               <Avatar size={24} collective={account} />
               <div className="flex flex-col overflow-hidden">
-                <span className="truncate font-medium group-hover:underline">{account.name}</span>
+                <span className="truncate font-medium">{account.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
                   {formatCollectiveType(intl, account.type)}
                 </span>
@@ -130,7 +131,12 @@ function getExpenseColumns(
                 values={{
                   date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                   submittedByAccount: (
-                    <LinkCollective collective={submittedBy} withHoverCard className="">
+                    <LinkCollective
+                      collective={submittedBy}
+                      withHoverCard
+                      className=""
+                      onClick={e => e.preventDefault()}
+                    >
                       <Avatar size={14} collective={submittedBy} />
                     </LinkCollective>
                   ),
@@ -180,11 +186,16 @@ function getExpenseColumns(
         const payee = expense.payee;
         return (
           <div className="max-w-fit">
-            <LinkCollective collective={payee} withHoverCard className="group hover:no-underline">
+            <LinkCollective
+              collective={payee}
+              withHoverCard
+              className="hover:no-underline"
+              onClick={e => e.preventDefault()}
+            >
               <div className="flex items-center gap-2">
                 <Avatar size={24} collective={payee} />
                 <div className="flex flex-col overflow-hidden">
-                  <span className="truncate font-medium group-hover:underline">{payee.name}</span>
+                  <span className="truncate font-medium">{payee.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {intl ? formatCollectiveType(intl, payee.type) : payee.type}
                   </span>
