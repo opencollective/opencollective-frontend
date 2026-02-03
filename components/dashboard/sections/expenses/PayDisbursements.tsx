@@ -42,6 +42,7 @@ import { HostContextFilter, hostContextFilter } from '../../filters/HostContextF
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
+import { DefinitionTooltip } from '../reports/DefinitionTooltip';
 
 import ExpensePipelineOverview from './ExpensePipelineOverview';
 import type { FilterMeta as CommonFilterMeta } from './filters';
@@ -281,6 +282,27 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               />
             )}
           </div>
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Review, process and disburse payment and grant requests that are <DefinitionTooltip>ready to pay</DefinitionTooltip>."
+            id="AJOacS"
+            values={{
+              DefinitionTooltip: parts => (
+                <DefinitionTooltip
+                  key="definition"
+                  definition={
+                    <FormattedMessage
+                      defaultMessage="Requests that have been approved and can be covered by existing funds"
+                      id="ReadyToPayDefinition"
+                    />
+                  }
+                >
+                  {parts}
+                </DefinitionTooltip>
+              ),
+            }}
+          />
         }
       />
       {paypalPreApprovalError && (
