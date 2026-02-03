@@ -4,10 +4,11 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import type {
   Account,
   AccountHoverCardFieldsFragment,
@@ -16,6 +17,7 @@ import type {
   HostDashboardExpensesQuery,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
@@ -54,7 +56,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { hostDashboardExpensesQuery } from './queries';
+import { hostDashboardExpensesQuery, hostPaymentRequestsMetadataQuery } from './queries';
 
 type HostExpensesQueryNode = NonNullable<HostDashboardExpensesQuery['expenses']['nodes']>[number];
 
@@ -279,6 +281,34 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
+  const views: Views<FilterValues> = [
+    {
+      id: 'all',
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+      filter: {},
+    },
+    {
+      id: 'pending',
+      label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
+      filter: { status: [ExpenseStatusFilter.PENDING] },
+    },
+    {
+      id: 'approved',
+      label: intl.formatMessage({ id: 'expense.approved', defaultMessage: 'Approved' }),
+      filter: { status: [ExpenseStatusFilter.APPROVED] },
+    },
+    {
+      id: 'rejected',
+      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
+      filter: { status: [ExpenseStatusFilter.REJECTED] },
+    },
+    {
+      id: 'paid',
+      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+      filter: { status: [ExpenseStatusFilter.PAID] },
+    },
+  ];
+
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
@@ -290,6 +320,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
       hideExpensesMetaStatuses: true,
     },
+    views,
     skipFiltersOnReset: ['hostContext'],
   });
 
@@ -302,6 +333,18 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const { data, error, loading, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables,
   });
+
+  const { data: metaData } = useQuery(hostPaymentRequestsMetadataQuery, {
+    variables: {
+      hostSlug,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+    },
+  });
+
+  const viewsWithCount: Views<FilterValues> = views.map(view => ({
+    ...view,
+    count: metaData?.[view.id]?.totalCount,
+  }));
 
   const getExpenseActions = useExpenseActions({
     refetchList: () => {
@@ -339,7 +382,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
         description={<FormattedMessage defaultMessage="All submitted payment requests" id="vpLBRJ" />}
       />
 
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} views={viewsWithCount} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
