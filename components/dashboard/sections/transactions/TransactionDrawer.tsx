@@ -240,7 +240,7 @@ const getExpenseUrl = (dashboardAccount, expense, LoggedInUser) => {
   if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
     return getDashboardRoute(
       expense.host,
-      LoggedInUser.hasEnabledPreviewFeature(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+      LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
         ? `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`
         : `${ALL_SECTIONS.HOST_EXPENSES}?openExpenseId=${expense.legacyId}`,
     );
