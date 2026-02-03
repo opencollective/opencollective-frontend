@@ -576,7 +576,7 @@ const createExpensePageQuery = gql`
       supportedExpenseTypes
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV1
         MULTI_CURRENCY_EXPENSES
       }
       expensesTags {
