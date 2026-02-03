@@ -336,12 +336,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
             )}
           </div>
         }
-        description={
-          <FormattedMessage
-            defaultMessage="All payment requests across your hosted Collectives."
-            id="HostPaymentRequestsDescription"
-          />
-        }
+        description={<FormattedMessage defaultMessage="All submitted payment requests" id="vpLBRJ" />}
       />
 
       <Filterbar {...queryFilter} />
