@@ -4863,6 +4863,7 @@
   "zG/rb8": "Verified Data",
   "zG2d9i": "Beitrag anzeigen!",
   "Zh9ojg": "Has <AgreementsLink>{hostAgreementsCount} host agreements</AgreementsLink>",
+  "zhBj2s": "Platform tip is calculated proportionally based on the contributor's original choice ({initialTipAmount} tip on {baseAmount} = {percent}%)",
   "ZHm2jf": "Added {formattedKey} {value}",
   "ZhrlbS": "Edit Agreement",
   "Zi4M6s": "Verbunden am {date, date, simple}",
