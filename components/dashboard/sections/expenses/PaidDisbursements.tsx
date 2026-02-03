@@ -48,7 +48,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { hostDashboardMetadataQuery, paidDisbursementsQuery } from './queries';
+import { paidDisbursementsMetadataQuery, paidDisbursementsQuery } from './queries';
 
 enum PaidDisbursementsTab {
   ALL = 'ALL',
@@ -267,10 +267,6 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
-  const { data: metaData } = useQuery(hostDashboardMetadataQuery, {
-    variables: { hostSlug, withHoverCard: true },
-  });
-
   const views: Views<FilterValues> = [
     {
       id: PaidDisbursementsTab.ALL,
@@ -300,18 +296,16 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
     },
   ];
 
-  const meta: FilterMeta = {
-    currency: metaData?.host?.currency,
-    hostSlug: hostSlug,
-    includeUncategorized: true,
-    accountingCategoryKinds: ExpenseAccountingCategoryKinds,
-  };
-
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
     filters,
-    meta,
+    meta: {
+      currency: account.currency,
+      hostSlug: hostSlug,
+      includeUncategorized: true,
+      accountingCategoryKinds: ExpenseAccountingCategoryKinds,
+    },
     views,
     skipFiltersOnReset: ['hostContext'],
   });
@@ -324,6 +318,18 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const { data, error, loading, refetch } = useQuery(paidDisbursementsQuery, {
     variables,
   });
+
+  const { data: metaData } = useQuery(paidDisbursementsMetadataQuery, {
+    variables: {
+      hostSlug,
+      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+    },
+  });
+
+  const viewsWithCount: Views<FilterValues> = views.map(view => ({
+    ...view,
+    count: metaData?.[view.id]?.totalCount,
+  }));
 
   const getExpenseActions = useExpenseActions({
     refetchList: refetch,
@@ -354,9 +360,10 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
             )}
           </div>
         }
+        description={<FormattedMessage defaultMessage="Disbursed payment and grant requests" id="eTiWF/" />}
       />
 
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} views={viewsWithCount} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />

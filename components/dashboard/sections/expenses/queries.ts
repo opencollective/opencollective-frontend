@@ -379,6 +379,31 @@ export const paymentRequestsMetadataQuery = gql`
   ${expenseHostFields}
 `;
 
+/**
+ * Metadata query for the Paid Disbursements page - fetches counts for all, invoices, reimbursements, and grants
+ */
+export const paidDisbursementsMetadataQuery = gql`
+  query PaidDisbursementsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    ALL: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+    INVOICES: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [INVOICE]) {
+      totalCount
+    }
+    REIMBURSEMENTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [RECEIPT]) {
+      totalCount
+    }
+    GRANTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [GRANT]) {
+      totalCount
+    }
+  }
+`;
+
 export const paidDisbursementsQuery = gql`
   query PaidDisbursements(
     $hostSlug: String!
