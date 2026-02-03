@@ -148,12 +148,7 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
             )}
           </div>
         }
-        description={
-          <FormattedMessage
-            defaultMessage="Approve payment requests that have been submitted to your organization."
-            id="GS5NkP"
-          />
-        }
+        description={<FormattedMessage defaultMessage="Approve payment requests" id="DKcbG3" />}
       />
 
       <Filterbar {...queryFilter} />
