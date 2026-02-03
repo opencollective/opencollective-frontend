@@ -15,9 +15,10 @@ import { AccountHoverCard } from '@/components/AccountHoverCard';
 import AmountWithExchangeRateInfo from '@/components/AmountWithExchangeRateInfo';
 import { AvatarWithLink } from '@/components/AvatarWithLink';
 import DateTime from '@/components/DateTime';
-import ConfirmProcessExpenseModal, {
+import type {
   ConfirmProcessExpenseModalType,
 } from '@/components/expenses/ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpenseModal';
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
