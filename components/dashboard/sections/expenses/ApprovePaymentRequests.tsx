@@ -139,13 +139,11 @@ const ApprovePaymentRequests = ({ accountSlug: hostSlug }: DashboardSectionProps
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Approve Payment Requests" id="ApprovePaymentRequests" />
-            {account.hasHosting && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
           </div>
         }
         description={<FormattedMessage defaultMessage="Approve payment requests" id="DKcbG3" />}

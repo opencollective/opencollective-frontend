@@ -337,7 +337,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const { data: metaData } = useQuery(hostPaymentRequestsMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: queryFilter.values.hostContext,
     },
   });
 
@@ -370,13 +370,11 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="All Payment Requests" id="HostPaymentRequests" />
-            {account.hasHosting && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
           </div>
         }
         description={<FormattedMessage defaultMessage="All submitted payment requests" id="vpLBRJ" />}

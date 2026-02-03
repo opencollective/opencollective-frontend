@@ -235,7 +235,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   } = useQuery(hostDashboardMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: queryFilter.values.hostContext,
     },
   });
 
@@ -274,13 +274,11 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Pay Disbursements" id="El6h63" />
-            {account.hasHosting && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
           </div>
         }
         description={
