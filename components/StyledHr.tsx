@@ -15,13 +15,7 @@ type StyledHrProps = SpaceProps &
   React.HTMLProps<HTMLHRElement>;
 
 // Props that should not be forwarded to the DOM
-const FILTERED_PROPS = new Set([
-  'borderWidth',
-  'borderStyle',
-  'borderColor',
-  'borderRadius',
-  'boxShadow',
-]);
+const FILTERED_PROPS = new Set(['borderWidth', 'borderStyle', 'borderColor', 'borderRadius', 'boxShadow']);
 
 /**
  * An horizontal line. Control the color and size using border properties.
