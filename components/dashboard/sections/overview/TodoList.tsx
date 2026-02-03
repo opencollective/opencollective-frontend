@@ -128,6 +128,12 @@ export const HostTodoList = () => {
                 },
                 { count: data?.missingReceiptExpenses.totalCount },
               ),
+              href: getDashboardRoute(
+                account,
+                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                  ? ALL_SECTIONS.PAID_DISBURSEMENTS
+                  : ALL_SECTIONS.HOST_EXPENSES,
+              ),
               queryParams: `?chargeHasReceipts=false${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? '' : '&status=ALL'}`,
             },
 
@@ -224,7 +230,7 @@ export const HostTodoList = () => {
         }))
         .filter(item => item.subItems.length > 0),
 
-    [data, account, intl],
+    [data, account, intl, LoggedInUser],
   );
 
   return (
@@ -266,7 +272,7 @@ export const HostTodoList = () => {
                   </div>
                   <div className="pointer-events-auto flex flex-wrap items-center gap-2">
                     {item.subItems.map(subItem => (
-                      <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
+                      <Link key={subItem.id} href={`${subItem.href ?? item.href}${subItem.queryParams ?? ''}`}>
                         <Badge
                           type="outline"
                           className={
