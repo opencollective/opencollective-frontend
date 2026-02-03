@@ -5,12 +5,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { gql } from '@/lib/graphql/helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import Link from '../../../Link';
+import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
 const hostTodoQuery = gql`
@@ -70,6 +73,7 @@ const hostTodoQuery = gql`
 
 export const HostTodoList = () => {
   const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
 
   const { data, loading } = useQuery(hostTodoQuery, {
@@ -84,7 +88,12 @@ export const HostTodoList = () => {
         {
           id: 'expenses',
           title: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-          href: getDashboardRoute(account, 'host-expenses'),
+          href: getDashboardRoute(
+            account,
+            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+              ? ALL_SECTIONS.PAY_DISBURSEMENTS
+              : ALL_SECTIONS.HOST_EXPENSES,
+          ),
           icon: Receipt,
           iconBgColor: 'bg-green-50',
           iconColor: 'text-green-700',
@@ -119,7 +128,13 @@ export const HostTodoList = () => {
                 },
                 { count: data?.missingReceiptExpenses.totalCount },
               ),
-              queryParams: '?chargeHasReceipts=false&status=ALL',
+              href: getDashboardRoute(
+                account,
+                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+                  ? ALL_SECTIONS.PAID_DISBURSEMENTS
+                  : ALL_SECTIONS.HOST_EXPENSES,
+              ),
+              queryParams: `?chargeHasReceipts=false${LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS) ? '' : '&status=ALL'}`,
             },
 
             {
@@ -215,7 +230,7 @@ export const HostTodoList = () => {
         }))
         .filter(item => item.subItems.length > 0),
 
-    [data, account, intl],
+    [data, account, intl, LoggedInUser],
   );
 
   return (
@@ -257,7 +272,7 @@ export const HostTodoList = () => {
                   </div>
                   <div className="pointer-events-auto flex flex-wrap items-center gap-2">
                     {item.subItems.map(subItem => (
-                      <Link key={subItem.id} href={`${item.href}${subItem.queryParams ?? ''}`}>
+                      <Link key={subItem.id} href={`${subItem.href ?? item.href}${subItem.queryParams ?? ''}`}>
                         <Badge
                           type="outline"
                           className={

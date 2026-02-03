@@ -54,11 +54,15 @@ import {
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-// TODO: As we add the "Approve Payment Requests" tool, also exclude 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'
-const ExpenseStatusesToExclude = ['PAID'];
+const ExpenseStatusesToExclude = ['PAID', 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'];
 const PayExpenseStatusFilter = Object.fromEntries(
   Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
+) as {
+  [K in Exclude<
+    keyof typeof ExpenseStatusFilter,
+    'PAID' | 'PENDING' | 'REJECTED' | 'UNVERIFIED' | 'INVITE_DECLINED'
+  >]: (typeof ExpenseStatusFilter)[K];
+};
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
@@ -166,11 +170,6 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const views: Views<FilterValues> = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-      id: 'all',
-    },
-    {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
       filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'ready_to_pay',
@@ -216,7 +215,7 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
-    defaultFilterValues: views[1].filter,
+    defaultFilterValues: views[0].filter,
     filters,
     meta: {
       currency: account.currency,

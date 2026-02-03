@@ -3833,7 +3833,7 @@
   "solutions.features.item.all-financial-activities-are-recorded.description": "crwdns30685:0crwdne30685:0",
   "solutions.features.item.all-financial-activities-are-recorded.title": "crwdns30687:0crwdne30687:0",
   "solutions.features.item.approve-payment-requests.description": "crwdns30689:0crwdne30689:0",
-  "solutions.features.item.approve-payment-requests.title": "crwdns30691:0crwdne30691:0",
+  "ApprovePaymentRequests": "crwdns30691:0crwdne30691:0",
   "solutions.features.item.automated-security-checks-protect-against-fraud.description": "crwdns30693:0crwdne30693:0",
   "solutions.features.item.automated-security-checks-protect-against-fraud.title": "crwdns30695:0crwdne30695:0",
   "solutions.features.item.categorize-financial-activities-for-accounting.description": "crwdns30697:0crwdne30697:0",

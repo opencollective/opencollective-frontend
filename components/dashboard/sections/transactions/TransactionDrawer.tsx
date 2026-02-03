@@ -10,6 +10,8 @@ import type { GetActions } from '../../../../lib/actions/types';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import LinkCollective from '@/components/LinkCollective';
 
@@ -31,6 +33,7 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { ALL_SECTIONS } from '../../constants';
 import { DashboardContext } from '../../DashboardContext';
 
 import type { TransactionDetailsQueryNode } from './types';
@@ -233,9 +236,14 @@ interface TransactionDetailsProps {
   getActions: GetActions<TransactionDetailsQueryNode>;
 }
 
-const getExpenseUrl = (dashboardAccount, expense) => {
+const getExpenseUrl = (dashboardAccount, expense, LoggedInUser) => {
   if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
-    return getDashboardRoute(expense.host, `host-expenses?openExpenseId=${expense.legacyId}`);
+    return getDashboardRoute(
+      expense.host,
+      LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SIDEBAR_REORG_DISBURSEMENTS)
+        ? `${ALL_SECTIONS.HOST_PAYMENT_REQUESTS}/${expense.legacyId}`
+        : `${ALL_SECTIONS.HOST_EXPENSES}?openExpenseId=${expense.legacyId}`,
+    );
   } else if (dashboardAccount?.id === expense.account.id) {
     return getDashboardRoute(expense.account, `expenses?openExpenseId=${expense.legacyId}`);
   }
@@ -244,6 +252,7 @@ const getExpenseUrl = (dashboardAccount, expense) => {
 
 function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
   const prevTransactionId = usePrevious(transactionId);
   const id = transactionId || prevTransactionId;
   const { data, refetch, loading, error } = useQuery(transactionQuery, {
@@ -258,7 +267,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   let expenseUrl;
 
   if (transaction?.expense) {
-    expenseUrl = getExpenseUrl(account, transaction.expense);
+    expenseUrl = getExpenseUrl(account, transaction.expense, LoggedInUser);
   }
   return (
     <React.Fragment>
