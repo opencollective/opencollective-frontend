@@ -1,12 +1,14 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import type { Expense } from '../../lib/graphql/types/v2/schema';
+import type { Currency as CurrencyEnum, Expense } from '../../lib/graphql/types/v2/schema';
 import { ExpenseStatus, ExpenseType, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
+import InputAmount from '../InputAmount';
 import type { BaseModalProps } from '../ModalContext';
 import RichTextEditor from '../RichTextEditor';
 import {
@@ -19,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/AlertDialog';
-import { Checkbox } from '../ui/Checkbox';
+import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { toast } from '../ui/useToast';
@@ -55,10 +57,23 @@ const messages = defineMessages({
     defaultMessage: 'e.g. Failed transfer',
     id: 'mOdpl+',
   },
+  amountRefundedLabel: {
+    id: 'expense.markAsUnpaid.amountRefunded',
+    defaultMessage: 'Amount refunded',
+  },
+  originalProcessorFeeHelper: {
+    id: 'expense.markAsUnpaid.originalProcessorFee',
+    defaultMessage: 'Original payment processor fee: {amount}',
+  },
 });
 
+type ExpenseWithPaymentInfo = Pick<Expense, 'id' | 'legacyId' | 'type'> & {
+  amountInHostCurrency?: { valueInCents: number; currency: string } | null;
+  paymentInfo?: { processorFee: { valueInCents: number; currency: string } } | null;
+};
+
 type MarkExpenseAsUnpaidModalProps = BaseModalProps & {
-  expense: Pick<Expense, 'id' | 'legacyId' | 'type'>;
+  expense: ExpenseWithPaymentInfo;
   onSuccess?: () => void;
 };
 
@@ -74,20 +89,56 @@ export default function MarkExpenseAsUnpaidModal({
   const [newExpenseStatusOption, setNewExpenseStatusOption] = React.useState(expenseStatusOptions[0]);
   const [uploading, setUploading] = React.useState(false);
   const [message, setMessage] = React.useState<string>();
-  const [refundPaymentProcessorFee, setRefundPaymentProcessorFee] = React.useState(true);
   const [submitting, setSubmitting] = React.useState(false);
+
+  const totalPaidCents =
+    (expense.amountInHostCurrency?.valueInCents ?? 0) + (expense.paymentInfo?.processorFee?.valueInCents ?? 0);
+  const hostCurrency = expense.amountInHostCurrency?.currency ?? expense.paymentInfo?.processorFee?.currency ?? 'USD';
+  const processorFeeCents = expense.paymentInfo?.processorFee?.valueInCents ?? 0;
+
+  const [amountRefundedDisplay, setAmountRefundedDisplay] = React.useState<string>(() =>
+    totalPaidCents > 0 ? (totalPaidCents / 100).toString() : '',
+  );
+
+  React.useEffect(() => {
+    if (open && totalPaidCents > 0) {
+      setAmountRefundedDisplay((totalPaidCents / 100).toString());
+    }
+  }, [open, totalPaidCents]);
 
   const processExpense = useProcessExpense({
     expense,
   });
 
   const onConfirm = React.useCallback(async () => {
+    const parsed = parseFloat(amountRefundedDisplay);
+    const amountRefundedCents = Number.isFinite(parsed) ? Math.round(parsed * 100) : 0;
+    if (amountRefundedCents <= 0) {
+      toast({
+        variant: 'error',
+        message: intl.formatMessage({ id: 'errors.amountInvalid', defaultMessage: 'Amount must be greater than 0' }),
+      });
+      return;
+    }
+    if (totalPaidCents > 0 && amountRefundedCents > totalPaidCents) {
+      toast({
+        variant: 'error',
+        message: intl.formatMessage({
+          id: 'errors.amountExceedsTotal',
+          defaultMessage: 'Amount refunded cannot exceed the total amount paid',
+        }),
+      });
+      return;
+    }
     try {
       setSubmitting(true);
       await processExpense.markAsUnpaid({
         paymentParams: {
           markAsUnPaidStatus: newExpenseStatusOption.value,
-          shouldRefundPaymentProcessorFee: refundPaymentProcessorFee,
+          amountRefunded: {
+            valueInCents: amountRefundedCents,
+            currency: hostCurrency as unknown as CurrencyEnum,
+          },
         },
         message,
       });
@@ -98,7 +149,17 @@ export default function MarkExpenseAsUnpaidModal({
     } finally {
       setSubmitting(false);
     }
-  }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message, intl, onSuccess, setOpen]);
+  }, [
+    processExpense,
+    newExpenseStatusOption,
+    amountRefundedDisplay,
+    totalPaidCents,
+    hostCurrency,
+    message,
+    intl,
+    onSuccess,
+    setOpen,
+  ]);
 
   const onCloseAutoFocus = (e: Event) => {
     if (onCloseFocusRef?.current) {
@@ -154,19 +215,37 @@ export default function MarkExpenseAsUnpaidModal({
             </Select>
           </div>
 
-          <div className="flex items-start gap-2">
-            <Checkbox
-              id="processorFeeRefunded"
-              name="processorFeeRefunded"
-              checked={refundPaymentProcessorFee}
-              onCheckedChange={checked => setRefundPaymentProcessorFee(Boolean(checked))}
-            />
-            <Label htmlFor="processorFeeRefunded" className="cursor-pointer font-normal">
-              <FormattedMessage
-                id="processorFeeRefunded.checkbox.label"
-                defaultMessage="Also refund payment processor fees?"
-              />
+          <div>
+            <Label htmlFor="amount-refunded" className="mb-2">
+              <FormattedMessage {...messages.amountRefundedLabel} />
             </Label>
+            <InputAmount
+              id="amount-refunded"
+              data-cy="amount-refunded-input"
+              type="number"
+              min={0.01}
+              currency={hostCurrency}
+              max={totalPaidCents > 0 ? totalPaidCents / 100 : undefined}
+              step="0.01"
+              value={totalPaidCents}
+              onChange={e => setAmountRefundedDisplay(e.target.value)}
+              placeholder={totalPaidCents > 0 ? (totalPaidCents / 100).toString() : undefined}
+            />
+            {processorFeeCents > 0 && (
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                <FormattedMessage
+                  defaultMessage="Expense amount: {amount}. Paid processor fees: {processorFeeAmount}."
+                  id="wTeO7u"
+                  values={{
+                    amount: formatCurrency(
+                      expense.amountInHostCurrency.valueInCents,
+                      expense.amountInHostCurrency.currency,
+                    ),
+                    processorFeeAmount: formatCurrency(processorFeeCents, hostCurrency as unknown as CurrencyEnum),
+                  }}
+                />
+              </p>
+            )}
           </div>
 
           <div>
