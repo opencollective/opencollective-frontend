@@ -131,7 +131,7 @@
     "sanitize-html": "2.17.0",
     "slugify": "1.6.6",
     "spdx-license-list": "6.11.0",
-    "otplib": "13.1.1",
+    "otplib": "13.2.1",
     "styled-components": "6.1.19",
     "styled-system": "5.1.5",
     "tailwind-merge": "3.4.0",
