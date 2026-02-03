@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
@@ -101,28 +101,31 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
 
-  const views: Views<FilterValues> = [
-    {
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-      id: 'all',
-    },
-    {
-      label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
-      filter: { status: [ExpenseStatusFilter.PENDING] },
-      id: 'pending',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-      filter: { status: [ExpenseStatusFilter.PAID] },
-      id: 'paid',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
-      filter: { status: [ExpenseStatusFilter.REJECTED] },
-      id: 'rejected',
-    },
-  ];
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+        filter: {},
+        id: 'all',
+      },
+      {
+        label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
+        filter: { status: [ExpenseStatusFilter.PENDING] },
+        id: 'pending',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+        filter: { status: [ExpenseStatusFilter.PAID] },
+        id: 'paid',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
+        filter: { status: [ExpenseStatusFilter.REJECTED] },
+        id: 'rejected',
+      },
+    ],
+    [intl],
+  );
 
   const {
     data: metadata,
@@ -132,10 +135,14 @@ const PaymentRequests = ({ accountSlug }: DashboardSectionProps) => {
     variables: { accountSlug },
   });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metadata?.[view.id]?.totalCount,
-  }));
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metadata?.[view.id]?.totalCount,
+      })),
+    [views, metadata],
+  );
 
   const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');

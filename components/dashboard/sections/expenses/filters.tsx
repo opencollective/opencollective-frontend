@@ -39,6 +39,9 @@ const sortFilter = buildSortFilter({
     field: 'CREATED_AT',
     direction: 'DESC',
   },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }),
+  },
 });
 
 export const schema = z.object({
@@ -104,7 +107,7 @@ export const toVariables: FiltersToVariables<
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
-  date: dateFilter.filter,
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }) },
   amount: amountFilter.filter,
   accountingCategory: accountingCategoryFilter.filter,
   status: {

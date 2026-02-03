@@ -379,6 +379,59 @@ export const paymentRequestsMetadataQuery = gql`
   ${expenseHostFields}
 `;
 
+/**
+ * Metadata query for the Paid Disbursements page - fetches counts for all, invoices, reimbursements, and grants
+ */
+export const paidDisbursementsMetadataQuery = gql`
+  query PaidDisbursementsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    ALL: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+    INVOICES: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [INVOICE]) {
+      totalCount
+    }
+    REIMBURSEMENTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [RECEIPT]) {
+      totalCount
+    }
+    GRANTS: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID], types: [GRANT]) {
+      totalCount
+    }
+  }
+`;
+
+/**
+ * Metadata query for Host Payment Requests page - fetches counts by expense status
+ */
+export const hostPaymentRequestsMetadataQuery = gql`
+  query HostPaymentRequestsMetadata($hostSlug: String!, $hostContext: HostContext) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+    }
+    all: expenses(host: { slug: $hostSlug }, hostContext: $hostContext) {
+      totalCount
+    }
+    pending: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PENDING, UNVERIFIED]) {
+      totalCount
+    }
+    approved: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [APPROVED]) {
+      totalCount
+    }
+    rejected: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [REJECTED]) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, hostContext: $hostContext, status: [PAID]) {
+      totalCount
+    }
+  }
+`;
+
 export const paidDisbursementsQuery = gql`
   query PaidDisbursements(
     $hostSlug: String!

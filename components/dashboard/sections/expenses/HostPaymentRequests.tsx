@@ -4,10 +4,11 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import type {
   Account,
   AccountHoverCardFieldsFragment,
@@ -16,6 +17,7 @@ import type {
   HostDashboardExpensesQuery,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
@@ -54,7 +56,7 @@ import {
   schema as commonSchema,
   toVariables as commonToVariables,
 } from './filters';
-import { hostDashboardExpensesQuery } from './queries';
+import { hostDashboardExpensesQuery, hostPaymentRequestsMetadataQuery } from './queries';
 
 type HostExpensesQueryNode = NonNullable<HostDashboardExpensesQuery['expenses']['nodes']>[number];
 
@@ -66,7 +68,7 @@ function getExpenseColumns(
 ): ColumnDef<HostExpensesQueryNode, unknown>[] {
   return [
     columnHelper.accessor('createdAt', {
-      meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
+      meta: { className: 'max-w-32', labelMsg: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }) },
       header: ctx => <ColumnHeader {...ctx} filterKey="date" />,
       cell: ({ row }) => {
         const createdAt = row.original.createdAt;
@@ -87,11 +89,12 @@ function getExpenseColumns(
             <LinkCollective
               collective={account}
               withHoverCard
-              className="group flex items-center gap-2 hover:no-underline"
+              className="flex items-center gap-2 hover:no-underline"
+              onClick={e => e.preventDefault()}
             >
               <Avatar size={24} collective={account} />
               <div className="flex flex-col overflow-hidden">
-                <span className="truncate font-medium group-hover:underline">{account.name}</span>
+                <span className="truncate font-medium">{account.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
                   {formatCollectiveType(intl, account.type)}
                 </span>
@@ -130,7 +133,12 @@ function getExpenseColumns(
                 values={{
                   date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                   submittedByAccount: (
-                    <LinkCollective collective={submittedBy} withHoverCard className="">
+                    <LinkCollective
+                      collective={submittedBy}
+                      withHoverCard
+                      className=""
+                      onClick={e => e.preventDefault()}
+                    >
                       <Avatar size={14} collective={submittedBy} />
                     </LinkCollective>
                   ),
@@ -180,11 +188,16 @@ function getExpenseColumns(
         const payee = expense.payee;
         return (
           <div className="max-w-fit">
-            <LinkCollective collective={payee} withHoverCard className="group hover:no-underline">
+            <LinkCollective
+              collective={payee}
+              withHoverCard
+              className="hover:no-underline"
+              onClick={e => e.preventDefault()}
+            >
               <div className="flex items-center gap-2">
                 <Avatar size={24} collective={payee} />
                 <div className="flex flex-col overflow-hidden">
-                  <span className="truncate font-medium group-hover:underline">{payee.name}</span>
+                  <span className="truncate font-medium">{payee.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {intl ? formatCollectiveType(intl, payee.type) : payee.type}
                   </span>
@@ -268,6 +281,37 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const intl = useIntl();
   const { account } = useContext(DashboardContext);
 
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        id: 'all',
+        label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
+        filter: {},
+      },
+      {
+        id: 'pending',
+        label: intl.formatMessage({ id: 'expense.pending', defaultMessage: 'Pending' }),
+        filter: { status: [ExpenseStatusFilter.PENDING] },
+      },
+      {
+        id: 'approved',
+        label: intl.formatMessage({ id: 'expense.approved', defaultMessage: 'Approved' }),
+        filter: { status: [ExpenseStatusFilter.APPROVED] },
+      },
+      {
+        id: 'rejected',
+        label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
+        filter: { status: [ExpenseStatusFilter.REJECTED] },
+      },
+      {
+        id: 'paid',
+        label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+        filter: { status: [ExpenseStatusFilter.PAID] },
+      },
+    ],
+    [intl],
+  );
+
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
@@ -279,6 +323,7 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
       accountingCategoryKinds: ExpenseAccountingCategoryKinds,
       hideExpensesMetaStatuses: true,
     },
+    views,
     skipFiltersOnReset: ['hostContext'],
   });
 
@@ -291,6 +336,22 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
   const { data, error, loading, refetch } = useQuery(hostDashboardExpensesQuery, {
     variables,
   });
+
+  const { data: metaData } = useQuery(hostPaymentRequestsMetadataQuery, {
+    variables: {
+      hostSlug,
+      hostContext: queryFilter.values.hostContext,
+    },
+  });
+
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
 
   const getExpenseActions = useExpenseActions({
     refetchList: () => {
@@ -316,24 +377,17 @@ const HostPaymentRequests = ({ accountSlug: hostSlug, subpath }: DashboardSectio
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="All Payment Requests" id="HostPaymentRequests" />
-            {account.hasHosting && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
           </div>
         }
-        description={
-          <FormattedMessage
-            defaultMessage="All payment requests across your hosted Collectives."
-            id="HostPaymentRequestsDescription"
-          />
-        }
+        description={<FormattedMessage defaultMessage="All submitted payment requests" id="vpLBRJ" />}
       />
 
-      <Filterbar {...queryFilter} />
+      <Filterbar {...queryFilter} views={viewsWithCount} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
