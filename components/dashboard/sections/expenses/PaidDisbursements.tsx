@@ -336,7 +336,7 @@ export const PaidDisbursements = ({ accountSlug: hostSlug, subpath }: DashboardS
   const { data: metaData } = useQuery(paidDisbursementsMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: queryFilter.values.hostContext,
     },
   });
 
