@@ -71,7 +71,7 @@ const ExpenseAdminAccountingCategoryPill = ({
         }
       }}
     >
-      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90')}>
+      <Button className={cn(BADGE_CLASS, 'h-auto max-w-full min-w-0 hover:bg-neutral-50 hover:opacity-90')}>
         <span className="mr-1 max-w-40 truncate">{getCategoryLabel(expense.accountingCategory)}</span>
         {loading ? <Spinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
@@ -88,7 +88,7 @@ export const ExpenseAccountingCategoryPill = ({
   showCodeInSelect = false,
 }: ExpenseAccountingCategoryPillProps) => {
   if (!canEdit || !host) {
-    return <div className={BADGE_CLASS}>{getCategoryLabel(expense.accountingCategory)}</div>;
+    return <div className={cn(BADGE_CLASS, 'truncate')}>{getCategoryLabel(expense.accountingCategory)}</div>;
   } else {
     return (
       <ExpenseAdminAccountingCategoryPill

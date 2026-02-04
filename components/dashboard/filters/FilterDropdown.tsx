@@ -183,7 +183,7 @@ function FilterPill<FV, FM>({
 /**
  * Form for editing a filter's value with an Apply button.
  */
-function FilterValueForm<FV, FM>({
+export function FilterValueForm<FV, FM>({
   draftValue,
   setDraftValue,
   filterKey,
@@ -434,12 +434,5 @@ export function AddFilterDropdown<FV, FM>({
     </Popover>
   );
 }
-
-// ============================================================================
-// Exports
-// ============================================================================
-
-// Legacy export for SetFilter (used by other components)
-export { FilterValueForm as SetFilter };
 
 export default React.memo(FilterDropdown) as typeof FilterDropdown;

@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { OrderDirection } from '../../lib/graphql/types/v2/schema';
 
-import { SetFilter } from '../dashboard/filters/FilterDropdown';
+import { FilterValueForm } from '../dashboard/filters/FilterDropdown';
 import { Button } from '../ui/Button';
 import {
   DropdownMenu,
@@ -47,7 +47,7 @@ export function ColumnHeader<TData, TValue>({
     );
   }
   const canSort = Boolean(sortField);
-  const canHide = column.getCanHide();
+  const canHide = column.getCanHide() && Boolean(table.options.meta?.setColumnVisibility);
   const canFilter = Boolean(queryFilter.filters[filterKey]);
 
   const hasFilterValue = queryFilter.values[filterKey] !== undefined;
@@ -60,6 +60,7 @@ export function ColumnHeader<TData, TValue>({
   const DownIcon = sortType === 'alphabetic' ? ArrowDownZA : ArrowDown10;
 
   const Icon = isSorted ? (isSortedDesc ? DownIcon : UpIcon) : ArrowUpDown;
+  const hasActions = canSort || canFilter || canHide;
   return (
     <div className={clsx('flex items-center', align === 'right' && 'justify-end')}>
       <DropdownMenu
@@ -82,11 +83,15 @@ export function ColumnHeader<TData, TValue>({
             variant="ghost"
             size="xs"
             className={clsx(
-              'group/btn -m-2.5 gap-2 data-[state=open]:bg-accent data-[state=open]:text-foreground data-[state=open]:[&>svg]:text-muted-foreground!',
+              'group/btn -m-2.5 gap-2 overflow-hidden data-[state=open]:bg-accent data-[state=open]:text-foreground data-[state=open]:[&>svg]:text-muted-foreground!',
               isSorted && 'text-foreground',
+              !hasActions && 'text-muted-foreground disabled:opacity-100',
             )}
+            disabled={!hasActions}
           >
-            <span className={clsx(align === 'right' && 'order-1')}>{labelMsg && intl.formatMessage(labelMsg)}</span>
+            <span className={clsx('truncate', align === 'right' && 'order-1')}>
+              {labelMsg && intl.formatMessage(labelMsg)}
+            </span>
             {canSort && (
               <Icon
                 className={clsx(
@@ -99,9 +104,9 @@ export function ColumnHeader<TData, TValue>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className={clsx('max-w-64', addingFilter ? 'p-0' : '')}>
           {addingFilter ? (
-            <SetFilter
-              tmpValue={tmpFilterValue}
-              setTmpValue={setTmpFilterValue}
+            <FilterValueForm
+              draftValue={tmpFilterValue}
+              setDraftValue={setTmpFilterValue}
               filterKey={filterKey}
               setOpen={setOpen}
               {...queryFilter}
