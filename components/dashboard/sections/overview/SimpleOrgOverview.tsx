@@ -1,5 +1,6 @@
-import React from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useCallback, useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { Settings } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -7,16 +8,24 @@ import { z } from 'zod';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import dayjs from '@/lib/dayjs';
 import { type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
 import { DataTable } from '@/components/table/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
+import DashboardHeader from '../../DashboardHeader';
 import { DateFilterType } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { periodFilter } from '../../filters/PeriodFilter';
@@ -26,20 +35,42 @@ import {
   toVariables as transactionsToVariables,
 } from '../transactions/AccountTransactions';
 
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
-import { orgOverviewMetricsQuery } from './queries';
+import { editAccountSettingMutation, orgOverviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
+import { WelcomeOrganization } from './Welcome';
 
 const schema = z.object({
   period: periodFilter.schema,
   as: z.string().optional(),
 });
 
-export function OrgOverviewContent({ accountSlug }: DashboardSectionProps) {
-  const { account } = React.useContext(DashboardContext);
+export function SimpleOrgOverview({ accountSlug }: DashboardSectionProps) {
   const router = useRouter();
   const intl = useIntl();
+  const { account } = React.useContext(DashboardContext);
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+
+  const [showSetupGuide, setShowSetupGuide] = useState(undefined);
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
+
+  const handleSetupGuideToggle = useCallback(
+    async (open: boolean) => {
+      setShowSetupGuide(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showSetupGuide.id${account.legacyId}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
 
   const queryFilter = useQueryFilter<typeof schema, HostOverviewMetricsQueryVariables>({
     schema,
@@ -87,7 +118,30 @@ export function OrgOverviewContent({ accountSlug }: DashboardSectionProps) {
   ];
 
   return (
-    <React.Fragment>
+    <div className="space-y-6">
+      <DashboardHeader
+        title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon-sm" variant="outline">
+                <Settings size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuCheckboxItem
+                checked={showSetupGuide}
+                onClick={() => handleSetupGuideToggle(!showSetupGuide)}
+              >
+                <FormattedMessage defaultMessage="Display setup guide" id="SetupGuide.DisplaySetupGuide" />
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      />
+      <ConvertedAccountMessage account={account} />
+      <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+
       <Card className="pb-3">
         <CardHeader>
           <CardTitle className="text-xl">
@@ -157,6 +211,6 @@ export function OrgOverviewContent({ accountSlug }: DashboardSectionProps) {
           <Timeline withTitle accountSlug={router.query?.as ?? accountSlug} />
         </div>
       </div>
-    </React.Fragment>
+    </div>
   );
 }
