@@ -19,7 +19,7 @@ import {
 import { getPaymentMethodName } from '@/lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '@/lib/payment-method-utils';
 import { confirmPayment } from '@/lib/stripe/confirm-payment';
-import { StripePaymentMethodsLabels } from '@/lib/stripe/payment-methods';
+import { getStripePaymentMethodLabel } from '@/lib/stripe/payment-methods';
 import type { StripePaymentIntent } from '@/lib/stripe/usePaymentIntent';
 import usePaymentIntent from '@/lib/stripe/usePaymentIntent';
 
@@ -90,9 +90,9 @@ export function PayExpenseWithStripe(props: PayExpenseWithStripeProps) {
     ],
   };
 
-  let availableMethodLabels = (paymentIntent?.payment_method_types ?? []).map(method => {
-    return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
-  });
+  let availableMethodLabels = (paymentIntent?.payment_method_types ?? []).map(method =>
+    getStripePaymentMethodLabel(intl, method),
+  );
 
   if (availableMethodLabels.length > 3) {
     availableMethodLabels = [...availableMethodLabels.slice(0, 3), 'etc'];

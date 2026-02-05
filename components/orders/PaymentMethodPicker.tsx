@@ -22,7 +22,7 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
-import { isStripePaymentMethodEnabledForCurrency, StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
+import { getStripePaymentMethodLabel, isStripePaymentMethodEnabledForCurrency } from '../../lib/stripe/payment-methods';
 import type { StripeSetupIntent } from '../../lib/stripe/useSetupIntent';
 import useSetupIntent from '../../lib/stripe/useSetupIntent';
 
@@ -305,9 +305,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
 
     let types = setupIntent.payment_method_types
       .filter(t => isStripePaymentMethodEnabledForCurrency(t, props.currency))
-      .map(method => {
-        return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
-      });
+      .map(method => getStripePaymentMethodLabel(intl, method));
 
     if (types.length > 3) {
       types = [...types.slice(0, 3), 'etc'];

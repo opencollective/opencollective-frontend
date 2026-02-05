@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, pick, sortBy, startCase, uniqBy } from 'lodash';
+import { find, get, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
@@ -19,8 +19,8 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
-import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
+import { getStripePaymentMethodLabel } from '@/lib/stripe/payment-methods';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
 import { getManualPaymentProviderIconComponent } from '../manual-payment-provider/ManualPaymentProviderIcon';
@@ -151,9 +151,9 @@ export const generatePaymentMethodOptions = (
   // adding payment methods
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
     if (paymentIntent) {
-      let availableMethodLabels = paymentIntent.payment_method_types.map(method => {
-        return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
-      });
+      let availableMethodLabels = paymentIntent.payment_method_types.map(method =>
+        getStripePaymentMethodLabel(intl, method),
+      );
 
       if (availableMethodLabels.length > 3) {
         availableMethodLabels = [...availableMethodLabels.slice(0, 3), 'etc'];
@@ -163,7 +163,7 @@ export const generatePaymentMethodOptions = (
         <FormattedMessage
           defaultMessage="New payment method: {methods}"
           id="jwtunf"
-          values={{ methods: availableMethodLabels.map(startCase).join(', ') }} // amazon_pay => Amazon Pay
+          values={{ methods: availableMethodLabels.join(', ') }}
         />
       );
 
