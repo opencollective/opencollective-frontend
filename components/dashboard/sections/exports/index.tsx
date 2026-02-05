@@ -570,6 +570,7 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
       type: variables.type,
       status: variables.status,
     },
+    pollInterval: 5000, // Poll every 5 seconds to update the status of export requests
     fetchPolicy: 'cache-and-network',
   });
 
