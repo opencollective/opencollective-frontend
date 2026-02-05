@@ -1,10 +1,11 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
-import { AlertCircle, CheckCircle2, Clock, Download, FileText, Loader2 } from 'lucide-react';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { AlertCircle, CheckCircle2, Clock, Download, FileText, Loader2, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { i18nGraphqlException } from '@/lib/errors';
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
@@ -12,11 +13,13 @@ import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { useModal } from '../../../ModalContext';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { DataList, DataListItem } from '../../../ui/DataList';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -41,6 +44,7 @@ const exportRequestFieldsFragment = gql`
     createdBy {
       id
       name
+      type
       slug
       imageUrl
     }
@@ -80,6 +84,14 @@ const exportRequestQuery = gql`
     }
   }
   ${exportRequestFieldsFragment}
+`;
+
+const removeExportRequestMutation = gql`
+  mutation RemoveExportRequest($exportRequest: ExportRequestReferenceInput!) {
+    removeExportRequest(exportRequest: $exportRequest) {
+      id
+    }
+  }
 `;
 
 type ExportRequestNode = {
@@ -155,7 +167,7 @@ const ExportTypeLabels = {
 
 const ExportStatusLabels = {
   [ExportRequestStatus.ENQUEUED]: defineMessage({ defaultMessage: 'Queued', id: 'ExportStatus.Enqueued' }),
-  [ExportRequestStatus.PROCESSING]: defineMessage({ defaultMessage: 'Processing', id: 'ExportStatus.Processing' }),
+  [ExportRequestStatus.PROCESSING]: defineMessage({ defaultMessage: 'Processing', id: 'processing' }),
   [ExportRequestStatus.COMPLETED]: defineMessage({ defaultMessage: 'Completed', id: 'ExportStatus.Completed' }),
   [ExportRequestStatus.FAILED]: defineMessage({ defaultMessage: 'Failed', id: 'ExportStatus.Failed' }),
 };
@@ -303,7 +315,7 @@ const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportRequestD
               )}
 
               <DataListItem
-                label={<FormattedMessage defaultMessage="Created" id="expense.incurredAt" />}
+                label={<FormattedMessage defaultMessage="Date" id="expense.incurredAt" />}
                 value={<DateTime value={exportRequest.createdAt} dateStyle="medium" timeStyle="short" />}
               />
 
@@ -314,14 +326,14 @@ const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportRequestD
 
               {exportRequest.expiresAt && (
                 <DataListItem
-                  label={<FormattedMessage defaultMessage="Expires" id="Expires" />}
+                  label={<FormattedMessage defaultMessage="Expires" id="Agreement.expiresAt" />}
                   value={<DateTime value={exportRequest.expiresAt} dateStyle="medium" timeStyle="short" />}
                 />
               )}
 
               {exportRequest.parameters && Object.keys(exportRequest.parameters).length > 0 && (
                 <DataListItem
-                  label={<FormattedMessage defaultMessage="Parameters" id="Parameters" />}
+                  label={<FormattedMessage defaultMessage="Parameters" id="export.json.parameters.title" />}
                   itemClassName="w-full max-w-full"
                   value={
                     <code className="block max-h-80 w-full overflow-auto rounded-md bg-slate-100 p-2 text-xs">
@@ -427,7 +439,7 @@ const getColumns = ({ intl }) => {
     },
     {
       accessorKey: 'createdAt',
-      header: intl.formatMessage({ defaultMessage: 'Created', id: 'expense.incurredAt' }),
+      header: intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }),
       cell: ({ row }) => {
         const exportRequest = row.original;
         return (
@@ -494,8 +506,11 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const { toast } = useToast();
+  const { showConfirmationModal } = useModal();
   const selectedExportRequestId = subpath?.[0] || null;
   const pushSubpath = React.useMemo(() => makePushSubpath(router), [router]);
+  const [removeExportRequest] = useMutation(removeExportRequestMutation);
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -512,7 +527,10 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
     },
     {
       id: 'processing',
-      label: intl.formatMessage({ defaultMessage: 'Processing', id: 'ExportStatus.Processing' }),
+      label: intl.formatMessage({
+        defaultMessage: 'Processing',
+        id: 'processing',
+      }),
       filter: {
         status: ExportRequestStatus.PROCESSING,
       },
@@ -558,6 +576,37 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const exportRequests = data?.exportRequests?.nodes || [];
   const loading = queryLoading;
   const error = queryError;
+
+  const handleRemove = React.useCallback(
+    (exportRequest: ExportRequestNode) => {
+      showConfirmationModal({
+        title: intl.formatMessage({ defaultMessage: 'Delete Export', id: 'ExportRequest.Delete.Title' }),
+        description: intl.formatMessage({
+          defaultMessage: 'Are you sure you want to delete this export? This action cannot be undone.',
+          id: 'ExportRequest.Delete.Description',
+        }),
+        confirmLabel: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
+        variant: 'destructive',
+        onConfirm: async () => {
+          try {
+            await removeExportRequest({
+              variables: { exportRequest: { id: exportRequest.id } },
+              refetchQueries: [exportRequestsQuery],
+              awaitRefetchQueries: true,
+            });
+            toast({
+              variant: 'success',
+              message: intl.formatMessage({ defaultMessage: 'Export deleted', id: 'ExportRequest.Deleted' }),
+            });
+          } catch (e) {
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          }
+        },
+      });
+    },
+    [intl, removeExportRequest, showConfirmationModal, toast],
+  );
+
   const getActions = React.useCallback(
     (exportRequest: ExportRequestNode) => {
       const primary = [];
@@ -574,9 +623,17 @@ const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
         });
       }
 
+      secondary.push({
+        key: 'delete',
+        label: intl.formatMessage({ defaultMessage: 'Delete', id: 'actions.delete' }),
+        Icon: Trash2,
+        variant: 'danger',
+        onClick: () => handleRemove(exportRequest),
+      });
+
       return { primary, secondary };
     },
-    [intl],
+    [intl, handleRemove],
   );
 
   const columns = React.useMemo(() => getColumns({ intl }), [intl]);

@@ -5,8 +5,9 @@ import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
+import { useRouter } from 'next/router';
 import type { MouseEventHandler } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import slugify from 'slugify';
 
 import { setRestAuthorizationCookie } from '../../lib/auth';
@@ -32,8 +33,10 @@ import type {
 } from '../../lib/graphql/types/v2/graphql';
 import type { Account, AccountReferenceInput } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn, parseToBoolean } from '../../lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -46,6 +49,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
+import { ToastAction } from '../ui/Toast';
+import { useToast } from '../ui/useToast';
 
 type MakeUrlParams = {
   account?: Pick<Account, 'slug'>;
@@ -239,6 +244,17 @@ const editAccountSettingsMutation = gql`
   }
 `;
 
+const createExportRequestMutation = gql`
+  mutation CreateExportRequest($exportRequest: ExportRequestCreateInput!) {
+    createExportRequest(exportRequest: $exportRequest) {
+      id
+      name
+      type
+      status
+    }
+  }
+`;
+
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
@@ -258,6 +274,11 @@ const ExportTransactionsCSVModal = ({
   isHostReport,
   canCreatePreset = true,
 }: ExportTransactionsCSVModalProps) => {
+  const intl = useIntl();
+  const { toast } = useToast();
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+  const hasAsyncExportsFeature = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.ASYNC_EXPORTS);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
@@ -285,6 +306,69 @@ const ExportTransactionsCSVModal = ({
 
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] =
     useMutation(editAccountSettingsMutation);
+
+  const [createExportRequest] = useMutation(createExportRequestMutation);
+
+  const handleGenerateExport = React.useCallback(
+    async ({
+      fields,
+      flattenTaxesAndPaymentProcessorFees,
+      isHostReport,
+      queryFilterVariables,
+      useFieldNames,
+      fetchAll,
+    }: {
+      fields: string[];
+      flattenTaxesAndPaymentProcessorFees: boolean;
+      isHostReport: boolean;
+      queryFilterVariables: Partial<TransactionsTableQueryVariables>;
+      useFieldNames: boolean;
+      fetchAll: boolean;
+    }) => {
+      const exportName = `${LoggedInUser.collective.name}'s export: ${new Date().toLocaleString()}`;
+      try {
+        await createExportRequest({
+          variables: {
+            exportRequest: {
+              account: { slug: account?.slug },
+              name: exportName,
+              type: 'TRANSACTIONS',
+              parameters: {
+                variables: omit(queryFilterVariables, ['limit', 'offset']),
+                fields,
+                useFieldNames,
+                isHostReport,
+                flattenTaxesAndPaymentProcessorFees,
+                fetchAll,
+              },
+            },
+          },
+        });
+        toast({
+          variant: 'success',
+          message: intl.formatMessage({
+            defaultMessage: 'Your export is being generated. You can check its progress in the Exports section.',
+            id: 'ExportRequest.Created',
+          }),
+          action: (
+            <ToastAction altText="View Exports" onClick={() => router.push(`/dashboard/${account?.slug}/exports`)}>
+              <FormattedMessage defaultMessage="View Exports" id="ExportRequest.ViewExports" />
+            </ToastAction>
+          ),
+        });
+        setOpen?.(false);
+      } catch {
+        toast({
+          variant: 'error',
+          message: intl.formatMessage({
+            defaultMessage: 'Failed to create export request. Please try again.',
+            id: 'ExportRequest.Error',
+          }),
+        });
+      }
+    },
+    [account?.slug, createExportRequest, intl, setOpen, toast],
+  );
 
   const customFields = React.useMemo(
     () =>
@@ -761,7 +845,7 @@ const ExportTransactionsCSVModal = ({
                 </div>
               ) : null}
             </div>
-            <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
+            <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-between">
               {canEditFields && (
                 <Button
                   variant="outline"
@@ -778,11 +862,30 @@ const ExportTransactionsCSVModal = ({
                   <FormattedMessage id="ExportSample" defaultMessage="Export Sample" />
                 </DownloadLink>
               </Button>
-              <Button disabled={disabled} className="whitespace-nowrap">
-                <DownloadLink url={`${downloadUrl}&fetchAll=1`} disabled={disabled}>
-                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-                </DownloadLink>
-              </Button>
+              {hasAsyncExportsFeature ? (
+                <Button
+                  disabled={disabled}
+                  onClick={() =>
+                    handleGenerateExport({
+                      fields,
+                      flattenTaxesAndPaymentProcessorFees,
+                      isHostReport,
+                      queryFilterVariables: queryFilter.variables,
+                      useFieldNames,
+                      fetchAll: true,
+                    })
+                  }
+                  className="whitespace-nowrap"
+                >
+                  <FormattedMessage id="GenerateExport" defaultMessage="Generate Export" />
+                </Button>
+              ) : (
+                <Button disabled={disabled} className="whitespace-nowrap">
+                  <DownloadLink url={`${downloadUrl}&fetchAll=1`} disabled={disabled}>
+                    <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+                  </DownloadLink>
+                </Button>
+              )}
             </div>
           </DialogFooter>
         </DialogContent>
