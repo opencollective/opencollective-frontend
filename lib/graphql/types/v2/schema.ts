@@ -1142,6 +1142,8 @@ export enum ActivityAndClassesType {
   DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSES = 'EXPENSES',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
+  EXPORT_REQUEST_COMPLETED = 'EXPORT_REQUEST_COMPLETED',
+  EXPORT_REQUEST_FAILED = 'EXPORT_REQUEST_FAILED',
   FUND_EVENTS = 'FUND_EVENTS',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
@@ -1341,6 +1343,8 @@ export enum ActivityType {
   DEACTIVATED_HOSTING = 'DEACTIVATED_HOSTING',
   DEACTIVATED_MONEY_MANAGEMENT = 'DEACTIVATED_MONEY_MANAGEMENT',
   EXPENSE_COMMENT_CREATED = 'EXPENSE_COMMENT_CREATED',
+  EXPORT_REQUEST_COMPLETED = 'EXPORT_REQUEST_COMPLETED',
+  EXPORT_REQUEST_FAILED = 'EXPORT_REQUEST_FAILED',
   HOST_APPLICATION_COMMENT_CREATED = 'HOST_APPLICATION_COMMENT_CREATED',
   HOST_APPLICATION_CONTACT = 'HOST_APPLICATION_CONTACT',
   KYC_REQUESTED = 'KYC_REQUESTED',
@@ -8548,6 +8552,8 @@ export type Mutation = {
   rejectVirtualCardRequest: VirtualCardRequest;
   /** Remove an emoji reaction. Scope: "conversations", "expenses" or "updates". */
   removeEmojiReaction: EmojiReactionResponse;
+  /** Remove an existing export request. Scope: "account". */
+  removeExportRequest: ExportRequest;
   /** Removes the host for an account */
   removeHost: Account;
   /** Remove a member from the Collective. Scope: "account". */
@@ -9482,6 +9488,12 @@ export type MutationRemoveEmojiReactionArgs = {
   comment?: InputMaybe<CommentReferenceInput>;
   emoji: Scalars['String']['input'];
   update?: InputMaybe<UpdateReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationRemoveExportRequestArgs = {
+  exportRequest: ExportRequestReferenceInput;
 };
 
 
@@ -12147,6 +12159,7 @@ export type Query = {
   expense?: Maybe<Expense>;
   expenseTagStats: TagStatsCollection;
   expenses: ExpenseCollection;
+  exportRequest?: Maybe<ExportRequest>;
   exportRequests: ExportRequestCollection;
   fund?: Maybe<Fund>;
   host?: Maybe<Host>;
@@ -12349,6 +12362,13 @@ export type QueryExpensesArgs = {
   type?: InputMaybe<ExpenseType>;
   types?: InputMaybe<Array<InputMaybe<ExpenseType>>>;
   virtualCards?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
+};
+
+
+/** This is the root query */
+export type QueryExportRequestArgs = {
+  exportRequest: ExportRequestReferenceInput;
+  throwIfMissing?: Scalars['Boolean']['input'];
 };
 
 
