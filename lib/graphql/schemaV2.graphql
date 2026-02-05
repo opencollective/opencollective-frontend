@@ -5717,6 +5717,8 @@ enum ActivityType {
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
   TRANSACTIONS_IMPORT_ROW_UPDATED
+  EXPORT_REQUEST_COMPLETED
+  EXPORT_REQUEST_FAILED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -17407,6 +17409,17 @@ type Query {
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!
+  exportRequest(
+    """
+    Identifiers to retrieve the export request
+    """
+    exportRequest: ExportRequestReferenceInput!
+
+    """
+    If true, an error will be returned if the export request is missing
+    """
+    throwIfMissing: Boolean! = true
+  ): ExportRequest
   exportRequests(
     """
     The number of results to fetch (default 10, max 1000)
@@ -19605,6 +19618,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
   TRANSACTIONS_IMPORT_ROW_UPDATED
+  EXPORT_REQUEST_COMPLETED
+  EXPORT_REQUEST_FAILED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -19727,16 +19742,6 @@ type TagStatsCollection implements Collection {
 }
 
 """
-A collection of "ExportRequest"
-"""
-type ExportRequestCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [ExportRequest!]
-}
-
-"""
 An export request
 """
 type ExportRequest {
@@ -19834,6 +19839,31 @@ enum ExportRequestStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+"""
+Input type for referencing an ExportRequest
+"""
+input ExportRequestReferenceInput {
+  """
+  The public id identifying the export request
+  """
+  id: String
+
+  """
+  The internal id of the export request
+  """
+  legacyId: Int
+}
+
+"""
+A collection of "ExportRequest"
+"""
+type ExportRequestCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [ExportRequest!]
 }
 
 """
@@ -23294,6 +23324,16 @@ type Mutation {
   ): ExportRequest!
 
   """
+  Remove an existing export request. Scope: "account".
+  """
+  removeExportRequest(
+    """
+    Reference to the export request to remove
+    """
+    exportRequest: ExportRequestReferenceInput!
+  ): ExportRequest!
+
+  """
   Mark an account as confirmed
   """
   confirmGuestAccount(
@@ -26077,21 +26117,6 @@ input ExportRequestCreateInput {
   Optional parameters for the export request
   """
   parameters: JSON
-}
-
-"""
-Input type for referencing an ExportRequest
-"""
-input ExportRequestReferenceInput {
-  """
-  The public id identifying the export request
-  """
-  id: String
-
-  """
-  The internal id of the export request
-  """
-  legacyId: Int
 }
 
 """
