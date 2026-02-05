@@ -6185,6 +6185,7 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** List of activities that the logged-in user is subscribed for this collective */
   activitySubscriptions?: Maybe<Array<Maybe<ActivitySubscription>>>;
   backgroundImageUrl?: Maybe<Scalars['String']['output']>;
+  /** @deprecated 2026-01-23: Deprecated in favour of custom payment providers */
   bankAccount?: Maybe<PayoutMethod>;
   /** Whether this account can have changelog updates */
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
@@ -6290,6 +6291,8 @@ export type Host = Account & AccountWithContributions & AccountWithPlatformSubsc
   /** The address associated to this account. This field is always public for collectives and events. */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']['output']>;
+  /** Manual payment providers configured for this host */
+  manualPaymentProviders: Array<ManualPaymentProvider>;
   /** Returns the pending invitations, or null if not allowed. */
   memberInvitations?: Maybe<Array<Maybe<MemberInvitation>>>;
   memberOf: MemberOfCollection;
@@ -6688,6 +6691,13 @@ export type HostKycVerificationRequestsArgs = {
 /** This represents an Host account */
 export type HostLegalDocumentsArgs = {
   type?: InputMaybe<Array<InputMaybe<LegalDocumentType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostManualPaymentProvidersArgs = {
+  includeArchived?: Scalars['Boolean']['input'];
+  type?: InputMaybe<ManualPaymentProviderType>;
 };
 
 
@@ -8061,6 +8071,64 @@ export type ManualKycProviderData = {
   notes: Scalars['String']['output'];
 };
 
+/** A manual payment provider configured by a host for contributors to use */
+export type ManualPaymentProvider = {
+  __typename?: 'ManualPaymentProvider';
+  /** Bank account details for BANK_TRANSFER type providers */
+  accountDetails?: Maybe<Scalars['JSON']['output']>;
+  /** When this provider was created */
+  createdAt: Scalars['DateTime']['output'];
+  /** Icon name for this payment provider */
+  icon?: Maybe<Scalars['String']['output']>;
+  /** Unique identifier for this provider */
+  id: Scalars['String']['output'];
+  /** Payment instructions to show contributors (HTML) */
+  instructions?: Maybe<Scalars['String']['output']>;
+  /** Whether this provider has been archived */
+  isArchived: Scalars['Boolean']['output'];
+  /** Display name for this payment provider */
+  name: Scalars['NonEmptyString']['output'];
+  /** The type of manual payment provider */
+  type: ManualPaymentProviderType;
+  /** When this provider was last updated */
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ManualPaymentProviderCreateInput = {
+  /** Bank account details for BANK_TRANSFER type providers */
+  accountDetails?: InputMaybe<Scalars['JSON']['input']>;
+  /** Icon name for this payment provider */
+  icon?: InputMaybe<Scalars['String']['input']>;
+  /** Payment instructions to show contributors (HTML allowed) */
+  instructions: Scalars['String']['input'];
+  /** Display name for this payment provider */
+  name: Scalars['NonEmptyString']['input'];
+  /** The type of manual payment provider */
+  type: ManualPaymentProviderType;
+};
+
+export type ManualPaymentProviderReferenceInput = {
+  /** The unique identifier of the manual payment provider */
+  id: Scalars['String']['input'];
+};
+
+/** The type of manual payment provider */
+export enum ManualPaymentProviderType {
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  OTHER = 'OTHER'
+}
+
+export type ManualPaymentProviderUpdateInput = {
+  /** Bank account details for BANK_TRANSFER type providers */
+  accountDetails?: InputMaybe<Scalars['JSON']['input']>;
+  /** Icon name for this payment provider */
+  icon?: InputMaybe<Scalars['String']['input']>;
+  /** Payment instructions to show contributors (HTML allowed) */
+  instructions?: InputMaybe<Scalars['String']['input']>;
+  /** Display name for this payment provider */
+  name?: InputMaybe<Scalars['NonEmptyString']['input']>;
+};
+
 export enum MarkAsUnPaidExpenseStatus {
   APPROVED = 'APPROVED',
   ERROR = 'ERROR',
@@ -8243,6 +8311,8 @@ export type Mutation = {
   createExpenseStripePaymentIntent: PaymentIntent;
   /** Create a Fund. Scope: "account". */
   createFund?: Maybe<Fund>;
+  /** Create a new manual payment provider for a host. Scope: "host". */
+  createManualPaymentProvider: ManualPaymentProvider;
   /** [Root only] Create a member entry directly. For non-root users, use `inviteMember` */
   createMember: Member;
   /** To submit a new order. Scope: "orders". */
@@ -8284,6 +8354,8 @@ export type Mutation = {
   deleteConnectedAccount?: Maybe<ConnectedAccount>;
   /** Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses". */
   deleteExpense: Expense;
+  /** Delete a manual payment provider. If orders reference this provider, it will be archived instead. Scope: "host". */
+  deleteManualPaymentProvider: ManualPaymentProvider;
   deletePersonalToken?: Maybe<PersonalToken>;
   /** Delete a tier. */
   deleteTier: Tier;
@@ -8404,6 +8476,8 @@ export type Mutation = {
   removePayoutMethod: PayoutMethod;
   /** Remove 2FA from the Individual if it has been enabled. Scope: "account". */
   removeTwoFactorAuthTokenFromIndividual: Individual;
+  /** Reorder manual payment providers for a host. Scope: "host". */
+  reorderManualPaymentProviders: Array<ManualPaymentProvider>;
   /** Endpoint to accept or reject an invitation to become a member. Scope: "account". */
   replyToMemberInvitation: Scalars['Boolean']['output'];
   /** Requests an account to be verified using a KYC provider */
@@ -8454,6 +8528,8 @@ export type Mutation = {
   unpublishUpdate: Update;
   updateAccountPlatformSubscription: Account;
   updateApplication?: Maybe<Application>;
+  /** Update an existing manual payment provider. Scope: "host". */
+  updateManualPaymentProvider: ManualPaymentProvider;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
   /** Update the accounting category of an order. Scope: "orders". */
@@ -8711,6 +8787,13 @@ export type MutationCreateFundArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreateManualPaymentProviderArgs = {
+  host: AccountReferenceInput;
+  manualPaymentProvider: ManualPaymentProviderCreateInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateMemberArgs = {
   account: AccountReferenceInput;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -8865,6 +8948,12 @@ export type MutationDeleteConnectedAccountArgs = {
 /** This is the root mutation */
 export type MutationDeleteExpenseArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationDeleteManualPaymentProviderArgs = {
+  manualPaymentProvider: ManualPaymentProviderReferenceInput;
 };
 
 
@@ -9342,6 +9431,14 @@ export type MutationRemoveTwoFactorAuthTokenFromIndividualArgs = {
 
 
 /** This is the root mutation */
+export type MutationReorderManualPaymentProvidersArgs = {
+  host: AccountReferenceInput;
+  providers: Array<ManualPaymentProviderReferenceInput>;
+  type: ManualPaymentProviderType;
+};
+
+
+/** This is the root mutation */
 export type MutationReplyToMemberInvitationArgs = {
   accept: Scalars['Boolean']['input'];
   invitation: MemberInvitationReferenceInput;
@@ -9514,6 +9611,13 @@ export type MutationUpdateAccountPlatformSubscriptionArgs = {
 /** This is the root mutation */
 export type MutationUpdateApplicationArgs = {
   application: ApplicationUpdateInput;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdateManualPaymentProviderArgs = {
+  input: ManualPaymentProviderUpdateInput;
+  manualPaymentProvider: ManualPaymentProviderReferenceInput;
 };
 
 
@@ -9724,6 +9828,7 @@ export type Order = {
   id: Scalars['String']['output'];
   lastChargedAt?: Maybe<Scalars['DateTime']['output']>;
   legacyId: Scalars['Int']['output'];
+  manualPaymentProvider?: Maybe<ManualPaymentProvider>;
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */
   membership?: Maybe<MemberOf>;
   /** Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received. */
@@ -10674,6 +10779,8 @@ export type PaymentMethodInput = {
    * @deprecated 2021-03-02: Please use service + type
    */
   legacyType?: InputMaybe<PaymentMethodLegacyType>;
+  /** The Manual Payment Provider ID used in this checkout */
+  manualPaymentProvider?: InputMaybe<ManualPaymentProviderReferenceInput>;
   /** Name of this payment method */
   name?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated 2021-08-20: Please use type instead */
@@ -13775,6 +13882,7 @@ export enum UploadedFileKind {
   ACCOUNT_LONG_DESCRIPTION = 'ACCOUNT_LONG_DESCRIPTION',
   AGREEMENT_ATTACHMENT = 'AGREEMENT_ATTACHMENT',
   COMMENT = 'COMMENT',
+  CUSTOM_PAYMENT_METHOD_TEMPLATE = 'CUSTOM_PAYMENT_METHOD_TEMPLATE',
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
   EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
