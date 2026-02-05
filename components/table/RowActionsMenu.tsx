@@ -58,6 +58,8 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   }
 
   const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef) ?? {};
+  const hasNoActions = !primary?.length && !secondary?.length && !openDrawer;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild ref={actionsMenuTriggerRef}>
@@ -66,6 +68,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
           variant="outline"
           className="border-transparent text-muted-foreground group-hover/row:border-border hover:bg-white hover:text-foreground hover:shadow-xs data-[state=open]:border-border data-[state=open]:text-foreground"
           data-cy="actions-menu-trigger"
+          disabled={hasNoActions}
         >
           <MoreHorizontal size={18} />
         </Button>
