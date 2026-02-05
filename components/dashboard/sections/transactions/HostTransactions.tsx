@@ -113,7 +113,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
       id: 'fiscal_host',
     },
   ];
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema, TransactionsTableQueryVariables, FilterMeta>({
     schema,
     toVariables,
     filters,
