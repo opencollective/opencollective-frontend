@@ -282,14 +282,15 @@ class LoggedInUser {
         (['development', 'staging'].includes(process.env.NODE_ENV) || ['e2e'].includes(process.env.OC_ENV));
       const hasAccess = feature.hasAccess?.(this);
       return (
-        feature.isEnabled?.() || // Always show enabled custom features
-        (isEnabledInEnv &&
-          (isEnabledByDevEnv ||
-            feature.publicBeta ||
-            userHaveSetting ||
-            hasClosedBetaAccess ||
-            enabledByDefault ||
-            hasAccess))
+        feature.hide?.(this) !== true &&
+        (feature.isEnabled?.() || // Always show enabled custom features
+          (isEnabledInEnv &&
+            (isEnabledByDevEnv ||
+              feature.publicBeta ||
+              userHaveSetting ||
+              hasClosedBetaAccess ||
+              enabledByDefault ||
+              hasAccess)))
       );
     });
 
