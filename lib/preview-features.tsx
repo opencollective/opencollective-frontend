@@ -1,4 +1,5 @@
 import React from 'react';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
@@ -41,6 +42,7 @@ export type PreviewFeature = {
   setIsEnabled?: (enable: boolean) => void;
   isEnabled?: () => boolean;
   hasAccess?: (loggedInUser: LoggedInUser) => boolean;
+  hide?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
@@ -111,8 +113,12 @@ export const previewFeatures: PreviewFeature[] = [
       />
     ),
     category: Categories.GENERAL,
-    publicBeta: true,
+    publicBeta: false,
     enabledByDefaultFor: ['*'],
+    // Hide if not root and not manually enabled
+    hide: (loggedInUser: LoggedInUser) =>
+      !loggedInUser.isRoot &&
+      !get(loggedInUser, `collective.settings.earlyAccess.${PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW}`),
   },
   {
     key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
