@@ -45,7 +45,7 @@ export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) => {
             organizationName: z.string().min(1).max(255),
             businessName: z.string().max(255).or(z.literal('')).optional(),
             federalTaxClassificationDetails: z.string().max(255).or(z.literal('')).optional(),
-            llcTaxClassification: z.enum(['C', 'S', 'P']).or(z.literal('')).optional(),
+            llcTaxClassification: z.enum(['C', 'S', 'P']).or(z.literal('')).optional().nullable(),
             exemptPayeeCode: z.string().max(5).or(z.literal('')).optional(),
             fatcaExemptionCode: z.string().max(14).or(z.literal('')).optional(),
           }),
@@ -158,7 +158,11 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
             </StyledInputFormikField>
           )}
           {values.federalTaxClassification === 'Other' && (
-            <StyledInputFormikField name="federalTaxClassificationDetails" label="Federal tax classification details" />
+            <StyledInputFormikField
+              name="federalTaxClassificationDetails"
+              label="Federal tax classification details"
+              required
+            />
           )}
           {/* From the reference PDF: Exemptions (codes apply only to certain entities, not individuals; see instructions on page 3) */}
           <div className="mt-2">

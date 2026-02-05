@@ -118,7 +118,7 @@ class EditUserEmailForm extends React.Component {
             >
               <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
             </Button>
-            {!isDone && (
+            {step === 'success' && (
               <Button
                 minWidth={180}
                 disabled={step === 'already-sent'}

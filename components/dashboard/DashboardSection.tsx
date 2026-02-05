@@ -36,9 +36,12 @@ import IncomingContributions from './sections/contributions/IncomingContribution
 import IncompleteContributions from './sections/contributions/IncompleteContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
 import Contributors from './sections/Contributors';
+import ApprovePaymentRequests from './sections/expenses/ApprovePaymentRequests';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
+import HostPaymentRequests from './sections/expenses/HostPaymentRequests';
 import { PaidDisbursements } from './sections/expenses/PaidDisbursements';
 import PayDisbursements from './sections/expenses/PayDisbursements';
+import PaymentRequests from './sections/expenses/PaymentRequests';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
@@ -92,6 +95,8 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.PAY_DISBURSEMENTS]: PayDisbursements,
   [SECTIONS.PAID_DISBURSEMENTS]: PaidDisbursements,
+  [SECTIONS.APPROVE_PAYMENT_REQUESTS]: ApprovePaymentRequests,
+  [SECTIONS.HOST_PAYMENT_REQUESTS]: HostPaymentRequests,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
@@ -100,6 +105,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
+  [SECTIONS.PAYMENT_REQUESTS]: PaymentRequests,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
   [SECTIONS.HOSTED_FUNDS]: HostedFunds,
   [SECTIONS.HOSTED_GRANTS]: HostedGrants,

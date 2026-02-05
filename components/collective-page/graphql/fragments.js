@@ -29,7 +29,7 @@ export const contributorsFieldsFragment = gqlV1 /* GraphQL */ `
  * Fields fetched for all possible collective page features
  */
 export const collectiveNavbarFieldsFragment = gqlV1 /* GraphQL */ `
-  fragment NavbarFields on CollectiveFeatures {
+  fragment NavbarFieldsV1 on CollectiveFeatures {
     id
     ABOUT
     CONNECTED_ACCOUNTS

@@ -1,10 +1,10 @@
 import React from 'react';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, uniq } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { boolean, isMulti, limit, offset } from '../../../../lib/filters/schemas';
+import { boolean, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
 import type {
   AccountExpensesQueryVariables,
   HostDashboardExpensesQueryVariables,
@@ -39,6 +39,9 @@ const sortFilter = buildSortFilter({
     field: 'CREATED_AT',
     direction: 'DESC',
   },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }),
+  },
 });
 
 export const schema = z.object({
@@ -49,7 +52,7 @@ export const schema = z.object({
   date: dateFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(ExpenseStatusFilter)).optional(),
-  type: z.nativeEnum(ExpenseType).optional(),
+  type: isNullable(isMulti(z.nativeEnum(ExpenseType))),
   payout: z.nativeEnum(PayoutMethodType).optional(),
   lastCommentBy: isMulti(z.nativeEnum(LastCommentBy)).optional(),
   tag: expenseTagFilter.schema,
@@ -67,6 +70,7 @@ export type FilterMeta = {
   currency?: Currency;
   hideExpensesMetaStatuses?: boolean;
   accountingCategoryKinds?: readonly AccountingCategoryKind[];
+  omitExpenseTypes?: ExpenseType[];
 };
 
 // Only needed when either the key or the expected query variables are different
@@ -80,14 +84,30 @@ export const toVariables: FiltersToVariables<
   tag: value => ({ tags: value.includes('untagged') ? null : value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
   payoutMethodId: id => ({ payoutMethod: { id } }),
-  status: value => (isEmpty(value) ? undefined : { status: value }),
+  type: (value, key, meta) => {
+    // Note: Using the `types` GraphQL query variable to allow multi-selection
+    return isEmpty(value)
+      ? meta?.omitExpenseTypes
+        ? { types: Object.values(ExpenseType).filter(v => !meta.omitExpenseTypes.includes(v)) }
+        : undefined
+      : { types: value };
+  },
+  status: value => {
+    return isEmpty(value)
+      ? undefined
+      : value.includes(ExpenseStatusFilter.PENDING)
+        ? {
+            status: uniq([...value, ExpenseStatusFilter.UNVERIFIED]), // include "Unverified" as "PENDING"
+          }
+        : { status: value };
+  },
 };
 
 // The filters config is used to populate the Filters component.
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
-  date: dateFilter.filter,
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Date Submitted', id: 'jS+tfC' }) },
   amount: amountFilter.filter,
   accountingCategory: accountingCategoryFilter.filter,
   status: {
@@ -95,7 +115,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
-        options={Object.values(ExpenseStatusFilter)
+        options={Object.values(omit(ExpenseStatusFilter, ExpenseStatusFilter.UNVERIFIED))
           .filter(
             value =>
               !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
@@ -110,9 +130,10 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
   type: {
     labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
+    Component: ({ valueRenderer, intl, meta, ...props }) => (
       <ComboSelectFilter
-        options={Object.values(omit(ExpenseType, ExpenseType.FUNDING_REQUEST))
+        isMulti
+        options={Object.values(omit(ExpenseType, [ExpenseType.FUNDING_REQUEST, ...(meta?.omitExpenseTypes ?? [])]))
           .map(value => ({ label: valueRenderer({ value, intl }), value }))
           .sort(sortSelectOptions)}
         {...props}

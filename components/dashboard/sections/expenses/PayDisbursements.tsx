@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
@@ -42,6 +42,7 @@ import { HostContextFilter, hostContextFilter } from '../../filters/HostContextF
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
+import { DefinitionTooltip } from '../reports/DefinitionTooltip';
 
 import ExpensePipelineOverview from './ExpensePipelineOverview';
 import type { FilterMeta as CommonFilterMeta } from './filters';
@@ -54,11 +55,15 @@ import {
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-// TODO: As we add the "Approve Payment Requests" tool, also exclude 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'
-const ExpenseStatusesToExclude = ['PAID'];
+const ExpenseStatusesToExclude = ['PAID', 'PENDING', 'REJECTED', 'UNVERIFIED', 'INVITE_DECLINED'];
 const PayExpenseStatusFilter = Object.fromEntries(
   Object.entries(ExpenseStatusFilter).filter(([status]) => !ExpenseStatusesToExclude.includes(status)),
-) as { [K in Exclude<keyof typeof ExpenseStatusFilter, 'PAID'>]: (typeof ExpenseStatusFilter)[K] };
+) as {
+  [K in Exclude<
+    keyof typeof ExpenseStatusFilter,
+    'PAID' | 'PENDING' | 'REJECTED' | 'UNVERIFIED' | 'INVITE_DECLINED'
+  >]: (typeof ExpenseStatusFilter)[K];
+};
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
@@ -164,59 +169,57 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
   });
 
-  const views: Views<FilterValues> = [
-    {
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {},
-      id: 'all',
-    },
-    {
-      label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
-      filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'ready_to_pay',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
-      filter: {
-        lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
-        status: [
-          ExpenseStatusFilter.APPROVED,
-          ExpenseStatusFilter.ERROR,
-          ExpenseStatusFilter.INCOMPLETE,
-          ExpenseStatusFilter.ON_HOLD,
-        ],
+  const views: Views<FilterValues> = useMemo(
+    () => [
+      {
+        label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
+        filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'ready_to_pay',
       },
-      id: 'unreplied',
-    },
-    {
-      label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
-      filter: {
-        status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
-        sort: { field: 'CREATED_AT', direction: 'ASC' },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
+        filter: {
+          lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
+          status: [
+            ExpenseStatusFilter.APPROVED,
+            ExpenseStatusFilter.ERROR,
+            ExpenseStatusFilter.INCOMPLETE,
+            ExpenseStatusFilter.ON_HOLD,
+          ],
+        },
+        id: 'unreplied',
       },
-      id: 'scheduled_for_payment',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
-      filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'on_hold',
-    },
-    {
-      label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
-      filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'incomplete',
-    },
-    {
-      label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
-      filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'error',
-    },
-  ];
+      {
+        label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
+        filter: {
+          status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+          sort: { field: 'CREATED_AT', direction: 'ASC' },
+        },
+        id: 'scheduled_for_payment',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
+        filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'on_hold',
+      },
+      {
+        label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
+        filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'incomplete',
+      },
+      {
+        label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
+        filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+        id: 'error',
+      },
+    ],
+    [intl],
+  );
 
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
-    defaultFilterValues: views[1].filter,
+    defaultFilterValues: views[0].filter,
     filters,
     meta: {
       currency: account.currency,
@@ -235,14 +238,18 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   } = useQuery(hostDashboardMetadataQuery, {
     variables: {
       hostSlug,
-      hostContext: account.hasHosting ? queryFilter.values.hostContext : undefined,
+      hostContext: queryFilter.values.hostContext,
     },
   });
 
-  const viewsWithCount: Views<FilterValues> = views.map(view => ({
-    ...view,
-    count: metaData?.[view.id]?.totalCount,
-  }));
+  const viewsWithCount: Views<FilterValues> = useMemo(
+    () =>
+      views.map(view => ({
+        ...view,
+        count: metaData?.[view.id]?.totalCount,
+      })),
+    [views, metaData],
+  );
 
   const variables = {
     hostSlug,
@@ -274,14 +281,33 @@ const PayDisbursements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         title={
           <div className="flex flex-1 flex-wrap items-center justify-between gap-4">
             <FormattedMessage defaultMessage="Pay Disbursements" id="El6h63" />
-            {account.hasHosting && (
-              <HostContextFilter
-                value={queryFilter.values.hostContext}
-                onChange={val => queryFilter.setFilter('hostContext', val)}
-                intl={intl}
-              />
-            )}
+            <HostContextFilter
+              value={queryFilter.values.hostContext}
+              onChange={val => queryFilter.setFilter('hostContext', val)}
+              intl={intl}
+            />
           </div>
+        }
+        description={
+          <FormattedMessage
+            defaultMessage="Review, process and disburse payment and grant requests that are <DefinitionTooltip>ready to pay</DefinitionTooltip>."
+            id="AJOacS"
+            values={{
+              DefinitionTooltip: parts => (
+                <DefinitionTooltip
+                  key="definition"
+                  definition={
+                    <FormattedMessage
+                      defaultMessage="Requests that have been approved and can be covered by existing funds"
+                      id="ReadyToPayDefinition"
+                    />
+                  }
+                >
+                  {parts}
+                </DefinitionTooltip>
+              ),
+            }}
+          />
         }
       />
       {paypalPreApprovalError && (

@@ -4336,6 +4336,16 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
   ): VendorCollection!
 
   """
@@ -17065,6 +17075,17 @@ type Query {
     """
     searchTerm: String
     relation: [CommunityRelationType!]
+    orderBy: OrderByInput
+
+    """
+    Only return accounts that contributed within this amount range
+    """
+    totalContributed: AmountRangeInput
+
+    """
+    Only return accounts that expended within this amount range
+    """
+    totalExpended: AmountRangeInput
     limit: Int! = 100
     offset: Int! = 0
   ): AccountCollection!
@@ -26848,6 +26869,7 @@ enum UploadedFileKind {
   EXPENSE_ATTACHED_FILE
   EXPENSE_ITEM
   TRANSACTIONS_IMPORT
+  TRANSACTIONS_CSV_EXPORT
   ACCOUNT_LONG_DESCRIPTION
   UPDATE
   COMMENT
