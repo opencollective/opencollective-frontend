@@ -1,24 +1,57 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { AlertCircle, CheckCircle2, Clock, Download, FileText, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, Views } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
-import { gql } from '@/lib/graphql/helpers';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
+import DateTime from '../../../DateTime';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
+import { DataList, DataListItem } from '../../../ui/DataList';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
+import { makePushSubpath } from '../../utils';
+
+const exportRequestFieldsFragment = gql`
+  fragment ExportRequestFields on ExportRequest {
+    id
+    legacyId
+    name
+    type
+    status
+    progress
+    error
+    parameters
+    createdAt
+    updatedAt
+    expiresAt
+    createdBy {
+      id
+      name
+      slug
+      imageUrl
+    }
+    file {
+      id
+      url
+      name
+      size
+    }
+  }
+`;
 
 const exportRequestsQuery = gql`
   query ExportRequests(
@@ -33,60 +66,54 @@ const exportRequestsQuery = gql`
       limit
       totalCount
       nodes {
-        id
-        legacyId
-        name
-        type
-        status
-        progress
-        error
-        createdAt
-        updatedAt
-        expiresAt
-        createdBy {
-          id
-          name
-          slug
-          imageUrl
-        }
-        file {
-          id
-          url
-          name
-        }
+        ...ExportRequestFields
       }
     }
   }
+  ${exportRequestFieldsFragment}
 `;
+
+const exportRequestQuery = gql`
+  query ExportRequest($exportRequest: ExportRequestReferenceInput!) {
+    exportRequest(exportRequest: $exportRequest) {
+      ...ExportRequestFields
+    }
+  }
+  ${exportRequestFieldsFragment}
+`;
+
+type ExportRequestNode = {
+  id: string;
+  legacyId: number;
+  name: string;
+  type: ExportRequestType;
+  status: ExportRequestStatus;
+  progress?: number;
+  error?: string;
+  parameters?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt?: string;
+  createdBy?: {
+    id: string;
+    name: string;
+    slug: string;
+    imageUrl: string;
+  };
+  file?: {
+    id: string;
+    url: string;
+    name: string;
+    size: number;
+  };
+};
 
 type ExportRequestsQuery = {
   exportRequests: {
     offset: number;
     limit: number;
     totalCount: number;
-    nodes: Array<{
-      id: string;
-      legacyId: number;
-      name: string;
-      type: ExportRequestType;
-      status: ExportRequestStatus;
-      progress?: number;
-      error?: string;
-      createdAt: string;
-      updatedAt: string;
-      expiresAt?: string;
-      createdBy?: {
-        id: string;
-        name: string;
-        slug: string;
-        imageUrl: string;
-      };
-      file?: {
-        id: string;
-        url: string;
-        name: string;
-      };
-    }>;
+    nodes: Array<ExportRequestNode>;
   };
 };
 
@@ -96,6 +123,14 @@ type ExportRequestsQueryVariables = {
   status?: ExportRequestStatus;
   limit: number;
   offset: number;
+};
+
+type ExportRequestQueryResult = {
+  exportRequest: ExportRequestNode | null;
+};
+
+type ExportRequestQueryVariables = {
+  exportRequest: { id: string };
 };
 
 enum ExportRequestType {
@@ -155,6 +190,168 @@ const getStatusClassName = (status: ExportRequestStatus): string => {
   }
 };
 
+const formatBytes = (bytes: number): string => {
+  if (bytes === null || bytes === undefined) {
+    return '—';
+  } else if (bytes === 0) {
+    return '0 B';
+  }
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
+
+type ExportRequestDetailsDialogProps = {
+  exportRequestId: string | null;
+  onClose: () => void;
+};
+
+const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportRequestDetailsDialogProps) => {
+  const intl = useIntl();
+
+  const { data, loading, error } = useQuery<ExportRequestQueryResult, ExportRequestQueryVariables>(exportRequestQuery, {
+    variables: { exportRequest: { id: exportRequestId } },
+    skip: !exportRequestId,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const exportRequest = data?.exportRequest;
+
+  if (!exportRequestId) {
+    return null;
+  }
+
+  const StatusIcon = exportRequest ? getStatusIcon(exportRequest.status) : null;
+  const statusClassName = exportRequest ? getStatusClassName(exportRequest.status) : '';
+
+  return (
+    <Dialog open={!!exportRequestId} onOpenChange={open => !open && onClose()}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage defaultMessage="Export Details" id="ExportDetails" />
+          </DialogTitle>
+        </DialogHeader>
+
+        {loading && !exportRequest ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : exportRequest ? (
+          <React.Fragment>
+            <DataList className="gap-4">
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
+                value={
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{exportRequest.name}</span>
+                  </div>
+                }
+              />
+
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Type" id="expense.type" />}
+                value={intl.formatMessage(ExportTypeLabels[exportRequest.type])}
+              />
+
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Status" id="expense.status" />}
+                value={
+                  <Badge className={`gap-1 ${statusClassName}`}>
+                    <StatusIcon
+                      className={`h-3 w-3 ${exportRequest.status === ExportRequestStatus.PROCESSING ? 'animate-spin' : ''}`}
+                    />
+                    {intl.formatMessage(ExportStatusLabels[exportRequest.status])}
+                  </Badge>
+                }
+              />
+
+              {exportRequest.status === ExportRequestStatus.FAILED && exportRequest.error && (
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Error" id="Error" />}
+                  value={<span className="text-red-600">{exportRequest.error}</span>}
+                />
+              )}
+
+              {exportRequest.file && (
+                <React.Fragment>
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="File Name" id="FileName" />}
+                    value={exportRequest.file.name}
+                  />
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="File Size" id="FileSize" />}
+                    value={formatBytes(exportRequest.file.size)}
+                  />
+                </React.Fragment>
+              )}
+
+              {exportRequest.createdBy && (
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Requested By" id="RequestedBy" />}
+                  value={
+                    <div className="flex items-center gap-2">
+                      <Avatar collective={exportRequest.createdBy} size={24} />
+                      <span>{exportRequest.createdBy.name}</span>
+                    </div>
+                  }
+                />
+              )}
+
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Created" id="expense.incurredAt" />}
+                value={<DateTime value={exportRequest.createdAt} dateStyle="medium" timeStyle="short" />}
+              />
+
+              <DataListItem
+                label={<FormattedMessage defaultMessage="Last Updated" id="LastUpdated" />}
+                value={<DateTime value={exportRequest.updatedAt} dateStyle="medium" timeStyle="short" />}
+              />
+
+              {exportRequest.expiresAt && (
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Expires" id="Expires" />}
+                  value={<DateTime value={exportRequest.expiresAt} dateStyle="medium" timeStyle="short" />}
+                />
+              )}
+
+              {exportRequest.parameters && Object.keys(exportRequest.parameters).length > 0 && (
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Parameters" id="Parameters" />}
+                  itemClassName="w-full max-w-full"
+                  value={
+                    <code className="block max-h-80 w-full overflow-auto rounded-md bg-slate-100 p-2 text-xs">
+                      <pre>{JSON.stringify(exportRequest.parameters, null, 2)}</pre>
+                    </code>
+                  }
+                />
+              )}
+            </DataList>
+
+            {exportRequest.status === ExportRequestStatus.COMPLETED && exportRequest.file && (
+              <div className="mt-4 flex justify-end">
+                <a
+                  href={exportRequest.file.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  <Download className="h-4 w-4" />
+                  <FormattedMessage defaultMessage="Download" id="Download" />
+                </a>
+              </div>
+            )}
+          </React.Fragment>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const getColumns = ({ intl }) => {
   return [
     {
@@ -183,7 +380,7 @@ const getColumns = ({ intl }) => {
         const StatusIcon = getStatusIcon(exportRequest.status);
         const className = getStatusClassName(exportRequest.status);
 
-        return (
+        const badge = (
           <Badge className={`gap-1 ${className}`}>
             <StatusIcon
               className={`h-3 w-3 ${exportRequest.status === ExportRequestStatus.PROCESSING ? 'animate-spin' : ''}`}
@@ -191,43 +388,41 @@ const getColumns = ({ intl }) => {
             {intl.formatMessage(ExportStatusLabels[exportRequest.status])}
           </Badge>
         );
+
+        if (exportRequest.status === ExportRequestStatus.FAILED && exportRequest.error) {
+          return (
+            <Tooltip>
+              <TooltipTrigger>{badge}</TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-sm">{exportRequest.error}</p>
+              </TooltipContent>
+            </Tooltip>
+          );
+        }
+
+        return badge;
       },
     },
     {
-      accessorKey: 'progress',
-      header: intl.formatMessage({ defaultMessage: 'Progress', id: 'Progress' }),
+      accessorKey: 'fileSize',
+      header: intl.formatMessage({ defaultMessage: 'File Size', id: 'FileSize' }),
       cell: ({ row }) => {
         const exportRequest = row.original;
-        if (exportRequest.status === ExportRequestStatus.PROCESSING && exportRequest.progress) {
-          return (
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-24 rounded-full bg-slate-200">
-                <div
-                  className="h-full rounded-full bg-blue-600 transition-all"
-                  style={{ width: `${exportRequest.progress}%` }}
-                />
-              </div>
-              <span className="text-xs text-muted-foreground">{exportRequest.progress}%</span>
-            </div>
-          );
+        if (exportRequest.file?.size) {
+          return <span className="text-sm">{formatBytes(exportRequest.file.size)}</span>;
         }
         return <span className="text-muted-foreground">—</span>;
       },
     },
     {
       accessorKey: 'createdBy',
-      header: intl.formatMessage({ defaultMessage: 'Created By', id: 'CreatedBy' }),
+      header: intl.formatMessage({ defaultMessage: 'Requested By', id: 'RequestedBy' }),
       cell: ({ row }) => {
         const exportRequest = row.original;
         if (!exportRequest.createdBy) {
           return <span className="text-muted-foreground">—</span>;
         }
-        return (
-          <div className="flex items-center gap-2">
-            <Avatar collective={exportRequest.createdBy} size={24} />
-            <span className="text-sm">{exportRequest.createdBy.name}</span>
-          </div>
-        );
+        return <Avatar collective={exportRequest.createdBy} size={24} />;
       },
     },
     {
@@ -296,8 +491,11 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   status: statusFilter.filter,
 };
 
-const Exports = ({ accountSlug }: DashboardSectionProps) => {
+const Exports = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
+  const router = useRouter();
+  const selectedExportRequestId = subpath?.[0] || null;
+  const pushSubpath = React.useMemo(() => makePushSubpath(router), [router]);
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -360,31 +558,18 @@ const Exports = ({ accountSlug }: DashboardSectionProps) => {
   const exportRequests = data?.exportRequests?.nodes || [];
   const loading = queryLoading;
   const error = queryError;
-
   const getActions = React.useCallback(
-    row => {
-      const exportRequest = row.original;
+    (exportRequest: ExportRequestNode) => {
       const primary = [];
       const secondary = [];
 
-      if (exportRequest.status === ExportRequestStatus.COMPLETED && exportRequest.file) {
+      if (exportRequest?.status === ExportRequestStatus.COMPLETED && exportRequest.file) {
         primary.push({
           key: 'download',
           label: intl.formatMessage({ defaultMessage: 'Download', id: 'Download' }),
           Icon: Download,
           onClick: () => {
             window.open(exportRequest.file.url, '_blank');
-          },
-        });
-      }
-
-      if (exportRequest.status === ExportRequestStatus.FAILED && exportRequest.error) {
-        secondary.push({
-          key: 'view-error',
-          label: intl.formatMessage({ defaultMessage: 'View Error', id: 'ViewError' }),
-          Icon: AlertCircle,
-          onClick: () => {
-            alert(exportRequest.error);
           },
         });
       }
@@ -420,11 +605,14 @@ const Exports = ({ accountSlug }: DashboardSectionProps) => {
             data={exportRequests}
             nbPlaceholders={queryFilter.values?.limit || PAGE_SIZE}
             getActions={getActions}
+            onClickRow={row => pushSubpath(row.original.id)}
             mobileTableView
           />
           <Pagination queryFilter={queryFilter} total={data?.exportRequests?.totalCount} />
         </div>
       )}
+
+      <ExportRequestDetailsDialog exportRequestId={selectedExportRequestId} onClose={() => pushSubpath('')} />
     </div>
   );
 };
