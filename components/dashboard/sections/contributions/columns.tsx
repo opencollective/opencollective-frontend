@@ -227,11 +227,11 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
       const pm = row.original.paymentMethod;
       if (row.original.manualPaymentProvider) {
         return (
-          <div className="flex items-center gap-1">
-            <Badge size="xs" type="neutral">
+          <div>
+            <Badge size="xs" type="neutral" className="mr-1">
               <FormattedMessage defaultMessage="Manual" id="PaymentMethod.Manual" />
             </Badge>
-            <span>{row.original.manualPaymentProvider.name}</span>
+            <span className="align-middle">{row.original.manualPaymentProvider.name}</span>
           </div>
         );
       } else if (row.original.pendingContributionData?.paymentMethod) {
