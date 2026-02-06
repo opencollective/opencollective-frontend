@@ -314,7 +314,10 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, i
     hasContact: !isAdmin && (isHostAdmin || isFeatureAvailable(collective, 'CONTACT_FORM')),
     hasApply: isFeatureAvailable(collective, 'RECEIVE_HOST_APPLICATIONS'),
     hasSubmitExpense:
-      isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
+      isFeatureAvailable(collective, 'RECEIVE_EXPENSES') &&
+      expenseSubmissionAllowed(collective, LoggedInUser) &&
+      (isSupportedExpenseType(collective, EXPENSE_TYPE.INVOICE) ||
+        isSupportedExpenseType(collective, EXPENSE_TYPE.RECEIPT)),
     hasManageSubscriptions:
       isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
