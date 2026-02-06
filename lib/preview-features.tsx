@@ -108,37 +108,37 @@ export const previewFeatures: PreviewFeature[] = [
           <ul className="mt-2 ml-4">
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>J</Kbd> to select the next Expense."
+                defaultMessage="{key} to select the next Expense."
                 id="PreviewFeatures.keyboardShortcutsExpenseListNext"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>J</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>K</Kbd> to select the previous Expense."
+                defaultMessage="{key} to select the previous Expense."
                 id="PreviewFeatures.keyboardShortcutsExpenseListPrev"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>K</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>P</Kbd> to Pay selected Expense (if ready to pay)."
+                defaultMessage="{key} to Pay selected Expense (if ready to pay)."
                 id="PreviewFeatures.keyboardShortcutsExpenseListPay"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>P</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>S</Kbd> to check Security alerts for selected Expense."
+                defaultMessage="{key} to check Security alerts for selected Expense."
                 id="PreviewFeatures.keyboardShortcutsExpenseListSecurity"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>S</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>Enter</Kbd> to open Expense details."
+                defaultMessage="{key} to open Expense details."
                 id="PreviewFeatures.keyboardShortcutsExpenseListOpen"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>Enter</Kbd> }}
               />
             </li>
           </ul>
@@ -148,44 +148,44 @@ export const previewFeatures: PreviewFeature[] = [
           <ul className="mt-2 ml-4">
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>&larr;</Kbd> and <Kbd>&rarr;</Kbd> to navigate through attachments."
+                defaultMessage="{leftKey} and {rightKey} to navigate through attachments."
                 id="PreviewFeatures.keyboardShortcutsExpenseDetailsAttachments"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ leftKey: <Kbd>&larr;</Kbd>, rightKey: <Kbd>&rarr;</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>H</Kbd> to put selected Expense on Hold."
+                defaultMessage="{key} to put selected Expense on Hold."
                 id="PreviewFeatures.keyboardShortcutsExpenseListHold"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>H</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>I</Kbd> to mark selected Expense as Incomplete."
+                defaultMessage="{key} to mark selected Expense as Incomplete."
                 id="PreviewFeatures.keyboardShortcutsExpenseListIncomplete"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>I</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>P</Kbd> to Pay selected Expense (if ready to pay)."
+                defaultMessage="{key} to Pay selected Expense (if ready to pay)."
                 id="PreviewFeatures.keyboardShortcutsExpenseListPay"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>P</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>E</Kbd> to enter Edit mode."
+                defaultMessage="{key} to enter Edit mode."
                 id="PreviewFeatures.keyboardShortcutsExpenseDetailsEdit"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>E</Kbd> }}
               />
             </li>
             <li>
               <FormattedMessage
-                defaultMessage="<Kbd>Esc</Kbd> to close Expense details."
+                defaultMessage="{key} to close Expense details."
                 id="PreviewFeatures.keyboardShortcutsExpenseDetailsClose"
-                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+                values={{ key: <Kbd>Esc</Kbd> }}
               />
             </li>
           </ul>
