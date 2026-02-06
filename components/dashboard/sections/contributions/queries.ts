@@ -16,6 +16,7 @@ export const dashboardOrdersQuery = gql`
     $paymentMethod: [PaymentMethodReferenceInput]
     $paymentMethodService: [PaymentMethodService]
     $paymentMethodType: [PaymentMethodType]
+    $manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
     $accountingCategory: [String]
     $hostContext: HostContext
     $includeChildrenAccounts: Boolean
@@ -49,6 +50,7 @@ export const dashboardOrdersQuery = gql`
         paymentMethod: $paymentMethod
         paymentMethodService: $paymentMethodService
         paymentMethodType: $paymentMethodType
+        manualPaymentProvider: $manualPaymentProvider
         accountingCategory: $accountingCategory
         hostContext: $hostContext
         includeChildrenAccounts: $includeChildrenAccounts

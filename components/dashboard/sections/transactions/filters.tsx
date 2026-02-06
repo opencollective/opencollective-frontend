@@ -70,6 +70,7 @@ export type FilterMeta = {
   currency?: Currency;
   paymentMethodTypes?: PaymentMethodType[];
   kinds?: TransactionKind[];
+  manualPaymentProviders?: Array<{ id: string; name: string }>;
 };
 
 // Only needed when values and key of filters are different

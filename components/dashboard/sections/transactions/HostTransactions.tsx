@@ -73,6 +73,10 @@ const hostTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      manualPaymentProviders {
+        id
+        name
+      }
       accountingCategories {
         nodes {
           ...AccountingCategorySelectFields
@@ -118,6 +122,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug, account }: DashboardSecti
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
+      manualPaymentProviders: metaData?.host?.manualPaymentProviders,
     },
     views,
   });
