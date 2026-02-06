@@ -39,6 +39,7 @@ const i18nFieldLabels = defineMessages({
   [OrderByFieldType.NAME]: { defaultMessage: 'Name', id: 'Fields.name' },
   [OrderByFieldType.UNHOSTED_AT]: { defaultMessage: 'Unhosted since', id: 'UnhostedSince' },
   [DateTimeField.PAID_AT]: { defaultMessage: 'Date Paid', id: '/SrpzP' },
+  [OrderByFieldType.STARTS_AT]: { defaultMessage: 'Event Starts Date', id: 'EventStartsDate' },
 });
 
 const i18nDefaultDirectionLabels = defineMessages({
@@ -75,6 +76,10 @@ const i18nFieldDirectionLabels = {
     [OrderDirection.DESC]: { defaultMessage: 'Newest to Oldest', id: 'SortDirection.NewestToOldest' },
     [OrderDirection.ASC]: { defaultMessage: 'Oldest to Newest', id: 'SortDirection.OldestToNewest' },
   }),
+  [OrderByFieldType.STARTS_AT]: defineMessages({
+    [OrderDirection.DESC]: { defaultMessage: 'Newest to Oldest', id: 'SortDirection.NewestToOldest' },
+    [OrderDirection.ASC]: { defaultMessage: 'Oldest to Newest', id: 'SortDirection.OldestToNewest' },
+  }),
 };
 
 const FieldIconTypes = {
@@ -92,6 +97,7 @@ const FieldIconTypes = {
   [OrderByFieldType.TOTAL_CONTRIBUTED]: 'NUMERICAL',
   [OrderByFieldType.MONEY_MANAGED]: 'NUMERICAL',
   [OrderByFieldType.LAST_TRANSACTION_CREATED_AT]: 'NUMERICAL',
+  [OrderByFieldType.STARTS_AT]: 'NUMERICAL',
 };
 
 const Icons = {

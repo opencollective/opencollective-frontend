@@ -604,6 +604,23 @@ const CollectiveDetails = ({
               }
             />
             <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
+            {collective?.type === CollectiveType.EVENT && (
+              <InfoListItem
+                className="col-span-2"
+                title={<FormattedMessage id="startsAt" defaultMessage="Event Starts At" />}
+                value={
+                  <div className="flex items-center gap-2">
+                    <FormattedDate value={collective.startsAt} day="numeric" month="long" year="numeric" />
+                    {collective.endsAt && collective.endsAt !== collective.startsAt && (
+                      <React.Fragment>
+                        <span>&rarr;</span>
+                        <FormattedDate value={collective.endsAt} day="numeric" month="long" year="numeric" />
+                      </React.Fragment>
+                    )}
+                  </div>
+                }
+              />
+            )}
             {isHostedCollective && (
               <React.Fragment>
                 {!isUpgradeRequiredForSettingHostFee && (
