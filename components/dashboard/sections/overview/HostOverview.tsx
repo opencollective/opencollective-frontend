@@ -1,24 +1,32 @@
-import React from 'react';
-import { useQuery } from '@apollo/client';
-import { ArrowRight } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { ArrowRight, Settings } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { isHeavyAccount } from '@/lib/collective';
+import { hasAccountMoneyManagement, isHeavyAccount } from '@/lib/collective';
 import dayjs from '@/lib/dayjs';
 import { HostContext, type HostOverviewMetricsQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
 import { columns } from '@/components/dashboard/sections/transactions/TransactionsTable';
 import { DataTable } from '@/components/table/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
+import DashboardHeader from '../../DashboardHeader';
 import { DateFilterType } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostContextFilter } from '../../filters/HostContextFilter';
@@ -29,11 +37,14 @@ import {
   toVariables as hostTransactionsToVariables,
 } from '../transactions/HostTransactions';
 
+import { ConvertedAccountMessage } from './ConvertedAccountMessage';
 import type { MetricProps } from './Metric';
 import { Metric } from './Metric';
-import { hostOverviewMetricsQuery } from './queries';
+import { PlatformBillingCollapsibleCard } from './PlatformBillingOverviewCard';
+import { editAccountSettingMutation, hostOverviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { HostTodoList } from './TodoList';
+import { WelcomeOrganization } from './Welcome';
 
 const schema = z.object({
   context: hostContextFilter.schema,
@@ -41,10 +52,31 @@ const schema = z.object({
   as: z.string().optional(),
 });
 
-export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
+export function HostOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
   const router = useRouter();
   const intl = useIntl();
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
+  const [showSetupGuide, setShowSetupGuide] = useState(undefined);
+  const [editAccountSetting] = useMutation(editAccountSettingMutation);
+
+  const handleSetupGuideToggle = useCallback(
+    async (open: boolean) => {
+      setShowSetupGuide(open);
+
+      await editAccountSetting({
+        variables: {
+          account: { legacyId: LoggedInUser.collective.id },
+          key: `showSetupGuide.id${account.legacyId}`,
+          value: open,
+        },
+      }).catch(() => {});
+      await refetchLoggedInUser();
+    },
+    [account, LoggedInUser, editAccountSetting, refetchLoggedInUser],
+  );
+
+  const hasMoneyManagement = hasAccountMoneyManagement(account);
 
   const queryFilter = useQueryFilter<typeof schema, HostOverviewMetricsQueryVariables>({
     schema,
@@ -128,7 +160,31 @@ export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
   ];
 
   return (
-    <React.Fragment>
+    <div className="space-y-6">
+      <DashboardHeader
+        title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon-sm" variant="outline">
+                <Settings size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuCheckboxItem
+                checked={showSetupGuide}
+                onClick={() => handleSetupGuideToggle(!showSetupGuide)}
+              >
+                <FormattedMessage defaultMessage="Display setup guide" id="SetupGuide.DisplaySetupGuide" />
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      />
+      <ConvertedAccountMessage account={account} />
+      <WelcomeOrganization account={account} open={showSetupGuide} setOpen={handleSetupGuideToggle} />
+      {hasMoneyManagement && account.platformSubscription && <PlatformBillingCollapsibleCard />}
+
       <HostTodoList />
 
       <Card className="pb-3">
@@ -214,6 +270,6 @@ export function HostOverviewContent({ accountSlug }: DashboardSectionProps) {
           <Timeline withTitle accountSlug={router.query?.as ?? accountSlug} />
         </div>
       </div>
-    </React.Fragment>
+    </div>
   );
 }
