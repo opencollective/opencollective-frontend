@@ -112,16 +112,43 @@ const ZoneSelect: React.FC<ZoneSelectProps> = ({
 }) => {
   const intl = useIntl();
   const zoneOptions = React.useMemo(() => orderBy((info || []).map(buildZoneOption), 'label'), [info]);
+  const hasOptions = zoneOptions.length > 0;
 
   // Reset zone if not supported
   React.useEffect(() => {
-    if (zoneOptions) {
+    if (zoneOptions && hasOptions) {
       const formValueZone = value;
       if (formValueZone && !zoneOptions.find(option => option.value === formValueZone)) {
         onChange({ target: { name: name, value: null } });
       }
     }
-  }, [zoneOptions, name, onChange, value]);
+  }, [zoneOptions, hasOptions, name, onChange, value]);
+
+  // When there are no zone options, show a text input instead of a select
+  if (!hasOptions) {
+    const inputValue = value ?? '';
+    if (useLegacyComponent) {
+      return (
+        <StyledInput
+          {...{ name, required, ...props }}
+          id={id}
+          value={inputValue}
+          onChange={onChange}
+          error={Boolean(error)}
+          data-cy={`address-${name}`}
+        />
+      );
+    }
+    return (
+      <Input
+        {...{ name, required, ...props }}
+        id={id}
+        value={inputValue}
+        onChange={e => onChange({ target: { name: e.target.name, value: e.target.value } })}
+        data-cy={`address-${name}`}
+      />
+    );
+  }
 
   const placeholder = intl.formatMessage({ defaultMessage: 'Please select your {label}', id: 'WOyn1N' }, { label });
   if (useLegacyComponent) {
@@ -419,7 +446,6 @@ const I18nAddressFields: React.FC<I18nAddressFieldsProps> = ({
   if (!selectedCountry || !fields || !addressFormFields) {
     return null;
   }
-
   return (
     <React.Fragment>
       {fields.map(([fieldName, fieldLabel, fieldInfo]) => (
