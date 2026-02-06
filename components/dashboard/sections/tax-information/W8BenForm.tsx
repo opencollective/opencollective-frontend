@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FormikProps } from 'formik';
-import { merge, pick } from 'lodash';
+import { isEqual, merge, pick } from 'lodash';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -100,6 +100,14 @@ export const getInitialValuesForW8Ben = (
 export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFormValues> }) => {
   const intl = useIntl();
   const { values, setFieldValue } = formik;
+
+  // Update signer info when same as beneficial owner
+  React.useEffect(() => {
+    if (values.isSignerTheBeneficialOwner && !isEqual(values.signer, values.beneficialOwner)) {
+      setFieldValue('signer', values.beneficialOwner);
+    }
+  }, [values.isSignerTheBeneficialOwner, values.beneficialOwner, values.signer, setFieldValue]);
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="mt-2">
