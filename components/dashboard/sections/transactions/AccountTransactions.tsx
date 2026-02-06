@@ -74,6 +74,20 @@ const accountTransactionsMetaDataQuery = gql`
           id
         }
       }
+      ... on AccountWithHost {
+        host {
+          manualPaymentProviders {
+            id
+            name
+          }
+        }
+      }
+      ... on Host {
+        manualPaymentProviders {
+          id
+          name
+        }
+      }
     }
   }
 `;
@@ -98,6 +112,8 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
       kinds: metaData?.transactions?.kinds,
       accountSlug,
       childrenAccounts: account.childrenAccounts?.nodes ?? [],
+      manualPaymentProviders:
+        metaData?.account?.manualPaymentProviders ?? metaData?.account?.host?.manualPaymentProviders,
     },
   });
 

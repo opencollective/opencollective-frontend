@@ -92,6 +92,7 @@ export const transactionsTableQuery = gql`
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
     $paymentMethodService: [PaymentMethodService]
+    $manualPaymentProvider: [ManualPaymentProviderReferenceInput!]
     $amount: AmountRangeInput
     $minAmount: Int
     $maxAmount: Int
@@ -127,6 +128,7 @@ export const transactionsTableQuery = gql`
       type: $type
       paymentMethodType: $paymentMethodType
       paymentMethodService: $paymentMethodService
+      manualPaymentProvider: $manualPaymentProvider
       amount: $amount
       minAmount: $minAmount
       maxAmount: $maxAmount
