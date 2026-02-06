@@ -11,13 +11,10 @@ import { integer } from '@/lib/filters/schemas';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
-import DateTime from '../../../DateTime';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
-import { DataList, DataListItem } from '../../../ui/DataList';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
@@ -27,6 +24,8 @@ import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 import { makePushSubpath } from '../../utils';
+
+import { ExportRequestDetailsDialog } from './ExportRequestDetailsDialog';
 
 const exportRequestFieldsFragment = gql`
   fragment ExportRequestFields on ExportRequest {
@@ -72,15 +71,6 @@ const exportRequestsQuery = gql`
       nodes {
         ...ExportRequestFields
       }
-    }
-  }
-  ${exportRequestFieldsFragment}
-`;
-
-const exportRequestQuery = gql`
-  query ExportRequest($exportRequest: ExportRequestReferenceInput!) {
-    exportRequest(exportRequest: $exportRequest) {
-      ...ExportRequestFields
     }
   }
   ${exportRequestFieldsFragment}
@@ -135,14 +125,6 @@ type ExportRequestsQueryVariables = {
   status?: ExportRequestStatus;
   limit: number;
   offset: number;
-};
-
-type ExportRequestQueryResult = {
-  exportRequest: ExportRequestNode | null;
-};
-
-type ExportRequestQueryVariables = {
-  exportRequest: { id: string };
 };
 
 enum ExportRequestType {
@@ -212,156 +194,6 @@ const formatBytes = (bytes: number): string => {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-};
-
-type ExportRequestDetailsDialogProps = {
-  exportRequestId: string | null;
-  onClose: () => void;
-};
-
-const ExportRequestDetailsDialog = ({ exportRequestId, onClose }: ExportRequestDetailsDialogProps) => {
-  const intl = useIntl();
-
-  const { data, loading, error } = useQuery<ExportRequestQueryResult, ExportRequestQueryVariables>(exportRequestQuery, {
-    variables: { exportRequest: { id: exportRequestId } },
-    skip: !exportRequestId,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const exportRequest = data?.exportRequest;
-
-  if (!exportRequestId) {
-    return null;
-  }
-
-  const StatusIcon = exportRequest ? getStatusIcon(exportRequest.status) : null;
-  const statusClassName = exportRequest ? getStatusClassName(exportRequest.status) : '';
-
-  return (
-    <Dialog open={!!exportRequestId} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
-            <FormattedMessage defaultMessage="Export Details" id="ExportDetails" />
-          </DialogTitle>
-        </DialogHeader>
-
-        {loading && !exportRequest ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : error ? (
-          <MessageBoxGraphqlError error={error} />
-        ) : exportRequest ? (
-          <React.Fragment>
-            <DataList className="gap-4">
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Name" id="Fields.name" />}
-                value={
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{exportRequest.name}</span>
-                  </div>
-                }
-              />
-
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Type" id="expense.type" />}
-                value={intl.formatMessage(ExportTypeLabels[exportRequest.type])}
-              />
-
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Status" id="expense.status" />}
-                value={
-                  <Badge className={`gap-1 ${statusClassName}`}>
-                    <StatusIcon
-                      className={`h-3 w-3 ${exportRequest.status === ExportRequestStatus.PROCESSING ? 'animate-spin' : ''}`}
-                    />
-                    {intl.formatMessage(ExportStatusLabels[exportRequest.status])}
-                  </Badge>
-                }
-              />
-
-              {exportRequest.status === ExportRequestStatus.FAILED && exportRequest.error && (
-                <DataListItem
-                  label={<FormattedMessage defaultMessage="Error" id="Error" />}
-                  value={<span className="text-red-600">{exportRequest.error}</span>}
-                />
-              )}
-
-              {exportRequest.file && (
-                <React.Fragment>
-                  <DataListItem
-                    label={<FormattedMessage defaultMessage="File Name" id="FileName" />}
-                    value={exportRequest.file.name}
-                  />
-                  <DataListItem
-                    label={<FormattedMessage defaultMessage="File Size" id="FileSize" />}
-                    value={formatBytes(exportRequest.file.size)}
-                  />
-                </React.Fragment>
-              )}
-
-              {exportRequest.createdBy && (
-                <DataListItem
-                  label={<FormattedMessage defaultMessage="Requested By" id="RequestedBy" />}
-                  value={
-                    <div className="flex items-center gap-2">
-                      <Avatar collective={exportRequest.createdBy} size={24} />
-                      <span>{exportRequest.createdBy.name}</span>
-                    </div>
-                  }
-                />
-              )}
-
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Date" id="expense.incurredAt" />}
-                value={<DateTime value={exportRequest.createdAt} dateStyle="medium" timeStyle="short" />}
-              />
-
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Last Updated" id="LastUpdated" />}
-                value={<DateTime value={exportRequest.updatedAt} dateStyle="medium" timeStyle="short" />}
-              />
-
-              {exportRequest.expiresAt && (
-                <DataListItem
-                  label={<FormattedMessage defaultMessage="Expires" id="Agreement.expiresAt" />}
-                  value={<DateTime value={exportRequest.expiresAt} dateStyle="medium" timeStyle="short" />}
-                />
-              )}
-
-              {exportRequest.parameters && Object.keys(exportRequest.parameters).length > 0 && (
-                <DataListItem
-                  label={<FormattedMessage defaultMessage="Parameters" id="export.json.parameters.title" />}
-                  itemClassName="w-full max-w-full"
-                  value={
-                    <code className="block max-h-80 w-full overflow-auto rounded-md bg-slate-100 p-2 text-xs">
-                      <pre>{JSON.stringify(exportRequest.parameters, null, 2)}</pre>
-                    </code>
-                  }
-                />
-              )}
-            </DataList>
-
-            {exportRequest.status === ExportRequestStatus.COMPLETED && exportRequest.file && (
-              <div className="mt-4 flex justify-end">
-                <a
-                  href={exportRequest.file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                >
-                  <Download className="h-4 w-4" />
-                  <FormattedMessage defaultMessage="Download" id="Download" />
-                </a>
-              </div>
-            )}
-          </React.Fragment>
-        ) : null}
-      </DialogContent>
-    </Dialog>
-  );
 };
 
 const getColumns = ({ intl }) => {
