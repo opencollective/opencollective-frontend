@@ -10,6 +10,7 @@ import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
+import { graphql } from '@/lib/graphql/tada';
 import { UploadedFileKind } from '@/lib/graphql/types/v2/schema';
 import { useImageUploader } from '@/lib/hooks/useImageUploader';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,22 @@ import { cn } from '@/lib/utils';
 import { DROPZONE_ACCEPT_IMAGES } from './Dropzone';
 import type { FlexProps } from './Grid';
 import { Flex } from './Grid';
+
+/**
+ * Fragment defining the Account fields required by Avatar component.
+ * Spread this fragment in your queries when passing account data to Avatar.
+ */
+export const AvatarFragment = graphql(`
+  fragment AvatarFragment on Account {
+    slug
+    type
+    name
+    imageUrl
+    ... on Individual {
+      isGuest
+    }
+  }
+`);
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 

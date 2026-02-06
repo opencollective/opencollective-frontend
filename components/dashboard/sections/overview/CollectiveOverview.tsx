@@ -9,6 +9,7 @@ import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import type { VariablesOf } from '@/lib/graphql/tada';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
@@ -30,6 +31,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { periodCompareFilter } from '../../filters/PeriodCompareFilter';
 import type { DashboardSectionProps } from '../../types';
 
+import { AccountProfileCard } from './AccountProfileCard';
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
 import { ConvertedAccountMessage } from './ConvertedAccountMessage';
@@ -136,7 +138,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       slug: accountSlug,
       ...queryFilter.variables,
       ...(account.parent && { includeChildren: false }),
-    },
+    } as VariablesOf<typeof overviewMetricsQuery>,
     fetchPolicy: 'cache-and-network',
   });
 
@@ -144,7 +146,9 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  const metrics: MetricProps[] = [
+  // Note: Type assertions needed because gql.tada infers enums as string literal unions,
+  // while MetricProps expects Currency type from codegen. Values are compatible at runtime.
+  const metrics = [
     {
       id: 'balance',
       className: 'col-span-1 row-span-2',
@@ -172,14 +176,13 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />,
       amount: data?.account.spent,
     },
-
     {
       id: 'contributions',
       label: <FormattedMessage id="Contributions" defaultMessage="Contributions" />,
       count: data?.account.contributionsCount,
       hide: !account.isActive,
     },
-  ];
+  ] as MetricProps[];
 
   if (queryFilter.values.subpath) {
     const metric = metrics.find(m => m.id === queryFilter.values.subpath);
@@ -204,6 +207,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
 
   return (
     <div className="space-y-6">
+      {data?.account && <AccountProfileCard account={data.account} />}
       <DashboardHeader
         title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
         titleRoute={getDashboardRoute(account, 'overview')}

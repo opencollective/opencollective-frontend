@@ -9,6 +9,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { gql } from '../lib/graphql/helpers';
+import { graphql } from '@/lib/graphql/tada';
 import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { type Amount, KycVerificationStatus } from '@/lib/graphql/types/v2/schema';
@@ -72,6 +73,55 @@ export const accountHoverCardFields = gql`
     }
   }
 `;
+
+/**
+ * gql.tada version of AccountHoverCardFields fragment.
+ * Use this in queries migrated to gql.tada.
+ */
+export const AccountHoverCardFragment = graphql(`
+  fragment AccountHoverCardFragment on Account {
+    id
+    name
+    legalName
+    slug
+    type
+    description
+    imageUrl
+    isHost
+    isArchived
+    isVerified
+    ... on Individual {
+      isGuest
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        type
+        isTrustedHost
+        isFirstPartyHost
+        isVerified
+      }
+      approvedAt
+    }
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        isTrustedHost
+        isFirstPartyHost
+        isVerified
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+      }
+    }
+  }
+`);
 
 type AccountHoverCardProps = {
   trigger: React.ReactNode;

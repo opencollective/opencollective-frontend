@@ -21,7 +21,7 @@ const config: CodegenConfig = {
     },
   },
   pluckConfig: {
-    globalGqlIdentifierName: 'gql',
+    globalGqlIdentifierName: ['gql', 'graphql'],
     gqlMagicComment: 'GraphQLV2',
   },
 };

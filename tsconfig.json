@@ -20,7 +20,13 @@
     "paths": {
       "@/components/*": ["./components/*"],
       "@/lib/*": ["./lib/*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "gql.tada/ts-plugin",
+        "schema": "./lib/graphql/schemaV2.graphql"
+      }
+    ]
   },
   "include": [
     ".eslintrc.js",

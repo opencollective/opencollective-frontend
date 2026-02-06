@@ -5492,6 +5492,26 @@ type ExpenseCollection implements Collection {
   totalCount: Int
   nodes: [Expense]
   totalAmount: ExpenseCollectionTotalAmount
+
+  """
+  The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection.
+  """
+  fromAccounts(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term to filter by name or slug
+    """
+    searchTerm: String
+  ): AccountCollection!
 }
 
 type ExpenseCollectionTotalAmount {

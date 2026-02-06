@@ -4988,11 +4988,21 @@ export type ExpenseAttachedFileInput = {
 /** A collection of "Expenses" */
 export type ExpenseCollection = Collection & {
   __typename?: 'ExpenseCollection';
+  /** The accounts that are payees of the expenses in this collection (scoped to the main query arguments), regardless of pagination. Returns a paginated and searchable collection. */
+  fromAccounts: AccountCollection;
   limit?: Maybe<Scalars['Int']['output']>;
   nodes?: Maybe<Array<Maybe<Expense>>>;
   offset?: Maybe<Scalars['Int']['output']>;
   totalAmount?: Maybe<ExpenseCollectionTotalAmount>;
   totalCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+/** A collection of "Expenses" */
+export type ExpenseCollectionFromAccountsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ExpenseCollectionTotalAmount = {
