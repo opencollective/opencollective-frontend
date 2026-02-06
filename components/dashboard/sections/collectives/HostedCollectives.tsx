@@ -43,7 +43,7 @@ import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT']),
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT', 'STARTS_AT']),
   defaultValue: {
     field: 'CREATED_AT',
     direction: 'DESC',
