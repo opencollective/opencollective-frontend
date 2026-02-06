@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import I18nFormatters, { getI18nLink } from '@/components/I18nFormatters';
+import { Kbd } from '@/components/ui/Kbd';
 
 import type LoggedInUser from './LoggedInUser';
 
@@ -95,10 +96,101 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
     title: <FormattedMessage defaultMessage="Keyboard Shortcuts" id="PreviewFeatures.keyboardShortcutsTitle" />,
     description: (
-      <FormattedMessage
-        defaultMessage="Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions."
-        id="PreviewFeatures.keyboardShortcutsDescription"
-      />
+      <React.Fragment>
+        <p>
+          <FormattedMessage
+            defaultMessage="Navigate the expense flow more efficiently with keyboard shortcuts. Speed up your workflow and reduce mouse dependency for common actions."
+            id="PreviewFeatures.keyboardShortcutsDescription"
+          />
+        </p>
+        <p className="mt-2">
+          <FormattedMessage defaultMessage="On Expenses dashboard: " id="Bmw33p" />
+          <ul className="mt-2 ml-4">
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>J</Kbd> to select the next Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListNext"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>K</Kbd> to select the previous Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPrev"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>P</Kbd> to Pay selected Expense (if ready to pay)."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPay"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>S</Kbd> to check Security alerts for selected Expense."
+                id="PreviewFeatures.keyboardShortcutsExpenseListSecurity"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>Enter</Kbd> to open Expense details."
+                id="PreviewFeatures.keyboardShortcutsExpenseListOpen"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+          </ul>
+        </p>
+        <p className="mt-2">
+          <FormattedMessage defaultMessage="On Expenses details: " id="UDjr0F" />
+          <ul className="mt-2 ml-4">
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>&larr;</Kbd> and <Kbd>&rarr;</Kbd> to navigate through attachments."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsAttachments"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>H</Kbd> to put selected Expense on Hold."
+                id="PreviewFeatures.keyboardShortcutsExpenseListHold"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>I</Kbd> to mark selected Expense as Incomplete."
+                id="PreviewFeatures.keyboardShortcutsExpenseListIncomplete"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>P</Kbd> to Pay selected Expense (if ready to pay)."
+                id="PreviewFeatures.keyboardShortcutsExpenseListPay"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>E</Kbd> to enter Edit mode."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsEdit"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+            <li>
+              <FormattedMessage
+                defaultMessage="<Kbd>Esc</Kbd> to close Expense details."
+                id="PreviewFeatures.keyboardShortcutsExpenseDetailsClose"
+                values={{ Kbd: chunks => <Kbd>{chunks}</Kbd> }}
+              />
+            </li>
+          </ul>
+        </p>
+      </React.Fragment>
     ),
     publicBeta: true,
     category: Categories.GENERAL,
