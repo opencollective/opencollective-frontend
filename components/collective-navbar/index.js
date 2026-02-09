@@ -228,6 +228,7 @@ const accountPermissionsQuery = gql`
   query AccountPermissions($slug: String!) {
     account(slug: $slug) {
       id
+      supportedExpenseTypes
       permissions {
         id
         addFunds {
@@ -485,24 +486,46 @@ const CollectiveNavbar = ({
   };
 
   const loading = isLoading || dataLoading;
+  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
+
+  // Merge supportedExpenseTypes from accountPermissionsQuery into collective
+  // so that isSupportedExpenseType works even on pages that don't fetch this field
+  const collectiveWithExpenseTypes = React.useMemo(() => {
+    if (!collective) {
+      return collective;
+    }
+    if (collective.supportedExpenseTypes) {
+      return collective;
+    }
+    if (data?.account?.supportedExpenseTypes) {
+      return { ...collective, supportedExpenseTypes: data.account.supportedExpenseTypes };
+    }
+    return collective;
+  }, [collective, data?.account?.supportedExpenseTypes]);
 
   const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
 
   const isNewExpenseFlowEnabled =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
+    (!isSupportedExpenseType(collectiveWithExpenseTypes, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
-  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
-    return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
-  }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
+    return sectionsFromParent || getFilteredSectionsForCollective(collectiveWithExpenseTypes, isAdmin, isHostAdmin);
+  }, [sectionsFromParent, collectiveWithExpenseTypes, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(collective, sections, isAdmin, LoggedInUser, isAllowedAddFunds, isHostAdmin),
+    ...getDefaultCallsToActions(
+      collectiveWithExpenseTypes,
+      sections,
+      isAdmin,
+      LoggedInUser,
+      isAllowedAddFunds,
+      isHostAdmin,
+    ),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(
-    collective,
+    collectiveWithExpenseTypes,
     actionsArray,
     LoggedInUser,
     isNewExpenseFlowEnabled,
@@ -512,7 +535,7 @@ const CollectiveNavbar = ({
   const secondAction =
     actionsArray.length === 2 &&
     getMainAction(
-      collective,
+      collectiveWithExpenseTypes,
       without(actionsArray, mainAction?.type),
       LoggedInUser,
       isNewExpenseFlowEnabled,

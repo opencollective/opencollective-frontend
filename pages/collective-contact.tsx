@@ -108,6 +108,7 @@ const collectiveContactPageQuery = gql`
       settings
       imageUrl
       twitterHandle
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields

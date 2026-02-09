@@ -49,6 +49,7 @@ const updatePageQuery = gql`
           }
         }
       }
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields

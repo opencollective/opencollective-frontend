@@ -61,6 +61,7 @@ const conversationPageQuery = gql`
           twitterHandle
         }
       }
+      supportedExpenseTypes
       features {
         id
         ...NavbarFieldsV1

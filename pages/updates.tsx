@@ -63,6 +63,7 @@ const updatesPageQuery = gql`
           imageUrl
         }
       }
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields

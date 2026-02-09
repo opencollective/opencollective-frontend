@@ -42,6 +42,7 @@ export const tierPageQuery = gqlV1 /* GraphQL */ `
         imageUrl
         isHost
         settings
+        supportedExpenseTypes
         currency
         isArchived
         path

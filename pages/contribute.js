@@ -362,6 +362,7 @@ const contributePageQuery = gqlV1 /* GraphQL */ `
       type
       currency
       settings
+      supportedExpenseTypes
       isActive
       isHost
       backgroundImageUrl

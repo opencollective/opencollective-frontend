@@ -165,6 +165,7 @@ const createConversationPageQuery = gql`
         id
         tag
       }
+      supportedExpenseTypes
       features {
         id
         ...NavbarFieldsV1

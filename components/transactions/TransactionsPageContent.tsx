@@ -161,6 +161,7 @@ export const transactionsPageQuery = gql`
       imageUrl(height: 256)
       currency
       settings
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields
